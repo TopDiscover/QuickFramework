@@ -1,0 +1,19 @@
+<div id="view" class="scroll">
+    <div class="section" style>
+        <ui-section>
+            <div class="header greenColor">子游戏</div>
+            <div class="layout vertical">
+                <ui-prop name="子游戏目录地址">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-input class="flex-2" readonly="readonly" disabled="disabled" v-value="gameRoot"></ui-input>
+                        <ui-button v-on:confirm="onSelectGameRoot" disabled="disabled" >选择</ui-button>
+                        <ui-button v-on:confirm="onOpenGameRoot"><i class="icon-doc-text"></i></ui-button>
+                    </div>
+                </ui-prop>
+                <!--subgame test start-->
+                <!--subgame test end-->
+
+            </div>
+        </ui-section>
+    </div>
+</div>

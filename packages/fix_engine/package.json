@@ -1,0 +1,12 @@
+{
+  "name": "fix_engine",
+  "version": "0.0.1",
+  "description": "自定义引擎，即修复引擎Bug,相关引擎代码保存在packages/engine目录下,执行该插件直接用该目录下代码对现有2.1.2引擎代码进行修改",
+  "author": "Cocos Creator",
+  "main": "main.js",
+  "main-menu": {
+    "项目工具/引擎修正": {
+      "message": "fix_engine:fix_engine"
+    }
+  }
+}

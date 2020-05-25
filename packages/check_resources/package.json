@@ -1,0 +1,21 @@
+{
+  "name": "check_resources",
+  "version": "0.0.1",
+  "description": "检测子游戏是否引入了除自己以外的其它子游戏资源",
+  "author": "Cocos Creator",
+  "main": "main.js",
+  "main-menu": {
+    "项目工具/资源引用检测": {
+      "message": "check_resources:start"
+    }
+  },
+  "panel": {
+    "main": "panel/index.js",
+    "type": "dockable",
+    "title": "子游戏资源引用检测",
+    "width": 600,
+    "height": 500,
+    "min-height" : 400,
+    "min-width" : 500
+  }
+}

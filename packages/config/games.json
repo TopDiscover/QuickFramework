@@ -1,0 +1,10 @@
+{
+    "packageUrl":"http://192.168.3.104/hotupdate",
+    "forceIncludeAllGameToApk": false,
+    "games":[
+        {  "id" : "0"    , "name" : "大厅"     , "dir" : ""          , "version" : "1" , "includeApk" : false },
+        {  "id" : "1"    , "name" : "游戏1"    , "dir" : "gameOne"   , "version" : "1" , "includeApk" : true },
+        {  "id" : "2"    , "name" : "游戏2"    , "dir" : "gameTwo"   , "version" : "1" , "includeApk" : false }
+    ]
+}
+
