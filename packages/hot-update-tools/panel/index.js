@@ -512,11 +512,11 @@ Editor.Panel.extend({
                             searchPaths: []
                         };
                         if ("/" === serverRootDir[serverRootDir.length - 1]) {
-                            submanifest.remoteManifestUrl = `${serverRootDir}${key}_project.manifest`;
-                            submanifest.remoteVersionUrl = `${serverRootDir}${key}_version.manifest`;
+                            submanifest.remoteManifestUrl = `${serverRootDir}manifest/${key}_project.manifest`;
+                            submanifest.remoteVersionUrl = `${serverRootDir}manifest/${key}_version.manifest`;
                         } else {
-                            submanifest.remoteManifestUrl = `${serverRootDir}/${key}_project.manifest`;
-                            submanifest.remoteVersionUrl = `${serverRootDir}/${key}_version.manifest`;
+                            submanifest.remoteManifestUrl = `${serverRootDir}/manifest/${key}_project.manifest`;
+                            submanifest.remoteVersionUrl = `${serverRootDir}/manifest/${key}_version.manifest`;
                         }
 
                         this._readDir(path.join(source, `subpackages/${key}`), submanifest.assets, source);
