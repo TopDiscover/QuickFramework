@@ -289,7 +289,7 @@ private:
     
     rapidjson::Document _json;
 
-	//远程下载地址,这个地址会动态的去变更
+	//Remote download url , this url will be dynamically changed
 	std::string _hotUpdateUrl;
 };
 
