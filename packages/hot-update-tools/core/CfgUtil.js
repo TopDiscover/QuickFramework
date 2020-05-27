@@ -4,7 +4,6 @@ let fs = require("fire-fs"),
     FileUtil = Editor.require("packages://hot-update-tools/core/FileUtil"),
     self = module.exports = {
         cfgData: {
-            version: "",
             serverRootDir: "",
             resourceRootDir: "",
             genManifestDir: "",
@@ -12,8 +11,7 @@ let fs = require("fire-fs"),
             hotAddressArray: [],
             buildTime: null,
             genTime: null,
-            genVersion: null,
-            subGameVersion: null,
+            genVersion: null
         },
         updateBuildTimeByMain(e) {
             let t = this._getAppCfgPath();
@@ -43,12 +41,10 @@ let fs = require("fire-fs"),
             return e
         },
         saveConfig(e) {
-            this.cfgData.version = e.version;
             this.cfgData.serverRootDir = e.serverRootDir;
             this.cfgData.resourceRootDir = e.resourceRootDir;
             this.cfgData.localServerPath = e.localServerPath; 
             this.cfgData.hotAddressArray = e.hotAddressArray;
-            this.cfgData.subGameVersion = e.subGameVersion;
             this._save()
         },
         _save() {

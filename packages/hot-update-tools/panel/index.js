@@ -3,13 +3,8 @@ window.packageRoot = "packages://hot-update-tools/";
 const fs = require("fire-fs");
 const path = require("fire-path");
 const Electron = require("electron"),
-    {
-        remote: remote
-    } = require("electron"),
     CfgUtil = Editor.require("packages://hot-update-tools/core/CfgUtil.js"),
     FileUtil = Editor.require("packages://hot-update-tools/core/FileUtil.js"),
-    OSS = Editor.require("packages://hot-update-tools/node_modules/ali-oss"),
-    CO = Editor.require("packages://hot-update-tools/node_modules/co"),
     GoogleAnalytics = Editor.require("packages://hot-update-tools/core/GoogleAnalytics.js");
 
 
@@ -26,7 +21,7 @@ let _subGameVersion = {};
 let _subGameServerVersionView = ``;
 let _subGameVersionView = ``;
 let _subGameServerVersion = {};
-let _hallVersion = ``;
+let _hallVersion = `1`;
 //子游戏是否包含
 let _subGameInclude = {};
 for (let i = 0; i < _gamesConfig.games.length; i++) {
@@ -59,9 +54,9 @@ for (let i = 0; i < _gamesConfig.games.length; i++) {
             </div>
         </ui-prop>
         `;
-        if ( gameInfo.id == "0" ){
-            _hallVersion = gameInfo.version;
-        }
+    }
+    if ( gameInfo.id == "0" ){
+        _hallVersion = gameInfo.version;
     }
 }
 
@@ -83,7 +78,7 @@ Editor.Panel.extend({
     template: _template,
     $: {
         logTextArea: "#logTextArea",
-        hotAddressSelect: "#hotAddressSelect",
+        hotAddressSelect: "#hotAddressSelect"
     },
     ready() {
         GoogleAnalytics.init(), GoogleAnalytics.eventOpen();
@@ -97,11 +92,8 @@ Editor.Panel.extend({
             },
             init: function () {},
             data: {
-                testHttpUrl: null,
                 srcDirPath: "",
                 resDirPath: "",
-                projManifestPath: "",
-                verManifestPath: "",
                 version: _hallVersion,
                 remoteServerVersion: "",
                 isShowRemoteServerVersion: !1,
@@ -122,57 +114,15 @@ Editor.Panel.extend({
                 localGameVersionManifest: "",
                 localGameProjectManifestUrl: "",
                 localGameVersionManifestUrl: "",
-                testEnvLocal: !0,
-                testEnvALi: !1,
-                testEnvEmail: !1,
-                testEnvSelect: 0,
                 isShowUseAddrBtn: !1,
                 isShowDelAddrBtn: !1,
                 hotAddressArray: [],
-                emailContent: "邮件内容!",
-                addMailPeople: "",
-                emailPeopleArray: ["xu_yanfeng@126.com"],
                 subGameVersion: _subGameVersion,
                 originSubGameVersion : JSON.parse(JSON.stringify(_subGameVersion)),
                 subGameInclude : JSON.parse(JSON.stringify(_subGameInclude))
             },
             computed: {},
             methods: {
-                onTest() {},
-                onBtnClickOpenTestHttpServer() {
-                    require("http").createServer(function (e, t) {
-                        t.writeHead(200, {
-                            "Content-Type": "text-plain"
-                        }), t.end("Hello World\n")
-                    }).listen(9800), this.testHttpUrl = "http://127.0.0.1:9800"
-                },
-                onBtnClickTestHttp() {
-                    this.testHttpUrl && Electron.shell.openExternal(this.testHttpUrl)
-                },
-                onStopTouchEvent(e) {
-                    e.preventDefault(), e.stopPropagation()
-                },
-                onBtnClickAliTest() {
-                    let e = new OSS({
-                        region: "oss-cn-beijing",
-                        accessKeyId: "LTAIOxxDqJpJbzfy",
-                        accessKeySecret: "kZRbbX3nNtxWlx5XWsR8uRrJzj4X5C",
-                        bucket: "happycars"
-                    });
-                    CO(function* () {
-                        e.useBucket("happycars"), yield function* (t) {
-                            let i = yield e.list({
-                                prefix: t,
-                                delimiter: "/"
-                            });
-                            i.prefixes.forEach(function (e) {}), i.objects.forEach(function (e) {})
-                        }("hot")
-                    }).catch(function (e) {})
-                },
-               
-                onBtnClickPackVersion() {
-                    this._packageVersion()
-                },
                 _packageDir(e, t) {
                     let i = fs.readdirSync(e);
                     for (let s = 0; s < i.length; s++) {
@@ -275,18 +225,13 @@ Editor.Panel.extend({
                     }
                     return !0
                 },
-                onCleanAPPCfg() {
-                    CfgUtil.cleanConfig()
-                },
                 _saveConfig() {
                     let e = {
-                        version: this.version,
                         serverRootDir: this.serverRootDir,
                         resourceRootDir: this.resourceRootDir,
                         genManifestDir: CfgUtil.getMainFestDir(),
                         localServerPath: this.localServerPath,
-                        hotAddressArray: this.hotAddressArray,
-                        subGameVersion: this.subGameVersion,
+                        hotAddressArray: this.hotAddressArray
                     };
                     CfgUtil.saveConfig(e)
                 },
@@ -297,12 +242,10 @@ Editor.Panel.extend({
                     }
                     CfgUtil.initCfg(function (e) {
                         if (e) {
-                            this.version = e.version;
                             this.serverRootDir = e.serverRootDir;
                             this.resourceRootDir = e.resourceRootDir;
                             this.localServerPath = e.localServerPath;
                             this.hotAddressArray = e.hotAddressArray || [];
-                            this.subGameVersion = e.subGameVersion;
                             this._updateServerVersion();
 
                             let keys = Object.keys(this.subGameVersion);
@@ -402,7 +345,6 @@ Editor.Panel.extend({
                 onClickGenCfg(e) {
                     GoogleAnalytics.eventCustom("GenManifest");
                     this._genVersion(this.version, this.serverRootDir, this.resourceRootDir, this.genManifestDir);
-                    return;
                 },
                 _readDir(dir, obj, source) {
                     var stat = fs.statSync(dir);
@@ -494,9 +436,6 @@ Editor.Panel.extend({
                     versionManifest = path.join(bulidPathManifestDir,"version.manifest");
                     fs.writeFileSync(versionManifest,JSON.stringify(manifest));
                     this._addLog("[Build] 生成 version.manifest成功");
-
-
-
 
                     //子游戏manifest生成
                     // Editor.log("source",source);
@@ -600,6 +539,7 @@ Editor.Panel.extend({
                         //复制子游戏
                         this._copySourceDirToDesDir(subpackages, path.join(this.localServerPath, "subpackages"));
                     }
+
                 },
                 _getTotalCopyFileNum() {
                     let count = this._getFileNum(path.join(this.resourceRootDir, "src")) + this._getFileNum(path.join(this.resourceRootDir, "res")) + 2 + 2;
@@ -626,10 +566,10 @@ Editor.Panel.extend({
                     if (this.localServerPath.length > 0) {
                         let e = require("fire-path"),
                             t = require("fire-fs"),
-                            i = e.join(this.localServerPath, "version.manifest");
+                            i = e.join(this.localServerPath, "manifest/version.manifest");
                         t.readFile(i, "utf-8", function (i, s) {
                             if (i) {
-                                let i = e.join(this.localServerPath, "project.manifest");
+                                let i = e.join(this.localServerPath, "manifest/project.manifest");
                                 t.readFile(i, "utf-8", function (e, t) {
                                     if (e) this._addLog("无法获取到本地测试服务器版本号");
                                     else {
@@ -648,10 +588,10 @@ Editor.Panel.extend({
                     if (this.localServerPath.length > 0) {
                         let path = require("fire-path"),
                             fs = require("fire-fs"),
-                            filename = path.join(this.localServerPath, `${gamedirName}_version.manifest`);
+                            filename = path.join(this.localServerPath, `manifest/${gamedirName}_version.manifest`);
                         fs.readFile(filename, "utf-8", function (err, data) {
                             if (err) {
-                                let projectManifest = path.join(this.localServerPath, `${gamedirName}_project.manifest`);
+                                let projectManifest = path.join(this.localServerPath, `manifest/${gamedirName}_project.manifest`);
                                 fs.readFile(projectManifest, "utf-8", function (err, data) {
                                     if (err) this._addLog("无法获取到本地测试服务器版本号");
                                     else {
@@ -896,36 +836,9 @@ Editor.Panel.extend({
                         this._checkResourceRootDir(t) && (this.resourceRootDir = t, this._saveConfig())
                     }
                 },
-                onCleanSimRemoteRes() {
-                    let e = require("fire-path"),
-                        t = cc.sys.os,
-                        i = null;
-                    if ("Windows" === t) {
-                        let t = e.join(__dirname, "../cocos2d-x/simulator/");
-                        i = e.join(t, "win32/remote-asset")
-                    } else if ("OS X" === t) {
-                        let t = e.join(__dirname, "../cocos2d-x/simulator/");
-                        i = e.join(t, "mac/Simulator.app/Contents/Resources/remote-asset")
-                    }
-                    i && (fs.existsSync(i) ? (FileUtil.emptyDir(i), this._addLog("[清理热更缓存] 清空目录 " + i + " 成功.")) : this._addLog("[清理热更缓存] 目录不存在: " + i))
-                },
                 onOpenLocalGameManifestDir() {
                     let e = this.localGameProjectManifest.split("project.manifest")[0];
                     fs.existsSync(e) ? (Electron.shell.showItemInFolder(e), Electron.shell.beep()) : this._addLog("目录不存在：" + e)
-                },
-                onTestZip() {
-                    require("node-native-zip")
-                },
-                onTestSelect() {
-                    let e = 100 * Math.random();
-                    var i;
-                    this.hotAddressArray.push(e.toFixed(2)), i = this.hotAddressArray.length - 1, setTimeout(function () {
-                        t.selectedIndex = i
-                    }, 10)
-                },
-                onIpSelectChange(e) {},
-                onLogIp() {
-                    Editor.Ipc.sendToMain("hot-update-tools:test", "Hello, this is simple panel")
                 }
             }
         });
