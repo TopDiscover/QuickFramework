@@ -34,35 +34,15 @@
         "name" : "jsb_cocos2dx_extension_auto.cpp",
         "desc" : "执更新修改,jsb_cocos2dx_extension_auto.cpp"
     },
-    "del_jsb_default_android_game":{
-        "path" : "cocos2d-x/templates/js-template-default/frameworks/runtime-src/proj.android-studio/game",
-        "name" : "delete_dir",
-        "desc" : "执更新修改,删除无用目录"
-    },
-    "del_jsb_default_android_instantapp":{
-        "path" : "cocos2d-x/templates/js-template-default/frameworks/runtime-src/proj.android-studio/instantapp",
-        "name" : "delete_dir",
-        "desc" : "执更新修改,删除无用目录"
-    },
-    "del_jsb_link_android_game":{
-        "path" : "cocos2d-x/templates/js-template-link/frameworks/runtime-src/proj.android-studio/game",
-        "name" : "delete_dir",
-        "desc" : "执更新修改,删除无用目录"
-    },
-    "del_jsb_link_android_instantapp":{
-        "path" : "cocos2d-x/templates/js-template-link/frameworks/runtime-src/proj.android-studio/instantapp",
-        "name" : "delete_dir",
-        "desc" : "执更新修改,删除无用目录"
-    },
     "jsb_default_settings.gradle":{
         "path" : "cocos2d-x/templates/js-template-default/frameworks/runtime-src/proj.android-studio/settings.gradle",
         "name" : "jsb-default/settings.gradle",
-        "desc" : "执更新修改,删除jsb-default无用的配置"
+        "desc" : "执更新修改,修改include ':libcocos2dx',':game', ':instantapp' --> include ':libcocos2dx' "
     },
     "jsb_link_settings.gradle":{
         "path" : "cocos2d-x/templates/js-template-link/frameworks/runtime-src/proj.android-studio/settings.gradle",
         "name" : "jsb-link/settings.gradle",
-        "desc" : "执更新修改,删除jsb-link无用的配置"
+        "desc" : "执更新修改,修改include ':libcocos2dx',':game', ':instantapp' --> include ':libcocos2dx'"
     },
     "jsb_default_HelloJavascript.vcxproj":{
         "path" : "cocos2d-x/templates/js-template-default/frameworks/runtime-src/proj.win32/HelloJavascript.vcxproj",
