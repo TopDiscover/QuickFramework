@@ -83,6 +83,7 @@ function fixEngine(creatorPath) {
     Editor.log(`正在检查修正的引擎文件是否完整`);
     for (let i = 0; i < keys.length; i++) {
         let info = config[keys[i]];
+        if( info.name == "delete_dir" ) continue;
         let sourcePath = `${Editor.argv.path}/packages/engine/${info.name}`;
         sourcePath = path.normalize(sourcePath);
         let engineSourcePath = `${resourcesPath}/${info.path}`;
@@ -98,19 +99,27 @@ function fixEngine(creatorPath) {
         }
     }
 
-    //Editor.log(`ssssssss`);
     if (isAllExist) {
         Editor.log(`检查完成，文件完整`);
         for (let i = 0; i < keys.length; i++) {
             let info = config[keys[i]];
-            let sourcePath = `${Editor.argv.path}/packages/engine/${info.name}`;
-            sourcePath = path.normalize(sourcePath);
-            let source = fs.readFileSync(sourcePath,"utf-8");
-            //Editor.log(source);
-            let engineSourcePath = `${resourcesPath}/${info.path}`;
-            engineSourcePath = path.normalize(engineSourcePath);
-            fs.writeFileSync(engineSourcePath,source,"utf-8");
-            Editor.log(info.desc);
+            if ( info.name == "delete_dir"){
+                let engineSourcePath = `${resourcesPath}/${info.path}`;
+                engineSourcePath = path.normalize(engineSourcePath);
+                if (fs.existsSync(engineSourcePath)) {
+                    _delDir(engineSourcePath)
+                    fs.rmdirSync(engineSourcePath)
+                }
+                Editor.log(`${info.desc}${info.path}`);
+            }else{
+                let sourcePath = `${Editor.argv.path}/packages/engine/${info.name}`;
+                sourcePath = path.normalize(sourcePath);
+                let source = fs.readFileSync(sourcePath,"utf-8");
+                let engineSourcePath = `${resourcesPath}/${info.path}`;
+                engineSourcePath = path.normalize(engineSourcePath);
+                fs.writeFileSync(engineSourcePath,source,"utf-8");
+                Editor.log(info.desc);
+            }
         }
 
         //删除引擎生成的老文件bin，提示重启Creator编译新的引擎代码
