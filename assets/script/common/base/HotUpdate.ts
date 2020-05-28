@@ -263,19 +263,6 @@ class _HotUpdate {
         }
     }
 
-    /**@description 本地是否已经存在子游戏 */
-    public isExistSubGame(localName: string, gameName: string) {
-        if (CC_JSB) {
-            let subgameIndex = `subpackages/${localName}/index.js`
-            let result = jsb.fileUtils.isFileExist(subgameIndex);
-            if (!result) {
-                cc.error(`${gameName} 入口文件不存在!!`);
-            }
-            return result;
-        }
-        return true;
-    }
-
     /**@description 判断是否需要重新尝试下载之前下载失败的文件 */
     private isTryDownloadFailedAssets() {
         if (this.currentAssetsManager &&

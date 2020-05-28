@@ -105,13 +105,6 @@ class GameManager {
       let me = this;
       //加载子包
       let versionInfo = HotUpdate.allGameConfig[this.curGame.subpackageName];
-      if (!HotUpdate.isExistSubGame(versionInfo.subpackageName, versionInfo.gameName)) {
-         //Manager.loading.hide();
-         versionInfo.isLoaded = false;
-         me.isLoading = false;
-         return;
-      }
-
       cc.loader.downloader.loadSubpackage(versionInfo.subpackageName, (err) => {
          me.isLoading = false;
          //Manager.loading.hide();
