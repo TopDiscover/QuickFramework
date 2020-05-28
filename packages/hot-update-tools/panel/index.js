@@ -27,17 +27,10 @@ let _subGameInclude = {};
 for (let i = 0; i < _gamesConfig.games.length; i++) {
     let gameInfo = _gamesConfig.games[i];
     if (gameInfo.dir && gameInfo.dir.length > 0) {
-        // _subGameVersionView += `
-        // <ui-prop name="${gameInfo.name}(${gameInfo.dir})">
-        //     <div class="flex-1 layout horizontal center">
-        //         <ui-checkbox v-value = "subGameInclude.${gameInfo.dir}"> 是否包含在原始包内 </ui-checkbox>
-        //         <ui-input class="flex-1" v-on:blur="onInputSubVersionOver(null,'${gameInfo.dir}')" v-value="subGameVersion.${gameInfo.dir}"></ui-input>
-        //     </div>
-        // </ui-prop>
-        // `;
         _subGameVersionView += `
         <ui-prop name="${gameInfo.name}(${gameInfo.dir})">
             <div class="flex-1 layout horizontal center">
+                <ui-checkbox v-value = "subGameInclude.${gameInfo.dir}"> 是否包含在原始包内 </ui-checkbox>
                 <ui-input class="flex-1" v-on:blur="onInputSubVersionOver(null,'${gameInfo.dir}')" v-value="subGameVersion.${gameInfo.dir}"></ui-input>
             </div>
         </ui-prop>
@@ -345,6 +338,10 @@ Editor.Panel.extend({
                 onClickGenCfg(e) {
                     GoogleAnalytics.eventCustom("GenManifest");
                     this._genVersion(this.version, this.serverRootDir, this.resourceRootDir, this.genManifestDir);
+                },
+                onClickDelSubGames(){
+                    //弹出提示确定是否需要删除当前的子游戏
+                    Editor.Panel.open('confirm_del_subgames');
                 },
                 _readDir(dir, obj, source) {
                     var stat = fs.statSync(dir);
@@ -839,6 +836,43 @@ Editor.Panel.extend({
                 onOpenLocalGameManifestDir() {
                     let e = this.localGameProjectManifest.split("project.manifest")[0];
                     fs.existsSync(e) ? (Electron.shell.showItemInFolder(e), Electron.shell.beep()) : this._addLog("目录不存在：" + e)
+                },
+                onConfirmDelSubgames(){
+                    let games = Object.keys(this.subGameVersion);
+                    let isFind = false;
+                    for( let i = 0 ; i < games.length ; i++ ){
+                        let game = games[i];
+                        if ( !this.subGameInclude[game] ){
+                            isFind = true;
+                            
+                            let gamePath = path.join(this.resourceRootDir,"subpackages");
+                            gamePath = path.join(gamePath,game);
+                            if (fs.existsSync(gamePath)) {
+                                //删除子游戏代码及资源
+                                this._delDir(gamePath)
+                                fs.rmdirSync(gamePath)
+                                this._addLog(`删除子游戏${game} : ${gamePath}`);
+                                //删除子游戏 版本控制文件
+                                let versionManifestPath = path.join(this.resourceRootDir,`manifest/${game}_version.manifest`);
+                                if ( fs.existsSync(versionManifestPath) ){
+                                    fs.unlinkSync(versionManifestPath)
+                                    this._addLog(`删除子游戏${game} : ${versionManifestPath}`);
+                                }
+                                
+                                let projectManifestPath = path.join(this.resourceRootDir,`manifest/${game}_project.manifest`);
+                                if ( fs.existsSync(projectManifestPath) ){
+                                    fs.unlinkSync(projectManifestPath)
+                                    this._addLog(`删除子游戏${game} : ${projectManifestPath}`);
+                                }
+                            }else{
+                                this._addLog(`子游戏${game}已经删除`);
+                            }
+                            
+                        }
+                    }
+                    if( !isFind ){
+                        Editor.log("没有子游戏需要剔除")
+                    }
                 }
             }
         });
@@ -846,6 +880,9 @@ Editor.Panel.extend({
     messages: {
         "hot-update-tools:onBuildFinished"(e, t) {
             window.plugin.onBuildFinished(t)
+        },
+        'hot-update-tools:onConfirmDelSubgames'(e,t){
+            window.plugin.onConfirmDelSubgames();
         }
     }
 });

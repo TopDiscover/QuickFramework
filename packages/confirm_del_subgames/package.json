@@ -1,0 +1,13 @@
+{
+  "name": "confirm_del_subgames",
+  "version": "0.0.1",
+  "description": "热更新部署完成后，把不包含在包体内的子游戏删除",
+  "author": "Cocos Creator",
+  "panel": {
+    "main": "panel/index.js",
+    "type": "dockable",
+    "title": "confirm_del_subgames",
+    "width": 400,
+    "height": 300
+  }
+}
