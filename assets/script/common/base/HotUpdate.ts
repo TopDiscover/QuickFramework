@@ -344,7 +344,7 @@ class _HotUpdate {
      * @returns manifest url
      */
     public getGameManifest(gameName): string {
-        return `${gameName}_project.manifest`;
+        return `${this.manifestRoot}${gameName}_project.manifest`;
     }
 
     /**
@@ -365,7 +365,7 @@ class _HotUpdate {
                 //存在版本控制文件 
                 let content = jsb.fileUtils.getStringFromFile(manifestUrl);
                 let jsbGameManifest = new jsb.Manifest(content, this.storagePath, this.getHotUpdateUrl(this.currentAssetsManager.name));
-                cc.log(`--checkUpdate--`);
+                cc.log(`--存在本地版本控制文件checkUpdate--`);
                 cc.log(`mainifestUrl : ${manifestUrl}`);
                 this.currentAssetsManager.manager.loadLocalManifest(jsbGameManifest, "");
                 this.checkUpdate(callback);
@@ -381,7 +381,7 @@ class _HotUpdate {
                 let gameManifest = {
                     version: "0",
                     packageUrl: packageUrl,
-                    remoteManifestUrl: `${packageUrl}/${this.manifestRoot}${manifestUrl}`,
+                    remoteManifestUrl: `${packageUrl}/${manifestUrl}`,
                     remoteVersionUrl: `${packageUrl}/${this.manifestRoot}${gameName}_version.manifest`,
                     assets: {},
                     searchPaths: []
