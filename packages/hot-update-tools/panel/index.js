@@ -136,9 +136,9 @@ Editor.Panel.extend({
                     this._addLog("[Pack] 开始打包版本 ...");
                     let jszip = new(Editor.require("packages://hot-update-tools/node_modules/jszip")),
                         versionManifest = path.join(this.genManifestDir, "version.manifest");
-                    jszip.file("version.manifest", fs.readFileSync(versionManifest));
+                    jszip.file("manifest/version.manifest", fs.readFileSync(versionManifest));
                     let projectManifest = path.join(this.genManifestDir, "project.manifest");
-                    jszip.file("project.manifest", fs.readFileSync(projectManifest));
+                    jszip.file("manifest/project.manifest", fs.readFileSync(projectManifest));
                     //把包src目录的代码资源
                     let src = path.join(this.resourceRootDir, "src");
                     this._packageDir(src, jszip.folder("src"));
@@ -155,9 +155,9 @@ Editor.Panel.extend({
                     for (let i = 0; i < keys.length; i++) {
                         let key = keys[i];
                         let subgameManifest = path.join(this.genManifestDir, `${key}_project.manifest`);
-                        jszip.file(`${key}_project.manifest`, fs.readFileSync(subgameManifest));
+                        jszip.file(`manifest/${key}_project.manifest`, fs.readFileSync(subgameManifest));
                         let subgameVersionManifest = path.join(this.genManifestDir, `${key}_version.manifest`);
-                        jszip.file(`${key}_version.manifest`, fs.readFileSync(subgameVersionManifest));
+                        jszip.file(`manifest/${key}_version.manifest`, fs.readFileSync(subgameVersionManifest));
                     }
 
                     let mainVersionManifest = fs.readFileSync(versionManifest, "utf-8"),
