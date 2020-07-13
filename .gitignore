@@ -71,6 +71,5 @@ quick_gen_project_*_autogen.sh.meta
 # VSCode files
 #/////////////////////////////////////////////////////////////////////////////
 
-creator.d.ts
 .vscode/
 packVersion/
