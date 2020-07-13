@@ -105,7 +105,7 @@ class GameManager {
       let me = this;
       //加载子包
       let versionInfo = HotUpdate.allGameConfig[this.curGame.subpackageName];
-      cc.loader.downloader.loadSubpackage(versionInfo.subpackageName, (err) => {
+      cc.assetManager.loadBundle(versionInfo.subpackageName, (err: Error, bundle: cc.AssetManager.Bundle) => {
          me.isLoading = false;
          //Manager.loading.hide();
          if (err) {
