@@ -15,7 +15,7 @@ const {ccclass, property} = cc._decorator;
 export default class GameOneView extends UIView {
 
     public static getPrefabUrl(){
-        return GAME("prefabs/GameOneView");
+        return "prefabs/GameOneView";
     }
 
     onLoad(){

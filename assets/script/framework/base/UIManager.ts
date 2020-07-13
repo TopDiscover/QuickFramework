@@ -6,6 +6,7 @@ import { loader } from "../loader/Loader";
 import { remoteCaches } from "../cache/ResCaches";
 import UILoadingDelegate from "../ui/UILoadingDelegate";
 import ToastDelegate from "../ui/ToastDelegate";
+import { assetManager } from "../assetManager/AssetManager";
 
 export function uiManager() {
     return getSingleton(UIManager);
@@ -227,8 +228,8 @@ class UIManager {
     public uiLoading: UILoadingDelegate = null;
     public toast : ToastDelegate = null;
 
-    public preload<T extends UIView>(uiClass: UIClass<T>) {
-        return this._open(uiClass, 0, true, null,null);
+    public preload<T extends UIView>(uiClass: UIClass<T>,bundle:string | cc.AssetManager.Bundle) {
+        return this._open(uiClass,bundle, 0, true, null,null);
     }
 
     /**
@@ -250,11 +251,11 @@ class UIManager {
      * @param zIndex 节点层级 
      * @param args 传入参数列表
      */
-    public open<T extends UIView>(config: { type: UIClass<T>, zIndex?: number, args?: any[] , delay?: number,name?:string}) : Promise<T>{
-        return this._open(config.type, config.zIndex ? config.zIndex : 0, false, config.args,config.delay,config.name);
+    public open<T extends UIView>(config: { type: UIClass<T>, bundle?:string|cc.AssetManager.Bundle , zIndex?: number, args?: any[] , delay?: number,name?:string}) : Promise<T>{
+        return this._open(config.type,config.bundle, config.zIndex ? config.zIndex : 0, false, config.args,config.delay,config.name);
     }
 
-    private _open<T extends UIView>(uiClass: UIClass<T>, zOrder: number = 0, isPreload: boolean, args: any[],delay : number,name?:string) {
+    private _open<T extends UIView>(uiClass: UIClass<T>, bundle:string|cc.AssetManager.Bundle, zOrder: number = 0, isPreload: boolean, args: any[],delay : number,name?:string) {
         return new Promise<T>((reslove, reject) => {
             if (!uiClass) {
                 if (CC_DEBUG) cc.log(`${this._logTag}open ui class error`);
@@ -319,14 +320,14 @@ class UIManager {
                         if (this.uiLoading) this.uiLoading.updateProgress(progress);
                     };
                 }
-                this.loadPrefab(prefabUrl, progressCallback)
+                this.loadPrefab(bundle,prefabUrl, progressCallback)
                     .then((prefab) => {
                         viewData.info = new ResourceInfo;
                         viewData.info.url = prefabUrl;
                         viewData.info.type = cc.Prefab;
                         viewData.info.data = prefab;
-                        viewData.info.assetUrl = loader().getResourcePath(prefab);
-                        loader().retainAsset(viewData.info);
+                        //viewData.info.assetUrl = loader().getResourcePath(prefab);
+                        //loader().retainAsset(viewData.info);
                         this.createNode(className, uiClass, reslove, prefab, args, zOrder);
                         if (this.uiLoading) this.uiLoading.hide();
                     }).catch((reason) => {
@@ -436,9 +437,12 @@ class UIManager {
         }
     }
 
-    private loadPrefab(url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
+    private loadPrefab( bundle: string | cc.AssetManager.Bundle, url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
         return new Promise<cc.Prefab>((resolove, reject) => {
-            loader().loadRes(url, cc.Prefab, progressCallback, (data: ResourceCacheData) => {
+            if ( bundle == undefined || bundle == "" ){
+                bundle = assetManager().getBundleResources();
+            }
+            assetManager().load(bundle,url,cc.Prefab,progressCallback,(data: ResourceCacheData) => {
                 if (data && data.data && data.data instanceof cc.Prefab) {
                     resolove(data.data);
                 }

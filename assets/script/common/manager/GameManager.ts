@@ -30,25 +30,19 @@ class GameManager {
       }
 
       let versionInfo = HotUpdate.allGameConfig[this.curGame.subpackageName];
-
-      if (CC_PREVIEW) {
-         this.onGameReady();
-      } else {
-         if (HotUpdate.subGameUpdateType == SubGameUpdateType.Normal) {
-            if (versionInfo.isLoaded) {
-               cc.log(`游戏已经加载过了`);
-               this.onGameReady();
-            } else {
-               //检测游戏版本更新
-               this.checkUpdate(versionInfo);
-            }
+      if (HotUpdate.subGameUpdateType == SubGameUpdateType.Normal) {
+         if (versionInfo.isLoaded) {
+            cc.log(`游戏已经加载过了`);
+            this.onGameReady();
          } else {
+            //检测游戏版本更新
             this.checkUpdate(versionInfo);
          }
-
+      } else {
+         this.checkUpdate(versionInfo);
       }
    }
-  
+
    private onGameReady() {
       if (this.isLoading) {
          this.isLoading = false;

@@ -9,7 +9,7 @@ const {ccclass, property} = cc._decorator;
 export default class GameTwoView extends UIView {
 
     public static getPrefabUrl(){
-        return GAME("prefabs/GameTwoView");
+        return "prefabs/GameTwoView";
     }
 
     onLoad(){

@@ -29,7 +29,7 @@ class GameOneLogic extends Logic {
     private onEnterGame( data ) {
         if( data == this.getGameName()){
             GamePath.instance.delegate = this.gamePahtDelegate;
-            uiManager().open({type:GameOneView});
+            uiManager().open({type:GameOneView,bundle:this.getGameName()});
         }
     }
 }

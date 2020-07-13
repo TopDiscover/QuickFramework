@@ -594,7 +594,7 @@ class Loader {
             let data: ResourceData = arguments[0];
             let completeCallback: (data: ResourceCacheData) => void = arguments[1];
             if (data.preloadView) {
-                uiManager().preload(data.preloadView).then((view) => {
+                uiManager().preload(data.preloadView,data.bundle).then((view) => {
                     if (completeCallback) {
                         let cache = new ResourceCacheData();
                         cache.isLoaded = true;

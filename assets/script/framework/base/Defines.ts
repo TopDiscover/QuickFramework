@@ -109,6 +109,7 @@ export interface ResourceData {
      * 从而会造成消息处理不是顺序执行 
      * */
     preloadView?: UIClass<UIView>,
+    bundle?:string|cc.AssetManager.Bundle,
 }
 
 export interface RemoteUrl {
