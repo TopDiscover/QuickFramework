@@ -90,7 +90,8 @@
   "design-resolution-height": 640,
   "design-resolution-width": 960,
   "excluded-modules": [
-    "3D Physics/Builtin"
+    "3D Physics/Builtin",
+    "SafeArea"
   ],
   "fit-height": true,
   "fit-width": false,
@@ -113,7 +114,7 @@
   "use-customize-simulator": false,
   "use-project-simulator-setting": false,
   "start-scene": "current",
-  "last-module-event-record-time": 1590390194318,
+  "last-module-event-record-time": 1594610536192,
   "assets-sort-type": "name",
   "facebook": {
     "enable": false,
@@ -125,5 +126,7 @@
       "enable": false
     }
   },
-  "migrate-history": []
+  "migrate-history": [
+    "cloud-function"
+  ]
 }
