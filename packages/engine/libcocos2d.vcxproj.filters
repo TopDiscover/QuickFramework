@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\cocos\base\base64.cpp">
@@ -865,6 +865,27 @@
     </ClCompile>
     <ClCompile Include="..\cocos\editor-support\spine\ConstraintData.cpp">
       <Filter>editor-support\spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\sources\edtaa3func\edtaa3func.cpp">
+      <Filter>external\edtaa3func</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cocos\2d\CCFontAtlas.cpp">
+      <Filter>2d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cocos\2d\CCFontFreetype.cpp">
+      <Filter>2d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cocos\2d\CCLabelLayout.cpp">
+      <Filter>2d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cocos\2d\CCTTFLabelAtlasCache.cpp">
+      <Filter>2d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cocos\2d\CCTTFLabelRenderer.cpp">
+      <Filter>2d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cocos\2d\CCTTFTypes.cpp">
+      <Filter>2d</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1937,6 +1958,27 @@
     <ClInclude Include="..\cocos\editor-support\spine\ConstraintData.h">
       <Filter>editor-support\spine</Filter>
     </ClInclude>
+    <ClInclude Include="..\external\sources\edtaa3func\edtaa3func.h">
+      <Filter>external\edtaa3func</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cocos\2d\CCFontAtlas.h">
+      <Filter>2d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cocos\2d\CCFontFreetype.h">
+      <Filter>2d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cocos\2d\CCLabelLayout.h">
+      <Filter>2d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cocos\2d\CCTTFLabelAtlasCache.h">
+      <Filter>2d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cocos\2d\CCTTFLabelRenderer.h">
+      <Filter>2d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cocos\2d\CCTTFTypes.h">
+      <Filter>2d</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="base">
@@ -2079,6 +2121,12 @@
     </Filter>
     <Filter Include="editor-support\particle">
       <UniqueIdentifier>{333e24f4-af65-4a68-96a9-a5cccd0b4b81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\edtaa3func">
+      <UniqueIdentifier>{5fec0464-c81d-4e07-99b4-323a528303ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2d">
+      <UniqueIdentifier>{171a4a8a-5cd5-404c-a9c5-607ff536314c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
