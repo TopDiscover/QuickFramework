@@ -1,13 +1,7 @@
-// Learn TypeScript:
-//  - https://docs.cocos.com/creator/manual/en/scripting/typescript.html
-// Learn Attribute:
-//  - https://docs.cocos.com/creator/manual/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
+import UIView from "../../../script/framework/ui/UIView";
+import { GAME } from "../../../script/common/base/ResPath";
+import { LogicEvent, dispatchEnterComplete, LogicType } from "../../../script/common/event/LogicEvent";
 
-import UIView from "../../framework/ui/UIView";
-import { GAME } from "../../common/base/ResPath";
-import { dispatchEnterComplete, LogicType, LogicEvent } from "../../common/event/LogicEvent";
 
 const {ccclass, property} = cc._decorator;
 

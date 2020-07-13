@@ -1,10 +1,11 @@
-import { Logic } from "../../common/base/Logic";
-import { LogicType, LogicEvent } from "../../common/event/LogicEvent";
-import { uiManager } from "../../framework/base/UIManager";
-import { logicManager } from "../../common/manager/LogicManager";
+import { Logic } from "../../../script/common/base/Logic";
+import { LogicType, LogicEvent } from "../../../script/common/event/LogicEvent";
 import GameOneResPath from "./GameOneResPath";
-import { GamePath } from "../../common/base/ResPath";
+import { GamePath } from "../../../script/common/base/ResPath";
+import { uiManager } from "../../../script/framework/base/UIManager";
 import GameOneView from "./GameOneView";
+import { logicManager } from "../../../script/common/manager/LogicManager";
+
 
 class GameOneLogic extends Logic {
 

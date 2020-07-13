@@ -5,9 +5,9 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
-import UIView from "../../framework/ui/UIView";
-import { GAME } from "../../common/base/ResPath";
-import { dispatchEnterComplete, LogicType, LogicEvent } from "../../common/event/LogicEvent";
+import UIView from "../../../script/framework/ui/UIView";
+import { GAME } from "../../../script/common/base/ResPath";
+import { LogicEvent, dispatchEnterComplete, LogicType } from "../../../script/common/event/LogicEvent";
 
 const {ccclass, property} = cc._decorator;
 
