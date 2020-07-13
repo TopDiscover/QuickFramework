@@ -216,4 +216,16 @@ declare interface StringConstructor {
 	format(...args): string;
 }
 
+declare interface RemoteUrl {
+    /**@description 原url地址 */
+    url: string;
+    /**@description 下载完成后本地存储路径 */
+    path: string;
+    /**@description 下载完成后本地存储文件名 */
+    fileName: string;
+}
+
+declare function makeRemoteUrl(remoteUrl: RemoteUrl): string;
+declare function parseRemoteUrl( url : string ) : RemoteUrl;
+
 declare function md5(data: any): any;

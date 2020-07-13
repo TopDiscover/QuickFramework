@@ -34,6 +34,7 @@ export class ResourceInfo{
     assetUrl : string = "";
     /**@description 是否常驻内存，远程加载资源有效 */
     retain : boolean = false;
+    bundle:string|cc.AssetManager.Bundle = null;
 }
 
 export class ResourceCacheData {
@@ -59,6 +60,8 @@ export class ResourceCacheData {
     assetType: typeof cc.Asset = null;
 
     status = ResourceCacheStatus.NONE;
+
+    bundle:string|cc.AssetManager.Bundle = null;
 
     /**@description 在加载过程中有地方获取,加载完成后再回调 */
     getCb: ((data: any) => void)[] = [];
@@ -110,15 +113,6 @@ export interface ResourceData {
      * */
     preloadView?: UIClass<UIView>,
     bundle?:string|cc.AssetManager.Bundle,
-}
-
-export interface RemoteUrl {
-    /**@description 原url地址 */
-    url: string;
-    /**@description 下载完成后本地存储路径 */
-    path: string;
-    /**@description 下载完成后本地存储文件名 */
-    fileName: string;
 }
 
 /**

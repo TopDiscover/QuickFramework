@@ -8,6 +8,29 @@ window.md5 = function md5(data) {
     return this.CryptoJS.MD5(data);
 }
 
+window.makeRemoteUrl = function (remoteUrl) {
+    return `${remoteUrl.path}/${remoteUrl.fileName}`;
+}
+
+window.parseRemoteUrl = function (url) {
+    url = url.replace(/\s*/g, "");
+
+    let data = { url: null, path: null, fileName: null };
+    data.url = url;
+    //摘取文件
+    let fileName = data.url.slice(data.url.lastIndexOf("/") + 1);
+    let fileDir = data.url.substr(0, data.url.length - fileName.length - 1);
+    let md5path = fileDir;
+    if (CC_JSB) {
+        md5path = window.md5(fileDir).toString();
+        data.path = md5path;
+    } else {
+        data.path = fileDir;
+    }
+    data.fileName = fileName;
+    return data;
+}
+
 Date.prototype.format = function (format) {
     var date = {
         "M+": this.getMonth() + 1,

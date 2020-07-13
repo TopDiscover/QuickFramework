@@ -1,6 +1,6 @@
 import UIView from "../ui/UIView";
 import { addExtraLoadResourceReference } from "../extentions/Utils";
-import { RemoteUrl, ResourceCacheData, ResourceInfo } from "../base/Defines";
+import { ResourceCacheData, ResourceInfo } from "../base/Defines";
 import { loader } from "../loader/Loader";
 import { getSingleton } from "../base/Singleton";
 
@@ -198,26 +198,11 @@ class RemoteCaches {
     }
 
     public makeUrl(remoteUrl: RemoteUrl): string {
-        return `${remoteUrl.path}/${remoteUrl.fileName}`;
+        return makeRemoteUrl(remoteUrl);
     }
 
     public parseUrl(url) {
-        url = url.replace(/\s*/g, "");
-
-        let data: RemoteUrl = { url: null, path: null, fileName: null };
-        data.url = url;
-        //摘取文件
-        let fileName = data.url.slice(data.url.lastIndexOf("/") + 1);
-        let fileDir = data.url.substr(0, data.url.length - fileName.length - 1);
-        let md5path = fileDir;
-        if (CC_JSB) {
-            md5path = md5(fileDir).toString();
-            data.path = md5path;
-        } else {
-            data.path = fileDir;
-        }
-        data.fileName = fileName;
-        return data;
+        return parseRemoteUrl(url);
     }
 
     showCaches() {

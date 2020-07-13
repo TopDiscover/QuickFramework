@@ -46,7 +46,8 @@ class AssetManager {
                 cache = new ResourceCacheData();
                 cache.url = path;
                 cache.assetType = type;
-                cacheManager().setCache(bundle,path);
+                cache.bundle = bundle;
+                cacheManager().setCache(bundle,path,cache);
                 cc.time(`加载资源 : ${cache.url}`);
                 let _bundle = this.getBundle(bundle);
                 let res = _bundle.get(path,type);
@@ -71,7 +72,7 @@ class AssetManager {
             cc.error(`${this.logTag}加载资源失败:${cache.url} 原因:${err.message ? err.message : "未知"}`);
             cache.data = null;
             tempCache.data = null;
-            //resCaches().remove(cache.url);
+            cacheManager().removeCache(cache.bundle,cache.url);
             completeCallback(cache);
         }
         else {
@@ -89,15 +90,25 @@ class AssetManager {
             if (CC_DEBUG) cc.warn(this.logTag, `资源:${cache.url}加载完成，但缓存状态为等待销毁，销毁资源`);
             if (cache.data) {
                 cache.status = ResourceCacheStatus.NONE;
-                // let info = new ResourceInfo;
-                // info.url = cache.url;
-                // info.type = cache.assetType;
-                // info.data = cache.data;
-                // this.releasePreReference(info);
-                // this.releaseAsset(info);
+                let info = new ResourceInfo;
+                info.url = cache.url;
+                info.type = cache.assetType;
+                info.data = cache.data;
+                info.bundle = cache.bundle;
+                this.releaseAsset(info);
             }
         }
 
         cc.timeEnd(`加载资源 : ${cache.url}`);
     }
+
+    public releaseAsset( info : ResourceInfo ){
+        if ( info.bundle ){
+            let bundle = this.getBundle(info.bundle);
+            if ( bundle ){
+                bundle.release(info.url,info.type);
+            }
+        }
+    }
+
 }

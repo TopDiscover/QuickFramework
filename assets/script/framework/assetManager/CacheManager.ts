@@ -8,8 +8,22 @@ export function cacheManager() {
 
 class ResourceCache{
 
-    public get( path : string) : ResourceCacheData{
+    private _caches = new Map<string , ResourceCacheData>();
+    private name = "unknown";
+    constructor( name : string ){
+        this.name = name;
+    }
+
+    public get( path : string , isCheck : boolean) : ResourceCacheData{
         return null;
+    }
+
+    public set( path : string , data : ResourceCacheData ){
+
+    }
+
+    public delete( path : string ){
+
     }
 }
 
@@ -22,20 +36,41 @@ class CacheManager {
 
     public _bundles = new Map<string,ResourceCache>();
 
-    public getCache( bundle : string | cc.AssetManager.Bundle, path : string ): ResourceCacheData{
-        let bundleName = "";
+    public getBundle( bundle : string | cc.AssetManager.Bundle ){
         if ( typeof bundle == "string"){
-            bundleName = bundle;
+            return bundle;
         }else{
-            bundleName = bundle.name;
+            return bundle ? bundle.name : null;
         }
-        if ( this._bundles.has(bundleName)){
-            return this._bundles.get(bundleName).get(path);
+    }
+
+    public getCache( bundle : string | cc.AssetManager.Bundle, path : string , isCheck : boolean = true): ResourceCacheData{
+        let bundleName = this.getBundle(bundle);
+        if ( bundleName && this._bundles.has(bundleName)){
+            return this._bundles.get(bundleName).get(path,isCheck);
         }
         return null;
     }
 
-    public setCache( bundle : string | cc.AssetManager.Bundle , path:string){
-        
+    public setCache( bundle : string | cc.AssetManager.Bundle , path:string , data : ResourceCacheData){
+        let bundleName = this.getBundle(bundle);
+        if ( bundleName){
+            if ( !this._bundles.has(bundleName) ){
+                let cache = new ResourceCache(bundleName);
+                cache.set(path,data);
+                this._bundles.set(bundleName,cache);
+            }else{
+                this._bundles.get(bundleName).set(path,data);
+            }
+        }
+    }
+
+    public removeCache( bundle : string | cc.AssetManager.Bundle , path:string){
+        let bundleName = this.getBundle(bundle);
+        if ( bundleName ){
+            if ( this._bundles.has(bundleName) ){
+                this._bundles.get(bundleName).delete(path);
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
 import { dataBase, DataBaseTable } from "../database/DataBase";
 import { RequestPackge } from "../net/HttpClient";
-import { ResourceCacheData, ResourceType, RemoteUrl } from "../base/Defines";
+import { ResourceCacheData, ResourceType } from "../base/Defines";
 import { getSingleton } from "../base/Singleton";
 import { remoteCaches } from "../cache/ResCaches";
 
