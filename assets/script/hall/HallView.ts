@@ -4,6 +4,7 @@ import { dispatchEnterComplete, LogicType } from "../common/event/LogicEvent";
 import { gameManager } from "../common/manager/GameManager";
 import { GameConfig } from "../common/base/HotUpdate";
 import { HallEvent } from "./HallEvent";
+import { BUNDLE_RESOURCES } from "../framework/base/Defines";
 
 const { ccclass, property } = cc._decorator;
 
@@ -22,6 +23,8 @@ export default class HallView extends UIView {
         let game = cc.find(`gameOne`, this.node);
         if (game) {
             game.on(cc.Node.EventType.TOUCH_END, () => {
+                //let sp = cc.find("Background/icon",game).getComponent(cc.Sprite);
+                //sp.loadImage({view:this,url:"hall/texture/icon3",bundle:BUNDLE_RESOURCES});
                 gameManager().enterGame(new GameConfig("斗地主", "gameOne"));
             })
             this._oneProgress = cc.find("Background/progressBar",game).getComponent(cc.ProgressBar);
