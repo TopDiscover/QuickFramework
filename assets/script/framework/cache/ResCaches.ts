@@ -1,6 +1,4 @@
-import UIView from "../ui/UIView";
 import { ResourceCacheData, ResourceInfo } from "../base/Defines";
-import { loader } from "../loader/Loader";
 import { getSingleton } from "../base/Singleton";
 
 class CacheInfo {
@@ -383,86 +381,6 @@ class ResCaches {
             }
         });
     }
-
-    /**
-     * @description 异步获取资源，如果资源未加载，会加载完成后返回
-     * @param url 
-     * @param type 
-     */
-    public getCacheByAsync<T extends cc.Asset>(url: string, type: { prototype: T }): Promise<T>;
-    public getCacheByAsync() {
-        let me = this;
-        let args: { url: string, type: typeof cc.Asset } = this._getGetCacheByAsyncArgs.apply(this, arguments);
-        return new Promise<any>((resolve) => {
-            if (!args) {
-                resolve(null);
-                return;
-            }
-            me.getCache(args.url, args.type).then((data) => {
-                if (data && data instanceof args.type) {
-                    resolve(data);
-                }
-                else {
-                    loader().loadRes({ url: args.url, type: args.type }, (cache) => {
-                        if (cache && cache.data && cache.data instanceof args.type) {
-                            resolve(cache.data);
-                        }
-                        else {
-                            cc.error(`${this.logTag}加载失败 : ${args.url}`);
-                            resolve(null);
-                        }
-                    });
-                }
-            });
-        });
-    }
-
-    public getSpriteFrameByAsync(urls: string[], key: string, view: UIView, addExtraLoadResource: (view: UIView, info: ResourceInfo) => void) {
-        let me = this;
-        return new Promise<{ url: string, spriteFrame: cc.SpriteFrame, isTryReload?: boolean }>((resolve) => {
-
-            let nIndex = 0;
-
-            let getFun = (url) => {
-                me.getCacheByAsync(url, cc.SpriteAtlas).then((atlas) => {
-                    let info = new ResourceInfo;
-                    info.url = url;
-                    info.type = cc.SpriteAtlas;
-                    info.data = atlas;
-                    addExtraLoadResource(view, info);
-                    if (atlas) {
-                        let spriteFrame = atlas.getSpriteFrame(key);
-                        if (spriteFrame) {
-                            if (cc.isValid(spriteFrame)) {
-                                resolve({ url: url, spriteFrame: spriteFrame });
-                            } else {
-                                //来到这里面，其实程序已经崩溃了，已经没什么意思，也不知道写这个有啥用，尽量安慰,哈哈哈
-                                cc.error(`精灵帧被释放，释放当前无法的图集资源 url ：${url} key : ${key}`);
-                                loader().releasePreReference(info);
-                                loader().releaseAsset(info);
-                                //删除当前无效的缓存
-                                this.remove(url);
-                                resolve({ url: url, spriteFrame: null, isTryReload: true });
-                            }
-                        } else {
-                            nIndex++;
-                            if (nIndex >= urls.length) {
-                                resolve({ url: url, spriteFrame: null });
-                            } else {
-                                getFun(urls[nIndex]);
-                            }
-                        }
-                    } else {
-                        resolve({ url: url, spriteFrame: null });
-                    }
-                })
-            };
-
-            getFun(urls[nIndex]);
-        });
-    }
-
-
 
     private _getGetCacheArgs(): { url: string, type?: typeof cc.Asset } {
         if (arguments.length < 1 || typeof arguments[0] != "string") {
