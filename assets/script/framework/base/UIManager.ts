@@ -2,10 +2,10 @@ import UIView, { UIClass } from "../ui/UIView";
 import { resolutionHelper } from "../adaptor/ResolutionHelper";
 import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
 import { getSingleton } from "./Singleton";
-import { remoteCaches } from "../cache/ResCaches";
 import UILoadingDelegate from "../ui/UILoadingDelegate";
 import ToastDelegate from "../ui/ToastDelegate";
 import { assetManager } from "../assetManager/AssetManager";
+import { cacheManager } from "../assetManager/CacheManager";
 
 export function uiManager() {
     return getSingleton(UIManager);
@@ -44,7 +44,7 @@ class ViewDynamicLoadData {
                 cc.error(`找不到资源持有者 : ${info.url}`);
             }
             if (CC_DEBUG) uiManager().checkView(info.url, className);
-            remoteCaches().retainAsset(info);
+            cacheManager().remoteCaches.retainAsset(info);
             this.remote.set(info.url, info);
         }
     }
@@ -84,7 +84,7 @@ class ViewDynamicLoadData {
             }
             if (this.remote) {
                 this.remote.forEach((info, url) => {
-                    remoteCaches().releaseAsset(info);
+                    cacheManager().remoteCaches.releaseAsset(info);
                 });
                 this.remote.clear();
             }

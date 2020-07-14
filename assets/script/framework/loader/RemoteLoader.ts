@@ -1,8 +1,8 @@
 import { dataBase, DataBaseTable } from "../database/DataBase";
 import { RequestPackge } from "../net/HttpClient";
-import { ResourceCacheData, ResourceType } from "../base/Defines";
+import { ResourceCacheData, ResourceType, BUNDLE_REMOTE } from "../base/Defines";
 import { getSingleton } from "../base/Singleton";
-import { remoteCaches } from "../cache/ResCaches";
+import { cacheManager } from "../assetManager/CacheManager";
 
 /**
  * @description 远程资源加载器
@@ -38,8 +38,8 @@ class RemoteLoader {
                 resolve(null);
                 return;
             }
-            let remoteUrl = remoteCaches().parseUrl(url);
-            let spCache = remoteCaches().getSpriteFrame(remoteUrl);
+            let remoteUrl = parseRemoteUrl(url);
+            let spCache = cacheManager().remoteCaches.getSpriteFrame(remoteUrl);
             if (spCache && spCache.data) {
                 if (CC_DEBUG) cc.log(this._logTag, `从缓存精灵帧中获取:${remoteUrl.url}`);
                 resolve(<cc.SpriteFrame>(spCache.data));
@@ -47,15 +47,15 @@ class RemoteLoader {
             }
 
             me._loadRemoteRes(url,cc.Texture2D , "cache_png", isNeedCache).then((data: any) => {
-                let remoteUrl = remoteCaches().parseUrl(url);
+                let remoteUrl = parseRemoteUrl(url);
                 //改变缓存类型
-                let cache = remoteCaches().get(remoteUrl);
+                let cache = cacheManager().remoteCaches.get(remoteUrl);
                 if (data && cache) {
                     if (CC_DEBUG) cc.log(`${this._logTag}加载图片完成${remoteUrl.url}`);
                     cache.data = data;
                     cache.data.name = remoteUrl.url;
                     cache.data.url = remoteUrl.url;
-                    let spriteFrame = remoteCaches().setSpriteFrame(remoteUrl, cache.data);
+                    let spriteFrame = cacheManager().remoteCaches.setSpriteFrame(remoteUrl, cache.data);
                     resolve(spriteFrame);
                 } else {
                     if (CC_DEBUG) cc.warn(`${this._logTag}加载图片错误${remoteUrl.url}`);
@@ -73,8 +73,8 @@ class RemoteLoader {
                 let spineAtlas = `${path}/${name}.atlas`;
                 let spinePng = `${path}/${name}.png`;
                 let spineJson = `${path}/${name}.json`;
-                let remoteUrl = remoteCaches().parseUrl(url);
-                let cache = remoteCaches().get(remoteUrl);
+                let remoteUrl = parseRemoteUrl(url);
+                let cache = cacheManager().remoteCaches.get(remoteUrl);
                 if (cache) {
                     if ( cache.isLoaded ){
                         resolve(<sp.SkeletonData>(cache.data));
@@ -85,7 +85,8 @@ class RemoteLoader {
                     cache = new ResourceCacheData();
                     cache.resourceType = ResourceType.Remote;
                     cache.assetType = sp.SkeletonData;
-                    remoteCaches().set(remoteUrl,cache);
+                    cache.bundle = BUNDLE_REMOTE;
+                    cacheManager().remoteCaches.set(remoteUrl,cache);
                     me._loadRemoteRes(spinePng,cc.Texture2D, "cache_png", isNeedCache).then((texture) => {
                         if (texture) {
                             me._loadRemoteRes(spineJson,cc.JsonAsset, "cache_json", isNeedCache).then((json) => {
@@ -110,19 +111,19 @@ class RemoteLoader {
                                         } else {
                                             resolve(null);
                                             cache.doFinish(null);
-                                            remoteCaches().remove(remoteUrl);
+                                            cacheManager().remoteCaches.remove(remoteUrl);
                                         }
                                     });
                                 } else {
                                     resolve(null);
                                     cache.doFinish(null);
-                                    remoteCaches().remove(remoteUrl);
+                                    cacheManager().remoteCaches.remove(remoteUrl);
                                 }
                             });
                         } else {
                             resolve(null);
                             cache.doFinish(null);
-                            remoteCaches().remove(remoteUrl);
+                            cacheManager().remoteCaches.remove(remoteUrl);
                         }
                     })
                 }
@@ -140,8 +141,8 @@ class RemoteLoader {
     private _loadLocalRes(requestURL: string, storagePath: string) {
         let me = this;
         if (CC_DEBUG) cc.log(`${this._logTag}加载本地文件:${storagePath}`);
-        let urlData = remoteCaches().parseUrl(requestURL);
-        let cache = remoteCaches().get(urlData);
+        let urlData = parseRemoteUrl(requestURL);
+        let cache = cacheManager().remoteCaches.get(urlData);
         if ( cache ){
             cc.loader.load(storagePath,(err,data) => {
                 if ( cache ){
@@ -166,8 +167,8 @@ class RemoteLoader {
 
     private _loadRemoteRes(url: string,type : typeof cc.Asset , databaseTable: DataBaseTable, isNeedCache: boolean) {
         return new Promise<any>((resolve) => {
-            let urlData = remoteCaches().parseUrl(url);
-            let cache = remoteCaches().get(urlData);
+            let urlData = parseRemoteUrl(url);
+            let cache = cacheManager().remoteCaches.get(urlData);
             if (cache) {
                 //有缓存,查看是否已经加载
                 if (cache.isLoaded) {
@@ -182,9 +183,9 @@ class RemoteLoader {
                 cache = new ResourceCacheData();
                 cache.resourceType = ResourceType.Remote;
                 cache.assetType = type;
-                remoteCaches().set(urlData, cache);
+                cacheManager().remoteCaches.set(urlData, cache);
                 if (CC_JSB) {
-                    let path = remoteCaches().makeUrl(urlData);
+                    let path = makeRemoteUrl(urlData);
                     let fullPath = `${jsb.fileUtils.getWritablePath()}${path}`;
                     if (CC_DEBUG) cc.log(`${this._logTag}${urlData.url}下载的资源将存入本地${fullPath}`);
                     //先缓存回调，加载完成后再回调
@@ -254,7 +255,7 @@ class RemoteLoader {
             resolve(null);
             if (CC_DEBUG) cc.warn(this._logTag, `加载网络资源异常:${urlData.url}`);
             cache.doFinish(null);
-            remoteCaches().remove(urlData);
+            cacheManager().remoteCaches.remove(urlData);
         });
     }
 
@@ -335,15 +336,15 @@ class RemoteLoader {
         if (CC_DEBUG) cc.error(`${this._logTag}task url : ${task.requestURL} , errorCode : ${errorCode} , internal : ${errorCodeInternal} reason : ${errorStr}`);
         //下载错误，减少当前任务数量 
         this._currentTaskCount--;
-        let remoteUrl = remoteCaches().parseUrl(task.requestURL);
-        let cache = remoteCaches().get(remoteUrl);
+        let remoteUrl = parseRemoteUrl(task.requestURL);
+        let cache = cacheManager().remoteCaches.get(remoteUrl);
         cache.isLoaded = true;
         cache.data = null;
         if (CC_DEBUG) cc.warn(`${this._logTag}下载远程资源异常:${task.requestURL}`);
         cache.doJsbFinish(null);
         //把再加载过程里，双加载同一资源的回调都回调回去
         cache.doFinish(null);
-        remoteCaches().remove(remoteUrl);
+        cacheManager().remoteCaches.remove(remoteUrl);
     }
 
     private pushTask( url : string , path : string ){
