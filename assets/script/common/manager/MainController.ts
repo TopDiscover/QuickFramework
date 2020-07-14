@@ -1,10 +1,10 @@
 import ViewController from "../../framework/controller/ViewController";
 import { dataBase } from "../../framework/database/DataBase";
-import { remoteLoader } from "../../framework/loader/RemoteLoader";
 import { resolutionHelper } from "../../framework/adaptor/ResolutionHelper";
 import { logicManager } from "./LogicManager";
 import { uiManager } from "../../framework/base/UIManager";
 import GlobalAudio from "../component/GlobalAudio";
+import { assetManager } from "../../framework/assetManager/AssetManager";
 
 /**
  * @description 主控制器 
@@ -52,7 +52,7 @@ export default class MainController extends ViewController {
         //主逻辑
 
         //远程资源下载任务调度
-        remoteLoader().update();
+        assetManager().remote.update();
     }
 
     onDestroy(){

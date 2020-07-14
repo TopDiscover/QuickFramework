@@ -1,4 +1,3 @@
-import { remoteLoader } from "../loader/RemoteLoader";
 import { resolutionHelper } from "../adaptor/ResolutionHelper";
 import WebEditBoxImpl from "./WebEditBoxImpl";
 import { ResourceType, BUNDLE_RESOURCES } from "../base/Defines";
@@ -8,6 +7,7 @@ import {
     createNodeWithPrefab
 } from "./Utils";
 import { cacheManager } from "../assetManager/CacheManager";
+import { assetManager } from "../assetManager/AssetManager";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
 if (typeof Reflect == "object") {
@@ -55,7 +55,7 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
         isRetain = true;
     }
     let bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
-    remoteLoader().loadImage(config.url, config.isNeedCache).then((data) => {
+    assetManager().remote.loadImage(config.url, config.isNeedCache).then((data) => {
         if (data) {
             setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback,bundle, ResourceType.Remote, isRetain);
         } else {
@@ -152,7 +152,7 @@ sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
     if (config.isNeedCache == undefined || config.isNeedCache == null) {
         config.isNeedCache = true;
     }
-    remoteLoader().loadSkeleton(config.path, config.name, config.isNeedCache).then((data) => {
+    assetManager().remote.loadSkeleton(config.path, config.name, config.isNeedCache).then((data) => {
         setSkeletonSkeletonData(me, config, data, ResourceType.Remote);
     });
 }
