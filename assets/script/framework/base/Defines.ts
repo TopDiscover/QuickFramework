@@ -130,3 +130,5 @@ export enum ViewStatus {
 }
 
 export type BUNDLE_TYPE = string | cc.AssetManager.Bundle;
+
+export const BUNDLE_RESOURCES = 'resources';

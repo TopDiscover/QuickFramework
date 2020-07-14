@@ -1,6 +1,7 @@
 import { getSingleton } from "../base/Singleton";
-import { ResourceCacheData, BUNDLE_TYPE } from "../base/Defines";
+import { ResourceCacheData, BUNDLE_TYPE, ResourceInfo } from "../base/Defines";
 import { assetManager } from "./AssetManager";
+import UIView from "../ui/UIView";
 
 /**@description 资源管理器 */
 export function cacheManager() {
@@ -84,9 +85,10 @@ class CacheManager {
         let bundleName = this.getBundle(bundle);
         if ( bundleName ){
             if ( this._bundles.has(bundleName) ){
-                this._bundles.get(bundleName).remove(path);
+                return this._bundles.get(bundleName).remove(path);
             }
         }
+        return false;
     }
 
     private _getGetCacheByAsyncArgs(): { url: string, type: typeof cc.Asset , bundle:BUNDLE_TYPE} {
@@ -176,6 +178,47 @@ class CacheManager {
                     });
                 }
             });
+        });
+    }
+
+    public getSpriteFrameByAsync(urls: string[], key: string, view: UIView, addExtraLoadResource: (view: UIView, info: ResourceInfo) => void,bundle:BUNDLE_TYPE) {
+        let me = this;
+        return new Promise<{ url: string, spriteFrame: cc.SpriteFrame, isTryReload?: boolean }>((resolve) => {
+            let nIndex = 0;
+            let getFun = (url) => {
+                me.getCacheByAsync(url, cc.SpriteAtlas,bundle).then((atlas) => {
+                    let info = new ResourceInfo;
+                    info.url = url;
+                    info.type = cc.SpriteAtlas;
+                    info.data = atlas;
+                    info.bundle = bundle;
+                    addExtraLoadResource(view, info);
+                    if (atlas) {
+                        let spriteFrame = atlas.getSpriteFrame(key);
+                        if (spriteFrame) {
+                            if (cc.isValid(spriteFrame)) {
+                                resolve({ url: url, spriteFrame: spriteFrame });
+                            } else {
+                                //来到这里面，其实程序已经崩溃了，已经没什么意思，也不知道写这个有啥用，尽量安慰,哈哈哈
+                                cc.error(`精灵帧被释放，释放当前无法的图集资源 url ：${url} key : ${key}`);
+                                assetManager().releaseAsset(info);
+                                resolve({ url: url, spriteFrame: null, isTryReload: true });
+                            }
+                        } else {
+                            nIndex++;
+                            if (nIndex >= urls.length) {
+                                resolve({ url: url, spriteFrame: null });
+                            } else {
+                                getFun(urls[nIndex]);
+                            }
+                        }
+                    } else {
+                        resolve({ url: url, spriteFrame: null });
+                    }
+                })
+            };
+
+            getFun(urls[nIndex]);
         });
     }
 }

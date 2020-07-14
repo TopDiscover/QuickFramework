@@ -28,10 +28,6 @@ class AssetManager {
         return null;
     }
 
-    public getBundleResources(){
-        return this.getBundle("resources");
-    }
-
     public load(
         bundle: BUNDLE_TYPE,
         path: string,
@@ -124,6 +120,7 @@ class AssetManager {
 
     public releaseAsset( info : ResourceInfo ){
         if ( info.bundle ){
+            cacheManager().remove(info.bundle,info.url);
             let bundle = this.getBundle(info.bundle);
             if ( bundle ){
                 bundle.release(info.url,info.type);

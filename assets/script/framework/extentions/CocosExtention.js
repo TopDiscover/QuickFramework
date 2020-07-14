@@ -1,14 +1,13 @@
 import { remoteLoader } from "../loader/RemoteLoader";
-import { resCaches } from "../cache/ResCaches";
 import { resolutionHelper } from "../adaptor/ResolutionHelper";
 import WebEditBoxImpl from "./WebEditBoxImpl";
-import { ResourceType, ResourceInfo } from "../base/Defines";
+import { ResourceType, BUNDLE_RESOURCES } from "../base/Defines";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
-    createNodeWithPrefab,
-    addExtraLoadResourceReference
+    createNodeWithPrefab
 } from "./Utils";
+import { cacheManager } from "../assetManager/CacheManager";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
 if (typeof Reflect == "object") {
@@ -55,19 +54,16 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
     if (config.retain) {
         isRetain = true;
     }
+    let bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
     remoteLoader().loadImage(config.url, config.isNeedCache).then((data) => {
         if (data) {
-            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback, ResourceType.Remote, isRetain);
+            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback,bundle, ResourceType.Remote, isRetain);
         } else {
             if (config.defaultSpriteFrame) {
                 if (typeof config.defaultSpriteFrame == "string") {
                     //动态加载了一张图片，把资源通知管理器
-                    let info = new ResourceInfo;
-                    info.type = cc.SpriteFrame;
-                    info.url = config.defaultSpriteFrame;
-                    addExtraLoadResourceReference(config.view, info);
-                    resCaches().getCacheByAsync(config.defaultSpriteFrame, cc.SpriteFrame).then((spriteFrame) => {
-                        setSpriteSpriteFrame(config.view, config.defaultSpriteFrame, me, spriteFrame, config.completeCallback);
+                    cacheManager().getCacheByAsync(config.defaultSpriteFrame,cc.SpriteFrame,bundle).then((spriteFrame) => {
+                        setSpriteSpriteFrame(config.view, config.defaultSpriteFrame, me, spriteFrame, config.completeCallback,bundle);
                     });
                 }
             }
@@ -94,21 +90,18 @@ cc.Sprite.prototype.loadImage = function (config) {
     let view = config.view;
     let url = config.url;
     let completeCallback = config.completeCallback;
+    let bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
     if (typeof url == "string") {
-        let info = new ResourceInfo;
-        info.type = cc.SpriteFrame;
-        info.url = config.url;
-        addExtraLoadResourceReference(config.view, info);
-        resCaches().getCacheByAsync(url, cc.SpriteFrame).then((spriteFrame) => {
-            setSpriteSpriteFrame(view, url, me, spriteFrame, completeCallback);
+        cacheManager().getCacheByAsync(url, cc.SpriteFrame,bundle).then((spriteFrame) => {
+            setSpriteSpriteFrame(view, url, me, spriteFrame, completeCallback,bundle);
         });
     } else {
         //在纹理图集中查找
-        resCaches().getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource).then((data) => {
+        cacheManager().getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource,bundle).then((data) => {
             if ( data && data.isTryReload ){
                //来到这里面程序已经崩溃了，无意义在处理了
             }else{
-                setSpriteSpriteFrame(view, data.url, me, data.spriteFrame, completeCallback,ResourceType.Local,false,true);
+                setSpriteSpriteFrame(view, data.url, me, data.spriteFrame, completeCallback,bundle,ResourceType.Local,false,true);
             }
         });
     }
@@ -128,7 +121,8 @@ cc.Sprite.prototype.loadImage = function (config) {
  */
 cc.createPrefab = function (config) {
     let url = config.url;
-    resCaches().getCacheByAsync(url, cc.Prefab).then((data) => {
+    let bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
+    cacheManager().getCacheByAsync(url, cc.Prefab,bundle).then((data) => {
         createNodeWithPrefab(config, data)
     });
 }
@@ -177,11 +171,8 @@ sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
 sp.Skeleton.prototype.loadSkeleton = function (config) {
     let me = this;
     let url = config.url;
-    let info = new ResourceInfo;
-    info.type = sp.SkeletonData;
-    info.url = config.url;
-    addExtraLoadResourceReference(config.view, info);
-    resCaches().getCacheByAsync(url, sp.SkeletonData).then((data) => {
+    let bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
+    cacheManager().getCacheByAsync(url, sp.SkeletonData,bundle).then((data) => {
         setSkeletonSkeletonData(me, config, data);
     });
 }
@@ -206,11 +197,8 @@ cc.Button.prototype.loadButton = function (config) {
 cc.Label.prototype.loadFont = function (config) {
     let font = config.font;
     let me = this;
-    let info = new ResourceInfo;
-    info.type = cc.Font;
-    info.url = config.font;
-    addExtraLoadResourceReference(config.view, info);
-    resCaches().getCacheByAsync(font, cc.Font).then((data) => {
+    let bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
+    cacheManager().getCacheByAsync(font, cc.Font,bundle).then((data) => {
         setLabelFont(me, config, data);
     });
 }
@@ -238,11 +226,8 @@ cc.Label.prototype.forceDoLayout = function () {
 cc.ParticleSystem.prototype.loadFile = function (config) {
     let me = this;
     let url = config.url;
-    let info = new ResourceInfo;
-    info.type = cc.ParticleAsset;
-    info.url = config.url;
-    addExtraLoadResourceReference(config.view, info);
-    resCaches().getCacheByAsync(url, cc.ParticleAsset).then((data) => {
+    let bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
+    cacheManager().getCacheByAsync(url, cc.ParticleAsset,bundle).then((data) => {
         setParticleSystemFile(me, config, data);
     });
 }

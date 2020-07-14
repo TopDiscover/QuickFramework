@@ -1,5 +1,4 @@
 import UIView from "../ui/UIView";
-import { addExtraLoadResourceReference } from "../extentions/Utils";
 import { ResourceCacheData, ResourceInfo } from "../base/Defines";
 import { loader } from "../loader/Loader";
 import { getSingleton } from "../base/Singleton";
@@ -425,10 +424,6 @@ class ResCaches {
             let nIndex = 0;
 
             let getFun = (url) => {
-                let info = new ResourceInfo;
-                info.type = cc.SpriteAtlas;
-                info.url = url;
-                addExtraLoadResourceReference(view, info);
                 me.getCacheByAsync(url, cc.SpriteAtlas).then((atlas) => {
                     let info = new ResourceInfo;
                     info.url = url;

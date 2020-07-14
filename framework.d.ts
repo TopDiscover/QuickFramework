@@ -20,6 +20,7 @@ declare module cc {
  	 * @param config.url 预置体路径
 	 * @param config.view 预置视图资源管理器，继承自UIView
 	 * @param config.completeCallback 创建完成回调 
+	 * @param config.bundle 可不填，默认为resources
 	 * @example 
 	 * cc.createPrefab({url :GAME_RES("res/animations/shzDealerCommon"),view:this,completeCallback:(node)=>{
 	 *     if ( node ){
@@ -27,7 +28,7 @@ declare module cc {
 	 *     }
 	 * }});
 	 */
-	export function createPrefab(config: { url: string, view: any, completeCallback: (node: cc.Node) => void });
+	export function createPrefab(config: { url: string, view: any, completeCallback: (node: cc.Node) => void ,bundle?:BUNDLE_TYPE});
 
 	export interface Sprite {
         /**
@@ -37,6 +38,7 @@ declare module cc {
 		 * @param defaultSpriteFrame 加载图片失败后，使用的默认图片,当传入string时，会动态加载该默认图片
 		 * @param isNeedCache 是否需要缓存到本地,如果不需要，每次都会从网络拉取资源,默认都会缓存到本地
 		 * @param config.retain 远程加载的资源是否驻留在内存中,默认都不驻留内存
+		 * @param config.bundle 可不填，默认为resources
 		 * @example
 		 * 示例1：
 		 * let sprite = imageNode.getComponent(cc.Sprite);
@@ -53,25 +55,40 @@ declare module cc {
 		 * sprite.loadRemoteImage({url :"http://tools.itharbors.com/res/logo.png", view : this});
 		 * }
 		 */
-		loadRemoteImage(config: { url: string, view: any, completeCallback?: (data: cc.SpriteFrame) => void, defaultSpriteFrame?: string, isNeedCache?: boolean , retain? : boolean});
+		loadRemoteImage(config: { 
+			url: string, 
+			view: any, 
+			completeCallback?: (data: cc.SpriteFrame) => void, 
+			defaultSpriteFrame?: string, 
+			isNeedCache?: boolean , 
+			retain? : boolean,
+			bundle?:BUNDLE_TYPE
+		});
 
         /**
 		 * @description 加载本地图片
 		 * @param url 图片路径 {urls:string[],key:string} urls 为纹理名如果有此纹理会打包成多张，此时需要传入所有纹理的地址，key指纹理中名字
 		 * @param view 所属视图，UIView的子类
 		 * @param completeCallback 完成回调
+		 * @param config.bundle 可不填，默认为resources
 		 * @example
 		 * 示例1：
 		 * sprite.getComponent(cc.Sprite).loadImage({url:{urls:["plist/fish_30","plist/fish_30_1","plist/fish_30_2"],key:"fishMove_030_28"},view:this});
 		 * 示例2：
 		 * sprite.getComponent(cc.Sprite).loadImage({url:"hall/a",view:this});
 		 */
-		loadImage(config: { url: string | { urls: string[], key: string }, view: any, completeCallback?: (data: SpriteFrame) => void });
+		loadImage(config: { 
+			url: string | { urls: string[], key: string }, 
+			view: any, 
+			completeCallback?: (data: SpriteFrame) => void,
+			bundle?:BUNDLE_TYPE
+		});
 	}
 
 	export interface Button {
         /**
 		 * @description 加载按钮
+		 * @param config.bundle 可不填，默认为resources
 		 * @example
 		 * 示例1：
 		 * let button = cc.find("button",this.node);
@@ -92,18 +109,20 @@ declare module cc {
 			pressedSprite?: string | { urls: string[], key: string },
 			hoverSprite?: string | { urls: string[], key: string },
 			disabledSprite?: string | { urls: string[], key: string },
-			completeCallback?: (type: string, spriteFrame: SpriteFrame) => void
+			completeCallback?: (type: string, spriteFrame: SpriteFrame) => void,
+			bundle?:BUNDLE_TYPE
 		});
 	}
 
 	export interface Label {
 		/**
 		  * @description 加载字体
+		  * @param config.bundle 可不填，默认为resources
 		  * @example
 		  * let content = cc.find("content",this.node); 
 		  * content.getComponent(cc.Label).loadFont({font:"font/DFYUANW7-GB2312",view:this});
 		  */
-		loadFont(config: { font: string, view: any, completeCallback?: (font: Font) => void });
+		loadFont(config: { font: string, view: any, completeCallback?: (font: Font) => void , bundle?:BUNDLE_TYPE});
 
 		/**@description 强制label在当前帧进行绘制 */
 		forceDoLayout();
@@ -121,13 +140,14 @@ declare module cc {
 
 		/**
  		 * @description 加载特效文件 view 为null时，加载之前不会释
+		 * @param config.bundle 可不填，默认为resources
 		 * @example
 		 * let node = new cc.Node();
 		 * let par = node.addComponent(cc.ParticleSystem);
 		 * par.loadFile({url:GAME_RES( "res/action/DDZ_win_lizi" ),view:null});
 		 * this.node.addChild(node);
 		 */
-		loadFile(config: { url: string, view: any, completeCallback?: (file: ParticleAsset) => void });
+		loadFile(config: { url: string, view: any, completeCallback?: (file: ParticleAsset) => void , bundle?:BUNDLE_TYPE});
 
 	}
 }
@@ -141,6 +161,7 @@ declare namespace sp {
  		 * @param completeCallback 完成回调
 		 * @param isNeedCache 是否需要缓存到本地,如果不需要，每次都会从网络拉取资源,默认都会缓存到本地
 		 * @param config.retain 远程加载的资源是否驻留在内存中,默认都不驻留内存
+		 * @param config.bundle 可不填，默认为resources
  		 * @example
  		 * var skeleton = node.addComponent(sp.Skeleton);
          *
@@ -153,10 +174,11 @@ declare namespace sp {
          *    }
          * }});
          */
-		loadRemoteSkeleton(config: { view: any, path: string, name: string, completeCallback: (data: sp.SkeletonData) => void, isNeedCache?: boolean,retain? :boolean });
+		loadRemoteSkeleton(config: { view: any, path: string, name: string, completeCallback: (data: sp.SkeletonData) => void, isNeedCache?: boolean,retain? :boolean , bundle?:BUNDLE_TYPE});
 
 		/**
 		 * @description 加载动画
+		 * @param config.bundle 可不填，默认为resources
 		 * @example
 		 * action.loadSkeleton({url:"hall/vip/vipAction/vip_10",view:this,completeCallback:(data)=>{
 		 *	if ( data ){
@@ -166,9 +188,11 @@ declare namespace sp {
 		 *	}
 		 * }});
 		 */
-		loadSkeleton(config: { url: string, view: any, completeCallback: (data: sp.SkeletonData) => void });
+		loadSkeleton(config: { url: string, view: any, completeCallback: (data: sp.SkeletonData) => void , bundle?:BUNDLE_TYPE});
 	}
 }
+
+declare type BUNDLE_TYPE = string | cc.AssetManager.Bundle;
 
 declare function require(any);
 

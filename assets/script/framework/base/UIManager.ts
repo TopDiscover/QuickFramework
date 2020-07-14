@@ -1,8 +1,7 @@
 import UIView, { UIClass } from "../ui/UIView";
 import { resolutionHelper } from "../adaptor/ResolutionHelper";
-import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_TYPE } from "./Defines";
+import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
 import { getSingleton } from "./Singleton";
-import { loader } from "../loader/Loader";
 import { remoteCaches } from "../cache/ResCaches";
 import UILoadingDelegate from "../ui/UILoadingDelegate";
 import ToastDelegate from "../ui/ToastDelegate";
@@ -19,7 +18,6 @@ const DYNAMIC_LOAD_RETAIN_MEMORY = "DYNAMIC_LOAD_RETAIN_MEMORY";
 class ViewDynamicLoadData {
     private local = new Map<string, ResourceInfo>();
     private remote = new Map<string, ResourceInfo>();
-    private reference = new Map<string, ResourceInfo>();
     public name: string;
 
     constructor(name: string = null) {
@@ -28,16 +26,13 @@ class ViewDynamicLoadData {
 
     /**@description 添加动态加载的本地资源 */
     public addLocal(info: ResourceInfo, className: string = null) {
-        if (info && info.data) {
+        if (info && info.url) {
             if (this.name == DYNAMIC_LOAD_GARBAGE) {
                 cc.error(`找不到资源持有者: ${info.url}`);
             }
-            let path = loader().getResourcePath(info.data);
             if (CC_DEBUG) uiManager().checkView(info.url, className);
-            if (!this.local.has(path)) {
-                info.assetUrl = path;
-                loader().retainAsset(info);
-                this.local.set(path, info);
+            if (!this.local.has(info.url)) {
+                this.local.set(info.url, info);
             }
         }
     }
@@ -54,36 +49,13 @@ class ViewDynamicLoadData {
         }
     }
 
-    /**@description 添加资源加载引用*/
-    public addReference(info: ResourceInfo, className: string = null) {
-        if (info) {
-            if (this.name == DYNAMIC_LOAD_GARBAGE) {
-                cc.error(`找不到资源持有者: ${info.url}`);
-            }
-            if (CC_DEBUG) uiManager().checkView(info.url, className);
-            if (!this.reference.has(info.url)) {
-                loader().retainPreReference(info);
-                this.reference.set(info.url, info);
-            }
-        }
-    }
-
     /**@description 清除远程加载资源 */
     public clear() {
         if (this.name == DYNAMIC_LOAD_GARBAGE) {
             //先输出
-            let isShow = this.reference.size > 0 || this.local.size > 0 || this.remote.size > 0;
+            let isShow = this.local.size > 0 || this.remote.size > 0;
             if (isShow) {
                 cc.error(`当前未能释放资源如下:`);
-            }
-
-            if (this.reference && this.reference.size > 0) {
-                cc.error("-----------reference-----------");
-                if (this.reference) {
-                    this.reference.forEach((info) => {
-                        cc.error(info.url);
-                    });
-                }
             }
             if (this.local && this.local.size > 0) {
                 cc.error("-----------local-----------");
@@ -104,15 +76,9 @@ class ViewDynamicLoadData {
 
         } else {
             //先清除当前资源的引用关系
-            if (this.reference) {
-                this.reference.forEach((info) => {
-                    loader().releasePreReference(info);
-                });
-                this.reference.clear();
-            }
             if (this.local) {
                 this.local.forEach((info) => {
-                    loader().releaseAsset(info);
+                    assetManager().releaseAsset(info);
                 });
                 this.local.clear();
             }
@@ -326,8 +292,6 @@ class UIManager {
                         viewData.info.url = prefabUrl;
                         viewData.info.type = cc.Prefab;
                         viewData.info.data = prefab;
-                        //viewData.info.assetUrl = loader().getResourcePath(prefab);
-                        //loader().retainAsset(viewData.info);
                         this.createNode(className, uiClass, reslove, prefab, args, zOrder);
                         if (this.uiLoading) this.uiLoading.hide();
                     }).catch((reason) => {
@@ -439,8 +403,8 @@ class UIManager {
 
     private loadPrefab( bundle: BUNDLE_TYPE, url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
         return new Promise<cc.Prefab>((resolove, reject) => {
-            if ( bundle == undefined || bundle == "" ){
-                bundle = assetManager().getBundleResources();
+            if ( bundle == undefined || bundle == "" || bundle == null ){
+                bundle = BUNDLE_RESOURCES;
             }
             assetManager().load(bundle,url,cc.Prefab,progressCallback,(data: ResourceCacheData) => {
                 if (data && data.data && data.data instanceof cc.Prefab) {
@@ -488,7 +452,7 @@ class UIManager {
                         viewData.node.destroy();
                     }
                     viewData.loadData.clear();
-                    loader().releaseAsset(viewData.info);
+                    assetManager().releaseAsset(viewData.info);
                     this._viewDatas.delete(className);
                     cc.timeEnd(`${this._logTag} close view : ${className}`);
                 }
@@ -529,16 +493,6 @@ class UIManager {
             let viewData = this.getViewData(className);
             if (viewData) {
                 viewData.loadData.addRemote(info, className);
-            }
-        }
-    }
-
-    /**@description 添加资源加载引用*/
-    public addReference(info: ResourceInfo, className: string) {
-        if (info) {
-            let viewData = this.getViewData(className);
-            if (viewData) {
-                viewData.loadData.addReference(info, className);
             }
         }
     }

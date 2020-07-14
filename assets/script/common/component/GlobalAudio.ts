@@ -7,8 +7,8 @@
  * @FilePath: \ddz\assets\common\component\GlobalAudio.ts
  */
 import AudioComponent from "../../framework/base/AudioComponent";
-import { resCaches } from "../../framework/cache/ResCaches";
-import { loader } from "../../framework/loader/Loader";
+import { BUNDLE_TYPE, BUNDLE_RESOURCES } from "../../framework/base/Defines";
+import { cacheManager } from "../../framework/assetManager/CacheManager";
 
 /**
  * @description 全局音频播放组棒
@@ -20,14 +20,13 @@ const {ccclass, property,menu} = cc._decorator;
 @menu("common/component/GlobalAudio")
 export default class GlobalAudio extends AudioComponent {
 
-    public playMusic(url: string, loop: boolean = true) {
+    public playMusic(url: string, bundle: BUNDLE_TYPE, loop: boolean = true) {
         let me = this;
         return new Promise<{ url: string, isSuccess: boolean }>((resolve) => {
             this.audioData.curMusicUrl = url;
             if (this.audioData.isMusicOn) {
-                resCaches().getCacheByAsync(url, cc.AudioClip).then((data) => {
+                cacheManager().getCacheByAsync(url, cc.AudioClip,BUNDLE_RESOURCES).then((data) => {
                     if (data) {
-                        loader().addPersistResource(url,data);
                         me.stopMusic();
                         cc.audioEngine.playMusic(data, loop);
                         resolve({ url: url, isSuccess: true });
@@ -40,12 +39,11 @@ export default class GlobalAudio extends AudioComponent {
 
     }
 
-    public playEffect(url: string, loop: boolean = false) {
+    public playEffect(url: string, bundle:BUNDLE_TYPE, loop: boolean = false) {
         return new Promise<number>((resolve) => {
             if (this.audioData.isEffectOn) {
-                resCaches().getCacheByAsync(url, cc.AudioClip).then((data) => {
+                cacheManager().getCacheByAsync(url, cc.AudioClip,BUNDLE_RESOURCES).then((data) => {
                     if (data) {
-                        loader().addPersistResource(url,data);
                         this.audioData.curEffectId = cc.audioEngine.playEffect(data, loop);
                         resolve(this.audioData.curEffectId);
                     } else {

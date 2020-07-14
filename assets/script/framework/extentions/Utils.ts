@@ -1,7 +1,7 @@
 import UIView from "../ui/UIView";
-import { resCaches } from "../cache/ResCaches";
-import { ResourceInfo, ResourceType } from "../base/Defines";
+import { ResourceInfo, ResourceType, BUNDLE_RESOURCES } from "../base/Defines";
 import { uiManager } from "../base/UIManager";
+import { cacheManager } from "../assetManager/CacheManager";
 
 /*
  * @Author: your name
@@ -21,19 +21,6 @@ export function addExtraLoadResource(view: UIView, info: ResourceInfo) {
         uiManager().addLocal(info, view.className);
     } else {
         uiManager().garbage.addLocal(info);
-    }
-}
-
-/**@description 计录当前对资源引用的url地址,以防止在A界面关闭，B界面打开时，且在使用同一资源时，
- * 由于B界面资源未加载完成进行资源的引用+1操作，A界面已经提前对资源进行-1操作释放，造成资源被释放问题 */
-export function addExtraLoadResourceReference(view: UIView, info: ResourceInfo) {
-    if (view == <any>(uiManager().retainMemory)) {
-        uiManager().retainMemory.addReference(info);
-    }
-    else if (view && view instanceof UIView) {
-        uiManager().addReference(info, view.className);
-    } else {
-        uiManager().garbage.addReference(info);
     }
 }
 
@@ -73,6 +60,7 @@ export function setSpriteSpriteFrame(
     sprite: cc.Sprite,
     spriteFrame: cc.SpriteFrame,
     completeCallback: (data: cc.SpriteFrame) => void,
+    bundle:BUNDLE_TYPE,
     resourceType: ResourceType = ResourceType.Local,
     retain: boolean = false,
     isAtlas: boolean = false) {
@@ -84,6 +72,7 @@ export function setSpriteSpriteFrame(
         info.type = cc.SpriteFrame;
         info.data = spriteFrame;
         info.retain = retain;
+        info.bundle = bundle;
         if (resourceType == ResourceType.Remote) {
             addRemoteLoadResource(view, info);
         } else {
@@ -134,13 +123,15 @@ function _setSpriteFrame(
     spriteFrame: cc.SpriteFrame,
     memberName: string,
     completeCallback: (type: string, data: cc.SpriteFrame) => void,
-    isAtlas: boolean) {
+    isAtlas: boolean,
+    bundle:BUNDLE_TYPE) {
 
     if (!isAtlas) {
         let info = new ResourceInfo;
         info.url = url;
         info.type = cc.SpriteFrame;
         info.data = spriteFrame;
+        info.bundle = bundle;
         addExtraLoadResource(view, info);
     }
 
@@ -180,10 +171,11 @@ function _setButtonSpriteFrame(
     url: string,
     spriteFrame: cc.SpriteFrame,
     completeCallback: (type: string, data: cc.SpriteFrame) => void,
+    bundle: BUNDLE_TYPE,
     isAtlas: boolean = false) {
 
     if (spriteFrame && isValidComponent(button)) {
-        _setSpriteFrame(view, url, button, spriteFrame, memberName, completeCallback, isAtlas);
+        _setSpriteFrame(view, url, button, spriteFrame, memberName, completeCallback, isAtlas,bundle);
     } else {
         //完成回调
         if (completeCallback && isValidComponent(button)) completeCallback(memberName, spriteFrame);
@@ -203,24 +195,21 @@ function _setButtonWithType(
     memberName: ButtonSpriteMemberName,
     view: UIView,
     url: string | { urls: string[], key: string },
-    completeCallback?: (type: string, spriteFrame: cc.SpriteFrame) => void
+    completeCallback?: (type: string, spriteFrame: cc.SpriteFrame) => void,
+    bundle ?: BUNDLE_TYPE
 ) {
     if (url) {
         if (typeof url == "string") {
-            let info = new ResourceInfo;
-            info.type = cc.SpriteFrame;
-            info.url = url;
-            addExtraLoadResourceReference(view, info);
-            resCaches().getCacheByAsync(url, cc.SpriteFrame).then((spriteFrame) => {
-                _setButtonSpriteFrame(button, memberName, view, url, spriteFrame, completeCallback);
+            cacheManager().getCacheByAsync(url, cc.SpriteFrame,bundle).then((spriteFrame) => {
+                _setButtonSpriteFrame(button, memberName, view, url, spriteFrame, completeCallback,bundle);
             });
         } else {
             //在纹理图集中查找
-            resCaches().getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource).then((data) => {
+            cacheManager().getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource,bundle).then((data) => {
                 if (data && data.isTryReload) {
                     //来到这里面，程序已经崩溃，无意义在处理
                 } else {
-                    _setButtonSpriteFrame(button, memberName, view, data.url, data.spriteFrame, completeCallback, true);
+                    _setButtonSpriteFrame(button, memberName, view, data.url, data.spriteFrame, completeCallback,bundle, true);
                 }
             });
         }
@@ -238,12 +227,13 @@ export function setButtonSpriteFrame(button: cc.Button, config: {
     pressedSprite?: string | { urls: string[], key: string },
     hoverSprite?: string | { urls: string[], key: string },
     disabledSprite?: string | { urls: string[], key: string },
-    completeCallback?: (type: string, spriteFrame: cc.SpriteFrame) => void
+    completeCallback?: (type: string, spriteFrame: cc.SpriteFrame) => void,
+    bundle?:BUNDLE_TYPE
 }) {
-    _setButtonWithType(button, ButtonSpriteMemberName.Norml, config.view, config.normalSprite, config.completeCallback);
-    _setButtonWithType(button, ButtonSpriteMemberName.Pressed, config.view, config.pressedSprite, config.completeCallback);
-    _setButtonWithType(button, ButtonSpriteMemberName.Hover, config.view, config.hoverSprite, config.completeCallback);
-    _setButtonWithType(button, ButtonSpriteMemberName.Disable, config.view, config.disabledSprite, config.completeCallback);
+    _setButtonWithType(button, ButtonSpriteMemberName.Norml, config.view, config.normalSprite, config.completeCallback,config.bundle);
+    _setButtonWithType(button, ButtonSpriteMemberName.Pressed, config.view, config.pressedSprite, config.completeCallback,config.bundle);
+    _setButtonWithType(button, ButtonSpriteMemberName.Hover, config.view, config.hoverSprite, config.completeCallback,config.bundle);
+    _setButtonWithType(button, ButtonSpriteMemberName.Disable, config.view, config.disabledSprite, config.completeCallback,config.bundle);
 }
 
 /**
@@ -254,13 +244,14 @@ export function setButtonSpriteFrame(button: cc.Button, config: {
  */
 export function setParticleSystemFile(
     component: cc.ParticleSystem,
-    config: { url: string, view: any, completeCallback?: (file: cc.ParticleAsset) => void },
+    config: { url: string, view: any, completeCallback?: (file: cc.ParticleAsset) => void , bundle:BUNDLE_TYPE},
     data: cc.ParticleAsset
 ) {
     let info = new ResourceInfo;
     info.url = config.url;
     info.type = cc.ParticleAsset;
     info.data = data;
+    info.bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
     addExtraLoadResource(config.view, info);
     if (data && isValidComponent(component)) {
         let oldFile = component.file;
@@ -289,12 +280,13 @@ export function setParticleSystemFile(
  */
 export function setLabelFont(
     component: cc.Label,
-    config: { font: string, view: any, completeCallback?: (font: cc.Font) => void },
+    config: { font: string, view: any, completeCallback?: (font: cc.Font) => void , bundle:BUNDLE_TYPE },
     data: cc.Font) {
     let info = new ResourceInfo;
     info.url = config.font;
     info.type = cc.Font;
     info.data = data;
+    info.bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
     addExtraLoadResource(config.view, info);
     if (data && isValidComponent(component)) {
         let oldFont = component.font;
@@ -323,8 +315,8 @@ export function setLabelFont(
  */
 export function setSkeletonSkeletonData(
     component: sp.Skeleton,
-    config: { url: string, view: any, completeCallback: (data: sp.SkeletonData) => void } |
-    { view: any, path: string, name: string, completeCallback: (data: sp.SkeletonData) => void, isNeedCache?: boolean, retain?: boolean },
+    config: { url: string, view: any, completeCallback: (data: sp.SkeletonData) => void , bundle:BUNDLE_TYPE} |
+    { view: any, path: string, name: string, completeCallback: (data: sp.SkeletonData) => void, bundle:BUNDLE_TYPE , isNeedCache?: boolean, retain?: boolean },
     data: sp.SkeletonData,
     resourceType: ResourceType = ResourceType.Local) {
     let url = "";
@@ -342,6 +334,7 @@ export function setSkeletonSkeletonData(
     info.type = sp.SkeletonData;
     info.data = data;
     info.retain = retain;
+    info.bundle = config.bundle;
     if (resourceType == ResourceType.Remote) {
         addRemoteLoadResource(config.view, info);
     } else {
@@ -370,11 +363,12 @@ export function setSkeletonSkeletonData(
  * @description 通过预置体创建Node
  * @param config 配置信息
  */
-export function createNodeWithPrefab(config: { url: string, view: any, completeCallback: (node: cc.Node) => void }, data: cc.Prefab) {
+export function createNodeWithPrefab(config: { bundle:BUNDLE_TYPE , url: string, view: any, completeCallback: (node: cc.Node) => void }, data: cc.Prefab) {
     let info = new ResourceInfo;
     info.url = config.url;
     info.type = cc.Prefab;
     info.data = data;
+    info.bundle = config.bundle?config.bundle : BUNDLE_RESOURCES;
     addExtraLoadResource(config.view, info);
     if (data && isValidComponent(config.view) && config.completeCallback) {
         let node = cc.instantiate(data);
