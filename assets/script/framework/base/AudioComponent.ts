@@ -1,8 +1,8 @@
 import UIView from "../ui/UIView";
-import { ResourceInfo } from "./Defines";
+import { ResourceInfo, BUNDLE_TYPE } from "./Defines";
 import { localStorage } from "./LocalStorage";
 import { uiManager } from "./UIManager";
-import { resCaches } from "../cache/ResCaches";
+import { cacheManager } from "../assetManager/CacheManager";
 
 /**
  * @description 声音组件
@@ -25,6 +25,7 @@ class AudioData {
     public isMusicOn = true;
     public curMusicUrl = "";
     public curEffectId = -1;
+    public curBundle : BUNDLE_TYPE = null;
 
     private readonly _storeMusicKey: string = "default_save_music";
     private readonly _storeEffectKey: string = "default_save_effect";
@@ -106,7 +107,7 @@ export default class AudioComponent extends cc.Component {
                 return;
             }
             if (isPlay) {
-                this.playMusic(this.curMusicUrl, true);
+                this.playMusic(this.curMusicUrl,this.curBundle,true);
             }
         } else {
             this.stopMusic();
@@ -115,6 +116,9 @@ export default class AudioComponent extends cc.Component {
     /**@description 当前播放的背景音乐 */
     public get curMusicUrl() { return this.audioData.curMusicUrl; }
     public set curMusicUrl(value) { this.audioData.curMusicUrl = value };
+
+    public get curBundle(){ return this.audioData.curBundle;}
+    public set curBundle(value){ this.audioData.curBundle = value;}
 
     /**@description 存储 */
     public save() {
@@ -143,7 +147,7 @@ export default class AudioComponent extends cc.Component {
         cc.audioEngine.stopMusic();
     }
 
-    public playMusic(url: string, loop: boolean = true) {
+    public playMusic(url: string, bundle : BUNDLE_TYPE , loop: boolean = true) {
         return new Promise<{ url: string, isSuccess: boolean }>((resolve) => {
             if ( CC_DEBUG ){
                 if ( !this.owner ){
@@ -154,12 +158,13 @@ export default class AudioComponent extends cc.Component {
             }
             this.audioData.curMusicUrl = url;
             if (this.audioData.isMusicOn) {
-                resCaches().getCacheByAsync(url, cc.AudioClip).then((data) => {
+                cacheManager().getCacheByAsync(url,cc.AudioClip,bundle).then((data) => {
                     if (data) {
                         let info = new ResourceInfo;
                         info.url = url;
                         info.type = cc.AudioClip;
                         info.data = data;
+                        info.bundle = bundle;
                         if ( this.owner ){ 
                             uiManager().addLocal(info,this.owner.className);
                         }else{
@@ -179,7 +184,7 @@ export default class AudioComponent extends cc.Component {
 
     }
 
-    public playEffect(url: string, loop: boolean = false) {
+    public playEffect(url: string, bundle:BUNDLE_TYPE ,loop: boolean = false) {
         return new Promise<number>((resolve) => {
             if ( CC_DEBUG ){
                 if ( !this.owner ){
@@ -189,12 +194,13 @@ export default class AudioComponent extends cc.Component {
                 }
             }
             if (this.audioData.isEffectOn) {
-                resCaches().getCacheByAsync(url, cc.AudioClip).then((data) => {
+                cacheManager().getCacheByAsync(url,cc.AudioClip,bundle).then((data) => {
                     if (data) {
                         let info = new ResourceInfo;
                         info.url = url;
                         info.type = cc.AudioClip;
                         info.data = data;
+                        info.bundle = bundle;
                         if ( this.owner ) {
                             uiManager().addLocal(info,this.owner.className);
                         }else{

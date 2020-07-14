@@ -34,7 +34,7 @@ export class ResourceInfo{
     assetUrl : string = "";
     /**@description 是否常驻内存，远程加载资源有效 */
     retain : boolean = false;
-    bundle:string|cc.AssetManager.Bundle = null;
+    bundle:BUNDLE_TYPE = null;
 }
 
 export class ResourceCacheData {
@@ -61,7 +61,7 @@ export class ResourceCacheData {
 
     status = ResourceCacheStatus.NONE;
 
-    bundle:string|cc.AssetManager.Bundle = null;
+    bundle:BUNDLE_TYPE = null;
 
     /**@description 在加载过程中有地方获取,加载完成后再回调 */
     getCb: ((data: any) => void)[] = [];
@@ -112,7 +112,7 @@ export interface ResourceData {
      * 从而会造成消息处理不是顺序执行 
      * */
     preloadView?: UIClass<UIView>,
-    bundle?:string|cc.AssetManager.Bundle,
+    bundle?:BUNDLE_TYPE,
 }
 
 /**
@@ -128,3 +128,5 @@ export enum ViewStatus {
     /**@description 无状态 */
     WAITTING_NONE,
 }
+
+export type BUNDLE_TYPE = string | cc.AssetManager.Bundle;

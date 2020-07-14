@@ -1,6 +1,6 @@
 import UIView, { UIClass } from "../ui/UIView";
 import { resolutionHelper } from "../adaptor/ResolutionHelper";
-import { ResourceInfo, ResourceCacheData, ViewStatus } from "./Defines";
+import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_TYPE } from "./Defines";
 import { getSingleton } from "./Singleton";
 import { loader } from "../loader/Loader";
 import { remoteCaches } from "../cache/ResCaches";
@@ -228,7 +228,7 @@ class UIManager {
     public uiLoading: UILoadingDelegate = null;
     public toast : ToastDelegate = null;
 
-    public preload<T extends UIView>(uiClass: UIClass<T>,bundle:string | cc.AssetManager.Bundle) {
+    public preload<T extends UIView>(uiClass: UIClass<T>,bundle:BUNDLE_TYPE) {
         return this._open(uiClass,bundle, 0, true, null,null);
     }
 
@@ -251,11 +251,11 @@ class UIManager {
      * @param zIndex 节点层级 
      * @param args 传入参数列表
      */
-    public open<T extends UIView>(config: { type: UIClass<T>, bundle?:string|cc.AssetManager.Bundle , zIndex?: number, args?: any[] , delay?: number,name?:string}) : Promise<T>{
+    public open<T extends UIView>(config: { type: UIClass<T>, bundle?:BUNDLE_TYPE , zIndex?: number, args?: any[] , delay?: number,name?:string}) : Promise<T>{
         return this._open(config.type,config.bundle, config.zIndex ? config.zIndex : 0, false, config.args,config.delay,config.name);
     }
 
-    private _open<T extends UIView>(uiClass: UIClass<T>, bundle:string|cc.AssetManager.Bundle, zOrder: number = 0, isPreload: boolean, args: any[],delay : number,name?:string) {
+    private _open<T extends UIView>(uiClass: UIClass<T>, bundle:BUNDLE_TYPE, zOrder: number = 0, isPreload: boolean, args: any[],delay : number,name?:string) {
         return new Promise<T>((reslove, reject) => {
             if (!uiClass) {
                 if (CC_DEBUG) cc.log(`${this._logTag}open ui class error`);
@@ -437,7 +437,7 @@ class UIManager {
         }
     }
 
-    private loadPrefab( bundle: string | cc.AssetManager.Bundle, url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
+    private loadPrefab( bundle: BUNDLE_TYPE, url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
         return new Promise<cc.Prefab>((resolove, reject) => {
             if ( bundle == undefined || bundle == "" ){
                 bundle = assetManager().getBundleResources();

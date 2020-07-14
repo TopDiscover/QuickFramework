@@ -6,7 +6,7 @@ CocosCreator 快速开发轻量级棋牌框架
 
 本项目基于 cocos creator 2.4.0版本
 
-以subpackages为基础的大厅+子游戏示例
+以Asset Bundle为基础的大厅+子游戏示例
 提供一个轻量级的棋牌开发框架,让你的开发更加简单
 
 [界面管理器](https://github.com/zhengfasheng/QuickFramework/tree/2.4.0/assets/script/framework/base/UIManager.ts)
