@@ -6,7 +6,6 @@ import { uiManager } from "../../../script/framework/base/UIManager";
 import GameOneView from "./GameOneView";
 import { logicManager } from "../../../script/common/manager/LogicManager";
 
-
 class GameOneLogic extends Logic {
 
     logicType: LogicType = LogicType.GAME;

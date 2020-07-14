@@ -1,8 +1,8 @@
 import { LogicEventData, LogicType } from "../event/LogicEvent";
-import ResourceLoader, { ResourceLoaderError } from "../../framework/loader/ResourceLoader";
 import EventComponent from "../../framework/base/EventComponect";
 import { GamePathDelegate } from "./ResPath";
 import { ResourceData, ResourceCacheData } from "../../framework/base/Defines";
+import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
 
 /**
  * @description 逻辑控制器 需要实现LogicInterface
