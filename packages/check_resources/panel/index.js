@@ -23,7 +23,7 @@ for (let i = 0; i < _gamesConfig.games.length; i++) {
     let gameInfo = _gamesConfig.games[i];
     if (gameInfo.dir && gameInfo.dir.length > 0) {
         _subGameVersion[`${gameInfo.dir}`] = gameInfo.version;
-        _subGameDir[`${gameInfo.dir}`] = `db://assets/resources/games/${gameInfo.dir}`;
+        _subGameDir[`${gameInfo.dir}`] = `db://assets/games/${gameInfo.dir}`;
         _subGameServerVersionView += `
         <ui-prop name="${gameInfo.name}(${gameInfo.dir})">
             <div class="flex-1 layout horizontal center">
@@ -64,11 +64,11 @@ Editor.Panel.extend({
             computed: {},
             methods: {
                 _initPluginCfg() {
-                    this.gameRoot = `${Editor.Project.path}/assets/resources/games`;
+                    this.gameRoot = `${Editor.Project.path}/assets/games`;
                 },
                 /**@description 选择子游戏目录 */
                 onSelectGameRoot(e) {
-                    let assetsPath = `${Editor.Project.path}/assets/resources/games`;
+                    let assetsPath = `${Editor.Project.path}/assets/games`;
                     this.gameRoot && this.gameRoot.length > 0 && fs.existsSync(this.gameRoot) && (assetsPath = this.gameRoot);
                     let result = Editor.Dialog.openFile({
                         title: "选择本地测试服务器目录",
