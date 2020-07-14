@@ -1,5 +1,6 @@
 import { ResourceData, ResourceCacheData, ResourceInfo } from "../base/Defines";
-import { loader } from "./Loader";
+import { assetManager } from "../assetManager/AssetManager";
+import { uiManager } from "../base/UIManager";
 
 export enum ResourceLoaderError {
     /**@description 加载中 */
@@ -114,18 +115,18 @@ export default class ResourceLoader {
 
         this._loadedCount = 0;
         this._resources.forEach((value: ResourceData,key,source) => {
-            if (value.url) {
-                //先添加引用关系
-                let info = new ResourceInfo;
-                info.url = value.url;
-                info.type = value.type;
-                //cc.log(`load info url : ${info.url}`);
-                loader().retainPreReference(info);
+            if ( value.preloadView ){
+                uiManager().preload(value.preloadView,value.bundle).then((view)=>{
+                    let cache = new ResourceCacheData();
+                    cache.isLoaded = true;
+                    cache.data = <any>view;
+                    cache.url = value.preloadView.getPrefabUrl();
+                    cache.bundle = value.bundle;
+                    this._onLoadResourceComplete(cache);
+                })
             }else{
-                //预加载界面由UIManager管理
+                assetManager().load(value.bundle,value.url,value.type,null,this._onLoadResourceComplete.bind(this));
             }
-
-            loader().loadRes(value, this._onLoadResourceComplete.bind(this));
         });
     }
 
@@ -147,15 +148,10 @@ export default class ResourceLoader {
         if (this._resources.size > 0) {
             this._resources.forEach((value: ResourceData) => {
                 if ( value.url ){
-                    //解除预加载引用
-                    let info = new ResourceInfo;
-                    info.url = value.url;
-                    info.type = value.type;
-                    loader().releasePreReference(info);
                     if( this._loadedResource.has(value.url)){
                         let data = this._loadedResource.get(value.url);
                         if( data ){
-                            loader().releaseAsset(data);
+                            assetManager().releaseAsset(data);
                         }
                         this._loadedResource.delete(value.url);
                     }
@@ -185,8 +181,7 @@ export default class ResourceLoader {
             info.url = data.url;
             info.type = data.assetType;
             info.data = data.data;
-            info.assetUrl = loader().getResourcePath(data.data);
-            loader().retainAsset(info);
+            info.bundle = data.bundle;
             this._loadedResource.set(info.url,info);
         }
 

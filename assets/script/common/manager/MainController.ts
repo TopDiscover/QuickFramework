@@ -4,7 +4,6 @@ import { remoteLoader } from "../../framework/loader/RemoteLoader";
 import { resolutionHelper } from "../../framework/adaptor/ResolutionHelper";
 import { logicManager } from "./LogicManager";
 import { uiManager } from "../../framework/base/UIManager";
-import { loader } from "../../framework/loader/Loader";
 import GlobalAudio from "../component/GlobalAudio";
 
 /**
@@ -47,7 +46,6 @@ export default class MainController extends ViewController {
     /**@description 游戏完成一次渲染过程之后 */
     private _onDirectorAfterDraw( ){
         let cando = uiManager().onDirectorAfterDraw();
-        loader().onDirectorAfterDraw(cando);
     }
 
     update(){
