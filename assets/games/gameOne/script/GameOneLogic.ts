@@ -16,19 +16,19 @@ class GameOneLogic extends Logic {
         super.onLoad();
     }
 
-    protected bindingEvents(){
+    protected bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(LogicEvent.ENTER_GAME,this.onEnterGame);
+        this.registerEvent(LogicEvent.ENTER_GAME, this.onEnterGame);
     }
 
-    protected getGameName(){
+    protected getGameName() {
         return "gameOne";
     }
 
-    private onEnterGame( data ) {
-        if( data == this.getGameName()){
+    private onEnterGame(data) {
+        if (data == this.getGameName()) {
             GamePath.instance.delegate = this.gamePahtDelegate;
-            uiManager().open({type:GameOneView,bundle:this.getGameName()});
+            uiManager().open({ type: GameOneView, bundle: this.getGameName() });
         }
     }
 }
