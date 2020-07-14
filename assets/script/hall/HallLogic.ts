@@ -3,6 +3,7 @@ import { uiManager } from "../framework/base/UIManager";
 import HallView from "./HallView";
 import { logicManager } from "../common/manager/LogicManager";
 import { LogicType, LogicEvent } from "../common/event/LogicEvent";
+import { BUNDLE_RESOURCES } from "../framework/base/Defines";
 
 
 class HallLogic extends Logic {
@@ -20,7 +21,7 @@ class HallLogic extends Logic {
     }
 
     private onEnterHall(){
-        uiManager().open({ type: HallView });
+        uiManager().open({ type: HallView , bundle:BUNDLE_RESOURCES});
     }
 }
 

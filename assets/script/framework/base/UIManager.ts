@@ -292,6 +292,7 @@ class UIManager {
                         viewData.info.url = prefabUrl;
                         viewData.info.type = cc.Prefab;
                         viewData.info.data = prefab;
+                        viewData.info.bundle = bundle;
                         this.createNode(className, uiClass, reslove, prefab, args, zOrder);
                         if (this.uiLoading) this.uiLoading.hide();
                     }).catch((reason) => {
