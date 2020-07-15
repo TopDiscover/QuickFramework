@@ -49,14 +49,26 @@
   "xxteaKey": "de565b49-7232-43",
   "zipCompressJs": true,
   "android": {
+    "REMOTE_SERVER_ROOT": "",
     "packageName": "org.cocos2d.Quick"
   },
   "ios": {
+    "REMOTE_SERVER_ROOT": "",
     "packageName": "org.cocos2d.examplecases"
   },
   "mac": {
-    "packageName": "org.cocos2d.examplecases"
+    "REMOTE_SERVER_ROOT": "",
+    "height": 720,
+    "packageName": "org.cocos2d.examplecases",
+    "width": 1280
   },
-  "win32": {},
-  "includeAnySDK": null
+  "win32": {
+    "REMOTE_SERVER_ROOT": "",
+    "height": 720,
+    "width": 1280
+  },
+  "includeAnySDK": null,
+  "mainCompressionType": "default",
+  "mainIsRemote": false,
+  "nativeMd5Cache": true
 }

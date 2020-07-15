@@ -834,7 +834,7 @@ Editor.Panel.extend({
                         if ( !this.subGameInclude[game] ){
                             isFind = true;
                             
-                            let gamePath = path.join(this.resourceRootDir,"subpackages");
+                            let gamePath = path.join(this.resourceRootDir,"assets");
                             gamePath = path.join(gamePath,game);
                             if (fs.existsSync(gamePath)) {
                                 //删除子游戏代码及资源
