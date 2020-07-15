@@ -105,19 +105,14 @@ android.applicationVariants.all { variant ->
         def sourceDir = "${buildDir}/../../../../.."
 
         copy {
-            from "${sourceDir}/res"
-            into "${outputDir}/res"
+            from "${sourceDir}/assets"
+            into "${outputDir}/assets"
         }
 
-        //如果不需要某个子游戏，请手动删除其版本控制文件、代码及资源，但大厅的版本文件必须存在
+        //如果要删除子游戏，请使用热更新工具去除子游戏，再打包,但大厅的版本文件必须在包内
         copy {
             from "${sourceDir}/manifest"
             into "${outputDir}/manifest"
-        }
-
-        copy {
-            from "${sourceDir}/subpackages"
-            into "${outputDir}/subpackages"
         }
 
         copy {
@@ -139,6 +134,7 @@ android.applicationVariants.all { variant ->
 }
 
 dependencies {
+    implementation fileTree(dir: '../libs', include: ['*.jar','*.aar'])
     implementation fileTree(dir: 'libs', include: ['*.jar','*.aar'])
     implementation fileTree(dir: "../../../cocos2d-x/cocos/platform/android/java/libs", include: ['*.jar'])
     implementation project(':libcocos2dx')

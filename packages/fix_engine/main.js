@@ -89,7 +89,7 @@ function fixEngine(creatorPath) {
         let engineSourcePath = `${resourcesPath}/${info.path}`;
         engineSourcePath = path.normalize(engineSourcePath);
         Editor.log(engineSourcePath);
-        if (!fs.existsSync(engineSourcePath) && info.name != "fix_engine_version.json") {
+        if (!fs.existsSync(engineSourcePath) && info.name != "version.json") {
             Editor.error(`不存在 ： ${engineSourcePath}`);
             isAllExist = false;
         }
@@ -135,13 +135,65 @@ function fixEngine(creatorPath) {
     }
 }
 
+/**@description 获取CocosCreator安装目录 */
+function getCocosCreatorPath(){
+    //window : D:\CocosCreator\2.1.2\CocosCreator.exe --path
+    //mac : Applications/CocosCreator.app/Contents/MacOS/CocosCreator --path
+    let editorPath = Editor.argv[`$0`];
+    editorPath = editorPath.substr(0, editorPath.length - 7);
+    let pos = editorPath.indexOf("MacOS");
+    let isMac = false;
+    if (pos != -1) {
+        isMac = true;
+        editorPath = editorPath.substr(0, pos - 1);
+    } else {
+        editorPath = editorPath.substr(0, editorPath.indexOf("CocosCreator.exe") - 1);
+    }
+    Editor.log("Creator 安装目录 : " + editorPath);
+    Editor.log("当前平台 : " + (isMac ? "Mac" : "Windows"));
+    return editorPath;
+}
+
+function checkFixEngineVersion(options){
+    let nowVersionPath = `${options.project}/packages/engine/version.json`;
+    nowVersionPath = path.normalize(nowVersionPath);
+    let nowVersion = fs.readFileSync(nowVersionPath, "utf-8");
+    nowVersion = JSON.parse(nowVersion);
+    let resourcesPath = getResourcePath(getCocosCreatorPath());
+    let oldVersionPath = `${resourcesPath}/version.json`;
+    if (!fs.existsSync(oldVersionPath)){
+        //Editor.error(`引擎修正插件必须执行一次!!`);
+        throw new Error("引擎修正插件必须执行一次!!");
+        return;
+    }
+    oldVersionPath = path.normalize(oldVersionPath);
+    let oldVersion = fs.readFileSync(oldVersionPath,"utf-8");
+    oldVersion = JSON.parse(oldVersion);
+    if( nowVersion.version != oldVersion.version ){
+        //Editor.error(`引擎修正插件有更新，必须执行一次!!`);
+        throw new Error(`引擎修正插件有更新，必须执行一次!!`);
+    }
+}
+
+function onBuildStart( options , callback){
+    //执行构建时测试当前是否已经做过引用修正，检测引擎修正的版本是否最新
+    checkFixEngineVersion(options);
+    callback();
+}
+
+function onBuildFinish( options , callback){
+    callback();
+}
+
 module.exports = {
     load() {
-        // execute when package loaded
+        Editor.Builder.on('build-start', onBuildStart);
+        Editor.Builder.on('build-finished', onBuildFinish);
     },
 
     unload() {
-        // execute when package unloaded
+        Editor.Builder.removeListener('build-start', onBuildStart);
+        Editor.Builder.removeListener('build-finished', onBuildFinish);
     },
 
     // register your ipc messages here
@@ -172,21 +224,7 @@ module.exports = {
                 Editor.log(`请自己手动对比packages/engine目录下对引擎的改动`);
                 return;
             }
-
-            //window : D:\CocosCreator\2.1.2\CocosCreator.exe --path
-            //mac : Applications/CocosCreator.app/Contents/MacOS/CocosCreator --path
-            let editorPath = Editor.argv[`$0`];
-            editorPath = editorPath.substr(0, editorPath.length - 7);
-            let pos = editorPath.indexOf("MacOS");
-            if (pos != -1) {
-                isMac = true;
-                editorPath = editorPath.substr(0, pos - 1);
-            } else {
-                editorPath = editorPath.substr(0, editorPath.indexOf("CocosCreator.exe") - 1);
-            }
-            Editor.log("Creator 安装目录 : " + editorPath);
-            Editor.log("当前平台 : " + (isMac ? "Mac" : "Windows"));
-            fixEngine(editorPath);
+            fixEngine(getCocosCreatorPath());
         }
     },
 };
