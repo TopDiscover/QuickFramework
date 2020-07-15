@@ -125,10 +125,9 @@
   <ItemDefinitionGroup>
     <CustomBuildStep>
       <Command>xcopy "$(ProjectDir)..\..\..\src" "$(OutDir)\src" /D /E /I /F /Y
-xcopy "$(ProjectDir)..\..\..\res" "$(OutDir)\res" /D /E /I /F /Y
+xcopy "$(ProjectDir)..\..\..\assets" "$(OutDir)\assets" /D /E /I /F /Y
 xcopy "$(ProjectDir)..\..\..\jsb-adapter" "$(OutDir)\jsb-adapter" /D /E /I /F /Y
 xcopy "$(ProjectDir)..\..\..\manifest" "$(OutDir)\manifest" /D /E /I /F /Y
-xcopy "$(ProjectDir)..\..\..\subpackages" "$(OutDir)\subpackages" /D /E /I /F /Y
 copy "$(ProjectDir)..\..\..\main.js" "$(OutDir)\" /Y
 copy "$(ProjectDir)..\..\..\project.json" "$(OutDir)\" /Y</Command>
       <Outputs>$(TargetName).cab</Outputs>
@@ -189,6 +188,7 @@ copy "$(ProjectDir)..\..\..\project.json" "$(OutDir)\" /Y</Command>
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Classes\NativeConfig.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="resource.h" />

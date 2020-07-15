@@ -33,5 +33,15 @@
         "path" : "cocos2d-x/cocos/scripting/js-bindings/auto/jsb_cocos2dx_extension_auto.cpp",
         "name" : "jsb_cocos2dx_extension_auto.cpp",
         "desc" : "执更新修改,jsb_cocos2dx_extension_auto.cpp"
+    },
+    "jsb_default_HelloJavascript.vcxproj":{
+        "path" : "cocos2d-x/templates/js-template-default/frameworks/runtime-src/proj.win32/HelloJavascript.vcxproj",
+        "name" : "jsb-default/HelloJavascript.vcxproj",
+        "desc" : "执更新修改,添加win32 jsb-default 工程复制版本控制文件生成事件"
+    },
+    "jsb_link_HelloJavascript.vcxproj":{
+        "path" : "cocos2d-x/templates/js-template-link/frameworks/runtime-src/proj.win32/HelloJavascript.vcxproj",
+        "name" : "jsb-link/HelloJavascript.vcxproj",
+        "desc" : "执更新修改,添加win32 jsb-link 工程复制版本控制文件生成事件"
     }
 }
