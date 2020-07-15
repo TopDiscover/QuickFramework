@@ -129,29 +129,16 @@ Editor.Panel.extend({
                     this._addLog("[Pack] 开始打包版本 ...");
                     let jszip = new(Editor.require("packages://hot-update-tools/node_modules/jszip")),
                         versionManifest = path.join(this.genManifestDir, "version.manifest");
-                    jszip.file("manifest/version.manifest", fs.readFileSync(versionManifest));
-                    let projectManifest = path.join(this.genManifestDir, "project.manifest");
-                    jszip.file("manifest/project.manifest", fs.readFileSync(projectManifest));
                     //把包src目录的代码资源
                     let src = path.join(this.resourceRootDir, "src");
                     this._packageDir(src, jszip.folder("src"));
-                    //批包res目录的代码资源
-                    let res = path.join(this.resourceRootDir, "res");
-                    this._packageDir(res, jszip.folder("res"));
+                    //批包assets目录的代码资源
+                    let assets = path.join(this.resourceRootDir, "assets");
+                    this._packageDir(assets, jszip.folder("assets"));
 
-                    //打包subpackages的子游戏资源及代码
-                    let subpackages = path.join(this.resourceRootDir, "subpackages");
-                    this._packageDir(subpackages, jszip.folder("subpackages"));
-
-                    //打包subpackages的子游戏版本文件
-                    let keys = Object.keys(this.subGameVersion);
-                    for (let i = 0; i < keys.length; i++) {
-                        let key = keys[i];
-                        let subgameManifest = path.join(this.genManifestDir, `${key}_project.manifest`);
-                        jszip.file(`manifest/${key}_project.manifest`, fs.readFileSync(subgameManifest));
-                        let subgameVersionManifest = path.join(this.genManifestDir, `${key}_version.manifest`);
-                        jszip.file(`manifest/${key}_version.manifest`, fs.readFileSync(subgameVersionManifest));
-                    }
+                    //打包manifest的版本文件
+                    let manifest = path.join(this.resourceRootDir, "manifest");
+                    this._packageDir(manifest, jszip.folder("manifest"));
 
                     let mainVersionManifest = fs.readFileSync(versionManifest, "utf-8"),
                         mainVersion = JSON.parse(mainVersionManifest).version;
@@ -410,7 +397,9 @@ Editor.Panel.extend({
                     let dest = genManifestDir;
                     let source = resourceRootDir;
                     this._readDir(path.join(source, "src"), manifest.assets, source);
-                    this._readDir(path.join(source, "res"), manifest.assets, source);
+                    this._readDir(path.join(source, "assets/internal"), manifest.assets, source);
+                    this._readDir(path.join(source, "assets/main"), manifest.assets, source);
+                    this._readDir(path.join(source, "assets/resources"), manifest.assets, source);
                     let projectManifest = path.join(dest, "project.manifest");
                     let versionManifest = path.join(dest, "version.manifest");
                     this._mkdirSync(dest);
@@ -455,7 +444,7 @@ Editor.Panel.extend({
                             submanifest.remoteVersionUrl = `${serverRootDir}/manifest/${key}_version.manifest`;
                         }
 
-                        this._readDir(path.join(source, `subpackages/${key}`), submanifest.assets, source);
+                        this._readDir(path.join(source, `assets/${key}`), submanifest.assets, source);
 
                         let subgameManifest = path.join(dest, `${key}_project.manifest`);
                         fs.writeFileSync(subgameManifest, JSON.stringify(submanifest));
