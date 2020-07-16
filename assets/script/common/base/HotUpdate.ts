@@ -118,9 +118,11 @@ export class GameConfig {
     gameName: string = "";
     /**@description h5是否加载子游戏完成 */
     isLoaded = false;
-    constructor( gameName : string , subpackageName : string ){
+    index = 0;
+    constructor( gameName : string , subpackageName : string , index : number){
         this.gameName = gameName;
         this.subpackageName = subpackageName;
+        this.index = index;
         this.isLoaded = false;
     }
  }
@@ -219,7 +221,7 @@ class _HotUpdate {
 
     /**@description 获取子游戏名 */
     public getGameLocalName(gameName: string) {
-        return this.allGameConfig[gameName].gameName;
+        return this.allGameConfig[gameName];
     }
 
     /**@description 释放资源管理器，默认为hall 大厅资源管理器 */

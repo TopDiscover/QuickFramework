@@ -161,23 +161,23 @@ needRestart : ${needRestart}
     ERROR_DECOMPRESS,
        */
 
-      let gameName = HotUpdate.getGameLocalName(this.curGame.subpackageName);
+      let gameConfig = HotUpdate.getGameLocalName(this.curGame.subpackageName);
 
       if (code == AssetManagerCode.UPDATE_PROGRESSION) {
          newPercent = percent == Number.NaN ? 0 : percent;
-         dispatch(HallEvent.DOWNLOAD_PROGRESS, { progress: newPercent, name: this.curGame.subpackageName });
+         dispatch(HallEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
       } else if (code == AssetManagerCode.ALREADY_UP_TO_DATE) {
          newPercent = 1;
-         dispatch(HallEvent.DOWNLOAD_PROGRESS, { progress: newPercent, name: this.curGame.subpackageName });
+         dispatch(HallEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
       } else if (code == AssetManagerCode.UPDATE_FINISHED) {
          newPercent = 1.1;
-         cc.log(`更新${gameName}成功`);
+         cc.log(`更新${gameConfig.gameName}成功`);
          if (!needRestart) {
             //不需要重启//直接加载子游戏进入
-            cc.log(`正在加载${gameName}`);
+            cc.log(`正在加载${gameConfig.gameName}`);
             this.loadSubpackage();
          }
-         dispatch(HallEvent.DOWNLOAD_PROGRESS, { progress: newPercent, name: this.curGame.subpackageName });
+         dispatch(HallEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
       } else if (code == AssetManagerCode.UPDATE_FAILED ||
          code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||
          code == AssetManagerCode.ERROR_DOWNLOAD_MANIFEST ||
@@ -185,8 +185,8 @@ needRestart : ${needRestart}
          code == AssetManagerCode.ERROR_DECOMPRESS) {
          newPercent = -1;
          this.isLoading = false;
-         cc.error(`更新${gameName}失败`);
-         dispatch(HallEvent.DOWNLOAD_PROGRESS, { progress: newPercent, name: this.curGame.subpackageName });
+         cc.error(`更新${gameConfig.gameName}失败`);
+         dispatch(HallEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
       }
    }
 }

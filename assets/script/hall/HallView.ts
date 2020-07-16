@@ -4,7 +4,6 @@ import { dispatchEnterComplete, LogicType } from "../common/event/LogicEvent";
 import { gameManager } from "../common/manager/GameManager";
 import { GameConfig } from "../common/base/HotUpdate";
 import { HallEvent } from "./HallEvent";
-import { BUNDLE_RESOURCES } from "../framework/base/Defines";
 
 const { ccclass, property } = cc._decorator;
 
@@ -15,27 +14,27 @@ export default class HallView extends UIView {
         return HALL("prefabs/HallView")
     }
 
-    private _oneProgress : cc.ProgressBar;
-    private _twoProgress : cc.ProgressBar;
+    private readonly games = [
+        new GameConfig("游戏1","gameOne",1),
+        new GameConfig("游戏2","gameTwo",2),
+    ];
 
     onLoad() {
         super.onLoad();
-        let game = cc.find(`gameOne`, this.node);
-        if (game) {
-            game.on(cc.Node.EventType.TOUCH_END, () => {
-                //let sp = cc.find("Background/icon",game).getComponent(cc.Sprite);
-                //sp.loadImage({view:this,url:"hall/texture/icon3",bundle:BUNDLE_RESOURCES});
-                gameManager().enterGame(new GameConfig("斗地主", "gameOne"));
-            })
-            this._oneProgress = cc.find("Background/progressBar",game).getComponent(cc.ProgressBar);
-        }
-        game = cc.find(`gameTwo`, this.node);
-        if (game) {
-            game.on(cc.Node.EventType.TOUCH_END, () => {
-                gameManager().enterGame(new GameConfig("欢乐捕鱼", "gameTwo"));
-
-            })
-            this._twoProgress = cc.find("Background/progressBar",game).getComponent(cc.ProgressBar);
+        let nodeGames = cc.find("games",this.node);
+        let notice = cc.find("hall_msg_bg/content",this.node).getComponent(cc.Label);
+        for( let i = 1 ; i <= 6 ; i++ ){
+            let game = cc.find(`game_${i}`,nodeGames);
+            if ( i -1 < this.games.length ){
+                game.on(cc.Node.EventType.TOUCH_END,()=>{
+                    gameManager().enterGame(this.games[i-1]);
+                });
+            }else{
+                game.on(cc.Node.EventType.TOUCH_END,()=>{
+                    let title = cc.find("Background/name",game).getComponent(cc.Label);
+                    notice.string = `【${title.string}】未实现，更多功能，敬请期待!!!`;
+                });
+            }
         }
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
     }
@@ -45,18 +44,10 @@ export default class HallView extends UIView {
          this.registerEvent(HallEvent.DOWNLOAD_PROGRESS,this.onDownloadProgess);
      }
      
-     private onDownloadProgess( data : { progress: number, name: string }){
+     private onDownloadProgess( data : { progress: number, config: GameConfig }){
 
-        let progressBar : cc.ProgressBar = null;
-        let progressLabel : cc.Label = null;
-        if ( data.name == "gameOne"){
-            progressBar = this._oneProgress;
-            progressLabel = cc.find("progress",progressBar.node).getComponent(cc.Label);
-        }else{
-            progressBar = this._twoProgress;
-            progressLabel = cc.find("progress",progressBar.node).getComponent(cc.Label);
-        }
-
+        let progressBar : cc.ProgressBar = cc.find(`games/game_${data.config.index}/Background/progressBar`,this.node).getComponent(cc.ProgressBar);
+        let progressLabel : cc.Label = cc.find(`games/game_${data.config.index}/Background/progressBar/progress`,this.node).getComponent(cc.Label);
         if ( data.progress == -1 ){
             progressBar.node.active = false;
         }else if ( data.progress < 1 ){
