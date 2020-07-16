@@ -279,7 +279,7 @@ class _HotUpdate {
 
     /**@description 检测更新 */
     private checkUpdate(callback: (code: AssetManagerCode, state: AssetManagerState) => void) {
-        if (CC_PREVIEW || cc.sys.isBrowser) {
+        if (CC_WECHATGAME || CC_PREVIEW || cc.sys.isBrowser ) {
             //预览及浏览器下，不需要有更新的操作
             this.updating = false;
             callback(AssetManagerCode.ALREADY_UP_TO_DATE, AssetManagerState.UP_TO_DATE);
@@ -316,7 +316,7 @@ class _HotUpdate {
 
     /**@description 检查大厅是否需要更新 */
     checkHallUpdate(callback: (code: AssetManagerCode, state: AssetManagerState) => void) {
-        if (CC_PREVIEW || cc.sys.isBrowser) {
+        if ( CC_WECHATGAME || CC_PREVIEW || cc.sys.isBrowser) {
             //预览及浏览器下，不需要有更新的操作
             cc.log(`预览或浏览器`);
             callback(AssetManagerCode.ALREADY_UP_TO_DATE, AssetManagerState.UP_TO_DATE);
@@ -342,7 +342,7 @@ class _HotUpdate {
      * @param callback 检测完成回调
      */
     checkGameUpdate(gameName: string, callback: (code: AssetManagerCode, state: AssetManagerState) => void) {
-        if (CC_PREVIEW || cc.sys.isBrowser) {
+        if (CC_WECHATGAME || CC_PREVIEW || cc.sys.isBrowser) {
             //预览及浏览器下，不需要有更新的操作
             cc.log(`预览或浏览器`);
             callback(AssetManagerCode.ALREADY_UP_TO_DATE, AssetManagerState.UP_TO_DATE);

@@ -127,7 +127,7 @@ class ResolutionHelper {
             cc.view.resizeWithBrowserSize(true);
 
             //调试浏览器
-            if (CC_PREVIEW) {
+            if (CC_PREVIEW || CC_WECHATGAME) {
                 me.recordHeight();
             } else {
                 window.addEventListener("load", () => {
@@ -170,7 +170,7 @@ class ResolutionHelper {
         let me = resolutionHelper();
         //cc.log(me._logTag,`onResize`);
         if (me.node) {
-            if (CC_PREVIEW) {
+            if (CC_PREVIEW || CC_WECHATGAME) {
                 me.recordHeight();
                 me.doAdapt();
             }

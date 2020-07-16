@@ -5,7 +5,7 @@
   "bundleName": "gameTwo",
   "priority": 5,
   "compressionType": {
-    "wechatgame": "subpackage",
+    "wechatgame": "default",
     "baidugame": "subpackage",
     "xiaomi": "subpackage",
     "quickgame": "subpackage",
@@ -13,8 +13,14 @@
     "huawei": "subpackage",
     "cocos-runtime": "subpackage"
   },
-  "optimizeHotUpdate": {},
-  "inlineSpriteFrames": {},
-  "isRemoteBundle": {},
+  "optimizeHotUpdate": {
+    "wechatgame": false
+  },
+  "inlineSpriteFrames": {
+    "wechatgame": false
+  },
+  "isRemoteBundle": {
+    "wechatgame": true
+  },
   "subMetas": {}
 }

@@ -31776,7 +31776,8 @@ declare namespace jsb{
 
     export class Manifest {
         constructor (manifestUrl: string);
-        constructor (content: string, manifestRoot: string);
+		constructor (content: string, manifestRoot: string);
+		constructor (content: string, manifestRoot: string , hotupdateUrl: string);
         parseFile (manifestUrl: string): void;
         parseJSONString (content: string, manifestRoot: string): void;
 

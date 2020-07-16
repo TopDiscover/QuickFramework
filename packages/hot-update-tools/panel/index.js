@@ -478,8 +478,7 @@ Editor.Panel.extend({
                     }
 
                     let src = path.join(this.resourceRootDir, "src");
-                    let res = path.join(this.resourceRootDir, "res");
-                    let subpackages = path.join(this.resourceRootDir, "subpackages")
+                    let res = path.join(this.resourceRootDir, "assets");
                     if (!fs.existsSync(this.resourceRootDir)) {
                         this._addLog("资源目录不存在: " + this.resourceRootDir + ", 请先构建项目");
                         return;
@@ -518,18 +517,12 @@ Editor.Panel.extend({
                     //复制src目录
                     this._copySourceDirToDesDir(src, path.join(this.localServerPath, "src"));
                     //复制res目录
-                    this._copySourceDirToDesDir(res, path.join(this.localServerPath, "res"));
+                    this._copySourceDirToDesDir(res, path.join(this.localServerPath, "assets"));
                     //复制manifest文件
                     this._copySourceDirToDesDir(path.join(this.resourceRootDir,"manifest"),path.join(this.localServerPath,"manifest"));
-                    if (fs.existsSync(subpackages)) {
-                        //复制子游戏
-                        this._copySourceDirToDesDir(subpackages, path.join(this.localServerPath, "subpackages"));
-                    }
-
                 },
                 _getTotalCopyFileNum() {
-                    let count = this._getFileNum(path.join(this.resourceRootDir, "src")) + this._getFileNum(path.join(this.resourceRootDir, "res")) + 2 + 2;
-                    count += this._getFileNum(path.join(this.resourceRootDir, "subpackages"));
+                    let count = this._getFileNum(path.join(this.resourceRootDir, "src")) + this._getFileNum(path.join(this.resourceRootDir, "assets")) + 2;
                     //这里需要加上子游戏版本文件个数
                     let subgames = Object.keys(this.subGameVersion);
                     if (subgames.length > 0) {
