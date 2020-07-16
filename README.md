@@ -40,4 +40,6 @@ sprite.loadRemoteImage({url :"http://tools.itharbors.com/res/logo.png", view : t
 --------
 生成版本控制文件
 
-#注意修改 [TEST_HOT_UPDATE_URL_ROOT](https://github.com/TopDiscover/QuickFramework/blob/2.4.0/assets/script/common/base/HotUpdate.ts#L132)为自己的服务器测试地址
+注意修改
+-------
+[TEST_HOT_UPDATE_URL_ROOT](https://github.com/TopDiscover/QuickFramework/blob/2.4.0/assets/script/common/base/HotUpdate.ts#L132)为自己的服务器测试地址
