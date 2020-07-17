@@ -392,25 +392,23 @@ class _HotUpdate {
         //this.checkCallback = null;
         //存储当前的状态，当下载版本文件失败时，state的状态与下载非版本文件是一样的状态
         this.currentAssetsManager.code = event.getEventCode();
-        if (CC_DEBUG) {
-            cc.log(`checkCb event code : ${event.getEventCode()} state : ${this.currentAssetsManager.manager.getState()}`);
-            switch (event.getEventCode()) {
-                case AssetManagerCode.ERROR_NO_LOCAL_MANIFEST:
-                    cc.log(`No local manifest file found, hot update skipped.`);
-                    break;
-                case AssetManagerCode.ERROR_DOWNLOAD_MANIFEST:
-                case AssetManagerCode.ERROR_PARSE_MANIFEST:
-                    cc.log(`Fail to download manifest file, hot update skipped.`);
-                    break;
-                case AssetManagerCode.ALREADY_UP_TO_DATE:
-                    cc.log(`Already up to date with the latest remote version.`);
-                    break;
-                case AssetManagerCode.NEW_VERSION_FOUND:
-                    cc.log(`New version found, please try to update.`);
-                    break;
-                default:
-                    return;
-            }
+        cc.log(`checkCb event code : ${event.getEventCode()} state : ${this.currentAssetsManager.manager.getState()}`);
+        switch (event.getEventCode()) {
+            case AssetManagerCode.ERROR_NO_LOCAL_MANIFEST:
+                cc.log(`No local manifest file found, hot update skipped.`);
+                break;
+            case AssetManagerCode.ERROR_DOWNLOAD_MANIFEST:
+            case AssetManagerCode.ERROR_PARSE_MANIFEST:
+                cc.log(`Fail to download manifest file, hot update skipped.`);
+                break;
+            case AssetManagerCode.ALREADY_UP_TO_DATE:
+                cc.log(`Already up to date with the latest remote version.`);
+                break;
+            case AssetManagerCode.NEW_VERSION_FOUND:
+                cc.log(`New version found, please try to update.`);
+                break;
+            default:
+                return;
         }
 
         //this.currentAssetsManager.setEventCallback(null);
