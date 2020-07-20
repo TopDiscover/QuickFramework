@@ -4,7 +4,7 @@ import { dispatchEnterComplete, LogicType } from "../common/event/LogicEvent";
 import { gameManager } from "../common/manager/GameManager";
 import { GameConfig } from "../common/base/HotUpdate";
 import { HallEvent } from "./HallEvent";
-import LanguageManager from "../common/manager/LanguageManager";
+import LanguageManager, { LANG } from "../common/manager/LanguageManager";
 
 const { ccclass, property } = cc._decorator;
 
@@ -34,7 +34,7 @@ export default class HallView extends UIView {
             }else{
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
                     let title = cc.find("Background/label",game).getComponent(cc.Label);
-                    notice.string = `【${title.string}】未实现，更多功能，敬请期待!!!`;
+                    notice.string = String.format(LANG.hall_view_nogame_notice, title.string);
                 });
             }
         }

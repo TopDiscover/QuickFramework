@@ -9,5 +9,6 @@ export module LanguageEN {
         'game6',
     ];
     export let hall_view_broadcast_content = '[broadcast] congratulations!';
+    export let hall_view_nogame_notice = '【{0}】developing!!!';
   
 }
