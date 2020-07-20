@@ -2586,7 +2586,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "content",
+    "_name": "label",
     "_objFlags": 0,
     "_parent": {
       "__id__": 66
@@ -2614,7 +2614,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 238.34,
+      "width": 283.74,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -2667,8 +2667,8 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_useOriginalSize": false,
-    "_string": "[系统广播] 恭喜大佬进入",
-    "_N$string": "[系统广播] 恭喜大佬进入",
+    "_string": "hall_view_broadcast_content",
+    "_N$string": "hall_view_broadcast_content",
     "_fontSize": 22,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -2999,7 +2999,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "name",
+    "_name": "label",
     "_objFlags": 0,
     "_parent": {
       "__id__": 75
@@ -3027,7 +3027,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 102.25,
+      "width": 464.71,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -3107,8 +3107,8 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_useOriginalSize": true,
-    "_string": "游戏1",
-    "_N$string": "游戏1",
+    "_string": "hall_view_game_name.0",
+    "_N$string": "hall_view_game_name.0",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -3843,7 +3843,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "name",
+    "_name": "label",
     "_objFlags": 0,
     "_parent": {
       "__id__": 98
@@ -3871,7 +3871,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 102.25,
+      "width": 464.71,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -3951,8 +3951,8 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_useOriginalSize": true,
-    "_string": "游戏2",
-    "_N$string": "游戏2",
+    "_string": "hall_view_game_name.1",
+    "_N$string": "hall_view_game_name.1",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -4687,7 +4687,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "name",
+    "_name": "label",
     "_objFlags": 0,
     "_parent": {
       "__id__": 121
@@ -4715,7 +4715,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 102.25,
+      "width": 464.71,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -4795,8 +4795,8 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_useOriginalSize": true,
-    "_string": "游戏3",
-    "_N$string": "游戏3",
+    "_string": "hall_view_game_name.2",
+    "_N$string": "hall_view_game_name.2",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -5531,7 +5531,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "name",
+    "_name": "label",
     "_objFlags": 0,
     "_parent": {
       "__id__": 144
@@ -5559,7 +5559,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 102.25,
+      "width": 464.71,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -5639,8 +5639,8 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_useOriginalSize": true,
-    "_string": "游戏4",
-    "_N$string": "游戏4",
+    "_string": "hall_view_game_name.3",
+    "_N$string": "hall_view_game_name.3",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -6375,7 +6375,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "name",
+    "_name": "label",
     "_objFlags": 0,
     "_parent": {
       "__id__": 167
@@ -6403,7 +6403,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 102.25,
+      "width": 464.71,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -6483,8 +6483,8 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_useOriginalSize": true,
-    "_string": "游戏5",
-    "_N$string": "游戏5",
+    "_string": "hall_view_game_name.4",
+    "_N$string": "hall_view_game_name.4",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -7219,7 +7219,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "name",
+    "_name": "label",
     "_objFlags": 0,
     "_parent": {
       "__id__": 190
@@ -7247,7 +7247,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 102.25,
+      "width": 464.71,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -7327,8 +7327,8 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_useOriginalSize": true,
-    "_string": "游戏6",
-    "_N$string": "游戏6",
+    "_string": "hall_view_game_name.5",
+    "_N$string": "hall_view_game_name.5",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,

@@ -1,6 +1,7 @@
 import EventComponent from "../base/EventComponect";
 import AudioComponent from "../base/AudioComponent";
 import { uiManager } from "../base/UIManager";
+import { LANG } from "../../common/manager/LanguageManager";
 
 /**
  * @description 视图基类
@@ -241,4 +242,61 @@ export default abstract class UIView extends EventComponent {
 
     }
 
+    /**
+     * @description 自动语言动态适配
+     * 需在creator编辑器中将带label组件的节点命名为'label'，让后将语言包中的key填入string，在界面初始化时调用adaptLanguage()即可。
+     */
+    private arrLabel: Array<cc.Label> = new Array<cc.Label>();
+    private arrLabelKey: Array<string> = new Array<string>();
+    
+    //自动适配语言刷新界面
+    protected adaptLanguage(){
+        if (this.arrLabelKey.length <= 0) {
+            this.checkLabal(this.node, 'label');
+            if (this.arrLabel && this.arrLabel.length > 0) {
+                for (let i = 0; i < this.arrLabel.length; i++) {
+                    const element = this.arrLabel[i];
+                    let key = element.string;
+                    this.arrLabelKey.push(key);
+                }
+            }
+        }
+
+        for (let i = 0; i < this.arrLabelKey.length; i++) {
+            const element = this.arrLabel[i];
+            let key = this.arrLabelKey[i];
+            let arrKey = key.split('.');
+            let strText = undefined;
+            if (arrKey.length === 1) {
+                strText = LANG[arrKey[0]];
+            } else if (arrKey.length === 2 && LANG[arrKey[0]]) {
+                strText = LANG[arrKey[0]][arrKey[1]];
+            } else if (arrKey.length === 3 && LANG[arrKey[0]] && LANG[arrKey[0]][arrKey[1]]) {
+                strText = LANG[arrKey[0]][arrKey[1]][arrKey[2]];
+            } else {
+                strText = undefined;
+            }
+            if (strText) {
+                element.string = strText;
+            } else {
+                element.string = '';
+                cc.error('err: ' + key + ' 未找到语言包');
+            }
+        }
+    }
+
+    //递归遍历节点label
+    private checkLabal(node: cc.Node, name: string){
+        if (node && node.childrenCount > 0) {
+            node.children.forEach(element => {
+                if (element.name === name) {
+                    let label = element.getComponent(cc.Label);
+                    if (label) {
+                        this.arrLabel.push(label);
+                    }
+                }
+                this.checkLabal(element, name);
+            });
+        }
+    }
 }

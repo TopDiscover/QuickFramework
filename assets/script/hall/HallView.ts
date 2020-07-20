@@ -4,6 +4,7 @@ import { dispatchEnterComplete, LogicType } from "../common/event/LogicEvent";
 import { gameManager } from "../common/manager/GameManager";
 import { GameConfig } from "../common/base/HotUpdate";
 import { HallEvent } from "./HallEvent";
+import LanguageManager from "../common/manager/LanguageManager";
 
 const { ccclass, property } = cc._decorator;
 
@@ -21,8 +22,9 @@ export default class HallView extends UIView {
 
     onLoad() {
         super.onLoad();
+
         let nodeGames = cc.find("games",this.node);
-        let notice = cc.find("hall_msg_bg/content",this.node).getComponent(cc.Label);
+        let notice = cc.find("hall_msg_bg/label",this.node).getComponent(cc.Label);
         for( let i = 1 ; i <= 6 ; i++ ){
             let game = cc.find(`game_${i}`,nodeGames);
             if ( i -1 < this.games.length ){
@@ -31,12 +33,25 @@ export default class HallView extends UIView {
                 });
             }else{
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
-                    let title = cc.find("Background/name",game).getComponent(cc.Label);
+                    let title = cc.find("Background/label",game).getComponent(cc.Label);
                     notice.string = `【${title.string}】未实现，更多功能，敬请期待!!!`;
                 });
             }
         }
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
+
+        //语言适配
+        this.adaptLanguage();
+
+        this.scheduleOnce(() => {
+            LanguageManager.setLanguage('EN');
+            this.adaptLanguage();
+        }, 2.5);
+
+        this.scheduleOnce(() => {
+            LanguageManager.setLanguage('CN');
+            this.adaptLanguage();
+        }, 5);
     }
 
      bindingEvents(){
