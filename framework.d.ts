@@ -20,7 +20,7 @@ declare module cc {
  	 * @param config.url 预置体路径
 	 * @param config.view 预置视图资源管理器，继承自UIView
 	 * @param config.completeCallback 创建完成回调 
-	 * @param config.bundle 可不填，默认为resources
+	 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
 	 * @example 
 	 * cc.createPrefab({url :GAME_RES("res/animations/shzDealerCommon"),view:this,completeCallback:(node)=>{
 	 *     if ( node ){
@@ -38,7 +38,7 @@ declare module cc {
 		 * @param defaultSpriteFrame 加载图片失败后，使用的默认图片,当传入string时，会动态加载该默认图片
 		 * @param isNeedCache 是否需要缓存到本地,如果不需要，每次都会从网络拉取资源,默认都会缓存到本地
 		 * @param config.retain 远程加载的资源是否驻留在内存中,默认都不驻留内存
-		 * @param config.bundle 可不填，默认为resources
+		 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
 		 * @example
 		 * 示例1：
 		 * let sprite = imageNode.getComponent(cc.Sprite);
@@ -70,7 +70,7 @@ declare module cc {
 		 * @param url 图片路径 {urls:string[],key:string} urls 为纹理名如果有此纹理会打包成多张，此时需要传入所有纹理的地址，key指纹理中名字
 		 * @param view 所属视图，UIView的子类
 		 * @param completeCallback 完成回调
-		 * @param config.bundle 可不填，默认为resources
+		 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
 		 * @example
 		 * 示例1：
 		 * sprite.getComponent(cc.Sprite).loadImage({url:{urls:["plist/fish_30","plist/fish_30_1","plist/fish_30_2"],key:"fishMove_030_28"},view:this});
@@ -88,7 +88,7 @@ declare module cc {
 	export interface Button {
         /**
 		 * @description 加载按钮
-		 * @param config.bundle 可不填，默认为resources
+		 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
 		 * @example
 		 * 示例1：
 		 * let button = cc.find("button",this.node);
@@ -117,7 +117,7 @@ declare module cc {
 	export interface Label {
 		/**
 		  * @description 加载字体
-		  * @param config.bundle 可不填，默认为resources
+		  * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
 		  * @example
 		  * let content = cc.find("content",this.node); 
 		  * content.getComponent(cc.Label).loadFont({font:"font/DFYUANW7-GB2312",view:this});
@@ -140,7 +140,7 @@ declare module cc {
 
 		/**
  		 * @description 加载特效文件 view 为null时，加载之前不会释
-		 * @param config.bundle 可不填，默认为resources
+		 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
 		 * @example
 		 * let node = new cc.Node();
 		 * let par = node.addComponent(cc.ParticleSystem);
@@ -161,7 +161,7 @@ declare namespace sp {
  		 * @param completeCallback 完成回调
 		 * @param isNeedCache 是否需要缓存到本地,如果不需要，每次都会从网络拉取资源,默认都会缓存到本地
 		 * @param config.retain 远程加载的资源是否驻留在内存中,默认都不驻留内存
-		 * @param config.bundle 可不填，默认为resources
+		 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
  		 * @example
  		 * var skeleton = node.addComponent(sp.Skeleton);
          *
@@ -178,7 +178,7 @@ declare namespace sp {
 
 		/**
 		 * @description 加载动画
-		 * @param config.bundle 可不填，默认为resources
+		 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
 		 * @example
 		 * action.loadSkeleton({url:"hall/vip/vipAction/vip_10",view:this,completeCallback:(data)=>{
 		 *	if ( data ){

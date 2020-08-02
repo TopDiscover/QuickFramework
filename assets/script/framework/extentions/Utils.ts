@@ -36,6 +36,17 @@ export function addRemoteLoadResource(view: UIView, info: ResourceInfo) {
     }
 }
 
+/**@description 获取Bundle,如果没有传入，会默认指定当前View打开时的bundle,否则批定resources */
+export function getBundle( config : { bundle? : BUNDLE_TYPE , view? : UIView}){
+    let bundle : BUNDLE_TYPE = BUNDLE_RESOURCES;
+    if ( config.bundle != BUNDLE_RESOURCES ){
+        if( config.view ){
+            bundle = config.view.bundle;
+        }
+    }
+    return bundle;
+}
+
 function isValidComponent(component: cc.Component): boolean {
     if (cc.isValid(component) && component.node && cc.isValid(component.node)) {
         return true;
@@ -230,10 +241,11 @@ export function setButtonSpriteFrame(button: cc.Button, config: {
     completeCallback?: (type: string, spriteFrame: cc.SpriteFrame) => void,
     bundle?:BUNDLE_TYPE
 }) {
-    _setButtonWithType(button, ButtonSpriteMemberName.Norml, config.view, config.normalSprite, config.completeCallback,config.bundle);
-    _setButtonWithType(button, ButtonSpriteMemberName.Pressed, config.view, config.pressedSprite, config.completeCallback,config.bundle);
-    _setButtonWithType(button, ButtonSpriteMemberName.Hover, config.view, config.hoverSprite, config.completeCallback,config.bundle);
-    _setButtonWithType(button, ButtonSpriteMemberName.Disable, config.view, config.disabledSprite, config.completeCallback,config.bundle);
+    let bundle = getBundle(config);
+    _setButtonWithType(button, ButtonSpriteMemberName.Norml, config.view, config.normalSprite, config.completeCallback,bundle);
+    _setButtonWithType(button, ButtonSpriteMemberName.Pressed, config.view, config.pressedSprite, config.completeCallback,bundle);
+    _setButtonWithType(button, ButtonSpriteMemberName.Hover, config.view, config.hoverSprite, config.completeCallback,bundle);
+    _setButtonWithType(button, ButtonSpriteMemberName.Disable, config.view, config.disabledSprite, config.completeCallback,bundle);
 }
 
 /**
@@ -251,7 +263,7 @@ export function setParticleSystemFile(
     info.url = config.url;
     info.type = cc.ParticleAsset;
     info.data = data;
-    info.bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
+    info.bundle = getBundle(config);
     addExtraLoadResource(config.view, info);
     if (data && isValidComponent(component)) {
         let oldFile = component.file;
@@ -286,7 +298,7 @@ export function setLabelFont(
     info.url = config.font;
     info.type = cc.Font;
     info.data = data;
-    info.bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
+    info.bundle = getBundle(config);
     addExtraLoadResource(config.view, info);
     if (data && isValidComponent(component)) {
         let oldFont = component.font;
@@ -334,7 +346,7 @@ export function setSkeletonSkeletonData(
     info.type = sp.SkeletonData;
     info.data = data;
     info.retain = retain;
-    info.bundle = config.bundle;
+    info.bundle = getBundle(config);
     if (resourceType == ResourceType.Remote) {
         addRemoteLoadResource(config.view, info);
     } else {
@@ -368,7 +380,7 @@ export function createNodeWithPrefab(config: { bundle:BUNDLE_TYPE , url: string,
     info.url = config.url;
     info.type = cc.Prefab;
     info.data = data;
-    info.bundle = config.bundle?config.bundle : BUNDLE_RESOURCES;
+    info.bundle = getBundle(config);
     addExtraLoadResource(config.view, info);
     if (data && isValidComponent(config.view) && config.completeCallback) {
         let node = cc.instantiate(data);

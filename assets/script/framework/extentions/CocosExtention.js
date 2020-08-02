@@ -4,7 +4,7 @@ import { ResourceType, BUNDLE_RESOURCES } from "../base/Defines";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
-    createNodeWithPrefab
+    createNodeWithPrefab,getBundle
 } from "./Utils";
 import { cacheManager } from "../assetManager/CacheManager";
 import { assetManager } from "../assetManager/AssetManager";
@@ -54,7 +54,7 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
     if (config.retain) {
         isRetain = true;
     }
-    let bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
+    let bundle = getBundle(config);
     assetManager().remote.loadImage(config.url, config.isNeedCache).then((data) => {
         if (data) {
             setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback,bundle, ResourceType.Remote, isRetain);
@@ -90,7 +90,7 @@ cc.Sprite.prototype.loadImage = function (config) {
     let view = config.view;
     let url = config.url;
     let completeCallback = config.completeCallback;
-    let bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
+    let bundle = getBundle(config);
     if (typeof url == "string") {
         cacheManager().getCacheByAsync(url, cc.SpriteFrame,bundle).then((spriteFrame) => {
             setSpriteSpriteFrame(view, url, me, spriteFrame, completeCallback,bundle);
@@ -121,7 +121,7 @@ cc.Sprite.prototype.loadImage = function (config) {
  */
 cc.createPrefab = function (config) {
     let url = config.url;
-    let bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
+    let bundle = getBundle(config);
     cacheManager().getCacheByAsync(url, cc.Prefab,bundle).then((data) => {
         createNodeWithPrefab(config, data)
     });
@@ -171,7 +171,7 @@ sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
 sp.Skeleton.prototype.loadSkeleton = function (config) {
     let me = this;
     let url = config.url;
-    let bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
+    let bundle = getBundle(config);
     cacheManager().getCacheByAsync(url, sp.SkeletonData,bundle).then((data) => {
         setSkeletonSkeletonData(me, config, data);
     });
@@ -197,7 +197,7 @@ cc.Button.prototype.loadButton = function (config) {
 cc.Label.prototype.loadFont = function (config) {
     let font = config.font;
     let me = this;
-    let bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
+    let bundle = getBundle(config);
     cacheManager().getCacheByAsync(font, cc.Font,bundle).then((data) => {
         setLabelFont(me, config, data);
     });
@@ -226,7 +226,7 @@ cc.Label.prototype.forceDoLayout = function () {
 cc.ParticleSystem.prototype.loadFile = function (config) {
     let me = this;
     let url = config.url;
-    let bundle = config.bundle ? config.bundle : BUNDLE_RESOURCES;
+    let bundle = getBundle(config);
     cacheManager().getCacheByAsync(url, cc.ParticleAsset,bundle).then((data) => {
         setParticleSystemFile(me, config, data);
     });

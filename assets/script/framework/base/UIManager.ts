@@ -293,7 +293,7 @@ class UIManager {
                         viewData.info.type = cc.Prefab;
                         viewData.info.data = prefab;
                         viewData.info.bundle = bundle;
-                        this.createNode(className, uiClass, reslove, prefab, args, zOrder);
+                        this.createNode(className, uiClass, reslove, prefab, args, zOrder,bundle);
                         if (this.uiLoading) this.uiLoading.hide();
                     }).catch((reason) => {
                         viewData.isLoaded = true;
@@ -315,7 +315,7 @@ class UIManager {
         });
     }
 
-    private _addComponent<T extends UIView>(uiNode: cc.Node, uiClass: UIClass<T>, viewData: ViewData, className: string, zOrder: number, args: any[]): UIView {
+    private _addComponent<T extends UIView>(uiNode: cc.Node, uiClass: UIClass<T>, viewData: ViewData, className: string, zOrder: number, args: any[],bundle:BUNDLE_TYPE): UIView {
         if (uiNode) {
             //挂载脚本
             let view = uiNode.getComponent(uiClass) as UIView;
@@ -333,6 +333,7 @@ class UIManager {
             resolutionHelper().fullScreenAdapt(uiNode);
 
             view.className = className;
+            view.bundle = bundle
             viewData.view = view;
             view.init(args);
 
@@ -364,7 +365,7 @@ class UIManager {
         }
     }
 
-    private createNode<T extends UIView>(className: string, uiClass: UIClass<T>, reslove, data: cc.Prefab, args: any[], zOrder: number) {
+    private createNode<T extends UIView>(className: string, uiClass: UIClass<T>, reslove, data: cc.Prefab, args: any[], zOrder: number,bundle:BUNDLE_TYPE) {
         let viewData = this._viewDatas.get(className);
         viewData.isLoaded = true;
         if (viewData.status == ViewStatus.WAITTING_CLOSE) {
@@ -378,7 +379,7 @@ class UIManager {
 
         let uiNode: cc.Node = cc.instantiate(data);
         viewData.node = uiNode;
-        let view = this._addComponent(uiNode, uiClass, viewData, className, zOrder, args);
+        let view = this._addComponent(uiNode, uiClass, viewData, className, zOrder, args,bundle);
         if (!view) {
             reslove(null);
             return;

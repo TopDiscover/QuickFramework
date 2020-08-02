@@ -2,6 +2,7 @@ import EventComponent from "../base/EventComponect";
 import AudioComponent from "../base/AudioComponent";
 import { uiManager } from "../base/UIManager";
 import { LANG } from "../../common/manager/LanguageManager";
+import { BUNDLE_RESOURCES } from "../base/Defines";
 
 /**
  * @description 视图基类
@@ -78,6 +79,15 @@ export default abstract class UIView extends EventComponent {
     }
     public get className(): string {
         return this._className;
+    }
+
+    private _bundle: BUNDLE_TYPE = null;
+    /**指向当前View打开时的bundle */
+    public set bundle( value ){
+        this._bundle = value;
+    }
+    public get bundle(){
+        return this._bundle;
     }
 
     public init(args: any[]) {
