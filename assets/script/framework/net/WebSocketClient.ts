@@ -50,8 +50,8 @@ export default class WebSocketClinet {
         return this._onClose;
     }
 
-    private _onMessage : ({data : Uint8Array})=> void = null;
-    public set onMessage( value : ({data : Uint8Array})=>void){
+    private _onMessage : (data : Uint8Array)=> void = null;
+    public set onMessage( value : (data : Uint8Array)=>void){
         this._onMessage = value;
     }
     /**@description 接收网络数据 */
@@ -181,7 +181,7 @@ export default class WebSocketClinet {
 
     private __onMessage(arraybuffer : MessageEvent ) {
         let dataArr = new Uint8Array(arraybuffer.data);
-        if ( this.onMessage ) this.onMessage({data : dataArr});
+        if ( this.onMessage ) this.onMessage(dataArr);
     }
 
     private __onClose(event ) {
