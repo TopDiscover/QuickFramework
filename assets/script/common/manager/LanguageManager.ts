@@ -1,5 +1,5 @@
-import { LanguageCN } from "../data/LanguageCN";
-import { LanguageEN } from "../data/LanguageEN";
+import { LanguageCN } from "../language/LanguageCN";
+import { LanguageEN } from "../language/LanguageEN";
 
 export let LANG = LanguageCN;
 
