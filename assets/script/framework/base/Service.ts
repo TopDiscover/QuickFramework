@@ -117,7 +117,7 @@ export class Service implements ServerConnectorDelegate{
             
             if ( listenerDatas[i].isQueue ){
                 //需要加入队列处理
-                queueDatas.push(this.copyProtoListenerData(listenerDatas[i],obj));
+                queueDatas.push(this.copyListenerData(listenerDatas[i],obj));
             }
             else{
                 //不需要进入队列处理
@@ -181,7 +181,7 @@ export class Service implements ServerConnectorDelegate{
      * @param handleFunc 处理回调
      * @param isQueue 是否进入消息队列
      */
-    public addProtoListener(
+    public addListener(
         mainCmd: number,
         subCmd: number,
         handleType: any,
@@ -222,7 +222,7 @@ export class Service implements ServerConnectorDelegate{
         }
     }
 
-    public removeProtoListeners( target : any , mainCmd ?: number , subCmd ?: number ){
+    public removeListeners( target : any , mainCmd ?: number , subCmd ?: number ){
 
         if ( mainCmd && subCmd ){
             let self = this;
@@ -306,7 +306,7 @@ export class Service implements ServerConnectorDelegate{
      * @param input 
      * @param data 
      */
-    private copyProtoListenerData(input: ProtoListenerData, data: any): ProtoListenerData {
+    private copyListenerData(input: ProtoListenerData, data: any): ProtoListenerData {
         return {
             mainCmd: input.mainCmd,
             subCmd: input.subCmd,

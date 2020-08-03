@@ -1,4 +1,4 @@
-import EventComponent from "../base/EventComponect";
+import EventComponent from "../base/EventComponent";
 import AudioComponent from "../base/AudioComponent";
 import { uiManager } from "../base/UIManager";
 import { LANG } from "../../common/manager/LanguageManager";

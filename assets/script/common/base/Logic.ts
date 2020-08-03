@@ -1,5 +1,5 @@
 import { LogicEventData, LogicType } from "../event/LogicEvent";
-import EventComponent from "../../framework/base/EventComponect";
+import EventComponent from "../../framework/base/EventComponent";
 import { GamePathDelegate } from "./ResPath";
 import { ResourceData, ResourceCacheData } from "../../framework/base/Defines";
 import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";

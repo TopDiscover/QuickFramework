@@ -1,5 +1,5 @@
 
-import EventComponent from "../base/EventComponect";
+import EventComponent from "../base/EventComponent";
 
 /**
  * @description 控制器基类 , 对service 及 loader 的自动注入
