@@ -95,7 +95,7 @@ export class ServerConnector {
     private _onOpen() {
         this._curRecvHartTimeOutCount = 0;
         this.stopSendHartSchedule();
-        this.sendHeartbeat();
+        this._sendHeartbeat();
         this.startSendHartSchedule();
         this.delegate && this.delegate.onOpen();
     }
@@ -139,7 +139,7 @@ export class ServerConnector {
                     self.delegate.onHeartbeatTimeOut();
                     return;
                 }
-                self.sendHeartbeat();
+                self._sendHeartbeat();
             }, self.delegate.getMaxHeartbeatTimeOut());
         }else{
             this._errorDelegate();
@@ -149,7 +149,7 @@ export class ServerConnector {
     /**
      * @description 发送心跳
      */
-    private sendHeartbeat() {
+    private _sendHeartbeat() {
         this.delegate ? this.delegate.sendHeartbeat() : this._errorDelegate();
     }
 
