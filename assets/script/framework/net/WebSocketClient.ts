@@ -172,7 +172,7 @@ export default class WebSocketClinet {
         }
         if ( this._dataArr.length > 0 ){
             for ( let i = 0 ; i < this._dataArr.length ; i++ ){
-                this.sendBinary(this._dataArr[i]);
+                this.send(this._dataArr[i]);
             }
             this._dataArr = [];
         }
@@ -219,25 +219,24 @@ export default class WebSocketClinet {
         if ( this.onError ) this.onError(event);
     }
 
-    public sendBinary( buffer ){
-        if ( !this._ws || !buffer ){
+    public send( data: string | ArrayBufferLike | Blob | ArrayBufferView ){
+        if ( !this._ws || !data ){
             return;
         }
         if ( this._ws.readyState === WebSocket.OPEN ){
-            this._ws.send(buffer);
+            this._ws.send(data);
         }
         else{
             //放入发送队列
             
             //如果当前连接正在连接中
             if ( this._ws.readyState == WebSocket.CONNECTING ){
-                this._dataArr.push(buffer);
+                this._dataArr.push(data);
             }
             else{
                 //关闭或者正在关闭状态
                 let content = this._ws.readyState == WebSocket.CLOSING ? `网络正在关闭` : `网络已经关闭`;
                 if ( CC_DEBUG ) cc.warn(this._tag,`发送消息失败: ${content}`);
-                //this._dataArr.push(buffer);
             }
         }
     }

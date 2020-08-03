@@ -1,20 +1,25 @@
 import WebSocketClinet from "./WebSocketClient";
 
-export class Message{
+export class Message {
     /**@description 消息主cmd码 */
     mainCmd: number = 0;
     /**@description 消息子cmd码 */
-    subCmd : number = 0;
+    subCmd: number = 0;
     /**@description 消息数据主体 */
-    data : any = null;
+    data: any = null;
+    /**@description 打包数据 */
+    encode(): boolean{
+        return true;
+    }
+    /**@description 解析数据 */
+    decode(data: Uint8Array): boolean{
+        this.data = data;
+        return true;
+    }
 }
 
 /**@description 服务器连接器代码*/
 export interface ServerConnectorDelegate{
-    /**@description 打包数据 */
-    encode( data : Message) : any;
-    /**@description 解析数据 */
-    decode( data: Uint8Array ): Message;
     /**@description 发送心跳 */
     sendHeartbeat();
     /**@description 获取心跳超时的最大次数 */
@@ -22,7 +27,7 @@ export interface ServerConnectorDelegate{
     /**@description 心跳超时 */
     onHeartbeatTimeOut();
     /**@description 是否是心跳消息 */
-    isHeartBeat( data : Message);
+    isHeartBeat( data : Message) : boolean;
     /**@description 网络打开 */
     onOpen();
     /**@description 网络关闭 */
@@ -30,7 +35,7 @@ export interface ServerConnectorDelegate{
     /**@description 网络错误 */
     onError( ev : Event );
     /**@description 收到网络消息 */
-    onMessage( msg : Message );
+    onMessage( data : Uint8Array );
 }
 
 /**
@@ -46,10 +51,10 @@ export class ServerConnector {
 
     private _delegate: ServerConnectorDelegate = null;
     /**@description 代理 */
-    protected set delegate( value ){
+    public set delegate( value ){
         this._delegate = value;
     }
-    protected get delegate( ){
+    public get delegate( ){
         return this._delegate;
     }
 
@@ -159,13 +164,8 @@ export class ServerConnector {
      */
     private _onMessage(data: Uint8Array ) {
         if ( this.delegate ){
-            let msg = this.delegate.decode(data);
-            if ( msg ){
-                this.recvHeartbeat();
-                this.delegate.onMessage(msg);
-            }else{
-                if ( CC_DEBUG ) { cc.error(`网络数据解析错误`) };
-            }
+            this.recvHeartbeat();
+            this.delegate.onMessage(data);
         }else{
             this._errorDelegate();
         }
@@ -175,20 +175,14 @@ export class ServerConnector {
      * @description 发送请求
      * @param msg 消息
      */
-    public sendRequest(msg : Message) {
+    public send(msg : Message) {
         if ( this.delegate ){
-            let buf = this.delegate.encode(msg);
-            if ( buf ){
-                if ( this.delegate.isHeartBeat(msg) ){
-                    if ( CC_DEBUG) cc.log(`send request main cmd : ${msg.mainCmd} , sub cmd : ${msg.subCmd} buffer length : ${buf.length}`);
-                }else{
-                    cc.log(`send request main cmd : ${msg.mainCmd} , sub cmd : ${msg.subCmd} buffer length : ${buf.length}`);
-                }
-                this._wsClient && this._wsClient.sendBinary(buf);
-            }else{
-                cc.error(`encode message error ! mainCmd : ${ msg.mainCmd} subCmd : ${msg.subCmd}`);
+            if (this.delegate.isHeartBeat(msg)) {
+                if (CC_DEBUG) cc.log(`send request main cmd : ${msg.mainCmd} , sub cmd : ${msg.subCmd} `);
+            } else {
+                cc.log(`send request main cmd : ${msg.mainCmd} , sub cmd : ${msg.subCmd} `);
             }
-            
+            this._wsClient && this._wsClient.send(msg.data);
         }else{
             this._errorDelegate();
         }
