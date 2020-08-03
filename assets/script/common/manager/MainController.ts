@@ -5,6 +5,7 @@ import { logicManager } from "./LogicManager";
 import { uiManager } from "../../framework/base/UIManager";
 import GlobalAudio from "../component/GlobalAudio";
 import { assetManager } from "../../framework/assetManager/AssetManager";
+import { CommonService } from "../base/CommonService";
 
 /**
  * @description 主控制器 
@@ -14,7 +15,7 @@ const {ccclass, property,menu} = cc._decorator;
 
 @ccclass
 @menu("manager/MainController")
-export default class MainController extends ViewController {
+export default class MainController extends ViewController<CommonService> {
     
     /**@description 进入后台的时间 */
     private _enterBackgroundTime = 0;
@@ -75,6 +76,7 @@ export default class MainController extends ViewController {
         this._enterBackgroundTime = Date.timeNow();
         cc.log(`[MainController]`,`onEnterBackground ${this._enterBackgroundTime}`);
         uiManager().getCanvas().getComponent(GlobalAudio).onEnterBackground();
+        this.service && this.service.onEnterBackground();
     }
 
     private onEnterForgeground(){
@@ -82,5 +84,6 @@ export default class MainController extends ViewController {
         let inBackgroundTime = now - this._enterBackgroundTime;
         cc.log(`[MainController]`,`onEnterForgeground ${now} background total time : ${inBackgroundTime}`);
         uiManager().getCanvas().getComponent(GlobalAudio).onEnterForgeground(inBackgroundTime);
+        this.service && this.service.onEnterForgeground(inBackgroundTime);
     }
 }
