@@ -8,34 +8,14 @@ export class Message {
     /**@description 消息数据主体 */
     data: any = null;
     /**@description 打包数据 */
-    encode(): boolean{
+    encode(): boolean {
         return true;
     }
     /**@description 解析数据 */
-    decode(data: Uint8Array): boolean{
+    decode(data: Uint8Array): boolean {
         this.data = data;
         return true;
     }
-}
-
-/**@description 服务器连接器代码*/
-export interface ServerConnectorDelegate{
-    /**@description 发送心跳 */
-    sendHeartbeat();
-    /**@description 获取心跳超时的最大次数 */
-    getMaxHeartbeatTimeOut():number;
-    /**@description 心跳超时 */
-    onHeartbeatTimeOut();
-    /**@description 是否是心跳消息 */
-    isHeartBeat( data : Message) : boolean;
-    /**@description 网络打开 */
-    onOpen();
-    /**@description 网络关闭 */
-    onClose( ev : Event );
-    /**@description 网络错误 */
-    onError( ev : Event );
-    /**@description 收到网络消息 */
-    onMessage( data : Uint8Array );
 }
 
 /**
@@ -49,21 +29,81 @@ export class ServerConnector {
      */
     private _wsClient: WebSocketClinet = null;
 
-    private _delegate: ServerConnectorDelegate = null;
-    /**@description 代理 */
-    public set delegate( value ){
-        this._delegate = value;
-    }
-    public get delegate( ){
-        return this._delegate;
+    constructor() {
+        this._wsClient = new WebSocketClinet();
+        this._wsClient.onClose = this.onClose.bind(this);
+        this._wsClient.onError = this.onError.bind(this);
+        this._wsClient.onMessage = this.onMessage.bind(this);
+        this._wsClient.onOpen = this.onOpen.bind(this);
     }
 
-    constructor(){
-        this._wsClient = new WebSocketClinet();
-        this._wsClient.onClose = this._onClose.bind(this);
-        this._wsClient.onError = this._onError.bind(this);
-        this._wsClient.onMessage = this._onMessage.bind(this);
-        this._wsClient.onOpen = this._onOpen.bind(this);
+    /**
+     * @description 发送心跳
+     */
+    protected sendHeartbeat() {
+        if ( CC_DEBUG ) cc.error(`请重写sendHeartbeat`);
+    }
+
+    /**
+     * @description 获取最大心跳超时的次数
+     */
+    protected getMaxHeartbeatTimeOut(): number {
+        //默认给5次
+        return 5;
+    }
+
+    /**
+     * @description 心跳超时
+     */
+    protected onHeartbeatTimeOut() {
+        //do noting
+    }
+
+    /**
+     * @description 是否为心跳消息
+     */
+    protected isHeartBeat(data: Message): boolean {
+        return false;
+    }
+
+    /**
+     * @description 网络打开
+     */
+    protected onOpen() {
+        this._curRecvHartTimeOutCount = 0;
+        this.stopSendHartSchedule();
+        this.sendHeartbeat();
+        this.startSendHartSchedule();
+    }
+
+    /**
+     * @description 网络关闭
+     */
+    protected onClose(ev: Event) {
+        //停止心跳发送，已经没有意义
+        this.stopSendHartSchedule();
+    }
+
+    /**
+     * @description 网络错误
+     */
+    protected onError(ev: Event) {
+        //网络连接出错误，停止心跳发送
+        this.stopSendHartSchedule();
+    }
+
+    /**
+     * @description 收到网络消息
+     */
+    protected onMessage(data: Uint8Array) {
+        this.recvHeartbeat();
+    }
+
+    /**
+     * @description 收到心跳
+     */
+    protected recvHeartbeat() {
+        this._curRecvHartTimeOutCount = 0;
     }
 
     private _sendHartId: number = -1; //发送心跳包的间隔id
@@ -75,41 +115,18 @@ export class ServerConnector {
      * @param port 
      * @param protocol 协议类型 ws / wss 
      */
-    public connect(ip: string, port: number | string = null, protocol : string = "wss" ) {
-        if ( port ){
-            if ( typeof port == "string" && port.length > 0 ){
-                this._wsClient && this._wsClient.initWebSocket(ip,port,protocol);
-            }else if ( typeof port == "number" && port > 0 ){
-                this._wsClient && this._wsClient.initWebSocket(ip,port.toString(),protocol);
-            }else{
-                this._wsClient && this._wsClient.initWebSocket(ip,null,protocol);
+    public connect(ip: string, port: number | string = null, protocol: string = "wss") {
+        if (port) {
+            if (typeof port == "string" && port.length > 0) {
+                this._wsClient && this._wsClient.initWebSocket(ip, port, protocol);
+            } else if (typeof port == "number" && port > 0) {
+                this._wsClient && this._wsClient.initWebSocket(ip, port.toString(), protocol);
+            } else {
+                this._wsClient && this._wsClient.initWebSocket(ip, null, protocol);
             }
-        }else{
-            this._wsClient && this._wsClient.initWebSocket(ip,null,protocol);
+        } else {
+            this._wsClient && this._wsClient.initWebSocket(ip, null, protocol);
         }
-    }
-
-    /**
-     * @description 连接网络成功
-     */
-    private _onOpen() {
-        this._curRecvHartTimeOutCount = 0;
-        this.stopSendHartSchedule();
-        this._sendHeartbeat();
-        this.startSendHartSchedule();
-        this.delegate && this.delegate.onOpen();
-    }
-
-    private _onClose( ev ){
-        //停止心跳发送，已经没有意义
-        this.stopSendHartSchedule();
-        this.delegate && this.delegate.onClose(ev);
-    }
-
-    private _onError( ev : Event ){
-        //网络连接出错误，停止心跳发送
-        this.stopSendHartSchedule();
-        this.delegate && this.delegate.onError(ev);
     }
 
     /**
@@ -122,73 +139,37 @@ export class ServerConnector {
         }
     }
 
-    private _errorDelegate(){
-        cc.error(`请指定ServerConnector的代理`);
-    }
-
     /**
      * @description 启动心跳发送
      */
     private startSendHartSchedule() {
         let self = this;
-        if ( this._delegate ){
-            this._sendHartId = setInterval(() => {
-                self._curRecvHartTimeOutCount = self._curRecvHartTimeOutCount + 1;
-                if (self._curRecvHartTimeOutCount > self.delegate.getMaxHeartbeatTimeOut()) {
-                    self.stopSendHartSchedule();
-                    self.delegate.onHeartbeatTimeOut();
-                    return;
-                }
-                self._sendHeartbeat();
-            }, self.delegate.getMaxHeartbeatTimeOut());
-        }else{
-            this._errorDelegate();
-        }
-    }
+        this._sendHartId = setInterval(() => {
+            self._curRecvHartTimeOutCount = self._curRecvHartTimeOutCount + 1;
+            if (self._curRecvHartTimeOutCount > self.getMaxHeartbeatTimeOut()) {
+                self.stopSendHartSchedule();
+                self.onHeartbeatTimeOut();
+                return;
+            }
+            self.sendHeartbeat();
+        }, self.getMaxHeartbeatTimeOut());
 
-    /**
-     * @description 发送心跳
-     */
-    private _sendHeartbeat() {
-        this.delegate ? this.delegate.sendHeartbeat() : this._errorDelegate();
-    }
-
-    //收到心跳
-    private recvHeartbeat() {
-        this._curRecvHartTimeOutCount = 0;
-    }
-
-    /**
-     * @description 收到网络请求
-     * @param value 
-     */
-    private _onMessage(data: Uint8Array ) {
-        if ( this.delegate ){
-            this.recvHeartbeat();
-            this.delegate.onMessage(data);
-        }else{
-            this._errorDelegate();
-        }
     }
 
     /**
      * @description 发送请求
      * @param msg 消息
      */
-    public send(msg : Message) {
-        if ( this.delegate ){
-            if (this.delegate.isHeartBeat(msg)) {
-                if (CC_DEBUG) cc.log(`send request main cmd : ${msg.mainCmd} , sub cmd : ${msg.subCmd} `);
-            } else {
-                cc.log(`send request main cmd : ${msg.mainCmd} , sub cmd : ${msg.subCmd} `);
-            }
-            this._wsClient && this._wsClient.send(msg.data);
-        }else{
-            this._errorDelegate();
+    public send(msg: Message) {
+        if (this.isHeartBeat(msg)) {
+            if (CC_DEBUG) cc.log(`send request main cmd : ${msg.mainCmd} , sub cmd : ${msg.subCmd} `);
+        } else {
+            cc.log(`send request main cmd : ${msg.mainCmd} , sub cmd : ${msg.subCmd} `);
         }
+        this._wsClient && this._wsClient.send(msg.data);
     }
 
-    public close(){
+    public close() {
         this.stopSendHartSchedule();
         this._wsClient && this._wsClient.close();
     }

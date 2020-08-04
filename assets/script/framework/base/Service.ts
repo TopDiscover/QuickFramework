@@ -1,4 +1,4 @@
-import { ServerConnector, ServerConnectorDelegate, Message } from "../net/ServerConnector";
+import { ServerConnector, Message } from "../net/ServerConnector";
 import { EventApi } from "../event/EventApi";
 import { makeKey } from "../decorator/Decorators";
 import { uiManager } from "./UIManager";
@@ -19,77 +19,58 @@ export interface ProtoListenerData {
     target?: any, //处理者
 }
 
-export interface ServiceDelegate{
-    /**@description 是否是心跳 */
-    isHeartBeat(data: Message) : boolean;
-    /**@description 心跳超时 */
-    onHeartbeatTimeOut();
-    /**@description 心跳发送超时最大次数 */
-    getMaxHeartbeatTimeOut():number;
-    /**@description 发送心跳 */
-    sendHeartbeat();
+export class Service extends ServerConnector {
+
     /**@description 公共的消息解析类型，必须包含对消息码的解析与打包 */
-    commonMessageType: typeof Message;
-}
-
-export class Service implements ServerConnectorDelegate{
-
-    private _errorDelegate(){
-        cc.error(`请先对Service进行代理设置才能使用`);
+    protected get commonMessageType(): typeof Message{
+        return Message;
     }
 
-    sendHeartbeat() {
-        if ( this.delegate ){
-            return this.delegate.sendHeartbeat();
-        }else{
-            this._errorDelegate();
-        }
+    /**
+     * @description 发送心跳
+     */
+    protected sendHeartbeat() {
+        super.sendHeartbeat();
     }
-    getMaxHeartbeatTimeOut(): number {
-        if ( this.delegate ){
-            return this.delegate.getMaxHeartbeatTimeOut();
-        }else{
-            this._errorDelegate();
-            //默认5次
-            return 5;
-        }
+    /**
+     * @description 获取最大心跳超时的次数
+     */
+    protected getMaxHeartbeatTimeOut(): number {
+        return super.getMaxHeartbeatTimeOut();
     }
-    onHeartbeatTimeOut() {
-        if ( this.delegate ){
-            this.delegate.onHeartbeatTimeOut();
-        }else{
-            this._errorDelegate();
-        }
+    /**
+     * @description 心跳超时
+     */
+    protected onHeartbeatTimeOut() {
+        super.onHeartbeatTimeOut();
     }
-    isHeartBeat(data: Message) : boolean{
-        if( this.delegate ) {
-            return this.delegate.isHeartBeat(data) 
-        }
-        this._errorDelegate();
-        return false;
+    /**
+     * @description 是否为心跳消息
+     */
+    protected isHeartBeat(data: Message): boolean {
+        return super.isHeartBeat(data);
     }
-    onOpen() {
+    protected onOpen() {
+        super.onOpen();
         dispatch(EventApi.NetEvent.ON_OPEN);
     }
-    onClose(ev: Event) {
-        dispatch(EventApi.NetEvent.ON_CLOSE,ev);
+    protected onClose(ev: Event) {
+        super.onClose(ev);
+        dispatch(EventApi.NetEvent.ON_CLOSE, ev);
     }
-    onError(ev: Event) {
-        dispatch(EventApi.NetEvent.ON_ERROR,ev);
+    protected onError(ev: Event) {
+        super.onError(ev);
+        dispatch(EventApi.NetEvent.ON_ERROR, ev);
     }
-    onMessage(data: Uint8Array) {
-        if ( !this.delegate ){
-            this._errorDelegate();
-            return ;
-        }
+    protected onMessage(data: Uint8Array) {
 
         //先对包信进行解析
-        let msg = new this.delegate.commonMessageType();
-        if( !msg.decode(data) ){
+        let msg = new this.commonMessageType();
+        if (!msg.decode(data)) {
             cc.error(`decode error`);
             return;
         }
-
+        super.onMessage(data);
         cc.log(`recv data main cmd : ${msg.mainCmd} sub cmd : ${msg.subCmd} buffer length : ${msg.data.length}`);
         let key = makeKey(msg.mainCmd, msg.subCmd);
 
@@ -97,54 +78,42 @@ export class Service implements ServerConnectorDelegate{
             cc.warn(`no find listener data main cmd : ${msg.mainCmd} sub cmd : ${msg.subCmd}`);
             return;
         }
-        if ( this._listeners[key].length <= 0 ){
+        if (this._listeners[key].length <= 0) {
             return;
         }
         let listenerDatas = this._listeners[key];
         let queueDatas = [];
-        
-        for( let i = 0 ; i < listenerDatas.length ; i++ ){
+
+        for (let i = 0; i < listenerDatas.length; i++) {
             //预先存储的解析类型 //同一个命令使用同一类类型
-            let obj : Message = null;
-            if ( listenerDatas[i].type ){
+            let obj: Message = null;
+            if (listenerDatas[i].type) {
                 obj = new listenerDatas[i].type();
                 //解包
                 obj.decode(data);
-            }else{
+            } else {
                 //把数据放到里面，让后面使用都自己解析
                 obj = msg;
             }
-            
-            if ( listenerDatas[i].isQueue ){
+
+            if (listenerDatas[i].isQueue) {
                 //需要加入队列处理
-                queueDatas.push(this.copyListenerData(listenerDatas[i],obj));
+                queueDatas.push(this.copyListenerData(listenerDatas[i], obj));
             }
-            else{
+            else {
                 //不需要进入队列处理
                 try {
-                    listenerDatas[i].func && listenerDatas[i].func.call(listenerDatas[i].target,obj);
+                    listenerDatas[i].func && listenerDatas[i].func.call(listenerDatas[i].target, obj);
                 } catch (error) {
                     cc.error(error);
                 }
-                
+
             }
         }
 
-        if ( queueDatas.length > 0 ){
+        if (queueDatas.length > 0) {
             this._masseageQueue.push(queueDatas);
         }
-    }
-
-    protected delegate: ServiceDelegate = null;
-
-    /** 服务器连接器 */
-    private _connector: ServerConnector = null;
-    public get connector(): ServerConnector {
-        return this._connector;
-    }
-    public set connector(value: ServerConnector) {
-        this._connector = value;
-        this._connector.delegate = this;
     }
 
     /** 监听集合*/
@@ -186,18 +155,18 @@ export class Service implements ServerConnectorDelegate{
         subCmd: number,
         handleType: any,
         handleFunc: MessageHandleFunc,
-        isQueue: boolean ,
-        target : any) {
+        isQueue: boolean,
+        target: any) {
         let key = makeKey(mainCmd, subCmd);
-        if ( this._listeners[key] ){
+        if (this._listeners[key]) {
             let hasSame = false;
-            for ( let i = 0 ; i < this._listeners[key].length  ; i++ ){
-                if ( this._listeners[key][i].target === target ){
+            for (let i = 0; i < this._listeners[key].length; i++) {
+                if (this._listeners[key][i].target === target) {
                     hasSame = true;
                     break;
                 }
             }
-            if ( hasSame ){
+            if (hasSame) {
                 return;
             }
             this._listeners[key].push({
@@ -206,55 +175,55 @@ export class Service implements ServerConnectorDelegate{
                 func: handleFunc,
                 type: handleType,
                 isQueue: isQueue,
-                target : target
+                target: target
             });
         }
-        else{
-            this._listeners[key] = []; 
+        else {
+            this._listeners[key] = [];
             this._listeners[key].push({
                 mainCmd: mainCmd,
                 subCmd: subCmd,
                 func: handleFunc,
                 type: handleType,
                 isQueue: isQueue,
-                target : target
+                target: target
             });
         }
     }
 
-    public removeListeners( target : any , mainCmd ?: number , subCmd ?: number ){
+    public removeListeners(target: any, mainCmd?: number, subCmd?: number) {
 
-        if ( mainCmd && subCmd ){
+        if (mainCmd && subCmd) {
             let self = this;
-            Object.keys(this._listeners).forEach((value)=>{
+            Object.keys(this._listeners).forEach((value) => {
                 let datas = self._listeners[value];
                 let i = datas.length;
-                while( i-- ){
-                    if ( datas[i].target == target && datas[i].mainCmd == mainCmd && datas[i].subCmd == subCmd ){
-                        datas.splice(i,1);
+                while (i--) {
+                    if (datas[i].target == target && datas[i].mainCmd == mainCmd && datas[i].subCmd == subCmd) {
+                        datas.splice(i, 1);
                     }
                 }
-                if ( datas.length == 0 ){
+                if (datas.length == 0) {
                     delete self._listeners[value];
                 }
             });
 
             //移除网络队列中已经存在的消息
             let i = this._masseageQueue.length;
-            while( i-- ){
+            while (i--) {
                 let datas = this._masseageQueue[i];
                 let j = datas.length;
-                while(j--){
-                    if ( datas[j].target == target && datas[j].mainCmd == mainCmd && datas[j].subCmd == subCmd ){
-                        datas.splice(j,1);
+                while (j--) {
+                    if (datas[j].target == target && datas[j].mainCmd == mainCmd && datas[j].subCmd == subCmd) {
+                        datas.splice(j, 1);
                     }
                 }
-                if ( datas.length == 0  ){
-                    this._masseageQueue.splice(i,1);
+                if (datas.length == 0) {
+                    this._masseageQueue.splice(i, 1);
                 }
             }
 
-        }else{
+        } else {
             let self = this;
             Object.keys(this._listeners).forEach((value: string, index: number, arr: string[]) => {
                 let datas = self._listeners[value];
@@ -273,16 +242,16 @@ export class Service implements ServerConnectorDelegate{
 
             //移除网络队列中已经存在的消息
             let i = this._masseageQueue.length;
-            while( i-- ){
+            while (i--) {
                 let datas = this._masseageQueue[i];
                 let j = datas.length;
-                while(j--){
-                    if ( datas[j].target == target ){
-                        datas.splice(j,1);
+                while (j--) {
+                    if (datas[j].target == target) {
+                        datas.splice(j, 1);
                     }
                 }
-                if ( datas.length == 0  ){
-                    this._masseageQueue.splice(i,1);
+                if (datas.length == 0) {
+                    this._masseageQueue.splice(i, 1);
                 }
             }
         }
@@ -292,11 +261,11 @@ export class Service implements ServerConnectorDelegate{
      * @description 发送请求
      * @param msg msg
      */
-    public send(msg:Message) {
+    public send(msg: Message) {
         //发送请求数据
-        if ( msg.encode() ){
-            this.connector.send(msg);
-        }else{
+        if (msg.encode()) {
+            super.send(msg);
+        } else {
             cc.error(`encode error`);
         }
     }
@@ -314,7 +283,7 @@ export class Service implements ServerConnectorDelegate{
             func: input.func,
             isQueue: input.isQueue,
             data: data,
-            target : input.target
+            target: input.target
         };
     }
 
@@ -333,18 +302,18 @@ export class Service implements ServerConnectorDelegate{
 
         let datas = this._masseageQueue.shift();
         if (datas == undefined) return;
-        if (datas.length == 0 ) return;
+        if (datas.length == 0) return;
 
         this._isDoingMessage = true;
         let handleTime = 0;
-        if ( CC_DEBUG ) cc.log("---handMessage---");
-        for( let i =0 ; i < datas.length ; i++ ){
+        if (CC_DEBUG) cc.log("---handMessage---");
+        for (let i = 0; i < datas.length; i++) {
             let data = datas[i];
-            if ( data.func instanceof Function){
+            if (data.func instanceof Function) {
                 try {
-                    let tempTime = data.func.call(data.target,data.data);
-                    if ( typeof tempTime == "number" ){
-                        handleTime = Math.max(handleTime , tempTime);
+                    let tempTime = data.func.call(data.target, data.data);
+                    if (typeof tempTime == "number") {
+                        handleTime = Math.max(handleTime, tempTime);
                     }
                 } catch (error) {
                     cc.error(error);
@@ -352,14 +321,14 @@ export class Service implements ServerConnectorDelegate{
             }
         }
 
-        if ( handleTime == 0 ){
+        if (handleTime == 0) {
             //立即进行处理
             this._isDoingMessage = false;
         }
-        else{
-            uiManager().getCanvasComponent().scheduleOnce(()=>{
+        else {
+            uiManager().getCanvasComponent().scheduleOnce(() => {
                 this._isDoingMessage = false;
-            },handleTime);
+            }, handleTime);
         }
     }
 
@@ -373,13 +342,13 @@ export class Service implements ServerConnectorDelegate{
         this.resumeMessageQueue();
     }
 
-    public close( ){
+    public close() {
 
         //清空消息处理队列
         this._masseageQueue = [];
         this._isDoingMessage = false;
         //不能恢复这个队列，可能在重新连接网络时，如游戏的Logic层暂停掉了处理队列去加载资源，期望加载完成资源后再恢复队列的处理
         //this.resumeMessageQueue();
-        this.connector && this.connector.close();
+        super.close();
     }
 }
