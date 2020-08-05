@@ -21,9 +21,6 @@ class Language{
     public static Instance() { return this._instance || (this._instance = new Language()); }
 
     private _data : LanguageData = { language : "unknown"};
-    public get data() {
-        return this._data;
-    }
     private _delegate : LanguageDelegate;
     public set delegate( value ){
         this._delegate = value;
