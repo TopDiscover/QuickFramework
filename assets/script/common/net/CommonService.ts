@@ -11,7 +11,7 @@ import { Service } from "../../framework/base/Service";
 import { GameEventInterface } from "../../framework/base/GameEventInterface";
 import { Message } from "../../framework/net/ServerConnector";
 
-export class CommonMessage extends Message{
+export class CommonMessage extends Message {
 
 }
 
@@ -21,9 +21,11 @@ export class CommonMessage extends Message{
 
 export class CommonService extends Service implements GameEventInterface {
 
+    protected static _instance: CommonService = null;
+    public static get instance() { return this._instance || (this._instance = new CommonService()); }
 
     /**@description 公共的消息解析类型，必须包含对消息码的解析与打包 */
-    protected get commonMessageType(): typeof Message{
+    protected get commonMessageType(): typeof Message {
         return CommonMessage;
     }
 
@@ -57,7 +59,7 @@ export class CommonService extends Service implements GameEventInterface {
     }
 
     onEnterBackground() {
-        
+
     }
 
     onEnterForgeground(inBackgroundTime: number) {
