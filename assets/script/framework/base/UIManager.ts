@@ -635,6 +635,15 @@ class UIManager {
         });
     }
 
+    /**@description 语言包适配 */
+    public languageAdapt(){
+        this._viewDatas.forEach((data)=>{
+            if ( data.isLoaded && data.view ){
+                data.view.adaptLanguage();
+            }
+        });
+    }
+
     /*获取当前canvas的组件 */
     public getCanvasComponent(): cc.Component {
         return this.getCanvas().getComponent("MainController");

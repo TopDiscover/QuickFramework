@@ -4,7 +4,8 @@ import { dispatchEnterComplete, LogicType } from "../common/event/LogicEvent";
 import { gameManager } from "../common/manager/GameManager";
 import { GameConfig } from "../common/base/HotUpdate";
 import { HallEvent } from "./HallEvent";
-import LanguageManager, { LANG } from "../common/manager/LanguageManager";
+import { language } from "../framework/base/Language";
+import { LanguageCN } from "../common/language/LanguageCN";
 
 const { ccclass, property } = cc._decorator;
 
@@ -14,6 +15,8 @@ export default class HallView extends UIView {
     public static getPrefabUrl() {
         return HALL("prefabs/HallView")
     }
+
+    public _count = 10;
 
     private readonly games = [
         new GameConfig("游戏1","gameOne",1),
@@ -33,8 +36,16 @@ export default class HallView extends UIView {
                 });
             }else{
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
-                    let title = cc.find("Background/label",game).getComponent(cc.Label);
-                    notice.string = String.format(LANG.hall_view_nogame_notice, title.string);
+                    //let title = cc.find("Background/label",game).getComponent(cc.Label);
+                    notice.string = String.format(language().get("hall_view_nogame_notice"), this._count);
+                    this._count ++;
+                    let ret = this._count % 2;
+                    ret = Math.floor(ret);
+                    if ( ret == 0 ){
+                        language().change("zh");
+                    }else{
+                        language().change("en");
+                    }
                 });
             }
         }
@@ -44,12 +55,12 @@ export default class HallView extends UIView {
         this.adaptLanguage();
 
         this.scheduleOnce(() => {
-            LanguageManager.setLanguage('EN');
+            language().change('en');
             this.adaptLanguage();
         }, 2.5);
 
         this.scheduleOnce(() => {
-            LanguageManager.setLanguage('CN');
+            language().change('zh');
             this.adaptLanguage();
         }, 5);
     }

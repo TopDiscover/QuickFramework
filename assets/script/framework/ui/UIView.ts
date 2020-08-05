@@ -1,8 +1,7 @@
 import EventComponent from "../base/EventComponent";
 import AudioComponent from "../base/AudioComponent";
 import { uiManager } from "../base/UIManager";
-import { LANG } from "../../common/manager/LanguageManager";
-import { BUNDLE_RESOURCES } from "../base/Defines";
+import { language } from "../base/Language";
 
 /**
  * @description 视图基类
@@ -260,7 +259,7 @@ export default abstract class UIView extends EventComponent {
     private arrLabelKey: Array<string> = new Array<string>();
     
     //自动适配语言刷新界面
-    protected adaptLanguage(){
+    public adaptLanguage( ){
         if (this.arrLabelKey.length <= 0) {
             this.checkLabal(this.node, 'label');
             if (this.arrLabel && this.arrLabel.length > 0) {
@@ -278,11 +277,11 @@ export default abstract class UIView extends EventComponent {
             let arrKey = key.split('.');
             let strText = undefined;
             if (arrKey.length === 1) {
-                strText = LANG[arrKey[0]];
-            } else if (arrKey.length === 2 && LANG[arrKey[0]]) {
-                strText = LANG[arrKey[0]][arrKey[1]];
-            } else if (arrKey.length === 3 && LANG[arrKey[0]] && LANG[arrKey[0]][arrKey[1]]) {
-                strText = LANG[arrKey[0]][arrKey[1]][arrKey[2]];
+                strText = language().data[arrKey[0]];
+            } else if (arrKey.length === 2 && language().data[arrKey[0]]) {
+                strText = language().data[arrKey[0]][arrKey[1]];
+            } else if (arrKey.length === 3 && language().data[arrKey[0]] && language().data[arrKey[0]][arrKey[1]]) {
+                strText = language().data[arrKey[0]][arrKey[1]][arrKey[2]];
             } else {
                 strText = undefined;
             }
