@@ -1,4 +1,4 @@
-import ViewController from "../../framework/controller/ViewController";
+import Controller from "../../framework/controller/Controller";
 import { dataBase } from "../../framework/database/DataBase";
 import { resolutionHelper } from "../../framework/adaptor/ResolutionHelper";
 import { logicManager } from "./LogicManager";
@@ -6,6 +6,8 @@ import { uiManager } from "../../framework/base/UIManager";
 import GlobalAudio from "../component/GlobalAudio";
 import { assetManager } from "../../framework/assetManager/AssetManager";
 import { CommonService } from "../base/CommonService";
+import { netManager } from "./NetManager";
+import { Config } from "../config/Config";
 
 /**
  * @description 主控制器 
@@ -15,7 +17,7 @@ const {ccclass, property,menu} = cc._decorator;
 
 @ccclass
 @menu("manager/MainController")
-export default class MainController extends ViewController<CommonService> {
+export default class MainController extends Controller<CommonService> {
     
     /**@description 进入后台的时间 */
     private _enterBackgroundTime = 0;
@@ -27,12 +29,37 @@ export default class MainController extends ViewController<CommonService> {
         //本地缓存数据库打开
         dataBase().open();
 
-        //先添加全局的网络action组件
+        //先添加全局的网络组件
+        netManager().addNetControllers(this.node);
 
         //预先加载下loading预置体
         
 
-        //键盘事件注册
+        //调试按钮事件注册
+        let showUI = cc.find("showUI",this.node);
+        let showNode = cc.find("showNode",this.node);
+        let showRes = cc.find("showRes",this.node);
+        if ( showUI && showNode && showRes){
+            showUI.zIndex = 9999;
+            showNode.zIndex = 9999;
+            showRes.zIndex = 9999;
+             let isShow = false;
+            if ( Config.isShowDebugButton ){
+                isShow = true;
+                showUI.on(cc.Node.EventType.TOUCH_END,()=>{
+                    uiManager().printViews();
+                });
+                showNode.on(cc.Node.EventType.TOUCH_END,()=>{
+                    uiManager().printCanvasChildren();
+                });
+                showRes.on(cc.Node.EventType.TOUCH_END,()=>{
+
+                });
+            }
+            showUI.active = isShow;
+            showNode.active = isShow;
+            showRes.active = isShow;
+        }
 
         //游戏事件注册
         cc.game.on(cc.game.EVENT_HIDE,this.onEnterBackground,this);
@@ -61,6 +88,7 @@ export default class MainController extends ViewController<CommonService> {
         resolutionHelper().onDestroy();
 
         //移除网络组件 
+        netManager().removeNetControllers(this.node);
         //移除键盘事件
         cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP);
 

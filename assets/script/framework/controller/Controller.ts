@@ -3,13 +3,13 @@ import { EventApi } from "../event/EventApi";
 import EventComponent from "../base/EventComponent";
 
 /**
- * @description 控制器基类 , 对service 及 loader 的自动注入
+ * @description 控制器基类 , 对service 的自动注入
  */
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class ViewController<ServiceType> extends EventComponent {
+export default class Controller<ServiceType> extends EventComponent {
 
     /**
      * @description 这个变量会在脚本onLoad时自动赋值，使用者请勿进行修改
@@ -29,14 +29,14 @@ export default class ViewController<ServiceType> extends EventComponent {
     }
 
     protected onNetOpen() {
-        if ( CC_DEBUG ) cc.log(`--ViewController-- onNetOpen---`);
+        if ( CC_DEBUG ) cc.log(`--Controller-- onNetOpen---`);
     }
     
     protected onNetClose( ev ) {
-        if ( CC_DEBUG ) cc.log(`--ViewController-- onNetClose---`);
+        if ( CC_DEBUG ) cc.log(`--Controller-- onNetClose---`);
     }
     protected onNetError( ev : Event ) {
-        if ( CC_DEBUG ) cc.log(`--ViewController-- onNetError---`);
+        if ( CC_DEBUG ) cc.log(`--Controller-- onNetError---`);
     }
 
 }
