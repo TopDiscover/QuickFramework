@@ -234,7 +234,7 @@ declare interface StringConstructor {
 	/**
 	 * @description 格式化字符串
 	 * @example
-	 * String.format("{0}-->{1}-->{2}","one","two","three")
+	 * String.format("{0}-->{1}-->{2}","one","two","three") | String.format("{0}-->{1}-->{2}",["one","two","three"])
 	 * => "one-->two-->three"
 	 * */
 	format(...args): string;

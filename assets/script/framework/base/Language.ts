@@ -51,7 +51,7 @@ class Language{
         localStorage().setItem(LANG_KEY,this._data.language);
     }
 
-    public get( key : string ){
+    public get( key : string , ...arg){
         let values = key.split(".");
         if ( values.length <= 0 ){
             cc.error(`key error`);
@@ -72,6 +72,8 @@ class Language{
         if ( i != values.length-1 ){
             cc.error(`语言包不存在 : ${key}`);
         }
+
+        result = String.format(result,arg);
         return result;
     }
 

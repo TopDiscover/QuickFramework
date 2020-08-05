@@ -12,5 +12,5 @@ export let LanguageEN = {
     ],
     hall_view_broadcast_content: '[broadcast] congratulations!',
     hall_view_nogame_notice: '【{0}】developing!!!',
-
+    test : " test : {0}-->{1}-->{2}-->{3}-->"
 }

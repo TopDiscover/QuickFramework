@@ -70,6 +70,9 @@ String.format = function () {
     }
     var statment = param[0]; // get the first element(the original statement)
     param.shift(); // remove the first element from array
+    if ( Array.isArray(param[0]) && param.length == 1 ){
+        param = param[0];
+    }
     return statment.replace(/\{(\d+)\}/g, function (m, n) {
         return param[n];
     });

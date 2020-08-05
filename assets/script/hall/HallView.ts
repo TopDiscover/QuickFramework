@@ -36,8 +36,6 @@ export default class HallView extends UIView {
                 });
             }else{
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
-                    //let title = cc.find("Background/label",game).getComponent(cc.Label);
-                    
                     this._count ++;
                     let ret = this._count % 2;
                     ret = Math.floor(ret);
@@ -46,7 +44,8 @@ export default class HallView extends UIView {
                     }else{
                         language().change("en");
                     }
-                    notice.string = String.format(language().get("hall_view_nogame_notice"), this._count);
+                    
+                    notice.string = language().get("test",this._count,100,200,300);
                 });
             }
         }
