@@ -6,6 +6,7 @@ import { GameConfig } from "../common/base/HotUpdate";
 import { HallEvent } from "./HallEvent";
 import { language } from "../framework/base/Language";
 import { LanguageCN } from "../common/language/LanguageCN";
+import { i18n } from "../common/language/LanguageImpl";
 
 const { ccclass, property } = cc._decorator;
 
@@ -45,7 +46,8 @@ export default class HallView extends UIView {
                         language().change("en");
                     }
                     
-                    notice.string = language().get("test",this._count,100,200,300);
+                    //notice.string = language().get("test",this._count,100,200,300);
+                    notice.string = String.format(i18n.test,this._count,100,200,300);
                 });
             }
         }
