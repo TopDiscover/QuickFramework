@@ -10,6 +10,7 @@ import { netManager } from "./NetManager";
 import { Config } from "../config/Config";
 import { language } from "../../framework/base/Language";
 import { LanguageImpl } from "../language/LanguageImpl";
+import { getSingleton } from "../../framework/base/Singleton";
 
 /**
  * @description 主控制器 
@@ -29,7 +30,7 @@ export default class MainController extends Controller<CommonService> {
         resolutionHelper().onLoad(this.node);
 
         //语言包初始化
-        language().delegate = new LanguageImpl();
+        language().delegate = getSingleton(LanguageImpl);
         
         //本地缓存数据库打开
         dataBase().open();
