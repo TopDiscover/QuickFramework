@@ -59,13 +59,18 @@ class Language{
         }
         let result = this._data[values[0]];
         if ( !result ){
+            cc.error("data error");
             return "";
         }
-        for ( let i = 0 ; i < values.length ; i++ ){
+        let i = 0;
+        for ( i = 0 ; i < values.length ; i++ ){
             if ( result[values[i]] == undefined ){
                 break;
             }
             result = result[values[i]];
+        }
+        if ( i != values.length-1 ){
+            cc.error(`语言包不存在 : ${key}`);
         }
         return result;
     }
