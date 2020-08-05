@@ -62,14 +62,14 @@ class Language{
             cc.error("data error");
             return "";
         }
-        let i = 0;
-        for ( i = 0 ; i < values.length ; i++ ){
+        let i = 1;
+        for ( ; i < values.length ; i++ ){
             if ( result[values[i]] == undefined ){
                 break;
             }
             result = result[values[i]];
         }
-        if ( i != values.length-1 ){
+        if ( i != values.length ){
             cc.error(`语言包不存在 : ${key}`);
         }
 

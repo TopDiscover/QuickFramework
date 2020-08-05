@@ -69,6 +69,10 @@ String.format = function () {
         param.push(arguments[i]);
     }
     var statment = param[0]; // get the first element(the original statement)
+    if ( typeof statment != "string" ){
+        cc.error(`String.format error,first param is not a string`);
+        return "";
+    }
     param.shift(); // remove the first element from array
     if ( Array.isArray(param[0]) && param.length == 1 ){
         param = param[0];

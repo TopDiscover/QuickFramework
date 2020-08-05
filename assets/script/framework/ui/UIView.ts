@@ -274,23 +274,7 @@ export default abstract class UIView extends EventComponent {
         for (let i = 0; i < this.arrLabelKey.length; i++) {
             const element = this.arrLabel[i];
             let key = this.arrLabelKey[i];
-            let arrKey = key.split('.');
-            let strText = undefined;
-            if (arrKey.length === 1) {
-                strText = language().data[arrKey[0]];
-            } else if (arrKey.length === 2 && language().data[arrKey[0]]) {
-                strText = language().data[arrKey[0]][arrKey[1]];
-            } else if (arrKey.length === 3 && language().data[arrKey[0]] && language().data[arrKey[0]][arrKey[1]]) {
-                strText = language().data[arrKey[0]][arrKey[1]][arrKey[2]];
-            } else {
-                strText = undefined;
-            }
-            if (strText) {
-                element.string = strText;
-            } else {
-                element.string = '';
-                cc.error('err: ' + key + ' 未找到语言包');
-            }
+            element.string = language().get(key);
         }
     }
 
