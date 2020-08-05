@@ -7,6 +7,7 @@ import { injectService } from "../framework/decorator/Decorators";
 import Controller from "../framework/controller/Controller";
 import { MainCmd, SubCmd, UpdateMoney } from "./HallMessage";
 import { HallEvent } from "./HallEvent";
+import { netManager } from "../common/manager/NetManager";
 
 const { ccclass, property } = cc._decorator;
 
@@ -25,3 +26,5 @@ export default class HallNetController extends Controller<LobbyService> {
     }
 
 }
+
+netManager().push(HallNetController);

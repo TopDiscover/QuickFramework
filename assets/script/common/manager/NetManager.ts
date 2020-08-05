@@ -3,8 +3,6 @@
  */
 
 import { getSingleton } from "../../framework/base/Singleton";
-import Controller from "../../framework/controller/Controller";
-import { CommonService } from "../base/CommonService";
 
  export function netManager(){
      return getSingleton(NetManager);
@@ -21,7 +19,7 @@ import { CommonService } from "../base/CommonService";
     }
 
     /**@description 网络控制器添加 */
-    public push( controller : Controller<typeof CommonService> ){
+    public push( controller : any ){
         for ( let i = 0 ; i < this.controllers.length ; i++ ){
             if ( this.controllers[i] == controller ){
                 cc.error(this._logTag,`重复添加${cc.js.getClassName(controller)}`);
