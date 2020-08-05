@@ -7,6 +7,7 @@ import { HallEvent } from "./HallEvent";
 import { language } from "../framework/base/Language";
 import { LanguageCN } from "../common/language/LanguageCN";
 import { i18n } from "../common/language/LanguageImpl";
+import { LobbyService } from "../common/net/LobbyService";
 
 const { ccclass, property } = cc._decorator;
 
@@ -65,6 +66,10 @@ export default class HallView extends UIView {
             language().change('zh');
             this.adaptLanguage();
         }, 5);
+
+        //根据自己的需要，连接网络
+        //LobbyService.instance.connect("www.baidu.com");
+
     }
 
      bindingEvents(){
