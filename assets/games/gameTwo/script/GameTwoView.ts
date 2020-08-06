@@ -1,5 +1,4 @@
 import UIView from "../../../script/framework/ui/UIView";
-import { GAME } from "../../../script/common/base/ResPath";
 import { LogicEvent, dispatchEnterComplete, LogicType } from "../../../script/common/event/LogicEvent";
 
 

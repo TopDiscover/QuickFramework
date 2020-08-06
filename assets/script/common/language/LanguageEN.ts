@@ -5,7 +5,8 @@ export let LanguageEN = {
     hall_view_game_name: [
         'game1',
         'game2',
-        'game3',
+        `BATTLE
+CITY`,
         'game4',
         'game5',
         'game6',

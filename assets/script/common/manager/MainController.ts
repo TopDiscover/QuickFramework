@@ -7,9 +7,6 @@ import GlobalAudio from "../component/GlobalAudio";
 import { assetManager } from "../../framework/assetManager/AssetManager";
 import { netManager } from "./NetManager";
 import { Config } from "../config/Config";
-import { language } from "../../framework/base/Language";
-import { LanguageImpl } from "../language/LanguageImpl";
-import { getSingleton } from "../../framework/base/Singleton";
 import { CommonService } from "../net/CommonService";
 import { LobbyService } from "../net/LobbyService";
 
@@ -29,9 +26,6 @@ export default class MainController extends Controller<CommonService> {
     onLoad () {
 
         resolutionHelper().onLoad(this.node);
-
-        //语言包初始化
-        language().delegate = getSingleton(LanguageImpl);
         
         //本地缓存数据库打开
         dataBase().open();

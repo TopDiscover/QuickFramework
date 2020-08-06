@@ -1,6 +1,5 @@
 import { LogicEventData, LogicType } from "../event/LogicEvent";
 import EventComponent from "../../framework/base/EventComponent";
-import { GamePathDelegate } from "./ResPath";
 import { ResourceData, ResourceCacheData } from "../../framework/base/Defines";
 import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
 
@@ -14,9 +13,6 @@ export class Logic extends EventComponent {
     protected _loader: ResourceLoader = null;
 
     protected logicType : LogicType = LogicType.UNKNOWN;
-
-    /**@description 游戏路径代理，在LogicType为GAME时，根据自己的游戏来设置路径代理 */
-    protected gamePahtDelegate : GamePathDelegate = null;
 
     constructor() {
         super();

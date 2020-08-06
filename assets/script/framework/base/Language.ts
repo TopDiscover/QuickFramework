@@ -56,7 +56,7 @@ class Language{
         }
         let result = this._data[values[0]];
         if ( !result ){
-            cc.error("data error");
+            cc.error(`语言包不存在 : ${key}`);
             return "";
         }
         let i = 1;

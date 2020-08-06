@@ -1,5 +1,4 @@
 import UIView from "../framework/ui/UIView";
-import { HALL } from "../common/base/ResPath";
 import { dispatchEnterComplete, LogicType } from "../common/event/LogicEvent";
 import { gameManager } from "../common/manager/GameManager";
 import { GameConfig } from "../common/base/HotUpdate";
@@ -19,7 +18,7 @@ const { ccclass, property } = cc._decorator;
 export default class HallView extends UIView implements IController<LobbyService>{
 
     public static getPrefabUrl() {
-        return HALL("prefabs/HallView")
+        return "hall/prefabs/HallView";
     }
 
     service : LobbyService = null;
@@ -29,6 +28,7 @@ export default class HallView extends UIView implements IController<LobbyService
     private readonly games = [
         new GameConfig("游戏1","gameOne",1),
         new GameConfig("游戏2","gameTwo",2),
+        new GameConfig(i18n.hall_view_game_name[2],"tankBattle",3)
     ];
 
     onLoad() {

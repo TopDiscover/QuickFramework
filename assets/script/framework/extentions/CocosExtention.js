@@ -260,6 +260,5 @@ if (!CC_EDITOR) {
 }
 
 export function CocosExtentionInit() {
-    //cc.log(`添加cc.Sprite 的 loadImage方法`);
-    //cc.log(`添加sp.Skeleton 的 loadSkeleton方法`);
+    cc.log("CocosExtentionInit");
 }
