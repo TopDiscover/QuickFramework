@@ -71,7 +71,11 @@ export class Service extends ServerConnector {
             return;
         }
         super.onMessage(data);
-        cc.log(`recv data main cmd : ${msg.mainCmd} sub cmd : ${msg.subCmd} buffer length : ${msg.data.length}`);
+        if ( this.isHeartBeat(msg) ){
+            //心跳消息，路过处理，应该不会有人注册心跳吧
+            return;
+        }
+        cc.log(`recv data main cmd : ${msg.mainCmd} sub cmd : ${msg.subCmd} buffer length : ${msg.buffer.length}`);
         let key = makeKey(msg.mainCmd, msg.subCmd);
 
         if (!this._listeners[key]) {

@@ -8,15 +8,21 @@ import { language } from "../framework/base/Language";
 import { LanguageCN } from "../common/language/LanguageCN";
 import { i18n } from "../common/language/LanguageImpl";
 import { LobbyService } from "../common/net/LobbyService";
+import { injectService } from "../framework/decorator/Decorators";
+import { IController } from "../framework/controller/Controller";
+import { UpdateMoney } from "./HallMessage";
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class HallView extends UIView {
+@injectService(LobbyService.instance)
+export default class HallView extends UIView implements IController<LobbyService>{
 
     public static getPrefabUrl() {
         return HALL("prefabs/HallView")
     }
+
+    service : LobbyService = null;
 
     public _count = 10;
 
@@ -36,7 +42,14 @@ export default class HallView extends UIView {
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
                     gameManager().enterGame(this.games[i-1]);
                 });
-            }else{
+            }else if( i == 6 ){
+                game.on(cc.Node.EventType.TOUCH_END,()=>{
+                    //websocket测试
+                    let msg = new UpdateMoney();
+                    this.service.send(msg);
+                });
+            }
+            else{
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
                     this._count ++;
                     let ret = this._count % 2;
@@ -68,8 +81,7 @@ export default class HallView extends UIView {
         }, 5);
 
         //根据自己的需要，连接网络
-        //LobbyService.instance.connect("www.baidu.com");
-
+        LobbyService.instance.connect("echo.websocket.org");
     }
 
      bindingEvents(){

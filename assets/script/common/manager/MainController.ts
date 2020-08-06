@@ -5,12 +5,13 @@ import { logicManager } from "./LogicManager";
 import { uiManager } from "../../framework/base/UIManager";
 import GlobalAudio from "../component/GlobalAudio";
 import { assetManager } from "../../framework/assetManager/AssetManager";
-import { CommonService } from "../base/CommonService";
 import { netManager } from "./NetManager";
 import { Config } from "../config/Config";
 import { language } from "../../framework/base/Language";
 import { LanguageImpl } from "../language/LanguageImpl";
 import { getSingleton } from "../../framework/base/Singleton";
+import { CommonService } from "../net/CommonService";
+import { LobbyService } from "../net/LobbyService";
 
 /**
  * @description 主控制器 
@@ -83,7 +84,9 @@ export default class MainController extends Controller<CommonService> {
     }
 
     update(){
-        //主逻辑
+
+        //大厅网络连接调度
+        LobbyService.instance.handMessage();
 
         //远程资源下载任务调度
         assetManager().remote.update();

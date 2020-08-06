@@ -12,7 +12,6 @@ import { GameEventInterface } from "../../framework/base/GameEventInterface";
 import { Message } from "../../framework/net/ServerConnector";
 
 export class CommonMessage extends Message {
-
 }
 
 /**
@@ -35,6 +34,8 @@ export class CommonService extends Service implements GameEventInterface {
     protected sendHeartbeat() {
         //发送心跳
         let msg = new CommonMessage();
+        msg.mainCmd = 1;
+        msg.subCmd = 1;
         this.send(msg);
     }
     /**
@@ -43,6 +44,11 @@ export class CommonService extends Service implements GameEventInterface {
     protected getMaxHeartbeatTimeOut(): number {
         return super.getMaxHeartbeatTimeOut();
     }
+
+    protected getHeartbeatInterval() {
+        return super.getHeartbeatInterval();
+    }
+
     /**
      * @description 心跳超时
      */
