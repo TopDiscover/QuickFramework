@@ -84,7 +84,7 @@ String.format = function () {
 }
 
 export function extentionsInit(){
-    cc.log(`extentionsInit`);
+    //cc.log(`extentionsInit`);
 }
 
 

@@ -15,5 +15,5 @@ extentionsInit();
 //引擎扩展初始化
 CocosExtentionInit();
 //语言包初始化
-cc.log("language init");
+//cc.log("language init");
 language().delegate = getSingleton(LanguageImpl)

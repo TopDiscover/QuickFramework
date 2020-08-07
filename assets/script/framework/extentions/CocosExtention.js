@@ -260,5 +260,5 @@ if (!CC_EDITOR) {
 }
 
 export function CocosExtentionInit() {
-    cc.log("CocosExtentionInit");
+    //cc.log("CocosExtentionInit");
 }
