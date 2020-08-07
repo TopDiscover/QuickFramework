@@ -1,11 +1,11 @@
 import UIView, { UIClass } from "../ui/UIView";
-import { resolutionHelper } from "../adaptor/ResolutionHelper";
 import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
 import { getSingleton } from "./Singleton";
 import UILoadingDelegate from "../ui/UILoadingDelegate";
 import ToastDelegate from "../ui/ToastDelegate";
 import { assetManager } from "../assetManager/AssetManager";
 import { cacheManager } from "../assetManager/CacheManager";
+import { Manager } from "../Framework";
 
 export function uiManager() {
     return getSingleton(UIManager);
@@ -251,7 +251,7 @@ class UIManager {
                             if (!viewData.node.parent) {
                                 viewData.node.parent = this.getCanvas();
                             }
-                            resolutionHelper().fullScreenAdapt(viewData.node);
+                            Manager.resolutionHelper.fullScreenAdapt(viewData.node);
                             viewData.view.show(args);
                         }
                     }
@@ -330,7 +330,7 @@ class UIManager {
                 }
             }
 
-            resolutionHelper().fullScreenAdapt(uiNode);
+            Manager.resolutionHelper.fullScreenAdapt(uiNode);
 
             view.className = className;
             view.bundle = bundle
@@ -630,7 +630,7 @@ class UIManager {
     public fullScreenAdapt() {
         this._viewDatas.forEach((data) => {
             if (data.isLoaded && data.view) {
-                resolutionHelper().fullScreenAdapt(data.view.node);
+                Manager.resolutionHelper.fullScreenAdapt(data.view.node);
             }
         });
     }

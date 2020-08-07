@@ -1,7 +1,7 @@
 
 import { EventApi } from "../event/EventApi";
-import { getSingleton } from "../base/Singleton";
 import { uiManager } from "../base/UIManager";
+import { Manager } from "../Framework";
 
 type DeviceDirection = "" | "Landscape" | "Portrait";
 
@@ -16,11 +16,7 @@ export enum ScreenAdaptType {
     Max,
 }
 
-export function resolutionHelper(){
-    return getSingleton(ResolutionHelper);
-}
-
-class ResolutionHelper {
+export class ResolutionHelper {
     private _logTag = "[ResolutionHelper]";
     private static _instance: ResolutionHelper = null;
     public static Instance() { return this._instance || (this._instance = new ResolutionHelper()); }
@@ -41,11 +37,10 @@ class ResolutionHelper {
     public _keybordChangeTimerId = -1;
     public _maxLandscapeHeight = 0;
     public get isShowKeyboard() {
-        let me = resolutionHelper();
-        return me._isShowKeyboard;
+        return Manager.resolutionHelper._isShowKeyboard;
     }
     public set isShowKeyboard(value) {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         //let content = value ? "键盘显示!!!" : "键盘隐藏!!!";
         //cc.log(me._logTag,`${content}`);
         me._isShowKeyboard = value;
@@ -57,7 +52,7 @@ class ResolutionHelper {
 
     /**@description 全屏适配 */
     public fullScreenAdapt(node: cc.Node) {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         if (node && me.isNeedAdapt) {
             node.setContentSize(cc.winSize);
             //这里可能父节点还没有，就不管了，按当前节点大小，把子节点做布局
@@ -67,7 +62,7 @@ class ResolutionHelper {
 
     /**@description 是否需要做适配操作，当分辨率发生变化，只要ScreenAdaptType 不是None的情况 */
     public get isNeedAdapt() {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         if (me.screenAdaptType != ScreenAdaptType.None) {
             return true;
         }
@@ -75,7 +70,7 @@ class ResolutionHelper {
     }
 
     private updateAlignment(node: cc.Node) {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         let ch = node.children;
         for (let i = 0; i < ch.length; i++) {
             let child = ch[i];
@@ -87,7 +82,7 @@ class ResolutionHelper {
 
 
     public onLoad(node: cc.Node) {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         me.node = node;
         me.canvas = node.getComponent(cc.Canvas);
         me.designResolution = me.canvas.designResolution.clone();
@@ -95,14 +90,14 @@ class ResolutionHelper {
     }
 
     public onDestroy() {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         me.node = null;
         me.isFirstResize = false;
     }
 
     /**@description 做屏幕适配 */
     private doChangeResolution() {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         if (me.screenAdaptType == ScreenAdaptType.Increase) {
             let winsize = me.getWinsize();
             me.canvas.designResolution = winsize;
@@ -122,7 +117,7 @@ class ResolutionHelper {
 
     /**@description 浏览器适配初始化 */
     public initBrowserAdaptor() {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         if (me.isBrowser && !CC_EDITOR) {
             cc.view.resizeWithBrowserSize(true);
 
@@ -147,7 +142,7 @@ class ResolutionHelper {
     }
 
     private get isSafari() {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         if (me.isBrowser && cc.sys.OS_IOS == cc.sys.os && cc.sys.browserType == cc.sys.BROWSER_TYPE_SAFARI) {
             return true;
         }
@@ -155,19 +150,19 @@ class ResolutionHelper {
     }
 
     private onOrientationChange() {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         me.recordHeight();
         me.isFirstResize = false;
         //cc.log(me._logTag,`onOrientationChange`);
     }
 
     private onResize() {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         me._onResize(false);
     }
 
     private _onResize(isHideKeyboard: boolean) {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         //cc.log(me._logTag,`onResize`);
         if (me.node) {
             if (CC_PREVIEW || CC_WECHATGAME) {
@@ -240,7 +235,7 @@ class ResolutionHelper {
     }
 
     private doAdapt() {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         if (me.canvas) {
             if (me.waitScorllY != null) {
                 let top = me.waitScorllY;
@@ -261,7 +256,7 @@ class ResolutionHelper {
     //记录屏幕高度
     private recordHeight() {
         if (window.innerWidth && window.innerHeight) {
-            let me = resolutionHelper();
+            let me = Manager.resolutionHelper;
             if (me.dviceDirection == "Landscape") {
                 me.landscapeHeight = window.innerHeight;
                 me._maxLandscapeHeight = Math.max(me._maxLandscapeHeight, me.landscapeHeight);
@@ -273,7 +268,7 @@ class ResolutionHelper {
     }
 
     private getWinsize() {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         let frameSize = me.getFrameSize();
         let width = frameSize.width * me.designResolution.height / frameSize.height;
         let height = me.designResolution.height;
@@ -282,7 +277,7 @@ class ResolutionHelper {
 
     /**@description 最大化窗口大小 */
     private getMaxWinsize() {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         //实际当前窗口的宽度
         let height = me.designResolution.height;
         let width = height * me.MAX_RATE;
@@ -290,7 +285,7 @@ class ResolutionHelper {
     }
 
     private getFrameSize() {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         let frameSize = cc.view.getFrameSize();
         let innerSize = me.windowInnerSize;
         let size = frameSize.clone();
@@ -302,7 +297,7 @@ class ResolutionHelper {
 
     /**计算是否需要进行全屏幕适配 */
     private calculateNeedFullScreenAdapt() {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         //当前设计分辨率的宽高比
         let design = me.designResolution.width / me.designResolution.height;
         let frameSize = me.getFrameSize();
@@ -339,7 +334,7 @@ class ResolutionHelper {
     }
 
     private get windowInnerSize() {
-        let me = resolutionHelper();
+        let me = Manager.resolutionHelper;
         let size = cc.Size.ZERO.clone();
         if (window.innerHeight && window.innerWidth) {
             let w = window.innerWidth;

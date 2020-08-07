@@ -102,6 +102,6 @@ class Language {
 
     /**@description 获取语言包名 */
     public getLanguage() {
-        return localStorage().getItem(LANG_KEY, null);
+        return localStorage().getItem(LANG_KEY, "zh");
     }
 }

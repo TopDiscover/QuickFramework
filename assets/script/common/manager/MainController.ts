@@ -1,14 +1,8 @@
 import Controller from "../../framework/controller/Controller";
-import { dataBase } from "../../framework/database/DataBase";
-import { resolutionHelper } from "../../framework/adaptor/ResolutionHelper";
-import { logicManager } from "./LogicManager";
-import { uiManager } from "../../framework/base/UIManager";
-import GlobalAudio from "../component/GlobalAudio";
-import { assetManager } from "../../framework/assetManager/AssetManager";
-import { netManager } from "./NetManager";
 import { Config } from "../config/Config";
 import { CommonService } from "../net/CommonService";
 import { LobbyService } from "../net/LobbyService";
+import { Manager } from "./Manager";
 
 /**
  * @description 主控制器 
@@ -25,13 +19,13 @@ export default class MainController extends Controller<CommonService> {
 
     onLoad () {
 
-        resolutionHelper().onLoad(this.node);
+        Manager.resolutionHelper.onLoad(this.node);
         
         //本地缓存数据库打开
-        dataBase().open();
+        Manager.dataBase.open();
 
         //先添加全局的网络组件
-        netManager().addNetControllers(this.node);
+        Manager.netManager.addNetControllers(this.node);
 
         //预先加载下loading预置体
         
@@ -48,10 +42,10 @@ export default class MainController extends Controller<CommonService> {
             if ( Config.isShowDebugButton ){
                 isShow = true;
                 showUI.on(cc.Node.EventType.TOUCH_END,()=>{
-                    uiManager().printViews();
+                    Manager.uiManager.printViews();
                 });
                 showNode.on(cc.Node.EventType.TOUCH_END,()=>{
-                    uiManager().printCanvasChildren();
+                    Manager.uiManager.printCanvasChildren();
                 });
                 showRes.on(cc.Node.EventType.TOUCH_END,()=>{
 
@@ -69,12 +63,12 @@ export default class MainController extends Controller<CommonService> {
         cc.director.on(cc.Director.EVENT_AFTER_DRAW,this._onDirectorAfterDraw,this);
 
         //逻辑管理器
-        logicManager().onLoad(this.node);
+        Manager.logicManager.onLoad(this.node);
     }
 
     /**@description 游戏完成一次渲染过程之后 */
     private _onDirectorAfterDraw( ){
-        let cando = uiManager().onDirectorAfterDraw();
+        Manager.uiManager.onDirectorAfterDraw();
     }
 
     update(){
@@ -83,15 +77,15 @@ export default class MainController extends Controller<CommonService> {
         LobbyService.instance.handMessage();
 
         //远程资源下载任务调度
-        assetManager().remote.update();
+        Manager.assetManager.remote.update();
     }
 
     onDestroy(){
         
-        resolutionHelper().onDestroy();
+        Manager.resolutionHelper.onDestroy();
 
         //移除网络组件 
-        netManager().removeNetControllers(this.node);
+        Manager.netManager.removeNetControllers(this.node);
         //移除键盘事件
         cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP);
 
@@ -100,13 +94,13 @@ export default class MainController extends Controller<CommonService> {
         cc.game.off(cc.game.EVENT_SHOW);
 
         //逻辑管理器
-        logicManager().onDestroy(this.node);
+        Manager.logicManager.onDestroy(this.node);
     }
 
     private onEnterBackground(){
         this._enterBackgroundTime = Date.timeNow();
         cc.log(`[MainController]`,`onEnterBackground ${this._enterBackgroundTime}`);
-        uiManager().getCanvas().getComponent(GlobalAudio).onEnterBackground();
+        Manager.globalAudio.onEnterBackground();
         this.service && this.service.onEnterBackground();
     }
 
@@ -114,7 +108,7 @@ export default class MainController extends Controller<CommonService> {
         let now = Date.timeNow();
         let inBackgroundTime = now - this._enterBackgroundTime;
         cc.log(`[MainController]`,`onEnterForgeground ${now} background total time : ${inBackgroundTime}`);
-        uiManager().getCanvas().getComponent(GlobalAudio).onEnterForgeground(inBackgroundTime);
+        Manager.globalAudio.onEnterForgeground(inBackgroundTime);
         this.service && this.service.onEnterForgeground(inBackgroundTime);
     }
 }

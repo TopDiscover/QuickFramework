@@ -1,4 +1,3 @@
-import { resolutionHelper } from "../adaptor/ResolutionHelper";
 import WebEditBoxImpl from "./WebEditBoxImpl";
 import { ResourceType, ENABLE_CHANGE_LANGUAGE } from "../base/Defines";
 import {
@@ -11,6 +10,7 @@ import { assetManager } from "../assetManager/AssetManager";
 import { language , USING_LAN_KEY} from "../../framework/base/Language"
 import { EventApi } from "../event/EventApi";
 import { eventDispatcher } from "../event/EventDispatcher";
+import { Manager } from "../Framework";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
 if (typeof Reflect == "object") {
@@ -256,7 +256,7 @@ cc.updateAlignment = function (node) {
 if (!CC_EDITOR) {
 
     //对引擎输入框进行修改 ,原始引擎版本2.1.2
-    if (resolutionHelper().isBrowser && !CC_PREVIEW && cc.sys.os != cc.sys.OS_WINDOWS) {
+    if ( Manager.resolutionHelper.isBrowser && !CC_PREVIEW && cc.sys.os != cc.sys.OS_WINDOWS) {
         if (CC_DEBUG) cc.log(`浏览器`);
         cc.EditBox._ImplClass = WebEditBoxImpl;
     }

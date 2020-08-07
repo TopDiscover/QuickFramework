@@ -1,4 +1,4 @@
-import { resolutionHelper } from "../adaptor/ResolutionHelper";
+import { Manager } from "../Framework";
 
 class WebEditBoxHelper {
     private static _instance: WebEditBoxHelper = null;
@@ -202,7 +202,7 @@ export default class WebEditBoxImpl {
 
     beginEditing() {
         this._isFocus = true;
-        resolutionHelper().isShowKeyboard = true;
+        Manager.resolutionHelper.isShowKeyboard = true;
         this._showDom();
         this._registerEventListeners();
         this._elem.focus();
@@ -360,7 +360,7 @@ export default class WebEditBoxImpl {
         cbs.onBlur = function () {
             impl._hideDom();
             impl._isFocus = false;
-            resolutionHelper().isShowKeyboard = false;
+            Manager.resolutionHelper.isShowKeyboard = false;
             //删除注册事件
             impl._removeEventListeners();
             impl._delegate.editBoxEditingDidEnded();
