@@ -19,11 +19,7 @@ interface StorageData {
     value: string | number | boolean | object;
 }
 
-export function localStorage(){
-    return getSingleton(LocalStorage);
-}
-
-class LocalStorage {
+export class LocalStorage {
 
     private static _instance: LocalStorage = null;
     public static Instance() { return this._instance || (this._instance = new LocalStorage()); }

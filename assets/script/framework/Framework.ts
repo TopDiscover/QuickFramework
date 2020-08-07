@@ -2,7 +2,7 @@ import { language } from "./base/Language";
 import { eventDispatcher } from "./event/EventDispatcher";
 import { dataBase } from "./database/DataBase";
 import { uiManager } from "./base/UIManager";
-import { localStorage } from "./base/LocalStorage";
+import { LocalStorage } from "./base/LocalStorage";
 import { AssetManager } from "./assetManager/AssetManager";
 import { CacheManager } from "./assetManager/CacheManager";
 import { ResolutionHelper } from "./adaptor/ResolutionHelper";
@@ -32,7 +32,7 @@ export class _FramewokManager{
 
     /**@description 本地仓库 */
     get localStorage(){
-        return localStorage();
+        return getSingleton(LocalStorage);
     }
 
     /**@description 资源管理器 */

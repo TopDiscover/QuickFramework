@@ -1,8 +1,7 @@
 import { getSingleton } from "../../framework/base/Singleton";
-import { localStorage } from "../../framework/base/LocalStorage"
-import { uiManager } from "./UIManager";
 import { EventApi } from "../event/EventApi";
 import { ENABLE_CHANGE_LANGUAGE } from "./Defines";
+import { Manager } from "../Framework";
 const LANG_KEY: string = "using_language";
 
 export interface LanguageData {
@@ -53,7 +52,7 @@ class Language {
         }else{
             this._data = this.delegate.data(this.getLanguage());
         }
-        localStorage().setItem(LANG_KEY, this._data.language);
+        Manager.localStorage.setItem(LANG_KEY, this._data.language);
     }
 
     public get(args: (string | number)[]) {
@@ -102,6 +101,6 @@ class Language {
 
     /**@description 获取语言包名 */
     public getLanguage() {
-        return localStorage().getItem(LANG_KEY, "zh");
+        return Manager.localStorage.getItem(LANG_KEY, "zh");
     }
 }

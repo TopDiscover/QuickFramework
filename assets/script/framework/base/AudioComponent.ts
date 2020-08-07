@@ -1,6 +1,5 @@
 import UIView from "../ui/UIView";
 import { ResourceInfo, BUNDLE_TYPE } from "./Defines";
-import { localStorage } from "./LocalStorage";
 import { uiManager } from "./UIManager";
 import { Manager } from "../Framework";
 
@@ -35,22 +34,22 @@ class AudioData {
     private init() {
 
         //音量开关读取
-        this.isMusicOn = localStorage().getItem(this._storeMusicKey, this.isMusicOn);
-        this.isEffectOn = localStorage().getItem(this._storeEffectKey, this.isEffectOn);
+        this.isMusicOn = Manager.localStorage.getItem(this._storeMusicKey, this.isMusicOn);
+        this.isEffectOn = Manager.localStorage.getItem(this._storeEffectKey, this.isEffectOn);
 
         //音量读取
-        this.musicVolume = localStorage().getItem(this._storeMusicVolumeKey, this.musicVolume);
-        this.effectVolume = localStorage().getItem(this._storeEffectVolumeKey, this.effectVolume);
+        this.musicVolume = Manager.localStorage.getItem(this._storeMusicVolumeKey, this.musicVolume);
+        this.effectVolume = Manager.localStorage.getItem(this._storeEffectVolumeKey, this.effectVolume);
     }
 
     /**@description 存储 */
     public save() {
         try {
-            localStorage().setItem(this._storeMusicKey, this.isMusicOn);
-            localStorage().setItem(this._storeMusicVolumeKey, this.musicVolume);
+            Manager.localStorage.setItem(this._storeMusicKey, this.isMusicOn);
+            Manager.localStorage.setItem(this._storeMusicVolumeKey, this.musicVolume);
 
-            localStorage().setItem(this._storeEffectKey, this.isEffectOn);
-            localStorage().setItem(this._storeEffectVolumeKey, this.effectVolume);
+            Manager.localStorage.setItem(this._storeEffectKey, this.isEffectOn);
+            Manager.localStorage.setItem(this._storeEffectVolumeKey, this.effectVolume);
         } catch (error) {
         }
     }
