@@ -127,8 +127,19 @@ declare module cc {
 		/**@description 强制label在当前帧进行绘制 */
 		forceDoLayout();
 
-		/**@description 设置语言包路径,如果"language",设置该值，会根据当前语言包查找对应的语言进行刷新this.string*/
-		lanKey : (string | number )[];
+		/**
+		 * @description 设置语言包路径,假设语言包为
+		 * @example 示例
+		 * export let i18n = {
+		 * language : "zh",
+		 * tips : "您好",
+		 * test : "测试 : {0}-->{1}-->{2}"
+		 * }
+		 * node.getComponent(cc.Label).lanKey = "i18n.tips"; //string显示为：您好
+		 * node.getComponent(cc.Label).lanKey = ["i18n.tips"];//string显示为：您好
+		 * node.getComponent(cc.Label).lanKey = ["i18n.test",100,200,300];//string显示为：100-->200-->300
+		 * */
+		lanKey : (string | number )[] | string ;
 	}
 
 

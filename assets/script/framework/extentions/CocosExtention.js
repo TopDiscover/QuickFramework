@@ -272,21 +272,31 @@ Reflect.defineProperty(cc.Label.prototype, "lanKey", {
     },
     set : function(v){
         //该游戏允许在游戏中进行语言包切换,当设置的值为 null | [] 时，清除lanKey的事件绑定
-        if ( ENABLE_CHANGE_LANGUAGE ){
-            if ( v && v.length > 0 ){
-                if ( !!!this._isUsingLanKey ){
-                    this._isUsingLanKey = true;
-                    eventDispatcher().addEventListener(EventApi.CHANGE_LANGUAGE,this._onChangeLanguage,this);
+        if (ENABLE_CHANGE_LANGUAGE) {
+            if (v) {
+                let value = null;
+                if (Array.isArray(v)) {
+                    value = v;
+                } else {
+                    //直接给的语言包路径 
+                    value = [v];
                 }
-                this._lanKey = [].concat(v);
-                this.string = language().get(v);
-            }else{
+                if (!!!this._isUsingLanKey) {
+                    this._isUsingLanKey = true;
+                    eventDispatcher().addEventListener(EventApi.CHANGE_LANGUAGE, this._onChangeLanguage, this);
+                }
+                this._lanKey = [].concat(value);
+                this.string = language().get(value);
+            } else {
                 this._isUsingLanKey = false;
+                if (this._lanKey) {
+                    eventDispatcher().removeEventListener(EventApi.CHANGE_LANGUAGE, this);
+                }
                 this._lanKey = null;
                 this.string = "";
-                eventDispatcher().removeEventListener(EventApi.CHANGE_LANGUAGE,this);
+
             }
-        }else{
+        } else {
             this._lanKey = [].concat(v);
             this.string = language().get(v);
         }

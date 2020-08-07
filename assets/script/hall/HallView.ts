@@ -60,15 +60,15 @@ export default class HallView extends UIView implements IController<LobbyService
                     this._count ++;
                     let ret = this._count % 2;
                     ret = Math.floor(ret);
+                    //notice.lanKey = "i18n.hall_view_broadcast_content";
+                    notice.lanKey = ["i18n.test",this._count,100,200,300];
+                    //notice.lanKey = null;
+
                     if ( ret == 0 ){
                         language().change("zh");
                     }else{
                         language().change("en");
                     }
-                    
-                    //notice.string = language().get("test",this._count,100,200,300);
-                    //notice.string = String.format(i18n.test,this._count,100,200,300);
-                    //notice.lanKey = [i18n.test,this._count,100,200,300];
                 });
             }
         }
