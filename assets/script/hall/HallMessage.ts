@@ -1,4 +1,3 @@
-import { Message } from "../framework/net/ServerConnector"
 import { CommonMessage } from "../common/net/CommonService"
 
 export let MainCmd = {
