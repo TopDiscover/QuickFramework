@@ -5,7 +5,6 @@ import {
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
     createNodeWithPrefab,getBundle
 } from "./Utils";
-import { cacheManager } from "../assetManager/CacheManager";
 import { assetManager } from "../assetManager/AssetManager";
 import { language , USING_LAN_KEY} from "../../framework/base/Language"
 import { EventApi } from "../event/EventApi";
@@ -65,7 +64,7 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
             if (config.defaultSpriteFrame) {
                 if (typeof config.defaultSpriteFrame == "string") {
                     //动态加载了一张图片，把资源通知管理器
-                    cacheManager().getCacheByAsync(config.defaultSpriteFrame,cc.SpriteFrame,bundle).then((spriteFrame) => {
+                    Manager.cacheManager.getCacheByAsync(config.defaultSpriteFrame,cc.SpriteFrame,bundle).then((spriteFrame) => {
                         setSpriteSpriteFrame(config.view, config.defaultSpriteFrame, me, spriteFrame, config.completeCallback,bundle);
                     });
                 }
@@ -95,12 +94,12 @@ cc.Sprite.prototype.loadImage = function (config) {
     let completeCallback = config.completeCallback;
     let bundle = getBundle(config);
     if (typeof url == "string") {
-        cacheManager().getCacheByAsync(url, cc.SpriteFrame,bundle).then((spriteFrame) => {
+        Manager.cacheManager.getCacheByAsync(url, cc.SpriteFrame,bundle).then((spriteFrame) => {
             setSpriteSpriteFrame(view, url, me, spriteFrame, completeCallback,bundle);
         });
     } else {
         //在纹理图集中查找
-        cacheManager().getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource,bundle).then((data) => {
+        Manager.cacheManager.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource,bundle).then((data) => {
             if ( data && data.isTryReload ){
                //来到这里面程序已经崩溃了，无意义在处理了
             }else{
@@ -125,7 +124,7 @@ cc.Sprite.prototype.loadImage = function (config) {
 cc.createPrefab = function (config) {
     let url = config.url;
     let bundle = getBundle(config);
-    cacheManager().getCacheByAsync(url, cc.Prefab,bundle).then((data) => {
+    Manager.cacheManager.getCacheByAsync(url, cc.Prefab,bundle).then((data) => {
         createNodeWithPrefab(config, data)
     });
 }
@@ -175,7 +174,7 @@ sp.Skeleton.prototype.loadSkeleton = function (config) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
-    cacheManager().getCacheByAsync(url, sp.SkeletonData,bundle).then((data) => {
+    Manager.cacheManager.getCacheByAsync(url, sp.SkeletonData,bundle).then((data) => {
         setSkeletonSkeletonData(me, config, data);
     });
 }
@@ -201,7 +200,7 @@ cc.Label.prototype.loadFont = function (config) {
     let font = config.font;
     let me = this;
     let bundle = getBundle(config);
-    cacheManager().getCacheByAsync(font, cc.Font,bundle).then((data) => {
+    Manager.cacheManager.getCacheByAsync(font, cc.Font,bundle).then((data) => {
         setLabelFont(me, config, data);
     });
 }
@@ -230,7 +229,7 @@ cc.ParticleSystem.prototype.loadFile = function (config) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
-    cacheManager().getCacheByAsync(url, cc.ParticleAsset,bundle).then((data) => {
+    Manager.cacheManager.getCacheByAsync(url, cc.ParticleAsset,bundle).then((data) => {
         setParticleSystemFile(me, config, data);
     });
 }

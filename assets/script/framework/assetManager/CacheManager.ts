@@ -3,11 +3,6 @@ import { ResourceCacheData, BUNDLE_TYPE, ResourceInfo, BUNDLE_REMOTE } from "../
 import { assetManager } from "./AssetManager";
 import UIView from "../ui/UIView";
 
-/**@description 资源管理器 */
-export function cacheManager() {
-    return getSingleton(CacheManager);
-}
-
 class ResourceCache {
 
     private _caches = new Map<string, ResourceCacheData>();
@@ -278,7 +273,7 @@ class RemoteCaches {
     }
 }
 
-class CacheManager {
+export class CacheManager {
     private logTag = `[CacheManager]: `;
     private static _instance: CacheManager = null;
     public static Instance() {

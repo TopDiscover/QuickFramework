@@ -1,7 +1,7 @@
 import UIView from "../ui/UIView";
 import { ResourceInfo, ResourceType, BUNDLE_RESOURCES } from "../base/Defines";
 import { uiManager } from "../base/UIManager";
-import { cacheManager } from "../assetManager/CacheManager";
+import { Manager } from "../Framework";
 
 /*
  * @Author: your name
@@ -211,12 +211,12 @@ function _setButtonWithType(
 ) {
     if (url) {
         if (typeof url == "string") {
-            cacheManager().getCacheByAsync(url, cc.SpriteFrame,bundle).then((spriteFrame) => {
+            Manager.cacheManager.getCacheByAsync(url, cc.SpriteFrame,bundle).then((spriteFrame) => {
                 _setButtonSpriteFrame(button, memberName, view, url, spriteFrame, completeCallback,bundle);
             });
         } else {
             //在纹理图集中查找
-            cacheManager().getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource,bundle).then((data) => {
+            Manager.cacheManager.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource,bundle).then((data) => {
                 if (data && data.isTryReload) {
                     //来到这里面，程序已经崩溃，无意义在处理
                 } else {

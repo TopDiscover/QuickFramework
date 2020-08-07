@@ -8,7 +8,7 @@
  */
 import AudioComponent from "../../framework/base/AudioComponent";
 import { BUNDLE_TYPE, BUNDLE_RESOURCES } from "../../framework/base/Defines";
-import { cacheManager } from "../../framework/assetManager/CacheManager";
+import { Manager } from "../manager/Manager";
 
 /**
  * @description 全局音频播放组棒
@@ -25,7 +25,7 @@ export default class GlobalAudio extends AudioComponent {
         return new Promise<{ url: string, isSuccess: boolean }>((resolve) => {
             this.audioData.curMusicUrl = url;
             if (this.audioData.isMusicOn) {
-                cacheManager().getCacheByAsync(url, cc.AudioClip,BUNDLE_RESOURCES).then((data) => {
+                Manager.cacheManager.getCacheByAsync(url, cc.AudioClip,BUNDLE_RESOURCES).then((data) => {
                     if (data) {
                         me.stopMusic();
                         cc.audioEngine.playMusic(data, loop);
@@ -42,7 +42,7 @@ export default class GlobalAudio extends AudioComponent {
     public playEffect(url: string, bundle:BUNDLE_TYPE, loop: boolean = false) {
         return new Promise<number>((resolve) => {
             if (this.audioData.isEffectOn) {
-                cacheManager().getCacheByAsync(url, cc.AudioClip,BUNDLE_RESOURCES).then((data) => {
+                Manager.cacheManager.getCacheByAsync(url, cc.AudioClip,BUNDLE_RESOURCES).then((data) => {
                     if (data) {
                         this.audioData.curEffectId = cc.audioEngine.playEffect(data, loop);
                         resolve(this.audioData.curEffectId);

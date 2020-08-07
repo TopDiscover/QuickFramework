@@ -4,7 +4,6 @@ import { getSingleton } from "./Singleton";
 import UILoadingDelegate from "../ui/UILoadingDelegate";
 import ToastDelegate from "../ui/ToastDelegate";
 import { assetManager } from "../assetManager/AssetManager";
-import { cacheManager } from "../assetManager/CacheManager";
 import { Manager } from "../Framework";
 
 export function uiManager() {
@@ -44,7 +43,7 @@ class ViewDynamicLoadData {
                 cc.error(`找不到资源持有者 : ${info.url}`);
             }
             if (CC_DEBUG) uiManager().checkView(info.url, className);
-            cacheManager().remoteCaches.retainAsset(info);
+            Manager.cacheManager.remoteCaches.retainAsset(info);
             this.remote.set(info.url, info);
         }
     }
@@ -84,7 +83,7 @@ class ViewDynamicLoadData {
             }
             if (this.remote) {
                 this.remote.forEach((info, url) => {
-                    cacheManager().remoteCaches.releaseAsset(info);
+                    Manager.cacheManager.remoteCaches.releaseAsset(info);
                 });
                 this.remote.clear();
             }

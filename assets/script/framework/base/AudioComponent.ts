@@ -2,7 +2,7 @@ import UIView from "../ui/UIView";
 import { ResourceInfo, BUNDLE_TYPE } from "./Defines";
 import { localStorage } from "./LocalStorage";
 import { uiManager } from "./UIManager";
-import { cacheManager } from "../assetManager/CacheManager";
+import { Manager } from "../Framework";
 
 /**
  * @description 声音组件
@@ -158,7 +158,7 @@ export default class AudioComponent extends cc.Component {
             }
             this.audioData.curMusicUrl = url;
             if (this.audioData.isMusicOn) {
-                cacheManager().getCacheByAsync(url,cc.AudioClip,bundle).then((data) => {
+                Manager.cacheManager.getCacheByAsync(url,cc.AudioClip,bundle).then((data) => {
                     if (data) {
                         let info = new ResourceInfo;
                         info.url = url;
@@ -194,7 +194,7 @@ export default class AudioComponent extends cc.Component {
                 }
             }
             if (this.audioData.isEffectOn) {
-                cacheManager().getCacheByAsync(url,cc.AudioClip,bundle).then((data) => {
+                Manager.cacheManager.getCacheByAsync(url,cc.AudioClip,bundle).then((data) => {
                     if (data) {
                         let info = new ResourceInfo;
                         info.url = url;
