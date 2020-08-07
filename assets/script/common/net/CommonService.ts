@@ -10,8 +10,9 @@
 import { Service } from "../../framework/base/Service";
 import { GameEventInterface } from "../../framework/base/GameEventInterface";
 import { Message } from "../../framework/net/Message";
+import { JsonMessage } from "../../framework/net/JsonMessage";
 
-export class CommonMessage extends Message {
+export class CommonMessage extends JsonMessage {
 }
 
 /**
