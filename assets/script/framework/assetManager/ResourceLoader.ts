@@ -1,6 +1,6 @@
 import { ResourceData, ResourceCacheData, ResourceInfo } from "../base/Defines";
-import { assetManager } from "../assetManager/AssetManager";
 import { uiManager } from "../base/UIManager";
+import { Manager } from "../Framework";
 
 export enum ResourceLoaderError {
     /**@description 加载中 */
@@ -125,7 +125,7 @@ export default class ResourceLoader {
                     this._onLoadResourceComplete(cache);
                 })
             }else{
-                assetManager().load(value.bundle,value.url,value.type,null,this._onLoadResourceComplete.bind(this));
+                Manager.assetManager.load(value.bundle,value.url,value.type,null,this._onLoadResourceComplete.bind(this));
             }
         });
     }
@@ -151,7 +151,7 @@ export default class ResourceLoader {
                     if( this._loadedResource.has(value.url)){
                         let data = this._loadedResource.get(value.url);
                         if( data ){
-                            assetManager().releaseAsset(data);
+                            Manager.assetManager.releaseAsset(data);
                         }
                         this._loadedResource.delete(value.url);
                     }

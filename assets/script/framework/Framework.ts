@@ -3,7 +3,7 @@ import { eventDispatcher } from "./event/EventDispatcher";
 import { dataBase } from "./database/DataBase";
 import { uiManager } from "./base/UIManager";
 import { localStorage } from "./base/LocalStorage";
-import { assetManager } from "./assetManager/AssetManager";
+import { AssetManager } from "./assetManager/AssetManager";
 import { CacheManager } from "./assetManager/CacheManager";
 import { ResolutionHelper } from "./adaptor/ResolutionHelper";
 import { getSingleton } from "./base/Singleton";
@@ -37,7 +37,7 @@ export class _FramewokManager{
 
     /**@description 资源管理器 */
     get assetManager(){
-        return assetManager();
+        return getSingleton(AssetManager);
     }
 
     /**@description 资源缓存管理器 */

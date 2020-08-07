@@ -1,13 +1,7 @@
-import { getSingleton } from "../base/Singleton";
 import { ResourceCacheData, ResourceCacheStatus, ResourceInfo, BUNDLE_TYPE, ResourceType, BUNDLE_REMOTE } from "../base/Defines";
 import { DataBaseTable, dataBase } from "../database/DataBase";
 import { RequestPackge } from "../net/HttpClient";
 import { Manager } from "../Framework";
-
-/**@description 资源管理器 */
-export function assetManager() {
-    return getSingleton(AssetManager);
-}
 
 class RemoteLoader {
 
@@ -360,7 +354,7 @@ class RemoteLoader {
 }
 
 
-class AssetManager {
+export class AssetManager {
     private logTag = `[AssetManager]: `;
     private static _instance: AssetManager = null;
     public static Instance() {

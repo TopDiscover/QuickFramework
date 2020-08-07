@@ -1,7 +1,6 @@
-import { getSingleton } from "../base/Singleton";
 import { ResourceCacheData, BUNDLE_TYPE, ResourceInfo, BUNDLE_REMOTE } from "../base/Defines";
-import { assetManager } from "./AssetManager";
 import UIView from "../ui/UIView";
+import { Manager } from "../Framework";
 
 class ResourceCache {
 
@@ -400,7 +399,7 @@ export class CacheManager {
                     resolve(data);
                 } else {
                     //加载资源
-                    assetManager().load(args.bundle, args.url, args.type, null, (cache) => {
+                    Manager.assetManager.load(args.bundle, args.url, args.type, null, (cache) => {
                         if (cache && cache.data && cache.data instanceof args.type) {
                             resolve(cache.data);
                         } else {
@@ -433,7 +432,7 @@ export class CacheManager {
                             } else {
                                 //来到这里面，其实程序已经崩溃了，已经没什么意思，也不知道写这个有啥用，尽量安慰,哈哈哈
                                 cc.error(`精灵帧被释放，释放当前无法的图集资源 url ：${url} key : ${key}`);
-                                assetManager().releaseAsset(info);
+                                Manager.assetManager.releaseAsset(info);
                                 resolve({ url: url, spriteFrame: null, isTryReload: true });
                             }
                         } else {

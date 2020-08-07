@@ -3,7 +3,6 @@ import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_TYPE, BUNDLE_RESOUR
 import { getSingleton } from "./Singleton";
 import UILoadingDelegate from "../ui/UILoadingDelegate";
 import ToastDelegate from "../ui/ToastDelegate";
-import { assetManager } from "../assetManager/AssetManager";
 import { Manager } from "../Framework";
 
 export function uiManager() {
@@ -77,7 +76,7 @@ class ViewDynamicLoadData {
             //先清除当前资源的引用关系
             if (this.local) {
                 this.local.forEach((info) => {
-                    assetManager().releaseAsset(info);
+                    Manager.assetManager.releaseAsset(info);
                 });
                 this.local.clear();
             }
@@ -407,7 +406,7 @@ class UIManager {
             if ( bundle == undefined || bundle == "" || bundle == null ){
                 bundle = BUNDLE_RESOURCES;
             }
-            assetManager().load(bundle,url,cc.Prefab,progressCallback,(data: ResourceCacheData) => {
+            Manager.assetManager.load(bundle,url,cc.Prefab,progressCallback,(data: ResourceCacheData) => {
                 if (data && data.data && data.data instanceof cc.Prefab) {
                     resolove(data.data);
                 }
@@ -453,7 +452,7 @@ class UIManager {
                         viewData.node.destroy();
                     }
                     viewData.loadData.clear();
-                    assetManager().releaseAsset(viewData.info);
+                    Manager.assetManager.releaseAsset(viewData.info);
                     this._viewDatas.delete(className);
                     cc.timeEnd(`${this._logTag} close view : ${className}`);
                 }

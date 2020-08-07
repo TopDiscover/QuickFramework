@@ -5,7 +5,6 @@ import {
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
     createNodeWithPrefab,getBundle
 } from "./Utils";
-import { assetManager } from "../assetManager/AssetManager";
 import { language , USING_LAN_KEY} from "../../framework/base/Language"
 import { EventApi } from "../event/EventApi";
 import { eventDispatcher } from "../event/EventDispatcher";
@@ -57,7 +56,7 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
         isRetain = true;
     }
     let bundle = getBundle(config);
-    assetManager().remote.loadImage(config.url, config.isNeedCache).then((data) => {
+    Manager.assetManager.remote.loadImage(config.url, config.isNeedCache).then((data) => {
         if (data) {
             setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback,bundle, ResourceType.Remote, isRetain);
         } else {
@@ -154,7 +153,7 @@ sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
     if (config.isNeedCache == undefined || config.isNeedCache == null) {
         config.isNeedCache = true;
     }
-    assetManager().remote.loadSkeleton(config.path, config.name, config.isNeedCache).then((data) => {
+    Manager.assetManager.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then((data) => {
         setSkeletonSkeletonData(me, config, data, ResourceType.Remote);
     });
 }
