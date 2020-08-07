@@ -11,6 +11,8 @@ export default class TankBattleGameView extends UIView {
         return "prefabs/TankBattleGameView";
     }
 
+    private panelStart : cc.Node = null;
+
     onLoad(){
         super.onLoad();
 
@@ -18,6 +20,15 @@ export default class TankBattleGameView extends UIView {
             dispatch(LogicEvent.ENTER_HALL);
         });
 
+        this.panelStart = cc.find("panel_start",this.node);
+
+        this.updatePanelStart();
+
         dispatchEnterComplete({type:LogicType.GAME,views:[this]});
     }
+
+    private updatePanelStart(){
+        
+    }
+
 }

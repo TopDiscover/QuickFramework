@@ -1,4 +1,4 @@
-export let LanguageCN = {
+export let LanguageZH = {
   language : "zh",
   hall_view_game_name: [
     '游戏1',
