@@ -1,7 +1,6 @@
 import EventComponent from "../base/EventComponent";
 import AudioComponent from "../base/AudioComponent";
 import { uiManager } from "../base/UIManager";
-import { language } from "../base/Language";
 
 /**
  * @description 视图基类
@@ -249,47 +248,5 @@ export default abstract class UIView extends EventComponent {
     }
     protected onEnterBackground() {
 
-    }
-
-    /**
-     * @description 自动语言动态适配
-     * 需在creator编辑器中将带label组件的节点命名为'label'，让后将语言包中的key填入string，在界面初始化时调用adaptLanguage()即可。
-     */
-    private arrLabel: Array<cc.Label> = new Array<cc.Label>();
-    private arrLabelKey: Array<string> = new Array<string>();
-    
-    //自动适配语言刷新界面
-    public adaptLanguage( ){
-        if (this.arrLabelKey.length <= 0) {
-            this.checkLabal(this.node, 'label');
-            if (this.arrLabel && this.arrLabel.length > 0) {
-                for (let i = 0; i < this.arrLabel.length; i++) {
-                    const element = this.arrLabel[i];
-                    let key = element.string;
-                    this.arrLabelKey.push(key);
-                }
-            }
-        }
-
-        for (let i = 0; i < this.arrLabelKey.length; i++) {
-            const element = this.arrLabel[i];
-            let key = this.arrLabelKey[i];
-            element.string = language().get(key);
-        }
-    }
-
-    //递归遍历节点label
-    private checkLabal(node: cc.Node, name: string){
-        if (node && node.childrenCount > 0) {
-            node.children.forEach(element => {
-                if (element.name === name) {
-                    let label = element.getComponent(cc.Label);
-                    if (label) {
-                        this.arrLabel.push(label);
-                    }
-                }
-                this.checkLabal(element, name);
-            });
-        }
     }
 }

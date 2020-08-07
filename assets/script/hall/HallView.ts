@@ -3,7 +3,7 @@ import { dispatchEnterComplete, LogicType } from "../common/event/LogicEvent";
 import { gameManager } from "../common/manager/GameManager";
 import { GameConfig } from "../common/base/HotUpdate";
 import { HallEvent } from "./HallEvent";
-import { language } from "../framework/base/Language";
+import { language, i18nPrefix } from "../framework/base/Language";
 import { LanguageCN } from "../common/language/LanguageCN";
 import { i18n } from "../common/language/LanguageImpl";
 import { LobbyService } from "../common/net/LobbyService";
@@ -35,9 +35,15 @@ export default class HallView extends UIView implements IController<LobbyService
         super.onLoad();
 
         let nodeGames = cc.find("games",this.node);
+        let item = cc.find("gameItem",this.node);
+
         let notice = cc.find("hall_msg_bg/label",this.node).getComponent(cc.Label);
         for( let i = 1 ; i <= 6 ; i++ ){
-            let game = cc.find(`game_${i}`,nodeGames);
+            let game = cc.instantiate(item);
+            game.name = `game_${i}`;
+            game.active = true;
+            cc.find("Background/label",game).getComponent(cc.Label).lanKey = [`i18n.hall_view_game_name.${i-1}`];
+            nodeGames.addChild(game);
             if ( i -1 < this.games.length ){
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
                     gameManager().enterGame(this.games[i-1]);
@@ -61,24 +67,12 @@ export default class HallView extends UIView implements IController<LobbyService
                     }
                     
                     //notice.string = language().get("test",this._count,100,200,300);
-                    notice.string = String.format(i18n.test,this._count,100,200,300);
+                    //notice.string = String.format(i18n.test,this._count,100,200,300);
+                    //notice.lanKey = [i18n.test,this._count,100,200,300];
                 });
             }
         }
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
-
-        //语言适配
-        this.adaptLanguage();
-
-        this.scheduleOnce(() => {
-            language().change('en');
-            this.adaptLanguage();
-        }, 2.5);
-
-        this.scheduleOnce(() => {
-            language().change('zh');
-            this.adaptLanguage();
-        }, 5);
 
         //根据自己的需要，连接网络
         LobbyService.instance.connect("echo.websocket.org");

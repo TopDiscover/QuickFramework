@@ -126,6 +126,9 @@ declare module cc {
 
 		/**@description 强制label在当前帧进行绘制 */
 		forceDoLayout();
+
+		/**@description 设置语言包路径,如果"language",设置该值，会根据当前语言包查找对应的语言进行刷新this.string*/
+		lanKey : (string | number )[];
 	}
 
 

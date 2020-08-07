@@ -10,6 +10,7 @@ export let EventApi = {
         ON_ERROR : TAG.NetEvent + "ON_ERROR",
     },
     AdaptScreenEvent : "AdaptScreenEvent",
+    CHANGE_LANGUAGE : "CHANGE_LANGUAGE",
 } 
 
 export enum CustomNetEventType{

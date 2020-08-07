@@ -1,6 +1,6 @@
 import { resolutionHelper } from "../adaptor/ResolutionHelper";
 import WebEditBoxImpl from "./WebEditBoxImpl";
-import { ResourceType, BUNDLE_RESOURCES } from "../base/Defines";
+import { ResourceType, ENABLE_CHANGE_LANGUAGE } from "../base/Defines";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
@@ -8,6 +8,9 @@ import {
 } from "./Utils";
 import { cacheManager } from "../assetManager/CacheManager";
 import { assetManager } from "../assetManager/AssetManager";
+import { language , i18nPrefix} from "../../framework/base/Language"
+import { EventApi } from "../event/EventApi";
+import { eventDispatcher } from "../event/EventDispatcher";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
 if (typeof Reflect == "object") {
@@ -261,4 +264,54 @@ if (!CC_EDITOR) {
 
 export function CocosExtentionInit() {
     //cc.log("CocosExtentionInit");
+}
+
+Reflect.defineProperty(cc.Label.prototype, "lanKey", {
+    get : function(){
+        return this._lanKey;
+    },
+    set : function(v){
+        //该游戏允许在游戏中进行语言包切换,当设置的值为 null | [] 时，清除lanKey的事件绑定
+        if ( ENABLE_CHANGE_LANGUAGE ){
+            if ( v && v.length > 0 ){
+                if ( !!!this._isUsingLanKey ){
+                    this._isUsingLanKey = true;
+                    eventDispatcher().addEventListener(EventApi.CHANGE_LANGUAGE,this._onChangeLanguage,this);
+                }
+                this._lanKey = [].concat(v);
+                this.string = language().get(v);
+            }else{
+                this._isUsingLanKey = false;
+                this._lanKey = null;
+                this.string = "";
+                eventDispatcher().removeEventListener(EventApi.CHANGE_LANGUAGE,this);
+            }
+        }else{
+            this._lanKey = [].concat(v);
+            this.string = language().get(v);
+        }
+    }
+});
+
+if ( !CC_EDITOR && ENABLE_CHANGE_LANGUAGE ){
+    cc.Label.prototype._onChangeLanguage = function(){
+        this.lanKey = this.lanKey;
+    }
+    
+    let __label_onDestroy__ = cc.Label.prototype.onDestroy;
+    cc.Label.prototype.onDestroy = function () {
+        if ( this._isUsingLanKey ){
+            eventDispatcher().removeEventListener(EventApi.CHANGE_LANGUAGE,this);
+        }
+        __label_onDestroy__ && __label_onDestroy__.call(this);
+    }
+
+    let __label_onLoad__ = cc.Label.prototype.onLoad;
+    cc.Label.prototype.onLoad = function () {
+        if ( this.string.indexOf(i18nPrefix) > -1){
+            this.lanKey = [this.string];
+        }
+        __label_onLoad__ && __label_onLoad__.call(this);
+    }
+
 }
