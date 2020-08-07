@@ -1,5 +1,4 @@
 import { ResourceData, ResourceCacheData, ResourceInfo } from "../base/Defines";
-import { uiManager } from "../base/UIManager";
 import { Manager } from "../Framework";
 
 export enum ResourceLoaderError {
@@ -116,7 +115,7 @@ export default class ResourceLoader {
         this._loadedCount = 0;
         this._resources.forEach((value: ResourceData,key,source) => {
             if ( value.preloadView ){
-                uiManager().preload(value.preloadView,value.bundle).then((view)=>{
+                Manager.uiManager.preload(value.preloadView,value.bundle).then((view)=>{
                     let cache = new ResourceCacheData();
                     cache.isLoaded = true;
                     cache.data = <any>view;

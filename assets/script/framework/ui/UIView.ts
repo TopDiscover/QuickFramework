@@ -1,6 +1,6 @@
 import EventComponent from "../base/EventComponent";
 import AudioComponent from "../base/AudioComponent";
-import { uiManager } from "../base/UIManager";
+import { Manager } from "../Framework";
 
 /**
  * @description 视图基类
@@ -93,7 +93,7 @@ export default abstract class UIView extends EventComponent {
     }
 
     public close() {
-        uiManager().close(this.className);
+        Manager.uiManager.close(this.className);
     }
 
     /**@description args为open代入的参数 */

@@ -1,13 +1,8 @@
 import UIView, { UIClass } from "../ui/UIView";
 import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
-import { getSingleton } from "./Singleton";
 import UILoadingDelegate from "../ui/UILoadingDelegate";
 import ToastDelegate from "../ui/ToastDelegate";
 import { Manager } from "../Framework";
-
-export function uiManager() {
-    return getSingleton(UIManager);
-}
 
 /**@description 动态加载垃圾数据名 */
 const DYNAMIC_LOAD_GARBAGE = "DYNAMIC_LOAD_GARBAGE";
@@ -28,7 +23,7 @@ class ViewDynamicLoadData {
             if (this.name == DYNAMIC_LOAD_GARBAGE) {
                 cc.error(`找不到资源持有者: ${info.url}`);
             }
-            if (CC_DEBUG) uiManager().checkView(info.url, className);
+            if (CC_DEBUG) Manager.uiManager.checkView(info.url, className);
             if (!this.local.has(info.url)) {
                 this.local.set(info.url, info);
             }
@@ -41,7 +36,7 @@ class ViewDynamicLoadData {
             if (this.name == DYNAMIC_LOAD_GARBAGE) {
                 cc.error(`找不到资源持有者 : ${info.url}`);
             }
-            if (CC_DEBUG) uiManager().checkView(info.url, className);
+            if (CC_DEBUG) Manager.uiManager.checkView(info.url, className);
             Manager.cacheManager.remoteCaches.retainAsset(info);
             this.remote.set(info.url, info);
         }
@@ -144,7 +139,7 @@ class ViewData {
     }
 }
 
-class UIManager {
+export class UIManager {
 
     private static _instance: UIManager = null;
     public static Instance() { return this._instance || (this._instance = new UIManager()); }

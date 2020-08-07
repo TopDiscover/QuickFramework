@@ -1,6 +1,5 @@
 /**@description 管理器 */
 
-import { uiManager } from "../../framework/base/UIManager";
 import { _FramewokManager } from "../../framework/Framework";
 import { netManager } from "./NetManager";
 import { logicManager } from "./LogicManager";
@@ -12,11 +11,6 @@ import { LanguageImpl } from "../language/LanguageImpl";
 import { getSingleton } from "../../framework/base/Singleton";
 
 class _Manager extends _FramewokManager {
-
-    /**@description 界面管理器 */
-    get uiManager() {
-        return uiManager();
-    }
 
     /**@description 网络组件管理器 */
     get netManager() {

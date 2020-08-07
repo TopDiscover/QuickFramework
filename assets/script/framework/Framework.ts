@@ -1,7 +1,7 @@
 import { language } from "./base/Language";
 import { eventDispatcher } from "./event/EventDispatcher";
-import { dataBase } from "./database/DataBase";
-import { uiManager } from "./base/UIManager";
+import { DataBase } from "./database/DataBase";
+import { UIManager } from "./base/UIManager";
 import { LocalStorage } from "./base/LocalStorage";
 import { AssetManager } from "./assetManager/AssetManager";
 import { CacheManager } from "./assetManager/CacheManager";
@@ -22,12 +22,12 @@ export class _FramewokManager{
 
     /**@description 数据库，仅web下可用 */
     get dataBase(){
-        return dataBase();
+        return getSingleton(DataBase);
     }
 
     /**@description 界面管理器 */
     get uiManager(){
-        return uiManager();
+        return getSingleton(UIManager);
     }
 
     /**@description 本地仓库 */

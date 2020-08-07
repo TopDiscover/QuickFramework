@@ -1,8 +1,8 @@
 import { Logic } from "../../../script/common/base/Logic";
 import { LogicType, LogicEvent } from "../../../script/common/event/LogicEvent";
-import { uiManager } from "../../../script/framework/base/UIManager";
 import GameTwoView from "./GameTwoView";
 import { logicManager } from "../../../script/common/manager/LogicManager";
+import { Manager } from "../../../script/common/manager/Manager";
 
 class GameTwoLogic extends Logic {
 
@@ -23,7 +23,7 @@ class GameTwoLogic extends Logic {
 
     private onEnterGame(data) {
         if (data == this.getGameName()) {
-            uiManager().open({ type: GameTwoView ,bundle:this.getGameName()});
+            Manager.uiManager.open({ type: GameTwoView ,bundle:this.getGameName()});
         }
     }
 }

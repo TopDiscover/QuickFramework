@@ -2,7 +2,7 @@ import { Logic } from "../base/Logic";
 import { LogicEvent, LogicEventData, LogicType } from "../event/LogicEvent";
 import { getSingleton } from "../../framework/base/Singleton";
 import { eventDispatcher } from "../../framework/event/EventDispatcher";
-import { uiManager } from "../../framework/base/UIManager";
+import { Manager } from "./Manager";
 
 export function logicManager(){
     return getSingleton(LogicManager);
@@ -68,7 +68,7 @@ class LogicManager{
         if ( data.type != LogicType.ROOM_LIST ){
             if (data && data.views && data.views.length > 0) {
                 //关闭掉除排除项之外的所有界面
-                uiManager().closeExcept(data.views);
+                Manager.uiManager.closeExcept(data.views);
             }
             for ( let i = 0 ; i < this._logics.length ; i++ ){
                 let logic = this._logics[i];

@@ -1,5 +1,5 @@
 import { ResourceCacheData, ResourceCacheStatus, ResourceInfo, BUNDLE_TYPE, ResourceType, BUNDLE_REMOTE } from "../base/Defines";
-import { DataBaseTable, dataBase } from "../database/DataBase";
+import { DataBaseTable } from "../database/DataBase";
 import { RequestPackge } from "../net/HttpClient";
 import { Manager } from "../Framework";
 
@@ -210,8 +210,8 @@ class RemoteLoader {
                 } else {
                     if (isNeedCache) {
                         //网页h5方式加载
-                        if (dataBase().isSupport()) {
-                            dataBase().get(databaseTable, urlData.url).then((data) => {
+                        if (Manager.dataBase.isSupport()) {
+                            Manager.dataBase.get(databaseTable, urlData.url).then((data) => {
                                 if (data) {
                                     this._loadH5DatabaseData(cache, databaseTable, resolve, data);
                                 }
@@ -241,7 +241,7 @@ class RemoteLoader {
         packge.send((netData) => {
             //存入数据库
             if (isNeedCache && isSupportDatabase) {
-                dataBase().put(databaseTable, { key: packge.data.url, data: netData });
+                Manager.dataBase.put(databaseTable, { key: packge.data.url, data: netData });
             }
             this._loadH5DatabaseData(cache, databaseTable, resolve, netData);
         }, (err) => {

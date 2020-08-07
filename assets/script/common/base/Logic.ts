@@ -38,8 +38,8 @@ export class Logic extends EventComponent {
     }
 
     /**@description 进入各模块完成回调 */
-    protected onEnterComplete(data: LogicEventData){
-        
+    public onEnterComplete(data: LogicEventData){
+
     }
 
     protected onLanguageChange(){

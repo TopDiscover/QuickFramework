@@ -1,6 +1,5 @@
 import UIView from "../ui/UIView";
 import { ResourceInfo, ResourceType, BUNDLE_RESOURCES } from "../base/Defines";
-import { uiManager } from "../base/UIManager";
 import { Manager } from "../Framework";
 
 /*
@@ -14,25 +13,27 @@ import { Manager } from "../Framework";
 
 /**@description 添加加载本地的资源 */
 export function addExtraLoadResource(view: UIView, info: ResourceInfo) {
-    if (view == <any>(uiManager().retainMemory)) {
-        uiManager().retainMemory.addLocal(info);
+    let uiManager = Manager.uiManager;
+    if (view == <any>(uiManager.retainMemory)) {
+        uiManager.retainMemory.addLocal(info);
     }
     else if (view && view instanceof UIView) {
-        uiManager().addLocal(info, view.className);
+        uiManager.addLocal(info, view.className);
     } else {
-        uiManager().garbage.addLocal(info);
+        uiManager.garbage.addLocal(info);
     }
 }
 
 /**@description 添加加载远程的资源 */
 export function addRemoteLoadResource(view: UIView, info: ResourceInfo) {
-    if (view == <any>(uiManager().retainMemory)) {
-        uiManager().retainMemory.addRemote(info);
+    let uiManager = Manager.uiManager;
+    if (view == <any>(uiManager.retainMemory)) {
+        uiManager.retainMemory.addRemote(info);
     }
     else if (view && view instanceof UIView) {
-        uiManager().addRemote(info, view.className);
+        uiManager.addRemote(info, view.className);
     } else {
-        uiManager().garbage.addRemote(info);
+        uiManager.garbage.addRemote(info);
     }
 }
 

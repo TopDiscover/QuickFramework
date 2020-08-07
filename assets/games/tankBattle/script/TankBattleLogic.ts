@@ -1,6 +1,5 @@
 import { Logic } from "../../../script/common/base/Logic";
 import { LogicType, LogicEvent, LogicEventData } from "../../../script/common/event/LogicEvent";
-import { uiManager } from "../../../script/framework/base/UIManager";
 import { logicManager } from "../../../script/common/manager/LogicManager";
 import TankBattleGameView from "./TankBattleGameView";
 import { TANK_BUNDLE } from "./TankConfig";
@@ -11,6 +10,7 @@ import { language } from "../../../script/framework/base/Language";
 import { TANK_LAN_ZH } from "./TankLanguageZH";
 import { TANK_LAN_EN } from "./TankLanguageEN";
 import { i18n } from "../../../script/common/language/LanguageImpl";
+import { Manager } from "../../../script/common/manager/Manager";
 
 class GameTwoLogic extends Logic {
 
@@ -23,7 +23,6 @@ class GameTwoLogic extends Logic {
     protected bindingEvents() {
         super.bindingEvents();
         this.registerEvent(LogicEvent.ENTER_GAME, this.onEnterGame);
-        this.registerEvent(LogicEvent.ENTER_COMPLETE,this.onEnterComplete);
         this.registerEvent(LogicEvent.ENTER_ROOM_LIST,this.onEnterRoomList);
     }
 
@@ -31,7 +30,7 @@ class GameTwoLogic extends Logic {
         return TANK_BUNDLE;
     }
 
-    protected onEnterComplete( data : LogicEventData ){
+    public onEnterComplete( data : LogicEventData ){
         super.onEnterComplete(data);
         if( data.type == this.logicType ){
 
@@ -55,7 +54,7 @@ class GameTwoLogic extends Logic {
         super.onLoadResourceComplete(err);
         //加载完成，恢复网络
         LobbyService.instance.resumeMessageQueue();
-        uiManager().open({ type: TankBattleGameView ,bundle:this.getGameName()});
+        Manager.uiManager.open({ type: TankBattleGameView ,bundle:this.getGameName()});
     }
 
     private onEnterGame(data) {

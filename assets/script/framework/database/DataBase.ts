@@ -2,10 +2,7 @@ import { getSingleton } from "../base/Singleton";
 
 export type DataBaseTable = "cache_png" | "cache_json" | "cache_atlas";
 
-export function dataBase(){
-    return getSingleton(DataBase);
-}
-class DataBase{
+export class DataBase{
 
     private config = {
         name : "AppCaches",//数据库名

@@ -1,8 +1,8 @@
 import { ServerConnector } from "../net/ServerConnector";
 import { EventApi } from "../event/EventApi";
 import { makeKey } from "../decorator/Decorators";
-import { uiManager } from "./UIManager";
 import { Message } from "../net/Message";
+import { Manager } from "../Framework";
 /**
  * @description 与服务器之间消息收发基类,注册消息并转发
  */
@@ -331,7 +331,7 @@ export class Service extends ServerConnector {
             this._isDoingMessage = false;
         }
         else {
-            uiManager().getCanvasComponent().scheduleOnce(() => {
+            Manager.uiManager.getCanvasComponent().scheduleOnce(() => {
                 this._isDoingMessage = false;
             }, handleTime);
         }

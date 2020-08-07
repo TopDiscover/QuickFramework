@@ -1,6 +1,5 @@
 
 import { EventApi } from "../event/EventApi";
-import { uiManager } from "../base/UIManager";
 import { Manager } from "../Framework";
 
 type DeviceDirection = "" | "Landscape" | "Portrait";
@@ -110,7 +109,7 @@ export class ResolutionHelper {
         }
         if (me.isNeedAdapt) {
             dispatch(EventApi.AdaptScreenEvent);
-            uiManager().fullScreenAdapt();
+            Manager.uiManager.fullScreenAdapt();
         }
     }
 

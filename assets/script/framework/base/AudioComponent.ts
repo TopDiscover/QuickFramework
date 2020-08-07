@@ -1,6 +1,5 @@
 import UIView from "../ui/UIView";
 import { ResourceInfo, BUNDLE_TYPE } from "./Defines";
-import { uiManager } from "./UIManager";
 import { Manager } from "../Framework";
 
 /**
@@ -165,9 +164,9 @@ export default class AudioComponent extends cc.Component {
                         info.data = data;
                         info.bundle = bundle;
                         if ( this.owner ){ 
-                            uiManager().addLocal(info,this.owner.className);
+                            Manager.uiManager.addLocal(info,this.owner.className);
                         }else{
-                            uiManager().garbage.addLocal(info);
+                            Manager.uiManager.garbage.addLocal(info);
                         }
                         //停掉当前播放音乐
                         this.stopMusic();
@@ -201,9 +200,9 @@ export default class AudioComponent extends cc.Component {
                         info.data = data;
                         info.bundle = bundle;
                         if ( this.owner ) {
-                            uiManager().addLocal(info,this.owner.className);
+                            Manager.uiManager.addLocal(info,this.owner.className);
                         }else{
-                            uiManager().garbage.addLocal(info);
+                            Manager.uiManager.garbage.addLocal(info);
                         }
                         this.audioData.curEffectId = cc.audioEngine.playEffect(data, loop);
                         resolve(this.audioData.curEffectId);
