@@ -2,6 +2,7 @@ import { getSingleton } from "../../framework/base/Singleton";
 import { localStorage } from "../../framework/base/LocalStorage"
 import { uiManager } from "./UIManager";
 import { EventApi } from "../event/EventApi";
+import { ENABLE_CHANGE_LANGUAGE } from "./Defines";
 const LANG_KEY: string = "using_language";
 
 export interface LanguageData {
@@ -46,8 +47,12 @@ class Language {
             //当前有语言包数据 相同语言包，不再进行设置
             return;
         }
-        this._data = this.delegate.data(language);
-        dispatch(EventApi.CHANGE_LANGUAGE);
+        if ( ENABLE_CHANGE_LANGUAGE ){
+            this._data = this.delegate.data(language);
+            dispatch(EventApi.CHANGE_LANGUAGE);
+        }else{
+            this._data = this.delegate.data(this.getLanguage());
+        }
         localStorage().setItem(LANG_KEY, this._data.language);
     }
 

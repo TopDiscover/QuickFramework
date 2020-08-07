@@ -266,51 +266,57 @@ export function CocosExtentionInit() {
     //cc.log("CocosExtentionInit");
 }
 
-Reflect.defineProperty(cc.Label.prototype, "lanKey", {
+Reflect.defineProperty(cc.Label.prototype, "language", {
     get : function(){
-        return this._lanKey;
+        return this._language;
     },
     set : function(v){
-        //该游戏允许在游戏中进行语言包切换,当设置的值为 null | [] 时，清除lanKey的事件绑定
-        if (ENABLE_CHANGE_LANGUAGE) {
-            if (v) {
+        //该游戏允许在游戏中进行语言包切换,当设置的值为 null | [] 时，清除language的事件绑定
+        let self = this;
+        let updateLanguage = ( v , cb )=>{
+            if( v && ( (Array.isArray(v) && v.length > 0) || !!v) ){
                 let value = null;
-                if (Array.isArray(v)) {
+                if ( Array.isArray(v) ){
                     value = v;
-                } else {
-                    //直接给的语言包路径 
+                }else{
                     value = [v];
                 }
-                if (!!!this._isUsingLanKey) {
-                    this._isUsingLanKey = true;
-                    eventDispatcher().addEventListener(EventApi.CHANGE_LANGUAGE, this._onChangeLanguage, this);
-                }
-                this._lanKey = [].concat(value);
-                this.string = language().get(value);
-            } else {
-                this._isUsingLanKey = false;
-                if (this._lanKey) {
-                    eventDispatcher().removeEventListener(EventApi.CHANGE_LANGUAGE, this);
-                }
-                this._lanKey = null;
-                this.string = "";
-
+                cb && cb(true);
+                self._language = [].concat(value);
+                self.string = language().get(value);
+            }else{
+                cb && cb(false);
+                self._language = null;
+                self.string = "";
             }
+        }
+        if (ENABLE_CHANGE_LANGUAGE) {
+            updateLanguage(v,(isUsing)=>{
+                if ( isUsing ){
+                    if (!!!self._isUsinglanguage) {
+                        self._isUsinglanguage = true;
+                        eventDispatcher().addEventListener(EventApi.CHANGE_LANGUAGE, self._onChangeLanguage, self);
+                    }
+                }else{
+                    if (self._language) {
+                        eventDispatcher().removeEventListener(EventApi.CHANGE_LANGUAGE, self);
+                    }
+                }
+            })
         } else {
-            this._lanKey = [].concat(v);
-            this.string = language().get(v);
+            updateLanguage(v,null);
         }
     }
 });
 
 if ( !CC_EDITOR && ENABLE_CHANGE_LANGUAGE ){
     cc.Label.prototype._onChangeLanguage = function(){
-        this.lanKey = this.lanKey;
+        this.language = this.language;
     }
     
     let __label_onDestroy__ = cc.Label.prototype.onDestroy;
     cc.Label.prototype.onDestroy = function () {
-        if ( this._isUsingLanKey ){
+        if ( this._isUsinglanguage ){
             eventDispatcher().removeEventListener(EventApi.CHANGE_LANGUAGE,this);
         }
         __label_onDestroy__ && __label_onDestroy__.call(this);
@@ -319,7 +325,7 @@ if ( !CC_EDITOR && ENABLE_CHANGE_LANGUAGE ){
     let __label_onLoad__ = cc.Label.prototype.onLoad;
     cc.Label.prototype.onLoad = function () {
         if ( this.string.indexOf(USING_LAN_KEY) > -1){
-            this.lanKey = [this.string];
+            this.language = [this.string];
         }
         __label_onLoad__ && __label_onLoad__.call(this);
     }

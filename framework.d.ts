@@ -135,11 +135,12 @@ declare module cc {
 		 * tips : "您好",
 		 * test : "测试 : {0}-->{1}-->{2}"
 		 * }
-		 * node.getComponent(cc.Label).lanKey = "i18n.tips"; //string显示为：您好
-		 * node.getComponent(cc.Label).lanKey = ["i18n.tips"];//string显示为：您好
-		 * node.getComponent(cc.Label).lanKey = ["i18n.test",100,200,300];//string显示为：100-->200-->300
+		 * node.getComponent(cc.Label).language = "i18n.tips"; //string显示为：您好
+		 * node.getComponent(cc.Label).language = ["i18n.tips"];//string显示为：您好
+		 * node.getComponent(cc.Label).language = ["i18n.test",100,200,300];//string显示为：100-->200-->300
+		 * node.getConponent(cc.Label).language = null;//清除语言路径信息,如果在不需要使用语言包路径时，使用赋值空清除
 		 * */
-		lanKey : (string | number )[] | string ;
+		language : (string | number )[] | string ;
 	}
 
 
