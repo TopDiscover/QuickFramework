@@ -3,8 +3,7 @@ import { dispatchEnterComplete, LogicType } from "../common/event/LogicEvent";
 import { gameManager } from "../common/manager/GameManager";
 import { GameConfig } from "../common/base/HotUpdate";
 import { HallEvent } from "./HallEvent";
-import { language, i18nPrefix } from "../framework/base/Language";
-import { LanguageCN } from "../common/language/LanguageCN";
+import { language } from "../framework/base/Language";
 import { i18n } from "../common/language/LanguageImpl";
 import { LobbyService } from "../common/net/LobbyService";
 import { injectService } from "../framework/decorator/Decorators";
@@ -26,8 +25,8 @@ export default class HallView extends UIView implements IController<LobbyService
     public _count = 10;
 
     private readonly games = [
-        new GameConfig("游戏1","gameOne",1),
-        new GameConfig("游戏2","gameTwo",2),
+        new GameConfig(i18n.hall_view_game_name[0],"gameOne",1),
+        new GameConfig(i18n.hall_view_game_name[1],"gameTwo",2),
         new GameConfig(i18n.hall_view_game_name[2],"tankBattle",3)
     ];
 
@@ -62,7 +61,8 @@ export default class HallView extends UIView implements IController<LobbyService
                     ret = Math.floor(ret);
                     //notice.lanKey = "i18n.hall_view_broadcast_content";
                     notice.lanKey = ["i18n.test",this._count,100,200,300];
-                    //notice.lanKey = null;
+                    notice.lanKey = null;
+                    notice.string = i18n.test;
 
                     if ( ret == 0 ){
                         language().change("zh");

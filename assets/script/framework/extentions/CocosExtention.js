@@ -8,7 +8,7 @@ import {
 } from "./Utils";
 import { cacheManager } from "../assetManager/CacheManager";
 import { assetManager } from "../assetManager/AssetManager";
-import { language , i18nPrefix} from "../../framework/base/Language"
+import { language , USING_LAN_KEY} from "../../framework/base/Language"
 import { EventApi } from "../event/EventApi";
 import { eventDispatcher } from "../event/EventDispatcher";
 
@@ -318,7 +318,7 @@ if ( !CC_EDITOR && ENABLE_CHANGE_LANGUAGE ){
 
     let __label_onLoad__ = cc.Label.prototype.onLoad;
     cc.Label.prototype.onLoad = function () {
-        if ( this.string.indexOf(i18nPrefix) > -1){
+        if ( this.string.indexOf(USING_LAN_KEY) > -1){
             this.lanKey = [this.string];
         }
         __label_onLoad__ && __label_onLoad__.call(this);

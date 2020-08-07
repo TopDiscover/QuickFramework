@@ -8,7 +8,7 @@ export interface LanguageData {
     language: string;
 }
 
-export const i18nPrefix = "i18n.";
+export const USING_LAN_KEY = "i18n.";
 
 export function language() {
     return getSingleton(Language);
@@ -61,7 +61,7 @@ class Language {
                 cc.error("key error");
                 break;
             }
-            if (keyString.indexOf(i18nPrefix) > -1 ) {
+            if (keyString.indexOf(USING_LAN_KEY) > -1 ) {
 
                 let keys = keyString.split(".");
                 if (keys.length < 2) {
