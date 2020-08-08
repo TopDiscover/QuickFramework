@@ -4,6 +4,6 @@ export let TANK_LAN_EN = {
         title: `BATTLE
 CITY`,
         player: '1  PLAYER ',
-        palyers: '2  PLAYERS',
+        players: '2  PLAYERS',
     }
 }

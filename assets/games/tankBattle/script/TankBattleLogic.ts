@@ -58,8 +58,10 @@ class GameTwoLogic extends Logic {
     private onEnterGame(data) {
         if (data == this.getGameName()) {
 
+            //设置当前GameBundle
+            Manager.currentGameBundle = this.getGameName();
             //子游戏语言包初始化
-            if ( Manager.language.getLanguage())
+            this.onLanguageChange();
 
             //先暂停网络回调处理，等待资源加载完成后，恢复处理
             LobbyService.instance.pauseMessageQueue();
@@ -78,6 +80,7 @@ class GameTwoLogic extends Logic {
     }
 
     protected onLanguageChange(){
+        super.onLanguageChange();
         let lan = TANK_LAN_ZH;
         if ( Manager.language.getLanguage() == TANK_LAN_EN.language ){
             lan = TANK_LAN_EN;

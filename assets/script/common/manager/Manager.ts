@@ -56,13 +56,13 @@ class _Manager extends _FramewokManager {
     makeLanguage( param : string | (string | number)[] , isUsingAssetBundle : boolean = false ) : (string | number )[] | string {
         if ( typeof param == "string" ){
             if ( isUsingAssetBundle && !!this.currentGameBundle){
-                return `${USING_LAN_KEY}${this.currentGameBundle}${param}`;
+                return `${USING_LAN_KEY}${this.currentGameBundle}.${param}`;
             }
             return `${USING_LAN_KEY}${param}`;
         }
         if( typeof param[0] == "string" && param instanceof Array ){
             if ( isUsingAssetBundle && !!this.currentGameBundle ){
-                param[0] = `${USING_LAN_KEY}${this.currentGameBundle}${param[0]}`;
+                param[0] = `${USING_LAN_KEY}${this.currentGameBundle}.${param[0]}`;
             }else{
                 param[0] = `${USING_LAN_KEY}${param[0]}`;
             }

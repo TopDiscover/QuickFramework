@@ -1,5 +1,6 @@
 import UIView from "../../../script/framework/ui/UIView";
 import { LogicEvent, dispatchEnterComplete, LogicType } from "../../../script/common/event/LogicEvent";
+import { Manager } from "../../../script/common/manager/Manager";
 
 
 const {ccclass, property} = cc._decorator;
@@ -22,13 +23,11 @@ export default class TankBattleGameView extends UIView {
 
         this.panelStart = cc.find("panel_start",this.node);
 
-        this.updatePanelStart();
+        cc.find("title",this.panelStart).getComponent(cc.Label).language = Manager.makeLanguage("title",true);
+        cc.find("player",this.panelStart).getComponent(cc.Label).language = Manager.makeLanguage("player",true);
+        cc.find("players",this.panelStart).getComponent(cc.Label).language = Manager.makeLanguage("players",true);
 
         dispatchEnterComplete({type:LogicType.GAME,views:[this]});
-    }
-
-    private updatePanelStart(){
-        
     }
 
 }
