@@ -1,14 +1,11 @@
 import { Logic } from "../../../script/common/base/Logic";
 import { LogicType, LogicEvent, LogicEventData } from "../../../script/common/event/LogicEvent";
-import TankBattleGameView from "./TankBattleGameView";
-import { TANK_BUNDLE } from "./TankConfig";
 import { ResourceData } from "../../../script/framework/base/Defines";
 import { LobbyService } from "../../../script/common/net/LobbyService";
 import { ResourceLoaderError } from "../../../script/framework/assetManager/ResourceLoader";
-import { TANK_LAN_ZH } from "./TankLanguageZH";
-import { TANK_LAN_EN } from "./TankLanguageEN";
-import { i18n } from "../../../script/common/language/LanguageImpl";
 import { Manager } from "../../../script/common/manager/Manager";
+import TankBattleGameView from "./view/TankBattleGameView";
+import { TankBettle } from "./data/TankBattleGameData";
 
 class GameTwoLogic extends Logic {
 
@@ -24,8 +21,8 @@ class GameTwoLogic extends Logic {
         this.registerEvent(LogicEvent.ENTER_ROOM_LIST,this.onEnterRoomList);
     }
 
-    protected getGameName() {
-        return TANK_BUNDLE;
+    protected get bundle() {
+        return TankBettle.gameData.bundle;
     }
 
     public onEnterComplete( data : LogicEventData ){
@@ -48,18 +45,20 @@ class GameTwoLogic extends Logic {
         if ( err == ResourceLoaderError.LOADING ){
             return;
         }
-        cc.log(`${TANK_BUNDLE}资源加载完成!!!`);
+        cc.log(`${this.bundle}资源加载完成!!!`);
         super.onLoadResourceComplete(err);
         //加载完成，恢复网络
         LobbyService.instance.resumeMessageQueue();
-        Manager.uiManager.open({ type: TankBattleGameView ,bundle:this.getGameName()});
+        Manager.uiManager.open({ type: TankBattleGameView ,bundle:this.bundle});
     }
 
     private onEnterGame(data) {
-        if (data == this.getGameName()) {
+        if (data == this.bundle) {
 
-            //设置当前GameBundle
-            Manager.currentGameBundle = this.getGameName();
+            //游戏数据初始化
+            Manager.gameData = TankBettle.gameData;
+            Manager.gameData.clear();
+
             //子游戏语言包初始化
             this.onLanguageChange();
 
@@ -76,17 +75,12 @@ class GameTwoLogic extends Logic {
     }
 
     protected getLoadResources(): ResourceData[]{
-        return [{ preloadView: TankBattleGameView , bundle : this.getGameName()}];
+        return [{ preloadView: TankBattleGameView , bundle : this.bundle}];
     }
 
     protected onLanguageChange(){
         super.onLanguageChange();
-        let lan = TANK_LAN_ZH;
-        if ( Manager.language.getLanguage() == TANK_LAN_EN.language ){
-            lan = TANK_LAN_EN;
-        }
-        i18n[`${this.getGameName()}`] = {};
-        i18n[`${this.getGameName()}`] = lan.data;
+        TankBettle.gameData.onLanguageChange();
     }
 }
 

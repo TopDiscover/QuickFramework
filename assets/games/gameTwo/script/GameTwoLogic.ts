@@ -16,13 +16,13 @@ class GameTwoLogic extends Logic {
         this.registerEvent(LogicEvent.ENTER_GAME, this.onEnterGame);
     }
 
-    protected getGameName() {
+    protected get bundle() {
         return "gameTwo";
     }
 
     private onEnterGame(data) {
-        if (data == this.getGameName()) {
-            Manager.uiManager.open({ type: GameTwoView ,bundle:this.getGameName()});
+        if (data == this.bundle) {
+            Manager.uiManager.open({ type: GameTwoView ,bundle:this.bundle});
         }
     }
 }

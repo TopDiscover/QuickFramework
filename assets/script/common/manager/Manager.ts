@@ -10,6 +10,8 @@ import { CocosExtentionInit } from "../../framework/extentions/CocosExtention";
 import { LanguageImpl } from "../language/LanguageImpl";
 import { getSingleton } from "../../framework/base/Singleton";
 import { USING_LAN_KEY } from "../../framework/base/Defines";
+import GameView from "../base/GameView";
+import { GameData } from "../base/GameData";
 
 class _Manager extends _FramewokManager {
 
@@ -33,8 +35,11 @@ class _Manager extends _FramewokManager {
         return this._globalAudio;
     }
 
-    /**@description 当前游戏Bundle名 */
-    currentGameBundle : string = null;
+    /**@description 当前游戏GameView, GameView进入onLoad赋值 */
+    gameView : GameView = null;
+
+    /**@description 游戏数据 */
+    gameData : GameData = null;
 
     /**
      * @description 把语言包转换成i18n.xxx形式
@@ -55,14 +60,14 @@ class _Manager extends _FramewokManager {
      */
     makeLanguage( param : string | (string | number)[] , isUsingAssetBundle : boolean = false ) : (string | number )[] | string {
         if ( typeof param == "string" ){
-            if ( isUsingAssetBundle && !!this.currentGameBundle){
-                return `${USING_LAN_KEY}${this.currentGameBundle}.${param}`;
+            if ( isUsingAssetBundle && this.gameData){
+                return `${USING_LAN_KEY}${this.gameData.bundle}.${param}`;
             }
             return `${USING_LAN_KEY}${param}`;
         }
         if( typeof param[0] == "string" && param instanceof Array ){
-            if ( isUsingAssetBundle && !!this.currentGameBundle ){
-                param[0] = `${USING_LAN_KEY}${this.currentGameBundle}.${param[0]}`;
+            if ( isUsingAssetBundle && this.gameData ){
+                param[0] = `${USING_LAN_KEY}${this.gameData.bundle}.${param[0]}`;
             }else{
                 param[0] = `${USING_LAN_KEY}${param[0]}`;
             }

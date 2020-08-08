@@ -1,6 +1,6 @@
-import UIView from "../../../script/framework/ui/UIView";
-import { Manager } from "../../../script/common/manager/Manager";
-import { LogicEvent } from "../../../script/common/event/LogicEvent";
+import UIView from "../../../../script/framework/ui/UIView";
+import { LogicEvent } from "../../../../script/common/event/LogicEvent";
+import { Manager } from "../../../../script/common/manager/Manager";
 
 const {ccclass, property} = cc._decorator;
 

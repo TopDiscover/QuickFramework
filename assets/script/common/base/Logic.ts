@@ -1,8 +1,10 @@
 import { LogicEventData, LogicType } from "../event/LogicEvent";
 import EventComponent from "../../framework/base/EventComponent";
-import { ResourceData, ResourceCacheData } from "../../framework/base/Defines";
+import { ResourceData, ResourceCacheData, ENABLE_CHANGE_LANGUAGE } from "../../framework/base/Defines";
 import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
 import { EventApi } from "../../framework/event/EventApi";
+import { Config } from "../config/Config";
+import { Manager } from "../../framework/Framework";
 
 /**
  * @description 逻辑控制器 需要实现LogicInterface
@@ -29,11 +31,13 @@ export class Logic extends EventComponent {
 
     protected bindingEvents(){
         super.bindingEvents();
-        this.registerEvent(EventApi.CHANGE_LANGUAGE,this.onLanguageChange);
+        if ( ENABLE_CHANGE_LANGUAGE ){
+            this.registerEvent(EventApi.CHANGE_LANGUAGE,this.onLanguageChange);
+        }
     }
 
-    protected getGameName( ){
-        cc.error(`请子类重写getGameName,返回游戏的包名`);
+    protected get bundle( ) : string{
+        cc.error(`请子类重写protected get bundle,返回游戏的包名,即 asset bundle name`);
         return "";
     }
 
@@ -43,7 +47,7 @@ export class Logic extends EventComponent {
     }
 
     protected onLanguageChange(){
-
+        
     }
 
     public init( data : cc.Node ){
@@ -54,6 +58,11 @@ export class Logic extends EventComponent {
     }
 
     public onLoad() {
+        if ( !!this.bundle ){
+            Config.assetBundle[`${this.bundle}`] = this.bundle;
+        }else{
+            cc.error(`请子类重写protected get bundle,返回游戏的包名,即 asset bundle name`);
+        }
         super.onLoad();
     }
 

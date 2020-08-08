@@ -1,8 +1,8 @@
-import UIView from "../../../script/framework/ui/UIView";
-import { LogicEvent, dispatchEnterComplete, LogicType } from "../../../script/common/event/LogicEvent";
-import { Manager } from "../../../script/common/manager/Manager";
+import UIView from "../../../../script/framework/ui/UIView";
+import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../script/common/event/LogicEvent";
 import TankBattleStartView from "./TankBattleStartView";
-import { ViewZOrder } from "../../../script/common/config/Config";
+import { ViewZOrder } from "../../../../script/common/config/Config";
+import { Manager } from "../../../../script/common/manager/Manager";
 
 
 const {ccclass, property} = cc._decorator;
