@@ -13,12 +13,13 @@ export default class TankBattleGameView extends UIView {
     }
 
     private panelStart : cc.Node = null;
+    private paneGame : cc.Node = null;
 
     onLoad(){
         super.onLoad();
 
         cc.find("goBack",this.node).on(cc.Node.EventType.TOUCH_END,()=>{
-            dispatch(LogicEvent.ENTER_HALL);
+            this.goBack();
         });
 
         this.panelStart = cc.find("panel_start",this.node);
@@ -27,7 +28,30 @@ export default class TankBattleGameView extends UIView {
         cc.find("player",this.panelStart).getComponent(cc.Label).language = Manager.makeLanguage("player",true);
         cc.find("players",this.panelStart).getComponent(cc.Label).language = Manager.makeLanguage("players",true);
 
+        this.paneGame = cc.find("panel_game",this.node);
+
+        this.setEnabledKeyBack(true);
+
+        this.initGame();
+
         dispatchEnterComplete({type:LogicType.GAME,views:[this]});
     }
 
+    private initGame(){
+
+    }
+
+
+    protected onKeyUp( ev : cc.Event.EventKeyboard ){
+        super.onKeyUp( ev )
+        if ( ev.keyCode == cc.macro.KEY.escape ){
+            this.goBack();
+        }else{
+
+        }
+    }
+
+    private goBack(){
+        dispatch(LogicEvent.ENTER_HALL);
+    }
 }

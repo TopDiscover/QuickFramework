@@ -88,10 +88,6 @@ export default abstract class UIView extends EventComponent {
         return this._bundle;
     }
 
-    public init(args: any[]) {
-        this._args = args;
-    }
-
     public close() {
         Manager.uiManager.close(this.className);
     }

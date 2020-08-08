@@ -328,7 +328,8 @@ export class UIManager {
             view.className = className;
             view.bundle = bundle
             viewData.view = view;
-            view.init(args);
+            //去掉init函数，处理放在onLoad中，
+            (<any>view)._args = args;
 
             //界面显示在屏幕中间
             let widget = view.getComponent(cc.Widget);
