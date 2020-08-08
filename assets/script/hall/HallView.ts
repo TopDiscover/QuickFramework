@@ -41,7 +41,7 @@ export default class HallView extends UIView implements IController<LobbyService
             let game = cc.instantiate(item);
             game.name = `game_${i}`;
             game.active = true;
-            cc.find("Background/label",game).getComponent(cc.Label).language = [`i18n.hall_view_game_name.${i-1}`];
+            cc.find("Background/label",game).getComponent(cc.Label).language = Manager.makeLanguage(`hall_view_game_name.${i-1}`);
             nodeGames.addChild(game);
             if ( i -1 < this.games.length ){
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
@@ -59,8 +59,8 @@ export default class HallView extends UIView implements IController<LobbyService
                     this._count ++;
                     let ret = this._count % 2;
                     ret = Math.floor(ret);
-                    notice.language = "i18n.hall_view_broadcast_content";
-                    //notice.language = ["i18n.test",this._count,100,200,300];
+                    //notice.language = "i18n.hall_view_broadcast_content";
+                    notice.language = Manager.makeLanguage(["test",this._count,100,200,300]);
                     //notice.language = null;
                     //notice.string = i18n.test;
 

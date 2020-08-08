@@ -9,6 +9,7 @@ import { extentionsInit } from "../../framework/extentions/Extentions";
 import { CocosExtentionInit } from "../../framework/extentions/CocosExtention";
 import { LanguageImpl } from "../language/LanguageImpl";
 import { getSingleton } from "../../framework/base/Singleton";
+import { USING_LAN_KEY } from "../../framework/base/Defines";
 
 class _Manager extends _FramewokManager {
 
@@ -30,6 +31,43 @@ class _Manager extends _FramewokManager {
         }
         this._globalAudio = this.uiManager.getCanvas().getComponent(GlobalAudio);
         return this._globalAudio;
+    }
+
+    /**@description 当前游戏Bundle名 */
+    currentGameBundle : string = null;
+
+    /**
+     * @description 把语言包转换成i18n.xxx形式
+     * @param param 语言包配置
+     * @param isUsingAssetBundle 是否使用currentGameBundle进行转换如在某游戏内，需要获取某游戏的语言包路径
+     * @example
+     * export let TANK_LAN_ZH = {
+     * language: "zh",
+     * data: {
+     * title: `坦克大战`,
+     * player: '单人模式 ',
+     * palyers: '双人模式',
+     * }
+     * }
+     * //以上是坦克大战的语言包,assetBundle为tankBattle
+     * Manager.makeLanguage("title",true); //=> i18n.tankBattle.title 指向游戏特定的语言包
+     * Manager.makeLanguage("title"); //=> i18n.title 指向的大厅的公共语言包
+     */
+    makeLanguage( param : string | (string | number)[] , isUsingAssetBundle : boolean = false ) : (string | number )[] | string {
+        if ( typeof param == "string" ){
+            if ( isUsingAssetBundle && !!this.currentGameBundle){
+                return `${USING_LAN_KEY}${this.currentGameBundle}${param}`;
+            }
+            return `${USING_LAN_KEY}${param}`;
+        }
+        if( typeof param[0] == "string" && param instanceof Array ){
+            if ( isUsingAssetBundle && !!this.currentGameBundle ){
+                param[0] = `${USING_LAN_KEY}${this.currentGameBundle}${param[0]}`;
+            }else{
+                param[0] = `${USING_LAN_KEY}${param[0]}`;
+            }
+        }
+        return param;
     }
 
     init() {
