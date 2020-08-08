@@ -5,5 +5,6 @@ export let TANK_LAN_EN = {
 CITY`,
         player: '1  PLAYER ',
         players: '2  PLAYERS',
+        tips:"The current game does not support touch operation",
     }
 }

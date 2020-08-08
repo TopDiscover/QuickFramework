@@ -4,5 +4,6 @@ export let TANK_LAN_ZH = {
         title: `坦克大战`,
         player: '单人模式 ',
         players: '双人模式',
+        tips : "当前游戏不支持触摸操作",
     }
 }
