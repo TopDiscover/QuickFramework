@@ -10,15 +10,11 @@ export interface LanguageData {
 
 export const USING_LAN_KEY = "i18n.";
 
-export function language() {
-    return getSingleton(Language);
-}
-
 export interface LanguageDelegate {
     data(language: string): LanguageData;
 }
 
-class Language {
+export class Language {
 
     private static _instance: Language = null;
     public static Instance() { return this._instance || (this._instance = new Language()); }

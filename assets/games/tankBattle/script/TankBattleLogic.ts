@@ -1,12 +1,10 @@
 import { Logic } from "../../../script/common/base/Logic";
 import { LogicType, LogicEvent, LogicEventData } from "../../../script/common/event/LogicEvent";
-import { logicManager } from "../../../script/common/manager/LogicManager";
 import TankBattleGameView from "./TankBattleGameView";
 import { TANK_BUNDLE } from "./TankConfig";
 import { ResourceData } from "../../../script/framework/base/Defines";
 import { LobbyService } from "../../../script/common/net/LobbyService";
 import { ResourceLoaderError } from "../../../script/framework/assetManager/ResourceLoader";
-import { language } from "../../../script/framework/base/Language";
 import { TANK_LAN_ZH } from "./TankLanguageZH";
 import { TANK_LAN_EN } from "./TankLanguageEN";
 import { i18n } from "../../../script/common/language/LanguageImpl";
@@ -61,7 +59,7 @@ class GameTwoLogic extends Logic {
         if (data == this.getGameName()) {
 
             //子游戏语言包初始化
-            if ( language().getLanguage())
+            if ( Manager.language.getLanguage())
 
             //先暂停网络回调处理，等待资源加载完成后，恢复处理
             LobbyService.instance.pauseMessageQueue();
@@ -81,7 +79,7 @@ class GameTwoLogic extends Logic {
 
     protected onLanguageChange(){
         let lan = TANK_LAN_ZH;
-        if ( language().getLanguage() == TANK_LAN_EN.language ){
+        if ( Manager.language.getLanguage() == TANK_LAN_EN.language ){
             lan = TANK_LAN_EN;
         }
         i18n[`${this.getGameName()}`] = {};
@@ -89,4 +87,4 @@ class GameTwoLogic extends Logic {
     }
 }
 
-logicManager().push(GameTwoLogic);
+Manager.logicManager.push(GameTwoLogic);

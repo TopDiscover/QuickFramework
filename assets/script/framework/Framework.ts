@@ -1,5 +1,5 @@
-import { language } from "./base/Language";
-import { eventDispatcher } from "./event/EventDispatcher";
+import { Language } from "./base/Language";
+import { EventDispatcher } from "./event/EventDispatcher";
 import { DataBase } from "./database/DataBase";
 import { UIManager } from "./base/UIManager";
 import { LocalStorage } from "./base/LocalStorage";
@@ -12,12 +12,12 @@ export class _FramewokManager{
     
     /**@description 语言包 */
     get language( ){
-        return language();
+        return getSingleton(Language);
     }
     
     /**@description 事件派发器 */
     get eventDispatcher(){
-        return eventDispatcher();
+        return getSingleton(EventDispatcher);
     }
 
     /**@description 数据库，仅web下可用 */
@@ -52,5 +52,3 @@ export class _FramewokManager{
 }
 
 export const Manager = new _FramewokManager();
-
-window["Manager"] = window["Manager"] || Manager;

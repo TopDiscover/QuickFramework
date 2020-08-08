@@ -1,7 +1,6 @@
 import { Logic } from "../../../script/common/base/Logic";
 import { LogicType, LogicEvent } from "../../../script/common/event/LogicEvent";
 import GameOneView from "./GameOneView";
-import { logicManager } from "../../../script/common/manager/LogicManager";
 import { Manager } from "../../../script/common/manager/Manager";
 
 class GameOneLogic extends Logic {
@@ -28,4 +27,4 @@ class GameOneLogic extends Logic {
     }
 }
 
-logicManager().push(GameOneLogic);
+Manager.logicManager.push(GameOneLogic);

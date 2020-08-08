@@ -5,9 +5,8 @@ import {
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
     createNodeWithPrefab,getBundle
 } from "./Utils";
-import { language , USING_LAN_KEY} from "../../framework/base/Language"
+import { USING_LAN_KEY} from "../../framework/base/Language"
 import { EventApi } from "../event/EventApi";
-import { eventDispatcher } from "../event/EventDispatcher";
 import { Manager } from "../Framework";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
@@ -281,7 +280,7 @@ Reflect.defineProperty(cc.Label.prototype, "language", {
                 }
                 cb && cb(true);
                 self._language = [].concat(value);
-                self.string = language().get(value);
+                self.string = Manager.language.get(value);
             }else{
                 cb && cb(false);
                 self._language = null;
@@ -293,11 +292,11 @@ Reflect.defineProperty(cc.Label.prototype, "language", {
                 if ( isUsing ){
                     if (!!!self._isUsinglanguage) {
                         self._isUsinglanguage = true;
-                        eventDispatcher().addEventListener(EventApi.CHANGE_LANGUAGE, self._onChangeLanguage, self);
+                        Manager.eventDispatcher.addEventListener(EventApi.CHANGE_LANGUAGE, self._onChangeLanguage, self);
                     }
                 }else{
                     if (self._language) {
-                        eventDispatcher().removeEventListener(EventApi.CHANGE_LANGUAGE, self);
+                        Manager.eventDispatcher.removeEventListener(EventApi.CHANGE_LANGUAGE, self);
                     }
                 }
             })
@@ -315,7 +314,7 @@ if ( !CC_EDITOR && ENABLE_CHANGE_LANGUAGE ){
     let __label_onDestroy__ = cc.Label.prototype.onDestroy;
     cc.Label.prototype.onDestroy = function () {
         if ( this._isUsinglanguage ){
-            eventDispatcher().removeEventListener(EventApi.CHANGE_LANGUAGE,this);
+            Manager.eventDispatcher.removeEventListener(EventApi.CHANGE_LANGUAGE,this);
         }
         __label_onDestroy__ && __label_onDestroy__.call(this);
     }

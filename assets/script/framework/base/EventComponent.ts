@@ -1,5 +1,5 @@
 import { Service } from "./Service";
-import { eventDispatcher } from "../event/EventDispatcher";
+import { Manager } from "../Framework";
 
 /**
  * @description 事件处理组件
@@ -101,7 +101,7 @@ export default class EventComponent extends cc.Component {
             this._events.push(event);
 
             if ( event.name ){
-                eventDispatcher().addEventListener(event.name,event.func,this);
+                Manager.eventDispatcher.addEventListener(event.name,event.func,this);
             }else{
                 //网络消息事件注册
                 if (this._service) {
@@ -140,7 +140,7 @@ export default class EventComponent extends cc.Component {
         }
         if (arguments.length == 1) {
             //事件移除
-            eventDispatcher().removeEventListener(arguments[0], this);
+            Manager.eventDispatcher.removeEventListener(arguments[0], this);
             //删除本地事件
             let i = this._events.length;
             while (i--) {
@@ -185,7 +185,7 @@ export default class EventComponent extends cc.Component {
             let event = this._events[i];
             if (event.name) {
                 //普通事件注册
-                eventDispatcher().addEventListener(event.name, event.func, this);
+                Manager.eventDispatcher.addEventListener(event.name, event.func, this);
             } else {
                 //网络消息事件注册
                 if (this._service) {
@@ -211,7 +211,7 @@ export default class EventComponent extends cc.Component {
             let event = this._events[i];
             if (event.name) {
                 //普通事件注册
-                eventDispatcher().removeEventListener(event.name, this);
+                Manager.eventDispatcher.removeEventListener(event.name, this);
             }
         }
 

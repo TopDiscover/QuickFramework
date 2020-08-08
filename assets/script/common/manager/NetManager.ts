@@ -2,13 +2,7 @@
  * @description 全局的网络组件管理
  */
 
-import { getSingleton } from "../../framework/base/Singleton";
-
- export function netManager(){
-     return getSingleton(NetManager);
- }
-
- class NetManager{
+ export class NetManager{
     private _logTag = `[ActionManager]`;
     private static _instance: NetManager = null;
     public static Instance() {

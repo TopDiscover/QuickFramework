@@ -10,11 +10,7 @@ import { getSingleton } from "../base/Singleton";
      callback : ( (data : any )=>void ) | string ;//事件回调
  }
 
-export function eventDispatcher(){
-    return getSingleton(EventDispatcher);
-}
-
-class EventDispatcher{
+export class EventDispatcher{
 
     private static _instance : EventDispatcher = null;
     public static Instance(){return this._instance || (this._instance = new EventDispatcher());}
@@ -128,5 +124,5 @@ class EventDispatcher{
  window.dispatch = function (name : string  , data? : any) {
     if ( CC_DEBUG && !CC_EDITOR ) cc.log(`[dispatch] ${name} data : ${data}`);
     //向自己封闭的管理器中也分发
-    eventDispatcher().dispatchEvent(name, data);
+    EventDispatcher.Instance().dispatchEvent(name, data);
 }

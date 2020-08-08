@@ -1,14 +1,8 @@
 import { Logic } from "../base/Logic";
 import { LogicEvent, LogicEventData, LogicType } from "../event/LogicEvent";
-import { getSingleton } from "../../framework/base/Singleton";
-import { eventDispatcher } from "../../framework/event/EventDispatcher";
 import { Manager } from "./Manager";
 
-export function logicManager(){
-    return getSingleton(LogicManager);
-}
-
-class LogicManager{
+export class LogicManager{
     
     private _logTag = `[LogicManager]`;
     private static _instance: LogicManager = null;
@@ -38,7 +32,7 @@ class LogicManager{
 
     public onLoad( node : cc.Node ){
         this.node = node;
-        eventDispatcher().addEventListener(LogicEvent.ENTER_COMPLETE,this.onEnterComplete,this);
+        Manager.eventDispatcher.addEventListener(LogicEvent.ENTER_COMPLETE,this.onEnterComplete,this);
         if ( this._logics.length == 0 ){
             for ( let i = 0 ; i < this._logicTypes.length ; i++ ){
                 let type = this._logicTypes[i];
@@ -56,7 +50,7 @@ class LogicManager{
     }
 
     public onDestroy( node : cc.Node ){
-        eventDispatcher().removeEventListener(LogicEvent.ENTER_COMPLETE,this);
+        Manager.eventDispatcher.removeEventListener(LogicEvent.ENTER_COMPLETE,this);
         this._logics.forEach((data : Logic)=>{
             data.onDestroy();
         });

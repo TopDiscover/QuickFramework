@@ -1,8 +1,8 @@
 /**@description 管理器 */
 
 import { _FramewokManager } from "../../framework/Framework";
-import { netManager } from "./NetManager";
-import { logicManager } from "./LogicManager";
+import { NetManager } from "./NetManager";
+import { LogicManager } from "./LogicManager";
 import GlobalAudio from "../component/GlobalAudio";
 import { Log, LogLevel } from "../../framework/log/Log";
 import { extentionsInit } from "../../framework/extentions/Extentions";
@@ -14,16 +14,22 @@ class _Manager extends _FramewokManager {
 
     /**@description 网络组件管理器 */
     get netManager() {
-        return netManager();
+        return getSingleton(NetManager);
     }
 
     /**@description 逻辑控制器管理器 */
     get logicManager() {
-        return logicManager();
+        return getSingleton(LogicManager);
     }
 
+    /**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
+    private _globalAudio : GlobalAudio = null;
     get globalAudio() {
-        return Manager.uiManager.getCanvas().getComponent(GlobalAudio);
+        if ( this._globalAudio ){
+            return this._globalAudio;
+        }
+        this._globalAudio = this.uiManager.getCanvas().getComponent(GlobalAudio);
+        return this._globalAudio;
     }
 
     init() {
@@ -42,4 +48,3 @@ class _Manager extends _FramewokManager {
 }
 
 export const Manager = new _Manager();
-window["Manager"] = Manager;

@@ -1,6 +1,5 @@
 import { Logic } from "../common/base/Logic";
 import HallView from "./HallView";
-import { logicManager } from "../common/manager/LogicManager";
 import { LogicType, LogicEvent } from "../common/event/LogicEvent";
 import { BUNDLE_RESOURCES } from "../framework/base/Defines";
 import { Manager } from "../common/manager/Manager";
@@ -25,4 +24,4 @@ class HallLogic extends Logic {
     }
 }
 
-logicManager().push(HallLogic);
+Manager.logicManager.push(HallLogic);

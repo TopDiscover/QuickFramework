@@ -3,12 +3,12 @@ import { dispatchEnterComplete, LogicType } from "../common/event/LogicEvent";
 import { gameManager } from "../common/manager/GameManager";
 import { GameConfig } from "../common/base/HotUpdate";
 import { HallEvent } from "./HallEvent";
-import { language } from "../framework/base/Language";
 import { i18n } from "../common/language/LanguageImpl";
 import { LobbyService } from "../common/net/LobbyService";
 import { injectService } from "../framework/decorator/Decorators";
 import { IController } from "../framework/controller/Controller";
 import { UpdateMoney } from "./HallMessage";
+import { Manager } from "../common/manager/Manager";
 
 const { ccclass, property } = cc._decorator;
 
@@ -65,9 +65,9 @@ export default class HallView extends UIView implements IController<LobbyService
                     //notice.string = i18n.test;
 
                     if ( ret == 0 ){
-                        language().change("zh");
+                        Manager.language.change("zh");
                     }else{
-                        language().change("en");
+                        Manager.language.change("en");
                     }
                 });
             }
