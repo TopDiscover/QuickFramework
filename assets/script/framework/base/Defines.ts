@@ -137,3 +137,5 @@ export const BUNDLE_REMOTE = "__Remote__Caches__";
 
 /**@description 是否允许游戏启动后切换语言 */
 export const ENABLE_CHANGE_LANGUAGE = true;
+/**@description 语言包路径使用前缀 */
+export const USING_LAN_KEY = "i18n.";

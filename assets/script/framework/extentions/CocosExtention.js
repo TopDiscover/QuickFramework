@@ -1,11 +1,10 @@
 import WebEditBoxImpl from "./WebEditBoxImpl";
-import { ResourceType, ENABLE_CHANGE_LANGUAGE } from "../base/Defines";
+import { ResourceType, ENABLE_CHANGE_LANGUAGE,USING_LAN_KEY } from "../base/Defines";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
     createNodeWithPrefab,getBundle
 } from "./Utils";
-import { USING_LAN_KEY} from "../../framework/base/Language"
 import { EventApi } from "../event/EventApi";
 import { Manager } from "../Framework";
 

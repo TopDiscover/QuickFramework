@@ -1,14 +1,12 @@
 import { getSingleton } from "../../framework/base/Singleton";
 import { EventApi } from "../event/EventApi";
-import { ENABLE_CHANGE_LANGUAGE } from "./Defines";
+import { ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY } from "./Defines";
 import { Manager } from "../Framework";
 const LANG_KEY: string = "using_language";
 
 export interface LanguageData {
     language: string;
 }
-
-export const USING_LAN_KEY = "i18n.";
 
 export interface LanguageDelegate {
     data(language: string): LanguageData;
