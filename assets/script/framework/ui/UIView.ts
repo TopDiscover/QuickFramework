@@ -177,10 +177,10 @@ export default abstract class UIView extends EventComponent {
      */
     protected setEnabledKeyBack(isEnabled: boolean) {
         if (isEnabled) {
-            cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP);
-            cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
+            cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP,this.onKeyUp,this);
+            cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp,this);
         } else {
-            cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP);
+            cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP,this.onKeyUp,this);
         }
 
         this._isEnableKey = isEnabled;
@@ -196,6 +196,8 @@ export default abstract class UIView extends EventComponent {
         }
         if (ev.keyCode == cc.macro.KEY.escape) {
             this.onKeyBack(ev);
+        }else{
+            ev.stopPropagation();
         }
     }
 
@@ -210,6 +212,12 @@ export default abstract class UIView extends EventComponent {
         this.audioHelper = this.addComponent(AudioComponent);
         this.audioHelper.owner = this;
         super.onLoad();
+    }
+    
+    onDestroy(){
+        this.setEnabledKeyBack(false);
+        this.enableFrontAndBackgroundSwitch = false;
+        super.onDestroy();
     }
 
     private _enterBackgroundTime = 0;

@@ -6,23 +6,24 @@ import { Manager } from "../../../../script/framework/Framework";
 import { TANK_LAN_EN } from "./TankBattleLanguageEN";
 import { i18n } from "../../../../script/common/language/LanguageImpl";
 
-export class TankBettle{
-    public static get gameData(){
-        return new TankBettleGameData;
-    }
-}
-
 class TankBettleGameData extends GameData {
     onLanguageChange() {
         let lan = TANK_LAN_ZH;
-        if ( Manager.language.getLanguage() == TANK_LAN_EN.language ){
+        if (Manager.language.getLanguage() == TANK_LAN_EN.language) {
             lan = TANK_LAN_EN;
         }
         i18n[`${this.bundle}`] = {};
         i18n[`${this.bundle}`] = lan.data;
     }
 
-    public get bundle(){
+    public get bundle() {
         return "tankBattle";
     }
+
+    /**@description 单人模式 */
+    isSingle = true;
+}
+
+export namespace TankBettle {
+    export const gameData = new TankBettleGameData;
 }

@@ -9,6 +9,10 @@ class HallLogic extends Logic {
 
     logicType: LogicType = LogicType.HALL;
 
+    get bundle(){
+        return BUNDLE_RESOURCES;
+    }
+
     bindingEvents(){
         super.bindingEvents();
         this.registerEvent(LogicEvent.ENTER_HALL,this.onEnterHall);
