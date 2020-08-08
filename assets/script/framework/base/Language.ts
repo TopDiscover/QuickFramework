@@ -42,7 +42,7 @@ export class Language {
         }
         if ( ENABLE_CHANGE_LANGUAGE ){
             this._data = this.delegate.data(language);
-            dispatch(EventApi.CHANGE_LANGUAGE);
+            dispatch(EventApi.CHANGE_LANGUAGE,language);
         }else{
             this._data = this.delegate.data(this.getLanguage());
         }
@@ -95,6 +95,6 @@ export class Language {
 
     /**@description 获取语言包名 */
     public getLanguage() {
-        return Manager.localStorage.getItem(LANG_KEY, "zh");
+        return Manager.localStorage.getItem(LANG_KEY, cc.sys.LANGUAGE_CHINESE);
     }
 }

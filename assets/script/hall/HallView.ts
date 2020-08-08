@@ -57,17 +57,15 @@ export default class HallView extends UIView implements IController<LobbyService
             else{
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
                     this._count ++;
-                    let ret = this._count % 2;
-                    ret = Math.floor(ret);
                     //notice.language = "i18n.hall_view_broadcast_content";
                     notice.language = Manager.makeLanguage(["test",this._count,100,200,300]);
                     //notice.language = null;
                     //notice.string = i18n.test;
 
-                    if ( ret == 0 ){
-                        Manager.language.change("zh");
+                    if ( Manager.language.getLanguage() == cc.sys.LANGUAGE_ENGLISH ){
+                        Manager.language.change(cc.sys.LANGUAGE_CHINESE);
                     }else{
-                        Manager.language.change("en");
+                        Manager.language.change(cc.sys.LANGUAGE_ENGLISH);
                     }
                 });
             }

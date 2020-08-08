@@ -1,5 +1,5 @@
 export let TANK_LAN_EN = {
-    language: "en",
+    language: cc.sys.LANGUAGE_ENGLISH,
     data: {
         title: `BATTLE
 CITY`,

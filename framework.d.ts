@@ -131,7 +131,7 @@ declare module cc {
 		 * @description 设置语言包路径,假设语言包为
 		 * @example 示例
 		 * export let i18n = {
-		 * language : "zh",
+		 * language : cc.sys.LANGUAGE_CHINESE,
 		 * tips : "您好",
 		 * test : "测试 : {0}-->{1}-->{2}"
 		 * }

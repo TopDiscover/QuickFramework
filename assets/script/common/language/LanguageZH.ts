@@ -1,5 +1,5 @@
 export let LanguageZH = {
-  language : "zh",
+  language : cc.sys.LANGUAGE_CHINESE,
   hall_view_game_name: [
     '游戏1',
     '游戏2',

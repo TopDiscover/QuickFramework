@@ -1,6 +1,6 @@
 export let LanguageEN = {
 
-    language :"en",
+    language :cc.sys.LANGUAGE_ENGLISH,
 
     hall_view_game_name: [
         'game1',
