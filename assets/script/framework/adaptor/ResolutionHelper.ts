@@ -306,6 +306,10 @@ export class ResolutionHelper {
         let design = me.designResolution.width / me.designResolution.height;
         let frameSize = me.getFrameSize();
         let rate = frameSize.width / frameSize.height;
+        if (me.dviceDirection == "Portrait" || (me.dviceDirection == '' && design < 1)) {
+            design = 1 / design;
+            rate = 1 / rate;
+        }
         if (CC_DEBUG) cc.log(me._logTag, `design : ${design} real : ${rate}`);
 
         me.screenAdaptType = ScreenAdaptType.None;
