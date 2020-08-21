@@ -104,29 +104,29 @@
     "Collider",
     "Bullet",
     "Ui",
-    "Ball"
+    "Tank"
   ],
   "simulator-orientation": false,
   "simulator-resolution": {
     "height": 640,
     "width": 960
   },
-  "use-customize-simulator": false,
+  "use-customize-simulator": true,
   "use-project-simulator-setting": false,
-  "start-scene": "current",
   "last-module-event-record-time": 1594610536192,
   "assets-sort-type": "name",
   "facebook": {
-    "enable": false,
     "appID": "",
-    "live": {
+    "audience": {
       "enable": false
     },
-    "audience": {
+    "enable": false,
+    "live": {
       "enable": false
     }
   },
   "migrate-history": [
     "cloud-function"
-  ]
+  ],
+  "preview-port": 7456
 }

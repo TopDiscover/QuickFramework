@@ -22,8 +22,16 @@ class TankBettleGameData extends GameData {
 
     /**@description 单人模式 */
     isSingle = true;
+
+    emenyStopTime = 0;
 }
 
 export namespace TankBettle {
     export const gameData = new TankBettleGameData;
+    export enum Direction{
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT,
+    }
 }
