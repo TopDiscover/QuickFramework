@@ -11,7 +11,7 @@ const Electron = require("electron"),
 //读取界面
 let _template = fs.readFileSync(Editor.url("packages://hot-update-tools/panel/index.html", "utf8")) + "";
 //先读取子游戏配置
-let _gamesPath = `${Editor.argv.panelArgv.path}/packages/config/games.json`;
+let _gamesPath = `${Editor.Project.path}/packages/config/games.json`;
 //_gamesPath = path.normalize(_gamesPath);
 let _gamesConfig = fs.readFileSync(_gamesPath);
 _gamesConfig = JSON.parse(_gamesConfig);

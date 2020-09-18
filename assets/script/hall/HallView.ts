@@ -30,6 +30,10 @@ export default class HallView extends UIView implements IController<LobbyService
         new GameConfig(i18n.hall_view_game_name[2],"tankBattle",3)
     ];
 
+    private onClick( ev : cc.Event.EventTouch ){
+        gameManager().enterGame(this.games[ev.target.userData]);
+    }
+
     onLoad() {
         super.onLoad();
 
@@ -41,12 +45,13 @@ export default class HallView extends UIView implements IController<LobbyService
             let game = cc.instantiate(item);
             game.name = `game_${i}`;
             game.active = true;
+            game.userData = i-1
             cc.find("Background/label",game).getComponent(cc.Label).language = Manager.makeLanguage(`hall_view_game_name.${i-1}`);
             nodeGames.addChild(game);
             if ( i -1 < this.games.length ){
-                game.on(cc.Node.EventType.TOUCH_END,()=>{
-                    gameManager().enterGame(this.games[i-1]);
-                });
+                game.on(cc.Node.EventType.TOUCH_END,this.onClick,this);
+                //删除
+                //game.off(cc.Node.EventType.TOUCH_END,this.onClick,this)
             }else if( i == 6 ){
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
                     //websocket测试

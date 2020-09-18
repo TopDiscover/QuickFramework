@@ -633,7 +633,7 @@ const Level21 =
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 8, 1, 0, 0, 0, 4, 4, 0, 0, 3, 3, 0, 0]
     ];
 
-export const Level = {
+export const Level : { [key : string ] : number[][] }= {
     "1" : Level1,
     "2" : Level2,
     "3" : Level3,

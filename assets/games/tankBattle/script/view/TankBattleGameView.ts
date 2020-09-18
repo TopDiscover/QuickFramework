@@ -3,6 +3,7 @@ import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../script
 import TankBattleStartView from "./TankBattleStartView";
 import { ViewZOrder } from "../../../../script/common/config/Config";
 import { Manager } from "../../../../script/common/manager/Manager";
+import TankBattleMap from "../model/TankBattleMap";
 
 
 const {ccclass, property} = cc._decorator;
@@ -14,6 +15,9 @@ export default class TankBattleGameView extends UIView {
         return "prefabs/TankBattleGameView";
     }
 
+    /**@description 地图 */
+    private _Map : TankBattleMap  = null;
+
     onLoad(){
         super.onLoad();
 
@@ -24,6 +28,14 @@ export default class TankBattleGameView extends UIView {
 
     private init(){
         Manager.uiManager.open({type:TankBattleStartView,bundle:this.bundle,zIndex:ViewZOrder.UI});
+
+        let prefabs = cc.find("prefabs",this.node)
+
+        let game = cc.find("Game",this.node)
+        this._Map = game.addComponent(TankBattleMap);
+        this._Map.setPrefabs(prefabs);
+        this._Map.setLevel(1);
+
         this.setEnabledKeyBack(true);
     }
 

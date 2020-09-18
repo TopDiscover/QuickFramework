@@ -34,4 +34,28 @@ export namespace TankBettle {
         LEFT,
         RIGHT,
     }
+
+    export enum GAME_STATUS {
+        /**@description 菜单*/
+        MENU,
+        /**@description 初始化 */
+        INIT,
+        /**@description 开始 */
+        START,
+        /**@description 游戏结束 */
+        OVER,
+        /**@description 过关 */
+        WIN,
+    }
+
+    export enum BLOCK_TYPE {
+        /**@description 墙 */
+        WALL,
+        GRID,
+        GRASS,
+        WATER,
+        ICE,
+        HOME,
+        ANOTHREHOME
+    }
 }
