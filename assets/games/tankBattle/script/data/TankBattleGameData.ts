@@ -5,6 +5,7 @@ import { TANK_LAN_ZH } from "./TankBattleLanguageZH";
 import { Manager } from "../../../../script/framework/Framework";
 import { TANK_LAN_EN } from "./TankBattleLanguageEN";
 import { i18n } from "../../../../script/common/language/LanguageImpl";
+import { MapLevel } from "./TankBattleLevel";
 
 class TankBettleGameData extends GameData {
     onLanguageChange() {
@@ -20,8 +21,29 @@ class TankBettleGameData extends GameData {
         return "tankBattle";
     }
 
+    public nextLevel( ){
+        let level = this.currentLevel + 1;
+        if (level >= MapLevel.length ) {
+            level = 0
+        }
+        this.currentLevel = level
+        return level
+    }
+
+    public prevLevel( ){
+        let level = this.currentLevel - 1;
+        if (level < 0 ) {
+            level = MapLevel.length -1
+        }
+        this.currentLevel = level
+        return level
+    }
+
     /**@description 单人模式 */
     isSingle = true;
+
+    /**@description 当前关卡等级 */
+    currentLevel = 0;
 
     emenyStopTime = 0;
 }
@@ -50,12 +72,12 @@ export namespace TankBettle {
 
     export enum BLOCK_TYPE {
         /**@description 墙 */
-        WALL,
+        WALL = 1,
         GRID,
         GRASS,
         WATER,
         ICE,
-        HOME,
-        ANOTHREHOME
+        HOME = 9,
+        ANOTHREHOME = 8
     }
 }

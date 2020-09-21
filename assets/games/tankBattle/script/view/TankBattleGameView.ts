@@ -4,6 +4,7 @@ import TankBattleStartView from "./TankBattleStartView";
 import { ViewZOrder } from "../../../../script/common/config/Config";
 import { Manager } from "../../../../script/common/manager/Manager";
 import TankBattleMap from "../model/TankBattleMap";
+import { TankBettle } from "../data/TankBattleGameData";
 
 
 const {ccclass, property} = cc._decorator;
@@ -34,7 +35,7 @@ export default class TankBattleGameView extends UIView {
         let game = cc.find("Game",this.node)
         this._Map = game.addComponent(TankBattleMap);
         this._Map.setPrefabs(prefabs);
-        this._Map.setLevel(1);
+        this._Map.setLevel(TankBettle.gameData.currentLevel);
 
         this.setEnabledKeyBack(true);
     }
@@ -44,6 +45,15 @@ export default class TankBattleGameView extends UIView {
         super.onKeyBack(ev);
         //在主游戏视图中退出，打开游戏开始菜单
         Manager.uiManager.open({type:TankBattleStartView,bundle:this.bundle,zIndex:ViewZOrder.UI});
+    }
+
+    protected onKeyUp(ev: cc.Event.EventKeyboard) {
+        super.onKeyUp(ev);
+        if (ev.keyCode == cc.macro.KEY.n ) {
+            this._Map.setLevel(TankBettle.gameData.nextLevel())
+        }else if( ev.keyCode == cc.macro.KEY.p ){
+            this._Map.setLevel(TankBettle.gameData.prevLevel())
+        }
     }
 
 }

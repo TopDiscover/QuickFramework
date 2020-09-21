@@ -3,7 +3,6 @@
  * 地图数组 第一关卡
  * 1：水泥墙 2：铁墙 3：草 4：水 5：冰 9：家
  */
-
 const Level1 =
     [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -633,26 +632,26 @@ const Level21 =
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 8, 1, 0, 0, 0, 4, 4, 0, 0, 3, 3, 0, 0]
     ];
 
-export const Level : { [key : string ] : number[][] }= {
-    "1" : Level1,
-    "2" : Level2,
-    "3" : Level3,
-    "4" : Level4,
-    "5" : Level5,
-    "6" : Level6,
-    "7" : Level7,
-    "8" : Level8,
-    "l9" : Level9,
-    "10" : Level10,
-    "11" : Level11,
-    "12" : Level12,
-    "13" : Level13,
-    "14" : Level14,
-    "15" : Level15,
-    "16" : Level16,
-    "17" : Level17,
-    "18" : Level18,
-    "19" : Level19,
-    "20" : Level20,
-    "21" : Level21,
-}
+export const MapLevel : number[][][] = [
+    Level1,
+    Level2,
+    Level3,
+    Level4,
+    Level5,
+    Level6,
+    Level7,
+    Level8,
+    Level9,
+    Level10,
+    Level11,
+    Level12,
+    Level13,
+    Level14,
+    Level15,
+    Level16,
+    Level17,
+    Level18,
+    Level19,
+    Level20,
+    Level21,
+]
