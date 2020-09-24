@@ -63,6 +63,9 @@ class TankBettleGameData extends GameData {
     /**@description 关卡敌机数量 */
     maxEnemy = 20;
 
+    /**@description 当前敌机数量 */
+    curEnemy = 20;
+
     /**@description 玩家1的生命数量 */
     playerOneLive = 3;
     /**@description 玩家2的生命数量 */
@@ -100,5 +103,12 @@ export namespace TankBettle {
         ICE,
         HOME = 9,
         ANOTHREHOME = 8
+    }
+
+    export enum EVENT {
+        /**@description 显示地图 */
+        SHOW_MAP_LEVEL = "SHOW_MAP_LEVEL",
+        /**@description 换关卡动画播放完成 */
+        CHANGE_STAGE_FINISHED = "CHANGE_STAGE_FINISHED",
     }
 }

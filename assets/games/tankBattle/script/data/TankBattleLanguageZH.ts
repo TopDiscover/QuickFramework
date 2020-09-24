@@ -5,5 +5,6 @@ export let TANK_LAN_ZH = {
         player: '单人模式 ',
         players: '双人模式',
         tips : "当前游戏不支持触摸操作",
+        stage : "第 {0} 关",
     }
 }

@@ -2,6 +2,8 @@ import UIView from "../../../../script/framework/ui/UIView";
 import { LogicEvent } from "../../../../script/common/event/LogicEvent";
 import { Manager } from "../../../../script/common/manager/Manager";
 import { TankBettle } from "../data/TankBattleGameData";
+import TankBattleChangeStageView from "./TankBattleChangeStageView";
+import { ViewZOrder } from "../../../../script/common/config/Config";
 
 const { ccclass, property } = cc._decorator;
 
@@ -18,6 +20,11 @@ export default class TankBattleStartView extends UIView {
     private singlePlayer: cc.Node = null;
     /**@description 多人 */
     private doublePalyers: cc.Node = null;
+
+    protected bindingEvents(){
+        super.bindingEvents();
+        this.registerEvent(TankBettle.EVENT.SHOW_MAP_LEVEL,this.onChangeStageFinished)
+    }
 
     onLoad() {
         super.onLoad();
@@ -54,7 +61,11 @@ export default class TankBattleStartView extends UIView {
             TankBettle.gameData.isSingle = isSingle;
         }else if( ev.keyCode == cc.macro.KEY.space || cc.macro.KEY.enter ){
             //关闭自己界面，显示游戏界面
-            this.close();
+            Manager.uiManager.open({bundle:this.bundle,type:TankBattleChangeStageView,zIndex:ViewZOrder.UI,args:[TankBettle.gameData.currentLevel]})
         }
+    }
+
+    protected onChangeStageFinished(){
+        this.close();
     }
 }

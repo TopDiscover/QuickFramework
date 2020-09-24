@@ -1,0 +1,57 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "startEnter",
+  "_objFlags": 0,
+  "_native": "",
+  "_duration": 0.25,
+  "sample": 60,
+  "speed": 1,
+  "wrapMode": 1,
+  "curveData": {
+    "paths": {
+      "top": {
+        "props": {
+          "y": [
+            {
+              "frame": 0,
+              "value": 540
+            },
+            {
+              "frame": 0.25,
+              "value": 180
+            }
+          ]
+        }
+      },
+      "bottom": {
+        "props": {
+          "y": [
+            {
+              "frame": 0,
+              "value": -540
+            },
+            {
+              "frame": 0.25,
+              "value": -180
+            }
+          ]
+        }
+      },
+      "level": {
+        "props": {
+          "active": [
+            {
+              "frame": 0,
+              "value": false
+            },
+            {
+              "frame": 0.25,
+              "value": true
+            }
+          ]
+        }
+      }
+    }
+  },
+  "events": []
+}
