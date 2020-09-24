@@ -39,13 +39,34 @@ class TankBettleGameData extends GameData {
         return level
     }
 
+    private _isSingle = true;
     /**@description 单人模式 */
-    isSingle = true;
+    public set isSingle( value : boolean ){
+        this._isSingle = value;
+        if (value) {
+            this.playerOneLive = 3;
+            this.playerTwoLive = 0
+        } else {
+            this.playerOneLive = 3;
+            this.playerTwoLive = 3;
+        }
+    }
+    public get isSingle(){
+        return this._isSingle;
+    }
 
     /**@description 当前关卡等级 */
     currentLevel = 0;
 
     emenyStopTime = 0;
+
+    /**@description 关卡敌机数量 */
+    maxEnemy = 20;
+
+    /**@description 玩家1的生命数量 */
+    playerOneLive = 3;
+    /**@description 玩家2的生命数量 */
+    playerTwoLive = 0;
 }
 
 export namespace TankBettle {

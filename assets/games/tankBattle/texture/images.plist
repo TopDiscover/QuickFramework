@@ -826,15 +826,15 @@
             <key>level.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{60,112},{32,30}}</string>
+                <string>{{60,113},{31,30}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{0,1},{32,30}}</string>
+                <string>{{0,1},{31,30}}</string>
                 <key>sourceSize</key>
-                <string>{32,30}</string>
+                <string>{31,30}</string>
             </dict>
         </dict>
         <key>metadata</key>
