@@ -26,6 +26,7 @@ class TankBettleGameData extends GameData {
         if (level >= MapLevel.length ) {
             level = 0
         }
+        this.curEnemy = this.maxEnemy;
         this.currentLevel = level
         return level
     }
@@ -35,7 +36,8 @@ class TankBettleGameData extends GameData {
         if (level < 0 ) {
             level = MapLevel.length -1
         }
-        this.currentLevel = level
+        this.currentLevel = level;
+        this.curEnemy = this.maxEnemy;
         return level
     }
 

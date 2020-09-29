@@ -7,5 +7,18 @@ CITY`,
         players: '2  PLAYERS',
         tips:"The current game does not support touch operation",
         stage : "Stage {0}",
+        Instructions : `
+Instructions:
+
+Player 1:
+wasd up left down right 
+space shoot
+        
+Player 2:
+↓↑←→
+enter shoot
+        
+n Next level
+p Prev level`,
     }
 }

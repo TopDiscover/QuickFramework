@@ -30,6 +30,7 @@ export default class TankBattleGameView extends UIView {
     private _playerTwoLive : cc.Label = null;
     /**@description 当前游戏关卡等级 */
     private _gameLevel : cc.Label = null;
+    private _instructions : cc.Label = null;
 
     protected bindingEvents(){
         super.bindingEvents()
@@ -58,7 +59,10 @@ export default class TankBattleGameView extends UIView {
         this._playerOneLive = cc.find("player_count_1",gameInfo).getComponent(cc.Label);
         this._playerTwoLive = cc.find("player_count_2",gameInfo).getComponent(cc.Label);
 
-        this._gameLevel = cc.find("level",gameInfo).getComponent(cc.Label)
+        this._gameLevel = cc.find("level",gameInfo).getComponent(cc.Label);
+
+        this._instructions = cc.find("Instructions",this.node).getComponent(cc.Label);
+        this._instructions.language = Manager.makeLanguage("Instructions",true)
 
         this.setEnabledKeyBack(true);
     }

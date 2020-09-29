@@ -59,7 +59,7 @@ export default class TankBattleStartView extends UIView {
                 isSingle = true;
             }
             TankBettle.gameData.isSingle = isSingle;
-        }else if( ev.keyCode == cc.macro.KEY.space || cc.macro.KEY.enter ){
+        }else if( ev.keyCode == cc.macro.KEY.space || ev.keyCode == cc.macro.KEY.enter ){
             //关闭自己界面，显示游戏界面
             Manager.uiManager.open({bundle:this.bundle,type:TankBattleChangeStageView,zIndex:ViewZOrder.UI,args:[TankBettle.gameData.currentLevel]})
         }
