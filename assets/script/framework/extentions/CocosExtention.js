@@ -66,8 +66,8 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
                     });
                 }
             }
+            if (config.completeCallback && cc.isValid(me)) config.completeCallback(data);
         }
-        if (config.completeCallback && cc.isValid(me)) config.completeCallback(data);
     });
 };
 
