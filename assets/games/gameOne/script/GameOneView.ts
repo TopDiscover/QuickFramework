@@ -20,7 +20,12 @@ export default class GameOneView extends UIView {
 
         let icon = cc.find("cocos",this.node)
         let btnLoad = cc.find("loadImg",this.node);
-        let spine = cc.find("spine",this.node).getComponent(sp.Skeleton);
+
+        let children = this.node.children;
+        children.forEach(element => {
+            cc.log(element.name)
+        });
+        
         btnLoad.on(cc.Node.EventType.TOUCH_END,()=>{
             // icon.getComponent(cc.Sprite).loadRemoteImage({
             //     url:"https://www.baidu.com/img/flexible/logo/pc/result.png",
@@ -30,7 +35,7 @@ export default class GameOneView extends UIView {
             //         cc.log("下载完成")
             //     }
             // })
-
+            let spine = cc.find("spine",this.node).getComponent(sp.Skeleton);
             spine.loadRemoteSkeleton({
                 view:this,
                 path:"http://192.168.3.104/hotupdate",
