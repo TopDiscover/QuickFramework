@@ -2,10 +2,11 @@
 
 import { GameData } from "../../../../script/common/base/GameData";
 import { TANK_LAN_ZH } from "./TankBattleLanguageZH";
-import { Manager } from "../../../../script/framework/Framework";
 import { TANK_LAN_EN } from "./TankBattleLanguageEN";
 import { i18n } from "../../../../script/common/language/LanguageImpl";
 import { MapLevel } from "./TankBattleLevel";
+import { Manager } from "../../../../script/common/manager/Manager";
+import TankBattleNetController from "../controller/TankBattleNetController";
 
 class TankBettleGameData extends GameData {
     onLanguageChange() {
@@ -112,5 +113,11 @@ export namespace TankBettle {
         SHOW_MAP_LEVEL = "SHOW_MAP_LEVEL",
         /**@description 换关卡动画播放完成 */
         CHANGE_STAGE_FINISHED = "CHANGE_STAGE_FINISHED",
+        /**@description 请求当前游戏关卡 */
+        REQ_LEVEL = "REQ_LEVEL"
+    }
+
+    export function netController() : TankBattleNetController{
+        return Manager.gameController;
     }
 }

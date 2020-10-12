@@ -1,10 +1,22 @@
-import { JsonMessage } from "../../../../script/framework/net/JsonMessage";
+import { MainCmd } from "../../../../script/common/protocol/CmdNetID";
+import { CommonMessage } from "../../../../script/common/net/CommonService";
+import { serialize } from "../../../../script/framework/net/JsonMessage";
 
 /**
  * @description 网络协议接口定义及实现处理
  */
 
-/**@description 为了结构，写一个测试 些文件夹用来存放与服务器的协议交互*/
-export class TamkBattleProtocal extends JsonMessage{
+ export let SUB_CMD_GAME = {
+     /**@description 请求配置 */
+     CMD_GAME_CONFIG : 1,
+ }
 
+/**@description 存储当前游戏配置*/
+export class TankBattleConfig extends CommonMessage{
+    mainCmd = MainCmd.CMD_GAME;
+    subCmd = SUB_CMD_GAME.CMD_GAME_CONFIG;
+
+    /**@description 当前关卡*/
+    @serialize("level",Number)
+    level : number = 1
 }

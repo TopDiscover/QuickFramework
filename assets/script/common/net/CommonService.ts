@@ -11,6 +11,7 @@ import { Service } from "../../framework/base/Service";
 import { GameEventInterface } from "../../framework/base/GameEventInterface";
 import { Message } from "../../framework/net/Message";
 import { JsonMessage } from "../../framework/net/JsonMessage";
+import { MainCmd, SUB_CMD_GAME, SUB_CMD_SYS } from "../protocol/CmdNetID";
 
 export class CommonMessage extends JsonMessage {
 }
@@ -35,8 +36,8 @@ export class CommonService extends Service implements GameEventInterface {
     protected sendHeartbeat() {
         //发送心跳
         let msg = new CommonMessage();
-        msg.mainCmd = 1;
-        msg.subCmd = 1;
+        msg.mainCmd = MainCmd.CMD_SYS;
+        msg.subCmd = SUB_CMD_SYS.CMD_SYS_HEART_ACK;
         this.send(msg);
     }
     /**
@@ -62,7 +63,7 @@ export class CommonService extends Service implements GameEventInterface {
      */
     protected isHeartBeat(data: Message): boolean {
         //示例
-        return data.mainCmd == 1 && data.subCmd == 1;
+        return data.mainCmd == MainCmd.CMD_SYS && data.subCmd == SUB_CMD_SYS.CMD_SYS_HEART_ACK;
     }
 
     onEnterBackground() {

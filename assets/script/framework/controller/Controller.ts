@@ -2,6 +2,7 @@
 import { EventApi } from "../event/EventApi";
 import EventComponent from "../base/EventComponent";
 import { Service } from "../base/Service";
+import { Message } from "../net/Message";
 
 /**
  * @description 控制器基类 , 对service 的自动注入
@@ -43,6 +44,25 @@ export default class Controller<ServiceType> extends EventComponent {
     }
     protected onNetError( ev : Event ) {
         if ( CC_DEBUG ) cc.log(`--Controller-- onNetError---`);
+    }
+
+    /**
+     * @description 发送请求
+     * @param msg msg
+     */
+    public send(msg: Message) {
+        //发送请求数据
+        if( this.service instanceof Service){
+            this.service.send(msg)
+        }else{
+            cc.error("this.service is null")
+        }
+        
+    }
+
+    protected get bundle( ) : string{
+        cc.error(`请子类重写protected get bundle,返回游戏的包名,即 asset bundle name`);
+        return "";
     }
 
 }

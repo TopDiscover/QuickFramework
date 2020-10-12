@@ -17,7 +17,7 @@ import Tips from "../component/Tips";
 
 class _Manager extends Framework._FramewokManager {
 
-    /**@description 网络组件管理器 */
+    /**@description 全局常驻网络组件管理器 */
     get netManager() {
         return getSingleton(NetManager);
     }
@@ -46,6 +46,15 @@ class _Manager extends Framework._FramewokManager {
 
     /**@description 游戏数据 */
     gameData : GameData = null;
+
+    /**@description 游戏控制器，在自己的模块内写函数有类型化读取,此值在Logic.addNetComponent赋值
+     * @example 
+     * export function netController() : TankBattleNetController{
+     * return Manager.gameController;
+     * }
+     * 
+     */
+    gameController : any = null;
 
     /**
      * @description 把语言包转换成i18n.xxx形式

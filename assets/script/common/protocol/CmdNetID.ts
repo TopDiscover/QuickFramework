@@ -1,12 +1,15 @@
 export let MainCmd = {
+    /**@description 系统类 */
+    CMD_SYS: 1,
     /**@description 游戏类 */
-    CMD_GAME: 1,
+    CMD_GAME: 2,
     /**@description 大厅类 */
-    CMD_LOBBY: 2,
+    CMD_LOBBY: 3,
     /**@description 支付类 */
-    CMD_PAY: 3,
+    CMD_PAY: 4,
     /**@description 聊天类 */
-    CMD_CHAT: 4,
+    CMD_CHAT: 5,
+
 }
 
 /**@description 游戏类公共cmd定义 */
@@ -22,7 +25,7 @@ export let SUB_CMD_LOBBY = {
     /**@description 收到邮件*/
     CMD_LOBBY_MAIL_RECV: 1,
     /**@description 金钱更新 */
-    UPDATE_MONEY : 2,
+    UPDATE_MONEY: 2,
 }
 
 /**@description 支付类公共cmd定义 */
@@ -39,7 +42,14 @@ export let SUB_CMD_CHAT = {
     CMD_CHAT_INTERACTIVE_PROPS_RECV: 2,
 
     /**@description 请求发送文字聊天*/
-    CMD_CHAT_CHAT_REQ: 1,
+    CMD_CHAT_CHAT_REQ: 3,
     /**@description 收到文字聊天*/
-    CMD_CHAT_CHAT_RECV: 2,
+    CMD_CHAT_CHAT_RECV: 4,
+}
+
+export let SUB_CMD_SYS = {
+    /** 心跳请求 -- 客户端、服务器使用 **/
+    CMD_SYS_HEART_ASK: 1,
+    /** 心跳应答 -- 客户端、服务器使用 **/
+    CMD_SYS_HEART_ACK: 2,
 }

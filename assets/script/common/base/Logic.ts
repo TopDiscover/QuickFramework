@@ -4,7 +4,7 @@ import { ResourceData, ResourceCacheData, ENABLE_CHANGE_LANGUAGE } from "../../f
 import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
 import { EventApi } from "../../framework/event/EventApi";
 import { Config } from "../config/Config";
-import { Manager } from "../../framework/Framework";
+import { Manager } from "../manager/Manager";
 
 /**
  * @description 逻辑控制器 需要实现LogicInterface
@@ -84,13 +84,34 @@ export class Logic extends EventComponent {
     protected onLoadResourceProgress( loadedCount : number , total : number , data : ResourceCacheData ){
     }
 
+
+    /**@description 返回当前网络控制器类型Controller子类 */
+    protected getNetControllerType() : any {
+        return null;
+    }
+
     //移除网络组件
     protected removeNetComponent(){
-        
+        let type = this.getNetControllerType()
+        if( type ){
+            if( this.node.getComponent(type)){
+                this.node.removeComponent(type)
+                Manager.gameController = null;
+            } 
+        }
     }
 
     //添加网络组件
     protected addNetComponent(){
-       
+        let type = this.getNetControllerType()
+        if( type ){
+            let controller = this.node.getComponent(type);
+            if ( !controller ){
+                controller = this.node.addComponent(type);
+            }
+            Manager.gameController = controller;
+            return controller;
+        }
+        return null;
     }
 }

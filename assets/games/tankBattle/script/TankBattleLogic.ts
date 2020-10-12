@@ -6,6 +6,7 @@ import { ResourceLoaderError } from "../../../script/framework/assetManager/Reso
 import { Manager } from "../../../script/common/manager/Manager";
 import TankBattleGameView from "./view/TankBattleGameView";
 import { TankBettle } from "./data/TankBattleGameData";
+import TankBattleNetController from "./controller/TankBattleNetController";
 
 /**
  * @description 坦克大战Logic 
@@ -57,6 +58,10 @@ class TankBattleLogic extends Logic {
         Manager.uiManager.open({ type: TankBattleGameView ,bundle:this.bundle});
     }
 
+    protected getNetControllerType(){
+        return TankBattleNetController
+    }
+
     private onEnterGame(data) {
         if (data == this.bundle) {
 
@@ -66,6 +71,9 @@ class TankBattleLogic extends Logic {
 
             //子游戏语言包初始化
             this.onLanguageChange();
+
+            //添加网络组件
+            this.addNetComponent();
 
             //先暂停网络回调处理，等待资源加载完成后，恢复处理
             LobbyService.instance.pauseMessageQueue();
