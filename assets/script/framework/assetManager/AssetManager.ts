@@ -7,21 +7,6 @@ class RemoteLoader {
     private static _instance: RemoteLoader = null;
     public static Instance() { return this._instance || (this._instance = new RemoteLoader()); }
 
-    private _maxConcurrentTask = 5;
-    /**@description 设置下载任务的最大上限数量，目前仅对CC_JSB有效，限制downloader的任务数量  */
-    public set maxConcurrentTask( value : number ){
-        this._maxConcurrentTask = value;
-    }
-    public get maxConcurrentTask( ){
-        return this._maxConcurrentTask;
-    }
-
-    /**@description 当前下载任务 */
-    private _currentTaskCount = 0;
-
-    /**@description 当前任务队列  {下载地址,存储路径}*/
-    private _taskQueue : {url : string , path : string}[] = [];
-
     public loadImage(url: string, isNeedCache: boolean) {
         let me = this;
         return new Promise<cc.SpriteFrame>((resolve) => {
@@ -43,7 +28,6 @@ class RemoteLoader {
                     if (CC_DEBUG) cc.log(`${this._logTag}加载图片完成${url}`);
                     cache.data = data;
                     cache.data.name = url;
-                    cache.data.url = url;
                     let spriteFrame = Manager.cacheManager.remoteCaches.setSpriteFrame(url, cache.data);
                     resolve(spriteFrame);
                 } else {

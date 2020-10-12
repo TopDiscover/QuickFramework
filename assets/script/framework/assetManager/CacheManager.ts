@@ -80,10 +80,8 @@ class RemoteCaches {
             if (spriteFrame) {
                 return <cc.SpriteFrame>(spriteFrame.data);
             }
-
             let cache = new ResourceCacheData();
             cache.data = new cc.SpriteFrame(data);
-            cache.data.url = url;
             cache.isLoaded = true;
             cache.url = url;
             this._spriteFrameCaches.set(url, cache);
