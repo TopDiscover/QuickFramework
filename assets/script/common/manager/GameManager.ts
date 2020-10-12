@@ -1,6 +1,6 @@
 import { LogicEvent } from "../event/LogicEvent";
 import { HotUpdate, AssetManagerCode, AssetManagerState, SubGameUpdateType, GameConfig } from "../base/HotUpdate";
-import { HallEvent } from "../../hall/HallEvent";
+import { CommonEvent } from "../event/CommonEvent";
 
 export class GameManager {
    private static _instance: GameManager = null;
@@ -160,10 +160,10 @@ needRestart : ${needRestart}
 
       if (code == AssetManagerCode.UPDATE_PROGRESSION) {
          newPercent = percent == Number.NaN ? 0 : percent;
-         dispatch(HallEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
+         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
       } else if (code == AssetManagerCode.ALREADY_UP_TO_DATE) {
          newPercent = 1;
-         dispatch(HallEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
+         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
       } else if (code == AssetManagerCode.UPDATE_FINISHED) {
          newPercent = 1.1;
          cc.log(`更新${gameConfig.gameName}成功`);
@@ -172,7 +172,7 @@ needRestart : ${needRestart}
             cc.log(`正在加载${gameConfig.gameName}`);
             this.loadSubpackage();
          }
-         dispatch(HallEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
+         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
       } else if (code == AssetManagerCode.UPDATE_FAILED ||
          code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||
          code == AssetManagerCode.ERROR_DOWNLOAD_MANIFEST ||
@@ -181,7 +181,7 @@ needRestart : ${needRestart}
          newPercent = -1;
          this.isLoading = false;
          cc.error(`更新${gameConfig.gameName}失败`);
-         dispatch(HallEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
+         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
       }
    }
 }

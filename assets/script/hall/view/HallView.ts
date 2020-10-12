@@ -1,13 +1,13 @@
-import UIView from "../framework/ui/UIView";
-import { dispatchEnterComplete, LogicType } from "../common/event/LogicEvent";
-import { GameConfig } from "../common/base/HotUpdate";
-import { HallEvent } from "./HallEvent";
-import { i18n } from "../common/language/LanguageImpl";
-import { LobbyService } from "../common/net/LobbyService";
-import { injectService } from "../framework/decorator/Decorators";
-import { IController } from "../framework/controller/Controller";
-import { UpdateMoney } from "./HallMessage";
-import { Manager } from "../common/manager/Manager";
+import UIView from "../../framework/ui/UIView";
+import { injectService } from "../../framework/decorator/Decorators";
+import { LobbyService } from "../../common/net/LobbyService";
+import { IController } from "../../framework/controller/Controller";
+import { GameConfig } from "../../common/base/HotUpdate";
+import { i18n } from "../../common/language/LanguageImpl";
+import { UpdateMoney } from "../protocol/HallMessage";
+import { dispatchEnterComplete, LogicType } from "../../common/event/LogicEvent";
+import { Manager } from "../../common/manager/Manager";
+import { CommonEvent } from "../../common/event/CommonEvent";
 
 const { ccclass, property } = cc._decorator;
 
@@ -82,7 +82,7 @@ export default class HallView extends UIView implements IController<LobbyService
 
      bindingEvents(){
          super.bindingEvents();
-         this.registerEvent(HallEvent.DOWNLOAD_PROGRESS,this.onDownloadProgess);
+         this.registerEvent(CommonEvent.DOWNLOAD_PROGRESS,this.onDownloadProgess);
      }
      
      private onDownloadProgess( data : { progress: number, config: GameConfig }){

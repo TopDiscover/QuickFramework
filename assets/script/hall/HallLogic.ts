@@ -1,8 +1,8 @@
 import { Logic } from "../common/base/Logic";
-import HallView from "./HallView";
 import { LogicType, LogicEvent } from "../common/event/LogicEvent";
 import { BUNDLE_RESOURCES } from "../framework/base/Defines";
 import { Manager } from "../common/manager/Manager";
+import HallView from "./view/HallView";
 
 
 class HallLogic extends Logic {

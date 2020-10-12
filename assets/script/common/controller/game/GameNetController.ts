@@ -5,7 +5,6 @@ import { MainCmd, SUB_CMD_GAME } from "../../protocol/CmdNetID";
 import { Manager } from "../../manager/Manager";
 import { EnterGameFail, EnterGameSuccess } from "../../protocol/CmdGame";
 import { GameConfig } from "../../base/HotUpdate";
-import { HallEvent } from "../../../hall/HallEvent";
 
 const { ccclass, property } = cc._decorator;
 

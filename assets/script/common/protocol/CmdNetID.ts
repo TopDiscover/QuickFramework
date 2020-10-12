@@ -19,25 +19,27 @@ export let SUB_CMD_GAME = {
 
 /**@description 大厅类公共cmd定义 */
 export let SUB_CMD_LOBBY = {
-    /**@description 请求大厅游戏列表*/
-    CMD_LOBBY_GAME_LIST_REQ:1 ,
+    /**@description 收到邮件*/
+    CMD_LOBBY_MAIL_RECV: 1,
+    /**@description 金钱更新 */
+    UPDATE_MONEY : 2,
 }
 
 /**@description 支付类公共cmd定义 */
 export let SUB_CMD_PAY = {
     /**@description 支付成功*/
-    CMD_PAY_PAY_SUCCESS:1,
+    CMD_PAY_PAY_SUCCESS: 1,
 }
 
 /**@description 聊天类公共cmd定义 */
 export let SUB_CMD_CHAT = {
     /**@description 请求发送互动道具*/
-    CMD_CHAT_INTERACTIVE_PROPS_REQ:1,
+    CMD_CHAT_INTERACTIVE_PROPS_REQ: 1,
     /**@description 收到互动道具*/
-    CMD_CHAT_INTERACTIVE_PROPS_RECV:2,
+    CMD_CHAT_INTERACTIVE_PROPS_RECV: 2,
 
     /**@description 请求发送文字聊天*/
-    CMD_CHAT_CHAT_REQ:1,
+    CMD_CHAT_CHAT_REQ: 1,
     /**@description 收到文字聊天*/
-    CMD_CHAT_CHAT_RECV:2,
+    CMD_CHAT_CHAT_RECV: 2,
 }

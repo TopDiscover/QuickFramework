@@ -1,13 +1,6 @@
-import { CommonMessage } from "../common/net/CommonService"
-import { serialize } from "../framework/net/JsonMessage";
-
-export let MainCmd = {
-    LOBBY_UPDATE : 100,
-}
-
-export let SubCmd = {
-    UPDATE_MONEY : 100,
-}
+import { CommonMessage } from "../../common/net/CommonService";
+import { serialize } from "../../framework/net/JsonMessage";
+import { MainCmd, SUB_CMD_LOBBY } from "../../common/protocol/CmdNetID";
 
 export class TestData extends CommonMessage{
 
@@ -17,8 +10,8 @@ export class TestData extends CommonMessage{
 }
 
 export class UpdateMoney extends CommonMessage {
-    mainCmd = MainCmd.LOBBY_UPDATE;
-    subCmd = SubCmd.UPDATE_MONEY;
+    mainCmd = MainCmd.CMD_LOBBY;
+    subCmd = SUB_CMD_LOBBY.UPDATE_MONEY;
     @serialize("count",Number)
     count : number = 1000;
 
