@@ -37,8 +37,8 @@ class GameTwoLogic extends Logic {
         }
     }
 
-    private onEnterRoomList(){
-
+    private onEnterRoomList(data){
+        //打开自己的子游戏房间列表
     }
 
     protected onLoadResourceComplete( err : ResourceLoaderError ){
