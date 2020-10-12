@@ -67,7 +67,7 @@ class RemoteLoader {
                                         if (atlas) {
                                             //生成SkeletonData数据
                                             let asset = new sp.SkeletonData;
-                                            asset.skeletonJson = json;
+                                            asset.skeletonJson = json.json;
                                             asset.atlasText = atlas.text;
                                             asset.textures = [texture];
                                             let pngName = name + ".png"
@@ -75,7 +75,6 @@ class RemoteLoader {
 
                                             cache.url = url;
                                             asset.name = cache.url;
-                                            asset.url = cache.url;
                                             cache.data = asset;
                                             cache.isLoaded = true;
                                             resolve(<sp.SkeletonData>(cache.data));
