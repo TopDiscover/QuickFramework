@@ -20,9 +20,6 @@ export default class MainController extends Controller<CommonService> {
     onLoad () {
 
         Manager.resolutionHelper.onLoad(this.node);
-        
-        //本地缓存数据库打开
-        Manager.dataBase.open();
 
         //先添加全局的网络组件
         Manager.netManager.addNetControllers(this.node);

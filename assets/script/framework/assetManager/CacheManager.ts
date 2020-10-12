@@ -51,32 +51,18 @@ class RemoteCaches {
     /**
      * @description 获取远程缓存数据
      * @param type 远程奖状类型
-     * @param remoteUrl url数据
+     * @param url 远程地址
      */
-    public get(url: string | RemoteUrl) {
-        let tempUrl = "";
-        if (typeof url == "string") {
-            let remoteUrl = parseRemoteUrl(url);
-            tempUrl = makeRemoteUrl(remoteUrl);
-        } else {
-            tempUrl = makeRemoteUrl(url);
-        }
-        if (this._caches.has(tempUrl)) {
-            return this._caches.get(tempUrl);
+    public get(url: string ) {
+        if (this._caches.has(url)) {
+            return this._caches.get(url);
         }
         return null;
     }
 
-    public getSpriteFrame(url: string | RemoteUrl) {
-        let tempUrl = "";
-        if (typeof url == "string") {
-            let remoteUrl = parseRemoteUrl(url);
-            tempUrl = makeRemoteUrl(remoteUrl);
-        } else {
-            tempUrl = makeRemoteUrl(url);
-        }
-        if (this._spriteFrameCaches.has(tempUrl)) {
-            let cache = this._spriteFrameCaches.get(tempUrl);
+    public getSpriteFrame(url: string) {
+        if (this._spriteFrameCaches.has(url)) {
+            let cache = this._spriteFrameCaches.get(url);
             let texture2D = this.get(url);
             if (texture2D) {
                 return cache;
@@ -87,16 +73,8 @@ class RemoteCaches {
         }
         return null;
     }
-    public setSpriteFrame(url: string | RemoteUrl, data: any): cc.SpriteFrame {
-        let tempUrl = "";
-        if (typeof url == "string") {
-            let remoteUrl = parseRemoteUrl(url);
-            tempUrl = makeRemoteUrl(remoteUrl);
-        } else {
-            tempUrl = makeRemoteUrl(url);
-        }
+    public setSpriteFrame(url: string, data: any): cc.SpriteFrame {
         if (data && data instanceof cc.Texture2D) {
-
             //同一图片加载两次也会回调到这里，这里如果当前精灵缓存中有，不在重新创建
             let spriteFrame = this.getSpriteFrame(url);
             if (spriteFrame) {
@@ -105,42 +83,33 @@ class RemoteCaches {
 
             let cache = new ResourceCacheData();
             cache.data = new cc.SpriteFrame(data);
-            cache.data.url = tempUrl;
+            cache.data.url = url;
             cache.isLoaded = true;
-            cache.url = tempUrl;
-            this._spriteFrameCaches.set(tempUrl, cache);
+            cache.url = url;
+            this._spriteFrameCaches.set(url, cache);
             return <cc.SpriteFrame>(cache.data);
         }
         return null;
     }
 
-    public set(url: string | RemoteUrl, data: ResourceCacheData) {
-        let tempUrl = "";
-        if (typeof url == "string") {
-            let remoteUrl = parseRemoteUrl(url);
-            tempUrl = makeRemoteUrl(remoteUrl);
-        } else {
-            tempUrl = makeRemoteUrl(url);
-        }
-        data.url = tempUrl;
-        this._caches.set(tempUrl, data);
+    public set(url: string , data: ResourceCacheData) {
+        data.url = url;
+        this._caches.set(url, data);
     }
 
     private _getCacheInfo(info: ResourceInfo, isNoFoundCreate: boolean = true) {
         if (info && info.url && info.url.length > 0) {
-            let remoteUrl = parseRemoteUrl(info.url);
-            let url = makeRemoteUrl(remoteUrl);
-            if (!this._resMap.has(url)) {
+            if (!this._resMap.has(info.url)) {
                 if (isNoFoundCreate) {
                     let cache = new CacheInfo;
                     cache.url = info.url;
-                    this._resMap.set(url, cache);
+                    this._resMap.set(info.url, cache);
                 }
                 else {
                     return null;
                 }
             }
-            return this._resMap.get(url);
+            return this._resMap.get(info.url);
         }
         return null;
     }
@@ -180,37 +149,29 @@ class RemoteCaches {
         }
     }
 
-    public remove(url: string | RemoteUrl) {
-        let tempUrl = "";
-        if (typeof url == "string") {
-            let remoteUrl = parseRemoteUrl(url);
-            tempUrl = makeRemoteUrl(remoteUrl);
-        } else {
-            tempUrl = makeRemoteUrl(url);
-        }
-
-        this._resMap.delete(tempUrl);
+    public remove(url: string) {
+        this._resMap.delete(url);
 
         //先删除精灵帧
-        if (this._spriteFrameCaches.has(tempUrl)) {
-            this._spriteFrameCaches.delete(tempUrl);
-            if (CC_DEBUG) cc.log(`remove remote sprite frames resource url : ${tempUrl}`);
+        if (this._spriteFrameCaches.has(url)) {
+            this._spriteFrameCaches.delete(url);
+            if (CC_DEBUG) cc.log(`remove remote sprite frames resource url : ${url}`);
         }
 
-        let cache = this._caches.has(tempUrl) ? this._caches.get(tempUrl) : null;
+        let cache = this._caches.has(url) ? this._caches.get(url) : null;
         if (cache && cache.data instanceof sp.SkeletonData) {
             //这里面需要删除加载进去的三个文件缓存 
             this.remove(`${cache.url}.atlas`);
             this.remove(`${cache.url}.png`);
             this.remove(`${cache.url}.json`);
         }
-        let success = this._caches.delete(tempUrl);
+        let success = this._caches.delete(url);
         if (success) {
             if (CC_JSB && cache && cache.data instanceof cc.Asset ) {
+                if (CC_DEBUG) cc.log(`释放加载的本地远程资源:${cache.url}`);
                 cc.assetManager.releaseAsset(cache.data);
-                if (CC_DEBUG) cc.log(`释放加载的本地远程资源:${cache.jsbStoragePath}`);
             }
-            if (CC_DEBUG) cc.log(`remove remote cache url : ${tempUrl}`);
+            if (CC_DEBUG) cc.log(`remove remote cache url : ${url}`);
         }
         return success;
     }

@@ -20930,7 +20930,7 @@ declare namespace cc.AssetManager {
 		!#zh
 		通过原始 url 移除缓存 
 		*/
-		removeCache(): void;	
+		removeCache( url : string ): void;	
 	}	
 	/** !#en
 	use to cache something

@@ -69,12 +69,6 @@ export class ResourceCacheData {
     /**@description 完成回调，在资源正在加载过程中，又有其它地方调用加载同一个资源，此时需要等待资源加载完成，统一回调 */
     finishCb: ((data: any) => void)[] = [];
 
-    /**@description jsb下载完成回调 */
-    jsbFinishCb: (data: any) => void = null;
-
-    /**@description 远程下载资源保存本地的物理路径，仅在JSB情况下有效 */
-    jsbStoragePath: string = null;
-
     /**@description 默认为本地资源 */
     resourceType: ResourceType = ResourceType.Local;
 
@@ -92,12 +86,6 @@ export class ResourceCacheData {
         this.finishCb = [];
     }
 
-    public doJsbFinish(data) {
-        if (this.jsbFinishCb) {
-            this.jsbFinishCb(data);
-        }
-        this.jsbFinishCb = null;
-    }
 }
 
 export interface ResourceData {

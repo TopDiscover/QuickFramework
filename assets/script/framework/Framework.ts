@@ -1,6 +1,5 @@
 import { Language } from "./base/Language";
 import { EventDispatcher } from "./event/EventDispatcher";
-import { DataBase } from "./database/DataBase";
 import { UIManager } from "./base/UIManager";
 import { LocalStorage } from "./base/LocalStorage";
 import { AssetManager } from "./assetManager/AssetManager";
@@ -18,11 +17,6 @@ export class _FramewokManager{
     /**@description 事件派发器 */
     get eventDispatcher(){
         return getSingleton(EventDispatcher);
-    }
-
-    /**@description 数据库，仅web下可用 */
-    get dataBase(){
-        return getSingleton(DataBase);
     }
 
     /**@description 界面管理器 */
