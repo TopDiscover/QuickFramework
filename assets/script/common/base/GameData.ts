@@ -12,6 +12,11 @@ export class GameData{
 
     }
 
+    /**@description 游戏类型 */
+    public gameType(){
+        return -1;
+    }
+
     onLanguageChange(){
         
     }

@@ -1,6 +1,5 @@
 import UIView from "../framework/ui/UIView";
 import { dispatchEnterComplete, LogicType } from "../common/event/LogicEvent";
-import { gameManager } from "../common/manager/GameManager";
 import { GameConfig } from "../common/base/HotUpdate";
 import { HallEvent } from "./HallEvent";
 import { i18n } from "../common/language/LanguageImpl";
@@ -31,7 +30,7 @@ export default class HallView extends UIView implements IController<LobbyService
     ];
 
     private onClick( ev : cc.Event.EventTouch ){
-        gameManager().enterGame(this.games[ev.target.userData]);
+        Manager.gameManager.enterGame(this.games[ev.target.userData]);
     }
 
     onLoad() {

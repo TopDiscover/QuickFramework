@@ -1,7 +1,6 @@
 import UIView, { UIClass } from "../ui/UIView";
 import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
 import UILoadingDelegate from "../ui/UILoadingDelegate";
-import ToastDelegate from "../ui/ToastDelegate";
 import { Manager } from "../Framework";
 
 /**@description 动态加载垃圾数据名 */
@@ -185,7 +184,6 @@ export class UIManager {
     public retainMemory = new ViewDynamicLoadData(DYNAMIC_LOAD_RETAIN_MEMORY);
 
     public uiLoading: UILoadingDelegate = null;
-    public toast : ToastDelegate = null;
 
     public preload<T extends UIView>(uiClass: UIClass<T>,bundle:BUNDLE_TYPE) {
         return this._open(uiClass,bundle, 0, true, null,null);
@@ -301,7 +299,7 @@ export class UIManager {
                         if ( name ){
                             uiName = name;
                         }
-                        if (this.toast) this.toast.show(`加载界面${uiName}失败，请重试`);
+                        if (Manager.tips) Manager.tips.show(`加载界面${uiName}失败，请重试`);
                         if (this.uiLoading) this.uiLoading.hide();
                     });
             }

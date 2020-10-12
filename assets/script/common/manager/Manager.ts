@@ -1,6 +1,6 @@
 /**@description 管理器 */
 
-import { _FramewokManager } from "../../framework/Framework";
+import * as Framework from "../../framework/Framework";
 import { NetManager } from "./NetManager";
 import { LogicManager } from "./LogicManager";
 import GlobalAudio from "../component/GlobalAudio";
@@ -12,8 +12,10 @@ import { getSingleton } from "../../framework/base/Singleton";
 import { USING_LAN_KEY } from "../../framework/base/Defines";
 import GameView from "../base/GameView";
 import { GameData } from "../base/GameData";
+import { GameManager } from "./GameManager";
+import Tips from "../component/Tips";
 
-class _Manager extends _FramewokManager {
+class _Manager extends Framework._FramewokManager {
 
     /**@description 网络组件管理器 */
     get netManager() {
@@ -24,6 +26,10 @@ class _Manager extends _FramewokManager {
     get logicManager() {
         return getSingleton(LogicManager);
     }
+
+    get gameManager() {
+        return getSingleton(GameManager);
+     }
 
     /**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
     private _globalAudio : GlobalAudio = null;
@@ -78,6 +84,10 @@ class _Manager extends _FramewokManager {
     init() {
         //日志
         Log.logLevel = LogLevel.ERROR | LogLevel.LOG | LogLevel.WARN | LogLevel.DUMP;
+
+        /**@description 初始化框架层使用的提示组件 */
+        Framework.Manager.tips = getSingleton(Tips)
+
         //适配
         this.resolutionHelper.initBrowserAdaptor();
         //扩展

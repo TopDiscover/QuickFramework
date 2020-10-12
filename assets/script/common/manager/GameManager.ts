@@ -1,13 +1,8 @@
-import { getSingleton } from "../../framework/base/Singleton";
 import { LogicEvent } from "../event/LogicEvent";
 import { HotUpdate, AssetManagerCode, AssetManagerState, SubGameUpdateType, GameConfig } from "../base/HotUpdate";
 import { HallEvent } from "../../hall/HallEvent";
 
-export function gameManager() {
-   return getSingleton(GameManager);
-}
-
-class GameManager {
+export class GameManager {
    private static _instance: GameManager = null;
    public static Instance() { return this._instance || (this._instance = new GameManager()); }
    private curGame: GameConfig = null;

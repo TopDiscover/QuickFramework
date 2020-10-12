@@ -7,7 +7,6 @@
  * @FilePath: \ddz\assets\framework\base\LocalStorage.ts
  */
 import { BitEncrypt } from "../extentions/BitEncrypt";
-import { getSingleton } from "./Singleton";
 
 /**
  * @description 本地数据存储，为了后面可能需要对数据进入加密保存等，把cocos的封闭一层

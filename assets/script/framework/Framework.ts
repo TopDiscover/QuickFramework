@@ -6,6 +6,7 @@ import { AssetManager } from "./assetManager/AssetManager";
 import { CacheManager } from "./assetManager/CacheManager";
 import { ResolutionHelper } from "./adaptor/ResolutionHelper";
 import { getSingleton } from "./base/Singleton";
+import TipsDelegate from "./ui/TipsDelegate";
 
 export class _FramewokManager{
     
@@ -42,6 +43,15 @@ export class _FramewokManager{
     /**@description 屏幕适配 */
     get resolutionHelper(){
         return getSingleton(ResolutionHelper);
+    }
+
+    private _tips : TipsDelegate = null
+    /**@description 小提示 */
+    get tips(){
+        return this._tips;
+    }
+    set tips( value : TipsDelegate ){
+        this._tips = value
     }
 }
 

@@ -7,7 +7,12 @@ import { Manager } from "../../../script/common/manager/Manager";
 import TankBattleGameView from "./view/TankBattleGameView";
 import { TankBettle } from "./data/TankBattleGameData";
 
-class GameTwoLogic extends Logic {
+/**
+ * @description 坦克大战Logic 
+ * 1，处理LogicEvent的事件
+ * 2，
+ */
+class TankBattleLogic extends Logic {
 
     logicType: LogicType = LogicType.GAME;
 
@@ -84,4 +89,4 @@ class GameTwoLogic extends Logic {
     }
 }
 
-Manager.logicManager.push(GameTwoLogic);
+Manager.logicManager.push(TankBattleLogic);

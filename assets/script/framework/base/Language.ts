@@ -1,4 +1,3 @@
-import { getSingleton } from "../../framework/base/Singleton";
 import { EventApi } from "../event/EventApi";
 import { ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY } from "./Defines";
 import { Manager } from "../Framework";

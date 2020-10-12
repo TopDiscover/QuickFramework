@@ -1,6 +1,6 @@
 
  /**@description 提示代理 */
- export default class ToastDelegate {
+ export default class TipsDelegate {
 
     /**
      * @description tips提示

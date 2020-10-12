@@ -1,4 +1,3 @@
-import { getSingleton } from "../base/Singleton";
 
 /**
  * @description 事件派发器，原生的，当前节点没有在运行时，无法收到消息
