@@ -317,7 +317,7 @@ Editor.Panel.extend({
                 _checkResourceRootDir(e) {
                     if (FileUtil.isFileExit(e)) {
                         let t = path.join(e, "src"),
-                            i = path.join(e, "res");
+                            i = path.join(e, "assets");
                         return !1 === FileUtil.isFileExit(t) ? (this._addLog("没有发现 " + t + ", 请先构建项目."), !1) : !1 === FileUtil.isFileExit(i) ? (this._addLog("没有发现 " + i + ", 请先构建项目."), !1) : (this.resourceRootDir = e, !0)
                     }
                     return this._addLog("没有发现 " + e + ", 请先构建项目."), !1
