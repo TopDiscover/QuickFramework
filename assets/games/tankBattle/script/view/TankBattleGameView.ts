@@ -6,6 +6,7 @@ import { Manager } from "../../../../script/common/manager/Manager";
 import TankBattleMap from "../model/TankBattleMap";
 import { TankBettle } from "../data/TankBattleGameData";
 import TankBattleChangeStageView from "./TankBattleChangeStageView";
+import TankBettleTank from "../model/TankBattleTank";
 
 
 const {ccclass, property} = cc._decorator;
@@ -39,6 +40,12 @@ export default class TankBattleGameView extends UIView {
 
     onLoad(){
         super.onLoad();
+        //允许碰撞
+        cc.director.getCollisionManager().enabled = true;
+        //显示碰撞包围盒
+        cc.director.getCollisionManager().enabledDrawBoundingBox = true
+        //碰撞检测系统debug绘制显示
+        cc.director.getCollisionManager().enabledDebugDraw = true;
 
         this.init()
 
@@ -49,6 +56,7 @@ export default class TankBattleGameView extends UIView {
         Manager.uiManager.open({type:TankBattleStartView,bundle:this.bundle,zIndex:ViewZOrder.UI});
 
         let prefabs = cc.find("prefabs",this.node)
+        TankBettle.gameData.gamePrefabs = prefabs;
         let game = cc.find("Game",this.node)
         this._Map = game.addComponent(TankBattleMap);
         this._Map.setPrefabs(prefabs);
@@ -63,8 +71,10 @@ export default class TankBattleGameView extends UIView {
 
         this._instructions = cc.find("Instructions",this.node).getComponent(cc.Label);
         this._instructions.language = Manager.makeLanguage("Instructions",true)
-
         this.setEnabledKeyBack(true);
+
+        cc.systemEvent.off(cc.SystemEvent.EventType.KEY_DOWN,this.onKeyDown,this);
+        cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown,this);
     }
 
 
@@ -85,6 +95,12 @@ export default class TankBattleGameView extends UIView {
         }
     }
 
+    protected onKeyDown(ev:cc.Event.EventKeyboard){
+        if (this._Map) {
+            this._Map.onKeyDown(ev)
+        }
+    }
+
     protected setMapLevel( level ){
         /**@description 当前地图 */
         this._Map.setLevel( level );
@@ -101,6 +117,8 @@ export default class TankBattleGameView extends UIView {
             this._enemyTankCount.addChild(tank)
         }
 
+        //添加测试玩家
+        this._Map.addPlayer(true)
     }
 
     protected onShowMapLevel( data : any ){

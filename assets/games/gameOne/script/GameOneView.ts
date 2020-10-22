@@ -35,17 +35,17 @@ export default class GameOneView extends UIView {
             //         cc.log("下载完成")
             //     }
             // })
-            let spine = cc.find("spine",this.node).getComponent(sp.Skeleton);
-            spine.loadRemoteSkeleton({
-                view:this,
-                path:"http://192.168.3.104/hotupdate",
-                name:"VIP_CX1",
-                completeCallback:( data : sp.SkeletonData)=>{
-                    spine.animation = 'loop';
-                    spine.premultipliedAlpha = false;
-                    spine.loop = true
-                }
-            })
+            // let spine = cc.find("spine",this.node).getComponent(sp.Skeleton);
+            // spine.loadRemoteSkeleton({
+            //     view:this,
+            //     path:"http://192.168.3.104/hotupdate",
+            //     name:"VIP_CX1",
+            //     completeCallback:( data : sp.SkeletonData)=>{
+            //         spine.animation = 'loop';
+            //         spine.premultipliedAlpha = false;
+            //         spine.loop = true
+            //     }
+            // })
             
         });
 

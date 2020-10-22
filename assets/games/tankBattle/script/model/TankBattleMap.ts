@@ -4,6 +4,7 @@
 
 import { MapLevel } from "../data/TankBattleLevel";
 import { TankBettle } from "../data/TankBattleGameData";
+import TankBettleTank from "./TankBattleTank";
 
 const { ccclass, property } = cc._decorator;
 
@@ -17,6 +18,11 @@ export default class TankBattleMap extends cc.Component {
     public setPrefabs(node: cc.Node) {
         this._blockPrefab = node
     }
+
+    /**@description 玩家1 */
+    private playerOne : TankBettleTank = null;
+    /**@description 玩家2 */
+    private playerTwo : TankBettleTank = null;
 
     public setLevel(level: number) {
         if (!!!this._blockPrefab) {
@@ -56,6 +62,66 @@ export default class TankBattleMap extends cc.Component {
                     }
                 }
             }
+        }
+    }
+
+    public addPlayer( isOne : boolean){
+        let playerNode = cc.instantiate(TankBettle.gameData.getPlayerPrefab(true))
+        if (isOne) {
+            this.playerOne = playerNode.addComponent(TankBettleTank)  
+            playerNode.x = this.node.width - 2 * playerNode.width + playerNode.width/2
+            playerNode.y = -this.node.height + playerNode.height/2;
+            this.playerOne.born();
+        }else{
+            this.playerTwo = playerNode.addComponent(TankBettleTank);
+            playerNode.x = this.node.width + 2 * playerNode.width + playerNode.width /2;
+            playerNode.y = -this.node.height + playerNode.height /2;
+            this.playerTwo.born();
+        }
+        this.node.addChild(playerNode);
+    }
+
+    public onKeyDown(ev:cc.Event.EventKeyboard){
+        switch(ev.keyCode){
+            case cc.macro.KEY.a:{
+                this._handlePlayerMove(this.playerTwo,TankBettle.Direction.LEFT);
+            }
+            break;
+            case cc.macro.KEY.w:{
+                this._handlePlayerMove(this.playerTwo,TankBettle.Direction.UP);
+            }
+            break;
+            case cc.macro.KEY.s:{
+                this._handlePlayerMove(this.playerTwo,TankBettle.Direction.DOWN);
+            }
+            break;
+            case cc.macro.KEY.d:{
+                this._handlePlayerMove(this.playerTwo,TankBettle.Direction.RIGHT);
+            }
+            break;
+            case cc.macro.KEY.left:{
+                this._handlePlayerMove(this.playerOne,TankBettle.Direction.LEFT);
+            }
+            break;
+            case cc.macro.KEY.up:{
+                this._handlePlayerMove(this.playerOne,TankBettle.Direction.UP);
+            }
+            break;
+            case cc.macro.KEY.down:{
+                this._handlePlayerMove(this.playerOne,TankBettle.Direction.DOWN);
+            }
+            break;
+            case cc.macro.KEY.right:{
+                this._handlePlayerMove(this.playerOne,TankBettle.Direction.RIGHT);
+            }
+            break;
+        }
+    }
+
+    private _handlePlayerMove( player : TankBettleTank , dir : TankBettle.Direction){
+        if (player) {
+            player.direction = dir;
+            player.move();
         }
     }
 

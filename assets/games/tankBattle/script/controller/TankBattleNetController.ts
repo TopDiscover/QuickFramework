@@ -12,6 +12,7 @@ import { SUB_CMD_GAME, TankBattleConfig } from "../protocol/TankBattleProtocal";
 import { TankBettle } from "../data/TankBattleGameData";
 import TankBattleChangeStageView from "../view/TankBattleChangeStageView";
 import { ViewZOrder } from "../../../../script/common/config/Config";
+import TankBattleGameView from "../view/TankBattleGameView";
 
 const { ccclass, property } = cc._decorator;
 

@@ -18,8 +18,28 @@ class TankBettleGameData extends GameData {
         i18n[`${this.bundle}`] = lan.data;
     }
 
+    /**@description 子弹预置 */
+    public bulletPrefab : cc.Node = null;
+
     public get bundle() {
         return "tankBattle";
+    }
+
+    /**@description 游戏的各种预置 */
+    public gamePrefabs : cc.Node = null;
+
+    /**@description 动画预置 */
+    public get animationPrefab(){
+        return this.gamePrefabs.getChildByName("tank_animations")
+    }
+
+    /**@description 获取玩家的预置 */
+    public getPlayerPrefab( isOne : boolean ){
+        if (isOne) {
+            return this.gamePrefabs.getChildByName("player_1")
+        } else {
+            return this.gamePrefabs.getChildByName("player_2")
+        }
     }
 
     public nextLevel( ){
@@ -58,6 +78,12 @@ class TankBettleGameData extends GameData {
         return this._isSingle;
     }
 
+    public clear(){
+        //这个地方严谨点的写法，需要调用基类，虽然现在基类没有任何实现，不保证后面基类有公共的数据需要清理
+        super.clear();
+        //清理自己的游戏数据
+    }
+
     /**@description 当前关卡等级 */
     currentLevel = 0;
 
@@ -84,6 +110,11 @@ export namespace TankBettle {
         RIGHT,
     }
 
+    export enum BULLET_TYPE{
+        PLAYER,
+        ENEMY,
+    }
+
     export enum GAME_STATUS {
         /**@description 菜单*/
         MENU,
@@ -100,11 +131,17 @@ export namespace TankBettle {
     export enum BLOCK_TYPE {
         /**@description 墙 */
         WALL = 1,
-        GRID,
+        /**@description 石墙*/
+        STONE_WALL,
+        /**@description 草丛*/
         GRASS,
+        /**@description 水 */
         WATER,
+        /**@description 冰面 */
         ICE,
+        /**@description 老巢 */
         HOME = 9,
+        /**@description 老巢占位，不创建 */
         ANOTHREHOME = 8
     }
 
