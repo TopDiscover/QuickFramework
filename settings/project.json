@@ -7,14 +7,6 @@
       false,
       false,
       false,
-      false
-    ],
-    [
-      false,
-      false,
-      false,
-      false,
-      false,
       false,
       false
     ],
@@ -22,29 +14,12 @@
       false,
       false,
       false,
-      true,
-      true,
       false,
-      false
-    ],
-    [
+      false,
       false,
       false,
       true,
-      false,
-      false,
-      false,
-      true
-    ],
-    [
-      false,
-      false,
-      true,
-      false,
-      false,
-      false,
-      false,
-      false,
+      null,
       true
     ],
     [
@@ -53,38 +28,88 @@
       false,
       false,
       false,
-      true,
-      false
-    ],
-    [
-      false,
       false,
       false,
       true,
-      false,
-      false,
-      false
-    ],
-    [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false
-    ],
-    [
-      false,
-      false,
-      false,
-      false,
-      true,
-      false,
-      false,
-      false,
+      null,
       true
+    ],
+    [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ],
+    [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ],
+    [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ],
+    [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      null,
+      false
+    ],
+    [
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      null,
+      true
+    ],
+    [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ],
+    [
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
     ]
   ],
   "design-resolution-height": 640,
@@ -97,14 +122,15 @@
   "fit-width": false,
   "group-list": [
     "Default",
-    "Background",
-    "Actor",
-    "Platform",
     "Wall",
-    "Collider",
+    "StoneWall",
+    "Grass",
+    "Water",
+    "Ice",
+    "Home",
     "Bullet",
     "Ui",
-    "Tank"
+    "Player"
   ],
   "simulator-orientation": false,
   "simulator-resolution": {
@@ -113,7 +139,7 @@
   },
   "use-customize-simulator": true,
   "use-project-simulator-setting": false,
-  "last-module-event-record-time": 1594610536192,
+  "last-module-event-record-time": 1602475720067,
   "assets-sort-type": "name",
   "facebook": {
     "appID": "",

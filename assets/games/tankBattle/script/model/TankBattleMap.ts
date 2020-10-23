@@ -23,6 +23,21 @@ export default class TankBattleMap extends cc.Component {
     private playerOne : TankBettleTank = null;
     /**@description 玩家2 */
     private playerTwo : TankBettleTank = null;
+    private outWall:cc.Node[] = [];
+
+    protected onLoad(){
+        this.node.children.forEach(node=>{
+            this.outWall.push(node);
+        })
+        this.node.removeAllChildren(false);
+    }
+
+    protected onDestroy(){
+        this.outWall.forEach((value)=>{
+            value.destroy();
+        });
+        this.outWall = [];
+    }
 
     public setLevel(level: number) {
         if (!!!this._blockPrefab) {
@@ -32,6 +47,11 @@ export default class TankBattleMap extends cc.Component {
 
         //清空当前地图的东西
         this.node.removeAllChildren(true)
+
+        //添加四周的墙
+        this.outWall.forEach((value)=>{
+            this.node.addChild(cc.instantiate(value));
+        });
 
         let data = MapLevel[level];
         //地图数据
@@ -69,12 +89,12 @@ export default class TankBattleMap extends cc.Component {
         let playerNode = cc.instantiate(TankBettle.gameData.getPlayerPrefab(true))
         if (isOne) {
             this.playerOne = playerNode.addComponent(TankBettleTank)  
-            playerNode.x = this.node.width - 2 * playerNode.width + playerNode.width/2
+            playerNode.x = this.node.width / 2 - 2 * playerNode.width
             playerNode.y = -this.node.height + playerNode.height/2;
             this.playerOne.born();
         }else{
             this.playerTwo = playerNode.addComponent(TankBettleTank);
-            playerNode.x = this.node.width + 2 * playerNode.width + playerNode.width /2;
+            playerNode.x = this.node.width / 2 + 2 * playerNode.width;
             playerNode.y = -this.node.height + playerNode.height /2;
             this.playerTwo.born();
         }
@@ -116,6 +136,7 @@ export default class TankBattleMap extends cc.Component {
             }
             break;
         }
+        cc.log(ev.keyCode)
     }
 
     private _handlePlayerMove( player : TankBettleTank , dir : TankBettle.Direction){

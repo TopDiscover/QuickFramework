@@ -8,7 +8,7 @@ import { serialize } from "../../../../script/framework/net/JsonMessage";
 
  export let SUB_CMD_GAME = {
      /**@description 请求配置 */
-     CMD_GAME_CONFIG : 1,
+     CMD_GAME_CONFIG : 100,
  }
 
 /**@description 存储当前游戏配置*/

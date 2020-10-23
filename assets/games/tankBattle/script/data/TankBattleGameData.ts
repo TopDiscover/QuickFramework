@@ -145,6 +145,17 @@ export namespace TankBettle {
         ANOTHREHOME = 8
     }
 
+    export enum GROUP{
+        Wall = "Wall",
+        StoneWall = "StoneWall",
+        Grass = "Grass",
+        Water = "Water",
+        Ice = "Ice",
+        Home = "Home",
+        Bullet = "Bullet",
+        Player = "Player",
+    }
+
     export enum EVENT {
         /**@description 显示地图 */
         SHOW_MAP_LEVEL = "SHOW_MAP_LEVEL",
