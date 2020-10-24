@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2020-04-10 12:31:02
- * @LastEditTime: 2020-04-20 16:54:20
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: \ddz\assets\framework\ui\UILoadingView.ts
- */
 
  /**@description 界面加载动画，web端在下载界面时，如果超过了一定时间，需要弹出动画，告诉用户当前加载界面的进度 */
 export default class UILoadingDelegate {
