@@ -9,4 +9,13 @@
     public show( msg : string ) {
         
     }
+
+    /**@description 预加载预置体 */
+    public preloadPrefab(){
+
+    }
+
+    public finishShowItem( node : cc.Node ){
+        
+    }
 }

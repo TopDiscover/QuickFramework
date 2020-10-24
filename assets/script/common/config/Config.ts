@@ -6,6 +6,12 @@ export namespace Config {
 
     /**@description 当前入子游戏时，在Logic.onLoad时初始设置 */
     export let assetBundle = {};
+
+    /**@description 公共Prefabs预置路径 */
+    export let CommonPrefabs = {
+        tips : "common/prefabs/Tips",
+        uiLoading : "common/prefabs/UILoading",
+    }
 }
 
 /**
@@ -28,8 +34,6 @@ export namespace ViewZOrder {
     export const Tips = 300;
 
     export const Alert = 299;
-
-    export const Toast = 288;
 
     /**@description Loading层 */
     export const Loading = 600;

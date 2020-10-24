@@ -71,6 +71,12 @@ export default class HallView extends UIView implements IController<LobbyService
                     }else{
                         Manager.language.change(cc.sys.LANGUAGE_ENGLISH);
                     }
+
+                    // Manager.uiLoading.show(0.1,"牛B")
+                    // cc.tween(this.node).delay(0.2).call(()=>{
+                    //     Manager.uiLoading.updateProgress(99)
+                    // }).start();
+                    Manager.tips.show("您好，你就是一个牛B大佬");
                 });
             }
         }

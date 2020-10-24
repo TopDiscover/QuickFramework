@@ -25,6 +25,8 @@ export default class MainController extends Controller<CommonService> {
         Manager.netManager.addNetControllers(this.node);
 
         //预先加载下loading预置体
+        Manager.tips.preloadPrefab();
+        Manager.uiLoading.preloadPrefab();
         
 
         //调试按钮事件注册

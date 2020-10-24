@@ -21,4 +21,9 @@ export default class UILoadingDelegate {
     public hide( ) {
         
     }
+
+    /**@description 预加载预置体 */
+    public preloadPrefab(){
+
+    }
 }
