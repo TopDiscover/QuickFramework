@@ -1,6 +1,5 @@
 import UIView, { UIClass } from "../ui/UIView";
 import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
-import UILoadingDelegate from "../ui/UILoadingDelegate";
 import { Manager } from "../Framework";
 
 /**@description 动态加载垃圾数据名 */
@@ -183,8 +182,6 @@ export class UIManager {
     /**@description 驻留内存资源 */
     public retainMemory = new ViewDynamicLoadData(DYNAMIC_LOAD_RETAIN_MEMORY);
 
-    public uiLoading: UILoadingDelegate = null;
-
     public preload<T extends UIView>(uiClass: UIClass<T>,bundle:BUNDLE_TYPE) {
         return this._open(uiClass,bundle, 0, true, null,null);
     }
@@ -252,7 +249,7 @@ export class UIManager {
                 else {
                     viewData.status = ViewStatus.WAITTING_NONE;
                     if ( !isPreload ){
-                        if( this.uiLoading ) this.uiLoading.show(delay,name);
+                        Manager.uiLoading.show(delay,name);
                     }
                     //正在加载中
                     if (CC_DEBUG) cc.warn(`${this._logTag}${className} 正在加载中...`);
@@ -270,11 +267,11 @@ export class UIManager {
                 let progressCallback: (completedCount: number, totalCount: number, item: any) => void = null;
 
                 if (!isPreload) {
-                    if (this.uiLoading) this.uiLoading.show(delay,name);
+                    Manager.uiLoading.show(delay,name);
                     //预加载界面不显示进度
                     progressCallback = (completedCount: number, totalCount: number, item: any) => {
                         let progress = Math.ceil((completedCount / totalCount) * 100);
-                        if (this.uiLoading) this.uiLoading.updateProgress(progress);
+                        Manager.uiLoading.updateProgress(progress);
                     };
                 }
                 this.loadPrefab(bundle,prefabUrl, progressCallback)
@@ -285,7 +282,7 @@ export class UIManager {
                         viewData.info.data = prefab;
                         viewData.info.bundle = bundle;
                         this.createNode(className, uiClass, reslove, prefab, args, zOrder,bundle);
-                        if (this.uiLoading) this.uiLoading.hide();
+                        Manager.uiLoading.hide();
                     }).catch((reason) => {
                         viewData.isLoaded = true;
                         cc.error(reason);
@@ -299,8 +296,8 @@ export class UIManager {
                         if ( name ){
                             uiName = name;
                         }
-                        if (Manager.tips) Manager.tips.show(`加载界面${uiName}失败，请重试`);
-                        if (this.uiLoading) this.uiLoading.hide();
+                        Manager.tips.show(`加载界面${uiName}失败，请重试`);
+                        Manager.uiLoading.hide();
                     });
             }
         });

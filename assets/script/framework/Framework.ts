@@ -7,6 +7,7 @@ import { CacheManager } from "./assetManager/CacheManager";
 import { ResolutionHelper } from "./adaptor/ResolutionHelper";
 import { getSingleton } from "./base/Singleton";
 import TipsDelegate from "./ui/TipsDelegate";
+import UILoadingDelegate from "./ui/UILoadingDelegate";
 
 export class _FramewokManager{
     
@@ -52,6 +53,15 @@ export class _FramewokManager{
     }
     set tips( value : TipsDelegate ){
         this._tips = value
+    }
+
+    private _uiLoading : UILoadingDelegate = null;
+    /**@description 界面加载时的全屏Loading,显示加载进度 */
+    get uiLoading(){
+        return this._uiLoading;
+    }
+    set uiLoading( value : UILoadingDelegate){
+        this._uiLoading = value
     }
 }
 

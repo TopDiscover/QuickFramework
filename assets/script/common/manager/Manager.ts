@@ -14,6 +14,7 @@ import GameView from "../base/GameView";
 import { GameData } from "../base/GameData";
 import { GameManager } from "./GameManager";
 import Tips from "../component/Tips";
+import UILoading from "../component/UILoading";
 
 class _Manager extends Framework._FramewokManager {
 
@@ -95,9 +96,13 @@ class _Manager extends Framework._FramewokManager {
         Log.logLevel = LogLevel.ERROR | LogLevel.LOG | LogLevel.WARN | LogLevel.DUMP;
 
         /**@description 初始化框架层使用的提示组件 */
-        Framework.Manager.tips = getSingleton(Tips)
+        Framework.Manager.tips = getSingleton(Tips);
         /**@description 应用层的tips初始化 */
         this.tips = Framework.Manager.tips;
+
+        /**@description 初始框架层使用的UILoading */
+        Framework.Manager.uiLoading = getSingleton(UILoading);
+        this.uiLoading = Framework.Manager.uiLoading;
 
         //适配
         this.resolutionHelper.initBrowserAdaptor();
