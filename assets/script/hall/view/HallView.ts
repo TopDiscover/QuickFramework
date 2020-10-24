@@ -76,10 +76,37 @@ export default class HallView extends UIView implements IController<LobbyService
                     // cc.tween(this.node).delay(0.2).call(()=>{
                     //     Manager.uiLoading.updateProgress(99)
                     // }).start();
-                    Manager.tips.show("您好，你就是一个牛B大佬");
+                    // Manager.tips.show("您好，你就是一个牛B大佬");
                 });
             }
         }
+
+        //
+        let bottom_op = cc.find("bottom_op",this.node);
+        let setting = cc.find("setting",bottom_op);
+        this._count = 0;
+        setting.on(cc.Node.EventType.TOUCH_END,()=>{
+            this._count++;
+            Manager.alert.show({ immediatelyCallback:true, text:`您好，这是第${this._count}个弹出框？`,confirmCb:(isOK)=>{
+                cc.log(`confirmCb => ${isOK}`);
+                Manager.alert.close(3);
+            },cancelCb:(isOK)=>{
+                cc.log(`cancelCb => ${isOK}`);
+                Manager.alert.closeAll();
+            }});
+            this._count++;
+            Manager.alert.show({text:`您好，这是第${this._count}个弹出框？`,confirmCb:(isOK)=>{
+                cc.log(`confirmCb => ${isOK}`);
+            },cancelCb:(isOK)=>{
+                cc.log(`cancelCb => ${isOK}`);
+            }});
+            this._count++;
+            Manager.alert.show({tag:3,text:`您好，这是第${this._count}个弹出框？`,confirmCb:(isOK)=>{
+                cc.log(`confirmCb => ${isOK}`);
+            }});
+            this._count = 0;
+        });
+
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
 
         //根据自己的需要，连接网络

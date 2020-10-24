@@ -11,6 +11,7 @@ export namespace Config {
     export let CommonPrefabs = {
         tips : "common/prefabs/Tips",
         uiLoading : "common/prefabs/UILoading",
+        alert : "common/prefabs/Alert",
     }
 }
 

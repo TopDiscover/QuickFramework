@@ -13,5 +13,8 @@ CITY`,
     ],
     hall_view_broadcast_content: '[broadcast] congratulations!',
     hall_view_nogame_notice: '【{0}】developing!!!',
-    test : " test : {0}-->{1}-->{2}-->{3}-->"
+    test : " test : {0}-->{1}-->{2}-->{3}-->",
+    alert_title : "Tips",
+    alert_confirm : "Confirm",
+    alert_cancel : "Cancel",
 }

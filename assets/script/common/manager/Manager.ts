@@ -15,6 +15,7 @@ import { GameData } from "../base/GameData";
 import { GameManager } from "./GameManager";
 import Tips from "../component/Tips";
 import UILoading from "../component/UILoading";
+import Alert from "../component/Alert";
 
 class _Manager extends Framework._FramewokManager {
 
@@ -28,9 +29,15 @@ class _Manager extends Framework._FramewokManager {
         return getSingleton(LogicManager);
     }
 
+    /**@description 游戏管理器 */
     get gameManager() {
         return getSingleton(GameManager);
-     }
+    }
+
+    /**@description 弹出提示框,带一到两个按钮 */
+    get alert(){
+        return getSingleton(Alert);
+    }
 
     /**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
     private _globalAudio : GlobalAudio = null;

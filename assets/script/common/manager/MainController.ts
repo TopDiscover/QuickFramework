@@ -27,6 +27,7 @@ export default class MainController extends Controller<CommonService> {
         //预先加载下loading预置体
         Manager.tips.preloadPrefab();
         Manager.uiLoading.preloadPrefab();
+        Manager.alert.preLoadPrefab();
         
 
         //调试按钮事件注册
