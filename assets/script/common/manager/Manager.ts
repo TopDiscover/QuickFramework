@@ -96,6 +96,8 @@ class _Manager extends Framework._FramewokManager {
 
         /**@description 初始化框架层使用的提示组件 */
         Framework.Manager.tips = getSingleton(Tips)
+        /**@description 应用层的tips初始化 */
+        this.tips = Framework.Manager.tips;
 
         //适配
         this.resolutionHelper.initBrowserAdaptor();
