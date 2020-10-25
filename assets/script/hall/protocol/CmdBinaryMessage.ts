@@ -1,5 +1,14 @@
-import { BinaryStreamMessage, serialize, Int8Value, Int16Value, Int32Value, Float32Value, Float64Value, Uint8Value, Uint16Value, Uint32Value, StringValue } from "../../framework/net/BinaryStreamMessage";
+import { BinaryStreamMessage, serialize, Int8Value, Int16Value, Int32Value, Float32Value, Float64Value, Uint8Value, Uint16Value, Uint32Value, StringValue, BinaryStream } from "../../framework/net/BinaryStreamMessage";
 import { MainCmd, SUB_CMD_LOBBY } from "../../common/protocol/CmdNetID";
+
+class TestData extends BinaryStream{
+
+    @serialize("value32",Float32Value)
+    float32 : number = 32;
+
+    @serialize("value64",Float64Value)
+    float64: number = 64;
+}
 
 export class TestBinaryMessage extends BinaryStreamMessage {
     mainCmd = MainCmd.CMD_LOBBY;
@@ -34,15 +43,18 @@ export class TestBinaryMessage extends BinaryStreamMessage {
     // @serialize("arr",Array,Int8Value)
     // arr : Array<number> = [1,2,3,4,5,6]
 
-    @serialize("testMap",Map,String,Int32Value)
-    testMap:Map<string,number> = new Map();
+    // @serialize("testMap",Map,String,Int32Value)
+    // testMap:Map<string,number> = new Map();
+
+    @serialize("user",TestData)
+    user : TestData = new TestData();
 
     constructor(){
         super();
-        this.testMap.set("keyy_1",1);
-        this.testMap.set("keyy_2",2);
-        this.testMap.set("keyy_3",2);
-        this.testMap.set("keyy_4",4);
-        this.testMap.set("keyy_5",5);
+        // this.testMap.set("keyy_1",1);
+        // this.testMap.set("keyy_2",2);
+        // this.testMap.set("keyy_3",2);
+        // this.testMap.set("keyy_4",4);
+        // this.testMap.set("keyy_5",5);
     }
 }

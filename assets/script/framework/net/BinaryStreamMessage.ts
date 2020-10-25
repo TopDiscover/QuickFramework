@@ -5,23 +5,23 @@
 import { Message } from "./Message";
 import { USING_LITTLE_ENDIAN } from "../base/Defines";
 
-type BinaryStreamMessageConstructor = typeof BinaryStreamMessage;
+type BinaryStreamConstructor = typeof BinaryStream;
 type NumberStreamValueConstructor = typeof NumberStreamValue;
 type StringStreamValueConstructor = typeof StringStreamValue;
 
 export function serialize(
     key: string,
-    type: BinaryStreamMessageConstructor | NumberStreamValueConstructor | StringStreamValueConstructor
+    type: BinaryStreamConstructor | NumberStreamValueConstructor | StringStreamValueConstructor
 );
 export function serialize(
     key: string,
     type: ArrayConstructor,
-    arrayType: BinaryStreamMessageConstructor | NumberStreamValueConstructor | StringStreamValueConstructor);
+    arrayType: BinaryStreamConstructor | NumberStreamValueConstructor | StringStreamValueConstructor);
 export function serialize(
     key: string,
     type: MapConstructor,
     mapKeyType: NumberConstructor | StringConstructor,
-    mapValueType: BinaryStreamMessageConstructor | NumberStreamValueConstructor | StringStreamValueConstructor);
+    mapValueType: BinaryStreamConstructor | NumberStreamValueConstructor | StringStreamValueConstructor);
 export function serialize(key: string, type, arrTypeOrMapKeyType?, mapValueType?) {
     return function (target, memberName) {
         if (Reflect.getOwnPropertyDescriptor(target, '__serialize__') === undefined) {
@@ -309,7 +309,7 @@ export class Uint32Value extends NumberStreamValue {
     }
 }
 
-class BinaryStream extends Message {
+export class BinaryStream extends Message {
 
     private _dataView: DataView = null;
     /**@description 读取数据的偏移量 */
@@ -366,15 +366,15 @@ class BinaryStream extends Message {
             return this.memberArraySize(value, valueType, arrTypeOrMapKeyType, mapValueType);
         } else if (value instanceof Map) {
             return this.memberMapSize(value, valueType, arrTypeOrMapKeyType, mapValueType);
-        } else if (value instanceof BinaryStreamMessage) {
-            return value.serialize();
+        } else if (value instanceof BinaryStream) {
+            return value.size();
         } else if (valueType == Number ){//Map的key
             return this.memberNumberSize(value,Uint32Value)
         } else if (valueType == String ){//Map的key
             return this.memberStringSize(value,StringValue)
         } else {
             cc.warn("Invalid serialize value : " + value);
-            return null;
+            return 0;
         }
     }
 
@@ -438,8 +438,11 @@ class BinaryStream extends Message {
             this.serializeArray(value, valueType, arrTypeOrMapKeyType, mapValueType);
         } else if (value instanceof Map) {
             this.serializeMap(value, valueType, arrTypeOrMapKeyType, mapValueType);
-        } else if (value instanceof BinaryStreamMessage) {
+        } else if (value instanceof BinaryStream) {
+            value._dataView = this._dataView;
+            value._byteOffset = this._byteOffset;
             value.serialize();
+            this._byteOffset = value._byteOffset;
         } else {
             return false;
         }
@@ -534,8 +537,11 @@ class BinaryStream extends Message {
                 this.deserializeArray(memberName, memberType, arrTypeOrMapKeyType, mapValueType);
             } else if (originValue instanceof Map) {
                 this.deserializeMap(memberName, memberType, arrTypeOrMapKeyType, mapValueType);
-            } else if (originValue instanceof BinaryStreamMessage) {
+            } else if (originValue instanceof BinaryStream) {
+                originValue._dataView = this._dataView;
+                originValue._byteOffset = this._byteOffset;
                 originValue.deserialize();
+                this._byteOffset = originValue._byteOffset;
             } else {
                 return false;
             }
@@ -567,7 +573,7 @@ class BinaryStream extends Message {
         this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
         for (let i = 0; i < size; i++) {
             let type = new arrTypeOrMapKeyType();
-            if (type instanceof BinaryStreamMessage) {
+            if (type instanceof BinaryStream) {
                 this[memberName][i] = type.deserialize();
             } else {
                 this._byteOffset += type.read(this._dataView, this._byteOffset);
@@ -595,7 +601,7 @@ class BinaryStream extends Message {
             }
             //写值
             let data = new mapValueType();
-            if (mapValueType instanceof BinaryStreamMessage) {
+            if (mapValueType instanceof BinaryStream) {
                 data.deserialize();
             } else {
                 this._byteOffset += data.read(this._dataView, this._byteOffset);
