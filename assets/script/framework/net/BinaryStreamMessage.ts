@@ -103,6 +103,38 @@ export function str2ab(str: string): Promise<string | ArrayBuffer> {
     });
 }
 
+/**@description utf-8 Uint8Array转字符串 */
+function Utf8ArrayToStr(array) {
+    let out, i, len, c;
+    let char2, char3;
+    out = "";
+    len = array.length;
+    i = 0;
+    while (i < len) {
+        c = array[i++];
+        switch (c >> 4) {
+            case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+                // 0xxxxxxx
+                out += String.fromCharCode(c);
+                break;
+            case 12: case 13:
+                // 110x xxxx   10xx xxxx
+                char2 = array[i++];
+                out += String.fromCharCode(((c & 0x1F) << 6) | (char2 & 0x3F));
+                break;
+            case 14:
+                // 1110 xxxx  10xx xxxx  10xx xxxx
+                char2 = array[i++];
+                char3 = array[i++];
+                out += String.fromCharCode(((c & 0x0F) << 12) |
+                    ((char2 & 0x3F) << 6) |
+                    ((char3 & 0x3F) << 0));
+                break;
+        }
+    }
+    return out;
+}
+
 const Buffer = require('buffer').Buffer;
 /**@description 字符串类型 */
 export class StringValue extends StringStreamValue {
@@ -125,10 +157,7 @@ export class StringValue extends StringStreamValue {
             byteOffset += Uint8Array.BYTES_PER_ELEMENT;
         }
 
-        this.data = "";
-        for( let i = 0 ; i < arr.length ; i++ ){
-            this.data += String.fromCharCode(arr[i]);
-        }
+        this.data = Utf8ArrayToStr(arr);
         return byteOffset;
     }
 
@@ -518,6 +547,7 @@ class BinaryStream extends Message {
     private deserializeStringStreamValue(memberName: any, memberType: typeof StringStreamValue, arrTypeOrMapKeyType: number) {
         let value = new memberType();
         this._byteOffset += value.read(this._dataView, this._byteOffset);
+        return value.data;
     }
 
     private deserializeArray(memberName: any, memberType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
