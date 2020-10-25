@@ -127,3 +127,6 @@ export const BUNDLE_REMOTE = "__Remote__Caches__";
 export const ENABLE_CHANGE_LANGUAGE = true;
 /**@description 语言包路径使用前缀 */
 export const USING_LAN_KEY = "i18n.";
+
+/**@description 网络数据全以大端方式进行处理 */
+export const USING_LITTLE_ENDIAN = false;

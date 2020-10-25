@@ -3,6 +3,7 @@
  */
 
 import { Message } from "./Message";
+import { USING_LITTLE_ENDIAN } from "../base/Defines";
 
 type BinaryStreamMessageConstructor = typeof BinaryStreamMessage;
 type NumberStreamValueConstructor = typeof NumberStreamValue;
@@ -10,8 +11,7 @@ type StringStreamValueConstructor = typeof StringStreamValue;
 
 export function serialize(
     key: string,
-    type: BinaryStreamMessageConstructor | NumberStreamValueConstructor | StringStreamValueConstructor,
-    size?: number //如果是固定长度字符串，要传入字符串长度
+    type: BinaryStreamMessageConstructor | NumberStreamValueConstructor | StringStreamValueConstructor
 );
 export function serialize(
     key: string,
@@ -22,7 +22,7 @@ export function serialize(
     type: MapConstructor,
     mapKeyType: NumberConstructor | StringConstructor,
     mapValueType: BinaryStreamMessageConstructor | NumberStreamValueConstructor | StringStreamValueConstructor);
-export function serialize(key: string, type, arrTypeOrMapKeyOrStringSize?, mapValueType?) {
+export function serialize(key: string, type, arrTypeOrMapKeyType?, mapValueType?) {
     return function (target, memberName) {
         if (Reflect.getOwnPropertyDescriptor(target, '__serialize__') === undefined) {
             let selfSerializeInfo = {};
@@ -43,7 +43,7 @@ export function serialize(key: string, type, arrTypeOrMapKeyOrStringSize?, mapVa
         if (target['__serialize__'][key]) {
             throw `SerializeKey has already been declared:${key}`;
         }
-        target['__serialize__'][key] = [memberName, type, arrTypeOrMapKeyOrStringSize, mapValueType];
+        target['__serialize__'][key] = [memberName, type, arrTypeOrMapKeyType, mapValueType];
     }
 }
 
@@ -56,7 +56,6 @@ interface IStreamValue {
     littleEndian: boolean;
 }
 
-let isLittleEndian = false;
 /**@description 数据流基类 */
 class StreamValue<T> implements IStreamValue {
     data: T = null;
@@ -71,7 +70,7 @@ class StreamValue<T> implements IStreamValue {
     }
     /**@description 网络数据全以大端方式进行处理 */
     get littleEndian() {
-        return isLittleEndian;
+        return USING_LITTLE_ENDIAN;
     }
 }
 
@@ -83,112 +82,91 @@ class NumberStreamValue extends StreamValue<number>{
 /**@description 字符串类型 */
 class StringStreamValue extends StreamValue<string>{
     data = "";
-    /**@description 
-     * dataLength 为 null 为可变长字符串，
-     * dataLength 不为null ，会截取当前dataLength的长度进行序列化 
-     */
-    dataLength: number = null
 }
+
+export function getUtf8StringBytes(str) {
+    if (str == null || str === undefined) return 0;
+    if (typeof str != "string") {
+        return 0;
+    }
+    var total = 0, charCode, i, len;
+    for (i = 0, len = str.length; i < len; i++) {
+        charCode = str.charCodeAt(i);
+        if (charCode <= 0x007f) {
+            total += 1;//字符代码在000000 – 00007F之间的，用一个字节编码
+        } else if (charCode <= 0x07ff) {
+            total += 2;//000080 – 0007FF之间的字符用两个字节
+        } else if (charCode <= 0xffff) {
+            total += 3;//000800 – 00D7FF 和 00E000 – 00FFFF之间的用三个字节，注: Unicode在范围 D800-DFFF 中不存在任何字符
+        } else {
+            total += 4;//010000 – 10FFFF之间的用4个字节
+        }
+    }
+    return total;
+};
 
 //ArrayBuffer转字符串
-function ab2str(buffer: ArrayBuffer, cb: (data: string | ArrayBuffer) => void) {
-    var b = new Blob([buffer]);
-    var r = new FileReader();
-    r.readAsText(b, 'utf-8');
-    r.onload = () => { if (cb) cb(r.result) }
+export function ab2str(buffer: ArrayBuffer): Promise<string | ArrayBuffer> {
+    return new Promise((resolve) => {
+        var b = new Blob([buffer]);
+        var r = new FileReader();
+        r.readAsText(b, 'utf-8');
+        r.onload = () => { resolve(r.result) }
+    });
 }
 //字符串转字符串ArrayBuffer
-function str2ab(str: string, cb: (data: string | ArrayBuffer) => void) {
-    var b = new Blob([str], { type: 'text/plain' });
-    var r = new FileReader();
-    r.readAsArrayBuffer(b);
-    r.onload = () => { if (cb) cb(r.result) }
+export function str2ab(str: string): Promise<string | ArrayBuffer> {
+    return new Promise((resolve) => {
+        var b = new Blob([str], { type: 'text/plain' });
+        var r = new FileReader();
+        r.readAsArrayBuffer(b);
+        r.onload = () => { resolve(r.result) }
+    });
 }
 
-/**@description 不定长字符串类型 */
+/**@description 字符串类型 */
 export class StringValue extends StringStreamValue {
     size() {
         //先写入数据大小长度
         let byteSize = Uint32Array.BYTES_PER_ELEMENT;
         //加上当前字符串数量长度
-        if (this.dataLength == null) {
-            //可变长字符串
-            byteSize += this.data.length;
-        } else {
-            //固定长度字符串
-            byteSize += this.dataLength;
-        }
+        byteSize += getUtf8StringBytes(this.data);
         return byteSize;
     }
     read(dataView: DataView, offset: number) {
         //先读取字符串长度
         let length = dataView.getUint32(offset, this.littleEndian);
         let byteOffset = offset;
-        if (this.dataLength == null) {
-            //可变长字符串
-            let arr = new Uint8Array(length)
-            for (let i = 0; i < length; i++) {
-                arr[i] = dataView.getUint8(byteOffset);
-                byteOffset += Uint8Array.BYTES_PER_ELEMENT;
-            }
-
-            ab2str(arr.buffer, (data) => {
-                this.data = data as string;
-            });
-
-        } else {
-            //固定长度字符串
-            let arr = new Uint8Array(this.dataLength);
-            for (let i = 0; i < this.dataLength; i++) {
-                arr[i] = dataView.getUint8(byteOffset);
-                byteOffset += Uint8Array.BYTES_PER_ELEMENT;
-            }
+        //可变长字符串
+        let arr = new Uint8Array(length)
+        for (let i = 0; i < length; i++) {
+            arr[i] = dataView.getUint8(byteOffset);
+            byteOffset += Uint8Array.BYTES_PER_ELEMENT;
         }
+
+        ab2str(arr.buffer).then((data) => {
+            this.data = data as string;
+        });
         return byteOffset;
     }
 
     write(dataView: DataView, offset: number) {
         //先写入字符串长度
         let byteOffset = offset;
-        if (this.dataLength == null) {
-            //可变长字符串
-            dataView.setUint32(byteOffset, this.data.length, this.littleEndian);
-            byteOffset += Uint32Array.BYTES_PER_ELEMENT;
-            //写入字符串内容
-            str2ab(this.data, (ab) => {
-                let buffer = ab as ArrayBuffer;
-                let arr = new Uint8Array(buffer);
-                for (let i = 0; i < arr.length; i++) {
-                    dataView.setUint8(byteOffset, arr[i]);
-                    byteOffset += Uint8Array.BYTES_PER_ELEMENT;
-                }
-            });
-            byteOffset += this.data.length;
-        } else {
-            //定长字符串
-            //写长度
-            dataView.setUint32(byteOffset, this.dataLength, this.littleEndian);
-            //写内容
-            str2ab(this.data, (ab) => {
-                let buffer = ab as ArrayBuffer;
-                let arr = new Uint8Array(buffer);
-                let i = 0;
-                for (i = 0; i < this.dataLength; i++) {
-                    dataView.setUint8(byteOffset, arr[i]);
-                    byteOffset += Uint8Array.BYTES_PER_ELEMENT;
-                }
+        //可变长字符串
+        dataView.setUint32(byteOffset, this.data.length, this.littleEndian);
+        byteOffset += Uint32Array.BYTES_PER_ELEMENT;
+        //写入字符串内容
+        str2ab(this.data).then((ab) => {
+            let buffer = ab as ArrayBuffer;
+            let arr = new Uint8Array(buffer);
+            for (let i = 0; i < arr.length; i++) {
+                dataView.setUint8(byteOffset, arr[i]);
+                byteOffset += Uint8Array.BYTES_PER_ELEMENT;
+            }
+        });
+        byteOffset += this.data.length;
 
-                //不足长度的写空数据
-                if (i < this.dataLength) {
-                    arr = new Uint8Array(this.dataLength - i)
-                    for (i = 0; i < arr.length; i++) {
-                        dataView.setUint8(byteOffset, arr[i]);
-                        byteOffset += Uint8Array.BYTES_PER_ELEMENT;
-                    }
-                }
-            });
-            byteOffset += this.dataLength;
-        }
         return byteOffset;
     }
 }
@@ -355,8 +333,8 @@ class BinaryStream extends Message {
         let serializeKeyList = Object.keys(__serialize__);
         for (let len = serializeKeyList.length, i = 0; i < len; i++) {
             let serializeKey = serializeKeyList[i];
-            let [memberName, type, arrTypeOrMapKeyOrStringSize, mapValueType] = __serialize__[serializeKey];
-            let memberSize = this.memberSize(this[memberName], type, arrTypeOrMapKeyOrStringSize, mapValueType);
+            let [memberName, type, arrTypeOrMapKeyType, mapValueType] = __serialize__[serializeKey];
+            let memberSize = this.memberSize(this[memberName], type, arrTypeOrMapKeyType, mapValueType);
             if (null === memberSize) {
                 cc.warn("Invalid serialize member size : " + memberName);
             }
@@ -366,15 +344,15 @@ class BinaryStream extends Message {
     }
 
     /**@description 计算成员变量数据大小 */
-    protected memberSize(value: any, valueType: any, arrTypeOrMapKeyOrStringSize : any , mapValueType : any ): number {
+    protected memberSize(value: any, valueType: any, arrTypeOrMapKeyType: any, mapValueType: any): number {
         if (this.isNumberValue(valueType)) {
             return this.memberNumberSize(value, valueType);
         } else if (this.isStringValue(valueType)) {
-            return this.memberStringSize(value, valueType, arrTypeOrMapKeyOrStringSize);
+            return this.memberStringSize(value, valueType, arrTypeOrMapKeyType);
         } else if (value instanceof Array) {
-            return this.memberArraySize(value, valueType,arrTypeOrMapKeyOrStringSize,mapValueType);
+            return this.memberArraySize(value, valueType, arrTypeOrMapKeyType, mapValueType);
         } else if (value instanceof Map) {
-            return this.memberMapSize(value,valueType,arrTypeOrMapKeyOrStringSize,mapValueType);
+            return this.memberMapSize(value, valueType, arrTypeOrMapKeyType, mapValueType);
         } else if (value instanceof BinaryStreamMessage) {
             return value.serialize();
         } else {
@@ -391,30 +369,27 @@ class BinaryStream extends Message {
     protected memberStringSize(value: any, valueType: typeof StringStreamValue, size: number): number {
         let type = new valueType();
         type.data = value;
-        if (valueType == StringArrayValue) {
-            type.dataLength = size;
-        }
         return type.size();
     }
 
-    private memberArraySize(value: any[], valueType: any ,arrTypeOrMapKeyOrStringSize:any,mapValueType:any) {
+    private memberArraySize(value: any[], valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
         //数组的大小
         let typeSize = Uint32Array.BYTES_PER_ELEMENT;
         value.forEach(element => {
-            typeSize += this.memberSize(value,valueType,arrTypeOrMapKeyOrStringSize,mapValueType);
+            typeSize += this.memberSize(value, valueType, arrTypeOrMapKeyType, mapValueType);
         });
         return typeSize;
     }
 
-    private memberMapSize(value: Map<any, any>,valueType:any,arrTypeOrMapKeyOrStringSize:any,mapValueType:any) {
+    private memberMapSize(value: Map<any, any>, valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
         //数组大小
         let typeSize = Uint32Array.BYTES_PER_ELEMENT;
         let self = this;
         value.forEach((dataValue, key) => {
             //Key的大小
-            typeSize += this.memberSize(key,valueType,arrTypeOrMapKeyOrStringSize,mapValueType);
+            typeSize += this.memberSize(key, valueType, arrTypeOrMapKeyType, mapValueType);
             //数据的大小
-            typeSize += this.memberSize(dataValue,valueType,arrTypeOrMapKeyOrStringSize,mapValueType);
+            typeSize += this.memberSize(dataValue, valueType, arrTypeOrMapKeyType, mapValueType);
         });
         return typeSize;
     }
@@ -426,9 +401,9 @@ class BinaryStream extends Message {
         let serializeKeyList = Object.keys(__serialize__);
         for (let len = serializeKeyList.length, i = 0; i < len; i++) {
             let serializeKey = serializeKeyList[i];
-            let [memberName, type, arrTypeOrMapKeyOrStringSize, mapValueType] = __serialize__[serializeKey];
-            let iscomplete = this.serializeMember(this[memberName], type, arrTypeOrMapKeyOrStringSize, mapValueType);
-            if( !iscomplete ){
+            let [memberName, type, arrTypeOrMapKeyType, mapValueType] = __serialize__[serializeKey];
+            let iscomplete = this.serializeMember(this[memberName], type, arrTypeOrMapKeyType, mapValueType);
+            if (!iscomplete) {
                 cc.warn(`Invaild serialize member : ${memberName}`)
             }
         }
@@ -438,15 +413,15 @@ class BinaryStream extends Message {
      * @description 序列化成员变量
      * @param value 该成员变量的值
      * */
-    private serializeMember(value: any, valueType: any, arrTypeOrMapKeyOrStringSize:any, mapValueType:any) {
+    private serializeMember(value: any, valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
         if (this.isNumberValue(valueType)) {
             this.serializeNumberStreamValue(value, valueType);
         } else if (this.isStringValue(valueType)) {
-            this.serializeStringStreamValue(value, valueType, arrTypeOrMapKeyOrStringSize);
+            this.serializeStringStreamValue(value, valueType, arrTypeOrMapKeyType);
         } else if (value instanceof Array) {
-            this.serializeArray(value,valueType,arrTypeOrMapKeyOrStringSize,mapValueType);
+            this.serializeArray(value, valueType, arrTypeOrMapKeyType, mapValueType);
         } else if (value instanceof Map) {
-            this.serializeMap(value,valueType,arrTypeOrMapKeyOrStringSize,mapValueType);
+            this.serializeMap(value, valueType, arrTypeOrMapKeyType, mapValueType);
         } else if (value instanceof BinaryStreamMessage) {
             value.serialize();
         } else {
@@ -461,41 +436,38 @@ class BinaryStream extends Message {
         this._byteOffset += type.write(this._dataView, this._byteOffset);
     }
 
-    private serializeStringStreamValue(value: string , valueType : typeof StringStreamValue , size : number ) {
+    private serializeStringStreamValue(value: string, valueType: typeof StringStreamValue, size: number) {
         let type = new valueType();
-        type.data = (value === undefined || value === null ) ? "" : value;
-        if( valueType == StringArrayValue ){
-            type.dataLength = size;
-        }
-        this._byteOffset += type.write(this._dataView,this._byteOffset);
+        type.data = (value === undefined || value === null) ? "" : value;
+        this._byteOffset += type.write(this._dataView, this._byteOffset);
     }
 
-    private serializeArray(value: Array<any>,valueType:any,arrTypeOrMapKeyOrStringSize:any, mapValueType:any) {
+    private serializeArray(value: Array<any>, valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
         //先写入数组的大小
-        this._dataView.setUint32(this._byteOffset,value.length,isLittleEndian);
+        this._dataView.setUint32(this._byteOffset, value.length, USING_LITTLE_ENDIAN);
         this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
         value.forEach(element => {
-            this.serializeMember(element,valueType,arrTypeOrMapKeyOrStringSize,mapValueType);
+            this.serializeMember(element, valueType, arrTypeOrMapKeyType, mapValueType);
         });
     }
 
-    private serializeMap(value: Map<any, any>,valueType:any,arrTypeOrMapKeyOrStringSize:any, mapValueType:any) {
+    private serializeMap(value: Map<any, any>, valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
         let self = this;
         //先写入字典的大小
-        this._dataView.setUint32(this._byteOffset,value.size,isLittleEndian);
+        this._dataView.setUint32(this._byteOffset, value.size, USING_LITTLE_ENDIAN);
         this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
         value.forEach((dataValue, dataKey) => {
             //写入key
-            if( arrTypeOrMapKeyOrStringSize instanceof String ){
+            if (arrTypeOrMapKeyType instanceof String) {
                 let keyValue = new StringValue();
                 keyValue.data = dataKey;
-                this._byteOffset += keyValue.write(this._dataView,this._byteOffset);
-            }else{
-                this._dataView.setUint32(this._byteOffset,dataKey,isLittleEndian)
+                this._byteOffset += keyValue.write(this._dataView, this._byteOffset);
+            } else {
+                this._dataView.setUint32(this._byteOffset, dataKey, USING_LITTLE_ENDIAN)
                 this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
             }
             //写值
-            this.serializeMember(dataValue,valueType,arrTypeOrMapKeyOrStringSize,mapValueType);
+            this.serializeMember(dataValue, valueType, arrTypeOrMapKeyType, mapValueType);
         });
     }
 
@@ -517,8 +489,8 @@ class BinaryStream extends Message {
         let serializeKeyList = Object.keys(__serializeInfo);
         for (let len = serializeKeyList.length, i = 0; i < len; i++) {
             let serializeKey = serializeKeyList[i];
-            let [memberName, type, arrTypeOrMapKeyOrStringSize, mapValueType] = __serializeInfo[serializeKey];
-            let iscomplete = this.deserializeMember(memberName, type, arrTypeOrMapKeyOrStringSize, mapValueType);
+            let [memberName, type, arrTypeOrMapKeyType, mapValueType] = __serializeInfo[serializeKey];
+            let iscomplete = this.deserializeMember(memberName, type, arrTypeOrMapKeyType, mapValueType);
             if (!iscomplete) {
                 cc.warn("Invalid deserialize member :" + memberName);
                 return false;
@@ -531,21 +503,21 @@ class BinaryStream extends Message {
      * @description 反序列化成
      * @param memberName 成员变量名
      * @param memberType 成员变量类型
-     * @param arrTypeOrMapKeyOrStringSize 数组值类型/Map的key类型
+     * @param arrTypeOrMapKeyType 数组值类型/Map的key类型
      * @param mapValueType Map的值类型
      * @param value json压缩对象
      */
-    private deserializeMember(memberName: any, memberType: any, arrTypeOrMapKeyOrStringSize: any, mapValueType: any) {
+    private deserializeMember(memberName: any, memberType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
         try {
             let originValue = this[memberName];
             if (this.isNumberValue(memberType)) {
                 this[memberName] = this.deserializeNumberStreamValue(memberName, memberType);
             } else if (this.isStringValue(memberType)) {
-                this[memberName] = this.deserializeStringStreamValue(memberName, memberType,arrTypeOrMapKeyOrStringSize);
+                this[memberName] = this.deserializeStringStreamValue(memberName, memberType, arrTypeOrMapKeyType);
             } else if (originValue instanceof Array) {
-                this.deserializeArray(memberName, memberType , arrTypeOrMapKeyOrStringSize, mapValueType);
+                this.deserializeArray(memberName, memberType, arrTypeOrMapKeyType, mapValueType);
             } else if (originValue instanceof Map) {
-                this.deserializeMap(memberName, memberType , arrTypeOrMapKeyOrStringSize, mapValueType);
+                this.deserializeMap(memberName, memberType, arrTypeOrMapKeyType, mapValueType);
             } else if (originValue instanceof BinaryStreamMessage) {
                 originValue.deserialize();
             } else {
@@ -565,54 +537,51 @@ class BinaryStream extends Message {
         return value.data;
     }
 
-    private deserializeStringStreamValue(memberName: any, memberType : typeof StringStreamValue,arrTypeOrMapKeyOrStringSize:number) {
+    private deserializeStringStreamValue(memberName: any, memberType: typeof StringStreamValue, arrTypeOrMapKeyType: number) {
         let value = new memberType();
-        if( memberType == StringArrayValue ){
-            value.dataLength = arrTypeOrMapKeyOrStringSize;
-        }
-        this._byteOffset += value.read(this._dataView,this._byteOffset);
+        this._byteOffset += value.read(this._dataView, this._byteOffset);
     }
 
-    private deserializeArray(memberName: any, memberType : any , arrTypeOrMapKeyOrStringSize:any, mapValueType:any) {
+    private deserializeArray(memberName: any, memberType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
         //重新解析，初始化时可能已经赋值，需要先清空对象
         this[memberName] = [];
         //先读数组大小
-        let size = this._dataView.getUint32(this._byteOffset,isLittleEndian);
+        let size = this._dataView.getUint32(this._byteOffset, USING_LITTLE_ENDIAN);
         this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
-        for( let i = 0 ; i < size ; i++ ){
+        for (let i = 0; i < size; i++) {
             let type = new memberType();
-            if( memberType instanceof BinaryStreamMessage ){
+            if (memberType instanceof BinaryStreamMessage) {
                 this[memberName][i] = type.deserialize();
-            }else{
-                this._byteOffset += type.read(this._dataView,this._byteOffset);
+            } else {
+                this._byteOffset += type.read(this._dataView, this._byteOffset);
                 this[memberName][i] = type.data;
             }
         }
     }
 
-    private deserializeMap(memberName: any, memberType : any , arrTypeOrMapKeyOrStringSize:any, mapValueType:any) {
-        
+    private deserializeMap(memberName: any, memberType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
+
         this[memberName] = new Map;
         //先读入数组大小
-        let size = this._dataView.getUint32(this._byteOffset,isLittleEndian);
+        let size = this._dataView.getUint32(this._byteOffset, USING_LITTLE_ENDIAN);
         this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
-        for( let i = 0 ; i < size ; i++ ){
+        for (let i = 0; i < size; i++) {
             let key = null;
             //写入key
-            if( arrTypeOrMapKeyOrStringSize instanceof String ){
+            if (arrTypeOrMapKeyType instanceof String) {
                 let keyValue = new StringValue();
-                this._byteOffset += keyValue.read(this._dataView,this._byteOffset)
+                this._byteOffset += keyValue.read(this._dataView, this._byteOffset)
                 key = keyValue.data;
-            }else{
-                key = this._dataView.getUint32(this._byteOffset,isLittleEndian)
+            } else {
+                key = this._dataView.getUint32(this._byteOffset, USING_LITTLE_ENDIAN)
                 this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
             }
             //写值
             let data = new mapValueType();
-            if( mapValueType instanceof BinaryStreamMessage ){
+            if (mapValueType instanceof BinaryStreamMessage) {
                 data.deserialize();
-            }else{
-                this._byteOffset += data.read(this._dataView,this._byteOffset);
+            } else {
+                this._byteOffset += data.read(this._dataView, this._byteOffset);
                 data = data.data;
             }
             this[memberName].set(key, data);
