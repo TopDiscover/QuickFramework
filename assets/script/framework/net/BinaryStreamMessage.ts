@@ -323,7 +323,11 @@ export class BinaryStream extends Message {
         this._byteOffset = 0;
         this.serialize();
         this.buffer = new Uint8Array(this._dataView.buffer);
-        return true;
+        let success = this._byteOffset == this._dataView.byteLength;
+        if( !success ){
+            cc.error(`toBuffer 当前读取大小为 : ${this._byteOffset} 数据大小为 : ${this._dataView.byteLength}`);
+        }
+        return success;
     }
 
     /**@description 是否是数值类型 */
@@ -418,10 +422,7 @@ export class BinaryStream extends Message {
         for (let len = serializeKeyList.length, i = 0; i < len; i++) {
             let serializeKey = serializeKeyList[i];
             let [memberName, type, arrTypeOrMapKeyType, mapValueType] = __serialize__[serializeKey];
-            let iscomplete = this.serializeMember(this[memberName], type, arrTypeOrMapKeyType, mapValueType);
-            if (!iscomplete) {
-                cc.warn(`Invaild serialize member : ${memberName}`)
-            }
+            this.serializeMember(this[memberName],memberName, type, arrTypeOrMapKeyType, mapValueType);
         }
     }
 
@@ -429,24 +430,23 @@ export class BinaryStream extends Message {
      * @description 序列化成员变量
      * @param value 该成员变量的值
      * */
-    private serializeMember(value: any, valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
+    private serializeMember(value: any, memberName :string ,valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
         if (this.isNumberValue(valueType)) {
             this.serializeNumberStreamValue(value, valueType);
         } else if (this.isStringValue(valueType)) {
             this.serializeStringStreamValue(value, valueType, arrTypeOrMapKeyType);
         } else if (value instanceof Array) {
-            this.serializeArray(value, valueType, arrTypeOrMapKeyType, mapValueType);
+            this.serializeArray(value, memberName , valueType, arrTypeOrMapKeyType, mapValueType);
         } else if (value instanceof Map) {
-            this.serializeMap(value, valueType, arrTypeOrMapKeyType, mapValueType);
+            this.serializeMap(value,memberName, valueType, arrTypeOrMapKeyType, mapValueType);
         } else if (value instanceof BinaryStream) {
             value._dataView = this._dataView;
             value._byteOffset = this._byteOffset;
             value.serialize();
             this._byteOffset = value._byteOffset;
         } else {
-            return false;
+            cc.error(`序列化成员 : ${memberName} 出错!!`);
         }
-        return true;
     }
 
     private serializeNumberStreamValue(value: number, valueType: typeof NumberStreamValue) {
@@ -461,17 +461,16 @@ export class BinaryStream extends Message {
         this._byteOffset += type.write(this._dataView, this._byteOffset);
     }
 
-    private serializeArray(value: Array<any>, valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
+    private serializeArray(value: Array<any>, memberName : string , valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
         //先写入数组的大小
         this._dataView.setUint32(this._byteOffset, value.length, USING_LITTLE_ENDIAN);
         this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
         for( let i = 0; i< value.length ; i++ ){
-            this.serializeMember(value[i], arrTypeOrMapKeyType, null, null);
+            this.serializeMember(value[i],`${memberName}[${i}]` , arrTypeOrMapKeyType, null, null);
         }
     }
 
-    private serializeMap(value: Map<any, any>, valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
-        let self = this;
+    private serializeMap(value: Map<any, any>, memberName : string , valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
         //先写入字典的大小
         this._dataView.setUint32(this._byteOffset, value.size, USING_LITTLE_ENDIAN);
         this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
@@ -486,7 +485,7 @@ export class BinaryStream extends Message {
                 this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
             }
             //写值
-            this.serializeMember(dataValue, mapValueType, null, null);
+            this.serializeMember(dataValue,`${memberName}.${dataKey}`, mapValueType, null, null);
         });
     }
 
@@ -495,7 +494,12 @@ export class BinaryStream extends Message {
         this.buffer = data;
         this._dataView = new DataView(data.buffer);
         this._byteOffset = 0;
-        return this.deserialize();
+        this.deserialize();
+        let success = this._dataView.byteLength == this._byteOffset;
+        if( !success ){
+            cc.error(`decode 当前读取大小为 : ${this._byteOffset} 数据大小为 : ${this._dataView.byteLength}`);
+        }
+        return success;
     }
 
     /**
@@ -509,13 +513,8 @@ export class BinaryStream extends Message {
         for (let len = serializeKeyList.length, i = 0; i < len; i++) {
             let serializeKey = serializeKeyList[i];
             let [memberName, type, arrTypeOrMapKeyType, mapValueType] = __serializeInfo[serializeKey];
-            let iscomplete = this.deserializeMember(memberName, type, arrTypeOrMapKeyType, mapValueType);
-            if (!iscomplete) {
-                cc.warn("Invalid deserialize member :" + memberName);
-                return false;
-            }
+            this.deserializeMember(memberName, type, arrTypeOrMapKeyType, mapValueType);
         }
-        return true;
     }
 
     /**
@@ -543,13 +542,11 @@ export class BinaryStream extends Message {
                 originValue.deserialize();
                 this._byteOffset = originValue._byteOffset;
             } else {
-                return false;
+                cc.error(`deserializeMember ${memberName} error!!!`);
             }
-            return true;
         } catch (error) {
             cc.warn(error.message);
-            this[memberName] = error.data || null;
-            return false;
+            cc.error(`deserializeMember ${memberName} error!!!`);
         }
     }
 
