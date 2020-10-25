@@ -4,10 +4,12 @@ import { LobbyService } from "../../common/net/LobbyService";
 import { IController } from "../../framework/controller/Controller";
 import { GameConfig } from "../../common/base/HotUpdate";
 import { i18n } from "../../common/language/LanguageImpl";
-import { UpdateMoney } from "../protocol/HallMessage";
+import { UpdateMoney, TestMsg } from "../protocol/HallMessage";
 import { dispatchEnterComplete, LogicType } from "../../common/event/LogicEvent";
 import { Manager } from "../../common/manager/Manager";
 import { CommonEvent } from "../../common/event/CommonEvent";
+import { MessageProcessType } from "../../framework/base/Service";
+import { TestBinaryMessage } from "../protocol/CmdBinaryMessage";
 
 const { ccclass, property } = cc._decorator;
 
@@ -54,8 +56,18 @@ export default class HallView extends UIView implements IController<LobbyService
             }else if( i == 6 ){
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
                     //websocket测试
-                    let msg = new UpdateMoney();
-                    this.service.send(msg);
+                    
+                    let testProto = new TestMsg();
+                    testProto.data.awesomeField = "test hello";
+                    testProto.encode();
+                    testProto.decode(testProto.buffer);
+                    this.service.send(testProto);
+
+                    // let msg = new UpdateMoney();
+                    // this.service.send(msg);
+
+                    // let binaryMessage = new TestBinaryMessage();
+                    // this.service.send(binaryMessage);
                 });
             }
             else{
@@ -110,6 +122,7 @@ export default class HallView extends UIView implements IController<LobbyService
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
 
         //根据自己的需要，连接网络
+        LobbyService.instance.messageProcessType = MessageProcessType.Proto;
         LobbyService.instance.connect("echo.websocket.org");
     }
 

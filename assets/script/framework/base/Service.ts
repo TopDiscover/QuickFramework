@@ -3,6 +3,9 @@ import { EventApi } from "../event/EventApi";
 import { makeKey } from "../decorator/Decorators";
 import { Message } from "../net/Message";
 import { Manager } from "../Framework";
+import { JsonMessage } from "../net/JsonMessage";
+import { BaseProto } from "../net/ProtoMessage";
+import { BinaryStreamMessage } from "../net/BinaryStreamMessage";
 /**
  * @description 与服务器之间消息收发基类,注册消息并转发
  */
@@ -20,11 +23,42 @@ export interface ProtoListenerData {
     target?: any, //处理者
 }
 
+/**@description 解析消息类型 */
+export enum MessageProcessType{
+    /**@description 未知数据类型 */
+    unknown,
+    /**@description 以json类型作为解析 */
+    Json,
+    /**@description 以protobuf类型作为解析 */
+    Proto,
+    /**@description 以二进制数据流作为解析 */
+    BinaryStream,
+}
+
 export class Service extends ServerConnector {
 
+    protected _messageType : typeof Message = Message;
     /**@description 公共的消息解析类型，必须包含对消息码的解析与打包 */
     protected get commonMessageType(): typeof Message{
-        return Message;
+        return this._messageType;
+    }
+
+    protected _messageProcessType : MessageProcessType = MessageProcessType.unknown;
+    /**@description 当前使用什么方式进行数据解析 */
+    public get messageProcessType(){
+        return this._messageProcessType;
+    }
+    public set messageProcessType(value:MessageProcessType){
+        this._messageProcessType = value;
+        if (value == MessageProcessType.Json ) {
+            this._messageType = JsonMessage;
+        }else if (value == MessageProcessType.Proto ) {
+            this._messageType = BaseProto;
+        }else if ( value == MessageProcessType.BinaryStream) {
+            this._messageType = BinaryStreamMessage;
+        }else{
+            cc.error("未支持的数据处理类型")
+        }
     }
 
     /**

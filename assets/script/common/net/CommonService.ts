@@ -1,20 +1,11 @@
-/*
- * @Author: your name
- * @Date: 2019-11-20 19:04:21
- * @LastEditTime: 2020-04-10 16:03:39
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: \ddz\assets\common\base\CommonService.ts
- */
 
-import { Service } from "../../framework/base/Service";
+import { Service, MessageProcessType } from "../../framework/base/Service";
 import { GameEventInterface } from "../../framework/base/GameEventInterface";
 import { Message } from "../../framework/net/Message";
-import { JsonMessage } from "../../framework/net/JsonMessage";
-import { MainCmd, SUB_CMD_GAME, SUB_CMD_SYS } from "../protocol/CmdNetID";
-
-export class CommonMessage extends JsonMessage {
-}
+import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdNetID";
+import { HeartbeatJson } from "../protocol/HeartbetJson";
+import { HeartbeatProto } from "../protocol/HeartbetProto";
+import { HeartbeatBinary } from "../protocol/HeartbetBinary";
 
 /**
  * @description service公共基类
@@ -25,21 +16,21 @@ export class CommonService extends Service implements GameEventInterface {
     protected static _instance: CommonService = null;
     public static get instance() { return this._instance || (this._instance = new CommonService()); }
 
-    /**@description 公共的消息解析类型，必须包含对消息码的解析与打包 */
-    protected get commonMessageType(): typeof Message {
-        return CommonMessage;
-    }
-
     /**
      * @description 发送心跳
      */
     protected sendHeartbeat() {
         //发送心跳
-        let msg = new CommonMessage();
-        msg.mainCmd = MainCmd.CMD_SYS;
-        msg.subCmd = SUB_CMD_SYS.CMD_SYS_HEART_ACK;
-        this.send(msg);
-    }
+        if (this.messageProcessType == MessageProcessType.Json ) {
+            this.send(new HeartbeatJson() );
+        }else if (this.messageProcessType == MessageProcessType.Proto ) {
+            this.send(new HeartbeatProto());
+        }else if( this.messageProcessType == MessageProcessType.BinaryStream ){
+            this.send(new HeartbeatBinary())
+        }else{
+            cc.error("未支持的数据处理类型")
+        }
+    } 
     /**
      * @description 获取最大心跳超时的次数
      */

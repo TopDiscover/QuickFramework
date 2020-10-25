@@ -1,13 +1,11 @@
 /**
  * @description 游戏公共处理消息定义
  */
-
-import { CommonMessage } from "../net/CommonService";
 import { MainCmd, SUB_CMD_GAME } from "./CmdNetID";
-import { serialize } from "../../framework/net/JsonMessage";
+import { serialize, JsonMessage } from "../../framework/net/JsonMessage";
 
 /**@description 进入游戏成功 */
-export class EnterGameSuccess extends CommonMessage {
+export class EnterGameSuccess extends JsonMessage {
     mainCmd = MainCmd.CMD_GAME;
     subCmd = SUB_CMD_GAME.CMD_GAME_ENTER_SUCCESS;
     /**@description 房间号 */
@@ -30,7 +28,7 @@ export class EnterGameSuccess extends CommonMessage {
 }
 
 /**@description 进入游戏成功 */
-export class EnterGameFail extends CommonMessage {
+export class EnterGameFail extends JsonMessage {
     mainCmd = MainCmd.CMD_GAME;
     subCmd = SUB_CMD_GAME.CMD_GAME_ENTER_FAIL;
     /**@description 失败原因 */

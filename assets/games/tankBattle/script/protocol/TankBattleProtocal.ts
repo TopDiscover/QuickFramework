@@ -1,6 +1,5 @@
 import { MainCmd } from "../../../../script/common/protocol/CmdNetID";
-import { CommonMessage } from "../../../../script/common/net/CommonService";
-import { serialize } from "../../../../script/framework/net/JsonMessage";
+import { serialize, JsonMessage } from "../../../../script/framework/net/JsonMessage";
 
 /**
  * @description 网络协议接口定义及实现处理
@@ -12,7 +11,7 @@ import { serialize } from "../../../../script/framework/net/JsonMessage";
  }
 
 /**@description 存储当前游戏配置*/
-export class TankBattleConfig extends CommonMessage{
+export class TankBattleConfig extends JsonMessage{
     mainCmd = MainCmd.CMD_GAME;
     subCmd = SUB_CMD_GAME.CMD_GAME_CONFIG;
 

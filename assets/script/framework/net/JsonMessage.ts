@@ -115,7 +115,6 @@ export class JsonMessage extends Message {
 
     decode(data: Uint8Array): boolean {
         if (super.decode(data)) {
-            super.decode(data)
             return this.deserialize(this.data);
         }
         return false;
