@@ -17,7 +17,7 @@ export class Message {
     }
 
     /**@description 转换成Uint8Array buffer */
-    protected toBuffer() {
+    protected toBuffer() : boolean{
         let obj: { mainCmd?: number, subCmd?: number, data?: any } = {};
         obj.mainCmd = this.mainCmd;
         obj.subCmd = this.subCmd;
@@ -27,14 +27,14 @@ export class Message {
         for (let i = 0; i < result.length; i++) {
             this.buffer[i] = result.charCodeAt(i);
         }
+        return true;
     }
 
     /**@description 打包数据 */
     encode(): boolean {
         try {
             this.fillData();
-            this.toBuffer();
-            return true;
+            return this.toBuffer();
         } catch (error) {
             cc.error(error);
             return false;

@@ -316,7 +316,7 @@ export class BinaryStream extends Message {
     private _byteOffset = 0;
 
     /**@description 将当前数据转成buffer */
-    protected toBuffer() {
+    protected toBuffer() : boolean {
         let size = this.size()
         let buffer = new ArrayBuffer(size)
         this._dataView = new DataView(buffer)
