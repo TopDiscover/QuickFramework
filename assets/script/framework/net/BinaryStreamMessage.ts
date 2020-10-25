@@ -125,9 +125,10 @@ export class StringValue extends StringStreamValue {
             byteOffset += Uint8Array.BYTES_PER_ELEMENT;
         }
 
-        ab2str(arr.buffer).then((data) => {
-            this.data = data as string;
-        });
+        this.data = "";
+        for( let i = 0 ; i < arr.length ; i++ ){
+            this.data += String.fromCharCode(arr[i]);
+        }
         return byteOffset;
     }
 
