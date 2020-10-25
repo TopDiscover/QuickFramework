@@ -84,27 +84,6 @@ class StringStreamValue extends StreamValue<string>{
     data = "";
 }
 
-export function getUtf8StringBytes(str) {
-    if (str == null || str === undefined) return 0;
-    if (typeof str != "string") {
-        return 0;
-    }
-    var total = 0, charCode, i, len;
-    for (i = 0, len = str.length; i < len; i++) {
-        charCode = str.charCodeAt(i);
-        if (charCode <= 0x007f) {
-            total += 1;//字符代码在000000 – 00007F之间的，用一个字节编码
-        } else if (charCode <= 0x07ff) {
-            total += 2;//000080 – 0007FF之间的字符用两个字节
-        } else if (charCode <= 0xffff) {
-            total += 3;//000800 – 00D7FF 和 00E000 – 00FFFF之间的用三个字节，注: Unicode在范围 D800-DFFF 中不存在任何字符
-        } else {
-            total += 4;//010000 – 10FFFF之间的用4个字节
-        }
-    }
-    return total;
-};
-
 //ArrayBuffer转字符串
 export function ab2str(buffer: ArrayBuffer): Promise<string | ArrayBuffer> {
     return new Promise((resolve) => {
@@ -124,19 +103,21 @@ export function str2ab(str: string): Promise<string | ArrayBuffer> {
     });
 }
 
+const Buffer = require('buffer').Buffer;
 /**@description 字符串类型 */
 export class StringValue extends StringStreamValue {
     size() {
         //先写入数据大小长度
         let byteSize = Uint32Array.BYTES_PER_ELEMENT;
         //加上当前字符串数量长度
-        byteSize += getUtf8StringBytes(this.data);
+        let buffer = new Buffer(this.data);
+        byteSize += buffer.length;
         return byteSize;
     }
     read(dataView: DataView, offset: number) {
         //先读取字符串长度
         let length = dataView.getUint32(offset, this.littleEndian);
-        let byteOffset = offset;
+        let byteOffset = offset + Uint32Array.BYTES_PER_ELEMENT;
         //可变长字符串
         let arr = new Uint8Array(length)
         for (let i = 0; i < length; i++) {
@@ -153,20 +134,16 @@ export class StringValue extends StringStreamValue {
     write(dataView: DataView, offset: number) {
         //先写入字符串长度
         let byteOffset = offset;
+        let buffer: Uint8Array = new Buffer(this.data);
+        let byteLenght = buffer.length;
         //可变长字符串
-        dataView.setUint32(byteOffset, this.data.length, this.littleEndian);
+        dataView.setUint32(byteOffset, byteLenght, this.littleEndian);
         byteOffset += Uint32Array.BYTES_PER_ELEMENT;
         //写入字符串内容
-        str2ab(this.data).then((ab) => {
-            let buffer = ab as ArrayBuffer;
-            let arr = new Uint8Array(buffer);
-            for (let i = 0; i < arr.length; i++) {
-                dataView.setUint8(byteOffset, arr[i]);
-                byteOffset += Uint8Array.BYTES_PER_ELEMENT;
-            }
-        });
-        byteOffset += this.data.length;
-
+        for (let i = 0; i < buffer.length; i++) {
+            dataView.setUint8(byteOffset, buffer[i]);
+            byteOffset += Uint8Array.BYTES_PER_ELEMENT;
+        }
         return byteOffset;
     }
 }
