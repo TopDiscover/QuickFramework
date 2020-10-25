@@ -28,19 +28,21 @@ export class TestBinaryMessage extends BinaryStreamMessage {
     // @serialize("uint32",Uint32Value)
     // uint32: number = 32;
 
-    @serialize("str",StringValue)
-    str : string = "这只是一个测试，你没看错";
+    // @serialize("str",StringValue)
+    // str : string = "这只是一个测试，你没看错";
 
-    // @serialize("mapdata",Map,Number,Int32Value)
-    // testMap:Map<number,number> = new Map();//null;
+    // @serialize("arr",Array,Int8Value)
+    // arr : Array<number> = [1,2,3,4,5,6]
+
+    @serialize("testMap",Map,String,Int32Value)
+    testMap:Map<string,number> = new Map();
 
     constructor(){
         super();
-        // this.testMap.set(1,1);
-        // this.testMap.set(2,2);
-        // this.testMap.set(3,2);
-        // this.testMap.set(4,4);
-        // this.testMap.set(5,5);
-        // this.testMap.set(6,6);
+        this.testMap.set("keyy_1",1);
+        this.testMap.set("keyy_2",2);
+        this.testMap.set("keyy_3",2);
+        this.testMap.set("keyy_4",4);
+        this.testMap.set("keyy_5",5);
     }
 }
