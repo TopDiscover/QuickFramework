@@ -57,17 +57,18 @@ export default class HallView extends UIView implements IController<LobbyService
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
                     //websocket测试
                     
-                    let testProto = new TestMsg();
-                    testProto.data.awesomeField = "test hello";
-                    testProto.encode();
-                    testProto.decode(testProto.buffer);
-                    this.service.send(testProto);
+                    // let testProto = new TestMsg();
+                    // testProto.data.awesomeField = "test hello";
+                    // testProto.encode();
+                    // testProto.decode(testProto.buffer);
+                    // this.service.send(testProto);
 
                     // let msg = new UpdateMoney();
                     // this.service.send(msg);
 
-                    // let binaryMessage = new TestBinaryMessage();
-                    // this.service.send(binaryMessage);
+                    let binaryMessage = new TestBinaryMessage();
+                    this.service.send(binaryMessage);
+
                 });
             }
             else{
@@ -122,7 +123,7 @@ export default class HallView extends UIView implements IController<LobbyService
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
 
         //根据自己的需要，连接网络
-        LobbyService.instance.messageProcessType = MessageProcessType.Proto;
+        LobbyService.instance.messageProcessType = MessageProcessType.BinaryStream;
         LobbyService.instance.connect("echo.websocket.org");
     }
 
