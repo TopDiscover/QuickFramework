@@ -1,27 +1,21 @@
 import UIView from "../../framework/ui/UIView";
-import { injectService } from "../../framework/decorator/Decorators";
 import { LobbyService } from "../../common/net/LobbyService";
-import { IController } from "../../framework/controller/Controller";
 import { GameConfig } from "../../common/base/HotUpdate";
 import { i18n } from "../../common/language/LanguageImpl";
-import { UpdateMoney, TestMsg } from "../protocol/HallMessage";
 import { dispatchEnterComplete, LogicType } from "../../common/event/LogicEvent";
 import { Manager } from "../../common/manager/Manager";
 import { CommonEvent } from "../../common/event/CommonEvent";
 import { MessageProcessType } from "../../framework/base/Service";
-import { TestBinaryMessage } from "../protocol/CmdBinaryMessage";
+import { HallNetHelper } from "../protocol/HallNetHelper";
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-@injectService(LobbyService.instance)
-export default class HallView extends UIView implements IController<LobbyService>{
+export default class HallView extends UIView{
 
     public static getPrefabUrl() {
         return "hall/prefabs/HallView";
     }
-
-    service : LobbyService = null;
 
     public _count = 10;
 
@@ -56,17 +50,9 @@ export default class HallView extends UIView implements IController<LobbyService
             }else if( i == 6 ){
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
                     //websocket测试
-                    
-                    // let testProto = new TestMsg();
-                    // testProto.data.awesomeField = "这是一个中文的测试";
-                    // this.service.send(testProto);
-
-                    // let msg = new UpdateMoney();
-                    // this.service.send(msg);
-
-                    let binaryMessage = new TestBinaryMessage();
-                    this.service.send(binaryMessage);
-
+                    HallNetHelper.sendBinaryMessage();
+                    // HallNetHelper.sendJsonMessage();
+                    // HallNetHelper.sendProtoMessage();
                 });
             }
             else{

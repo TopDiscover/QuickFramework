@@ -10,11 +10,6 @@ import { Message } from "../net/Message";
 
 const { ccclass, property } = cc._decorator;
 
-/**@description 控制器接口,在UIView中注入Service时必须实现 */
-export interface IController<ServiceType>{
-    service : ServiceType;
-}
-
 @ccclass
 export default class Controller<ServiceType> extends EventComponent {
 
