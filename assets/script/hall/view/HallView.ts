@@ -6,7 +6,7 @@ import { dispatchEnterComplete, LogicType } from "../../common/event/LogicEvent"
 import { Manager } from "../../common/manager/Manager";
 import { CommonEvent } from "../../common/event/CommonEvent";
 import { MessageProcessType } from "../../framework/base/Service";
-import { HallNetHelper } from "../protocol/HallNetHelper";
+import { HallNetHelper } from "../controller/HallNetHelper";
 
 const { ccclass, property } = cc._decorator;
 
