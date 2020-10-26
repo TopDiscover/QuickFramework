@@ -57,8 +57,6 @@ export class Message {
     mainCmd: number = 0;
     /**@description 消息子cmd码 */
     subCmd: number = 0;
-    /**@description 解析后包体数据 */
-    data: any = null;
     /**@description 发送或接收的消息流 */
     buffer: Uint8Array = null;
 

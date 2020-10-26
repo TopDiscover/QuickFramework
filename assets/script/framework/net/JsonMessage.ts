@@ -36,6 +36,8 @@ const Buffer = require('buffer').Buffer;
  */
 export class JsonMessage extends Message {
 
+    private data = null;
+
     encode() : boolean {
         this.data = this.serialize();
         let obj: { mainCmd?: number, subCmd?: number, data?: any } = {};
