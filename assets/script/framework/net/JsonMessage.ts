@@ -1,5 +1,5 @@
 
-import { Message } from "./Message";
+import { Message, Utf8ArrayToStr } from "./Message";
 
 type JsonMessageConstructor = typeof JsonMessage;
 
@@ -30,14 +30,21 @@ export function serialize(key: string, type, arrTypeOrMapKeyType?, mapValueType?
         target['__serialize__'][key] = [memberName, type, arrTypeOrMapKeyType, mapValueType];
     }
 }
-
+const Buffer = require('buffer').Buffer;
 /**
  * @description JSON的序列化与序列化
  */
 export class JsonMessage extends Message {
 
-    protected fillData() {
+    encode() : boolean {
         this.data = this.serialize();
+        let obj: { mainCmd?: number, subCmd?: number, data?: any } = {};
+        obj.mainCmd = this.mainCmd;
+        obj.subCmd = this.subCmd;
+        obj.data = this.data ? this.data : {};
+        let result = JSON.stringify(obj);
+        this.buffer = new Buffer(result);
+        return true;
     }
 
     /**@description 序列化 */
@@ -114,7 +121,19 @@ export class JsonMessage extends Message {
     }
 
     decode(data: Uint8Array): boolean {
-        if (super.decode(data)) {
+        if (data) {
+            this.buffer = data;
+            let result = Utf8ArrayToStr(data);
+            if (result.length > 0) {
+                try {
+                    this.data = JSON.parse(result);
+                    this.mainCmd = this.data.mainCmd;
+                    this.subCmd = this.data.subCmd;
+                    this.data = this.data.data ? this.data.data : {};
+                } catch (error) {
+                    return false;
+                }
+            }
             return this.deserialize(this.data);
         }
         return false;

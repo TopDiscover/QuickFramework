@@ -1,5 +1,56 @@
 
 
+//ArrayBuffer转字符串
+export function ab2str(buffer: ArrayBuffer): Promise<string | ArrayBuffer> {
+    return new Promise((resolve) => {
+        var b = new Blob([buffer]);
+        var r = new FileReader();
+        r.readAsText(b, 'utf-8');
+        r.onload = () => { resolve(r.result) }
+    });
+}
+//字符串转字符串ArrayBuffer
+export function str2ab(str: string): Promise<string | ArrayBuffer> {
+    return new Promise((resolve) => {
+        var b = new Blob([str], { type: 'text/plain' });
+        var r = new FileReader();
+        r.readAsArrayBuffer(b);
+        r.onload = () => { resolve(r.result) }
+    });
+}
+
+/**@description utf-8 Uint8Array转字符串 */
+export function Utf8ArrayToStr(array) {
+    let out, i, len, c;
+    let char2, char3;
+    out = "";
+    len = array.length;
+    i = 0;
+    while (i < len) {
+        c = array[i++];
+        switch (c >> 4) {
+            case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+                // 0xxxxxxx
+                out += String.fromCharCode(c);
+                break;
+            case 12: case 13:
+                // 110x xxxx   10xx xxxx
+                char2 = array[i++];
+                out += String.fromCharCode(((c & 0x1F) << 6) | (char2 & 0x3F));
+                break;
+            case 14:
+                // 1110 xxxx  10xx xxxx  10xx xxxx
+                char2 = array[i++];
+                char3 = array[i++];
+                out += String.fromCharCode(((c & 0x0F) << 12) |
+                    ((char2 & 0x3F) << 6) |
+                    ((char3 & 0x3F) << 0));
+                break;
+        }
+    }
+    return out;
+}
+
 /**@description 与服务器交互的消息 */
 export class Message {
     /**@description 消息主cmd码 */
@@ -11,55 +62,12 @@ export class Message {
     /**@description 发送或接收的消息流 */
     buffer: Uint8Array = null;
 
-    /**@description 数据填充 */
-    protected fillData() {
-
-    }
-
-    /**@description 转换成Uint8Array buffer */
-    protected toBuffer() : boolean{
-        let obj: { mainCmd?: number, subCmd?: number, data?: any } = {};
-        obj.mainCmd = this.mainCmd;
-        obj.subCmd = this.subCmd;
-        obj.data = this.data ? this.data : {};
-        let result = JSON.stringify(obj);
-        this.buffer = new Uint8Array(result.length);
-        for (let i = 0; i < result.length; i++) {
-            this.buffer[i] = result.charCodeAt(i);
-        }
-        return true;
-    }
-
     /**@description 打包数据 */
     encode(): boolean {
-        try {
-            this.fillData();
-            return this.toBuffer();
-        } catch (error) {
-            cc.error(error);
-            return false;
-        }
+        return true;
     }
     /**@description 解析数据 */
     decode(data: Uint8Array): boolean {
-        if (data) {
-            this.buffer = data;
-            let result = "";
-            for (let i = 0; i < data.length; i++) {
-                result += String.fromCharCode(data[i]);
-            }
-            if (result.length > 0) {
-                try {
-                    this.data = JSON.parse(result);
-                    this.mainCmd = this.data.mainCmd;
-                    this.subCmd = this.data.subCmd;
-                    this.data = this.data.data ? this.data.data : {};
-                } catch (error) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
+        return true;
     }
 }

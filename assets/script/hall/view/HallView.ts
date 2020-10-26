@@ -63,11 +63,11 @@ export default class HallView extends UIView implements IController<LobbyService
                     // testProto.decode(testProto.buffer);
                     // this.service.send(testProto);
 
-                    // let msg = new UpdateMoney();
-                    // this.service.send(msg);
+                    let msg = new UpdateMoney();
+                    this.service.send(msg);
 
-                    let binaryMessage = new TestBinaryMessage();
-                    this.service.send(binaryMessage);
+                    // let binaryMessage = new TestBinaryMessage();
+                    // this.service.send(binaryMessage);
 
                 });
             }
@@ -123,7 +123,7 @@ export default class HallView extends UIView implements IController<LobbyService
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
 
         //根据自己的需要，连接网络
-        LobbyService.instance.messageProcessType = MessageProcessType.BinaryStream;
+        LobbyService.instance.messageProcessType = MessageProcessType.Json;
         LobbyService.instance.connect("echo.websocket.org");
     }
 

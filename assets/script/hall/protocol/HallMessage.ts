@@ -5,7 +5,7 @@ import { ProtoMessage } from "../../framework/net/ProtoMessage";
 export class TestData extends JsonMessage{
 
     @serialize("test",String)
-    test : string = "my test";
+    test : string = "这是一个中文的字符串测试";
 
 }
 

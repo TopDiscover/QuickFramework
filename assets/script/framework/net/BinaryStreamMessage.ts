@@ -2,7 +2,7 @@
  * @description 二进制数据流解析
  */
 
-import { Message } from "./Message";
+import { Message, Utf8ArrayToStr } from "./Message";
 import { USING_LITTLE_ENDIAN } from "../base/Defines";
 
 type BinaryStreamConstructor = typeof BinaryStream;
@@ -82,57 +82,6 @@ class NumberStreamValue extends StreamValue<number>{
 /**@description 字符串类型 */
 class StringStreamValue extends StreamValue<string>{
     data = "";
-}
-
-//ArrayBuffer转字符串
-export function ab2str(buffer: ArrayBuffer): Promise<string | ArrayBuffer> {
-    return new Promise((resolve) => {
-        var b = new Blob([buffer]);
-        var r = new FileReader();
-        r.readAsText(b, 'utf-8');
-        r.onload = () => { resolve(r.result) }
-    });
-}
-//字符串转字符串ArrayBuffer
-export function str2ab(str: string): Promise<string | ArrayBuffer> {
-    return new Promise((resolve) => {
-        var b = new Blob([str], { type: 'text/plain' });
-        var r = new FileReader();
-        r.readAsArrayBuffer(b);
-        r.onload = () => { resolve(r.result) }
-    });
-}
-
-/**@description utf-8 Uint8Array转字符串 */
-function Utf8ArrayToStr(array) {
-    let out, i, len, c;
-    let char2, char3;
-    out = "";
-    len = array.length;
-    i = 0;
-    while (i < len) {
-        c = array[i++];
-        switch (c >> 4) {
-            case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-                // 0xxxxxxx
-                out += String.fromCharCode(c);
-                break;
-            case 12: case 13:
-                // 110x xxxx   10xx xxxx
-                char2 = array[i++];
-                out += String.fromCharCode(((c & 0x1F) << 6) | (char2 & 0x3F));
-                break;
-            case 14:
-                // 1110 xxxx  10xx xxxx  10xx xxxx
-                char2 = array[i++];
-                char3 = array[i++];
-                out += String.fromCharCode(((c & 0x0F) << 12) |
-                    ((char2 & 0x3F) << 6) |
-                    ((char3 & 0x3F) << 0));
-                break;
-        }
-    }
-    return out;
 }
 
 const Buffer = require('buffer').Buffer;
@@ -316,7 +265,7 @@ export class BinaryStream extends Message {
     private _byteOffset = 0;
 
     /**@description 将当前数据转成buffer */
-    protected toBuffer() : boolean {
+    encode() : boolean {
         let size = this.size()
         let buffer = new ArrayBuffer(size)
         this._dataView = new DataView(buffer)
@@ -325,7 +274,7 @@ export class BinaryStream extends Message {
         this.buffer = new Uint8Array(this._dataView.buffer);
         let success = this._byteOffset == this._dataView.byteLength;
         if( !success ){
-            cc.error(`toBuffer 当前读取大小为 : ${this._byteOffset} 数据大小为 : ${this._dataView.byteLength}`);
+            cc.error(`encode 当前读取大小为 : ${this._byteOffset} 数据大小为 : ${this._dataView.byteLength}`);
         }
         return success;
     }
