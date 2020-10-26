@@ -58,16 +58,14 @@ export default class HallView extends UIView implements IController<LobbyService
                     //websocket测试
                     
                     // let testProto = new TestMsg();
-                    // testProto.data.awesomeField = "test hello";
-                    // testProto.encode();
-                    // testProto.decode(testProto.buffer);
+                    // testProto.data.awesomeField = "这是一个中文的测试";
                     // this.service.send(testProto);
 
-                    let msg = new UpdateMoney();
-                    this.service.send(msg);
+                    // let msg = new UpdateMoney();
+                    // this.service.send(msg);
 
-                    // let binaryMessage = new TestBinaryMessage();
-                    // this.service.send(binaryMessage);
+                    let binaryMessage = new TestBinaryMessage();
+                    this.service.send(binaryMessage);
 
                 });
             }
@@ -123,7 +121,7 @@ export default class HallView extends UIView implements IController<LobbyService
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
 
         //根据自己的需要，连接网络
-        LobbyService.instance.messageProcessType = MessageProcessType.Json;
+        LobbyService.instance.messageProcessType = MessageProcessType.BinaryStream;
         LobbyService.instance.connect("echo.websocket.org");
     }
 

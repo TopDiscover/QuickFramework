@@ -12,7 +12,7 @@ export class ProtoMessage<T> extends Message {
     private type : any = null;
 
     /**@description 真空的Proto数据 */
-    private data : T = null;
+    data : T = null;
 
     constructor( protoType? : any ){
         super();

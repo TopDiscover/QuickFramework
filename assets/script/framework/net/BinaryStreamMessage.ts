@@ -260,9 +260,9 @@ export class Uint32Value extends NumberStreamValue {
 
 export class BinaryStream extends Message {
 
-    private _dataView: DataView = null;
+    protected _dataView: DataView = null;
     /**@description 读取数据的偏移量 */
-    private _byteOffset = 0;
+    protected _byteOffset = 0;
 
     /**@description 将当前数据转成buffer */
     encode() : boolean {
@@ -455,7 +455,7 @@ export class BinaryStream extends Message {
      * @description 从json压缩对象信息 反序列化为实体类字段信息
      * @param data json压缩对象
      * */
-    private deserialize() {
+    protected deserialize() {
         let __serializeInfo = Reflect.getPrototypeOf(this)['__serialize__'];
         if (!__serializeInfo) return true;
         let serializeKeyList = Object.keys(__serializeInfo);
@@ -563,4 +563,12 @@ export class BinaryStreamMessage extends BinaryStream {
     mainCmd = 0;
     @serialize("subCmd", Int32Value)
     subCmd = 0;
+
+    decode(data: Uint8Array){
+        this.buffer = data;
+        this._dataView = new DataView(data.buffer);
+        this._byteOffset = 0;
+        this.deserialize();
+        return true;
+    }
 }
