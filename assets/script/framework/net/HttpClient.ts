@@ -67,6 +67,19 @@ export class HttpPackage {
     public get data(): HttpPackageData {
         return this._data;
     }
+
+    private _params : Object = null;
+    /**
+     * @description 传入的请求参数会拼在data.url 
+     * @example params = { a : 10 , b : 20 }
+     * 最终的url 为data.url?&a=10&b=20
+     */
+    public set params( value : Object ){
+        this._params = value;
+    }
+    public get params(){
+        return this._params;
+    }
     /**
      * @description 发送请求包
      * @param cb 
@@ -106,9 +119,30 @@ class HttpClient {
         }
     }
 
-    static request(packge: HttpPackage, cb?: (data: any) => void, errorcb?: (errorData: HttpError) => void) {
+    private static convertParams( url : string , params : Object ) : string{
+        if( params == null || params == undefined ){
+            return url;
+        }
+        let result = "&";
+        if ( url.indexOf("?") < 0 ){
+            result = "?";
+        }
+        let keys = Object.keys(params)
+        for( let i = 0 ; i < keys.length ; i++ ){
+            if( i == 0 ){
+                result += `${keys[i]}=${params[keys[i]]}`;
+            }else{
+                result += `&${keys[i]}=${params[keys[i]]}`
+            }
+        }
+        result = url + result;
+        let  ttt = "http://" + "severip" + "/v1/httpdns/clouddns?ws_domain=" + "address" + ".w.cdngslb.com&ws_ret_type=json&ws_cli_IP=";
+        return  result;
+    }
 
-        let url = packge.data.url;
+    static request(httpPackage: HttpPackage, cb?: (data: any) => void, errorcb?: (errorData: HttpError) => void) {
+
+        let url = httpPackage.data.url;
         if (!url) {
             if ( CC_DEBUG ){
                 cc.error(`reuqest url error`);
@@ -138,9 +172,9 @@ class HttpClient {
             }
         };
 
-        xhr.responseType = packge.data.responseType;
+        xhr.responseType = httpPackage.data.responseType;
 
-        xhr.timeout = packge.data.timeout;
+        xhr.timeout = httpPackage.data.timeout;
         xhr.ontimeout = () => {
             xhr.abort();//网络超时，断开连接
             if ( CC_DEBUG) cc.warn(`request timeout : ${url}`);
@@ -152,12 +186,13 @@ class HttpClient {
             if (errorcb) errorcb({ type: HttpErrorType.RequestError, reason: "请求错误" });
         };
 
-        if ( CC_DEBUG ) cc.log(`[send http request] url : ${url} request type : ${packge.data.type} , responseType : ${xhr.responseType}`);
+        if ( CC_DEBUG ) cc.log(`[send http request] url : ${url} request type : ${httpPackage.data.type} , responseType : ${xhr.responseType}`);
 
         url = this.crossProxy(url);
+        url = this.convertParams(url,httpPackage.params);
 
         if ( cc.sys.isBrowser ){
-            if ( packge.data.isAutoAttachCurrentTime ){
+            if ( httpPackage.data.isAutoAttachCurrentTime ){
                 if ( url.indexOf("?") >=0 ){
                     url = `${url}&cur_loc_t=${Date.timeNow()}`;
                 }else{
@@ -167,35 +202,35 @@ class HttpClient {
         }
 
         if (cc.sys.isBrowser && !CC_PREVIEW) {
-            if ( CC_DEBUG) cc.log(`[send http request] corss prox url : ${url} request type : ${packge.data.type} , responseType : ${xhr.responseType}`);
+            if ( CC_DEBUG) cc.log(`[send http request] corss prox url : ${url} request type : ${httpPackage.data.type} , responseType : ${xhr.responseType}`);
         }
 
-        if (packge.data.type === HttpRequestType.POST) {
+        if (httpPackage.data.type === HttpRequestType.POST) {
             xhr.open(HttpRequestType.POST, url);
-            if (packge.data.requestHeader) {
-                if( packge.data.requestHeader instanceof Array ){
-                    packge.data.requestHeader.forEach((header)=>{
+            if (httpPackage.data.requestHeader) {
+                if( httpPackage.data.requestHeader instanceof Array ){
+                    httpPackage.data.requestHeader.forEach((header)=>{
                         xhr.setRequestHeader(header.name, header.value);
                     });
                 }else{
-                    let header : { name: string, value: string } = packge.data.requestHeader;
+                    let header : { name: string, value: string } = httpPackage.data.requestHeader;
                     xhr.setRequestHeader(header.name,header.value);
                 }
             }
             else {
                 xhr.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
             }
-            xhr.send( packge.data.data );
+            xhr.send( httpPackage.data.data );
         }
         else {
             xhr.open(HttpRequestType.GET, url, true);
-            if( packge.data.requestHeader ){
-                if( packge.data.requestHeader instanceof Array ){
-                    packge.data.requestHeader.forEach((header)=>{
+            if( httpPackage.data.requestHeader ){
+                if( httpPackage.data.requestHeader instanceof Array ){
+                    httpPackage.data.requestHeader.forEach((header)=>{
                         xhr.setRequestHeader(header.name, header.value);
                     });
                 }else{
-                    let header : { name: string, value: string } = packge.data.requestHeader;
+                    let header : { name: string, value: string } = httpPackage.data.requestHeader;
                     xhr.setRequestHeader(header.name,header.value);
                 }
             }

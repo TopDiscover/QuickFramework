@@ -43,7 +43,11 @@ class _HallNetHelper extends NetHelper<LobbyService>{
 
         httpPackage = new HttpPackage();
         httpPackage.data.url = "https://httpbin.org/get";
-        httpPackage.data.requestHeader = {name : "Content-Type" , value : "text/plain"}
+        // httpPackage.data.requestHeader = {name : "Content-Type" , value : "text/plain"}
+        httpPackage.params = {
+            a : 100,
+            b : "zheng"
+        }
         httpPackage.send((data)=>{
             cc.log("数据返回")
         },()=>{
