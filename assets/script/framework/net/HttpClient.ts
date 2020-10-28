@@ -19,7 +19,7 @@ export enum HttpRequestType {
 }
 
 export class RequestPackgeData {
-    data: any = null;
+    data: Object = null;
     url: string = null;
     /**@description 超时设置 默认为10s*/
     timeout: number = 10000;
@@ -152,7 +152,7 @@ class HttpClient {
             if (errorcb) errorcb({ type: HttpErrorType.RequestError, reason: "请求错误" });
         };
 
-        if ( CC_DEBUG ) cc.log(`[send http request] url : ${url} request type : ${packge.data.type} , responseType : ${xhr.responseType} data : ${packge.data.data}`);
+        if ( CC_DEBUG ) cc.log(`[send http request] url : ${url} request type : ${packge.data.type} , responseType : ${xhr.responseType}`);
 
         url = this.crossProxy(url);
 
@@ -167,7 +167,7 @@ class HttpClient {
         }
 
         if (cc.sys.isBrowser && !CC_PREVIEW) {
-            if ( CC_DEBUG) cc.log(`[send http request] corss prox url : ${url} request type : ${packge.data.type} , responseType : ${xhr.responseType} data : ${packge.data.data}`);
+            if ( CC_DEBUG) cc.log(`[send http request] corss prox url : ${url} request type : ${packge.data.type} , responseType : ${xhr.responseType}`);
         }
 
         if (packge.data.type === HttpRequestType.POST) {
@@ -178,7 +178,13 @@ class HttpClient {
             else {
                 xhr.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
             }
-            xhr.send(packge.data.data);
+            try {
+                xhr.send( JSON.stringify(packge.data.data));
+            } catch (error) {
+                if ( CC_DEBUG) cc.warn(`request send data error : ${url}`);
+                if (errorcb) errorcb({ type: HttpErrorType.RequestError, reason: "请求数据错误" });
+            }
+            
         }
         else {
             xhr.open(HttpRequestType.GET, url, true);
