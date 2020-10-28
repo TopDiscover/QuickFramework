@@ -136,7 +136,6 @@ class HttpClient {
             }
         }
         result = url + result;
-        let  ttt = "http://" + "severip" + "/v1/httpdns/clouddns?ws_domain=" + "address" + ".w.cdngslb.com&ws_ret_type=json&ws_cli_IP=";
         return  result;
     }
 
