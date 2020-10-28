@@ -1,7 +1,8 @@
 import { LobbyService } from "../../common/net/LobbyService";
-import { TestBinaryMessage } from "./CmdBinaryMessage";
-import { UpdateMoney, TestMsg } from "./HallMessage";
 import NetHelper from "../../framework/controller/NetHelper";
+import { TestMsg, UpdateMoney } from "../protocol/HallMessage";
+import { TestBinaryMessage } from "../protocol/CmdBinaryMessage";
+import { HttpPackage, HttpRequestType } from "../../framework/net/HttpClient";
 
 class _HallNetHelper extends NetHelper<LobbyService>{
 
@@ -23,6 +24,32 @@ class _HallNetHelper extends NetHelper<LobbyService>{
     sendBinaryMessage() {
         let binaryMessage = new TestBinaryMessage();
         this.service.send(binaryMessage);
+    }
+
+    sendHttpMessage( ){
+
+        let httpPackage = new HttpPackage();
+        httpPackage.data.url = "https://httpbin.org/post";
+        httpPackage.data.type = HttpRequestType.POST;
+        //"text/plain;charset=UTF-8""Accept-Encoding","gzip,deflate"
+        //httpPackage.data.requestHeader = [{name : "Content-Type" , value : "text/plain"},{name:"Accept-Encoding",value:"gzip,deflate"}]
+        httpPackage.data.requestHeader = {name : "Content-Type" , value : "text/plain"}
+        httpPackage.data.data = new Uint8Array([1,2,3,4,5]);
+        httpPackage.send((data)=>{
+            cc.log("数据返回")
+        },()=>{
+            cc.log("数据错误")
+        })
+
+        httpPackage = new HttpPackage();
+        httpPackage.data.url = "https://httpbin.org/get";
+        httpPackage.data.requestHeader = {name : "Content-Type" , value : "text/plain"}
+        httpPackage.send((data)=>{
+            cc.log("数据返回")
+        },()=>{
+            cc.log("数据错误")
+        })
+
     }
 }
 export let HallNetHelper = new _HallNetHelper();

@@ -53,6 +53,7 @@ export default class HallView extends UIView{
                     HallNetHelper.sendBinaryMessage();
                     // HallNetHelper.sendJsonMessage();
                     // HallNetHelper.sendProtoMessage();
+                    // HallNetHelper.sendHttpMessage();
                 });
             }
             else{

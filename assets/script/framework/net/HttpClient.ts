@@ -18,14 +18,14 @@ export enum HttpRequestType {
     GET = "GET",
 }
 
-export class RequestPackgeData {
-    data: Object = null;
+class HttpPackageData {
+    data: any = null;
     url: string = null;
     /**@description 超时设置 默认为10s*/
     timeout: number = 10000;
     /**@description 请求类型 默认为GET请求*/
     type: HttpRequestType = HttpRequestType.GET;
-    requestHeader: { name: string, value: string } = null;
+    requestHeader: { name: string, value: string }[] | { name: string, value: string } = null;
     /**@description 发送接口时，默认为false 仅浏览器端生效
      * 自动附加当前时间的参数字段
      * 但如果服务器做了接口参数效验，可能会导致接口无法通过服务器验证，返回错误数据
@@ -53,18 +53,18 @@ export class RequestPackgeData {
 /**
  * @description http 请求包
  */
-export class RequestPackge {
+export class HttpPackage {
 
     /**@description 跨域代理 */
     public static crossProxy = {};
     /**@description 当前主机地址 */
     public static location = { host : "" , pathname : "" , protocol : ""};
 
-    private _data: RequestPackgeData = new RequestPackgeData();
-    public set data(data: RequestPackgeData) {
+    private _data: HttpPackageData = new HttpPackageData();
+    public set data(data: HttpPackageData) {
         this._data = data;
     }
-    public get data(): RequestPackgeData {
+    public get data(): HttpPackageData {
         return this._data;
     }
     /**
@@ -81,9 +81,9 @@ class HttpClient {
 
     static crossProxy(url: string): string {
         //浏览器，非调试模式下
-        if (cc.sys.isBrowser && !CC_PREVIEW && RequestPackge.crossProxy ) {
-            let config = RequestPackge.crossProxy;
-            let location = RequestPackge.location;
+        if (cc.sys.isBrowser && !CC_PREVIEW && HttpPackage.crossProxy ) {
+            let config = HttpPackage.crossProxy;
+            let location = HttpPackage.location;
             let keys = Object.keys(config);
 
             for (let i = 0; i < keys.length; i++) {
@@ -106,7 +106,7 @@ class HttpClient {
         }
     }
 
-    static request(packge: RequestPackge, cb?: (data: any) => void, errorcb?: (errorData: HttpError) => void) {
+    static request(packge: HttpPackage, cb?: (data: any) => void, errorcb?: (errorData: HttpError) => void) {
 
         let url = packge.data.url;
         if (!url) {
@@ -173,23 +173,31 @@ class HttpClient {
         if (packge.data.type === HttpRequestType.POST) {
             xhr.open(HttpRequestType.POST, url);
             if (packge.data.requestHeader) {
-                xhr.setRequestHeader(packge.data.requestHeader.name, packge.data.requestHeader.value);
+                if( packge.data.requestHeader instanceof Array ){
+                    packge.data.requestHeader.forEach((header)=>{
+                        xhr.setRequestHeader(header.name, header.value);
+                    });
+                }else{
+                    let header : { name: string, value: string } = packge.data.requestHeader;
+                    xhr.setRequestHeader(header.name,header.value);
+                }
             }
             else {
                 xhr.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
             }
-            try {
-                xhr.send( JSON.stringify(packge.data.data));
-            } catch (error) {
-                if ( CC_DEBUG) cc.warn(`request send data error : ${url}`);
-                if (errorcb) errorcb({ type: HttpErrorType.RequestError, reason: "请求数据错误" });
-            }
-            
+            xhr.send( packge.data.data );
         }
         else {
             xhr.open(HttpRequestType.GET, url, true);
-            if (packge.data.requestHeader) {
-                xhr.setRequestHeader(packge.data.requestHeader.name, packge.data.requestHeader.value);
+            if( packge.data.requestHeader ){
+                if( packge.data.requestHeader instanceof Array ){
+                    packge.data.requestHeader.forEach((header)=>{
+                        xhr.setRequestHeader(header.name, header.value);
+                    });
+                }else{
+                    let header : { name: string, value: string } = packge.data.requestHeader;
+                    xhr.setRequestHeader(header.name,header.value);
+                }
             }
             xhr.send();
         }
