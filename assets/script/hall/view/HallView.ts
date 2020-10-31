@@ -5,8 +5,13 @@ import { i18n } from "../../common/language/LanguageImpl";
 import { dispatchEnterComplete, LogicType } from "../../common/event/LogicEvent";
 import { Manager } from "../../common/manager/Manager";
 import { CommonEvent } from "../../common/event/CommonEvent";
-import { MessageProcessType } from "../../framework/base/Service";
 import { HallNetHelper } from "../controller/HallNetHelper";
+import { ProtoMessageHeader } from "../../framework/net/ProtoMessage";
+import { HeartbeatProto } from "../../common/protocol/HeartbetProto";
+import { JsonMessageHeader } from "../../framework/net/JsonMessage";
+import { HeartbeatJson } from "../../common/protocol/HeartbetJson";
+import { BinaryStreamMessageHeader } from "../../framework/net/BinaryStreamMessage";
+import { HeartbeatBinary } from "../../common/protocol/HeartbetBinary";
 
 const { ccclass, property } = cc._decorator;
 
@@ -50,10 +55,10 @@ export default class HallView extends UIView{
             }else if( i == 6 ){
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
                     //websocket测试
-                    HallNetHelper.sendBinaryMessage();
+                    // HallNetHelper.sendBinaryMessage();
                     // HallNetHelper.sendJsonMessage();
-                    // HallNetHelper.sendProtoMessage();
-                    HallNetHelper.sendHttpMessage();
+                    HallNetHelper.sendProtoMessage();
+                    // HallNetHelper.sendHttpMessage();
                 });
             }
             else{
@@ -108,7 +113,19 @@ export default class HallView extends UIView{
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
 
         //根据自己的需要，连接网络
-        LobbyService.instance.messageProcessType = MessageProcessType.BinaryStream;
+
+        //proto
+        LobbyService.instance.messageHeader = ProtoMessageHeader;
+        LobbyService.instance.heartbeat = HeartbeatProto;
+
+        //json
+        // LobbyService.instance.messageHeader = JsonMessageHeader;
+        // LobbyService.instance.heartbeat = HeartbeatJson;
+
+        //binaryStream
+        // LobbyService.instance.messageHeader = BinaryStreamMessageHeader;
+        // LobbyService.instance.heartbeat = HeartbeatBinary;
+
         LobbyService.instance.connect("echo.websocket.org");
     }
 

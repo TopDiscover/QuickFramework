@@ -2,7 +2,7 @@
  * @description 二进制数据流解析
  */
 
-import { Message, Utf8ArrayToStr } from "./Message";
+import { Message, Utf8ArrayToStr, MessageHeader } from "./Message";
 import { USING_LITTLE_ENDIAN } from "../base/Defines";
 
 type BinaryStreamConstructor = typeof BinaryStream;
@@ -559,16 +559,9 @@ export class BinaryStream extends Message {
 }
 
 export class BinaryStreamMessage extends BinaryStream {
-    @serialize("mainCmd", Int32Value)
-    mainCmd = 0;
-    @serialize("subCmd", Int32Value)
-    subCmd = 0;
+    
+}
 
-    decode(data: Uint8Array){
-        this.buffer = data;
-        this._dataView = new DataView(data.buffer);
-        this._byteOffset = 0;
-        this.deserialize();
-        return true;
-    }
+export class BinaryStreamMessageHeader extends MessageHeader{
+
 }

@@ -1,11 +1,8 @@
 
-import { Service, MessageProcessType } from "../../framework/base/Service";
+import { Service } from "../../framework/base/Service";
 import { GameEventInterface } from "../../framework/base/GameEventInterface";
-import { Message } from "../../framework/net/Message";
+import { IMessage } from "../../framework/net/Message";
 import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdNetID";
-import { HeartbeatJson } from "../protocol/HeartbetJson";
-import { HeartbeatProto } from "../protocol/HeartbetProto";
-import { HeartbeatBinary } from "../protocol/HeartbetBinary";
 
 /**
  * @description service公共基类
@@ -21,14 +18,10 @@ export class CommonService extends Service implements GameEventInterface {
      */
     protected sendHeartbeat() {
         //发送心跳
-        if (this.messageProcessType == MessageProcessType.Json ) {
-            this.send(new HeartbeatJson() );
-        }else if (this.messageProcessType == MessageProcessType.Proto ) {
-            this.send(new HeartbeatProto());
-        }else if( this.messageProcessType == MessageProcessType.BinaryStream ){
-            this.send(new HeartbeatBinary())
+        if (this.heartbeat) {
+            this.send(new this.heartbeat() );
         }else{
-            cc.error("未支持的数据处理类型")
+            cc.error("请先设置心跳解析类型")
         }
     } 
     /**
@@ -52,7 +45,7 @@ export class CommonService extends Service implements GameEventInterface {
     /**
      * @description 是否为心跳消息
      */
-    protected isHeartBeat(data: Message): boolean {
+    protected isHeartBeat(data: IMessage): boolean {
         //示例
         return data.mainCmd == MainCmd.CMD_SYS && data.subCmd == SUB_CMD_SYS.CMD_SYS_HEART_ACK;
     }

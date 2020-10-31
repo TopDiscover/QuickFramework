@@ -1,5 +1,5 @@
 import WebSocketClinet from "./WebSocketClient";
-import { Message } from "./Message";
+import { Message, IMessage } from "./Message";
 
 /**
  * @description 服务器连接器
@@ -50,7 +50,7 @@ export class ServerConnector {
     /**
      * @description 是否为心跳消息
      */
-    protected isHeartBeat(data: Message): boolean {
+    protected isHeartBeat(data: IMessage): boolean {
         return false;
     }
 
@@ -148,13 +148,8 @@ export class ServerConnector {
      * @description 发送请求
      * @param msg 消息
      */
-    public send(msg: Message) {
-        if (this.isHeartBeat(msg)) {
-            if (CC_DEBUG) cc.log(`send request main cmd : ${msg.mainCmd} , sub cmd : ${msg.subCmd} `);
-        } else {
-            cc.log(`send request main cmd : ${msg.mainCmd} , sub cmd : ${msg.subCmd} `);
-        }
-        this._wsClient && this._wsClient.send(msg.buffer);
+    protected sendBuffer(buffer: Uint8Array) {
+        this._wsClient && this._wsClient.send(buffer);
     }
 
     public close() {

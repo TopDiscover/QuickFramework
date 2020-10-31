@@ -1,11 +1,9 @@
 import { ServerConnector } from "../net/ServerConnector";
 import { EventApi } from "../event/EventApi";
 import { makeKey } from "../decorator/Decorators";
-import { Message } from "../net/Message";
+import { Message, MessageHeader, IMessage } from "../net/Message";
 import { Manager } from "../Framework";
-import { JsonMessage } from "../net/JsonMessage";
-import { BaseProto } from "../net/ProtoMessage";
-import { BinaryStreamMessage } from "../net/BinaryStreamMessage";
+
 /**
  * @description 与服务器之间消息收发基类,注册消息并转发
  */
@@ -23,42 +21,19 @@ export interface ProtoListenerData {
     target?: any, //处理者
 }
 
-/**@description 解析消息类型 */
-export enum MessageProcessType{
-    /**@description 未知数据类型 */
-    unknown,
-    /**@description 以json类型作为解析 */
-    Json,
-    /**@description 以protobuf类型作为解析 */
-    Proto,
-    /**@description 以二进制数据流作为解析 */
-    BinaryStream,
-}
-
 export class Service extends ServerConnector {
-
-    protected _messageType : typeof Message = Message;
-    /**@description 公共的消息解析类型，必须包含对消息码的解析与打包 */
-    protected get commonMessageType(): typeof Message{
-        return this._messageType;
+    private _messageHeader : typeof MessageHeader = MessageHeader;
+    /**@description 数据流消息包头定义类型 */
+    public set messageHeader( value : typeof MessageHeader ){
+        this._messageHeader = value;
     }
-
-    protected _messageProcessType : MessageProcessType = MessageProcessType.unknown;
-    /**@description 当前使用什么方式进行数据解析 */
-    public get messageProcessType(){
-        return this._messageProcessType;
+    private _Heartbeat : typeof Message = null;
+    /**@description 心跳的消息定义类型 */
+    public get heartbeat() : typeof Message{
+        return this._Heartbeat;
     }
-    public set messageProcessType(value:MessageProcessType){
-        this._messageProcessType = value;
-        if (value == MessageProcessType.Json ) {
-            this._messageType = JsonMessage;
-        }else if (value == MessageProcessType.Proto ) {
-            this._messageType = BaseProto;
-        }else if ( value == MessageProcessType.BinaryStream) {
-            this._messageType = BinaryStreamMessage;
-        }else{
-            cc.error("未支持的数据处理类型")
-        }
+    public set heartbeat( value : typeof Message ){
+        this._Heartbeat = value;
     }
 
     /**
@@ -82,7 +57,7 @@ export class Service extends ServerConnector {
     /**
      * @description 是否为心跳消息
      */
-    protected isHeartBeat(data: Message): boolean {
+    protected isHeartBeat(data: IMessage): boolean {
         return super.isHeartBeat(data);
     }
     protected onOpen() {
@@ -100,21 +75,21 @@ export class Service extends ServerConnector {
     protected onMessage(data: Uint8Array) {
 
         //先对包信进行解析
-        let msg = new this.commonMessageType();
-        if (!msg.decode(data)) {
-            cc.error(`decode error`);
+        let header = new this._messageHeader();
+        if (!header.decode(data)) {
+            cc.error(`decode header error`);
             return;
         }
         super.onMessage(data);
-        if ( this.isHeartBeat(msg) ){
+        if ( this.isHeartBeat(header) ){
             //心跳消息，路过处理，应该不会有人注册心跳吧
             return;
         }
-        cc.log(`recv data main cmd : ${msg.mainCmd} sub cmd : ${msg.subCmd} buffer length : ${msg.buffer.length}`);
-        let key = makeKey(msg.mainCmd, msg.subCmd);
+        cc.log(`recv data main cmd : ${header.mainCmd} sub cmd : ${header.subCmd} buffer length : ${header.size}`);
+        let key = makeKey(header.mainCmd, header.subCmd);
 
         if (!this._listeners[key]) {
-            cc.warn(`no find listener data main cmd : ${msg.mainCmd} sub cmd : ${msg.subCmd}`);
+            cc.warn(`no find listener data main cmd : ${header.mainCmd} sub cmd : ${header.subCmd}`);
             return;
         }
         if (this._listeners[key].length <= 0) {
@@ -129,10 +104,10 @@ export class Service extends ServerConnector {
             if (listenerDatas[i].type) {
                 obj = new listenerDatas[i].type();
                 //解包
-                obj.decode(data);
+                obj.decode(header.buffer);
             } else {
                 //把数据放到里面，让后面使用都自己解析
-                obj = msg;
+                obj = header.buffer as any;
             }
 
             if (listenerDatas[i].isQueue) {
@@ -302,10 +277,22 @@ export class Service extends ServerConnector {
      */
     public send(msg: Message) {
         //发送请求数据
-        if (msg.encode()) {
-            super.send(msg);
-        } else {
-            cc.error(`encode error`);
+        if( this._messageHeader ){
+            if( msg.encode() ){
+                let header = new this._messageHeader();
+                header.encode(msg);
+                if (this.isHeartBeat(msg)) {
+                    if (CC_DEBUG) cc.log(`send request main cmd : ${msg.mainCmd} , sub cmd : ${msg.subCmd} `);
+                } else {
+                    cc.log(`send request main cmd : ${msg.mainCmd} , sub cmd : ${msg.subCmd} `);
+                }
+                this.sendBuffer(header.buffer);
+            }else{
+                cc.error(`encode error`);
+            }
+           
+        }else{
+            cc.error("请求指定数据包头处理类型")
         }
     }
 

@@ -1,5 +1,5 @@
 
-import { Message, Utf8ArrayToStr } from "./Message";
+import { Message, Utf8ArrayToStr, MessageHeader } from "./Message";
 
 type JsonMessageConstructor = typeof JsonMessage;
 
@@ -40,11 +40,7 @@ export class JsonMessage extends Message {
 
     encode() : boolean {
         this.data = this.serialize();
-        let obj: { mainCmd?: number, subCmd?: number, data?: any } = {};
-        obj.mainCmd = this.mainCmd;
-        obj.subCmd = this.subCmd;
-        obj.data = this.data ? this.data : {};
-        let result = JSON.stringify(obj);
+        let result = JSON.stringify(this.data);
         this.buffer = new Buffer(result);
         return true;
     }
@@ -53,7 +49,7 @@ export class JsonMessage extends Message {
     private serialize(): any {
         let result = {};
         let __serialize__ = Reflect.getPrototypeOf(this)['__serialize__'];
-        if (!__serialize__) return null;
+        if (!__serialize__) return result;
         let serializeKeyList = Object.keys(__serialize__);
         for (let len = serializeKeyList.length, i = 0; i < len; i++) {
             let serializeKey = serializeKeyList[i];
@@ -129,9 +125,6 @@ export class JsonMessage extends Message {
             if (result.length > 0) {
                 try {
                     this.data = JSON.parse(result);
-                    this.mainCmd = this.data.mainCmd;
-                    this.subCmd = this.data.subCmd;
-                    this.data = this.data.data ? this.data.data : {};
                 } catch (error) {
                     return false;
                 }
@@ -293,4 +286,8 @@ export class JsonMessage extends Message {
             this[memberName].set(elementKey, elementValue);
         });
     }
+}
+
+export class JsonMessageHeader extends MessageHeader{
+    
 }

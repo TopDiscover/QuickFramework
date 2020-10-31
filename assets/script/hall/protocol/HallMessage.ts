@@ -46,27 +46,21 @@ import { Type ,Field,Message} from "../../framework/external/protobuf";
 @Type.d("TestMsg") 
 export class TestMsgProto extends Message {
 
-    @Field.d(1, "int32", "optional", "awesome default string")
-    public mainCmd: number ;
-
-    @Field.d(2, "int32","optional")
-    public subCmd: number ;
-
-    @Field.d(3, "string", "required", "awesome default string")
+    @Field.d(1, "string", "required", "awesome default string")
     public awesomeField: string;
 
-    @Field.d(4, AwesomeEnum,"required",AwesomeEnum.ONE)
+    @Field.d(2, AwesomeEnum,"required",AwesomeEnum.ONE)
     public awesomeEnum: AwesomeEnum;
 
     constructor(){
         super()
-        this.mainCmd = MainCmd.CMD_LOBBY;
-        this.subCmd = SUB_CMD_LOBBY.TEST_PROTO_MSG;
+        
     }
 }
 
 export class TestMsg extends ProtoMessage<TestMsgProto>{
-
+    mainCmd = MainCmd.CMD_LOBBY;
+    subCmd = SUB_CMD_LOBBY.TEST_PROTO_MSG;
     constructor(){
         super(TestMsgProto)
     }

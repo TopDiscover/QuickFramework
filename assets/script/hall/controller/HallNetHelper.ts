@@ -1,6 +1,6 @@
 import { LobbyService } from "../../common/net/LobbyService";
 import NetHelper from "../../framework/controller/NetHelper";
-import { TestMsg, UpdateMoney } from "../protocol/HallMessage";
+import { UpdateMoney, TestMsg } from "../protocol/HallMessage";
 import { TestBinaryMessage } from "../protocol/CmdBinaryMessage";
 import { HttpPackage, HttpRequestType } from "../../framework/net/HttpClient";
 
