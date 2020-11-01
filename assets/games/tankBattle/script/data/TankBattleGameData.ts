@@ -118,6 +118,13 @@ export namespace TankBettle {
         live = 1;
     }
 
+    /**@description 敌人出生点位置 */
+    export enum EnemyBornPosition{
+        LEFT,
+        MIDDLE,
+        RIGHT,
+    }
+
     class TankBettleGameData extends GameData {
         onLanguageChange() {
             let lan = TANK_LAN_ZH;

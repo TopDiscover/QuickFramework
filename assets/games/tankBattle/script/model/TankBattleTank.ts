@@ -13,28 +13,9 @@ export default class TankBettleTank extends cc.Component {
     /**@description 移动方向 */
     public direction: TankBettle.Direction = TankBettle.Direction.UP;
     /**@description 当前是否正常移动 */
-    private isMoving = false;
+    protected isMoving = false;
 
     move() {
-        if (this.isMoving) {
-            return;
-        }
-
-        this.node.stopAllActions();
-        this.isMoving = true;
-        if (this.direction == TankBettle.Direction.UP) {
-            this.node.angle = 0;
-            cc.tween(this.node).delay(0).by(this.config.time, { y: this.config.distance }).call(() => { this.isMoving = false; }).start();
-        } else if (this.direction == TankBettle.Direction.DOWN) {
-            this.node.angle = 180;
-            cc.tween(this.node).delay(0).by(this.config.time, { y: -this.config.distance }).call(() => { this.isMoving = false; }).start();
-        } else if (this.direction == TankBettle.Direction.RIGHT) {
-            this.node.angle = -90;
-            cc.tween(this.node).delay(0).by(this.config.time, { x: this.config.distance }).call(() => { this.isMoving = false; }).start();
-        } else if (this.direction == TankBettle.Direction.LEFT) {
-            this.node.angle = 90;
-            cc.tween(this.node).delay(0).by(this.config.time, { x: -this.config.distance }).call(() => { this.isMoving = false; }).start();
-        }
 
     }
 
@@ -57,6 +38,10 @@ export default class TankBettleTank extends cc.Component {
     /**@description 受伤 */
     public hurt() {
 
+    }
+
+    changeDirection(){
+        
     }
 
     /**
@@ -85,7 +70,7 @@ export default class TankBettleTank extends cc.Component {
     }
 
     /**@description 处理与地图元素的碰撞 */
-    private onBlockCollision(other: cc.BoxCollider, me: cc.BoxCollider) {
+    protected onBlockCollision(other: cc.BoxCollider, me: cc.BoxCollider) {
         //有阻挡才处理
         if (other.node.group == TankBettle.GROUP.Wall ||
             other.node.group == TankBettle.GROUP.StoneWall ||
@@ -100,6 +85,8 @@ export default class TankBettleTank extends cc.Component {
             this.node.x = pos.x;
             this.node.y = pos.y;
             this.isMoving = false;
+            //改变方向
+            this.changeDirection();
         }
     }
 
@@ -186,6 +173,28 @@ export class TankBettleTankPlayer extends TankBettleTank {
             TankBettle.gameData.gameMap.removePlayer(this);
         }
     }
+
+    move(){
+        if (this.isMoving) {
+            return;
+        }
+
+        this.node.stopAllActions();
+        this.isMoving = true;
+        if (this.direction == TankBettle.Direction.UP) {
+            this.node.angle = 0;
+            cc.tween(this.node).delay(0).by(this.config.time, { y: this.config.distance }).call(() => { this.isMoving = false; }).start();
+        } else if (this.direction == TankBettle.Direction.DOWN) {
+            this.node.angle = 180;
+            cc.tween(this.node).delay(0).by(this.config.time, { y: -this.config.distance }).call(() => { this.isMoving = false; }).start();
+        } else if (this.direction == TankBettle.Direction.RIGHT) {
+            this.node.angle = -90;
+            cc.tween(this.node).delay(0).by(this.config.time, { x: this.config.distance }).call(() => { this.isMoving = false; }).start();
+        } else if (this.direction == TankBettle.Direction.LEFT) {
+            this.node.angle = 90;
+            cc.tween(this.node).delay(0).by(this.config.time, { x: -this.config.distance }).call(() => { this.isMoving = false; }).start();
+        }
+    }
 }
 
 export class TankBettleTankEnemy extends TankBettleTank {
@@ -204,5 +213,47 @@ export class TankBettleTankEnemy extends TankBettleTank {
         if (this.config.live <= 0) {
             TankBettle.gameData.gameMap.removeEnemy(this.node);
         }
+    }
+
+    public move(){
+        this.node.stopAllActions();
+        if (this.direction == TankBettle.Direction.UP) {
+            this.node.angle = 0;
+            cc.tween(this.node).delay(0)
+            .by(this.config.time, { y: this.config.distance })
+            .repeatForever()
+            .start();
+        } else if (this.direction == TankBettle.Direction.DOWN) {
+            this.node.angle = 180;
+            cc.tween(this.node).delay(0)
+            .by(this.config.time, { y: -this.config.distance })
+            .repeatForever()
+            .start();
+        } else if (this.direction == TankBettle.Direction.RIGHT) {
+            this.node.angle = -90;
+            cc.tween(this.node).delay(0)
+            .by(this.config.time, { x: this.config.distance })
+            .repeatForever()
+            .start();
+        } else if (this.direction == TankBettle.Direction.LEFT) {
+            this.node.angle = 90;
+            cc.tween(this.node).delay(0).
+            by(this.config.time, { x: -this.config.distance })
+            .repeatForever()
+            .start();
+        }
+    }
+
+    changeDirection(){
+        let allDir : TankBettle.Direction[] = [];
+        for( let i = TankBettle.Direction.UP ; i <= TankBettle.Direction.RIGHT ; i++ ){
+            if( i != this.direction ){
+                allDir.push(i);
+            }
+        }
+
+        let dir = cc.randomInteger(0,allDir.length-1);
+        this.direction = dir;
+        this.move();
     }
 }

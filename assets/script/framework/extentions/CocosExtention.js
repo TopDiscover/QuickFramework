@@ -327,3 +327,10 @@ if ( !CC_EDITOR && ENABLE_CHANGE_LANGUAGE ){
     }
 
 }
+
+/**@description 随机[start，end]区间事件 */
+cc.randomInteger = function randomInteger( m , n ){
+    let value = (n+1- m) * Math.random() + m;
+    let result = Math.floor(value);
+    return result;
+}

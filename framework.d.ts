@@ -165,6 +165,9 @@ declare module cc {
 		loadFile(config: { url: string, view: any, completeCallback?: (file: ParticleAsset) => void , bundle?:BUNDLE_TYPE});
 
 	}
+
+	/**@description 随机[start，end]区间事件 */
+	export function randomInteger( start : number , end : number);
 }
 
 declare namespace sp {
