@@ -2,7 +2,7 @@
 
 export namespace Config {
     /**@description 是否显示调试按钮 */
-    export let isShowDebugButton = true;
+    export let isShowDebugButton = false;
 
     /**@description 当前入子游戏时，在Logic.onLoad时初始设置 */
     export let assetBundle = {};

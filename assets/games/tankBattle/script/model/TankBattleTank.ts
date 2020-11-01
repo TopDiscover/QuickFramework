@@ -40,8 +40,8 @@ export default class TankBettleTank extends cc.Component {
 
     }
 
-    changeDirection(){
-        
+    changeDirection(other: cc.BoxCollider) {
+
     }
 
     /**
@@ -69,6 +69,14 @@ export default class TankBettleTank extends cc.Component {
 
     }
 
+    protected getPlayer(node: cc.Node): TankBettleTank {
+        let player = node.getComponent(TankBettleTankPlayer);
+        if (player) {
+            return player;
+        }
+        return node.getComponent(TankBettleTankEnemy);
+    }
+
     /**@description 处理与地图元素的碰撞 */
     protected onBlockCollision(other: cc.BoxCollider, me: cc.BoxCollider) {
         //有阻挡才处理
@@ -85,8 +93,13 @@ export default class TankBettleTank extends cc.Component {
             this.node.x = pos.x;
             this.node.y = pos.y;
             this.isMoving = false;
-            //改变方向
-            this.changeDirection();
+            if (this.isAI && other.node.group == TankBettle.GROUP.Home) {
+                //如果是AI碰撞到老巢，直接GameOver
+                TankBettle.gameData.gameMap.gameOver();
+            }
+            if (this.isAI) {
+                this.changeDirection(other)
+            }
         }
     }
 
@@ -174,7 +187,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
         }
     }
 
-    move(){
+    move() {
         if (this.isMoving) {
             return;
         }
@@ -215,45 +228,63 @@ export class TankBettleTankEnemy extends TankBettleTank {
         }
     }
 
-    public move(){
+    public move() {
         this.node.stopAllActions();
         if (this.direction == TankBettle.Direction.UP) {
             this.node.angle = 0;
             cc.tween(this.node).delay(0)
-            .by(this.config.time, { y: this.config.distance })
-            .repeatForever()
-            .start();
+                .by(this.config.time, { y: this.config.distance })
+                .repeatForever()
+                .start();
         } else if (this.direction == TankBettle.Direction.DOWN) {
             this.node.angle = 180;
             cc.tween(this.node).delay(0)
-            .by(this.config.time, { y: -this.config.distance })
-            .repeatForever()
-            .start();
+                .by(this.config.time, { y: -this.config.distance })
+                .repeatForever()
+                .start();
         } else if (this.direction == TankBettle.Direction.RIGHT) {
             this.node.angle = -90;
             cc.tween(this.node).delay(0)
-            .by(this.config.time, { x: this.config.distance })
-            .repeatForever()
-            .start();
+                .by(this.config.time, { x: this.config.distance })
+                .repeatForever()
+                .start();
         } else if (this.direction == TankBettle.Direction.LEFT) {
             this.node.angle = 90;
             cc.tween(this.node).delay(0).
-            by(this.config.time, { x: -this.config.distance })
-            .repeatForever()
-            .start();
+                by(this.config.time, { x: -this.config.distance })
+                .repeatForever()
+                .start();
         }
     }
 
-    changeDirection(){
-        let allDir : TankBettle.Direction[] = [];
-        for( let i = TankBettle.Direction.UP ; i <= TankBettle.Direction.RIGHT ; i++ ){
-            if( i != this.direction ){
-                allDir.push(i);
+    changeDirection(other: cc.BoxCollider) {
+        let direction = this.direction;
+        let otherDir = null;
+        let isChange = true;
+        if (other.node.group == TankBettle.GROUP.Player) {
+            let player = this.getPlayer(other.node);
+            if (!player.isAI) {
+                //玩家顶着，就不改变原来方向
+                isChange = false;
+            }else{
+                otherDir = player.direction;
             }
         }
+        if (isChange) {
+            let allDir: TankBettle.Direction[] = [];
+            for (let i = TankBettle.Direction.UP; i <= TankBettle.Direction.RIGHT; i++) {
+                if (i != this.direction && i != otherDir ) {
+                    allDir.push(i);
+                }
+            }
+            direction = cc.randomInteger(0,allDir.length-1);
+        }
 
-        let dir = cc.randomInteger(0,allDir.length-1);
-        this.direction = dir;
+        if( this.node.x < 0 ){
+            cc.log(this.node.x);
+        }
+
+        this.direction = direction;
         this.move();
     }
 }

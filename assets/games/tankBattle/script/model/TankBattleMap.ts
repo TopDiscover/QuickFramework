@@ -35,6 +35,9 @@ export default class TankBattleMap extends cc.Component {
     /**@description 是否可生产敌人，以免生成的敌人重复 */
     private _isCanAddEnemy = true;
 
+    /**@description 老家 */
+    private _heart : cc.Node = null;
+
     protected onLoad() {
         this.node.children.forEach(node => {
             this.outWall.push(node);
@@ -185,6 +188,9 @@ export default class TankBattleMap extends cc.Component {
                         let node = cc.instantiate(prefab)
                         let block = node.addComponent(TankBattleBlock)
                         block.type = blockData;
+                        if( blockData == TankBettle.BLOCK_TYPE.HOME ){
+                            this._heart = node;
+                        }
                         this.node.addChild(node, TankBettle.ZIndex.BLOCK);
                         x = (j + 1) * prefebSize.width / 2 + j * prefebSize.width / 2
                         node.x = x;
@@ -288,8 +294,10 @@ export default class TankBattleMap extends cc.Component {
         }
     }
 
-    public gameOver(block: TankBattleBlock) {
-        let sprite = block.node.getComponent(cc.Sprite);
-        sprite.loadImage({ url: { urls: ["texture/images"], key: "heart_0" }, view: this.owner, bundle: this.owner.bundle })
+    public gameOver() {
+        if( this._heart ){
+            let sprite = this._heart.getComponent(cc.Sprite);
+            sprite.loadImage({ url: { urls: ["texture/images"], key: "heart_0" }, view: this.owner, bundle: this.owner.bundle })
+        }
     }
 }
