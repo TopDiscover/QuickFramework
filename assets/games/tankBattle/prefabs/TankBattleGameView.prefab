@@ -404,8 +404,8 @@
     "_skewX": 0,
     "_skewY": 0,
     "_is3DNode": false,
-    "_groupIndex": 2,
-    "groupIndex": 2,
+    "_groupIndex": 10,
+    "groupIndex": 10,
     "_id": ""
   },
   {
@@ -530,8 +530,8 @@
     "_skewX": 0,
     "_skewY": 0,
     "_is3DNode": false,
-    "_groupIndex": 2,
-    "groupIndex": 2,
+    "_groupIndex": 10,
+    "groupIndex": 10,
     "_id": ""
   },
   {
@@ -656,8 +656,8 @@
     "_skewX": 0,
     "_skewY": 0,
     "_is3DNode": false,
-    "_groupIndex": 2,
-    "groupIndex": 2,
+    "_groupIndex": 10,
+    "groupIndex": 10,
     "_id": ""
   },
   {
@@ -782,8 +782,8 @@
     "_skewX": 0,
     "_skewY": 0,
     "_is3DNode": false,
-    "_groupIndex": 2,
-    "groupIndex": 2,
+    "_groupIndex": 10,
+    "groupIndex": 10,
     "_id": ""
   },
   {
@@ -5703,7 +5703,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "bullet_0",
+    "_name": "bullet",
     "_objFlags": 0,
     "_parent": {
       "__id__": 125

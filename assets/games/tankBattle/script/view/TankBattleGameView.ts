@@ -18,9 +18,6 @@ export default class TankBattleGameView extends UIView {
         return "prefabs/TankBattleGameView";
     }
 
-    /**@description 地图 */
-    private _Map : TankBattleMap  = null;
-
     /**敌机总数显示节点 */
     private _enemyTankCount : cc.Node = null;
     private _enemyTankPrefab : cc.Node = null;
@@ -58,8 +55,8 @@ export default class TankBattleGameView extends UIView {
         let prefabs = cc.find("prefabs",this.node)
         TankBettle.gameData.gamePrefabs = prefabs;
         let game = cc.find("Game",this.node)
-        this._Map = game.addComponent(TankBattleMap);
-        this._Map.setPrefabs(prefabs);
+        TankBettle.gameData.gameMap = game.addComponent(TankBattleMap);
+        TankBettle.gameData.gameMap.setPrefabs(prefabs);
         let gameInfo = cc.find("Info",this.node);
         this._enemyTankCount = cc.find("enemy_count",gameInfo)
         this._enemyTankPrefab = cc.find("enemy_tank_prefab",gameInfo)
@@ -96,14 +93,14 @@ export default class TankBattleGameView extends UIView {
     }
 
     protected onKeyDown(ev:cc.Event.EventKeyboard){
-        if (this._Map) {
-            this._Map.onKeyDown(ev)
+        if (TankBettle.gameData.gameMap) {
+            TankBettle.gameData.gameMap.onKeyDown(ev)
         }
     }
 
     protected setMapLevel( level ){
         /**@description 当前地图 */
-        this._Map.setLevel( level );
+        TankBettle.gameData.gameMap.setLevel( level );
         /**@description 游戏关卡等级 */
         this._gameLevel.string = (level + 1).toString();
         /**@description 玩家生命 */
@@ -118,7 +115,7 @@ export default class TankBattleGameView extends UIView {
         }
 
         //添加测试玩家
-        this._Map.addPlayer(true)
+        TankBettle.gameData.gameMap.addPlayer(true)
     }
 
     protected onShowMapLevel( data : any ){

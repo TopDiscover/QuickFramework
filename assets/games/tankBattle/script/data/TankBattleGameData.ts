@@ -7,6 +7,7 @@ import { i18n } from "../../../../script/common/language/LanguageImpl";
 import { MapLevel } from "./TankBattleLevel";
 import { Manager } from "../../../../script/common/manager/Manager";
 import TankBattleNetController from "../controller/TankBattleNetController";
+import TankBattleMap from "../model/TankBattleMap";
 
 class TankBettleGameData extends GameData {
     onLanguageChange() {
@@ -19,11 +20,16 @@ class TankBettleGameData extends GameData {
     }
 
     /**@description 子弹预置 */
-    public bulletPrefab : cc.Node = null;
+    public get bulletPrefab (){
+        return this.gamePrefabs.getChildByName("bullet");
+    }
 
     public get bundle() {
         return "tankBattle";
     }
+
+    /**@description 游戏地图 */
+    public gameMap : TankBattleMap = null;
 
     /**@description 游戏的各种预置 */
     public gamePrefabs : cc.Node = null;
@@ -154,6 +160,8 @@ export namespace TankBettle {
         Home = "Home",
         Bullet = "Bullet",
         Player = "Player",
+        /**@description 边界 */
+        Boundary = "Boundary"
     }
 
     export enum EVENT {
@@ -167,5 +175,18 @@ export namespace TankBettle {
 
     export function netController() : TankBattleNetController{
         return Manager.gameController;
+    }
+
+    /**@description 玩家状态 */
+    export enum PLAYER_STATUS{
+        FAST_SPEED,//加速
+        STRONG,//这个状态下可以打白色砖块
+        PROTECTED,//保护状态
+    }
+
+    export enum ZIndex{
+        TANK,
+        BULLET,
+        BLOCK,
     }
 }

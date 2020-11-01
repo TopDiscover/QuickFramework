@@ -3,6 +3,8 @@ import { LogicEvent } from "../../../../script/common/event/LogicEvent";
 import { Manager } from "../../../../script/common/manager/Manager";
 import { TankBettle } from "../data/TankBattleGameData";
 import { TankBattleConfig } from "../protocol/TankBattleProtocal";
+import TankBattleChangeStageView from "./TankBattleChangeStageView";
+import { ViewZOrder } from "../../../../script/common/config/Config";
 
 const { ccclass, property } = cc._decorator;
 
@@ -60,8 +62,8 @@ export default class TankBattleStartView extends UIView {
             TankBettle.gameData.isSingle = isSingle;
         }else if( ev.keyCode == cc.macro.KEY.space || ev.keyCode == cc.macro.KEY.enter ){
             //关闭自己界面，显示游戏界面 //也可以使用大厅界面的方式，把网络组件注入到UIView中直接使用
-            TankBettle.netController().send(new TankBattleConfig())
-            //Manager.uiManager.open({bundle:this.bundle,type:TankBattleChangeStageView,zIndex:ViewZOrder.UI,args:[TankBettle.gameData.currentLevel]})
+            // TankBettle.netController().send(new TankBattleConfig())
+            Manager.uiManager.open({bundle:this.bundle,type:TankBattleChangeStageView,zIndex:ViewZOrder.UI,args:[TankBettle.gameData.currentLevel]})
         }
     }
 

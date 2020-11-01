@@ -5,6 +5,8 @@
 import { MapLevel } from "../data/TankBattleLevel";
 import { TankBettle } from "../data/TankBattleGameData";
 import TankBettleTank from "./TankBattleTank";
+import TankBettleBullet from "./TankBattleBullet";
+import TankBattleBlock from "./TankBattleBlock";
 
 const { ccclass, property } = cc._decorator;
 
@@ -69,7 +71,9 @@ export default class TankBattleMap extends cc.Component {
                     let prefab = this._blockPrefab.getChildByName(name)
                     if (prefab) {
                         let node = cc.instantiate(prefab)
-                        this.node.addChild(node);
+                        let block = node.addComponent(TankBattleBlock)
+                        block.type = blockData;
+                        this.node.addChild(node,TankBettle.ZIndex.BLOCK);
                         x = (j + 1) * prefebSize.width/2 + j * prefebSize.width/2
                         node.x = x;
                         node.y = y;
@@ -98,7 +102,11 @@ export default class TankBattleMap extends cc.Component {
             playerNode.y = -this.node.height + playerNode.height /2;
             this.playerTwo.born();
         }
-        this.node.addChild(playerNode);
+        this.node.addChild(playerNode,TankBettle.ZIndex.TANK);
+    }
+
+    public addBullet( bullet : TankBettleBullet ){
+        this.node.addChild(bullet.node,TankBettle.ZIndex.BULLET);
     }
 
     public onKeyDown(ev:cc.Event.EventKeyboard){
@@ -135,6 +143,10 @@ export default class TankBattleMap extends cc.Component {
                 this._handlePlayerMove(this.playerOne,TankBettle.Direction.RIGHT);
             }
             break;
+            case cc.macro.KEY.enter:{
+                this._handlePlayerShoot( this.playerOne );
+            }
+            break;
         }
         cc.log(ev.keyCode)
     }
@@ -146,4 +158,9 @@ export default class TankBattleMap extends cc.Component {
         }
     }
 
+    private _handlePlayerShoot( player : TankBettleTank ){
+        if( player ){
+            player.shoot();
+        }
+    }
 }
