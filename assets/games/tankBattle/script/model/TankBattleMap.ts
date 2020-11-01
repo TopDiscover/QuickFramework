@@ -83,6 +83,11 @@ export default class TankBattleMap extends cc.Component {
     /**@description 随机出生点敌人的初始方向 */
     private randomEnemyDirction( bornPosition : TankBettle.EnemyBornPosition ){
         let allDir = [TankBettle.Direction.LEFT,TankBettle.Direction.RIGHT,TankBettle.Direction.DOWN];
+        if( bornPosition == TankBettle.EnemyBornPosition.LEFT ){
+            allDir = [TankBettle.Direction.DOWN,TankBettle.Direction.RIGHT];
+        }else if( bornPosition == TankBettle.EnemyBornPosition.RIGHT ){
+            allDir = [TankBettle.Direction.DOWN,TankBettle.Direction.LEFT]
+        }
         let value = cc.randomInteger(0,allDir.length-1);
         let outDir = allDir[value]
         return outDir;
@@ -96,7 +101,7 @@ export default class TankBattleMap extends cc.Component {
             let type: TankBettle.EnemyType = cc.randomInteger(0,2);
             let prefab = TankBettle.gameData.getEnemyPrefab(type);
             let randomPos = this.randomEnemyPosition(prefab);
-            if (this.checkBornPosition(randomPos.position)) {
+            if (this.checkBornPosition(randomPos.position,prefab)) {
                 if (prefab) {
                     let enemyNode = cc.instantiate(prefab);
                     this.node.addChild(enemyNode, TankBettle.ZIndex.TANK);
@@ -112,10 +117,13 @@ export default class TankBattleMap extends cc.Component {
         }
     }
 
-    private checkBornPosition(pos: cc.Vec3) {
+    private checkBornPosition(pos: cc.Vec3,node:cc.Node) {
         for (let i = 0; i < this._enemys.length; i++) {
             let enemy = this._enemys[i];
-            if (enemy.getBoundingBox().contains(cc.v2(pos.x, pos.y))) {
+            let newBox = enemy.getBoundingBox();
+            newBox.width += 3 * node.width;
+            newBox.height += 3 * node.height;
+            if (newBox.contains(cc.v2(pos.x, pos.y))) {
                 return false;
             }
         }

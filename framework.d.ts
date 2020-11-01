@@ -166,7 +166,7 @@ declare module cc {
 
 	}
 
-	/**@description 随机[start，end]区间事件 */
+	/**@description 随机[start，end]区间整数 */
 	export function randomInteger( start : number , end : number);
 }
 

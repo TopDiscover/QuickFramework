@@ -12,10 +12,12 @@ import TankBattleGameView from "../view/TankBattleGameView";
 
 export namespace TankBettle {
     export enum Direction{
-        UP,
+        MIN = 0,
+        UP = MIN,
         DOWN,
         LEFT,
         RIGHT,
+        MAX = RIGHT,
     }
 
     /**@description 最大敌人数量 */

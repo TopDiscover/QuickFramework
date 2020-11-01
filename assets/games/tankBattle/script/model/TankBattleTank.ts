@@ -41,7 +41,7 @@ export default class TankBettleTank extends cc.Component {
     }
 
     changeDirection(other: cc.BoxCollider) {
-
+        
     }
 
     /**
@@ -90,6 +90,7 @@ export default class TankBettleTank extends cc.Component {
             this.node.stopAllActions()
             //把自己恢复到未碰撞前的位置
             let pos = this.node.parent.convertToNodeSpaceAR(wordPos)
+            this.checkPostion(pos);
             this.node.x = pos.x;
             this.node.y = pos.y;
             this.isMoving = false;
@@ -97,9 +98,16 @@ export default class TankBettleTank extends cc.Component {
                 //如果是AI碰撞到老巢，直接GameOver
                 TankBettle.gameData.gameMap.gameOver();
             }
-            if (this.isAI) {
-                this.changeDirection(other)
+            if( this.isAI ){
+                this.changeDirection(other);
             }
+        }
+    }
+
+    private checkPostion( pos : cc.Vec2 ){
+        if( pos.x < this.node.width / 2 ){
+            pos.x = this.node.width /2;
+            pos.y = this.node.y;
         }
     }
 
@@ -261,30 +269,36 @@ export class TankBettleTankEnemy extends TankBettleTank {
         let direction = this.direction;
         let otherDir = null;
         let isChange = true;
-        if (other.node.group == TankBettle.GROUP.Player) {
-            let player = this.getPlayer(other.node);
-            if (!player.isAI) {
-                //玩家顶着，就不改变原来方向
-                isChange = false;
-            }else{
-                otherDir = player.direction;
-            }
-        }
-        if (isChange) {
-            let allDir: TankBettle.Direction[] = [];
-            for (let i = TankBettle.Direction.UP; i <= TankBettle.Direction.RIGHT; i++) {
-                if (i != this.direction && i != otherDir ) {
-                    allDir.push(i);
-                }
-            }
-            direction = cc.randomInteger(0,allDir.length-1);
-        }
+        // if (other.node.group == TankBettle.GROUP.Player) {
+        //     let player = this.getPlayer(other.node);
+        //     if (!player.isAI) {
+        //         //玩家顶着，就不改变原来方向
+        //         isChange = false;
+        //     }else{
+        //         otherDir = player.direction;
+        //     }
+        // }
+        // if( isChange ){
+        //     isChange = cc.randomInteger(1,10) == 1;
+        // }
+        // if (isChange) {
+        //     let allDir: TankBettle.Direction[] = [];
+        //     for (let i = TankBettle.Direction.UP; i <= TankBettle.Direction.RIGHT; i++) {
+        //         if (i != this.direction && i != otherDir ) {
+        //             allDir.push(i);
+        //         }
+        //     }
+        //     direction = cc.randomInteger(0,allDir.length-1);
+        // }
 
-        if( this.node.x < 0 ){
-            cc.log(this.node.x);
-        }
+        // if( this.node.x < 0 ){
+        //     cc.log(this.node.x);
+        // }
 
-        this.direction = direction;
-        this.move();
+        
+        
+
+        // this.direction = cc.randomInteger(TankBettle.Direction.MIN,TankBettle.Direction.MAX);
+        // this.move();
     }
 }
