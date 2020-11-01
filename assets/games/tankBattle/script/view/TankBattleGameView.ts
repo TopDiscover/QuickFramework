@@ -6,7 +6,6 @@ import { Manager } from "../../../../script/common/manager/Manager";
 import TankBattleMap from "../model/TankBattleMap";
 import { TankBettle } from "../data/TankBattleGameData";
 import TankBattleChangeStageView from "./TankBattleChangeStageView";
-import TankBettleTank from "../model/TankBattleTank";
 
 
 const {ccclass, property} = cc._decorator;
@@ -56,6 +55,7 @@ export default class TankBattleGameView extends UIView {
         TankBettle.gameData.gamePrefabs = prefabs;
         let game = cc.find("Game",this.node)
         TankBettle.gameData.gameMap = game.addComponent(TankBattleMap);
+        TankBettle.gameData.gameMap.owner = this;
         TankBettle.gameData.gameMap.setPrefabs(prefabs);
         let gameInfo = cc.find("Info",this.node);
         this._enemyTankCount = cc.find("enemy_count",gameInfo)
@@ -101,24 +101,36 @@ export default class TankBattleGameView extends UIView {
     protected setMapLevel( level ){
         /**@description 当前地图 */
         TankBettle.gameData.gameMap.setLevel( level );
-        /**@description 游戏关卡等级 */
-        this._gameLevel.string = (level + 1).toString();
-        /**@description 玩家生命 */
-        this._playerOneLive.string = TankBettle.gameData.playerOneLive.toString();
-        this._playerTwoLive.string = TankBettle.gameData.playerTwoLive.toString();
-        
-        //敌机数量 
-        this._enemyTankCount.removeAllChildren()
-        for (let index = 0; index < TankBettle.gameData.curEnemy; index++) {
-            let tank = cc.instantiate(this._enemyTankPrefab);
-            this._enemyTankCount.addChild(tank)
-        }
-
+        this.showGameInfo();
         //添加测试玩家
         TankBettle.gameData.gameMap.addPlayer(true)
+        TankBettle.gameData.gameMap.addPlayer(false)
     }
 
     protected onShowMapLevel( data : any ){
         this.setMapLevel(data)
+    }
+
+    public showGameInfo( ){
+        //当前关卡
+        this._gameLevel.string = TankBettle.gameData.currentLevel.toString();
+        //玩家的生命
+        this._playerOneLive.string = TankBettle.gameData.playerOneLive.toString();
+        this._playerTwoLive.string = TankBettle.gameData.playerTwoLive.toString();
+        //当前剩余敌人数量 
+        let count = this._enemyTankCount.children.length;
+        if( count < TankBettle.gameData.curEnemy ){
+            let addCount = TankBettle.gameData.curEnemy - count;
+            for( let i = 0 ; i < addCount ; i++ ){
+                let tank = cc.instantiate(this._enemyTankPrefab);
+                this._enemyTankCount.addChild(tank);
+            }
+        }else if( count > TankBettle.gameData.curEnemy ){
+            //删除多余出来的
+            let delCount = count - TankBettle.gameData.curEnemy;
+            for( let i = 0 ; i < delCount ; i++ ){
+                this._enemyTankCount.removeChild(this._enemyTankCount.children[0]);
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 import { TankBettle } from "../data/TankBattleGameData";
 import TankBettleBullet from "./TankBattleBullet";
+import { TankBettleTankPlayer } from "./TankBattleTank";
 
 const {ccclass, property} = cc._decorator;
 @ccclass
@@ -34,6 +35,7 @@ export default class TankBattleBlock extends cc.Component {
 
     private handBullet( other:cc.BoxCollider , me : cc.BoxCollider ){
         if( other.node.group == TankBettle.GROUP.Bullet ){
+            //受到来处子弹的碰撞
             switch( this.type ){
                 case TankBettle.BLOCK_TYPE.GRASS: //草丛
                 case TankBettle.BLOCK_TYPE.ICE:{ //冰面
@@ -47,9 +49,16 @@ export default class TankBattleBlock extends cc.Component {
                 break;
                 case TankBettle.BLOCK_TYPE.STONE_WALL:{
                     let bullet = other.node.getComponent(TankBettleBullet);
-                    if( bullet.owner.hasStatus(TankBettle.PLAYER_STATUS.STRONG) ){
-                        this.node.removeFromParent();
+                    if( bullet && bullet.owner instanceof TankBettleTankPlayer ){
+                        if( bullet.owner.hasStatus(TankBettle.PLAYER_STATUS.STRONG) ){
+                            this.node.removeFromParent();
+                        }
                     }
+                }
+                break;
+                case TankBettle.BLOCK_TYPE.HOME:{
+                    //老巢
+                    TankBettle.gameData.gameMap.gameOver(this);
                 }
                 break;
             }

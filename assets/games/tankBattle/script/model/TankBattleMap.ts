@@ -4,9 +4,10 @@
 
 import { MapLevel } from "../data/TankBattleLevel";
 import { TankBettle } from "../data/TankBattleGameData";
-import TankBettleTank from "./TankBattleTank";
+import { TankBettleTankPlayer } from "./TankBattleTank";
 import TankBettleBullet from "./TankBattleBullet";
 import TankBattleBlock from "./TankBattleBlock";
+import TankBattleGameView from "../view/TankBattleGameView";
 
 const { ccclass, property } = cc._decorator;
 
@@ -22,10 +23,12 @@ export default class TankBattleMap extends cc.Component {
     }
 
     /**@description 玩家1 */
-    private playerOne : TankBettleTank = null;
+    private playerOne : TankBettleTankPlayer = null;
     /**@description 玩家2 */
-    private playerTwo : TankBettleTank = null;
+    private playerTwo : TankBettleTankPlayer = null;
     private outWall:cc.Node[] = [];
+
+    public owner : TankBattleGameView = null;
 
     protected onLoad(){
         this.node.children.forEach(node=>{
@@ -92,12 +95,14 @@ export default class TankBattleMap extends cc.Component {
     public addPlayer( isOne : boolean){
         let playerNode = cc.instantiate(TankBettle.gameData.getPlayerPrefab(true))
         if (isOne) {
-            this.playerOne = playerNode.addComponent(TankBettleTank)  
+            this.playerOne = playerNode.addComponent(TankBettleTankPlayer);
+            this.playerOne.isOnePlayer = isOne;
             playerNode.x = this.node.width / 2 - 2 * playerNode.width
             playerNode.y = -this.node.height + playerNode.height/2;
             this.playerOne.born();
         }else{
-            this.playerTwo = playerNode.addComponent(TankBettleTank);
+            this.playerTwo = playerNode.addComponent(TankBettleTankPlayer);
+            this.playerTwo.isOnePlayer = isOne;
             playerNode.x = this.node.width / 2 + 2 * playerNode.width;
             playerNode.y = -this.node.height + playerNode.height /2;
             this.playerTwo.born();
@@ -147,20 +152,29 @@ export default class TankBattleMap extends cc.Component {
                 this._handlePlayerShoot( this.playerOne );
             }
             break;
+            case cc.macro.KEY.space:{
+                this._handlePlayerShoot( this.playerTwo );
+            }
+            break;
         }
         cc.log(ev.keyCode)
     }
 
-    private _handlePlayerMove( player : TankBettleTank , dir : TankBettle.Direction){
+    private _handlePlayerMove( player : TankBettleTankPlayer , dir : TankBettle.Direction){
         if (player) {
             player.direction = dir;
             player.move();
         }
     }
 
-    private _handlePlayerShoot( player : TankBettleTank ){
+    private _handlePlayerShoot( player : TankBettleTankPlayer ){
         if( player ){
             player.shoot();
         }
+    }
+
+    public gameOver( block : TankBattleBlock ){
+        let sprite = block.node.getComponent(cc.Sprite);
+        sprite.loadImage({url:{urls:["texture/images"],key:"heart_0"},view:this.owner,bundle:this.owner.bundle})
     }
 }

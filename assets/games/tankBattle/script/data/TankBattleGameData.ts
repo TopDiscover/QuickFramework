@@ -87,19 +87,21 @@ class TankBettleGameData extends GameData {
     public clear(){
         //这个地方严谨点的写法，需要调用基类，虽然现在基类没有任何实现，不保证后面基类有公共的数据需要清理
         super.clear();
-        //清理自己的游戏数据
+        this._isSingle = true;
+        this.currentLevel = 0;
+        this.playerOneLive = 3;
+        this.playerTwoLive = 0;
     }
 
     /**@description 当前关卡等级 */
     currentLevel = 0;
 
-    emenyStopTime = 0;
-
     /**@description 关卡敌机数量 */
     maxEnemy = 20;
 
+
     /**@description 当前敌机数量 */
-    curEnemy = 20;
+    curEnemy = 10;
 
     /**@description 玩家1的生命数量 */
     playerOneLive = 3;

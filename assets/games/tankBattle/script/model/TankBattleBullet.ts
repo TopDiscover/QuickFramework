@@ -1,5 +1,5 @@
 import { TankBettle } from "../data/TankBattleGameData";
-import TankBettleTank from "./TankBattleTank";
+import TankBettleTank, { TankBettleTankEnemy, TankBettleTankPlayer } from "./TankBattleTank";
 
 const { ccclass, property } = cc._decorator;
 
@@ -66,13 +66,62 @@ export default class TankBettleBullet extends cc.Component {
         cc.log(`Bullet : onCollisionEnter=>${other.node.name}`)
         if (other.node.group == TankBettle.GROUP.Wall || 
             other.node.group == TankBettle.GROUP.StoneWall || 
-            other.node.group == TankBettle.GROUP.Boundary ) {
+            other.node.group == TankBettle.GROUP.Boundary ||
+            other.node.group == TankBettle.GROUP.Home ) {
             //撞到了墙或边界
             this.node.stopAllActions()
             this.node.removeFromParent()
             //取出子弹
             this.owner.bullet = null;
+        }else if( other.node.group == TankBettle.GROUP.Bullet ){
+            //子弹与子弹相撞
+            //同阵营子弹不抵消
+            let bullet = other.node.getComponent(TankBettleBullet);
+            if( this.owner.isAI ){
+                //敌人打出的子弹 与玩家子弹相互抵消
+                if( !bullet.owner.isAI ){
+                    this.node.stopAllActions();
+                    this.node.removeFromParent();
+                    this.owner.bullet = null;
+                }
+            }else{
+                //玩家打出子弹 与 敌人的子弹相互抵消
+                if( bullet.owner.isAI ){
+                    this.node.stopAllActions();
+                    this.node.removeFromParent();
+                    this.owner.bullet = null;
+                }
+            }
+        }else if( other.node.group == TankBettle.GROUP.Player ){
+            //子弹与玩家相撞
+            let tank = this.getPlayer(other.node);
+            if( this.owner.isAI ){
+                //敌人子弹不参打敌人
+                if( !tank.isAI ){
+                    this.node.stopAllActions();
+                    this.node.removeFromParent();
+                    this.owner.bullet = null;
+                }
+            }else{
+                if( tank.isAI ){
+                    //只有打到敌人才消失
+                    this.node.stopAllActions();
+                    this.node.removeFromParent();
+                    this.owner.bullet = null;
+                }
+            }
+            
+        }else{
+            //其它情况子弹继续走自己的路
         }
+    }
+
+    private getPlayer( node : cc.Node ) : TankBettleTank{
+        let player = node.getComponent(TankBettleTankPlayer);
+        if( player ){
+            return player;
+        }
+        return node.getComponent(TankBettleTankEnemy);
     }
 
     /**
