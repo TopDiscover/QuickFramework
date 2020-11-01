@@ -54,17 +54,6 @@ export default class TankBattleMap extends cc.Component {
 
     protected update() {
         this.addEnemy();
-        cc.log(cc.randomRange)
-        // this.changeEnemyDirection();
-    }
-
-
-    private changeEnemyDirection(){
-        if( this._enemys.length > 0 ){
-            for( let i = 0 ; i < this._enemys.length ; i++ ){
-                this._enemys[i].getComponent(TankBettleTankEnemy).changeDirection();
-            }
-        }
     }
 
     /**@description 随机敌人出生点位置 */
@@ -227,21 +216,23 @@ export default class TankBattleMap extends cc.Component {
     }
 
     public addPlayer(isOne: boolean) {
+        
         let playerNode = cc.instantiate(TankBettle.gameData.getPlayerPrefab(true))
         if (isOne) {
             this.playerOne = playerNode.addComponent(TankBettleTankPlayer);
             this.playerOne.isOnePlayer = isOne;
             playerNode.x = this.node.width / 2 - 2 * playerNode.width
             playerNode.y = -this.node.height + playerNode.height / 2;
+            this.node.addChild(playerNode, TankBettle.ZIndex.TANK);
             this.playerOne.born();
         } else {
             this.playerTwo = playerNode.addComponent(TankBettleTankPlayer);
             this.playerTwo.isOnePlayer = isOne;
             playerNode.x = this.node.width / 2 + 2 * playerNode.width;
             playerNode.y = -this.node.height + playerNode.height / 2;
+            this.node.addChild(playerNode, TankBettle.ZIndex.TANK);
             this.playerTwo.born();
         }
-        this.node.addChild(playerNode, TankBettle.ZIndex.TANK);
     }
 
     public removePlayer(player: TankBettleTankPlayer) {

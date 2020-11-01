@@ -248,6 +248,21 @@ cc.updateAlignment = function (node) {
     }
 }
 
+if( !cc.randomRangeInt ){
+    cc.randomRangeInt = function ( min , max){
+        let value = (max- min) * Math.random() + min;
+        let result = Math.floor(value);
+        return result;
+    }
+}
+
+if( !cc.randomRange ){
+    cc.randomRange = function ( min , max){
+        let value = (max- min) * Math.random() + min;
+        return value;
+    }
+}
+
 
 if (!CC_EDITOR) {
 
