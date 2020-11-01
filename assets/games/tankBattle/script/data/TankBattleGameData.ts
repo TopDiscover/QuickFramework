@@ -8,109 +8,9 @@ import { MapLevel } from "./TankBattleLevel";
 import { Manager } from "../../../../script/common/manager/Manager";
 import TankBattleNetController from "../controller/TankBattleNetController";
 import TankBattleMap from "../model/TankBattleMap";
-
-class TankBettleGameData extends GameData {
-    onLanguageChange() {
-        let lan = TANK_LAN_ZH;
-        if (Manager.language.getLanguage() == TANK_LAN_EN.language) {
-            lan = TANK_LAN_EN;
-        }
-        i18n[`${this.bundle}`] = {};
-        i18n[`${this.bundle}`] = lan.data;
-    }
-
-    /**@description 子弹预置 */
-    public get bulletPrefab (){
-        return this.gamePrefabs.getChildByName("bullet");
-    }
-
-    public get bundle() {
-        return "tankBattle";
-    }
-
-    /**@description 游戏地图 */
-    public gameMap : TankBattleMap = null;
-
-    /**@description 游戏的各种预置 */
-    public gamePrefabs : cc.Node = null;
-
-    /**@description 动画预置 */
-    public get animationPrefab(){
-        return this.gamePrefabs.getChildByName("tank_animations")
-    }
-
-    /**@description 获取玩家的预置 */
-    public getPlayerPrefab( isOne : boolean ){
-        if (isOne) {
-            return this.gamePrefabs.getChildByName("player_1")
-        } else {
-            return this.gamePrefabs.getChildByName("player_2")
-        }
-    }
-
-    public nextLevel( ){
-        let level = this.currentLevel + 1;
-        if (level >= MapLevel.length ) {
-            level = 0
-        }
-        this.curEnemy = this.maxEnemy;
-        this.currentLevel = level
-        return level
-    }
-
-    public prevLevel( ){
-        let level = this.currentLevel - 1;
-        if (level < 0 ) {
-            level = MapLevel.length -1
-        }
-        this.currentLevel = level;
-        this.curEnemy = this.maxEnemy;
-        return level
-    }
-
-    private _isSingle = true;
-    /**@description 单人模式 */
-    public set isSingle( value : boolean ){
-        this._isSingle = value;
-        if (value) {
-            this.playerOneLive = 3;
-            this.playerTwoLive = 0
-        } else {
-            this.playerOneLive = 3;
-            this.playerTwoLive = 3;
-        }
-    }
-    public get isSingle(){
-        return this._isSingle;
-    }
-
-    public clear(){
-        //这个地方严谨点的写法，需要调用基类，虽然现在基类没有任何实现，不保证后面基类有公共的数据需要清理
-        super.clear();
-        this._isSingle = true;
-        this.currentLevel = 0;
-        this.playerOneLive = 3;
-        this.playerTwoLive = 0;
-    }
-
-    /**@description 当前关卡等级 */
-    currentLevel = 0;
-
-    /**@description 关卡敌机数量 */
-    maxEnemy = 20;
-
-
-    /**@description 当前敌机数量 */
-    curEnemy = 10;
-
-    /**@description 玩家1的生命数量 */
-    playerOneLive = 3;
-    /**@description 玩家2的生命数量 */
-    playerTwoLive = 0;
-}
+import TankBattleGameView from "../view/TankBattleGameView";
 
 export namespace TankBettle {
-    export const gameData = new TankBettleGameData;
     export enum Direction{
         UP,
         DOWN,
@@ -118,18 +18,22 @@ export namespace TankBettle {
         RIGHT,
     }
 
-    export enum BULLET_TYPE{
-        PLAYER,
-        ENEMY,
-    }
+    /**@description 最大敌人数量 */
+    export const MAX_ENEMY = 20;
+    /**@description 屏幕出现的最大敌人数量 */
+    export const MAX_APPEAR_ENEMY = 5;
+    /**@description 玩家的生命最大上限 */
+    export const MAX_PLAYER_LIVE = 3;
 
     export enum GAME_STATUS {
-        /**@description 菜单*/
-        MENU,
-        /**@description 初始化 */
+        /**@description 未知*/
+        UNKNOWN,
+        /**@description 选择模式*/
+        SELECTED,
+        /**@description 游戏初始化 */
         INIT,
-        /**@description 开始 */
-        START,
+        /**@description 游戏中 */
+        GAME,
         /**@description 游戏结束 */
         OVER,
         /**@description 过关 */
@@ -191,4 +95,143 @@ export namespace TankBettle {
         BULLET,
         BLOCK,
     }
+
+    export enum EnemyType{
+        /**@description 普通的，一枪一个 */
+        NORMAL,
+        /**@description 速度快的，一枪一个 */
+        SPEED,
+        /**@description 牛逼的，三枪一个 */
+        STRONG,
+    }
+
+    export class TankConfig{
+        /** @description 坦克time时间内移动的距离 */
+        distance = 5;
+        /**@description 坦克每次移动distance距离需要的时间 */
+        time = 0.1;
+        /**@description 坦克子弹在bulletTime时间内移动的距离 */
+        bulletDistance = 10;
+        /**@description 坦克子弹每次移动bulletDistance距离需要的时间*/
+        bulletTime = 0.1;
+        /**@description 默认是只有一点生命，当受到子弹的攻击就-1 */
+        live = 1;
+    }
+
+    class TankBettleGameData extends GameData {
+        onLanguageChange() {
+            let lan = TANK_LAN_ZH;
+            if (Manager.language.getLanguage() == TANK_LAN_EN.language) {
+                lan = TANK_LAN_EN;
+            }
+            i18n[`${this.bundle}`] = {};
+            i18n[`${this.bundle}`] = lan.data;
+        }
+    
+        /**@description 子弹预置 */
+        public get bulletPrefab (){
+            return this.gamePrefabs.getChildByName("bullet");
+        }
+    
+        public get bundle() {
+            return "tankBattle";
+        }
+    
+        /**@description 游戏地图 */
+        public gameMap : TankBattleMap = null;
+    
+        /**@description 游戏的各种预置 */
+        public gamePrefabs : cc.Node = null;
+    
+        /**@description 动画预置 */
+        public get animationPrefab(){
+            return this.gamePrefabs.getChildByName("tank_animations")
+        }
+    
+        /**@description 获取玩家的预置 */
+        public getPlayerPrefab( isOne : boolean ){
+            if (isOne) {
+                return this.gamePrefabs.getChildByName("player_1")
+            } else {
+                return this.gamePrefabs.getChildByName("player_2")
+            }
+        }
+
+        /**@description 获取敌人的预置 */
+        public getEnemyPrefab( type : number ){
+            return this.gamePrefabs.getChildByName(`tank_${type}`)
+        }
+    
+        public nextLevel( ){
+            let level = this.currentLevel + 1;
+            if (level >= MapLevel.length ) {
+                level = 0
+            }
+            this.curLeftEnemy = TankBettle.MAX_ENEMY;
+            this.currentLevel = level
+            return level
+        }
+    
+        public prevLevel( ){
+            let level = this.currentLevel - 1;
+            if (level < 0 ) {
+                level = MapLevel.length -1
+            }
+            this.currentLevel = level;
+            this.curLeftEnemy = TankBettle.MAX_ENEMY;
+            return level
+        }
+    
+        private _isSingle = true;
+        /**@description 单人模式 */
+        public set isSingle( value : boolean ){
+            this._isSingle = value;
+            if (value) {
+                this.playerOneLive = MAX_PLAYER_LIVE;
+                this.playerTwoLive = 0
+            } else {
+                this.playerOneLive = MAX_PLAYER_LIVE;
+                this.playerTwoLive = MAX_PLAYER_LIVE;
+            }
+            this.curLeftEnemy = MAX_ENEMY;
+        }
+        public get isSingle(){
+            return this._isSingle;
+        }
+    
+        private _gameStatus : GAME_STATUS = GAME_STATUS.UNKNOWN;
+        /**@description 当前游戏状态 */
+        public set gameStatus( status ){
+            cc.log(`gamestatus : ${this._gameStatus} => ${status}`)
+            this._gameStatus = status;
+        }
+        public get gameStatus(){
+            return this._gameStatus;
+        }
+
+        public get gameView() : TankBattleGameView{
+            return Manager.gameView as TankBattleGameView;
+        }
+    
+        public clear(){
+            //这个地方严谨点的写法，需要调用基类，虽然现在基类没有任何实现，不保证后面基类有公共的数据需要清理
+            super.clear();
+            this._isSingle = true;
+            this.currentLevel = 0;
+            this.playerOneLive = 0;
+            this.playerTwoLive = 0;
+            this.curLeftEnemy = 0;
+        }
+    
+        /**@description 当前关卡等级 */
+        currentLevel = 0;
+        /**@description 当前剩余敌机数量 */
+        curLeftEnemy = 0;
+    
+        /**@description 玩家1的生命数量 */
+        playerOneLive = 0;
+        /**@description 玩家2的生命数量 */
+        playerTwoLive = 0;
+    }
+    export const gameData = new TankBettleGameData;
 }

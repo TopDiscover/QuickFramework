@@ -12,7 +12,6 @@ import { SUB_CMD_GAME, TankBattleConfig } from "../protocol/TankBattleProtocal";
 import { TankBettle } from "../data/TankBattleGameData";
 import TankBattleChangeStageView from "../view/TankBattleChangeStageView";
 import { ViewZOrder } from "../../../../script/common/config/Config";
-import TankBattleGameView from "../view/TankBattleGameView";
 
 const { ccclass, property } = cc._decorator;
 
@@ -31,6 +30,7 @@ export default class TankBattleNetController extends Controller<LobbyService> {
 
     private onGameSaveConfig( data: TankBattleConfig ) {
         //收到存储配置成功
+        TankBettle.gameData.gameStatus = TankBettle.GAME_STATUS.INIT;
         Manager.uiManager.open({bundle:this.bundle,type:TankBattleChangeStageView,zIndex:ViewZOrder.UI,args:[TankBettle.gameData.currentLevel]})
     }
 }

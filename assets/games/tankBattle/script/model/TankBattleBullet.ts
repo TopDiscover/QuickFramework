@@ -37,22 +37,22 @@ export default class TankBettleBullet extends cc.Component {
 
         if (this.owner.direction == TankBettle.Direction.UP) {
             cc.tween(this.node).delay(0)
-            .by(this.owner.bulletTime, { y: this.owner.bulletDistance})
+            .by(this.owner.config.bulletTime, { y: this.owner.config.bulletDistance})
             .repeatForever()
             .start();
         } else if (this.owner.direction == TankBettle.Direction.DOWN) {
             cc.tween(this.node).delay(0)
-            .by(this.owner.bulletTime, { y: -this.owner.bulletDistance })
+            .by(this.owner.config.bulletTime, { y: -this.owner.config.bulletDistance })
             .repeatForever()
             .start();
         } else if (this.owner.direction == TankBettle.Direction.RIGHT) {
             cc.tween(this.node).delay(0)
-            .by(this.owner.bulletTime, { x: this.owner.bulletDistance })
+            .by(this.owner.config.bulletTime, { x: this.owner.config.bulletDistance })
             .repeatForever()
             .start();
         } else if (this.owner.direction == TankBettle.Direction.LEFT) {
             cc.tween(this.node).delay(0).
-            by(this.owner.bulletTime, { x: -this.owner.bulletDistance })
+            by(this.owner.config.bulletTime, { x: -this.owner.config.bulletDistance })
             .repeatForever()
             .start();
         }

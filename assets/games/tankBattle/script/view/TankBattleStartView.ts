@@ -29,7 +29,6 @@ export default class TankBattleStartView extends UIView {
 
     onLoad() {
         super.onLoad();
-
         this.content = cc.find("content", this.node);
 
         cc.find("title", this.content).getComponent(cc.Label).language = Manager.makeLanguage("title", true);
@@ -51,6 +50,9 @@ export default class TankBattleStartView extends UIView {
 
     protected onKeyUp(ev: cc.Event.EventKeyboard) {
         super.onKeyUp(ev);
+        if( TankBettle.gameData.gameStatus != TankBettle.GAME_STATUS.SELECTED ){
+            return;
+        }
         if (ev.keyCode == cc.macro.KEY.down || ev.keyCode == cc.macro.KEY.up ) {
             let isSingle = false;
             if (this.selectTank.y == this.singlePlayer.y) {
@@ -63,6 +65,8 @@ export default class TankBattleStartView extends UIView {
         }else if( ev.keyCode == cc.macro.KEY.space || ev.keyCode == cc.macro.KEY.enter ){
             //关闭自己界面，显示游戏界面 //也可以使用大厅界面的方式，把网络组件注入到UIView中直接使用
             // TankBettle.netController().send(new TankBattleConfig())
+            TankBettle.gameData.gameStatus = TankBettle.GAME_STATUS.INIT;
+            TankBettle.gameData.isSingle = TankBettle.gameData.isSingle;
             Manager.uiManager.open({bundle:this.bundle,type:TankBattleChangeStageView,zIndex:ViewZOrder.UI,args:[TankBettle.gameData.currentLevel]})
         }
     }

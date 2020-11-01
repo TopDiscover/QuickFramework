@@ -5,25 +5,15 @@ const { ccclass, property } = cc._decorator;
 @ccclass
 export default class TankBettleTank extends cc.Component {
 
-
-    /** @description 是否自动 */
+    /** @description 是否是AI敌人*/
     public isAI = false;
-    /** @description 坦克time时间内移动的距离 */
-    private distance = 5;
-    /**@description 坦克每次移动distance距离需要的时间 */
-    private time = 0.1;
-    /**@description 坦克子弹在bulletTime时间内移动的距离 */
-    public bulletDistance = 10;
-    /**@description 坦克子弹每次移动bulletDistance距离需要的时间*/
-    public bulletTime = 0.1;
+    public config: TankBettle.TankConfig = null;
     /** @description 子弹 */
     public bullet: TankBettleBullet = null;
     /**@description 移动方向 */
     public direction: TankBettle.Direction = TankBettle.Direction.UP;
     /**@description 当前是否正常移动 */
     private isMoving = false;
-    /**@description 如果是补撞方，自己位置保持不动，让来撞方，退出碰撞区域 */
-    public isStand = false;
 
     move() {
         if (this.isMoving) {
@@ -34,16 +24,16 @@ export default class TankBettleTank extends cc.Component {
         this.isMoving = true;
         if (this.direction == TankBettle.Direction.UP) {
             this.node.angle = 0;
-            cc.tween(this.node).delay(0).by(this.time, { y: this.distance }).call(() => { this.isMoving = false; }).start();
+            cc.tween(this.node).delay(0).by(this.config.time, { y: this.config.distance }).call(() => { this.isMoving = false; }).start();
         } else if (this.direction == TankBettle.Direction.DOWN) {
             this.node.angle = 180;
-            cc.tween(this.node).delay(0).by(this.time, { y: -this.distance }).call(() => { this.isMoving = false; }).start();
+            cc.tween(this.node).delay(0).by(this.config.time, { y: -this.config.distance }).call(() => { this.isMoving = false; }).start();
         } else if (this.direction == TankBettle.Direction.RIGHT) {
             this.node.angle = -90;
-            cc.tween(this.node).delay(0).by(this.time, { x: this.distance }).call(() => { this.isMoving = false; }).start();
+            cc.tween(this.node).delay(0).by(this.config.time, { x: this.config.distance }).call(() => { this.isMoving = false; }).start();
         } else if (this.direction == TankBettle.Direction.LEFT) {
             this.node.angle = 90;
-            cc.tween(this.node).delay(0).by(this.time, { x: -this.distance }).call(() => { this.isMoving = false; }).start();
+            cc.tween(this.node).delay(0).by(this.config.time, { x: -this.config.distance }).call(() => { this.isMoving = false; }).start();
         }
 
     }
@@ -64,42 +54,18 @@ export default class TankBettleTank extends cc.Component {
 
     }
 
+    /**@description 受伤 */
+    public hurt() {
+
+    }
+
     /**
      * @description 当碰撞产生的时候调用
      * @param other 产生碰撞的另一个碰撞组件
      */
     private onCollisionEnter(other: cc.BoxCollider, me: cc.BoxCollider) {
-        if (this.isValidCollision(other, me)) {
-            cc.log(`onCollisionEnter=>${other.node.name}`)
-            if (other.node.group == TankBettle.GROUP.Wall ||
-                other.node.group == TankBettle.GROUP.StoneWall ||
-                other.node.group == TankBettle.GROUP.Boundary ||
-                other.node.group == TankBettle.GROUP.Player) {
-                this.node.stopAllActions()
-                if( other.node.group == TankBettle.GROUP.Player ){
-                    let tank = this.getPlayer(other.node);
-                    if( tank ){
-                        if( this.isStand ){
-                            tank.isStand = false;
-                        }else{
-                            tank.isStand = true;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private getPlayer( node : cc.Node ) : TankBettleTank {
-        let player = node.getComponent(TankBettleTankPlayer);
-        if( player ){
-            return player;
-        }
-        let enemy = node.getComponent(TankBettleTankEnemy);
-        if( enemy ){
-            return enemy;
-        }
-        return null;
+        this.onBulletCollision(other, me);
+        this.onBlockCollision(other, me);
     }
 
     /**
@@ -107,29 +73,7 @@ export default class TankBettleTank extends cc.Component {
      * @param other 产生碰撞的另一个碰撞组件
      */
     private onCollisionStay(other: cc.BoxCollider, me: cc.BoxCollider) {
-        if (this.isValidCollision(other, me)) {
-            cc.log(`onCollisionStay=>${other.node.name}`)
-            if (other.node.group == TankBettle.GROUP.Player) {
-                if( this.isStand ){
-                    this.tryExitCollision();
-                }
-            }else{
-                this.tryExitCollision();
-            }
-        }
-    }
 
-    private tryExitCollision() {
-        //退出碰撞区域
-        if (this.direction == TankBettle.Direction.UP) {
-            this.node.y -= 1;
-        } else if (this.direction == TankBettle.Direction.DOWN) {
-            this.node.y += 1;
-        } else if (this.direction == TankBettle.Direction.RIGHT) {
-            this.node.x -= 1;
-        } else if (this.direction == TankBettle.Direction.LEFT) {
-            this.node.x += 1;
-        }
     }
 
     /**
@@ -137,42 +81,56 @@ export default class TankBettleTank extends cc.Component {
      * @param other 产生碰撞的另一个碰撞组件
      */
     private onCollisionExit(other: cc.BoxCollider, me: cc.BoxCollider) {
-        if (this.isValidCollision(other, me)) {
-            cc.log(`onCollisionExit=>${other.node.name}`)
+
+    }
+
+    /**@description 处理与地图元素的碰撞 */
+    private onBlockCollision(other: cc.BoxCollider, me: cc.BoxCollider) {
+        //有阻挡才处理
+        if (other.node.group == TankBettle.GROUP.Wall ||
+            other.node.group == TankBettle.GROUP.StoneWall ||
+            other.node.group == TankBettle.GROUP.Boundary ||
+            other.node.group == TankBettle.GROUP.Home ||
+            other.node.group == TankBettle.GROUP.Player ||
+            other.node.group == TankBettle.GROUP.Water) {
+            let wordPos = me.world.preAabb.center
+            this.node.stopAllActions()
+            //把自己恢复到未碰撞前的位置
+            let pos = this.node.parent.convertToNodeSpaceAR(wordPos)
+            this.node.x = pos.x;
+            this.node.y = pos.y;
             this.isMoving = false;
-            if (other.node.group == TankBettle.GROUP.Player) {
-                this.isStand = false;
-            }
         }
     }
 
-    /**@description 测试是否是一个有效的碰撞 */
-    private isValidCollision(other: cc.BoxCollider, me: cc.BoxCollider) {
-        //与子弹的碰撞
+    /**@description 处理来自子弹的碰撞 */
+    private onBulletCollision(other: cc.BoxCollider, me: cc.BoxCollider) {
         if (other.node.group == TankBettle.GROUP.Bullet) {
-            //取出子弹
             let bullet = other.node.getComponent(TankBettleBullet);
-            if( this.isAI ){
-                if( bullet.owner.isAI ){
-                    //敌人的子弹不打敌人
-                    return false;
+            if (this.isAI) {
+                if (bullet.owner.isAI) {
+                    //敌方子弹打敌方，不做处理
+                    return;
                 }
-            }else{
-                if( !bullet.owner.isAI ){
-                    //玩家的子弹不打玩家
-                    return false;
+            } else {
+                if (!bullet.owner.isAI) {
+                    //两个玩家的子弹也不处理
+                    return;
                 }
             }
-            return true;
-        } else if (other.node.group == TankBettle.GROUP.Player) {
-            return true;
+            //受到来处不同阵营的子弹攻击
+            this.hurt();
         }
-        return true;
     }
 
 }
 
 export class TankBettleTankPlayer extends TankBettleTank {
+
+    constructor() {
+        super();
+        this.config = new TankBettle.TankConfig();
+    }
 
     /**@description 是否是玩家1 */
     public isOnePlayer = false;
@@ -217,11 +175,34 @@ export class TankBettleTankPlayer extends TankBettleTank {
         //出生动画
         this.addStatus(TankBettle.PLAYER_STATUS.PROTECTED);
     }
+
+    public hurt() {
+        if (this.hasStatus(TankBettle.PLAYER_STATUS.PROTECTED)) {
+            //受保护下
+            return;
+        }
+        this.config.live--;
+        if (this.config.live <= 0) {
+            TankBettle.gameData.gameMap.removePlayer(this);
+        }
+    }
 }
 
-export class TankBettleTankEnemy extends TankBettleTank{
-    constructor(){
+export class TankBettleTankEnemy extends TankBettleTank {
+    constructor() {
         super();
         this.isAI = true;
+        this.config = new TankBettle.TankConfig();
+    }
+
+    setConfig() {
+
+    }
+
+    public hurt() {
+        this.config.live--;
+        if (this.config.live <= 0) {
+            TankBettle.gameData.gameMap.removeEnemy(this.node);
+        }
     }
 }

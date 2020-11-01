@@ -4,7 +4,7 @@
 
 import { MapLevel } from "../data/TankBattleLevel";
 import { TankBettle } from "../data/TankBattleGameData";
-import { TankBettleTankPlayer } from "./TankBattleTank";
+import { TankBettleTankPlayer, TankBettleTankEnemy } from "./TankBattleTank";
 import TankBettleBullet from "./TankBattleBullet";
 import TankBattleBlock from "./TankBattleBlock";
 import TankBattleGameView from "../view/TankBattleGameView";
@@ -23,25 +23,116 @@ export default class TankBattleMap extends cc.Component {
     }
 
     /**@description 玩家1 */
-    private playerOne : TankBettleTankPlayer = null;
+    private playerOne: TankBettleTankPlayer = null;
     /**@description 玩家2 */
-    private playerTwo : TankBettleTankPlayer = null;
-    private outWall:cc.Node[] = [];
+    private playerTwo: TankBettleTankPlayer = null;
+    private outWall: cc.Node[] = [];
 
-    public owner : TankBattleGameView = null;
+    public owner: TankBattleGameView = null;
 
-    protected onLoad(){
-        this.node.children.forEach(node=>{
+    /**@description 敌人 */
+    private _enemys: cc.Node[] = [];
+    /**@description 是否可生产敌人，以免生成的敌人重复 */
+    private _isCanAddEnemy = true;
+
+    protected onLoad() {
+        this.node.children.forEach(node => {
             this.outWall.push(node);
         })
         this.node.removeAllChildren(false);
     }
 
-    protected onDestroy(){
-        this.outWall.forEach((value)=>{
+    protected onDestroy() {
+        this.outWall.forEach((value) => {
             value.destroy();
         });
         this.outWall = [];
+    }
+
+    protected update() {
+        this.addEnemy();
+    }
+
+    private randomEnemyPosition(enemyNode: cc.Node) {
+        let pos = Math.floor(Math.random() * 3);
+        let outPosition = cc.v3(0, 0, 0);
+        if (pos == 0) {
+            //左
+            outPosition.x = enemyNode.width / 2;
+            outPosition.y = -enemyNode.height / 2;
+        } else if (pos == 1) {
+            //中
+            outPosition.x = this.node.width / 2;
+            outPosition.y = -enemyNode.height / 2;
+        } else {
+            //右
+            outPosition.x = this.node.width - enemyNode.width / 2;
+            outPosition.y = -enemyNode.height / 2;
+        }
+        return outPosition;
+    }
+
+    public addEnemy() {
+        //要在游戏中且当前剩余敌人数量要大于0才创建
+        if (TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME && //游戏状态下
+            TankBettle.gameData.curLeftEnemy > 0 && //有剩余敌人
+            this._enemys.length < TankBettle.MAX_APPEAR_ENEMY) { //可以生产敌人
+            let type: TankBettle.EnemyType = Math.floor(Math.random() * 3);
+            let prefab = TankBettle.gameData.getEnemyPrefab(type);
+            let randomPos = this.randomEnemyPosition(prefab);
+            if (this.checkBornPosition(randomPos)) {
+                if (prefab) {
+                    let enemyNode = cc.instantiate(prefab);
+                    this.node.addChild(enemyNode, TankBettle.ZIndex.TANK);
+                    let enemy = enemyNode.addComponent(TankBettleTankEnemy);
+                    enemyNode.position = randomPos;
+                    this._enemys.push(enemyNode);
+                    TankBettle.gameData.curLeftEnemy -= 1;
+                    TankBettle.gameData.gameView.showGameInfo();
+                }
+            }
+        }
+    }
+
+    private checkBornPosition(pos: cc.Vec3) {
+        for (let i = 0; i < this._enemys.length; i++) {
+            let enemy = this._enemys[i];
+            if (enemy.getBoundingBox().contains(cc.v2(pos.x, pos.y))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public removeAllEnemy() {
+        let size = this._enemys.length;
+        for (let i = 0; i < this._enemys.length; i++) {
+            let enemy = this._enemys[i];
+            enemy.removeFromParent();
+        }
+        this._enemys = [];
+        this.checkGamePass();
+    }
+
+    public removeEnemy(enemy: cc.Node) {
+        let i = this._enemys.length;
+        while (i--) {
+            if (this._enemys[i] == enemy) {
+                enemy.removeFromParent();
+                this._enemys.splice(i, 1);
+            }
+        }
+        this.checkGamePass();
+    }
+
+    /**@description 检测游戏是否通关了 */
+    private checkGamePass() {
+        if (TankBettle.gameData.curLeftEnemy <= 0) {
+            if (this._enemys.length <= 0) {
+                //通关了
+                TankBettle.gameData.gameView.nextLevel();
+            }
+        }
     }
 
     public setLevel(level: number) {
@@ -54,37 +145,40 @@ export default class TankBattleMap extends cc.Component {
         this.node.removeAllChildren(true)
 
         //添加四周的墙
-        this.outWall.forEach((value)=>{
+        this.outWall.forEach((value) => {
             this.node.addChild(cc.instantiate(value));
         });
+
+        //清空
+        this._enemys = [];
 
         let data = MapLevel[level];
         //地图数据
         let x = 0;
         let y = 0;
         let tempBlock = this._blockPrefab.getChildByName("block_1");
-        let prefebSize : cc.Size = cc.size(tempBlock.width,tempBlock.height)
+        let prefebSize: cc.Size = cc.size(tempBlock.width, tempBlock.height)
         for (let i = 0; i < data.length; i++) {
             const element = data[i];
-            y = -( (i + 1 ) * prefebSize.height /2 + i * prefebSize.height /2 )
+            y = -((i + 1) * prefebSize.height / 2 + i * prefebSize.height / 2)
             for (let j = 0; j < element.length; j++) {
                 const blockData = element[j];
-                if (blockData > 0 && blockData != TankBettle.BLOCK_TYPE.ANOTHREHOME ) {
+                if (blockData > 0 && blockData != TankBettle.BLOCK_TYPE.ANOTHREHOME) {
                     let name = "block_" + blockData.toString()
                     let prefab = this._blockPrefab.getChildByName(name)
                     if (prefab) {
                         let node = cc.instantiate(prefab)
                         let block = node.addComponent(TankBattleBlock)
                         block.type = blockData;
-                        this.node.addChild(node,TankBettle.ZIndex.BLOCK);
-                        x = (j + 1) * prefebSize.width/2 + j * prefebSize.width/2
+                        this.node.addChild(node, TankBettle.ZIndex.BLOCK);
+                        x = (j + 1) * prefebSize.width / 2 + j * prefebSize.width / 2
                         node.x = x;
                         node.y = y;
-                        if ( blockData == TankBettle.BLOCK_TYPE.HOME ) {
+                        if (blockData == TankBettle.BLOCK_TYPE.HOME) {
                             //自己的老家，放在最中间
-                            x = this.node.width/2
+                            x = this.node.width / 2
                             node.x = x;
-                            node.y -= prefebSize.height/2
+                            node.y -= prefebSize.height / 2
                         }
                     }
                 }
@@ -92,89 +186,95 @@ export default class TankBattleMap extends cc.Component {
         }
     }
 
-    public addPlayer( isOne : boolean){
+    public addPlayer(isOne: boolean) {
         let playerNode = cc.instantiate(TankBettle.gameData.getPlayerPrefab(true))
         if (isOne) {
             this.playerOne = playerNode.addComponent(TankBettleTankPlayer);
             this.playerOne.isOnePlayer = isOne;
             playerNode.x = this.node.width / 2 - 2 * playerNode.width
-            playerNode.y = -this.node.height + playerNode.height/2;
+            playerNode.y = -this.node.height + playerNode.height / 2;
             this.playerOne.born();
-        }else{
+        } else {
             this.playerTwo = playerNode.addComponent(TankBettleTankPlayer);
             this.playerTwo.isOnePlayer = isOne;
             playerNode.x = this.node.width / 2 + 2 * playerNode.width;
-            playerNode.y = -this.node.height + playerNode.height /2;
+            playerNode.y = -this.node.height + playerNode.height / 2;
             this.playerTwo.born();
         }
-        this.node.addChild(playerNode,TankBettle.ZIndex.TANK);
+        this.node.addChild(playerNode, TankBettle.ZIndex.TANK);
     }
 
-    public addBullet( bullet : TankBettleBullet ){
-        this.node.addChild(bullet.node,TankBettle.ZIndex.BULLET);
+    public removePlayer(player: TankBettleTankPlayer) {
+        if (player.isOnePlayer) {
+            let isOne = player.isOnePlayer;
+            player.node.removeFromParent();
+            if (TankBettle.gameData.playerOneLive > 0) {
+                this.addPlayer(isOne);
+            }
+        }
     }
 
-    public onKeyDown(ev:cc.Event.EventKeyboard){
-        switch(ev.keyCode){
-            case cc.macro.KEY.a:{
-                this._handlePlayerMove(this.playerTwo,TankBettle.Direction.LEFT);
-            }
-            break;
-            case cc.macro.KEY.w:{
-                this._handlePlayerMove(this.playerTwo,TankBettle.Direction.UP);
-            }
-            break;
-            case cc.macro.KEY.s:{
-                this._handlePlayerMove(this.playerTwo,TankBettle.Direction.DOWN);
-            }
-            break;
-            case cc.macro.KEY.d:{
-                this._handlePlayerMove(this.playerTwo,TankBettle.Direction.RIGHT);
-            }
-            break;
-            case cc.macro.KEY.left:{
-                this._handlePlayerMove(this.playerOne,TankBettle.Direction.LEFT);
-            }
-            break;
-            case cc.macro.KEY.up:{
-                this._handlePlayerMove(this.playerOne,TankBettle.Direction.UP);
-            }
-            break;
-            case cc.macro.KEY.down:{
-                this._handlePlayerMove(this.playerOne,TankBettle.Direction.DOWN);
-            }
-            break;
-            case cc.macro.KEY.right:{
-                this._handlePlayerMove(this.playerOne,TankBettle.Direction.RIGHT);
-            }
-            break;
-            case cc.macro.KEY.enter:{
-                this._handlePlayerShoot( this.playerOne );
-            }
-            break;
-            case cc.macro.KEY.space:{
-                this._handlePlayerShoot( this.playerTwo );
-            }
-            break;
+    public addBullet(bullet: TankBettleBullet) {
+        this.node.addChild(bullet.node, TankBettle.ZIndex.BULLET);
+    }
+
+    public onKeyDown(ev: cc.Event.EventKeyboard) {
+        switch (ev.keyCode) {
+            case cc.macro.KEY.a: {
+                this._handlePlayerMove(this.playerTwo, TankBettle.Direction.LEFT);
+            } break;
+            case cc.macro.KEY.w: {
+                this._handlePlayerMove(this.playerTwo, TankBettle.Direction.UP);
+            } break;
+            case cc.macro.KEY.s: {
+                this._handlePlayerMove(this.playerTwo, TankBettle.Direction.DOWN);
+            } break;
+            case cc.macro.KEY.d: {
+                this._handlePlayerMove(this.playerTwo, TankBettle.Direction.RIGHT);
+            } break;
+            case cc.macro.KEY.left: {
+                this._handlePlayerMove(this.playerOne, TankBettle.Direction.LEFT);
+            } break;
+            case cc.macro.KEY.up: {
+                this._handlePlayerMove(this.playerOne, TankBettle.Direction.UP);
+            } break;
+            case cc.macro.KEY.down: {
+                this._handlePlayerMove(this.playerOne, TankBettle.Direction.DOWN);
+            } break;
+            case cc.macro.KEY.right: {
+                this._handlePlayerMove(this.playerOne, TankBettle.Direction.RIGHT);
+            } break;
+            case cc.macro.KEY.enter: {
+                this._handlePlayerShoot(this.playerOne);
+            } break;
+            case cc.macro.KEY.space: {
+                this._handlePlayerShoot(this.playerTwo);
+            } break;
+            case cc.macro.KEY.t: {
+                this.addEnemy();
+            } break;
+            case cc.macro.KEY.r: {
+                this.removeAllEnemy();
+            } break;
         }
         cc.log(ev.keyCode)
     }
 
-    private _handlePlayerMove( player : TankBettleTankPlayer , dir : TankBettle.Direction){
+    private _handlePlayerMove(player: TankBettleTankPlayer, dir: TankBettle.Direction) {
         if (player) {
             player.direction = dir;
             player.move();
         }
     }
 
-    private _handlePlayerShoot( player : TankBettleTankPlayer ){
-        if( player ){
+    private _handlePlayerShoot(player: TankBettleTankPlayer) {
+        if (player) {
             player.shoot();
         }
     }
 
-    public gameOver( block : TankBattleBlock ){
+    public gameOver(block: TankBattleBlock) {
         let sprite = block.node.getComponent(cc.Sprite);
-        sprite.loadImage({url:{urls:["texture/images"],key:"heart_0"},view:this.owner,bundle:this.owner.bundle})
+        sprite.loadImage({ url: { urls: ["texture/images"], key: "heart_0" }, view: this.owner, bundle: this.owner.bundle })
     }
 }
