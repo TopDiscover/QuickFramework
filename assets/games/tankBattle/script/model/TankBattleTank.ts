@@ -40,7 +40,7 @@ export default class TankBettleTank extends cc.Component {
 
     }
 
-    changeDirection(other: cc.BoxCollider) {
+    changeDirection(other?: cc.BoxCollider) {
         
     }
 
@@ -265,39 +265,14 @@ export class TankBettleTankEnemy extends TankBettleTank {
         }
     }
 
-    changeDirection(other: cc.BoxCollider) {
-        let direction = this.direction;
-        let otherDir = null;
-        let isChange = true;
-        // if (other.node.group == TankBettle.GROUP.Player) {
-        //     let player = this.getPlayer(other.node);
-        //     if (!player.isAI) {
-        //         //玩家顶着，就不改变原来方向
-        //         isChange = false;
-        //     }else{
-        //         otherDir = player.direction;
-        //     }
-        // }
-        // if( isChange ){
-        //     isChange = cc.randomInteger(1,10) == 1;
-        // }
-        // if (isChange) {
-        //     let allDir: TankBettle.Direction[] = [];
-        //     for (let i = TankBettle.Direction.UP; i <= TankBettle.Direction.RIGHT; i++) {
-        //         if (i != this.direction && i != otherDir ) {
-        //             allDir.push(i);
-        //         }
-        //     }
-        //     direction = cc.randomInteger(0,allDir.length-1);
-        // }
+    changeDirection(other?: cc.BoxCollider) {
 
-        // if( this.node.x < 0 ){
-        //     cc.log(this.node.x);
-        // }
+        // cc.tween(this.node).delay(cc.randomInteger.random)
+        if( other ){
 
-        
-        
+        }else{
 
+        }
         // this.direction = cc.randomInteger(TankBettle.Direction.MIN,TankBettle.Direction.MAX);
         // this.move();
     }

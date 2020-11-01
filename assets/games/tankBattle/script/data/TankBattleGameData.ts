@@ -99,12 +99,14 @@ export namespace TankBettle {
     }
 
     export enum EnemyType{
+        MIN,
         /**@description 普通的，一枪一个 */
-        NORMAL,
+        NORMAL = MIN,
         /**@description 速度快的，一枪一个 */
         SPEED,
         /**@description 牛逼的，三枪一个 */
         STRONG,
+        MAX = STRONG,
     }
 
     export class TankConfig{
@@ -122,9 +124,11 @@ export namespace TankBettle {
 
     /**@description 敌人出生点位置 */
     export enum EnemyBornPosition{
-        LEFT,
+        MIN,
+        LEFT = MIN,
         MIDDLE,
         RIGHT,
+        MAX = RIGHT,
     }
 
     class TankBettleGameData extends GameData {

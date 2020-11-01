@@ -54,11 +54,22 @@ export default class TankBattleMap extends cc.Component {
 
     protected update() {
         this.addEnemy();
+        cc.log(cc.randomRange)
+        // this.changeEnemyDirection();
+    }
+
+
+    private changeEnemyDirection(){
+        if( this._enemys.length > 0 ){
+            for( let i = 0 ; i < this._enemys.length ; i++ ){
+                this._enemys[i].getComponent(TankBettleTankEnemy).changeDirection();
+            }
+        }
     }
 
     /**@description 随机敌人出生点位置 */
     private randomEnemyPosition(enemyNode: cc.Node) : { position : cc.Vec3 , bornPosition : TankBettle.EnemyBornPosition } {
-        let pos = cc.randomInteger(0,2)
+        let pos = cc.randomRangeInt(TankBettle.EnemyBornPosition.MIN,TankBettle.EnemyBornPosition.MAX)
         let outPosition = cc.v3(0, 0, 0);
         let outBornPosition = TankBettle.EnemyBornPosition.RIGHT;
         if (pos == 0) {
@@ -88,7 +99,7 @@ export default class TankBattleMap extends cc.Component {
         }else if( bornPosition == TankBettle.EnemyBornPosition.RIGHT ){
             allDir = [TankBettle.Direction.DOWN,TankBettle.Direction.LEFT]
         }
-        let value = cc.randomInteger(0,allDir.length-1);
+        let value = cc.randomRangeInt(0,allDir.length);
         let outDir = allDir[value]
         return outDir;
     }
@@ -98,7 +109,7 @@ export default class TankBattleMap extends cc.Component {
         if (TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME && //游戏状态下
             TankBettle.gameData.curLeftEnemy > 0 && //有剩余敌人
             this._enemys.length < TankBettle.MAX_APPEAR_ENEMY) { //可以生产敌人
-            let type: TankBettle.EnemyType = cc.randomInteger(0,2);
+            let type: TankBettle.EnemyType = cc.randomRangeInt(TankBettle.EnemyType.MIN,TankBettle.EnemyType.MAX);
             let prefab = TankBettle.gameData.getEnemyPrefab(type);
             let randomPos = this.randomEnemyPosition(prefab);
             if (this.checkBornPosition(randomPos.position,prefab)) {
