@@ -11,6 +11,7 @@ import TankBattleGameView from "../view/TankBattleGameView";
 import { Manager } from "../../../../script/common/manager/Manager";
 import TankBattleGameOver from "../view/TankBattleGameOver";
 import { ViewZOrder } from "../../../../script/common/config/Config";
+import TankBattleProps from "./TankBattleProps";
 
 const { ccclass, property } = cc._decorator;
 
@@ -26,9 +27,9 @@ export default class TankBattleMap extends cc.Component {
     }
 
     /**@description 玩家1 */
-    private playerOne: TankBettleTankPlayer = null;
+    public playerOne: TankBettleTankPlayer = null;
     /**@description 玩家2 */
-    private playerTwo: TankBettleTankPlayer = null;
+    public playerTwo: TankBettleTankPlayer = null;
     private outWall: cc.Node[] = [];
 
     public owner: TankBattleGameView = null;
@@ -40,11 +41,19 @@ export default class TankBattleMap extends cc.Component {
     /**@description 老家 */
     private _heart: cc.Node = null;
 
+    /**@description 道具生成节点 */
+    public propsProductNode : cc.Node = null;
+    /**@description 待销毁的敌人 */
+    private _waitingDestory : cc.Node[] = [];
+
     protected onLoad() {
         this.node.children.forEach(node => {
             this.outWall.push(node);
         })
         this.node.removeAllChildren(false);
+        let node = new cc.Node();
+        this.node.addChild(node);
+        this.propsProductNode = node;
     }
 
     protected onDestroy() {
@@ -56,6 +65,7 @@ export default class TankBattleMap extends cc.Component {
         });
         this._waitEnemy = [];
         this.outWall = [];
+        this.propsProductNode = null;
     }
 
     protected update() {
@@ -102,6 +112,9 @@ export default class TankBattleMap extends cc.Component {
 
     public addEnemy() {
         //要在游戏中且当前剩余敌人数量要大于0才创建
+        if( this._waitingDestory.length > 0 ){
+            return;
+        }
         if (TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME && //游戏状态下
             TankBettle.gameData.curLeftEnemy > 0 && //有剩余敌人
             this._enemys.length < TankBettle.MAX_APPEAR_ENEMY) { //可以生产敌人
@@ -176,12 +189,12 @@ export default class TankBattleMap extends cc.Component {
         return result;
     }
 
+    /**@description 删除当前屏幕的敌人 */
     public removeAllEnemy() {
-        let size = this._enemys.length;
         for (let i = 0; i < this._enemys.length; i++) {
             let enemy = this._enemys[i];
-            enemy.removeFromParent();
-            enemy.destroy();
+            enemy.getComponent(TankBettleTankEnemy).die();
+            this._waitingDestory.push(enemy)
         }
         this._enemys = [];
         this.checkGamePass();
@@ -194,6 +207,14 @@ export default class TankBattleMap extends cc.Component {
                 enemy.removeFromParent();
                 enemy.destroy();
                 this._enemys.splice(i, 1);
+            }
+        }
+        i = this._waitingDestory.length;
+        while(i--){
+            if( this._waitingDestory[i] == enemy ){
+                enemy.removeFromParent();
+                enemy.destroy();
+                this._waitingDestory.splice(i,1);
             }
         }
         this.checkGamePass();
@@ -261,6 +282,38 @@ export default class TankBattleMap extends cc.Component {
                     }
                 }
             }
+        }
+    }
+
+    protected randomPropPosition( ){
+        let tank = TankBettle.gameData.getPlayerPrefab(true);
+        let xMin = tank.width / 2;
+        let xMax = this.node.width - tank.width /2 ;
+        let yMin = -tank.height/2;
+        let yMax = -this.node.height + tank.height/2;
+        let x = cc.randomRange(xMin,xMax);
+        let y = cc.randomRange(yMin,yMax);
+        return cc.v3(x,y,0);
+    }
+
+    private createProps( ){
+        let type = cc.randomRangeInt(TankBettle.PropsType.MIN,TankBettle.PropsType.MAX);
+        let prefab = TankBettle.gameData.getPropsPrefab(type);
+        let node = cc.instantiate(prefab);
+        let props = node.addComponent(TankBattleProps);
+        props.type = type;
+        this.node.addChild(node,TankBettle.ZIndex.PROPS);
+        node.position = this.randomPropPosition();
+    }
+
+    public starCreateProps() {
+        if( TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME ){
+            let time = cc.randomRange(TankBettle.PROPS_CREATE_INTERVAL.min,TankBettle.PROPS_CREATE_INTERVAL.max)
+            this.propsProductNode.stopAllActions();
+            cc.tween(this.propsProductNode).delay(time).call(()=>{
+                this.createProps();
+                this.starCreateProps();
+            }).start();
         }
     }
 

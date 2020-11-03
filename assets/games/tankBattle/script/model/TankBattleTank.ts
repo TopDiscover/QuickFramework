@@ -52,6 +52,10 @@ export default class TankBettleTank extends cc.Component {
 
     /**@description 受伤 */
     public hurt() {
+        
+    }
+
+    public die(){
 
     }
 
@@ -159,10 +163,23 @@ export class TankBettleTankPlayer extends TankBettleTank {
     public isOnePlayer = false;
 
     /**@description 玩家状态 */
-    private _status: TankBettle.PLAYER_STATUS[] = [];
+    private _status: Map<TankBettle.PLAYER_STATUS,boolean> = new Map();
+
+    /**@description 打白色砖墙状态 */
+    private _strongNode : cc.Node = null;
+    
+    onLoad(){
+        this._strongNode = new cc.Node();
+        this.node.addChild(this._strongNode);
+    }
+
+    addLive() {
+        this.config.live++;
+        TankBettle.gameData.gameView.showGameInfo();
+    }
 
     public addStatus(status: TankBettle.PLAYER_STATUS) {
-        this._status.push(status);
+        this._status.set(status,true);
         if (status == TankBettle.PLAYER_STATUS.PROTECTED) {
             let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
             this.node.addChild(aniNode);
@@ -170,30 +187,25 @@ export class TankBettleTankPlayer extends TankBettleTank {
             animation.play("tank_protected");
             aniNode.x = 0;
             aniNode.y = 0;
-            cc.tween(aniNode).delay(5).call(() => {
+            cc.tween(aniNode).delay(TankBettle.PLAYER_STATUS_EXIST_TIME).call(() => {
                 aniNode.removeFromParent()
                 aniNode.destroy();
                 this.removeStatus(TankBettle.PLAYER_STATUS.PROTECTED)
             }).removeSelf().start()
+        }else if( status == TankBettle.PLAYER_STATUS.STRONG ){
+            this._strongNode.stopAllActions();
+            cc.tween(this._strongNode).delay(TankBettle.PLAYER_STATUS_EXIST_TIME).call(()=>{
+                this.removeStatus(status);
+            }).start();
         }
     }
 
     public hasStatus(status: TankBettle.PLAYER_STATUS) {
-        for (let i = 0; i < this._status.length; i++) {
-            if (this._status[i] == status) {
-                return true;
-            }
-        }
-        return false;
+        return this._status.has(status);
     }
 
     public removeStatus(status: TankBettle.PLAYER_STATUS) {
-        let i = this._status.length;
-        while (i--) {
-            if (this._status[i] == status) {
-                this._status.splice(i, 1);
-            }
-        }
+        this._status.delete(status);
     }
 
     /**@description 出生 */
@@ -220,6 +232,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
                 TankBettle.gameData.gameMap.removePlayer(this);
             }).removeSelf().start()
         }
+        TankBettle.gameData.gameView.showGameInfo();
     }
 
     move() {
@@ -309,18 +322,22 @@ export class TankBettleTankEnemy extends TankBettleTank {
             sprite.loadImage({ url: { urls: ["texture/images"], key: spriteFrameKey }, view: TankBettle.gameData.gameView, bundle: TankBettle.gameData.gameView.bundle });
         }
         if (this.config.live == 0) {
-            this.node.stopAllActions();
-            this.stopShootAction();
-            let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
-            this.node.addChild(aniNode);
-            let animation = aniNode.getComponent(cc.Animation);
-            let state = animation.play("tank_boom");
-            aniNode.x = 0;
-            aniNode.y = 0;
-            cc.tween(aniNode).delay(state.duration).call(() => {
-                TankBettle.gameData.gameMap.removeEnemy(this.node);
-            }).removeSelf().start()
+            this.die()
         }
+    }
+
+    public die(){
+        this.node.stopAllActions();
+        this.stopShootAction();
+        let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
+        this.node.addChild(aniNode);
+        let animation = aniNode.getComponent(cc.Animation);
+        let state = animation.play("tank_boom");
+        aniNode.x = 0;
+        aniNode.y = 0;
+        cc.tween(aniNode).delay(state.duration).call(() => {
+            TankBettle.gameData.gameMap.removeEnemy(this.node);
+        }).removeSelf().start()
     }
 
     /**@description 开始射击 */

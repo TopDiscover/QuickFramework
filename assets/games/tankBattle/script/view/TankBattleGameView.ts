@@ -28,6 +28,8 @@ export default class TankBattleGameView extends GameView {
     /**@description 当前游戏关卡等级 */
     private _gameLevel: cc.Label = null;
     private _instructions: cc.Label = null;
+    private _playerOneTankLive: cc.Label = null;
+    private _playerTwoTankLive: cc.Label = null;
 
     protected bindingEvents() {
         super.bindingEvents()
@@ -64,6 +66,8 @@ export default class TankBattleGameView extends GameView {
 
         this._playerOneLive = cc.find("player_count_1", gameInfo).getComponent(cc.Label);
         this._playerTwoLive = cc.find("player_count_2", gameInfo).getComponent(cc.Label);
+        this._playerOneTankLive = cc.find("player_live_1", gameInfo).getComponent(cc.Label);
+        this._playerTwoTankLive = cc.find("player_live_2", gameInfo).getComponent(cc.Label);
 
         this._gameLevel = cc.find("level", gameInfo).getComponent(cc.Label);
 
@@ -134,6 +138,8 @@ export default class TankBattleGameView extends GameView {
     protected onShowMapLevel(data: any) {
         this.setMapLevel(data)
         TankBettle.gameData.gameStatus = TankBettle.GAME_STATUS.GAME;
+        //生成道具
+        TankBettle.gameData.gameMap.starCreateProps();
     }
 
     public showGameInfo() {
@@ -142,6 +148,17 @@ export default class TankBattleGameView extends GameView {
         //玩家的生命
         this._playerOneLive.string = (TankBettle.gameData.playerOneLive < 0 ? 0 : TankBettle.gameData.playerOneLive).toString();
         this._playerTwoLive.string = (TankBettle.gameData.playerTwoLive < 0 ? 0 : TankBettle.gameData.playerTwoLive).toString();
+        if( TankBettle.gameData.gameMap.playerOne && TankBettle.gameData.gameMap.playerOne.config.live > 0 ){
+            this._playerOneTankLive.string = `-${TankBettle.gameData.gameMap.playerOne.config.live}`
+        }else{
+            this._playerOneTankLive.string = "";
+        }
+        if( TankBettle.gameData.gameMap.playerTwo && TankBettle.gameData.gameMap.playerTwo.config.live > 0 ){
+            this._playerTwoTankLive.string = `-${TankBettle.gameData.gameMap.playerTwo.config.live}`
+        }else{
+            this._playerTwoTankLive.string = "";
+        }
+
         //当前剩余敌人数量 
         let count = this._enemyTankCount.children.length;
         if (count < TankBettle.gameData.curLeftEnemy) {

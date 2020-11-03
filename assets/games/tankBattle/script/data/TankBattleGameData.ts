@@ -69,7 +69,8 @@ export namespace TankBettle {
         Bullet = "Bullet",
         Player = "Player",
         /**@description 边界 */
-        Boundary = "Boundary"
+        Boundary = "Boundary",
+        Props = "Props",
     }
 
     export enum EVENT {
@@ -87,15 +88,18 @@ export namespace TankBettle {
 
     /**@description 玩家状态 */
     export enum PLAYER_STATUS{
-        FAST_SPEED,//加速
         STRONG,//这个状态下可以打白色砖块
         PROTECTED,//保护状态
     }
+
+    /**@description 玩家状态存在时间 */
+    export const PLAYER_STATUS_EXIST_TIME = 5;
 
     export enum ZIndex{
         TANK,
         BULLET,
         BLOCK,
+        PROPS,
     }
 
     export enum EnemyType{
@@ -133,7 +137,34 @@ export namespace TankBettle {
         MAX = RIGHT,
     }
 
+    /**@description 道具类型 */
+    export enum PropsType{
+        MIN ,
+        /**@description 添加玩家拥有坦克数量 */
+        LIVE = MIN,
+        /**@description 加长游戏时间 */
+        TIME,
+        /**@description 加强子弹威力 */
+        STRONG_BULLET,
+        /**@description 炸掉当前所有敌人 */
+        BOOM_ALL_ENEMY,
+        /**@description 添加玩家抗打能力，即玩家当前坦克生命 */
+        STRONG_MY_SELF,
+        /**@description 添加无敌状态 */
+        GOD,
+        MAX,
+    }
+
+    /**@description 道具的存在时间 */
+    export const PROPS_DISAPPEAR = 10;
+
+    /**@description 道具生成间隔时间 */
+    export const PROPS_CREATE_INTERVAL = { min : 1 , max : 5};
+
     class TankBettleGameData extends GameData {
+        addGameTime() {
+            //待处理
+        }
         onLanguageChange() {
             let lan = TANK_LAN_ZH;
             if (Manager.language.getLanguage() == TANK_LAN_EN.language) {
@@ -175,6 +206,11 @@ export namespace TankBettle {
         /**@description 获取敌人的预置 */
         public getEnemyPrefab( type : number ){
             return this.gamePrefabs.getChildByName(`tank_${type}`)
+        }
+
+        /**@description 根据当前类型取当道具预置 */
+        public getPropsPrefab( type : PropsType ){
+            return this.gamePrefabs.getChildByName(`item_${type}`);
         }
     
         public nextLevel( ){
@@ -237,6 +273,15 @@ export namespace TankBettle {
                     this.playerTwoLive--;
                 }
             }
+        }
+
+        public addPlayerLive( isOne : boolean ){
+            if( isOne ){
+                this.playerOneLive++;
+            }else{
+                this.playerTwoLive++;
+            }
+            this.gameView.showGameInfo();
         }
     
         public clear(){
