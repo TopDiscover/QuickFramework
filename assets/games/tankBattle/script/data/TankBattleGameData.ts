@@ -229,6 +229,15 @@ export namespace TankBettle {
         }
 
         public isNeedReducePlayerLive = true;
+        public reducePlayerLive( isOne : boolean ){
+            if( this.isNeedReducePlayerLive ){
+                if( isOne ){
+                    this.playerOneLive--;
+                }else{
+                    this.playerTwoLive--;
+                }
+            }
+        }
     
         public clear(){
             //这个地方严谨点的写法，需要调用基类，虽然现在基类没有任何实现，不保证后面基类有公共的数据需要清理

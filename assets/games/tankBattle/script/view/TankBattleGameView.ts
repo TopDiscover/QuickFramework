@@ -119,8 +119,11 @@ export default class TankBattleGameView extends GameView {
         TankBettle.gameData.gameMap.setLevel(level);
         
         if( TankBettle.gameData.isSingle ){
+            TankBettle.gameData.reducePlayerLive(true);
             TankBettle.gameData.gameMap.addPlayer(true)
         }else{
+            TankBettle.gameData.reducePlayerLive(true)
+            TankBettle.gameData.reducePlayerLive(false)
             TankBettle.gameData.gameMap.addPlayer(true);
             TankBettle.gameData.gameMap.addPlayer(false);
         }
@@ -137,8 +140,8 @@ export default class TankBattleGameView extends GameView {
         //当前关卡
         this._gameLevel.string = (TankBettle.gameData.currentLevel + 1).toString();
         //玩家的生命
-        this._playerOneLive.string = TankBettle.gameData.playerOneLive.toString();
-        this._playerTwoLive.string = TankBettle.gameData.playerTwoLive.toString();
+        this._playerOneLive.string = (TankBettle.gameData.playerOneLive < 0 ? 0 : TankBettle.gameData.playerOneLive).toString();
+        this._playerTwoLive.string = (TankBettle.gameData.playerTwoLive < 0 ? 0 : TankBettle.gameData.playerTwoLive).toString();
         //当前剩余敌人数量 
         let count = this._enemyTankCount.children.length;
         if (count < TankBettle.gameData.curLeftEnemy) {

@@ -208,8 +208,17 @@ export class TankBettleTankPlayer extends TankBettleTank {
             return;
         }
         this.config.live--;
-        if (this.config.live <= 0) {
-            TankBettle.gameData.gameMap.removePlayer(this);
+        if (this.config.live == 0) {
+            this.node.stopAllActions();
+            let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
+            this.node.addChild(aniNode);
+            let animation = aniNode.getComponent(cc.Animation);
+            let state = animation.play("tank_boom");
+            aniNode.x = 0;
+            aniNode.y = 0;
+            cc.tween(aniNode).delay(state.duration).call(() => {
+                TankBettle.gameData.gameMap.removePlayer(this);
+            }).removeSelf().start()
         }
     }
 

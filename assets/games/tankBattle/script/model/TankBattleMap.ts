@@ -48,7 +48,7 @@ export default class TankBattleMap extends cc.Component {
         this.outWall.forEach((value) => {
             value.destroy();
         });
-        this._waitEnemy.forEach((value)=>{
+        this._waitEnemy.forEach((value) => {
             value.destroy();
         });
         this._waitEnemy = [];
@@ -109,12 +109,12 @@ export default class TankBattleMap extends cc.Component {
             if (enemyNode == null) {
                 // cc.log("生成新敌机")
                 enemyNode = cc.instantiate(prefab);
-            }else{
+            } else {
                 // cc.log("从上次未生成的敌人里面取出")
             }
             this.node.addChild(enemyNode, TankBettle.ZIndex.TANK);
             let enemy = enemyNode.getComponent(TankBettleTankEnemy);
-            if( !enemy ){
+            if (!enemy) {
                 enemy = enemyNode.addComponent(TankBettleTankEnemy);
             }
             enemy.type = type;
@@ -154,18 +154,18 @@ export default class TankBattleMap extends cc.Component {
         let result = true;
         for (let i = 0; i < this._enemys.length; i++) {
             let enemy = this._enemys[i];
-            if( this.intersects(enemy,node) ){
+            if (this.intersects(enemy, node)) {
                 result = false;
                 break;
             }
         }
         if (result) {
             //检测出生的敌机是否跟玩家位置重叠
-            if( this.playerOne && this.intersects(node,this.playerOne.node)){
+            if (this.playerOne && this.intersects(node, this.playerOne.node)) {
                 // cc.log("与玩家1重叠")
                 return false;
             }
-            if( this.playerTwo && this.intersects(node,this.playerTwo.node) ){
+            if (this.playerTwo && this.intersects(node, this.playerTwo.node)) {
                 // cc.log("与玩家2重叠")
                 return false;
             }
@@ -263,7 +263,7 @@ export default class TankBattleMap extends cc.Component {
 
     public addPlayer(isOne: boolean) {
 
-        let playerNode = cc.instantiate(TankBettle.gameData.getPlayerPrefab(true))
+        let playerNode = cc.instantiate(TankBettle.gameData.getPlayerPrefab(isOne))
         if (isOne) {
             this.playerOne = playerNode.addComponent(TankBettleTankPlayer);
             this.playerOne.isOnePlayer = isOne;
@@ -271,9 +271,6 @@ export default class TankBattleMap extends cc.Component {
             playerNode.y = -this.node.height + playerNode.height / 2;
             this.node.addChild(playerNode, TankBettle.ZIndex.TANK);
             this.playerOne.born();
-            if( TankBettle.gameData.isNeedReducePlayerLive ){
-                TankBettle.gameData.playerOneLive--;
-            }
         } else {
             this.playerTwo = playerNode.addComponent(TankBettleTankPlayer);
             this.playerTwo.isOnePlayer = isOne;
@@ -281,21 +278,39 @@ export default class TankBattleMap extends cc.Component {
             playerNode.y = -this.node.height + playerNode.height / 2;
             this.node.addChild(playerNode, TankBettle.ZIndex.TANK);
             this.playerTwo.born();
-            if( TankBettle.gameData.isNeedReducePlayerLive ){
-                TankBettle.gameData.playerTwoLive--;
-            }
         }
     }
 
     public removePlayer(player: TankBettleTankPlayer) {
-        if (player.isOnePlayer) {
-            let isOne = player.isOnePlayer;
-            player.node.removeFromParent();
-            player.node.destroy();
+        let isOne = player.isOnePlayer;
+        player.node.removeFromParent();
+        player.node.destroy();
+        if (TankBettle.gameData.isSingle) {
+            this.playerOne = null;
             if (TankBettle.gameData.playerOneLive > 0) {
                 this.addPlayer(isOne);
+                TankBettle.gameData.reducePlayerLive(true);
                 TankBettle.gameData.gameView.showGameInfo();
-            }else{
+            } else {
+                TankBettle.gameData.gameMap.gameOver();
+            }
+        } else {
+            //双人
+            if (isOne) {
+                this.playerOne = null;
+                if (TankBettle.gameData.playerOneLive > 0) {
+                    this.addPlayer(isOne);
+                }
+                TankBettle.gameData.reducePlayerLive(true)
+            } else {
+                this.playerTwo = null;
+                if (TankBettle.gameData.playerTwoLive > 0) {
+                    this.addPlayer(isOne);
+                }
+                TankBettle.gameData.reducePlayerLive(false)
+            }
+            TankBettle.gameData.gameView.showGameInfo();
+            if (TankBettle.gameData.playerTwoLive < 0 && TankBettle.gameData.playerOneLive < 0) {
                 TankBettle.gameData.gameMap.gameOver();
             }
         }
@@ -348,7 +363,7 @@ export default class TankBattleMap extends cc.Component {
     }
 
     private _handlePlayerMove(player: TankBettleTankPlayer, dir: TankBettle.Direction) {
-        if( TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME ){
+        if (TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME) {
             if (player) {
                 player.direction = dir;
                 player.move();
@@ -357,7 +372,7 @@ export default class TankBattleMap extends cc.Component {
     }
 
     private _handlePlayerShoot(player: TankBettleTankPlayer) {
-        if( TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME ){
+        if (TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME) {
             if (player) {
                 player.shoot();
             }
@@ -365,6 +380,7 @@ export default class TankBattleMap extends cc.Component {
     }
 
     public gameOver() {
+        cc.log("gameOver")
         TankBettle.gameData.gameStatus = TankBettle.GAME_STATUS.OVER;
         if (this._heart) {
             let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
@@ -379,7 +395,7 @@ export default class TankBattleMap extends cc.Component {
                 let sprite = this._heart.getComponent(cc.Sprite);
                 sprite.loadImage({ url: { urls: ["texture/images"], key: "heart_0" }, view: this.owner, bundle: this.owner.bundle });
             }).removeSelf().start()
-            
+
         }
     }
 }
