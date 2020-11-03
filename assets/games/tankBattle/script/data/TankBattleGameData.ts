@@ -159,7 +159,7 @@ export namespace TankBettle {
     export const PROPS_DISAPPEAR = 10;
 
     /**@description 道具生成间隔时间 */
-    export const PROPS_CREATE_INTERVAL = { min : 1 , max : 5};
+    export const PROPS_CREATE_INTERVAL = { min : 10 , max : 20};
 
     class TankBettleGameData extends GameData {
         addGameTime() {
