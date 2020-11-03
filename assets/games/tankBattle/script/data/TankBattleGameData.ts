@@ -120,6 +120,8 @@ export namespace TankBettle {
         bulletTime = 0.1;
         /**@description 默认是只有一点生命，当受到子弹的攻击就-1 */
         live = 1;
+        /**@description 射击间隔时间 */
+        shootInterval = { min : 2 , max : 5 };
     }
 
     /**@description 敌人出生点位置 */

@@ -119,6 +119,7 @@ export default class TankBattleMap extends cc.Component {
             enemyNode.getComponent(cc.BoxCollider).enabled = false;
             if (this.checkBornPosition(randomPos.position, enemyNode)) {
                 enemy.move();
+                enemy.startShoot();
                 this._enemys.push(enemyNode);
                 enemyNode.getComponent(cc.BoxCollider).enabled = true;
                 TankBettle.gameData.curLeftEnemy -= 1;

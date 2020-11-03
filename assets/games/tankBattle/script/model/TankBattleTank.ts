@@ -236,10 +236,24 @@ export class TankBettleTankPlayer extends TankBettleTank {
 }
 
 export class TankBettleTankEnemy extends TankBettleTank {
+   
     constructor() {
         super();
         this.isAI = true;
         this.config = new TankBettle.TankConfig();
+    }
+
+    private shootAction : cc.Tween = null;
+
+    private stopShootAction(){
+        if( this.shootAction ){
+            this.shootAction.stop();
+        }
+        this.shootAction = null;
+    }
+
+    onDestroy(){
+        this.stopShootAction();
     }
 
     setConfig() {
@@ -251,6 +265,16 @@ export class TankBettleTankEnemy extends TankBettleTank {
         if (this.config.live <= 0) {
             TankBettle.gameData.gameMap.removeEnemy(this.node);
         }
+    }
+
+    /**@description 开始射击 */
+    public startShoot() {
+        let delay = cc.randomRange(this.config.shootInterval.min,this.config.shootInterval.max);
+        this.stopShootAction();
+        this.shootAction = cc.tween(this).delay(delay).call(()=>{
+            this.shoot();
+            this.startShoot();
+        }).start();
     }
 
     public move() {
@@ -311,7 +335,6 @@ export class TankBettleTankEnemy extends TankBettleTank {
         this.isWaitingChange = true;
         let delay = cc.randomRange(0.5, 1);
         this.node.stopAllActions();
-        // this.shoot();
         cc.tween(this.node).delay(delay).call(() => { this.delayMove(other) }).start();
     }
 }
