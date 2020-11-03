@@ -313,11 +313,11 @@ export class TankBettleTankEnemy extends TankBettleTank {
 
         if( this.node.x <= this.node.width ){
             //在最左
-            cc.log(`在最左`)
+            // cc.log(`在最左`)
             except = TankBettle.Direction.LEFT;
         }
         if( this.node.x >= this.node.parent.width - this.node.width ){
-            cc.log("在最右")
+            // cc.log("在最右")
             except = TankBettle.Direction.RIGHT;
         }
         

@@ -113,13 +113,14 @@ export default class TankBattleGameView extends GameView {
     protected setMapLevel(level) {
         /**@description 当前地图 */
         TankBettle.gameData.gameMap.setLevel(level);
-        this.showGameInfo();
+        
         if( TankBettle.gameData.isSingle ){
             TankBettle.gameData.gameMap.addPlayer(true)
         }else{
             TankBettle.gameData.gameMap.addPlayer(true);
             TankBettle.gameData.gameMap.addPlayer(false);
         }
+        this.showGameInfo();
     }
 
     protected onShowMapLevel(data: any) {

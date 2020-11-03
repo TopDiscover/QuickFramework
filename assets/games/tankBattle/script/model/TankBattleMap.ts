@@ -62,7 +62,7 @@ export default class TankBattleMap extends cc.Component {
     /**@description 随机敌人出生点位置 */
     private randomEnemyPosition(enemyNode: cc.Node): { position: cc.Vec3, bornPosition: TankBettle.EnemyBornPosition } {
         let pos = cc.randomRangeInt(TankBettle.EnemyBornPosition.MIN, TankBettle.EnemyBornPosition.MAX + 1)
-        cc.log(`pos : ${pos}`);
+        // cc.log(`pos : ${pos}`);
         let outPosition = cc.v3(0, 0, 0);
         let outBornPosition = TankBettle.EnemyBornPosition.RIGHT;
         if (pos == 0) {
@@ -107,10 +107,10 @@ export default class TankBattleMap extends cc.Component {
             let randomPos = this.randomEnemyPosition(prefab);
             let enemyNode = this._waitEnemy.shift();
             if (enemyNode == null) {
-                cc.log("生成新敌机")
+                // cc.log("生成新敌机")
                 enemyNode = cc.instantiate(prefab);
             }else{
-                cc.log("从上次未生成的敌人里面取出")
+                // cc.log("从上次未生成的敌人里面取出")
             }
             this.node.addChild(enemyNode, TankBettle.ZIndex.TANK);
             let enemy = enemyNode.addComponent(TankBettleTankEnemy);
@@ -125,7 +125,7 @@ export default class TankBattleMap extends cc.Component {
                 TankBettle.gameData.curLeftEnemy -= 1;
                 TankBettle.gameData.gameView.showGameInfo();
             } else {
-                cc.log("生成敌机周围有敌机，不出现")
+                // cc.log("生成敌机周围有敌机，不出现")
                 enemyNode.removeFromParent(false);
                 this._waitEnemy.push(enemyNode);
             }
@@ -140,7 +140,7 @@ export default class TankBattleMap extends cc.Component {
         let height = box.height * scale;
         let newBox = cc.rect(box.x - (width - box.width) / 2, box.y - (height - box.height) / 2, width, height)
         if (newBox.intersects(otherBox)) {
-            cc.log(`生成的敌机离${other.name}太近`);
+            // cc.log(`生成的敌机离${other.name}太近`);
             return true;
         }
         return false;
@@ -157,11 +157,11 @@ export default class TankBattleMap extends cc.Component {
         if (result) {
             //检测出生的敌机是否跟玩家位置重叠
             if( this.playerOne && this.intersects(node,this.playerOne.node)){
-                cc.log("与玩家1重叠")
+                // cc.log("与玩家1重叠")
                 return false;
             }
             if( this.playerTwo && this.intersects(node,this.playerTwo.node) ){
-                cc.log("与玩家2重叠")
+                // cc.log("与玩家2重叠")
                 return false;
             }
         }
@@ -263,6 +263,7 @@ export default class TankBattleMap extends cc.Component {
             playerNode.y = -this.node.height + playerNode.height / 2;
             this.node.addChild(playerNode, TankBettle.ZIndex.TANK);
             this.playerOne.born();
+            TankBettle.gameData.playerOneLive--;
         } else {
             this.playerTwo = playerNode.addComponent(TankBettleTankPlayer);
             this.playerTwo.isOnePlayer = isOne;
@@ -270,6 +271,7 @@ export default class TankBattleMap extends cc.Component {
             playerNode.y = -this.node.height + playerNode.height / 2;
             this.node.addChild(playerNode, TankBettle.ZIndex.TANK);
             this.playerTwo.born();
+            TankBettle.gameData.playerTwoLive--;
         }
     }
 
@@ -279,6 +281,9 @@ export default class TankBattleMap extends cc.Component {
             player.node.removeFromParent();
             if (TankBettle.gameData.playerOneLive > 0) {
                 this.addPlayer(isOne);
+                TankBettle.gameData.gameView.showGameInfo();
+            }else{
+                TankBettle.gameData.gameMap.gameOver();
             }
         }
     }
@@ -344,7 +349,9 @@ export default class TankBattleMap extends cc.Component {
     public gameOver() {
         if (this._heart) {
             let sprite = this._heart.getComponent(cc.Sprite);
-            sprite.loadImage({ url: { urls: ["texture/images"], key: "heart_0" }, view: this.owner, bundle: this.owner.bundle })
+            sprite.loadImage({ url: { urls: ["texture/images"], key: "heart_0" }, view: this.owner, bundle: this.owner.bundle });
+            //如果老家被干，去碰撞体
+            this._heart.getComponent(cc.BoxCollider).enabled = false;
         }
     }
 }
