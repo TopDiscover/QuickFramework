@@ -10,8 +10,23 @@ export default class TankBettleTank extends cc.Component {
     public config: TankBettle.TankConfig = null;
     /** @description 子弹 */
     public bullet: TankBettleBullet = null;
+    
+    public _direction: TankBettle.Direction = TankBettle.Direction.UP;
     /**@description 移动方向 */
-    public direction: TankBettle.Direction = TankBettle.Direction.UP;
+    public get direction(){
+        return this._direction;
+    }
+    public set direction( value ){
+        let old = this._direction;
+        this._direction = value;
+        if( old != this._direction ){
+            //改变了动画，立即响应
+            this.isMoving = false;
+        }
+    }
+
+    protected isWaitingChange = false;
+
     /**@description 当前是否正常移动 */
     protected isMoving = false;
 
@@ -98,15 +113,15 @@ export default class TankBettleTank extends cc.Component {
                 //如果是AI碰撞到老巢，直接GameOver
                 TankBettle.gameData.gameMap.gameOver();
             }
-            if( this.isAI ){
+            if (this.isAI) {
                 this.changeDirection(other);
             }
         }
     }
 
-    private checkPostion( pos : cc.Vec2 ){
-        if( pos.x < this.node.width / 2 ){
-            pos.x = this.node.width /2;
+    private checkPostion(pos: cc.Vec2) {
+        if (pos.x < this.node.width / 2) {
+            pos.x = this.node.width / 2;
             pos.y = this.node.y;
         }
     }
@@ -152,7 +167,9 @@ export class TankBettleTankPlayer extends TankBettleTank {
             let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
             this.node.addChild(aniNode);
             let animation = aniNode.getComponent(cc.Animation);
-            animation.play("tank_protected")
+            animation.play("tank_protected");
+            aniNode.x = 0;
+            aniNode.y = 0;
             cc.tween(aniNode).delay(5).call(() => {
                 aniNode.removeFromParent()
                 this.removeStatus(TankBettle.PLAYER_STATUS.PROTECTED)
@@ -265,15 +282,36 @@ export class TankBettleTankEnemy extends TankBettleTank {
         }
     }
 
-    changeDirection(other?: cc.BoxCollider) {
+    private delayMove( other:cc.BoxCollider ) {
+        this.isWaitingChange = false;
+        let except : TankBettle.Direction = null;
+        let allDir = [];
 
-        // cc.tween(this.node).delay(cc.randomInteger.random)
-        if( other ){
-
-        }else{
-
+        if( this.node.x <= this.node.width ){
+            //在最左
+            cc.log(`在最左`)
+            except = TankBettle.Direction.LEFT;
         }
-        // this.direction = cc.randomInteger(TankBettle.Direction.MIN,TankBettle.Direction.MAX);
-        // this.move();
+        if( this.node.x >= this.node.parent.width - this.node.width ){
+            cc.log("在最右")
+            except = TankBettle.Direction.RIGHT;
+        }
+        
+        for( let i = TankBettle.Direction.MIN ; i <= TankBettle.Direction.MAX ; i++){
+            if( this.direction != i && i != except ){
+                allDir.push(i);
+            }
+        }
+        let randomValue = cc.randomRangeInt(0,allDir.length);
+        this.direction = allDir[randomValue];
+        this.move();
+    }
+
+    changeDirection(other?: cc.BoxCollider) {
+        this.isWaitingChange = true;
+        let delay = cc.randomRange(0.5, 1);
+        this.node.stopAllActions();
+        // this.shoot();
+        cc.tween(this.node).delay(delay).call(() => { this.delayMove(other) }).start();
     }
 }

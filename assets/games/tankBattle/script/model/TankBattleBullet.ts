@@ -63,7 +63,7 @@ export default class TankBettleBullet extends cc.Component {
      * @param other 产生碰撞的另一个碰撞组件
      */
     private onCollisionEnter(other: cc.BoxCollider, me: cc.BoxCollider) {
-        cc.log(`Bullet : onCollisionEnter=>${other.node.name}`)
+        // cc.log(`Bullet : onCollisionEnter=>${other.node.name}`)
         if (other.node.group == TankBettle.GROUP.Wall || 
             other.node.group == TankBettle.GROUP.StoneWall || 
             other.node.group == TankBettle.GROUP.Boundary ||
@@ -129,7 +129,7 @@ export default class TankBettleBullet extends cc.Component {
      * @param other 产生碰撞的另一个碰撞组件
      */
     private onCollisionStay(other: cc.BoxCollider, me: cc.BoxCollider) {
-        cc.log(`Bullet : onCollisionStay=>${other.node.name}`)
+        // cc.log(`Bullet : onCollisionStay=>${other.node.name}`)
         
     }
 
@@ -138,7 +138,7 @@ export default class TankBettleBullet extends cc.Component {
      * @param other 产生碰撞的另一个碰撞组件
      */
     private onCollisionExit(other: cc.BoxCollider, me: cc.BoxCollider) {
-        cc.log(`Bullet : onCollisionExit=>${other.node.name}`)
+        // cc.log(`Bullet : onCollisionExit=>${other.node.name}`)
     }
 
 }

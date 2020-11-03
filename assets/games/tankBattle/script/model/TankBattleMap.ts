@@ -32,11 +32,10 @@ export default class TankBattleMap extends cc.Component {
 
     /**@description 敌人 */
     private _enemys: cc.Node[] = [];
-    /**@description 是否可生产敌人，以免生成的敌人重复 */
-    private _isCanAddEnemy = true;
+    private _waitEnemy: cc.Node[] = [];
 
     /**@description 老家 */
-    private _heart : cc.Node = null;
+    private _heart: cc.Node = null;
 
     protected onLoad() {
         this.node.children.forEach(node => {
@@ -49,6 +48,10 @@ export default class TankBattleMap extends cc.Component {
         this.outWall.forEach((value) => {
             value.destroy();
         });
+        this._waitEnemy.forEach((value)=>{
+            value.destroy();
+        });
+        this._waitEnemy = [];
         this.outWall = [];
     }
 
@@ -57,8 +60,9 @@ export default class TankBattleMap extends cc.Component {
     }
 
     /**@description 随机敌人出生点位置 */
-    private randomEnemyPosition(enemyNode: cc.Node) : { position : cc.Vec3 , bornPosition : TankBettle.EnemyBornPosition } {
-        let pos = cc.randomRangeInt(TankBettle.EnemyBornPosition.MIN,TankBettle.EnemyBornPosition.MAX)
+    private randomEnemyPosition(enemyNode: cc.Node): { position: cc.Vec3, bornPosition: TankBettle.EnemyBornPosition } {
+        let pos = cc.randomRangeInt(TankBettle.EnemyBornPosition.MIN, TankBettle.EnemyBornPosition.MAX + 1)
+        cc.log(`pos : ${pos}`);
         let outPosition = cc.v3(0, 0, 0);
         let outBornPosition = TankBettle.EnemyBornPosition.RIGHT;
         if (pos == 0) {
@@ -77,18 +81,18 @@ export default class TankBattleMap extends cc.Component {
             outPosition.y = -enemyNode.height / 2;
             outBornPosition = TankBettle.EnemyBornPosition.RIGHT;
         }
-        return { position : outPosition , bornPosition : outBornPosition};
+        return { position: outPosition, bornPosition: outBornPosition };
     }
 
     /**@description 随机出生点敌人的初始方向 */
-    private randomEnemyDirction( bornPosition : TankBettle.EnemyBornPosition ){
-        let allDir = [TankBettle.Direction.LEFT,TankBettle.Direction.RIGHT,TankBettle.Direction.DOWN];
-        if( bornPosition == TankBettle.EnemyBornPosition.LEFT ){
-            allDir = [TankBettle.Direction.DOWN,TankBettle.Direction.RIGHT];
-        }else if( bornPosition == TankBettle.EnemyBornPosition.RIGHT ){
-            allDir = [TankBettle.Direction.DOWN,TankBettle.Direction.LEFT]
+    private randomEnemyDirction(bornPosition: TankBettle.EnemyBornPosition) {
+        let allDir = [TankBettle.Direction.LEFT, TankBettle.Direction.RIGHT, TankBettle.Direction.DOWN];
+        if (bornPosition == TankBettle.EnemyBornPosition.LEFT) {
+            allDir = [TankBettle.Direction.DOWN, TankBettle.Direction.RIGHT];
+        } else if (bornPosition == TankBettle.EnemyBornPosition.RIGHT) {
+            allDir = [TankBettle.Direction.DOWN, TankBettle.Direction.LEFT]
         }
-        let value = cc.randomRangeInt(0,allDir.length);
+        let value = cc.randomRangeInt(0, allDir.length);
         let outDir = allDir[value]
         return outDir;
     }
@@ -98,36 +102,69 @@ export default class TankBattleMap extends cc.Component {
         if (TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME && //游戏状态下
             TankBettle.gameData.curLeftEnemy > 0 && //有剩余敌人
             this._enemys.length < TankBettle.MAX_APPEAR_ENEMY) { //可以生产敌人
-            let type: TankBettle.EnemyType = cc.randomRangeInt(TankBettle.EnemyType.MIN,TankBettle.EnemyType.MAX);
+            let type: TankBettle.EnemyType = cc.randomRangeInt(TankBettle.EnemyType.MIN, TankBettle.EnemyType.MAX + 1);
             let prefab = TankBettle.gameData.getEnemyPrefab(type);
             let randomPos = this.randomEnemyPosition(prefab);
-            if (this.checkBornPosition(randomPos.position,prefab)) {
-                if (prefab) {
-                    let enemyNode = cc.instantiate(prefab);
-                    this.node.addChild(enemyNode, TankBettle.ZIndex.TANK);
-                    let enemy = enemyNode.addComponent(TankBettleTankEnemy);
-                    enemyNode.position = randomPos.position;
-                    enemy.direction = this.randomEnemyDirction(randomPos.bornPosition);
-                    enemy.move();
-                    this._enemys.push(enemyNode);
-                    TankBettle.gameData.curLeftEnemy -= 1;
-                    TankBettle.gameData.gameView.showGameInfo();
-                }
+            let enemyNode = this._waitEnemy.shift();
+            if (enemyNode == null) {
+                cc.log("生成新敌机")
+                enemyNode = cc.instantiate(prefab);
+            }else{
+                cc.log("从上次未生成的敌人里面取出")
+            }
+            this.node.addChild(enemyNode, TankBettle.ZIndex.TANK);
+            let enemy = enemyNode.addComponent(TankBettleTankEnemy);
+            enemyNode.position = randomPos.position;
+            enemy.direction = this.randomEnemyDirction(randomPos.bornPosition);
+            enemyNode.getComponent(cc.BoxCollider).enabled = false;
+            if (this.checkBornPosition(randomPos.position, enemyNode)) {
+                enemy.move();
+                this._enemys.push(enemyNode);
+                enemyNode.getComponent(cc.BoxCollider).enabled = true;
+                TankBettle.gameData.curLeftEnemy -= 1;
+                TankBettle.gameData.gameView.showGameInfo();
+            } else {
+                cc.log("生成敌机周围有敌机，不出现")
+                enemyNode.removeFromParent(false);
+                this._waitEnemy.push(enemyNode);
             }
         }
     }
 
-    private checkBornPosition(pos: cc.Vec3,node:cc.Node) {
+    private intersects(node: cc.Node, other: cc.Node) {
+        let box = node.getBoundingBox();
+        let otherBox = other.getBoundingBox();
+        let scale = 3;//如果新出生的敌机，如果在附近有敌机或玩家，不生成，以免出来就产生碰撞
+        let width = box.width * scale;
+        let height = box.height * scale;
+        let newBox = cc.rect(box.x - (width - box.width) / 2, box.y - (height - box.height) / 2, width, height)
+        if (newBox.intersects(otherBox)) {
+            cc.log(`生成的敌机离${other.name}太近`);
+            return true;
+        }
+        return false;
+    }
+    private checkBornPosition(pos: cc.Vec3, node: cc.Node) {
+        let result = true;
         for (let i = 0; i < this._enemys.length; i++) {
             let enemy = this._enemys[i];
-            let newBox = enemy.getBoundingBox();
-            newBox.width += 3 * node.width;
-            newBox.height += 3 * node.height;
-            if (newBox.contains(cc.v2(pos.x, pos.y))) {
+            if( this.intersects(enemy,node) ){
+                result = false;
+                break;
+            }
+        }
+        if (result) {
+            //检测出生的敌机是否跟玩家位置重叠
+            if( this.playerOne && this.intersects(node,this.playerOne.node)){
+                cc.log("与玩家1重叠")
+                return false;
+            }
+            if( this.playerTwo && this.intersects(node,this.playerTwo.node) ){
+                cc.log("与玩家2重叠")
                 return false;
             }
         }
-        return true;
+        return result;
     }
 
     public removeAllEnemy() {
@@ -196,7 +233,7 @@ export default class TankBattleMap extends cc.Component {
                         let node = cc.instantiate(prefab)
                         let block = node.addComponent(TankBattleBlock)
                         block.type = blockData;
-                        if( blockData == TankBettle.BLOCK_TYPE.HOME ){
+                        if (blockData == TankBettle.BLOCK_TYPE.HOME) {
                             this._heart = node;
                         }
                         this.node.addChild(node, TankBettle.ZIndex.BLOCK);
@@ -216,7 +253,7 @@ export default class TankBattleMap extends cc.Component {
     }
 
     public addPlayer(isOne: boolean) {
-        
+
         let playerNode = cc.instantiate(TankBettle.gameData.getPlayerPrefab(true))
         if (isOne) {
             this.playerOne = playerNode.addComponent(TankBettleTankPlayer);
@@ -288,7 +325,6 @@ export default class TankBattleMap extends cc.Component {
                 this.removeAllEnemy();
             } break;
         }
-        cc.log(ev.keyCode)
     }
 
     private _handlePlayerMove(player: TankBettleTankPlayer, dir: TankBettle.Direction) {
@@ -305,7 +341,7 @@ export default class TankBattleMap extends cc.Component {
     }
 
     public gameOver() {
-        if( this._heart ){
+        if (this._heart) {
             let sprite = this._heart.getComponent(cc.Sprite);
             sprite.loadImage({ url: { urls: ["texture/images"], key: "heart_0" }, view: this.owner, bundle: this.owner.bundle })
         }
