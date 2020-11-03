@@ -299,9 +299,18 @@ export class TankBettleTankEnemy extends TankBettleTank {
             }
             sprite.loadImage({ url: { urls: ["texture/images"], key: spriteFrameKey }, view: TankBettle.gameData.gameView, bundle: TankBettle.gameData.gameView.bundle });
         }
-        if (this.config.live <= 0) {
+        if (this.config.live == 0) {
+            this.node.stopAllActions();
             this.stopShootAction();
-            TankBettle.gameData.gameMap.removeEnemy(this.node);
+            let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
+            this.node.addChild(aniNode);
+            let animation = aniNode.getComponent(cc.Animation);
+            let state = animation.play("tank_boom");
+            aniNode.x = 0;
+            aniNode.y = 0;
+            cc.tween(aniNode).delay(state.duration).call(() => {
+                TankBettle.gameData.gameMap.removeEnemy(this.node);
+            }).removeSelf().start()
         }
     }
 

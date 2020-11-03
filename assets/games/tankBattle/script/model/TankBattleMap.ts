@@ -367,8 +367,19 @@ export default class TankBattleMap extends cc.Component {
     public gameOver() {
         TankBettle.gameData.gameStatus = TankBettle.GAME_STATUS.OVER;
         if (this._heart) {
-            let sprite = this._heart.getComponent(cc.Sprite);
-            sprite.loadImage({ url: { urls: ["texture/images"], key: "heart_0" }, view: this.owner, bundle: this.owner.bundle });
+            let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
+            this._heart.addChild(aniNode);
+            let animation = aniNode.getComponent(cc.Animation);
+            let state = animation.play("king_boom");
+            aniNode.x = 0;
+            aniNode.y = 0;
+            cc.tween(aniNode).delay(state.duration).call(() => {
+                aniNode.removeFromParent()
+                aniNode.destroy();
+                let sprite = this._heart.getComponent(cc.Sprite);
+                sprite.loadImage({ url: { urls: ["texture/images"], key: "heart_0" }, view: this.owner, bundle: this.owner.bundle });
+            }).removeSelf().start()
+            
         }
     }
 }
