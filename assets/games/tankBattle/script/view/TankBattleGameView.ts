@@ -39,9 +39,9 @@ export default class TankBattleGameView extends GameView {
         //允许碰撞
         cc.director.getCollisionManager().enabled = true;
         //显示碰撞包围盒
-        cc.director.getCollisionManager().enabledDrawBoundingBox = true
+        // cc.director.getCollisionManager().enabledDrawBoundingBox = true
         //碰撞检测系统debug绘制显示
-        cc.director.getCollisionManager().enabledDebugDraw = true;
+        // cc.director.getCollisionManager().enabledDebugDraw = true;
 
         this.init()
 
@@ -86,8 +86,12 @@ export default class TankBattleGameView extends GameView {
     protected onKeyUp(ev: cc.Event.EventKeyboard) {
         super.onKeyUp(ev);
         if (ev.keyCode == cc.macro.KEY.n) {
+            //手动下一关，恢复下生命
+            TankBettle.gameData.isSingle = TankBettle.gameData.isSingle;
             this.nextLevel();
         } else if (ev.keyCode == cc.macro.KEY.p) {
+            //手动下一关，恢复下生命
+            TankBettle.gameData.isSingle = TankBettle.gameData.isSingle;
             this.prevLevel();
         }
     }
@@ -120,6 +124,7 @@ export default class TankBattleGameView extends GameView {
             TankBettle.gameData.gameMap.addPlayer(true);
             TankBettle.gameData.gameMap.addPlayer(false);
         }
+        TankBettle.gameData.isNeedReducePlayerLive = true;
         this.showGameInfo();
     }
 

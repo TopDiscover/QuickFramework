@@ -56,7 +56,7 @@ export default class TankBattleMap extends cc.Component {
     }
 
     protected update() {
-        // this.addEnemy();
+        this.addEnemy();
     }
 
     /**@description 随机敌人出生点位置 */
@@ -113,7 +113,10 @@ export default class TankBattleMap extends cc.Component {
                 // cc.log("从上次未生成的敌人里面取出")
             }
             this.node.addChild(enemyNode, TankBettle.ZIndex.TANK);
-            let enemy = enemyNode.addComponent(TankBettleTankEnemy);
+            let enemy = enemyNode.getComponent(TankBettleTankEnemy);
+            if( !enemy ){
+                enemy = enemyNode.addComponent(TankBettleTankEnemy);
+            }
             enemy.type = type;
             enemy.config = TankBettle.gameData.getEnemyConfig(type);
             enemyNode.position = randomPos.position;
@@ -198,6 +201,7 @@ export default class TankBattleMap extends cc.Component {
         if (TankBettle.gameData.curLeftEnemy <= 0) {
             if (this._enemys.length <= 0) {
                 //通关了
+                TankBettle.gameData.isNeedReducePlayerLive = false;
                 TankBettle.gameData.gameView.nextLevel();
             }
         }
@@ -267,7 +271,9 @@ export default class TankBattleMap extends cc.Component {
             playerNode.y = -this.node.height + playerNode.height / 2;
             this.node.addChild(playerNode, TankBettle.ZIndex.TANK);
             this.playerOne.born();
-            TankBettle.gameData.playerOneLive--;
+            if( TankBettle.gameData.isNeedReducePlayerLive ){
+                TankBettle.gameData.playerOneLive--;
+            }
         } else {
             this.playerTwo = playerNode.addComponent(TankBettleTankPlayer);
             this.playerTwo.isOnePlayer = isOne;
@@ -275,7 +281,9 @@ export default class TankBattleMap extends cc.Component {
             playerNode.y = -this.node.height + playerNode.height / 2;
             this.node.addChild(playerNode, TankBettle.ZIndex.TANK);
             this.playerTwo.born();
-            TankBettle.gameData.playerTwoLive--;
+            if( TankBettle.gameData.isNeedReducePlayerLive ){
+                TankBettle.gameData.playerTwoLive--;
+            }
         }
     }
 

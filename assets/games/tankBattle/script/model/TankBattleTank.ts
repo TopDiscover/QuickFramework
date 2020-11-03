@@ -10,16 +10,16 @@ export default class TankBettleTank extends cc.Component {
     public config: TankBettle.TankConfig = null;
     /** @description 子弹 */
     public bullet: TankBettleBullet = null;
-    
+
     public _direction: TankBettle.Direction = TankBettle.Direction.UP;
     /**@description 移动方向 */
-    public get direction(){
+    public get direction() {
         return this._direction;
     }
-    public set direction( value ){
+    public set direction(value) {
         let old = this._direction;
         this._direction = value;
-        if( old != this._direction ){
+        if (old != this._direction) {
             //改变了动画，立即响应
             this.isMoving = false;
         }
@@ -56,7 +56,7 @@ export default class TankBettleTank extends cc.Component {
     }
 
     changeDirection(other?: cc.BoxCollider) {
-        
+
     }
 
     /**
@@ -223,64 +223,78 @@ export class TankBettleTankPlayer extends TankBettleTank {
         if (this.direction == TankBettle.Direction.UP) {
             this.node.angle = 0;
             cc.tween(this.node).delay(0)
-            .by(this.config.time, { y: this.config.distance })
-            .call(() => { this.isMoving = false; })
-            .start();
+                .by(this.config.time, { y: this.config.distance })
+                .call(() => { this.isMoving = false; })
+                .start();
         } else if (this.direction == TankBettle.Direction.DOWN) {
             this.node.angle = 180;
             cc.tween(this.node).delay(0)
-            .by(this.config.time, { y: -this.config.distance })
-            .call(() => { this.isMoving = false; })
-            .start();
+                .by(this.config.time, { y: -this.config.distance })
+                .call(() => { this.isMoving = false; })
+                .start();
         } else if (this.direction == TankBettle.Direction.RIGHT) {
             this.node.angle = -90;
             cc.tween(this.node).delay(0)
-            .by(this.config.time, { x: this.config.distance })
-            .call(() => { this.isMoving = false; })
-            .start();
+                .by(this.config.time, { x: this.config.distance })
+                .call(() => { this.isMoving = false; })
+                .start();
         } else if (this.direction == TankBettle.Direction.LEFT) {
             this.node.angle = 90;
             cc.tween(this.node).delay(0)
-            .by(this.config.time, { x: -this.config.distance })
-            .call(() => { this.isMoving = false; })
-            .start();
+                .by(this.config.time, { x: -this.config.distance })
+                .call(() => { this.isMoving = false; })
+                .start();
         }
     }
 }
 
 export class TankBettleTankEnemy extends TankBettleTank {
-   
+
     constructor() {
         super();
         this.isAI = true;
         this.config = new TankBettle.TankConfig();
     }
 
-    private shootNode :cc.Node = null;
-    public type : TankBettle.EnemyType = null;
+    private shootNode: cc.Node = null;
+    public _type: TankBettle.EnemyType = null;
 
-    private stopShootAction(){
-        if( this.shootNode ){
+    public set type(value) {
+        this._type = value;
+        let spriteFrameKey = "";
+        if (value == TankBettle.EnemyType.NORMAL) {
+            spriteFrameKey = "tank_0_0";
+        } else if (value == TankBettle.EnemyType.SPEED) {
+            spriteFrameKey = "tank_3_0";
+        } else if (value == TankBettle.EnemyType.STRONG) {
+            spriteFrameKey = "tank_4_0";
+        }
+        let sprite = this.node.getComponent(cc.Sprite);
+        sprite.loadImage({ url: { urls: ["texture/images"], key: spriteFrameKey }, view: TankBettle.gameData.gameView, bundle: TankBettle.gameData.gameView.bundle });
+    }
+
+    private stopShootAction() {
+        if (this.shootNode) {
             this.shootNode.stopAllActions();
         }
     }
 
-    onLoad(){
+    onLoad() {
         let node = new cc.Node();
         this.node.addChild(node)
         this.shootNode = node;
     }
 
-    onDestroy(){
+    onDestroy() {
         this.stopShootAction();
     }
 
     public hurt() {
         this.config.live--;
-        if( this.type == TankBettle.EnemyType.STRONG ){
+        if (this._type == TankBettle.EnemyType.STRONG) {
             let sprite = this.node.getComponent(cc.Sprite);
             let spriteFrameKey = "tank_5_0"
-            if( this.config.live == 1 ){
+            if (this.config.live == 1) {
                 spriteFrameKey = "tank_6_0"
             }
             sprite.loadImage({ url: { urls: ["texture/images"], key: spriteFrameKey }, view: TankBettle.gameData.gameView, bundle: TankBettle.gameData.gameView.bundle });
@@ -293,9 +307,9 @@ export class TankBettleTankEnemy extends TankBettleTank {
 
     /**@description 开始射击 */
     public startShoot() {
-        let delay = cc.randomRange(this.config.shootInterval.min,this.config.shootInterval.max);
+        let delay = cc.randomRange(this.config.shootInterval.min, this.config.shootInterval.max);
         this.stopShootAction();
-        cc.tween(this.shootNode).delay(delay).call(()=>{
+        cc.tween(this.shootNode).delay(delay).call(() => {
             this.shoot();
             this.startShoot();
         }).start();
@@ -330,27 +344,27 @@ export class TankBettleTankEnemy extends TankBettleTank {
         }
     }
 
-    private delayMove( other:cc.BoxCollider ) {
+    private delayMove(other: cc.BoxCollider) {
         this.isWaitingChange = false;
-        let except : TankBettle.Direction = null;
+        let except: TankBettle.Direction = null;
         let allDir = [];
 
-        if( this.node.x <= this.node.width ){
+        if (this.node.x <= this.node.width) {
             //在最左
             // cc.log(`在最左`)
             except = TankBettle.Direction.LEFT;
         }
-        if( this.node.x >= this.node.parent.width - this.node.width ){
+        if (this.node.x >= this.node.parent.width - this.node.width) {
             // cc.log("在最右")
             except = TankBettle.Direction.RIGHT;
         }
-        
-        for( let i = TankBettle.Direction.MIN ; i <= TankBettle.Direction.MAX ; i++){
-            if( this.direction != i && i != except ){
+
+        for (let i = TankBettle.Direction.MIN; i <= TankBettle.Direction.MAX; i++) {
+            if (this.direction != i && i != except) {
                 allDir.push(i);
             }
         }
-        let randomValue = cc.randomRangeInt(0,allDir.length);
+        let randomValue = cc.randomRangeInt(0, allDir.length);
         this.direction = allDir[randomValue];
         this.move();
     }
