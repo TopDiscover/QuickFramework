@@ -56,7 +56,7 @@ export default class TankBattleMap extends cc.Component {
     }
 
     protected update() {
-        this.addEnemy();
+        // this.addEnemy();
     }
 
     /**@description 随机敌人出生点位置 */
@@ -324,34 +324,38 @@ export default class TankBattleMap extends cc.Component {
             case cc.macro.KEY.space: {
                 this._handlePlayerShoot(this.playerTwo);
             } break;
-            case cc.macro.KEY.t: {
-                this.addEnemy();
-            } break;
-            case cc.macro.KEY.r: {
-                this.removeAllEnemy();
-            } break;
+            //测试用代码
+            // case cc.macro.KEY.t: {
+            //     this.addEnemy();
+            // } break;
+            // case cc.macro.KEY.r: {
+            //     this.removeAllEnemy();
+            // } break;
         }
     }
 
     private _handlePlayerMove(player: TankBettleTankPlayer, dir: TankBettle.Direction) {
-        if (player) {
-            player.direction = dir;
-            player.move();
+        if( TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME ){
+            if (player) {
+                player.direction = dir;
+                player.move();
+            }
         }
     }
 
     private _handlePlayerShoot(player: TankBettleTankPlayer) {
-        if (player) {
-            player.shoot();
+        if( TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME ){
+            if (player) {
+                player.shoot();
+            }
         }
     }
 
     public gameOver() {
+        TankBettle.gameData.gameStatus = TankBettle.GAME_STATUS.OVER;
         if (this._heart) {
             let sprite = this._heart.getComponent(cc.Sprite);
             sprite.loadImage({ url: { urls: ["texture/images"], key: "heart_0" }, view: this.owner, bundle: this.owner.bundle });
-            //如果老家被干，去碰撞体
-            this._heart.getComponent(cc.BoxCollider).enabled = false;
         }
     }
 }
