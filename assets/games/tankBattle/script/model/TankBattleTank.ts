@@ -152,7 +152,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
 
     constructor() {
         super();
-        this.config = new TankBettle.TankConfig();
+        this.config = TankBettle.gameData.playerConfig;
     }
 
     /**@description 是否是玩家1 */
@@ -172,6 +172,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
             aniNode.y = 0;
             cc.tween(aniNode).delay(5).call(() => {
                 aniNode.removeFromParent()
+                aniNode.destroy();
                 this.removeStatus(TankBettle.PLAYER_STATUS.PROTECTED)
             }).removeSelf().start()
         }
@@ -221,16 +222,28 @@ export class TankBettleTankPlayer extends TankBettleTank {
         this.isMoving = true;
         if (this.direction == TankBettle.Direction.UP) {
             this.node.angle = 0;
-            cc.tween(this.node).delay(0).by(this.config.time, { y: this.config.distance }).call(() => { this.isMoving = false; }).start();
+            cc.tween(this.node).delay(0)
+            .by(this.config.time, { y: this.config.distance })
+            .call(() => { this.isMoving = false; })
+            .start();
         } else if (this.direction == TankBettle.Direction.DOWN) {
             this.node.angle = 180;
-            cc.tween(this.node).delay(0).by(this.config.time, { y: -this.config.distance }).call(() => { this.isMoving = false; }).start();
+            cc.tween(this.node).delay(0)
+            .by(this.config.time, { y: -this.config.distance })
+            .call(() => { this.isMoving = false; })
+            .start();
         } else if (this.direction == TankBettle.Direction.RIGHT) {
             this.node.angle = -90;
-            cc.tween(this.node).delay(0).by(this.config.time, { x: this.config.distance }).call(() => { this.isMoving = false; }).start();
+            cc.tween(this.node).delay(0)
+            .by(this.config.time, { x: this.config.distance })
+            .call(() => { this.isMoving = false; })
+            .start();
         } else if (this.direction == TankBettle.Direction.LEFT) {
             this.node.angle = 90;
-            cc.tween(this.node).delay(0).by(this.config.time, { x: -this.config.distance }).call(() => { this.isMoving = false; }).start();
+            cc.tween(this.node).delay(0)
+            .by(this.config.time, { x: -this.config.distance })
+            .call(() => { this.isMoving = false; })
+            .start();
         }
     }
 }
@@ -243,26 +256,37 @@ export class TankBettleTankEnemy extends TankBettleTank {
         this.config = new TankBettle.TankConfig();
     }
 
-    private shootAction : cc.Tween = null;
+    private shootNode :cc.Node = null;
+    public type : TankBettle.EnemyType = null;
 
     private stopShootAction(){
-        if( this.shootAction ){
-            this.shootAction.stop();
+        if( this.shootNode ){
+            this.shootNode.stopAllActions();
         }
-        this.shootAction = null;
+    }
+
+    onLoad(){
+        let node = new cc.Node();
+        this.node.addChild(node)
+        this.shootNode = node;
     }
 
     onDestroy(){
         this.stopShootAction();
     }
 
-    setConfig() {
-
-    }
-
     public hurt() {
         this.config.live--;
+        if( this.type == TankBettle.EnemyType.STRONG ){
+            let sprite = this.node.getComponent(cc.Sprite);
+            let spriteFrameKey = "tank_5_0"
+            if( this.config.live == 1 ){
+                spriteFrameKey = "tank_6_0"
+            }
+            sprite.loadImage({ url: { urls: ["texture/images"], key: spriteFrameKey }, view: TankBettle.gameData.gameView, bundle: TankBettle.gameData.gameView.bundle });
+        }
         if (this.config.live <= 0) {
+            this.stopShootAction();
             TankBettle.gameData.gameMap.removeEnemy(this.node);
         }
     }
@@ -271,7 +295,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
     public startShoot() {
         let delay = cc.randomRange(this.config.shootInterval.min,this.config.shootInterval.max);
         this.stopShootAction();
-        this.shootAction = cc.tween(this).delay(delay).call(()=>{
+        cc.tween(this.shootNode).delay(delay).call(()=>{
             this.shoot();
             this.startShoot();
         }).start();

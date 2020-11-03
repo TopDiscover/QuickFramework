@@ -33,6 +33,11 @@ export default class TankBattleBlock extends cc.Component {
         
     }
 
+    private removeSelf(){
+        this.node.removeFromParent();
+        this.node.destroy();
+    }
+
     private handBullet( other:cc.BoxCollider , me : cc.BoxCollider ){
         if( other.node.group == TankBettle.GROUP.Bullet ){
             //受到来处子弹的碰撞
@@ -44,14 +49,14 @@ export default class TankBattleBlock extends cc.Component {
                 break;
                 case TankBettle.BLOCK_TYPE.WALL:{
                     //把自己移除
-                    this.node.removeFromParent();
+                    this.removeSelf();
                 }
                 break;
                 case TankBettle.BLOCK_TYPE.STONE_WALL:{
                     let bullet = other.node.getComponent(TankBettleBullet);
                     if( bullet && bullet.owner instanceof TankBettleTankPlayer ){
                         if( bullet.owner.hasStatus(TankBettle.PLAYER_STATUS.STRONG) ){
-                            this.node.removeFromParent();
+                           this.removeSelf();
                         }
                     }
                 }

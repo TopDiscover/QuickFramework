@@ -114,6 +114,8 @@ export default class TankBattleMap extends cc.Component {
             }
             this.node.addChild(enemyNode, TankBettle.ZIndex.TANK);
             let enemy = enemyNode.addComponent(TankBettleTankEnemy);
+            enemy.type = type;
+            enemy.config = TankBettle.gameData.getEnemyConfig(type);
             enemyNode.position = randomPos.position;
             enemy.direction = this.randomEnemyDirction(randomPos.bornPosition);
             enemyNode.getComponent(cc.BoxCollider).enabled = false;
@@ -173,6 +175,7 @@ export default class TankBattleMap extends cc.Component {
         for (let i = 0; i < this._enemys.length; i++) {
             let enemy = this._enemys[i];
             enemy.removeFromParent();
+            enemy.destroy();
         }
         this._enemys = [];
         this.checkGamePass();
@@ -183,6 +186,7 @@ export default class TankBattleMap extends cc.Component {
         while (i--) {
             if (this._enemys[i] == enemy) {
                 enemy.removeFromParent();
+                enemy.destroy();
                 this._enemys.splice(i, 1);
             }
         }
@@ -279,6 +283,7 @@ export default class TankBattleMap extends cc.Component {
         if (player.isOnePlayer) {
             let isOne = player.isOnePlayer;
             player.node.removeFromParent();
+            player.node.destroy();
             if (TankBettle.gameData.playerOneLive > 0) {
                 this.addPlayer(isOne);
                 TankBettle.gameData.gameView.showGameInfo();
@@ -325,12 +330,12 @@ export default class TankBattleMap extends cc.Component {
                 this._handlePlayerShoot(this.playerTwo);
             } break;
             //测试用代码
-            // case cc.macro.KEY.t: {
-            //     this.addEnemy();
-            // } break;
-            // case cc.macro.KEY.r: {
-            //     this.removeAllEnemy();
-            // } break;
+            case cc.macro.KEY.t: {
+                this.addEnemy();
+            } break;
+            case cc.macro.KEY.r: {
+                this.removeAllEnemy();
+            } break;
         }
     }
 

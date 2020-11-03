@@ -237,6 +237,22 @@ export namespace TankBettle {
             this.playerTwoLive = 0;
             this.curLeftEnemy = 0;
         }
+
+        getEnemyConfig( type : EnemyType ){
+            let config = new TankConfig();
+            if( type == EnemyType.STRONG ){
+                config.live = 3;
+            }else if ( type == EnemyType.SPEED ){
+                config.distance *= 2;
+            }
+            return config;
+        }
+
+        get playerConfig( ){
+            let config = new TankConfig();
+            config.time = 0.05;
+            return config;
+        }
     
         /**@description 当前关卡等级 */
         currentLevel = 0;

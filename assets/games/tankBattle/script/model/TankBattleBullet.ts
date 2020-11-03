@@ -69,10 +69,7 @@ export default class TankBettleBullet extends cc.Component {
             other.node.group == TankBettle.GROUP.Boundary ||
             other.node.group == TankBettle.GROUP.Home ) {
             //撞到了墙或边界
-            this.node.stopAllActions()
-            this.node.removeFromParent()
-            //取出子弹
-            this.owner.bullet = null;
+            this.removeSelf();
         }else if( other.node.group == TankBettle.GROUP.Bullet ){
             //子弹与子弹相撞
             //同阵营子弹不抵消
@@ -80,16 +77,12 @@ export default class TankBettleBullet extends cc.Component {
             if( this.owner.isAI ){
                 //敌人打出的子弹 与玩家子弹相互抵消
                 if( !bullet.owner.isAI ){
-                    this.node.stopAllActions();
-                    this.node.removeFromParent();
-                    this.owner.bullet = null;
+                    this.removeSelf();
                 }
             }else{
                 //玩家打出子弹 与 敌人的子弹相互抵消
                 if( bullet.owner.isAI ){
-                    this.node.stopAllActions();
-                    this.node.removeFromParent();
-                    this.owner.bullet = null;
+                   this.removeSelf();
                 }
             }
         }else if( other.node.group == TankBettle.GROUP.Player ){
@@ -98,22 +91,25 @@ export default class TankBettleBullet extends cc.Component {
             if( this.owner.isAI ){
                 //敌人子弹不参打敌人
                 if( !tank.isAI ){
-                    this.node.stopAllActions();
-                    this.node.removeFromParent();
-                    this.owner.bullet = null;
+                   this.removeSelf();
                 }
             }else{
                 if( tank.isAI ){
                     //只有打到敌人才消失
-                    this.node.stopAllActions();
-                    this.node.removeFromParent();
-                    this.owner.bullet = null;
+                   this.removeSelf();
                 }
             }
             
         }else{
             //其它情况子弹继续走自己的路
         }
+    }
+
+    private removeSelf(){
+        this.node.stopAllActions();
+        this.owner.bullet = null;
+        this.node.removeFromParent();
+        this.node.destroy();
     }
 
     private getPlayer( node : cc.Node ) : TankBettleTank{
