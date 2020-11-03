@@ -350,6 +350,9 @@ export default class TankBattleMap extends cc.Component {
                 this._handlePlayerShoot(this.playerOne);
             } break;
             case cc.macro.KEY.space: {
+                if( TankBettle.gameData.isSingle ){
+                    this._handlePlayerShoot(this.playerOne);
+                }
                 this._handlePlayerShoot(this.playerTwo);
             } break;
             //测试用代码
