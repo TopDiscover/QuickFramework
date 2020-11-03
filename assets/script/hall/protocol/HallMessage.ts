@@ -40,8 +40,9 @@ export enum AwesomeEnum{
     TWO = 2,
 }
 
+
 //写的时候先打开，引用声明的，好提示,写完之前使用下面的正确引用
-// import {Type ,Message,Field} from "../../../../protobuf"
+// import {Type ,Message,Field, parse} from "../../../../protobuf"
 import { Type ,Field,Message} from "../../framework/external/protobuf";
 @Type.d("TestMsg") 
 export class TestMsgProto extends Message {
@@ -51,6 +52,9 @@ export class TestMsgProto extends Message {
 
     @Field.d(2, AwesomeEnum,"required",AwesomeEnum.ONE)
     public awesomeEnum: AwesomeEnum;
+
+    @Field.d(3,"float","required",3.3)
+    public afvalue : number = 3.3;
 
     constructor(){
         super()

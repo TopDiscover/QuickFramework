@@ -13,6 +13,7 @@ class _HallNetHelper extends NetHelper<LobbyService>{
     sendProtoMessage() {
         let testProto = new TestMsg();
         testProto.data.awesomeField = "这是一个中文的测试";
+        testProto.data.afvalue = 4.5;
         this.service.send(testProto);
     }
 
