@@ -8,6 +8,9 @@ import { TankBettleTankPlayer, TankBettleTankEnemy } from "./TankBattleTank";
 import TankBettleBullet from "./TankBattleBullet";
 import TankBattleBlock from "./TankBattleBlock";
 import TankBattleGameView from "../view/TankBattleGameView";
+import { Manager } from "../../../../script/common/manager/Manager";
+import TankBattleGameOver from "../view/TankBattleGameOver";
+import { ViewZOrder } from "../../../../script/common/config/Config";
 
 const { ccclass, property } = cc._decorator;
 
@@ -385,6 +388,7 @@ export default class TankBattleMap extends cc.Component {
     public gameOver() {
         cc.log("gameOver")
         TankBettle.gameData.gameStatus = TankBettle.GAME_STATUS.OVER;
+        Manager.uiManager.open({ type: TankBattleGameOver, bundle: this.owner.bundle, zIndex: ViewZOrder.UI });
         if (this._heart) {
             let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
             this._heart.addChild(aniNode);

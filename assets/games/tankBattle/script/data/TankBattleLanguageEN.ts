@@ -20,5 +20,6 @@ enter shoot
         
 n Next level
 p Prev level`,
+        gameOver: "GAME OVER"
     }
 }
