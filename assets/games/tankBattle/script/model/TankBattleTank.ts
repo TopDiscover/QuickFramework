@@ -115,7 +115,7 @@ export default class TankBettleTank extends cc.Component {
             this.isMoving = false;
             if (this.isAI && other.node.group == TankBettle.GROUP.Home) {
                 //如果是AI碰撞到老巢，直接GameOver
-                TankBettle.gameData.gameMap.gameOver();
+                TankBettle.gameData.gameOver();
             }
             if (this.isAI) {
                 this.changeDirection(other);
@@ -175,7 +175,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
 
     addLive() {
         this.config.live++;
-        TankBettle.gameData.gameView.showGameInfo();
+        TankBettle.gameData.updateGameInfo();
     }
 
     public addStatus(status: TankBettle.PLAYER_STATUS) {
@@ -232,7 +232,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
                 TankBettle.gameData.gameMap.removePlayer(this);
             }).removeSelf().start()
         }
-        TankBettle.gameData.gameView.showGameInfo();
+        TankBettle.gameData.updateGameInfo();
     }
 
     move() {

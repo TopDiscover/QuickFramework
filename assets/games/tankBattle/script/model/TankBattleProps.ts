@@ -1,6 +1,5 @@
 import { TankBettle } from "../data/TankBattleGameData";
-import { TankBettleTankEnemy, TankBettleTankPlayer } from "./TankBattleTank";
-import TankBattleMap from "./TankBattleMap";
+import { TankBettleTankPlayer } from "./TankBattleTank";
 
 const { ccclass, property } = cc._decorator;
 @ccclass

@@ -144,7 +144,7 @@ export default class TankBattleMap extends cc.Component {
                 this._enemys.push(enemyNode);
                 enemyNode.getComponent(cc.BoxCollider).enabled = true;
                 TankBettle.gameData.curLeftEnemy -= 1;
-                TankBettle.gameData.gameView.showGameInfo();
+                TankBettle.gameData.updateGameInfo();
             } else {
                 // cc.log("生成敌机周围有敌机，不出现")
                 enemyNode.removeFromParent(false);
@@ -226,7 +226,7 @@ export default class TankBattleMap extends cc.Component {
             if (this._enemys.length <= 0) {
                 //通关了
                 TankBettle.gameData.isNeedReducePlayerLive = false;
-                TankBettle.gameData.gameView.nextLevel();
+                TankBettle.gameData.nextLevel();
             }
         }
     }
@@ -346,9 +346,9 @@ export default class TankBattleMap extends cc.Component {
             if (TankBettle.gameData.playerOneLive > 0) {
                 this.addPlayer(isOne);
                 TankBettle.gameData.reducePlayerLive(true);
-                TankBettle.gameData.gameView.showGameInfo();
+                TankBettle.gameData.updateGameInfo();
             } else {
-                TankBettle.gameData.gameMap.gameOver();
+                TankBettle.gameData.gameOver();
             }
         } else {
             //双人
@@ -365,9 +365,9 @@ export default class TankBattleMap extends cc.Component {
                 }
                 TankBettle.gameData.reducePlayerLive(false)
             }
-            TankBettle.gameData.gameView.showGameInfo();
+            TankBettle.gameData.updateGameInfo();
             if (TankBettle.gameData.playerTwoLive < 0 && TankBettle.gameData.playerOneLive < 0) {
-                TankBettle.gameData.gameMap.gameOver();
+                TankBettle.gameData.gameOver();
             }
         }
     }
@@ -439,9 +439,6 @@ export default class TankBattleMap extends cc.Component {
     }
 
     public gameOver() {
-        cc.log("gameOver")
-        TankBettle.gameData.gameStatus = TankBettle.GAME_STATUS.OVER;
-        Manager.uiManager.open({ type: TankBattleGameOver, bundle: this.owner.bundle, zIndex: ViewZOrder.UI });
         if (this._heart) {
             let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
             this._heart.addChild(aniNode);

@@ -10,9 +10,13 @@ import TankBattleNetController from "../controller/TankBattleNetController";
 import TankBattleMap from "../model/TankBattleMap";
 import TankBattleGameView from "../view/TankBattleGameView";
 import { getSingleton } from "../../../../script/framework/base/Singleton";
+import TankBattleChangeStageView from "../view/TankBattleChangeStageView";
+import { ViewZOrder } from "../../../../script/common/config/Config";
+import TankBattleStartView from "../view/TankBattleStartView";
+import TankBattleGameOver from "../view/TankBattleGameOver";
 
 export namespace TankBettle {
-    export enum Direction{
+    export enum Direction {
         MIN = 0,
         UP = MIN,
         DOWN,
@@ -60,7 +64,7 @@ export namespace TankBettle {
         ANOTHREHOME = 8
     }
 
-    export enum GROUP{
+    export enum GROUP {
         Wall = "Wall",
         StoneWall = "StoneWall",
         Grass = "Grass",
@@ -83,12 +87,12 @@ export namespace TankBettle {
         REQ_LEVEL = "REQ_LEVEL"
     }
 
-    export function netController() : TankBattleNetController{
+    export function netController(): TankBattleNetController {
         return Manager.gameController;
     }
 
     /**@description 玩家状态 */
-    export enum PLAYER_STATUS{
+    export enum PLAYER_STATUS {
         STRONG,//这个状态下可以打白色砖块
         PROTECTED,//保护状态
     }
@@ -96,14 +100,14 @@ export namespace TankBettle {
     /**@description 玩家状态存在时间 */
     export const PLAYER_STATUS_EXIST_TIME = 5;
 
-    export enum ZIndex{
+    export enum ZIndex {
         TANK,
         BULLET,
         BLOCK,
         PROPS,
     }
 
-    export enum EnemyType{
+    export enum EnemyType {
         MIN,
         /**@description 普通的，一枪一个 */
         NORMAL = MIN,
@@ -114,7 +118,7 @@ export namespace TankBettle {
         MAX = STRONG,
     }
 
-    export class TankConfig{
+    export class TankConfig {
         /** @description 坦克time时间内移动的距离 */
         distance = 5;
         /**@description 坦克每次移动distance距离需要的时间 */
@@ -126,11 +130,11 @@ export namespace TankBettle {
         /**@description 默认是只有一点生命，当受到子弹的攻击就-1 */
         live = 1;
         /**@description 射击间隔时间 */
-        shootInterval = { min : 2 , max : 5 };
+        shootInterval = { min: 2, max: 5 };
     }
 
     /**@description 敌人出生点位置 */
-    export enum EnemyBornPosition{
+    export enum EnemyBornPosition {
         MIN,
         LEFT = MIN,
         MIDDLE,
@@ -139,8 +143,8 @@ export namespace TankBettle {
     }
 
     /**@description 道具类型 */
-    export enum PropsType{
-        MIN ,
+    export enum PropsType {
+        MIN,
         /**@description 添加玩家拥有坦克数量 */
         LIVE = MIN,
         /**@description 加长游戏时间 */
@@ -160,7 +164,7 @@ export namespace TankBettle {
     export const PROPS_DISAPPEAR = 10;
 
     /**@description 道具生成间隔时间 */
-    export const PROPS_CREATE_INTERVAL = { min : 10 , max : 20};
+    export const PROPS_CREATE_INTERVAL = { min: 10, max: 20 };
 
     export class TankBettleGameData extends GameData {
         private static _instance: TankBettleGameData = null;
@@ -176,29 +180,29 @@ export namespace TankBettle {
             i18n[`${this.bundle}`] = {};
             i18n[`${this.bundle}`] = lan.data;
         }
-    
+
         /**@description 子弹预置 */
-        public get bulletPrefab (){
+        public get bulletPrefab() {
             return this.gamePrefabs.getChildByName("bullet");
         }
-    
+
         public get bundle() {
             return "tankBattle";
         }
-    
+
         /**@description 游戏地图 */
-        public gameMap : TankBattleMap = null;
-    
+        public gameMap: TankBattleMap = null;
+
         /**@description 游戏的各种预置 */
-        public gamePrefabs : cc.Node = null;
-    
+        public gamePrefabs: cc.Node = null;
+
         /**@description 动画预置 */
-        public get animationPrefab(){
+        public get animationPrefab() {
             return this.gamePrefabs.getChildByName("tank_animations")
         }
-    
+
         /**@description 获取玩家的预置 */
-        public getPlayerPrefab( isOne : boolean ){
+        public getPlayerPrefab(isOne: boolean) {
             if (isOne) {
                 return this.gamePrefabs.getChildByName("player_1")
             } else {
@@ -207,38 +211,18 @@ export namespace TankBettle {
         }
 
         /**@description 获取敌人的预置 */
-        public getEnemyPrefab( type : number ){
+        public getEnemyPrefab(type: number) {
             return this.gamePrefabs.getChildByName(`tank_${type}`)
         }
 
         /**@description 根据当前类型取当道具预置 */
-        public getPropsPrefab( type : PropsType ){
+        public getPropsPrefab(type: PropsType) {
             return this.gamePrefabs.getChildByName(`item_${type}`);
         }
-    
-        public nextLevel( ){
-            let level = this.currentLevel + 1;
-            if (level >= MapLevel.length ) {
-                level = 0
-            }
-            this.curLeftEnemy = TankBettle.MAX_ENEMY;
-            this.currentLevel = level
-            return level
-        }
-    
-        public prevLevel( ){
-            let level = this.currentLevel - 1;
-            if (level < 0 ) {
-                level = MapLevel.length -1
-            }
-            this.currentLevel = level;
-            this.curLeftEnemy = TankBettle.MAX_ENEMY;
-            return level
-        }
-    
+
         private _isSingle = true;
         /**@description 单人模式 */
-        public set isSingle( value : boolean ){
+        public set isSingle(value: boolean) {
             this._isSingle = value;
             if (value) {
                 this.playerOneLive = MAX_PLAYER_LIVE;
@@ -249,45 +233,45 @@ export namespace TankBettle {
             }
             this.curLeftEnemy = MAX_ENEMY;
         }
-        public get isSingle(){
+        public get isSingle() {
             return this._isSingle;
         }
-    
-        private _gameStatus : GAME_STATUS = GAME_STATUS.UNKNOWN;
+
+        private _gameStatus: GAME_STATUS = GAME_STATUS.UNKNOWN;
         /**@description 当前游戏状态 */
-        public set gameStatus( status ){
+        public set gameStatus(status) {
             cc.log(`gamestatus : ${this._gameStatus} => ${status}`)
             this._gameStatus = status;
         }
-        public get gameStatus(){
+        public get gameStatus() {
             return this._gameStatus;
         }
 
-        public get gameView() : TankBattleGameView{
+        public get gameView(): TankBattleGameView {
             return Manager.gameView as TankBattleGameView;
         }
 
         public isNeedReducePlayerLive = true;
-        public reducePlayerLive( isOne : boolean ){
-            if( this.isNeedReducePlayerLive ){
-                if( isOne ){
+        public reducePlayerLive(isOne: boolean) {
+            if (this.isNeedReducePlayerLive) {
+                if (isOne) {
                     this.playerOneLive--;
-                }else{
+                } else {
                     this.playerTwoLive--;
                 }
             }
         }
 
-        public addPlayerLive( isOne : boolean ){
-            if( isOne ){
+        public addPlayerLive(isOne: boolean) {
+            if (isOne) {
                 this.playerOneLive++;
-            }else{
+            } else {
                 this.playerTwoLive++;
             }
-            this.gameView.showGameInfo();
+            this.updateGameInfo();
         }
-    
-        public clear(){
+
+        public clear() {
             //这个地方严谨点的写法，需要调用基类，虽然现在基类没有任何实现，不保证后面基类有公共的数据需要清理
             super.clear();
             this._isSingle = true;
@@ -297,31 +281,101 @@ export namespace TankBettle {
             this.curLeftEnemy = 0;
         }
 
-        getEnemyConfig( type : EnemyType ){
+        getEnemyConfig(type: EnemyType) {
             let config = new TankConfig();
-            if( type == EnemyType.STRONG ){
+            if (type == EnemyType.STRONG) {
                 config.live = 3;
-            }else if ( type == EnemyType.SPEED ){
+            } else if (type == EnemyType.SPEED) {
                 config.distance *= 2;
             }
             return config;
         }
 
-        get playerConfig( ){
+        get playerConfig() {
             let config = new TankConfig();
             config.time = 0.05;
             return config;
         }
-    
+
         /**@description 当前关卡等级 */
         currentLevel = 0;
         /**@description 当前剩余敌机数量 */
         curLeftEnemy = 0;
-    
+
         /**@description 玩家1的生命数量 */
         playerOneLive = 0;
         /**@description 玩家2的生命数量 */
         playerTwoLive = 0;
+
+        /**@description 进入游戏 */
+        enterGame() {
+            this.gameStatus = GAME_STATUS.INIT;
+            Manager.uiManager.open({ bundle: this.bundle, type: TankBattleChangeStageView, zIndex: ViewZOrder.UI, args: [this.currentLevel] })
+        }
+
+        /**@description 进入选人界面 */
+        enterStart() {
+            this.gameStatus = GAME_STATUS.SELECTED;
+            Manager.uiManager.open({ type: TankBattleStartView, bundle: this.bundle, zIndex: ViewZOrder.UI });
+        }
+
+        /**@description 下一关 */
+        public nextLevel() {
+            let level = this.currentLevel + 1;
+            if (level >= MapLevel.length) {
+                level = 0
+            }
+            this.curLeftEnemy = TankBettle.MAX_ENEMY;
+            this.currentLevel = level;
+            this.enterGame();
+        }
+
+        /**@description 上一关 */
+        public prevLevel() {
+            let level = this.currentLevel - 1;
+            if (level < 0) {
+                level = MapLevel.length - 1
+            }
+            this.currentLevel = level;
+            this.curLeftEnemy = TankBettle.MAX_ENEMY;
+            this.enterGame();
+        }
+
+        /**
+         * @description 显示地图
+         * @param level 关卡数
+         */
+        public showMap(level: number) {
+            /**@description 当前地图 */
+            this.gameMap.setLevel(level);
+
+            if (this.isSingle) {
+                this.reducePlayerLive(true);
+                this.gameMap.addPlayer(true)
+            } else {
+                this.reducePlayerLive(true)
+                this.reducePlayerLive(false)
+                this.gameMap.addPlayer(true);
+                this.gameMap.addPlayer(false);
+            }
+            this.isNeedReducePlayerLive = true;
+            this.updateGameInfo();
+            this.gameStatus = GAME_STATUS.GAME;
+            //生成道具
+            this.gameMap.starCreateProps();
+        }
+
+        /**@description 游戏结束 */
+        public gameOver(){
+            this.gameStatus = GAME_STATUS.OVER;
+            Manager.uiManager.open({ type: TankBattleGameOver, bundle: this.bundle, zIndex: ViewZOrder.UI });
+            this.gameMap.gameOver();
+        }
+
+        /**@description 更新游戏信息 */
+        public updateGameInfo(){
+            this.gameView.showGameInfo();
+        }
     }
     export const gameData = getSingleton(TankBettleGameData);
 }

@@ -63,7 +63,7 @@ export default class TankBattleBlock extends cc.Component {
                 break;
                 case TankBettle.BLOCK_TYPE.HOME:{
                     //老巢
-                    TankBettle.gameData.gameMap.gameOver();
+                    TankBettle.gameData.gameOver();
                 }
                 break;
             }

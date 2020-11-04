@@ -1,8 +1,6 @@
 import UIView from "../../../../script/framework/ui/UIView";
 import { Manager } from "../../../../script/common/manager/Manager";
 import { TankBettle } from "../data/TankBattleGameData";
-import { ViewZOrder } from "../../../../script/common/config/Config";
-import TankBattleStartView from "./TankBattleStartView";
 
 const { ccclass, property } = cc._decorator;
 
@@ -12,13 +10,6 @@ export default class TankBattleGameOver extends UIView {
     public static getPrefabUrl() {
         return "prefabs/TankBattleGameOver";
     }
-
-    /**@description 选择模式的小坦克 */
-    private selectTank: cc.Node = null;
-    /**@description 单人 */
-    private singlePlayer: cc.Node = null;
-    /**@description 多人 */
-    private doublePalyers: cc.Node = null;
 
     onLoad() {
         super.onLoad();
@@ -32,8 +23,7 @@ export default class TankBattleGameOver extends UIView {
     }
 
     private onClose(){
-        TankBettle.gameData.gameStatus = TankBettle.GAME_STATUS.SELECTED;
-        Manager.uiManager.open({ type: TankBattleStartView, bundle: this.bundle, zIndex: ViewZOrder.UI });
+        TankBettle.gameData.enterStart();
         this.close();
     }
 }

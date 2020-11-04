@@ -1,17 +1,21 @@
 import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../script/common/event/LogicEvent";
 import TankBattleStartView from "./TankBattleStartView";
-import { ViewZOrder } from "../../../../script/common/config/Config";
 import { Manager } from "../../../../script/common/manager/Manager";
 import TankBattleMap from "../model/TankBattleMap";
 import { TankBettle } from "../data/TankBattleGameData";
-import TankBattleChangeStageView from "./TankBattleChangeStageView";
 import GameView from "../../../../script/common/base/GameView";
+import { injectPresenter } from "../../../../script/framework/decorator/Decorators";
+import { IPresenter } from "../../../../script/framework/base/Presenter";
 
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class TankBattleGameView extends GameView {
+@injectPresenter(TankBettle.TankBettleGameData)
+export default class TankBattleGameView extends GameView implements IPresenter<TankBettle.TankBettleGameData>{
+    get presenter(): TankBettle.TankBettleGameData{
+        return this.presenterAny;
+    }
 
     public static getPrefabUrl() {
         return "prefabs/TankBattleGameView";
@@ -51,15 +55,14 @@ export default class TankBattleGameView extends GameView {
     }
 
     private init() {
-        TankBettle.gameData.gameStatus = TankBettle.GAME_STATUS.SELECTED;
-        Manager.uiManager.open({ type: TankBattleStartView, bundle: this.bundle, zIndex: ViewZOrder.UI });
+        this.presenter.enterStart();
 
         let prefabs = cc.find("prefabs", this.node)
-        TankBettle.gameData.gamePrefabs = prefabs;
+        this.presenter.gamePrefabs = prefabs;
         let game = cc.find("Game", this.node)
-        TankBettle.gameData.gameMap = game.addComponent(TankBattleMap);
-        TankBettle.gameData.gameMap.owner = this;
-        TankBettle.gameData.gameMap.setPrefabs(prefabs);
+        this.presenter.gameMap = game.addComponent(TankBattleMap);
+        this.presenter.gameMap.owner = this;
+        this.presenter.gameMap.setPrefabs(prefabs);
         let gameInfo = cc.find("Info", this.node);
         this._enemyTankCount = cc.find("enemy_count", gameInfo)
         this._enemyTankPrefab = cc.find("enemy_tank_prefab", gameInfo)
@@ -83,93 +86,60 @@ export default class TankBattleGameView extends GameView {
     protected onKeyBack(ev: cc.Event.EventKeyboard) {
         super.onKeyBack(ev);
         //在主游戏视图中退出，打开游戏开始菜单
-        TankBettle.gameData.gameStatus = TankBettle.GAME_STATUS.SELECTED;
-        Manager.uiManager.open({ type: TankBattleStartView, bundle: this.bundle, zIndex: ViewZOrder.UI });
+        this.presenter.enterStart();
     }
 
     protected onKeyUp(ev: cc.Event.EventKeyboard) {
         super.onKeyUp(ev);
         if (ev.keyCode == cc.macro.KEY.n) {
             //手动下一关，恢复下生命
-            TankBettle.gameData.isSingle = TankBettle.gameData.isSingle;
-            this.nextLevel();
+            this.presenter.isSingle = this.presenter.isSingle;
+            this.presenter.nextLevel();
         } else if (ev.keyCode == cc.macro.KEY.p) {
             //手动下一关，恢复下生命
-            TankBettle.gameData.isSingle = TankBettle.gameData.isSingle;
-            this.prevLevel();
+            this.presenter.isSingle = this.presenter.isSingle;
+            this.presenter.prevLevel();
         }
-    }
-
-    public nextLevel() {
-        TankBettle.gameData.nextLevel();
-        TankBettle.gameData.gameStatus = TankBettle.GAME_STATUS.INIT;
-        Manager.uiManager.open({ type: TankBattleChangeStageView, bundle: this.bundle, zIndex: ViewZOrder.UI, args: [TankBettle.gameData.currentLevel] })
-    }
-
-    public prevLevel() {
-        TankBettle.gameData.prevLevel();
-        TankBettle.gameData.gameStatus = TankBettle.GAME_STATUS.INIT;
-        Manager.uiManager.open({ type: TankBattleChangeStageView, bundle: this.bundle, zIndex: ViewZOrder.UI, args: [TankBettle.gameData.currentLevel] })
     }
 
     protected onKeyDown(ev: cc.Event.EventKeyboard) {
-        if (TankBettle.gameData.gameMap) {
-            TankBettle.gameData.gameMap.onKeyDown(ev)
+        if (this.presenter.gameMap) {
+            this.presenter.gameMap.onKeyDown(ev)
         }
-    }
-
-    protected setMapLevel(level) {
-        /**@description 当前地图 */
-        TankBettle.gameData.gameMap.setLevel(level);
-        
-        if( TankBettle.gameData.isSingle ){
-            TankBettle.gameData.reducePlayerLive(true);
-            TankBettle.gameData.gameMap.addPlayer(true)
-        }else{
-            TankBettle.gameData.reducePlayerLive(true)
-            TankBettle.gameData.reducePlayerLive(false)
-            TankBettle.gameData.gameMap.addPlayer(true);
-            TankBettle.gameData.gameMap.addPlayer(false);
-        }
-        TankBettle.gameData.isNeedReducePlayerLive = true;
-        this.showGameInfo();
     }
 
     protected onShowMapLevel(data: any) {
-        this.setMapLevel(data)
-        TankBettle.gameData.gameStatus = TankBettle.GAME_STATUS.GAME;
-        //生成道具
-        TankBettle.gameData.gameMap.starCreateProps();
+        this.presenter.showMap(data);
     }
 
     public showGameInfo() {
         //当前关卡
-        this._gameLevel.string = (TankBettle.gameData.currentLevel + 1).toString();
+        this._gameLevel.string = (this.presenter.currentLevel + 1).toString();
         //玩家的生命
-        this._playerOneLive.string = (TankBettle.gameData.playerOneLive < 0 ? 0 : TankBettle.gameData.playerOneLive).toString();
-        this._playerTwoLive.string = (TankBettle.gameData.playerTwoLive < 0 ? 0 : TankBettle.gameData.playerTwoLive).toString();
-        if( TankBettle.gameData.gameMap.playerOne && TankBettle.gameData.gameMap.playerOne.config.live > 0 ){
-            this._playerOneTankLive.string = `-${TankBettle.gameData.gameMap.playerOne.config.live}`
+        this._playerOneLive.string = (this.presenter.playerOneLive < 0 ? 0 : this.presenter.playerOneLive).toString();
+        this._playerTwoLive.string = (this.presenter.playerTwoLive < 0 ? 0 : this.presenter.playerTwoLive).toString();
+        if( this.presenter.gameMap.playerOne && this.presenter.gameMap.playerOne.config.live > 0 ){
+            this._playerOneTankLive.string = `-${this.presenter.gameMap.playerOne.config.live}`
         }else{
             this._playerOneTankLive.string = "";
         }
-        if( TankBettle.gameData.gameMap.playerTwo && TankBettle.gameData.gameMap.playerTwo.config.live > 0 ){
-            this._playerTwoTankLive.string = `-${TankBettle.gameData.gameMap.playerTwo.config.live}`
+        if( this.presenter.gameMap.playerTwo && this.presenter.gameMap.playerTwo.config.live > 0 ){
+            this._playerTwoTankLive.string = `-${this.presenter.gameMap.playerTwo.config.live}`
         }else{
             this._playerTwoTankLive.string = "";
         }
 
         //当前剩余敌人数量 
         let count = this._enemyTankCount.children.length;
-        if (count < TankBettle.gameData.curLeftEnemy) {
-            let addCount = TankBettle.gameData.curLeftEnemy - count;
+        if (count < this.presenter.curLeftEnemy) {
+            let addCount = this.presenter.curLeftEnemy - count;
             for (let i = 0; i < addCount; i++) {
                 let tank = cc.instantiate(this._enemyTankPrefab);
                 this._enemyTankCount.addChild(tank);
             }
-        } else if (count > TankBettle.gameData.curLeftEnemy) {
+        } else if (count > this.presenter.curLeftEnemy) {
             //删除多余出来的
-            let delCount = count - TankBettle.gameData.curLeftEnemy;
+            let delCount = count - this.presenter.curLeftEnemy;
             for (let i = 0; i < delCount; i++) {
                 this._enemyTankCount.removeChild(this._enemyTankCount.children[0]);
             }
