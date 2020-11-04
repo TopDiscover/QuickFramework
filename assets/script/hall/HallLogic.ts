@@ -15,7 +15,7 @@ class HallLogic extends Logic {
 
     bindingEvents(){
         super.bindingEvents();
-        this.registerEvent(LogicEvent.ENTER_HALL,this.onEnterHall);
+        this.registerEvent(LogicEvent.ENTER_HALL,this.onEnterHall); 
     }
 
     onLoad() {
