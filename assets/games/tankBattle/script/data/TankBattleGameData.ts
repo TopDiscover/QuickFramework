@@ -383,6 +383,11 @@ export namespace TankBettle {
         public updateGameInfo(){
             this.gameView.showGameInfo();
         }
+
+        /**@description 吃道具播放声音 */
+        public playPropsAudio(){
+
+        }
     }
     export const gameData = getSingleton(TankBettleGameData);
 }

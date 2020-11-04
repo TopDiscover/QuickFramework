@@ -226,7 +226,7 @@ export default abstract class UIView extends EventComponent {
         ev.stopPropagation();
     }
 
-    protected audioHelper: AudioComponent = null;
+    public audioHelper: AudioComponent = null;
 
     onLoad() {
         this.audioHelper = this.addComponent(AudioComponent);
