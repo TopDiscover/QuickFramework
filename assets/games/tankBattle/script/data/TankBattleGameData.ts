@@ -160,6 +160,10 @@ export namespace TankBettle {
         MAX,
     }
 
+    export enum AUDIO_PATH {
+        START = "audio/start"
+    }
+
     /**@description 道具的存在时间 */
     export const PROPS_DISAPPEAR = 10;
 

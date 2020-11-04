@@ -108,6 +108,7 @@ export default class TankBattleGameView extends GameView implements IPresenter<T
 
     protected onShowMapLevel(data: any) {
         this.presenter.showMap(data);
+        this.audioHelper.playMusic(TankBettle.AUDIO_PATH.START,this.bundle,false);
     }
 
     public showGameInfo() {
