@@ -1,6 +1,7 @@
 import EventComponent from "../base/EventComponent";
 import AudioComponent from "../base/AudioComponent";
 import { Manager } from "../Framework";
+import { getSingleton } from "../base/Singleton";
 
 /**
  * @description 视图基类
@@ -52,6 +53,25 @@ export default abstract class UIView extends EventComponent {
             } else {
                 return cc.find(path, referenceNode);
             }
+        }
+    }
+
+    private _presenterAny : any = null;
+    protected get presenterAny() : any{
+        let __presenter_type__ = Reflect.getPrototypeOf(this)['__presenter_type__'];
+        if( __presenter_type__ ){
+            if( __presenter_type__.Instance){
+                return getSingleton(__presenter_type__);
+            }else{
+                if( this._presenterAny ){
+                    return this._presenterAny;
+                }
+                this._presenterAny = new __presenter_type__();
+                return this._presenterAny;
+            }
+        }else{
+            if( CC_DEBUG ) cc.error(`请先使用injectPresenter注入Presenter`);
+            return null;
         }
     }
 
@@ -217,6 +237,7 @@ export default abstract class UIView extends EventComponent {
     onDestroy(){
         this.setEnabledKeyBack(false);
         this.enableFrontAndBackgroundSwitch = false;
+        this._presenterAny = null;
         super.onDestroy();
     }
 

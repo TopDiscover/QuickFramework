@@ -16,6 +16,7 @@ import { GameManager } from "./GameManager";
 import Tips from "../component/Tips";
 import UILoading from "../component/UILoading";
 import Alert from "../component/Alert";
+import { HallNetHelper } from "../../hall/controller/HallNetHelper";
 
 class _Manager extends Framework._FramewokManager {
 
@@ -27,6 +28,11 @@ class _Manager extends Framework._FramewokManager {
     /**@description 逻辑控制器管理器 */
     get logicManager() {
         return getSingleton(LogicManager);
+    }
+
+    /**@description 大厅的NetHelper*/
+    get netHelper(){
+        return HallNetHelper;
     }
 
     /**@description 游戏管理器 */

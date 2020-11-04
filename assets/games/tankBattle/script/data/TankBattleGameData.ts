@@ -9,6 +9,7 @@ import { Manager } from "../../../../script/common/manager/Manager";
 import TankBattleNetController from "../controller/TankBattleNetController";
 import TankBattleMap from "../model/TankBattleMap";
 import TankBattleGameView from "../view/TankBattleGameView";
+import { getSingleton } from "../../../../script/framework/base/Singleton";
 
 export namespace TankBettle {
     export enum Direction{
@@ -161,7 +162,9 @@ export namespace TankBettle {
     /**@description 道具生成间隔时间 */
     export const PROPS_CREATE_INTERVAL = { min : 10 , max : 20};
 
-    class TankBettleGameData extends GameData {
+    export class TankBettleGameData extends GameData {
+        private static _instance: TankBettleGameData = null;
+        public static Instance() { return this._instance || (this._instance = new TankBettleGameData()); }
         addGameTime() {
             //待处理
         }
@@ -320,5 +323,5 @@ export namespace TankBettle {
         /**@description 玩家2的生命数量 */
         playerTwoLive = 0;
     }
-    export const gameData = new TankBettleGameData;
+    export const gameData = getSingleton(TankBettleGameData);
 }
