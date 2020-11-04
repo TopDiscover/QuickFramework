@@ -82,15 +82,10 @@ export default class TankBattleGameView extends GameView implements IPresenter<T
         cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
     }
 
-
-    protected onKeyBack(ev: cc.Event.EventKeyboard) {
-        super.onKeyBack(ev);
-        //在主游戏视图中退出，打开游戏开始菜单
-        this.presenter.enterStart();
-    }
-
     protected onKeyUp(ev: cc.Event.EventKeyboard) {
-        super.onKeyUp(ev);
+        if( this.presenter.gameMap){
+            this.presenter.gameMap.onKeyUp(ev);
+        }
         if (ev.keyCode == cc.macro.KEY.n) {
             //手动下一关，恢复下生命
             this.presenter.isSingle = this.presenter.isSingle;
@@ -99,6 +94,9 @@ export default class TankBattleGameView extends GameView implements IPresenter<T
             //手动下一关，恢复下生命
             this.presenter.isSingle = this.presenter.isSingle;
             this.presenter.prevLevel();
+        } else if( ev.keyCode == cc.macro.KEY.escape ){
+            ev.stopPropagation();
+            this.presenter.enterStart();
         }
     }
 

@@ -8,9 +8,6 @@ import { TankBettleTankPlayer, TankBettleTankEnemy } from "./TankBattleTank";
 import TankBettleBullet from "./TankBattleBullet";
 import TankBattleBlock from "./TankBattleBlock";
 import TankBattleGameView from "../view/TankBattleGameView";
-import { Manager } from "../../../../script/common/manager/Manager";
-import TankBattleGameOver from "../view/TankBattleGameOver";
-import { ViewZOrder } from "../../../../script/common/config/Config";
 import TankBattleProps from "./TankBattleProps";
 
 const { ccclass, property } = cc._decorator;
@@ -45,6 +42,8 @@ export default class TankBattleMap extends cc.Component {
     public propsProductNode : cc.Node = null;
     /**@description 待销毁的敌人 */
     private _waitingDestory : cc.Node[] = [];
+    /**@description 放入按钮事件 */
+    private _keyboardEvents : Map<number,cc.Event.EventKeyboard> = new Map();
 
     protected onLoad() {
         this.node.children.forEach(node => {
@@ -70,6 +69,7 @@ export default class TankBattleMap extends cc.Component {
 
     protected update() {
         this.addEnemy();
+        this.doKeyboardEvents();
     }
 
     /**@description 随机敌人出生点位置 */
@@ -377,47 +377,46 @@ export default class TankBattleMap extends cc.Component {
     }
 
     public onKeyDown(ev: cc.Event.EventKeyboard) {
-        switch (ev.keyCode) {
-            case cc.macro.KEY.a: {
-                this._handlePlayerMove(this.playerTwo, TankBettle.Direction.LEFT);
-            } break;
-            case cc.macro.KEY.w: {
-                this._handlePlayerMove(this.playerTwo, TankBettle.Direction.UP);
-            } break;
-            case cc.macro.KEY.s: {
-                this._handlePlayerMove(this.playerTwo, TankBettle.Direction.DOWN);
-            } break;
-            case cc.macro.KEY.d: {
-                this._handlePlayerMove(this.playerTwo, TankBettle.Direction.RIGHT);
-            } break;
-            case cc.macro.KEY.left: {
-                this._handlePlayerMove(this.playerOne, TankBettle.Direction.LEFT);
-            } break;
-            case cc.macro.KEY.up: {
-                this._handlePlayerMove(this.playerOne, TankBettle.Direction.UP);
-            } break;
-            case cc.macro.KEY.down: {
-                this._handlePlayerMove(this.playerOne, TankBettle.Direction.DOWN);
-            } break;
-            case cc.macro.KEY.right: {
-                this._handlePlayerMove(this.playerOne, TankBettle.Direction.RIGHT);
-            } break;
-            case cc.macro.KEY.enter: {
+        if( !this._keyboardEvents.has(ev.keyCode) ){
+            this._keyboardEvents.set(ev.keyCode,ev);
+        }
+    }
+
+    public onKeyUp(ev: cc.Event.EventKeyboard) {
+        if( this._keyboardEvents.has(ev.keyCode) ){
+            this._keyboardEvents.delete(ev.keyCode);
+        }
+    }
+
+    private doKeyboardEvents(){
+        if( this._keyboardEvents.has(cc.macro.KEY.a) ){
+            this._handlePlayerMove(this.playerTwo, TankBettle.Direction.LEFT);
+        }else if( this._keyboardEvents.has(cc.macro.KEY.w)){
+            this._handlePlayerMove(this.playerTwo, TankBettle.Direction.UP);
+        }else if( this._keyboardEvents.has(cc.macro.KEY.s)){
+            this._handlePlayerMove(this.playerTwo, TankBettle.Direction.DOWN);
+        }else if( this._keyboardEvents.has(cc.macro.KEY.d)){
+            this._handlePlayerMove(this.playerTwo, TankBettle.Direction.RIGHT);
+        }
+        
+        if( this._keyboardEvents.has(cc.macro.KEY.left)){
+            this._handlePlayerMove(this.playerOne, TankBettle.Direction.LEFT);
+        }else if( this._keyboardEvents.has(cc.macro.KEY.up)){
+            this._handlePlayerMove(this.playerOne, TankBettle.Direction.UP);
+        }else if( this._keyboardEvents.has(cc.macro.KEY.down)){
+            this._handlePlayerMove(this.playerOne, TankBettle.Direction.DOWN);
+        }else if( this._keyboardEvents.has(cc.macro.KEY.right)){
+            this._handlePlayerMove(this.playerOne, TankBettle.Direction.RIGHT);
+        }
+        
+        if( this._keyboardEvents.has(cc.macro.KEY.enter)){
+            this._handlePlayerShoot(this.playerOne);
+        }
+        if( this._keyboardEvents.has(cc.macro.KEY.space)){
+            if( TankBettle.gameData.isSingle ){
                 this._handlePlayerShoot(this.playerOne);
-            } break;
-            case cc.macro.KEY.space: {
-                if( TankBettle.gameData.isSingle ){
-                    this._handlePlayerShoot(this.playerOne);
-                }
-                this._handlePlayerShoot(this.playerTwo);
-            } break;
-            //测试用代码
-            case cc.macro.KEY.t: {
-                this.addEnemy();
-            } break;
-            case cc.macro.KEY.r: {
-                this.removeAllEnemy();
-            } break;
+            }
+            this._handlePlayerShoot(this.playerTwo);
         }
     }
 
