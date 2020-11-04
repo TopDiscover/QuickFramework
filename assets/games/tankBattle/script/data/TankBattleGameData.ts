@@ -367,6 +367,9 @@ export namespace TankBettle {
 
         /**@description 游戏结束 */
         public gameOver(){
+            if( this.gameStatus == GAME_STATUS.OVER ){
+                return;
+            }
             this.gameStatus = GAME_STATUS.OVER;
             Manager.uiManager.open({ type: TankBattleGameOver, bundle: this.bundle, zIndex: ViewZOrder.UI });
             this.gameMap.gameOver();

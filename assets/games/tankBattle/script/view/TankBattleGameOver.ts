@@ -23,7 +23,7 @@ export default class TankBattleGameOver extends UIView {
     }
 
     private onClose(){
-        TankBettle.gameData.enterStart();
         this.close();
+        TankBettle.gameData.enterStart();
     }
 }
