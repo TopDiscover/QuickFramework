@@ -96,6 +96,7 @@ export default class TankBattleGameView extends GameView implements IPresenter<T
             this.presenter.prevLevel();
         } else if( ev.keyCode == cc.macro.KEY.escape ){
             ev.stopPropagation();
+            this.presenter.gameMap.clear();
             this.presenter.enterStart();
         }
     }
