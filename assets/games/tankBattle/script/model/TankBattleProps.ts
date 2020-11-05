@@ -23,9 +23,10 @@ export default class TankBattleProps extends cc.Component {
         if (other.node.group == TankBettle.GROUP.Player) {
             let player = other.node.getComponent(TankBettleTankPlayer)
             if( player ){
+                TankBettle.gameData.playPropsAudio();
                 if( this.type == TankBettle.PropsType.LIVE ){
                     TankBettle.gameData.addPlayerLive(player.isOnePlayer);
-                    TankBettle.gameData.playPropsAudio();
+                    
                 }else if( this.type == TankBettle.PropsType.BOOM_ALL_ENEMY ){
                     TankBettle.gameData.gameMap.removeAllEnemy();
                 }else if( this.type == TankBettle.PropsType.GOD ){

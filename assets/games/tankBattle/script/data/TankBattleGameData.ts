@@ -14,6 +14,7 @@ import TankBattleChangeStageView from "../view/TankBattleChangeStageView";
 import { ViewZOrder } from "../../../../script/common/config/Config";
 import TankBattleStartView from "../view/TankBattleStartView";
 import TankBattleGameOver from "../view/TankBattleGameOver";
+import UIView from "../../../../script/framework/ui/UIView";
 
 export namespace TankBettle {
     export enum Direction {
@@ -161,7 +162,13 @@ export namespace TankBettle {
     }
 
     export enum AUDIO_PATH {
-        START = "audio/start"
+        START = "audio/start",
+        MOVE = "audio/move",
+        ATTACK = "audio/attack",
+        PROP = "audio/prop",
+        BULLETCRACK = "audio/bulletCrack",
+        PLAYERCRACK = "audio/playerCrack",
+        ENEMYCRACK = "audio/tankCrack",
     }
 
     /**@description 道具的存在时间 */
@@ -386,7 +393,38 @@ export namespace TankBettle {
 
         /**@description 吃道具播放声音 */
         public playPropsAudio(){
+            this.gameView.audioHelper.playEffect(TankBettle.AUDIO_PATH.PROP,this.bundle,false);
+        }
 
+        /**@description 坦克移动声音 */
+        private moveEffectID : number = 0;
+        public async playMoveAudio(){
+            this.moveEffectID = await this.gameView.audioHelper.playEffect(TankBettle.AUDIO_PATH.MOVE,this.bundle,true);
+        }
+
+        /**@description 停止声音 */
+        public stopMoveAudio(){
+            this.gameView.audioHelper.stopEffect(this.moveEffectID);
+        }
+
+        /**@description 发射子弹声音 */
+        public playAttackAudio(){
+            this.gameView.audioHelper.playEffect(TankBettle.AUDIO_PATH.ATTACK,this.bundle,false);
+        }
+
+        /**@description 子弹销毁声音 */
+        public bulletCrackAudio(){
+            this.gameView.audioHelper.playEffect(TankBettle.AUDIO_PATH.BULLETCRACK,this.bundle,false);
+        }
+
+        /**@description 玩家销毁声音 */
+        public playerCrackAudio(){
+            this.gameView.audioHelper.playEffect(TankBettle.AUDIO_PATH.PLAYERCRACK,this.bundle,false);
+        }
+
+        /**@description 敌人销毁声音 */
+        public enemyCrackAudio(){
+            this.gameView.audioHelper.playEffect(TankBettle.AUDIO_PATH.ENEMYCRACK,this.bundle,false);
         }
     }
     export const gameData = getSingleton(TankBettleGameData);

@@ -37,11 +37,13 @@ export default class TankBettleTank extends cc.Component {
     public shoot() {
         if (this.bullet) {
             //正在发射
-            return;
+            return false;
         } else {
             let bulletNode = cc.instantiate(TankBettle.gameData.bulletPrefab);
             this.bullet = bulletNode.addComponent(TankBettleBullet);
             this.bullet.move(this);
+
+            return true;
         }
     }
 
@@ -52,10 +54,10 @@ export default class TankBettleTank extends cc.Component {
 
     /**@description 受伤 */
     public hurt() {
-        
+
     }
 
-    public die(){
+    public die() {
 
     }
 
@@ -163,12 +165,12 @@ export class TankBettleTankPlayer extends TankBettleTank {
     public isOnePlayer = false;
 
     /**@description 玩家状态 */
-    private _status: Map<TankBettle.PLAYER_STATUS,boolean> = new Map();
+    private _status: Map<TankBettle.PLAYER_STATUS, boolean> = new Map();
 
     /**@description 打白色砖墙状态 */
-    private _strongNode : cc.Node = null;
-    
-    onLoad(){
+    private _strongNode: cc.Node = null;
+
+    onLoad() {
         this._strongNode = new cc.Node();
         this.node.addChild(this._strongNode);
     }
@@ -178,8 +180,15 @@ export class TankBettleTankPlayer extends TankBettleTank {
         TankBettle.gameData.updateGameInfo();
     }
 
+    shoot() {
+        if (super.shoot()) {
+            TankBettle.gameData.playAttackAudio();
+        }
+        return true;
+    }
+
     public addStatus(status: TankBettle.PLAYER_STATUS) {
-        this._status.set(status,true);
+        this._status.set(status, true);
         if (status == TankBettle.PLAYER_STATUS.PROTECTED) {
             let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
             this.node.addChild(aniNode);
@@ -192,9 +201,9 @@ export class TankBettleTankPlayer extends TankBettleTank {
                 aniNode.destroy();
                 this.removeStatus(TankBettle.PLAYER_STATUS.PROTECTED)
             }).removeSelf().start()
-        }else if( status == TankBettle.PLAYER_STATUS.STRONG ){
+        } else if (status == TankBettle.PLAYER_STATUS.STRONG) {
             this._strongNode.stopAllActions();
-            cc.tween(this._strongNode).delay(TankBettle.PLAYER_STATUS_EXIST_TIME).call(()=>{
+            cc.tween(this._strongNode).delay(TankBettle.PLAYER_STATUS_EXIST_TIME).call(() => {
                 this.removeStatus(status);
             }).start();
         }
@@ -226,6 +235,9 @@ export class TankBettleTankPlayer extends TankBettleTank {
             this.node.addChild(aniNode);
             let animation = aniNode.getComponent(cc.Animation);
             let state = animation.play("tank_boom");
+            //玩家销毁声音
+            TankBettle.gameData.playerCrackAudio();
+
             aniNode.x = 0;
             aniNode.y = 0;
             cc.tween(aniNode).delay(state.duration).call(() => {
@@ -240,31 +252,46 @@ export class TankBettleTankPlayer extends TankBettleTank {
             return;
         }
 
+        TankBettle.gameData.stopMoveAudio();
+        TankBettle.gameData.playMoveAudio();
+
         this.node.stopAllActions();
         this.isMoving = true;
         if (this.direction == TankBettle.Direction.UP) {
             this.node.angle = 0;
             cc.tween(this.node).delay(0)
                 .by(this.config.time, { y: this.config.distance })
-                .call(() => { this.isMoving = false; })
+                .call(() => {
+                    this.isMoving = false;
+                    TankBettle.gameData.stopMoveAudio();
+                })
                 .start();
         } else if (this.direction == TankBettle.Direction.DOWN) {
             this.node.angle = 180;
             cc.tween(this.node).delay(0)
                 .by(this.config.time, { y: -this.config.distance })
-                .call(() => { this.isMoving = false; })
+                .call(() => {
+                    this.isMoving = false;
+                    TankBettle.gameData.stopMoveAudio();
+                })
                 .start();
         } else if (this.direction == TankBettle.Direction.RIGHT) {
             this.node.angle = -90;
             cc.tween(this.node).delay(0)
                 .by(this.config.time, { x: this.config.distance })
-                .call(() => { this.isMoving = false; })
+                .call(() => {
+                    this.isMoving = false;
+                    TankBettle.gameData.stopMoveAudio();
+                })
                 .start();
         } else if (this.direction == TankBettle.Direction.LEFT) {
             this.node.angle = 90;
             cc.tween(this.node).delay(0)
                 .by(this.config.time, { x: -this.config.distance })
-                .call(() => { this.isMoving = false; })
+                .call(() => {
+                    this.isMoving = false;
+                    TankBettle.gameData.stopMoveAudio();
+                })
                 .start();
         }
     }
@@ -326,13 +353,16 @@ export class TankBettleTankEnemy extends TankBettleTank {
         }
     }
 
-    public die(){
+    public die() {
         this.node.stopAllActions();
         this.stopShootAction();
         let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
         this.node.addChild(aniNode);
         let animation = aniNode.getComponent(cc.Animation);
         let state = animation.play("tank_boom");
+
+        TankBettle.gameData.enemyCrackAudio();
+
         aniNode.x = 0;
         aniNode.y = 0;
         cc.tween(aniNode).delay(state.duration).call(() => {

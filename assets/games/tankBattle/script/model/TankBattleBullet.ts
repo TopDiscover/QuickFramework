@@ -106,6 +106,8 @@ export default class TankBettleBullet extends cc.Component {
     }
 
     private removeSelf(){
+        //子弹销毁声音
+        TankBettle.gameData.bulletCrackAudio();
         this.node.stopAllActions();
         this.owner.bullet = null;
         this.node.removeFromParent();
