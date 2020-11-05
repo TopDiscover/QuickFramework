@@ -16,14 +16,15 @@ export default class TankBattleGameOver extends UIView {
         this.content = cc.find("content", this.node);
         let title =  cc.find("title", this.content);
         title.getComponent(cc.Label).language = Manager.makeLanguage("gameOver", true);
-        let y = 
-        cc.tween(title).set({y : this.node.height/2}).to(0.2,{y:0}).start();
-
-        cc.find("bankground",this.node).on(cc.Node.EventType.TOUCH_END,this.onClose,this)
-    }
-
-    private onClose(){
-        this.close();
-        TankBettle.gameData.enterStart();
+        cc.tween(title)
+        .set({y : this.node.height/2})
+        .to(1,{y:0})
+        .delay(2)
+        .call(()=>{
+            this.close();
+            TankBettle.gameData.gameMap.clear();
+            TankBettle.gameData.enterStart();
+        })
+        .start();
     }
 }

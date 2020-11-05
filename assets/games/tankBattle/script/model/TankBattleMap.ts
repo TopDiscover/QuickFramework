@@ -59,10 +59,7 @@ export default class TankBattleMap extends cc.Component {
         this.outWall.forEach((value) => {
             value.destroy();
         });
-        this._waitEnemy.forEach((value) => {
-            value.destroy();
-        });
-        this._waitEnemy = [];
+        this.clear()
         this.outWall = [];
         this.propsProductNode = null;
     }
@@ -222,7 +219,7 @@ export default class TankBattleMap extends cc.Component {
 
     /**@description 检测游戏是否通关了 */
     private checkGamePass() {
-        if (TankBettle.gameData.curLeftEnemy <= 0) {
+        if (TankBettle.gameData.curLeftEnemy <= 0 ) {
             if (this._enemys.length <= 0) {
                 //通关了
                 TankBettle.gameData.isNeedReducePlayerLive = false;
@@ -453,5 +450,23 @@ export default class TankBattleMap extends cc.Component {
             }).removeSelf().start()
 
         }
+    }
+
+    public clear(){
+        this._waitingDestory.forEach((value)=>{
+            value.destroy();
+        });
+        this._waitingDestory = [];
+        this._waitEnemy.forEach((value) => {
+            value.destroy();
+        });
+        this._waitEnemy = [];
+
+        for (let i = 0; i < this._enemys.length; i++) {
+            let enemy = this._enemys[i];
+            enemy.removeFromParent();
+            enemy.destroy();
+        }
+        this._enemys = [];
     }
 }
