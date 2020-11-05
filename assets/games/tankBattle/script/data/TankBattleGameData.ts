@@ -396,17 +396,6 @@ export namespace TankBettle {
             this.gameView.audioHelper.playEffect(TankBettle.AUDIO_PATH.PROP,this.bundle,false);
         }
 
-        /**@description 坦克移动声音 */
-        private moveEffectID : number = 0;
-        public async playMoveAudio(){
-            this.moveEffectID = await this.gameView.audioHelper.playEffect(TankBettle.AUDIO_PATH.MOVE,this.bundle,true);
-        }
-
-        /**@description 停止声音 */
-        public stopMoveAudio(){
-            this.gameView.audioHelper.stopEffect(this.moveEffectID);
-        }
-
         /**@description 发射子弹声音 */
         public playAttackAudio(){
             this.gameView.audioHelper.playEffect(TankBettle.AUDIO_PATH.ATTACK,this.bundle,false);

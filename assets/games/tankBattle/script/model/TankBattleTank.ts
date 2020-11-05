@@ -252,45 +252,42 @@ export class TankBettleTankPlayer extends TankBettleTank {
             return;
         }
 
-        TankBettle.gameData.stopMoveAudio();
-        TankBettle.gameData.playMoveAudio();
-
         this.node.stopAllActions();
         this.isMoving = true;
         if (this.direction == TankBettle.Direction.UP) {
             this.node.angle = 0;
-            cc.tween(this.node).delay(0)
+            cc.tween(this.node)
+                .delay(0)
                 .by(this.config.time, { y: this.config.distance })
                 .call(() => {
                     this.isMoving = false;
-                    TankBettle.gameData.stopMoveAudio();
                 })
                 .start();
         } else if (this.direction == TankBettle.Direction.DOWN) {
             this.node.angle = 180;
-            cc.tween(this.node).delay(0)
+            cc.tween(this.node)
+                .delay(0)
                 .by(this.config.time, { y: -this.config.distance })
                 .call(() => {
                     this.isMoving = false;
-                    TankBettle.gameData.stopMoveAudio();
                 })
                 .start();
         } else if (this.direction == TankBettle.Direction.RIGHT) {
             this.node.angle = -90;
-            cc.tween(this.node).delay(0)
+            cc.tween(this.node)
+                .delay(0)
                 .by(this.config.time, { x: this.config.distance })
                 .call(() => {
                     this.isMoving = false;
-                    TankBettle.gameData.stopMoveAudio();
                 })
                 .start();
         } else if (this.direction == TankBettle.Direction.LEFT) {
             this.node.angle = 90;
-            cc.tween(this.node).delay(0)
+            cc.tween(this.node)
+                .delay(0)
                 .by(this.config.time, { x: -this.config.distance })
                 .call(() => {
                     this.isMoving = false;
-                    TankBettle.gameData.stopMoveAudio();
                 })
                 .start();
         }
