@@ -17,7 +17,12 @@ export default class MainController extends Controller<CommonService> {
     /**@description 进入后台的时间 */
     private _enterBackgroundTime = 0;
 
+    @property(cc.Asset)
+    wssCacert : cc.Asset = null;
+
     onLoad () {
+
+        Manager.wssCacertUrl = this.wssCacert.nativeUrl;
 
         Manager.resolutionHelper.onLoad(this.node);
 

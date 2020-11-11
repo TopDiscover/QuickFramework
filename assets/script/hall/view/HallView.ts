@@ -126,7 +126,7 @@ export default class HallView extends UIView{
         // LobbyService.instance.messageHeader = BinaryStreamMessageHeader;
         // LobbyService.instance.heartbeat = HeartbeatBinary;
 
-        LobbyService.instance.connect("echo.websocket.org",null,"ws");
+        LobbyService.instance.connect("echo.websocket.org");
     }
 
      bindingEvents(){

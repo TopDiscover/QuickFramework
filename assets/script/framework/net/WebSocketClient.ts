@@ -1,4 +1,5 @@
 import { CustomNetEventType } from "../event/EventApi";
+import { Manager } from "../Framework";
 
 /**
  * @description websocket封装
@@ -92,11 +93,7 @@ export default class WebSocketClinet {
 
 
         if(CC_JSB && protocol == "wss"){
-            let pemFileUrl = cc.url.raw("resources/cacert/cacert.pem");
-            if(cc.loader.md5Pipe){
-                pemFileUrl = cc.loader.md5Pipe.transformURL(pemFileUrl)
-            }
-            this._ws = new (<any>(WebSocket))(fullUrl,[],pemFileUrl);
+            this._ws = new (<any>(WebSocket))(fullUrl,[],Manager.wssCacertUrl);
         }else{
             this._ws = new WebSocket(fullUrl);
         }

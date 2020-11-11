@@ -63,6 +63,15 @@ export class _FramewokManager{
     set uiLoading( value : UILoadingDelegate){
         this._uiLoading = value
     }
+
+    protected _wssCacertUrl : string = "";
+    /**@description websocket wss 证书url地址 */
+    get wssCacertUrl(){
+        return this._wssCacertUrl;
+    }
+    set wssCacertUrl(value){
+        this._wssCacertUrl = value;
+    }
 }
 
 export const Manager = new _FramewokManager();

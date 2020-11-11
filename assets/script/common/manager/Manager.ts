@@ -45,6 +45,12 @@ class _Manager extends Framework._FramewokManager {
         return getSingleton(Alert);
     }
 
+    /**@description websocket wss 证书url地址 */
+    set wssCacertUrl(value){
+        this._wssCacertUrl = value;
+        Framework.Manager.wssCacertUrl = value;
+    }
+
     /**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
     private _globalAudio : GlobalAudio = null;
     get globalAudio() {
