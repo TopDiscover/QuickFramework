@@ -13,6 +13,8 @@ export namespace Config {
         uiLoading : "common/prefabs/UILoading",
         alert : "common/prefabs/Alert",
     }
+    /**@description 是否跳过热更新检测 */
+    export const isSkipCheckUpdate = true;
 }
 
 /**

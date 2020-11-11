@@ -1,3 +1,4 @@
+import { Config } from "../config/Config";
 
 interface Manifest {
     /**@description 大厅版本 */
@@ -277,13 +278,20 @@ class _HotUpdate {
         return false;
     }
 
-    /**@description 检测更新 */
-    private checkUpdate(callback: (code: AssetManagerCode, state: AssetManagerState) => void) {
-        if (CC_WECHATGAME || CC_PREVIEW || cc.sys.isBrowser ) {
+    private isNeedUpdate( callback: (code: AssetManagerCode, state: AssetManagerState) => void ){
+        if( CC_WECHATGAME || CC_PREVIEW || cc.sys.isBrowser ){
             //预览及浏览器下，不需要有更新的操作
             this.updating = false;
             callback(AssetManagerCode.ALREADY_UP_TO_DATE, AssetManagerState.UP_TO_DATE);
-        } else {
+            return false;
+        }else{
+            return !Config.isSkipCheckUpdate;
+        }
+    }
+
+    /**@description 检测更新 */
+    private checkUpdate(callback: (code: AssetManagerCode, state: AssetManagerState) => void) {
+        if( this.isNeedUpdate(callback) ){
             cc.log(`--checkUpdate--`);
             if (this.updating) {
                 cc.log(`Checking or updating...`);
@@ -316,11 +324,7 @@ class _HotUpdate {
 
     /**@description 检查大厅是否需要更新 */
     checkHallUpdate(callback: (code: AssetManagerCode, state: AssetManagerState) => void) {
-        if ( CC_WECHATGAME || CC_PREVIEW || cc.sys.isBrowser) {
-            //预览及浏览器下，不需要有更新的操作
-            cc.log(`预览或浏览器`);
-            callback(AssetManagerCode.ALREADY_UP_TO_DATE, AssetManagerState.UP_TO_DATE);
-        } else {
+        if( this.isNeedUpdate(callback) ){
             this.currentAssetsManager = this.getAssetsManager();
             this.currentAssetsManager.manager.loadLocalManifest(this.hallProjectMainfest);
             this.checkUpdate(callback);
@@ -342,11 +346,7 @@ class _HotUpdate {
      * @param callback 检测完成回调
      */
     checkGameUpdate(gameName: string, callback: (code: AssetManagerCode, state: AssetManagerState) => void) {
-        if (CC_WECHATGAME || CC_PREVIEW || cc.sys.isBrowser) {
-            //预览及浏览器下，不需要有更新的操作
-            cc.log(`预览或浏览器`);
-            callback(AssetManagerCode.ALREADY_UP_TO_DATE, AssetManagerState.UP_TO_DATE);
-        } else {
+        if( this.isNeedUpdate(callback) ){
             this.currentAssetsManager = this.getAssetsManager(gameName);
             let manifestUrl = this.getGameManifest(gameName);
             //先检测本地是否已经存在子游戏版本控制文件 
