@@ -126,7 +126,7 @@ export class ResolutionHelper {
             cc.view.resizeWithBrowserSize(true);
 
             //调试浏览器
-            if (CC_PREVIEW || CC_WECHATGAME) {
+            if (CC_PREVIEW || cc.sys.platform == cc.sys.WECHAT_GAME) {
                 me.recordHeight();
             } else {
                 window.addEventListener("load", () => {
@@ -169,7 +169,7 @@ export class ResolutionHelper {
         let me = instance();
         //cc.log(me._logTag,`onResize`);
         if (me.node) {
-            if (CC_PREVIEW || CC_WECHATGAME) {
+            if (CC_PREVIEW || cc.sys.platform == cc.sys.WECHAT_GAME) {
                 me.recordHeight();
                 me.doAdapt();
             }

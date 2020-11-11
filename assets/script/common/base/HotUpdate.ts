@@ -279,12 +279,17 @@ class _HotUpdate {
     }
 
     private isNeedUpdate( callback: (code: AssetManagerCode, state: AssetManagerState) => void ){
-        if( CC_WECHATGAME || CC_PREVIEW || cc.sys.isBrowser ){
+        if( cc.sys.platform == cc.sys.WECHAT_GAME || CC_PREVIEW || cc.sys.isBrowser ){
             //预览及浏览器下，不需要有更新的操作
             this.updating = false;
             callback(AssetManagerCode.ALREADY_UP_TO_DATE, AssetManagerState.UP_TO_DATE);
             return false;
         }else{
+            if( Config.isSkipCheckUpdate ){
+                cc.log("跳过热更新，直接使用本地资源代码");
+                this.updating = false;
+                callback(AssetManagerCode.ALREADY_UP_TO_DATE, AssetManagerState.UP_TO_DATE);
+            }
             return !Config.isSkipCheckUpdate;
         }
     }
