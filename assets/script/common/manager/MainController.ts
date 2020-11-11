@@ -22,7 +22,9 @@ export default class MainController extends Controller<CommonService> {
 
     onLoad () {
 
-        Manager.wssCacertUrl = this.wssCacert.nativeUrl;
+        if( this.wssCacert ){
+            Manager.wssCacertUrl = this.wssCacert.nativeUrl;
+        }
 
         Manager.resolutionHelper.onLoad(this.node);
 

@@ -64,7 +64,7 @@ export class _FramewokManager{
         this._uiLoading = value
     }
 
-    protected _wssCacertUrl : string = "";
+    protected _wssCacertUrl : string = null;
     /**@description websocket wss 证书url地址 */
     get wssCacertUrl(){
         return this._wssCacertUrl;
