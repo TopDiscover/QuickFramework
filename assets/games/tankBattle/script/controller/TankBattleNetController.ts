@@ -21,6 +21,7 @@ export default class TankBattleNetController extends Controller<LobbyService> {
     
     protected bindingEvents(){
         super.bindingEvents()
+        cc.log("TankBattleNetController=>bindingEvents")
         this.registerEvent(MainCmd.CMD_GAME,SUB_CMD_GAME.CMD_GAME_CONFIG,this.onGameSaveConfig,TankBattleConfig);
     }
 
@@ -35,4 +36,3 @@ export default class TankBattleNetController extends Controller<LobbyService> {
     }
 }
 
-Manager.netManager.push(TankBattleNetController);
