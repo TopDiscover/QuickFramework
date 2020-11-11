@@ -14,7 +14,7 @@ export namespace Config {
         alert : "common/prefabs/Alert",
     }
     /**@description 是否跳过热更新检测 */
-    export const isSkipCheckUpdate = true;
+    export const isSkipCheckUpdate = false;
 }
 
 /**
