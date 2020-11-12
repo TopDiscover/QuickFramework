@@ -303,6 +303,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
     }
 
     private shootNode: cc.Node = null;
+    private changeNode: cc.Node = null;
     public _type: TankBettle.EnemyType = null;
 
     public set type(value) {
@@ -329,10 +330,15 @@ export class TankBettleTankEnemy extends TankBettleTank {
         let node = new cc.Node();
         this.node.addChild(node)
         this.shootNode = node;
+        this.changeNode = new cc.Node();
+        this.node.addChild(this.changeNode);
     }
 
     onDestroy() {
         this.stopShootAction();
+        if( this.changeNode ){
+            this.changeNode.stopAllActions();
+        }
     }
 
     public hurt() {
@@ -432,9 +438,22 @@ export class TankBettleTankEnemy extends TankBettleTank {
     }
 
     changeDirection(other?: cc.BoxCollider) {
+
+        if( other.node.group == TankBettle.GROUP.Player ){
+            let player = this.getPlayer(other.node);
+            if( !player.isAI ){
+                //玩家与自己相撞，无视
+                this.move();
+                return;
+            }
+        }
+
+        if( this.isWaitingChange ){
+            return ;
+        }
         this.isWaitingChange = true;
         let delay = cc.randomRange(0.5, 1);
-        this.node.stopAllActions();
-        cc.tween(this.node).delay(delay).call(() => { this.delayMove(other) }).start();
+        this.changeNode.stopAllActions();
+        cc.tween(this.changeNode).delay(delay).call(() => { this.delayMove(other) }).start();
     }
 }
