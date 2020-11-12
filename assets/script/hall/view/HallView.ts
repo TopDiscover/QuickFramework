@@ -27,7 +27,8 @@ export default class HallView extends UIView{
     private readonly games = [
         new GameConfig(i18n.hall_view_game_name[0],"gameOne",1),
         new GameConfig(i18n.hall_view_game_name[1],"gameTwo",2),
-        new GameConfig(i18n.hall_view_game_name[2],"tankBattle",3)
+        new GameConfig(i18n.hall_view_game_name[2],"tankBattle",3),
+        new GameConfig(i18n.hall_view_game_name[3],"game2048",4),
     ];
 
     private onClick( ev : cc.Event.EventTouch ){

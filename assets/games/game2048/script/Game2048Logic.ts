@@ -4,16 +4,15 @@ import { ResourceData } from "../../../script/framework/base/Defines";
 import { LobbyService } from "../../../script/common/net/LobbyService";
 import { ResourceLoaderError } from "../../../script/framework/assetManager/ResourceLoader";
 import { Manager } from "../../../script/common/manager/Manager";
-import TankBattleGameView from "./view/TankBattleGameView";
-import { TankBettle } from "./data/TankBattleGameData";
-import TankBattleNetController from "./controller/TankBattleNetController";
+import { Game2048 } from "./data/Game2048GameData";
+import Game2048GameView from "./view/Game2048GameView";
 
 /**
  * @description 坦克大战Logic 
  * 1，处理LogicEvent的事件
  * 2，
  */
-class TankBattleLogic extends Logic {
+class Game2048Logic extends Logic {
 
     logicType: LogicType = LogicType.GAME;
 
@@ -28,7 +27,7 @@ class TankBattleLogic extends Logic {
     }
 
     protected get bundle() {
-        return TankBettle.gameData.bundle;
+        return Game2048.gameData.bundle;
     }
 
     public onEnterComplete( data : LogicEventData ){
@@ -55,18 +54,14 @@ class TankBattleLogic extends Logic {
         super.onLoadResourceComplete(err);
         //加载完成，恢复网络
         LobbyService.instance.resumeMessageQueue();
-        Manager.uiManager.open({ type: TankBattleGameView ,bundle:this.bundle});
-    }
-
-    protected getNetControllerType(){
-        return TankBattleNetController
+        Manager.uiManager.open({ type: Game2048GameView ,bundle:this.bundle});
     }
 
     private onEnterGame(data) {
         if (data == this.bundle) {
 
             //游戏数据初始化
-            Manager.gameData = TankBettle.gameData;
+            Manager.gameData = Game2048.gameData;
             Manager.gameData.clear();
 
             //子游戏语言包初始化
@@ -88,8 +83,8 @@ class TankBattleLogic extends Logic {
     }
 
     protected getLoadResources(): ResourceData[]{
-        return [{ preloadView: TankBattleGameView , bundle : this.bundle}];
+        return [{ preloadView: Game2048GameView , bundle : this.bundle}];
     }
 }
 
-Manager.logicManager.push(TankBattleLogic);
+Manager.logicManager.push(Game2048Logic);

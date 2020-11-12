@@ -47,7 +47,9 @@ export class Logic extends EventComponent {
     }
 
     protected onLanguageChange(){
-        
+        if( Manager.gameData ){
+            Manager.gameData.onLanguageChange();
+        }
     }
 
     public init( data : cc.Node ){

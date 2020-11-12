@@ -7,7 +7,7 @@ export let LanguageEN = {
         'game2',
         `BATTLE
 CITY`,
-        'game4',
+        '2048',
         'game5',
         'game6',
     ],
