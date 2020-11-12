@@ -30,8 +30,15 @@ export default class Loading {
         return this._timeOutCb;
     }
 
+    /**@description 显示的Loading提示内容 */
+    private _content : string[] = [];
+    private _showContentIndex = 0;
+
     /**@description 超时回调定时器id */
     private _timerId:number = -1;
+
+    /**@description 显示的提示 */
+    private _text : cc.Label = null;
 
     public preLoadPrefab() {
         this.loadPrefab();
@@ -43,13 +50,19 @@ export default class Loading {
      * @param timeOutCb 超时回调
      * @param timeout 显示超时时间
      */
-    public show( content : string , timeOutCb?:()=>void,timeout = Config.LOADING_TIME_OUT ) {
+    public show( content : string | string[] , timeOutCb?:()=>void,timeout = Config.LOADING_TIME_OUT ) {
         this._timeOutCb = timeOutCb;
-        this._show(content,timeout);
+        if( Array.isArray(content) ){
+            this._content = content;
+        }else{
+            this._content = [];
+            this._content.push(content);
+        }
+        this._show(timeout);
         return this;
     }
 
-    private async _show( content : string , timeout : number ) {
+    private async _show( timeout : number ) {
         this._isWaitingHide = false;
         let finish = await this.loadPrefab();
         if (finish) {
@@ -58,7 +71,9 @@ export default class Loading {
             this._node.parent = Manager.uiManager.getCanvas();
             this._node.zIndex = ViewZOrder.Loading;
             this._node.position = cc.Vec3.ZERO;
-            cc.find("content/text",this._node).getComponent(cc.Label).string = content;
+            this._text = cc.find("content/text",this._node).getComponent(cc.Label);
+            this._showContentIndex = 0;
+            this.startShowContent();
             //第一次在预置体没加载好就被隐藏
             if (this._isWaitingHide) {
                 // cc.error(`sssssssss`);
@@ -71,6 +86,32 @@ export default class Loading {
         }
     }
 
+    private startShowContent( ){
+        if( this._content.length == 1 ){
+            this._text.string = this._content[0];
+        }else{
+            this._text.node.stopAllActions();
+            cc.tween(this._text.node)
+            .call(()=>{
+                this._text.string = this._content[this._showContentIndex];
+            })
+            .delay(Config.LOADING_CONTENT_CHANGE_INTERVAL)
+            .call(()=>{
+                this._showContentIndex ++;
+                if( this._showContentIndex >= this._content.length ){
+                    this._showContentIndex = 0;
+                }
+                this.startShowContent();
+            })
+            .start();
+        }
+    }
+
+    private stopShowContent(){
+        if( this._text ){
+            this._text.node.stopAllActions();
+        }
+    }
 
     /**@description 开始计时回调 */
     private startTimeOutTimer(timeout: number) {
@@ -124,6 +165,7 @@ export default class Loading {
     }
 
     public hide() {
+        this.stopShowContent();
         this.stopTimeOutTimer();
         if (this._node) {
             this._isWaitingHide = true;

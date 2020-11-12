@@ -62,9 +62,9 @@ export default class HallView extends UIView{
                 });
             }else if( i == 5 ){
                 game.on(cc.Node.EventType.TOUCH_END,()=>{
-                    Manager.loading.show("这是一个测试",()=>{
+                    Manager.loading.show(["这是一个测试","测试内容1","测试内容2"],()=>{
                         Manager.tips.show("超时关闭loading")
-                    },10)
+                    })
                 });
             }
             else{

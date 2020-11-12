@@ -22,6 +22,9 @@ export namespace Config {
 
     /**@description Loading动画显示超时回调默认超时时间 */
     export const LOADING_TIME_OUT = 30;
+
+    /**@description Loading提示中切换显示内容的时间间隔 */
+    export const LOADING_CONTENT_CHANGE_INTERVAL = 3;
 }
 
 /**
