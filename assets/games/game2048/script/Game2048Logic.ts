@@ -8,7 +8,7 @@ import { Game2048 } from "./data/Game2048GameData";
 import Game2048GameView from "./view/Game2048GameView";
 
 /**
- * @description 坦克大战Logic 
+ * @description 2048Logic 
  * 1，处理LogicEvent的事件
  * 2，
  */
