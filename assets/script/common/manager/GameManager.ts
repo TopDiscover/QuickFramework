@@ -15,6 +15,17 @@ export class GameManager {
    private curGame: GameConfig = null;
    private isLoading = false;
 
+
+   /**@description 已经加载的bundle */
+   private loadedBundle : string[] = []
+
+   public removeLoadedBundle(){
+      this.loadedBundle.forEach((value,index,origin)=>{
+         Manager.assetManager.removeBundle(value);
+      });
+      this.loadedBundle = [];
+   }
+
    /**
     * 外部接口 进入游戏
     * @param areaType
@@ -94,7 +105,7 @@ export class GameManager {
    }
 
    private loadBundle() {
-      Manager.assetManager.removeBundle(this.curGame.bundle);
+      // Manager.assetManager.removeBundle(this.curGame.bundle);
       cc.log(`updateGame : ${this.curGame.bundle}`);
       let me = this;
       //加载子包
@@ -108,6 +119,7 @@ export class GameManager {
          } else {
             cc.log(`load bundle : ${versionInfo.bundle} success !!!`);
             versionInfo.isLoaded = true;
+            this.loadedBundle.push(versionInfo.bundle);
             me.onGameReady();
          }
       });

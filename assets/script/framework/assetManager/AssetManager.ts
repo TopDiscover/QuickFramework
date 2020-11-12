@@ -179,6 +179,7 @@ export class AssetManager {
         let result = this.getBundle(bundle);
         if( result ){
             Manager.cacheManager.removeBundle(bundle);
+            result.releaseAll();
             cc.assetManager.removeBundle(result);
         }
     }
