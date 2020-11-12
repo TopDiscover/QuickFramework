@@ -61,6 +61,7 @@ export default class TankBattleMap extends cc.Component {
         });
         this.clear()
         this.outWall = [];
+        this.propsProductNode.stopAllActions();
         this.propsProductNode = null;
     }
 
@@ -303,13 +304,13 @@ export default class TankBattleMap extends cc.Component {
         node.position = this.randomPropPosition();
     }
 
-    public starCreateProps() {
+    public startCreateProps() {
         if( TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME ){
             let time = cc.randomRange(TankBettle.PROPS_CREATE_INTERVAL.min,TankBettle.PROPS_CREATE_INTERVAL.max)
             this.propsProductNode.stopAllActions();
             cc.tween(this.propsProductNode).delay(time).call(()=>{
                 this.createProps();
-                this.starCreateProps();
+                this.startCreateProps();
             }).start();
         }
     }

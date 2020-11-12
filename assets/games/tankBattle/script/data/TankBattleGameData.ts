@@ -358,6 +358,10 @@ export namespace TankBettle {
          */
         public showMap(level: number) {
             /**@description 当前地图 */
+            if( !this.gameMap ){
+                cc.error(`地图未初始化`);
+                return;
+            }
             this.gameMap.setLevel(level);
 
             if (this.isSingle) {
@@ -373,7 +377,7 @@ export namespace TankBettle {
             this.updateGameInfo();
             this.gameStatus = GAME_STATUS.GAME;
             //生成道具
-            this.gameMap.starCreateProps();
+            this.gameMap.startCreateProps();
         }
 
         /**@description 游戏结束 */

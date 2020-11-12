@@ -54,6 +54,12 @@ export default class TankBattleGameView extends GameView implements IPresenter<T
         dispatchEnterComplete({ type: LogicType.GAME, views: [this, TankBattleStartView] });
     }
 
+    onDestroy(){
+        this.presenter.gameMap = null;
+        this.presenter.gamePrefabs = null;
+        super.onDestroy();
+    }
+
     private init() {
         this.presenter.enterStart();
 

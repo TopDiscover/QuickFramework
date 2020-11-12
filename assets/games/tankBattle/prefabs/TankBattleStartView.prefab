@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "TankBattleGameView",
+    "_name": "TankBattleStartView",
     "_objFlags": 0,
     "_parent": null,
     "_children": [
