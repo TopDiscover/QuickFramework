@@ -11,6 +11,7 @@ export namespace Config {
     export let CommonPrefabs = {
         tips : "common/prefabs/Tips",
         uiLoading : "common/prefabs/UILoading",
+        loading : "common/prefabs/Loading",
         alert : "common/prefabs/Alert",
     }
     /**@description 是否跳过热更新检测 */
@@ -18,6 +19,9 @@ export namespace Config {
 
     /**@description 测试热更新服务器地址 */
     export const TEST_HOT_UPDATE_URL_ROOT = "http://192.168.3.104/hotupdate";
+
+    /**@description Loading动画显示超时回调默认超时时间 */
+    export const LOADING_TIME_OUT = 30;
 }
 
 /**
@@ -39,6 +43,7 @@ export namespace ViewZOrder {
     /**@description 提示 */
     export const Tips = 300;
 
+    /**@description 提示弹出框 */
     export const Alert = 299;
 
     /**@description Loading层 */

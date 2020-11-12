@@ -60,6 +60,12 @@ export default class HallView extends UIView{
                     HallNetHelper.sendProtoMessage();
                     // HallNetHelper.sendHttpMessage();
                 });
+            }else if( i == 5 ){
+                game.on(cc.Node.EventType.TOUCH_END,()=>{
+                    Manager.loading.show("这是一个测试",()=>{
+                        Manager.tips.show("超时关闭loading")
+                    },10)
+                });
             }
             else{
                 game.on(cc.Node.EventType.TOUCH_END,()=>{

@@ -17,6 +17,7 @@ import Tips from "../component/Tips";
 import UILoading from "../component/UILoading";
 import Alert from "../component/Alert";
 import { HallNetHelper } from "../../hall/controller/HallNetHelper";
+import Loading from "../component/Loading";
 
 /**@description 游戏所有运行单例的管理 */
 class _Manager extends Framework._FramewokManager {
@@ -44,6 +45,11 @@ class _Manager extends Framework._FramewokManager {
     /**@description 弹出提示框,带一到两个按钮 */
     get alert(){
         return getSingleton(Alert);
+    }
+
+    /**@description 公共loading */
+    get loading(){
+        return getSingleton(Loading);
     }
 
     /**@description websocket wss 证书url地址 */

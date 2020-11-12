@@ -34,6 +34,7 @@ export default class MainController extends Controller<CommonService> {
         //预先加载下loading预置体
         Manager.tips.preloadPrefab();
         Manager.uiLoading.preloadPrefab();
+        Manager.loading.preLoadPrefab();
         Manager.alert.preLoadPrefab();
         
 
