@@ -56,7 +56,7 @@ export default class MainController extends Controller<CommonService> {
                     Manager.uiManager.printCanvasChildren();
                 });
                 showRes.on(cc.Node.EventType.TOUCH_END,()=>{
-
+                    Manager.cacheManager.printCaches();
                 });
             }
             showUI.active = isShow;

@@ -3,6 +3,34 @@ import UIView from "../ui/UIView";
 import { Manager } from "../Framework";
 
 class ResourceCache {
+    print() {
+        let content = [];
+        let invalidContent = [];
+        this._caches.forEach((data, key, source) => {
+            let itemContent = { 
+                url: data.url, 
+                isLoaded: data.isLoaded, 
+                isValid: cc.isValid(data.data), 
+                assetType: cc.js.getClassName(data.assetType), 
+                data: data.data ? cc.js.getClassName(data.data) : null, 
+                status: data.status }
+            let item = { url: key, data: itemContent };
+
+            if (data.isLoaded && data.data && !cc.isValid(data.data)) {
+                invalidContent.push(item);
+            } else {
+                content.push(item);
+            }
+        });
+        if (content.length > 0) {
+            cc.log(`----------- Current valid caches -----------`);
+            cc.log(JSON.stringify(content));
+        }
+        if (invalidContent.length > 0) {
+            cc.log(`----------- Current invalid caches -----------`);
+            cc.log(JSON.stringify(invalidContent));
+        }
+    }
 
     private _caches = new Map<string, ResourceCacheData>();
     private name = "unknown";
@@ -420,6 +448,15 @@ export class CacheManager {
             };
 
             getFun(urls[nIndex]);
+        });
+    }
+
+    /**@description 打印当前缓存资源 */
+    public printCaches(){
+        this._bundles.forEach((value,key,originMap)=>{
+            if( CC_DEBUG) cc.log(`----------------Bundle ${key} caches begin----------------`)
+            value.print();
+            if( CC_DEBUG) cc.log(`----------------Bundle ${key} caches end----------------`)
         });
     }
 }

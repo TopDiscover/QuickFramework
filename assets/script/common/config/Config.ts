@@ -2,7 +2,7 @@
 
 export namespace Config {
     /**@description 是否显示调试按钮 */
-    export let isShowDebugButton = false;
+    export const isShowDebugButton = true;
 
     /**@description 当前入子游戏时，在Logic.onLoad时初始设置 */
     export let assetBundle = {};
@@ -15,7 +15,7 @@ export namespace Config {
         alert : "common/prefabs/Alert",
     }
     /**@description 是否跳过热更新检测 */
-    export const isSkipCheckUpdate = false;
+    export const isSkipCheckUpdate = true;
 
     /**@description 测试热更新服务器地址 */
     export const TEST_HOT_UPDATE_URL_ROOT = "http://192.168.3.104/hotupdate";
