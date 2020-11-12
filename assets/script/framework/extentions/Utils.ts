@@ -2,15 +2,6 @@ import UIView from "../ui/UIView";
 import { ResourceInfo, ResourceType, BUNDLE_RESOURCES } from "../base/Defines";
 import { Manager } from "../Framework";
 
-/*
- * @Author: your name
- * @Date: 2020-03-20 10:07:02
- * @LastEditTime: 2020-04-10 15:29:14
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: \ddz\assets\framework\extentions\Utils.ts
- */
-
 /**@description 添加加载本地的资源 */
 export function addExtraLoadResource(view: UIView, info: ResourceInfo) {
     let uiManager = Manager.uiManager;

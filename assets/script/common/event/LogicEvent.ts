@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2019-11-20 19:04:21
- * @LastEditTime: 2020-02-28 14:56:49
- * @LastEditors: your name
- * @Description: In User Settings Edit
- * @FilePath: \ddz\assets\common\event\LogicEvent.ts
- */
 import UIView, { UIClass } from "../../framework/ui/UIView";
 
 /**

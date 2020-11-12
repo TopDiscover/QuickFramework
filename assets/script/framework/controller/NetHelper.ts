@@ -1,11 +1,12 @@
 import { Service } from "../base/Service";
 
-/**@description NetHelper */
+/**@description NetHelper 
+ * 子类需要继承并实现constructor,传入实例化的service，
+ * 在该模块的其它地方，可直接调用
+ * 可参考HallNetHelper
+ */
 export default class NetHelper<ServiceType> {
     private _service: Service = null;
-    /**
-     * @description 这个变量会在脚本onLoad时自动赋值，使用者请勿进行修改
-     */
     public get service() : ServiceType{
         return <any>(this._service);
     };

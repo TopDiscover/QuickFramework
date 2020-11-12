@@ -2,6 +2,12 @@ import { Logic } from "../base/Logic";
 import { LogicEvent, LogicEventData, LogicType } from "../event/LogicEvent";
 import { Manager } from "./Manager";
 
+/**
+ * @description 逻辑控制器管理器 
+ * 管理所有继承自Logic的子类
+ * 如，坦克大战的TankBattleLogic
+ * 收到LogicEvent.ENTER_COMPLETE 时，会自动关闭掉除传入的views之外的所有继续息UIView的界面
+ */
 export class LogicManager{
     
     private _logTag = `[LogicManager]`;

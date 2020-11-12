@@ -1,5 +1,5 @@
 import WebSocketClinet from "./WebSocketClient";
-import { Message, IMessage } from "./Message";
+import { IMessage } from "./Message";
 
 /**
  * @description 服务器连接器

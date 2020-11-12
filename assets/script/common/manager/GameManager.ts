@@ -2,6 +2,11 @@ import { LogicEvent } from "../event/LogicEvent";
 import { HotUpdate, AssetManagerCode, AssetManagerState, SubGameUpdateType, GameConfig } from "../base/HotUpdate";
 import { CommonEvent } from "../event/CommonEvent";
 
+/**
+ * @description 子游戏管理器 
+ * 子游戏的下载，检测更新，运行子游戏
+ */
+
 export class GameManager {
    private static _instance: GameManager = null;
    public static Instance() { return this._instance || (this._instance = new GameManager()); }

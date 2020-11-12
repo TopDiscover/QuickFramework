@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2019-11-20 19:04:21
- * @LastEditTime: 2020-04-10 13:38:50
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: \ddz\assets\framework\base\LocalStorage.ts
- */
 import { BitEncrypt } from "../extentions/BitEncrypt";
 
 /**

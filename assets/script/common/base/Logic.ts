@@ -7,7 +7,7 @@ import { Config } from "../config/Config";
 import { Manager } from "../manager/Manager";
 
 /**
- * @description 逻辑控制器 需要实现LogicInterface
+ * @description 逻辑控制器
 */
 
 export class Logic extends EventComponent {

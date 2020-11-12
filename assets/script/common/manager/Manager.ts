@@ -18,6 +18,7 @@ import UILoading from "../component/UILoading";
 import Alert from "../component/Alert";
 import { HallNetHelper } from "../../hall/controller/HallNetHelper";
 
+/**@description 游戏所有运行单例的管理 */
 class _Manager extends Framework._FramewokManager {
 
     /**@description 全局常驻网络组件管理器 */

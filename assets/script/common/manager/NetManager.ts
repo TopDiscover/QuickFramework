@@ -1,5 +1,6 @@
 /**
  * @description 全局的网络组件管理
+ * 指常驻监听网络消息的组件，不需要动态的添加或移除
  */
 
  export class NetManager{

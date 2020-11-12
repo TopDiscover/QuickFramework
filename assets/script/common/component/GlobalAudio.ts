@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2019-11-20 19:04:21
- * @LastEditTime: 2020-04-10 15:27:19
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: \ddz\assets\common\component\GlobalAudio.ts
- */
 import AudioComponent from "../../framework/base/AudioComponent";
 import { BUNDLE_TYPE, BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import { Manager } from "../manager/Manager";
