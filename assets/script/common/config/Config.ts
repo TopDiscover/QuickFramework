@@ -25,6 +25,9 @@ export namespace Config {
 
     /**@description Loading提示中切换显示内容的时间间隔 */
     export const LOADING_CONTENT_CHANGE_INTERVAL = 3;
+
+    /**@description 加载界面超时时间,如果在LOAD_VIEW_TIME_OUT秒未加载出，提示玩家加载界面超时 */
+    export const LOAD_VIEW_TIME_OUT = 20;
 }
 
 /**

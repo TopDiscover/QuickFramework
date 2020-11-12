@@ -39,9 +39,6 @@ export default class UILoading extends UILoadingDelegate {
         this._uiName = name;
         this._show();
     }
-
-    /**@description 加载界面超时时间,如果15秒未加载出，提示玩家加载超时 */
-    private readonly TIME_OUT = 20;
     private _timerId = -1;
 
     /**
@@ -73,7 +70,7 @@ export default class UILoading extends UILoadingDelegate {
                 this._node.active = false;
                 return;
             }
-            this.startTimeOutTimer(this.TIME_OUT);
+            this.startTimeOutTimer(Config.LOAD_VIEW_TIME_OUT);
             this._node.active = true;
         }
     }
