@@ -1,6 +1,8 @@
 import { LogicEvent } from "../event/LogicEvent";
-import { HotUpdate, AssetManagerCode, AssetManagerState, SubGameUpdateType, GameConfig } from "../base/HotUpdate";
+import { HotUpdate, AssetManagerCode, AssetManagerState, GameConfig } from "../base/HotUpdate";
 import { CommonEvent } from "../event/CommonEvent";
+import { Manager } from "../../framework/Framework";
+import { i18n } from "../language/LanguageImpl";
 
 /**
  * @description 子游戏管理器 
@@ -19,46 +21,37 @@ export class GameManager {
     */
    public enterGame(config: GameConfig) {//进入游戏（输入房间号）
       if (this.isLoading) {
+         Manager.tips.show(i18n.updating);
          cc.log("正在更新游戏，请稍等");
          return;
       }
       this.curGame = config;
       this.isLoading = true;
 
-      if (!HotUpdate.allGameConfig[this.curGame.subpackageName]) {
-         HotUpdate.allGameConfig[this.curGame.subpackageName] = config;
+      if (!HotUpdate.allGameConfig[this.curGame.bundle]) {
+         HotUpdate.allGameConfig[this.curGame.bundle] = config;
       }
 
-      let versionInfo = HotUpdate.allGameConfig[this.curGame.subpackageName];
-      if (HotUpdate.subGameUpdateType == SubGameUpdateType.Normal) {
-         if (versionInfo.isLoaded) {
-            cc.log(`游戏已经加载过了`);
-            this.onGameReady();
-         } else {
-            //检测游戏版本更新
-            this.checkUpdate(versionInfo);
-         }
-      } else {
-         this.checkUpdate(versionInfo);
-      }
+      let versionInfo = HotUpdate.allGameConfig[this.curGame.bundle];
+      this.checkUpdate(versionInfo);
    }
 
    private onGameReady() {
       if (this.isLoading) {
          this.isLoading = false;
       }
-      dispatch(LogicEvent.ENTER_GAME, this.curGame.subpackageName);
+      dispatch(LogicEvent.ENTER_GAME, this.curGame.bundle);
    }
 
    /**@description 检测子游戏更新 */
    private checkUpdate(versionInfo: GameConfig) {
       let self = this;
-      cc.log(`检测更新信息:${versionInfo.gameName}(${versionInfo.subpackageName})`);
-      HotUpdate.checkGameUpdate(this.curGame.subpackageName, (code, state) => {
+      cc.log(`检测更新信息:${versionInfo.gameName}(${versionInfo.bundle})`);
+      HotUpdate.checkGameUpdate(this.curGame.bundle, (code, state) => {
          if (code == AssetManagerCode.NEW_VERSION_FOUND) {
             //有新版本
             HotUpdate.onDownload = this.onDownload.bind(this);
-            cc.log(`检测到${versionInfo.gameName}(${versionInfo.subpackageName})有新的版本`);
+            cc.log(`检测到${versionInfo.gameName}(${versionInfo.bundle})有新的版本`);
             HotUpdate.hotUpdate();
          } else if (state == AssetManagerState.TRY_DOWNLOAD_FAILED_ASSETS) {
             //尝试重新下载之前下载失败的文件
@@ -67,10 +60,16 @@ export class GameManager {
             HotUpdate.downloadFailedAssets();
          } else if (code == AssetManagerCode.ALREADY_UP_TO_DATE) {
             //已经是最新版本
-            if (versionInfo.isLoaded) {
-               self.onGameReady();
+            if ( HotUpdate.isBrowser ) {
+               //h5端如果已经加载，直接使用现在加载的
+               if( versionInfo.isLoaded ){
+                  self.onGameReady();
+               }else{
+                  self.loadBundle();
+               }
             } else {
-               self.loadSubpackage();
+               //以最新的bundle为准
+               self.loadBundle();
             }
          } else if (code == AssetManagerCode.ERROR_DOWNLOAD_MANIFEST ||
             code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||
@@ -94,20 +93,20 @@ export class GameManager {
       });
    }
 
-   private loadSubpackage() {
-      cc.log(`updateGame : ${this.curGame.subpackageName}`);
+   private loadBundle() {
+      Manager.assetManager.removeBundle(this.curGame.bundle);
+      cc.log(`updateGame : ${this.curGame.bundle}`);
       let me = this;
       //加载子包
-      let versionInfo = HotUpdate.allGameConfig[this.curGame.subpackageName];
-      cc.assetManager.loadBundle(versionInfo.subpackageName, (err: Error, bundle: cc.AssetManager.Bundle) => {
+      let versionInfo = HotUpdate.allGameConfig[this.curGame.bundle];
+      Manager.assetManager.loadBundle(versionInfo.bundle, (err: Error, bundle: cc.AssetManager.Bundle) => {
          me.isLoading = false;
-         //Manager.loading.hide();
          if (err) {
-            cc.error(`load subpackage : ${versionInfo.subpackageName} fail !!!`);
-            //Manager.toast.show(`加载${versionInfo.subpackageName}失败!`);
+            cc.error(`load bundle : ${versionInfo.bundle} fail !!!`);
+            Manager.tips.show(String.format(i18n.updateFaild,versionInfo.gameName));
             versionInfo.isLoaded = false;
          } else {
-            cc.log(`load subpackage : ${versionInfo.subpackageName} success !!!`);
+            cc.log(`load bundle : ${versionInfo.bundle} success !!!`);
             versionInfo.isLoaded = true;
             me.onGameReady();
          }
@@ -161,7 +160,7 @@ needRestart : ${needRestart}
     ERROR_DECOMPRESS,
        */
 
-      let gameConfig = HotUpdate.getGameLocalName(this.curGame.subpackageName);
+      let gameConfig = HotUpdate.getGameLocalName(this.curGame.bundle);
 
       if (code == AssetManagerCode.UPDATE_PROGRESSION) {
          newPercent = percent == Number.NaN ? 0 : percent;
@@ -172,11 +171,8 @@ needRestart : ${needRestart}
       } else if (code == AssetManagerCode.UPDATE_FINISHED) {
          newPercent = 1.1;
          cc.log(`更新${gameConfig.gameName}成功`);
-         if (!needRestart) {
-            //不需要重启//直接加载子游戏进入
-            cc.log(`正在加载${gameConfig.gameName}`);
-            this.loadSubpackage();
-         }
+         cc.log(`正在加载${gameConfig.gameName}`);
+         this.loadBundle();
          dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
       } else if (code == AssetManagerCode.UPDATE_FAILED ||
          code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||

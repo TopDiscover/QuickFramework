@@ -31850,7 +31850,7 @@ declare namespace jsb{
         constructor (manifestUrl: string, storagePath: string, versionCompareHandle?: (versionA: string, versionB: string) => number);
         static create (manifestUrl: string, storagePath: string): AssetsManager;
 
-        getState (): AssetsManager.State;
+		getState (): number;
         getStoragePath (): string
         getMaxConcurrentTask (): number;
         // setMaxConcurrentTask (max: number): void;  // actually not supported
@@ -31883,7 +31883,11 @@ declare namespace jsb{
          * Setup the verification callback, Return true if the verification passed, otherwise return false
          */
         setVerifyCallback (verifyCallback: (path: string, asset: ManifestAsset) => boolean): void;
-        setEventCallback (eventCallback: (event: EventAssetsManager) => void): void;
+		setEventCallback (eventCallback: (event: EventAssetsManager) => void): void;
+		
+		/** 扩展方法 */
+		setMaxConcurrentTask( count : number );
+		setHotUpdateUrl( url : string);
     }
 
     /**

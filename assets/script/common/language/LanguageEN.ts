@@ -17,4 +17,6 @@ CITY`,
     alert_title : "Tips",
     alert_confirm : "Confirm",
     alert_cancel : "Cancel",
+    updating : "Updating game",
+    updateFaild : "Update game({0}) Faild"
 }

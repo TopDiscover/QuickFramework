@@ -14,4 +14,6 @@ export let LanguageZH = {
   alert_title : "温馨提示",
   alert_confirm : "确 定",
   alert_cancel : "取 消",
+  updating : "正在更新游戏...",
+  updateFaild : "更新游戏({0})失败",
 }

@@ -27,7 +27,7 @@ class AssetsManager {
     /**@description 当前资源管理器的名称 */
     name: string = "";
     /**@description 当前资源管理器的实体 jsb.AssetsManager */
-    manager: any = null;
+    manager: jsb.AssetsManager = null;
 }
 
 export enum AssetManagerCode {
@@ -53,7 +53,6 @@ export enum AssetManagerCode {
     UPDATE_FAILED,
     /**@description 解压资源失败 */
     ERROR_DECOMPRESS,
-
 
     //以下是js中扩展的字段，上面是引擎中已经有的字段
     /**@description 正检测更新中 */
@@ -95,34 +94,17 @@ export enum AssetManagerState {
     TRY_DOWNLOAD_FAILED_ASSETS,
 }
 
-/**@description 子游戏热更新的方式 */
-export enum SubGameUpdateType {
-    /**@description 如果该子游戏的代码已经加载过，
-     * 在玩家不重启游戏的情况下，忽略服务器端的所有更新
-     * 优点：在玩家未关闭游戏前提，每个子游戏只会进行一次更新
-     * 缺点: 每个子游戏只能更新一次，不能时时保证进入子游戏的代码及资源为最新版本
-     *  */
-    Normal,
-    /**@description 不管子游戏戏代码是否已经加载
-     * 都先会检测更新，去服务器拉取到最新的代码及资源
-     * 优点 : 本地的代码始终保持最新
-     * 缺点 : 当玩家已经进入了该游戏，下次在进入该游戏时，
-     * 发现有新的版本，此时下载完成新版本的资源及代码后，会造成应用重启
-     */
-    CheckUpdate,
-}
-
 export class GameConfig {
-    /**@description 游戏子包名 */
-    subpackageName: string = "";
+    /**@description Bundle名 */
+    bundle: string = "";
     /**@description 游戏名 */
     gameName: string = "";
     /**@description h5是否加载子游戏完成 */
     isLoaded = false;
     index = 0;
-    constructor( gameName : string , subpackageName : string , index : number){
+    constructor( gameName : string , bundle : string , index : number){
         this.gameName = gameName;
-        this.subpackageName = subpackageName;
+        this.bundle = bundle;
         this.index = index;
         this.isLoaded = false;
     }
@@ -141,9 +123,6 @@ class _HotUpdate {
     private storagePath = "";
     /**@description 是否在热更新中或检测更新状态 */
     private updating = false;
-
-    /**@description 子游戏更新类型 */
-    public subGameUpdateType = SubGameUpdateType.Normal;
 
     private _commonHotUpdateUrl = Config.TEST_HOT_UPDATE_URL_ROOT;//"http://10.99.50.118/ddzserver";
     /**@description 通用的热更新地址，当在子游戏或大厅未指定热更新地址时，都统一使用服务器传回来的默认全局更新地址 */
@@ -226,6 +205,8 @@ class _HotUpdate {
     /**@description 释放资源管理器，默认为hall 大厅资源管理器 */
     destroyAssetsManager(name: string = HALL_ASSETS_MANAGER_NAME) {
         if (this.assetsManagers[name]) {
+            cc.log("destroyAssetsManager : " + name);
+            this.currentAssetsManager = null;
             delete this.assetsManagers[name];
         }
     }
@@ -265,7 +246,7 @@ class _HotUpdate {
     }
 
     /**@description 判断是否需要重新尝试下载之前下载失败的文件 */
-    private isTryDownloadFailedAssets() {
+    private isTryDownloadFailedAssets( ) {
         if (this.currentAssetsManager &&
             this.currentAssetsManager.manager.getState() == AssetManagerState.FAIL_TO_UPDATE &&
             this.currentAssetsManager.code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST &&
@@ -276,8 +257,13 @@ class _HotUpdate {
         return false;
     }
 
+    /**@description 是否是预览或浏览器 */
+    public get isBrowser( ){
+        return cc.sys.platform == cc.sys.WECHAT_GAME || CC_PREVIEW || cc.sys.isBrowser;
+    }
+
     private isNeedUpdate( callback: (code: AssetManagerCode, state: AssetManagerState) => void ){
-        if( cc.sys.platform == cc.sys.WECHAT_GAME || CC_PREVIEW || cc.sys.isBrowser ){
+        if( this.isBrowser ){
             //预览及浏览器下，不需要有更新的操作
             this.updating = false;
             callback(AssetManagerCode.ALREADY_UP_TO_DATE, AssetManagerState.UP_TO_DATE);
@@ -516,6 +502,7 @@ class _HotUpdate {
             jsb.fileUtils.setSearchPaths(searchPaths);
         }
 
+        let state = this.currentAssetsManager.manager.getState();
         if (this.currentAssetsManager.name == HALL_ASSETS_MANAGER_NAME) {
             if (isUpdateFinished) {
                 this.currentAssetsManager.manager.setEventCallback(null);
@@ -525,24 +512,15 @@ class _HotUpdate {
                 if (event.getDownloadedFiles() > 0) {
                     cc.game.restart();
                 }
+                //下载完成 删除资源管理器
+                this.destroyAssetsManager(this.currentAssetsManager.name);
             }
         } else {
             //子游戏更新
             if (isUpdateFinished) {
-                if (event.getDownloadedFiles() > 0) {
-                    //已经加载过子游戏代码，如果需要使用到最新，需要重启app才能是最新的代码
-                    if (this.allGameConfig[this.currentAssetsManager.name].isLoaded) {
-                        cc.log(`已经加载过游戏代码，需要重启app生效`);
-                        isUpdateFinished = true;
-                        cc.game.restart();
-                    } else {
-                        //没有加载过子游戏代码
-                        cc.log(`第一次加载子游戏代码，不需要重启`);
-                        isUpdateFinished = false;
-                    }
-                } else {
-                    isUpdateFinished = false;
-                }
+                cc.log(`${this.currentAssetsManager.name} 下载资源数 : ${event.getDownloadedFiles()}`)
+                //下载完成 删除资源管理器
+                this.destroyAssetsManager(this.currentAssetsManager.name);
             }
         }
 
@@ -555,7 +533,7 @@ class _HotUpdate {
                 event.getPercent(),
                 event.getPercentByFile(),
                 event.getEventCode(),
-                this.currentAssetsManager.manager.getState(),
+                state,
                 isUpdateFinished
             );
         }

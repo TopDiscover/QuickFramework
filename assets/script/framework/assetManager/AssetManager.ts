@@ -169,6 +169,20 @@ export class AssetManager {
         return null;
     }
 
+    /**@description 加载bundle */
+    public loadBundle(nameOrUrl: string, onComplete: (err: Error, bundle: cc.AssetManager.Bundle) => void): void{
+        cc.assetManager.loadBundle(nameOrUrl,onComplete);
+    }
+
+    /**@description 移除bundle */
+    public removeBundle( bundle : BUNDLE_TYPE ){
+        let result = this.getBundle(bundle);
+        if( result ){
+            Manager.cacheManager.removeBundle(bundle);
+            cc.assetManager.removeBundle(result);
+        }
+    }
+
     public load(
         bundle: BUNDLE_TYPE,
         path: string,

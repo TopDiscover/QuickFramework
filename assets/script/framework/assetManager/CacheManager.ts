@@ -271,14 +271,25 @@ export class CacheManager {
         }
     }
 
+    /**
+     * @description 
+     * @param bundle bundle
+     * @param path path
+     */
     public remove(bundle: BUNDLE_TYPE, path: string) {
         let bundleName = this.getBundleName(bundle);
-        if (bundleName) {
-            if (this._bundles.has(bundleName)) {
-                return this._bundles.get(bundleName).remove(path);
-            }
+        if (bundleName && this._bundles.has(bundleName) ) {
+            return this._bundles.get(bundleName).remove(path);
         }
         return false;
+    }
+
+    public removeBundle( bundle : BUNDLE_TYPE ){
+        let bundleName = this.getBundleName(bundle);
+        if (bundleName && this._bundles.has(bundleName) ) {
+            if( CC_DEBUG ) cc.log(`移除bundle cache : ${bundleName}`)
+            this._bundles.delete(bundleName);
+        }
     }
 
     private _getGetCacheByAsyncArgs(): { url: string, type: typeof cc.Asset, bundle: BUNDLE_TYPE } {
