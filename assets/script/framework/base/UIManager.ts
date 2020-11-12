@@ -192,7 +192,10 @@ export class UIManager {
      * @param config.type UIView
      * @param config.zIndex 节点层级，默认为0
      * @param config.args 传入的参数列表
-     * @param config.delay >0 多少时间未加载界面完成显示加载动画，<=0 | undefined | null 不显示动画
+     * @param config.delay 
+     * delay > 0 时间未加载界面完成显示加载动画，
+     * delay = 0 则不显示加载动画，但仍然会显示UILoading,在加载界面时阻挡玩家的触摸事件
+     * delay 其它情况以UILoading的默认显示时间为准
      * @param config.name 界面名字，如 商城 首充
      * @example 示例
      * Manager.uiManager.open({type:GameLayer});

@@ -35,7 +35,11 @@ export default class UILoading extends UILoadingDelegate {
     * @param delay 延迟显示时间 当为null时，不会显示loading进度，但会显示阻隔层 >0时为延迟显示的时间
     */
     public show( delay : number ,name : string) {
-        this.delay = delay;
+        if( delay == undefined || delay == null || delay < 0 ){
+            this.delay = Config.LOAD_VIEW_DELAY;
+        }else{
+            this.delay = delay;
+        }
         this._uiName = name;
         this._show();
     }
@@ -60,7 +64,7 @@ export default class UILoading extends UILoadingDelegate {
             this.text = cc.find("text", this.content).getComponent(cc.Label);
             this.text.string = "0%";
             this.content.opacity = 0;
-            if ( this.delay != null && this.delay != undefined && this.delay > 0 ){
+            if ( this.delay > 0 ){
                 cc.tween(this.content).delay(this.delay).set({ opacity: 255 }).start();
             }
             //第一次在预置体没加载好就被隐藏

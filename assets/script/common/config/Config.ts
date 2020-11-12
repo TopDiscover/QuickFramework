@@ -28,6 +28,13 @@ export namespace Config {
 
     /**@description 加载界面超时时间,如果在LOAD_VIEW_TIME_OUT秒未加载出，提示玩家加载界面超时 */
     export const LOAD_VIEW_TIME_OUT = 20;
+
+    /**@description UILoading显示默认时间，即在打开界面时，如果界面在LOAD_VIEW_DELAY之内未显示，就会弹出一的加载界面的进度 
+     * 在打开界面时，也可直接指定delay的值
+     * @example  
+     * Manager.uiManager.open({ type : LoginLayer, zIndex: ViewZOrder.zero, delay : 0.2});
+     */
+    export const LOAD_VIEW_DELAY = 0.1;
 }
 
 /**
