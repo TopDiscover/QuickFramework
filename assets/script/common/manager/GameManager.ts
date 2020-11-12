@@ -71,17 +71,8 @@ export class GameManager {
             HotUpdate.downloadFailedAssets();
          } else if (code == AssetManagerCode.ALREADY_UP_TO_DATE) {
             //已经是最新版本
-            if ( HotUpdate.isBrowser ) {
-               //h5端如果已经加载，直接使用现在加载的
-               if( versionInfo.isLoaded ){
-                  self.onGameReady();
-               }else{
-                  self.loadBundle();
-               }
-            } else {
-               //以最新的bundle为准
-               self.loadBundle();
-            }
+            //以最新的bundle为准
+            self.loadBundle();
          } else if (code == AssetManagerCode.ERROR_DOWNLOAD_MANIFEST ||
             code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||
             code == AssetManagerCode.ERROR_PARSE_MANIFEST) {
@@ -115,10 +106,8 @@ export class GameManager {
          if (err) {
             cc.error(`load bundle : ${versionInfo.bundle} fail !!!`);
             Manager.tips.show(String.format(i18n.updateFaild,versionInfo.gameName));
-            versionInfo.isLoaded = false;
          } else {
             cc.log(`load bundle : ${versionInfo.bundle} success !!!`);
-            versionInfo.isLoaded = true;
             this.loadedBundle.push(versionInfo.bundle);
             me.onGameReady();
          }

@@ -99,14 +99,11 @@ export class GameConfig {
     bundle: string = "";
     /**@description 游戏名 */
     gameName: string = "";
-    /**@description h5是否加载子游戏完成 */
-    isLoaded = false;
     index = 0;
     constructor( gameName : string , bundle : string , index : number){
         this.gameName = gameName;
         this.bundle = bundle;
         this.index = index;
-        this.isLoaded = false;
     }
  }
 

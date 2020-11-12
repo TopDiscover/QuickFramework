@@ -123,8 +123,8 @@ export default class HallView extends UIView{
         //根据自己的需要，连接网络
 
         //proto
-        LobbyService.instance.messageHeader = ProtoMessageHeader;
-        LobbyService.instance.heartbeat = HeartbeatProto;
+        // LobbyService.instance.messageHeader = ProtoMessageHeader;
+        // LobbyService.instance.heartbeat = HeartbeatProto;
 
         //json
         // LobbyService.instance.messageHeader = JsonMessageHeader;
@@ -134,7 +134,7 @@ export default class HallView extends UIView{
         // LobbyService.instance.messageHeader = BinaryStreamMessageHeader;
         // LobbyService.instance.heartbeat = HeartbeatBinary;
 
-        LobbyService.instance.connect("echo.websocket.org");
+        // LobbyService.instance.connect("echo.websocket.org");
     }
 
      bindingEvents(){
