@@ -54,7 +54,7 @@ export default class GameOneView extends UIView {
         
         btnLoad.on(cc.Node.EventType.TOUCH_END,()=>{
             icon.getComponent(cc.Sprite).loadRemoteImage({
-                url:"https://www.baidu.com/img/flexible/logo/pc/result1.png",
+                url:"https://www.baidu.com/img/flexible/logo/pc/result.png",
                 view:this,
                 bundle:BUNDLE_REMOTE,
                 defaultSpriteFrame:"texture/tiger",
