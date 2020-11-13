@@ -1,6 +1,6 @@
 import UIView from "../../../script/framework/ui/UIView";
 import { LogicEvent, dispatchEnterComplete, LogicType } from "../../../script/common/event/LogicEvent";
-import { BUNDLE_REMOTE, ResourceInfo } from "../../../script/framework/base/Defines";
+import { BUNDLE_REMOTE, ResourceInfo, BUNDLE_RESOURCES } from "../../../script/framework/base/Defines";
 import { Manager } from "../../../script/framework/Framework";
 import GameOne1 from "./GameOne1";
 import { ViewZOrder } from "../../../script/common/config/Config";
@@ -81,9 +81,10 @@ export default class GameOneView extends UIView {
             let sp = node.addComponent(cc.Sprite);
 
             sp.loadImage({
-                url:"texture/tiger",
-                view:this,
-                bundle:this.bundle,
+                url:"hall/texture/hall_bottom",
+                // view:this,
+                view:Manager.retainMemory, //把该资源常驻内存
+                bundle:BUNDLE_RESOURCES,
                 completeCallback:(data)=>{
                     cc.log("下载完成")
                 }

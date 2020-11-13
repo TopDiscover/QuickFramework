@@ -12,6 +12,9 @@ import UILoadingDelegate from "./ui/UILoadingDelegate";
 /**@description 框架层使用的各管理器单例的管理 */
 export class _FramewokManager{
     
+    /**@description 常驻资源指定的模拟view */
+    get retainMemory() { return this.uiManager.retainMemory; }
+
     /**@description 语言包 */
     get language( ){
         return getSingleton(Language);
