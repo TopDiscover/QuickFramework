@@ -36,6 +36,7 @@ declare module cc {
 		 * @param url 网络地址，如 : http://tools.itharbors.com/res/logo.png
 		 * @param completeCallback 加载完成回调
 		 * @param defaultSpriteFrame 加载图片失败后，使用的默认图片,当传入string时，会动态加载该默认图片
+		 * @param defaultBundle 若指定了defaultSpriteFrame，不指定defaultBundle ,优先使用view.bundle,否则则为resources目录
 		 * @param isNeedCache 是否需要缓存到本地,如果不需要，每次都会从网络拉取资源,默认都会缓存到本地
 		 * @param config.retain 远程加载的资源是否驻留在内存中,默认都不驻留内存
 		 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
@@ -60,6 +61,7 @@ declare module cc {
 			view: any, 
 			completeCallback?: (data: cc.SpriteFrame) => void, 
 			defaultSpriteFrame?: string, 
+			defaultBundle?:BUNDLE_TYPE,
 			isNeedCache?: boolean , 
 			retain? : boolean,
 			bundle?:BUNDLE_TYPE

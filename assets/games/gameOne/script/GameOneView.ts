@@ -53,14 +53,15 @@ export default class GameOneView extends UIView {
 
         
         btnLoad.on(cc.Node.EventType.TOUCH_END,()=>{
-            // icon.getComponent(cc.Sprite).loadRemoteImage({
-            //     url:"https://www.baidu.com/img/flexible/logo/pc/result.png",
-            //     view:this,
-            //     bundle:BUNDLE_REMOTE,
-            //     completeCallback:()=>{
-            //         cc.log("下载完成")
-            //     }
-            // })
+            icon.getComponent(cc.Sprite).loadRemoteImage({
+                url:"https://www.baidu.com/img/flexible/logo/pc/result1.png",
+                view:this,
+                bundle:BUNDLE_REMOTE,
+                defaultSpriteFrame:"texture/tiger",
+                completeCallback:()=>{
+                    cc.log("下载完成")
+                }
+            })
             // let spine = cc.find("spine",this.node).getComponent(sp.Skeleton);
             // spine.loadRemoteSkeleton({
             //     view:this,
@@ -73,25 +74,26 @@ export default class GameOneView extends UIView {
             //     }
             // })
 
-            if( this.testNode ){
-                return;
-            }
+            // if( this.testNode ){
+            //     return;
+            // }
 
-            let node = new cc.Node();
-            let sp = node.addComponent(cc.Sprite);
+            // let node = new cc.Node();
+            // let sp = node.addComponent(cc.Sprite);
 
-            sp.loadImage({
-                url:"hall/texture/hall_bottom",
-                // view:this,
-                view:Manager.retainMemory, //把该资源常驻内存
-                bundle:BUNDLE_RESOURCES,
-                completeCallback:(data)=>{
-                    cc.log("下载完成")
-                }
-            })
+            // sp.loadImage({
+            //     // url:"hall/texture/hall_bottom",
+            //     url:"texture/tiger",
+            //     // view:this,
+            //     view:Manager.retainMemory, //把该资源常驻内存
+            //     bundle:this.bundle,
+            //     completeCallback:(data)=>{
+            //         cc.log("下载完成")
+            //     }
+            // })
 
-            this.node.addChild(node);
-            this.testNode = node;
+            // this.node.addChild(node);
+            // this.testNode = node;
             
         });
 

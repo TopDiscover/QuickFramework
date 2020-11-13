@@ -54,6 +54,7 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
         isRetain = true;
     }
     let bundle = getBundle(config);
+    let defaultBundle = getBundle({bundle:config.defaultBundle,view:config.view})
     Manager.assetManager.remote.loadImage(config.url, config.isNeedCache).then((data) => {
         if (data) {
             setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback,bundle, ResourceType.Remote, isRetain);
@@ -61,8 +62,8 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
             if (config.defaultSpriteFrame) {
                 if (typeof config.defaultSpriteFrame == "string") {
                     //动态加载了一张图片，把资源通知管理器
-                    Manager.cacheManager.getCacheByAsync(config.defaultSpriteFrame,cc.SpriteFrame,bundle).then((spriteFrame) => {
-                        setSpriteSpriteFrame(config.view, config.defaultSpriteFrame, me, spriteFrame, config.completeCallback,bundle);
+                    Manager.cacheManager.getCacheByAsync(config.defaultSpriteFrame,cc.SpriteFrame,defaultBundle).then((spriteFrame) => {
+                        setSpriteSpriteFrame(config.view, config.defaultSpriteFrame, me, spriteFrame, config.completeCallback,defaultBundle);
                     });
                 }
             }
