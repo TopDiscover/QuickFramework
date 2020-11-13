@@ -151,6 +151,7 @@ class RemoteCaches {
                 } else {
                     cache.retain = info.retain;
                 }
+                info.data.addRef();
                 cache.refCount++;
                 if (cache.retain) {
                     cache.refCount = 999999;
@@ -180,6 +181,8 @@ class RemoteCaches {
 
         //先删除精灵帧
         if (this._spriteFrameCaches.has(url)) {
+            //先释放引用计数
+            this._spriteFrameCaches.get(url).data.decRef();
             this._spriteFrameCaches.delete(url);
             if (CC_DEBUG) cc.log(`remove remote sprite frames resource url : ${url}`);
         }
@@ -191,15 +194,13 @@ class RemoteCaches {
             this.remove(`${cache.info.url}.png`);
             this.remove(`${cache.info.url}.json`);
         }
-        let success = this._caches.delete(url);
-        if (success) {
-            if (CC_JSB && cache && cache.data instanceof cc.Asset ) {
-                if (CC_DEBUG) cc.log(`释放加载的本地远程资源:${cache.info.url}`);
-                cc.assetManager.releaseAsset(cache.data);
-            }
-            if (CC_DEBUG) cc.log(`remove remote cache url : ${url}`);
+        if (cache && cache.data instanceof cc.Asset) {
+            if (CC_DEBUG) cc.log(`释放加载的本地远程资源:${cache.info.url}`);
+            cache.data.decRef();
+            cc.assetManager.releaseAsset(cache.data);
         }
-        return success;
+        if (CC_DEBUG) cc.log(`remove remote cache url : ${url}`);
+        return this._caches.delete(url);
     }
 
     showCaches() {
@@ -464,5 +465,7 @@ export class CacheManager {
             value.print();
             if( CC_DEBUG) cc.log(`----------------Bundle ${key} caches end----------------`)
         });
+
+        this.remoteCaches.showCaches();
     }
 }

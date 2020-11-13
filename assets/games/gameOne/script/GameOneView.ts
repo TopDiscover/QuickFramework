@@ -53,26 +53,26 @@ export default class GameOneView extends UIView {
 
         
         btnLoad.on(cc.Node.EventType.TOUCH_END,()=>{
-            icon.getComponent(cc.Sprite).loadRemoteImage({
-                url:"https://www.baidu.com/img/flexible/logo/pc/result.png",
-                view:this,
-                bundle:BUNDLE_REMOTE,
-                defaultSpriteFrame:"texture/tiger",
-                completeCallback:()=>{
-                    cc.log("下载完成")
-                }
-            })
-            // let spine = cc.find("spine",this.node).getComponent(sp.Skeleton);
-            // spine.loadRemoteSkeleton({
+            // icon.getComponent(cc.Sprite).loadRemoteImage({
+            //     url:"https://www.baidu.com/img/flexible/logo/pc/result.png",
             //     view:this,
-            //     path:"http://192.168.3.104/hotupdate",
-            //     name:"VIP_CX1",
-            //     completeCallback:( data : sp.SkeletonData)=>{
-            //         spine.animation = 'loop';
-            //         spine.premultipliedAlpha = false;
-            //         spine.loop = true
+            //     bundle:BUNDLE_REMOTE,
+            //     defaultSpriteFrame:"texture/tiger",
+            //     completeCallback:()=>{
+            //         cc.log("下载完成")
             //     }
             // })
+            let spine = cc.find("spine",this.node).getComponent(sp.Skeleton);
+            spine.loadRemoteSkeleton({
+                view:this,
+                path:"http://192.168.3.104/hotupdate",
+                name:"VIP_CX1",
+                completeCallback:( data : sp.SkeletonData)=>{
+                    spine.animation = 'loop';
+                    spine.premultipliedAlpha = false;
+                    spine.loop = true
+                }
+            })
 
             // if( this.testNode ){
             //     return;

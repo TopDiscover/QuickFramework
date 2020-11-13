@@ -126,6 +126,7 @@ class RemoteLoader {
                     cache.isLoaded = true;
                     if (data) {
                         cache.data = data;
+                        cache.data.addRef();
                         if ( CC_DEBUG ) cc.log(`${this._logTag}加载远程资源完成:${url}`);
                     }
                     else {
