@@ -79,6 +79,7 @@ class ToastItem extends cc.Component {
                     (finish: number, total: number, item: cc.AssetManager.RequestItem)=>{},
                     (data : ResourceCacheData)=>{
                     if ( data && data.data && data.data instanceof cc.Prefab ){
+                        Manager.assetManager.addPersistAsset(Config.CommonPrefabs.tips,data.data,BUNDLE_RESOURCES);
                         this._prefab = data.data;
                         resolve(true);
                     }else{

@@ -319,6 +319,7 @@ export default class Alert {
                         this._isLoadingPrefab = false;
                         if (data && data.data && data.data instanceof cc.Prefab) {
                             this.prefab = data.data;
+                            Manager.assetManager.addPersistAsset(Config.CommonPrefabs.alert,data.data,BUNDLE_RESOURCES);
                             if (this.finishLoadCb) {
                                 this.finishLoadCb(true);
                                 this.finishLoadCb = null;

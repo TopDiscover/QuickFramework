@@ -8,10 +8,10 @@ class ResourceCache {
         let invalidContent = [];
         this._caches.forEach((data, key, source) => {
             let itemContent = { 
-                url: data.url, 
+                url: data.info.url, 
                 isLoaded: data.isLoaded, 
                 isValid: cc.isValid(data.data), 
-                assetType: cc.js.getClassName(data.assetType), 
+                assetType: cc.js.getClassName(data.info.type), 
                 data: data.data ? cc.js.getClassName(data.data) : null, 
                 status: data.status }
             let item = { url: key, data: itemContent };
@@ -38,14 +38,10 @@ class ResourceCache {
         this.name = name;
     }
 
-    private isInvalid(cache: ResourceCacheData) {
-        return cache.isLoaded && cache.data && !cc.isValid(cache.data);
-    }
-
     public get(path: string, isCheck: boolean): ResourceCacheData {
         if (this._caches.has(path)) {
             let cache = this._caches.get(path);
-            if (isCheck && this.isInvalid(cache)) {
+            if (isCheck && cache.isInvalid) {
                 //资源已经释放
                 cc.warn(`资源加载完成，但已经被释放 , 重新加载资源 : ${path}`);
                 this.remove(path);
@@ -62,6 +58,10 @@ class ResourceCache {
 
     public remove(path: string) {
         return this._caches.delete(path);
+    }
+
+    public get size(){
+        return this._caches.size;
     }
 }
 
@@ -111,7 +111,7 @@ class RemoteCaches {
             let cache = new ResourceCacheData();
             cache.data = new cc.SpriteFrame(data);
             cache.isLoaded = true;
-            cache.url = url;
+            cache.info.url = url;
             this._spriteFrameCaches.set(url, cache);
             return <cc.SpriteFrame>(cache.data);
         }
@@ -119,7 +119,7 @@ class RemoteCaches {
     }
 
     public set(url: string , data: ResourceCacheData) {
-        data.url = url;
+        data.info.url = url;
         this._caches.set(url, data);
     }
 
@@ -187,14 +187,14 @@ class RemoteCaches {
         let cache = this._caches.has(url) ? this._caches.get(url) : null;
         if (cache && cache.data instanceof sp.SkeletonData) {
             //这里面需要删除加载进去的三个文件缓存 
-            this.remove(`${cache.url}.atlas`);
-            this.remove(`${cache.url}.png`);
-            this.remove(`${cache.url}.json`);
+            this.remove(`${cache.info.url}.atlas`);
+            this.remove(`${cache.info.url}.png`);
+            this.remove(`${cache.info.url}.json`);
         }
         let success = this._caches.delete(url);
         if (success) {
             if (CC_JSB && cache && cache.data instanceof cc.Asset ) {
-                if (CC_DEBUG) cc.log(`释放加载的本地远程资源:${cache.url}`);
+                if (CC_DEBUG) cc.log(`释放加载的本地远程资源:${cache.info.url}`);
                 cc.assetManager.releaseAsset(cache.data);
             }
             if (CC_DEBUG) cc.log(`remove remote cache url : ${url}`);
@@ -208,7 +208,7 @@ class RemoteCaches {
         let content = [];
         let invalidContent = [];
         this._spriteFrameCaches.forEach((data, key, source) => {
-            let itemContent = { url: data.url, isLoaded: data.isLoaded, isValid: cc.isValid(data.data), assetType: cc.js.getClassName(data.assetType), data: data.data ? cc.js.getClassName(data.data) : null, status: data.status };
+            let itemContent = { url: data.info.url, isLoaded: data.isLoaded, isValid: cc.isValid(data.data), assetType: cc.js.getClassName(data.info.type), data: data.data ? cc.js.getClassName(data.data) : null, status: data.status };
             let item = { url: key, data: itemContent };
             if (data.isLoaded && ((data.data && !cc.isValid(data.data)) || !data.data)) {
                 invalidContent.push(item);
@@ -230,7 +230,7 @@ class RemoteCaches {
         content = [];
         invalidContent = [];
         this._caches.forEach((data, key, source) => {
-            let itemContent = { url: data.url, isLoaded: data.isLoaded, isValid: cc.isValid(data.data), assetType: cc.js.getClassName(data.assetType), data: data.data ? cc.js.getClassName(data.data) : null, status: data.status }
+            let itemContent = { url: data.info.url, isLoaded: data.isLoaded, isValid: cc.isValid(data.data), assetType: cc.js.getClassName(data.info.type), data: data.data ? cc.js.getClassName(data.data) : null, status: data.status }
             let item = { url: key, data: itemContent };
             if (data.isLoaded && data.data && !cc.isValid(data.data)) {
                 invalidContent.push(item);
@@ -315,7 +315,13 @@ export class CacheManager {
     public removeBundle( bundle : BUNDLE_TYPE ){
         let bundleName = this.getBundleName(bundle);
         if (bundleName && this._bundles.has(bundleName) ) {
-            if( CC_DEBUG ) cc.log(`移除bundle cache : ${bundleName}`)
+            if( CC_DEBUG ) {
+                cc.log(`移除bundle cache : ${bundleName}`)
+                let data = this._bundles.get(bundleName);
+                if( data.size > 0 ){
+                    cc.error(`移除bundle ${bundleName} 还有未释放的缓存`);
+                }
+            }
             this._bundles.delete(bundleName);
         }
     }
@@ -361,7 +367,7 @@ export class CacheManager {
                         if (cache.data instanceof _args.type) {
                             resolve(cache.data);
                         } else {
-                            if (CC_DEBUG) cc.error(`${this.logTag}传入类型:${cc.js.getClassName(_args.type)}与资源实际类型: ${cc.js.getClassName(cache.data)}不同 url : ${cache.url}`);
+                            if (CC_DEBUG) cc.error(`${this.logTag}传入类型:${cc.js.getClassName(_args.type)}与资源实际类型: ${cc.js.getClassName(cache.data)}不同 url : ${cache.info.url}`);
                             resolve(null);
                         }
                     } else {

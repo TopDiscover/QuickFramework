@@ -68,15 +68,8 @@ export default class MainController extends Controller<CommonService> {
         cc.game.on(cc.game.EVENT_HIDE,this.onEnterBackground,this);
         cc.game.on(cc.game.EVENT_SHOW,this.onEnterForgeground,this);
 
-        cc.director.on(cc.Director.EVENT_AFTER_DRAW,this._onDirectorAfterDraw,this);
-
         //逻辑管理器
         Manager.logicManager.onLoad(this.node);
-    }
-
-    /**@description 游戏完成一次渲染过程之后 */
-    private _onDirectorAfterDraw( ){
-        Manager.uiManager.onDirectorAfterDraw();
     }
 
     update(){

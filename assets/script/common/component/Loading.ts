@@ -154,6 +154,7 @@ export default class Loading {
                 (data: ResourceCacheData) => {
                 this._isLoadingPrefab = false;
                 if (data && data.data && data.data instanceof cc.Prefab) {
+                    Manager.assetManager.addPersistAsset(Config.CommonPrefabs.loading,data.data,BUNDLE_RESOURCES)
                     this._node = cc.instantiate(data.data);
                     resolove(true);
                 }

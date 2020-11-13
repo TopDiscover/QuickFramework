@@ -55,9 +55,9 @@ class RemoteLoader {
                     }
                 } else {
                     cache = new ResourceCacheData();
-                    cache.resourceType = ResourceType.Remote;
-                    cache.assetType = sp.SkeletonData;
-                    cache.bundle = BUNDLE_REMOTE;
+                    cache.info.resourceType = ResourceType.Remote;
+                    cache.info.type = sp.SkeletonData;
+                    cache.info.bundle = BUNDLE_REMOTE;
                     Manager.cacheManager.remoteCaches.set(url,cache);
                     me._loadRemoteRes(spinePng,cc.Texture2D, isNeedCache).then((texture:cc.Texture2D) => {
                         if (texture) {
@@ -73,8 +73,8 @@ class RemoteLoader {
                                             let pngName = name + ".png"
                                             asset["textureNames"] = [pngName];
 
-                                            cache.url = url;
-                                            asset.name = cache.url;
+                                            cache.info.url = url;
+                                            asset.name = url;
                                             cache.data = asset;
                                             cache.isLoaded = true;
                                             resolve(<sp.SkeletonData>(cache.data));
@@ -119,8 +119,8 @@ class RemoteLoader {
             } else {
                 //没有缓存存在,生成加载缓存
                 cache = new ResourceCacheData();
-                cache.resourceType = ResourceType.Remote;
-                cache.assetType = type;
+                cache.info.resourceType = ResourceType.Remote;
+                cache.info.type = type;
                 Manager.cacheManager.remoteCaches.set(url, cache);
                 cc.assetManager.loadRemote(url,(error,data)=>{
                     cache.isLoaded = true;
@@ -211,11 +211,11 @@ export class AssetManager {
             }else{
                 //无缓存信息
                 cache = new ResourceCacheData();
-                cache.url = path;
-                cache.assetType = type;
-                cache.bundle = bundle;
+                cache.info.url = path;
+                cache.info.type = type;
+                cache.info.bundle = bundle;
                 Manager.cacheManager.set(bundle,path,cache);
-                cc.time(`加载资源 : ${cache.url}`);
+                cc.time(`加载资源 : ${cache.info.url}`);
                 let _bundle = this.getBundle(bundle);
                 if (!_bundle ){
                     //如果bundle不存在
@@ -241,14 +241,14 @@ export class AssetManager {
         //添加引用关系
         let tempCache = cache;
         if (err) {
-            cc.error(`${this.logTag}加载资源失败:${cache.url} 原因:${err.message ? err.message : "未知"}`);
+            cc.error(`${this.logTag}加载资源失败:${cache.info.url} 原因:${err.message ? err.message : "未知"}`);
             cache.data = null;
             tempCache.data = null;
-            Manager.cacheManager.remove(cache.bundle,cache.url);
+            Manager.cacheManager.remove(cache.info.bundle,cache.info.url);
             completeCallback(cache);
         }
         else {
-            if (CC_DEBUG) cc.log(`${this.logTag}加载资源成功:${cache.url}`);
+            if (CC_DEBUG) cc.log(`${this.logTag}加载资源成功:${cache.info.url}`);
             cache.data = data;
             tempCache.data = data;
             completeCallback(cache);
@@ -259,29 +259,84 @@ export class AssetManager {
         cache.doGet(tempCache.data);
 
         if (cache.status == ResourceCacheStatus.WAITTING_FOR_RELEASE) {
-            if (CC_DEBUG) cc.warn(this.logTag, `资源:${cache.url}加载完成，但缓存状态为等待销毁，销毁资源`);
+            if (CC_DEBUG) cc.warn(this.logTag, `资源:${cache.info.url}加载完成，但缓存状态为等待销毁，销毁资源`);
             if (cache.data) {
                 cache.status = ResourceCacheStatus.NONE;
                 let info = new ResourceInfo;
-                info.url = cache.url;
-                info.type = cache.assetType;
+                info.url = cache.info.url;
+                info.type = cache.info.type;
                 info.data = cache.data;
-                info.bundle = cache.bundle;
+                info.bundle = cache.info.bundle;
                 this.releaseAsset(info);
             }
         }
 
-        cc.timeEnd(`加载资源 : ${cache.url}`);
+        cc.timeEnd(`加载资源 : ${cache.info.url}`);
     }
 
     public releaseAsset( info : ResourceInfo ){
-        if ( info.bundle ){
-            Manager.cacheManager.remove(info.bundle,info.url);
-            let bundle = this.getBundle(info.bundle);
-            if ( bundle ){
-                bundle.release(info.url,info.type);
+        if ( info && info.bundle ){
+            let cache = Manager.cacheManager.get(info.bundle,info.url,false);
+            if( !cache ){
+                return;
+            }else{
+                if( cache.isInvalid ){
+                    if( CC_DEBUG ) cc.warn(`资源已经释放 url : ${info.url}`);
+                    return;
+                }
             }
+            if( cache.isLoaded ){
+                if( cache.info.retain ){
+                    if( CC_DEBUG ) cc.log(`常驻资源 url : ${cache.info.url}`);
+                    return;
+                }
+                if( CC_DEBUG ) cc.log(`释放资源 : ${info.bundle}.${info.url}`);
+                Manager.cacheManager.remove(info.bundle,info.url);
+                let bundle = this.getBundle(info.bundle);
+                if ( bundle ){
+                    info && info.data && info.data.decRef();
+                    bundle.release(info.url,info.type);
+                    if( CC_DEBUG ) cc.log(`成功释放资源 : ${info.bundle}.${info.url}`);
+                }
+            }else{
+                cache.status = ResourceCacheStatus.WAITTING_FOR_RELEASE;
+                if( CC_DEBUG ) cc.warn(`${cache.info.url} 正在加载，等待加载完成后进行释放`);
+            }
+            
         }
     }
 
+    public retainAsset( info : ResourceInfo ){
+        if( info ){
+            let cache = Manager.cacheManager.get(info.bundle,info.url)
+            if( cache ){
+                if( CC_DEBUG ){
+                    if( info.data != cache.data ){
+                        cc.error(`错误的retainAsset :${info.url}`);
+                    }
+                }
+                if( !cache.info.retain ){
+                    cache.info.retain = info.retain;
+                }
+                cache.data && cache.data.addRef();
+            }else{
+                if( CC_DEBUG ) cc.error(`retainAsset cache.data is null`);
+            }
+        }else{
+            if ( CC_DEBUG ) cc.error(`retainAsset info is null`);
+        }
+    }
+
+    /**
+     * @description 添加常驻资源
+     * @param prefab 
+     */
+    public addPersistAsset(url: string, data: cc.Asset , bundle : BUNDLE_TYPE ) {
+        let info = new ResourceInfo;
+        info.url = url;
+        info.data = data;
+        info.bundle = bundle;
+        info.retain = true;
+        this.retainAsset(info);
+    }
 }

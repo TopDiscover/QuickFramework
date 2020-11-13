@@ -1,11 +1,4 @@
-/*
- * @Author: your name
- * @Date: 2019-11-20 19:04:21
- * @LastEditTime: 2020-04-01 18:06:09
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: \ddz\assets\framework\loader\Defines.ts
- */
+
 import UIView, { UIClass } from "../ui/UIView";
 
 /**
@@ -27,20 +20,19 @@ export enum ResourceType {
 }
 
 /**@description 资源信息 */
-export class ResourceInfo{
-    url : string = "";
-    type : typeof cc.Asset = null;
-    data : cc.Asset = null;
-    assetUrl : string = "";
+export class ResourceInfo {
+    url: string = "";
+    type: typeof cc.Asset = null;
+    data: cc.Asset = null;
+    assetUrl: string = "";
     /**@description 是否常驻内存，远程加载资源有效 */
-    retain : boolean = false;
-    bundle:BUNDLE_TYPE = null;
+    retain: boolean = false;
+    bundle: BUNDLE_TYPE = null;
+    /**@description 默认为本地资源 */
+    resourceType: ResourceType = ResourceType.Local;
 }
 
 export class ResourceCacheData {
-
-    /**@description 加载资源url地址 */
-    url: string = "";
     /**@description 是否已经加载完成 */
     isLoaded: boolean = false;
     /**@description 加载完成数据 
@@ -56,21 +48,15 @@ export class ResourceCacheData {
      * */
     data: cc.Asset = null;
 
-    /**@description 加载资源类型 */
-    assetType: typeof cc.Asset = null;
+    info: ResourceInfo = new ResourceInfo();
 
     status = ResourceCacheStatus.NONE;
-
-    bundle:BUNDLE_TYPE = null;
 
     /**@description 在加载过程中有地方获取,加载完成后再回调 */
     getCb: ((data: any) => void)[] = [];
 
     /**@description 完成回调，在资源正在加载过程中，又有其它地方调用加载同一个资源，此时需要等待资源加载完成，统一回调 */
     finishCb: ((data: any) => void)[] = [];
-
-    /**@description 默认为本地资源 */
-    resourceType: ResourceType = ResourceType.Local;
 
     public doGet(data) {
         for (let i = 0; i < this.getCb.length; i++) {
@@ -86,6 +72,9 @@ export class ResourceCacheData {
         this.finishCb = [];
     }
 
+    public get isInvalid() {
+        return this.isLoaded && this.data && !cc.isValid(this.data);
+    }
 }
 
 export interface ResourceData {
@@ -100,7 +89,7 @@ export interface ResourceData {
      * 从而会造成消息处理不是顺序执行 
      * */
     preloadView?: UIClass<UIView>,
-    bundle?:BUNDLE_TYPE,
+    bundle?: BUNDLE_TYPE,
 }
 
 /**

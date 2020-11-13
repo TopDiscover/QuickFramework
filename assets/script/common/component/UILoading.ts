@@ -126,6 +126,7 @@ export default class UILoading extends UILoadingDelegate {
                 (data: ResourceCacheData) => {
                 this._isLoadingPrefab = false;
                 if (data && data.data && data.data instanceof cc.Prefab) {
+                    Manager.assetManager.addPersistAsset(Config.CommonPrefabs.uiLoading,data.data,BUNDLE_RESOURCES);
                     this._node = cc.instantiate(data.data);
                     if (this.finishLoadCb) {
                         this.finishLoadCb(true);

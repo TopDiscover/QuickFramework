@@ -19,6 +19,7 @@ export default class GlobalAudio extends AudioComponent {
             if (this.audioData.isMusicOn) {
                 Manager.cacheManager.getCacheByAsync(url, cc.AudioClip,BUNDLE_RESOURCES).then((data) => {
                     if (data) {
+                        Manager.assetManager.addPersistAsset(url,data,BUNDLE_RESOURCES);
                         me.stopMusic();
                         cc.audioEngine.playMusic(data, loop);
                         resolve({ url: url, isSuccess: true });
@@ -36,6 +37,7 @@ export default class GlobalAudio extends AudioComponent {
             if (this.audioData.isEffectOn) {
                 Manager.cacheManager.getCacheByAsync(url, cc.AudioClip,BUNDLE_RESOURCES).then((data) => {
                     if (data) {
+                        Manager.assetManager.addPersistAsset(url,data,BUNDLE_RESOURCES);
                         this.audioData.curEffectId = cc.audioEngine.playEffect(data, loop);
                         resolve(this.audioData.curEffectId);
                     } else {

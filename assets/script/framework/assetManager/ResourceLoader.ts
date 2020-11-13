@@ -119,8 +119,8 @@ export default class ResourceLoader {
                     let cache = new ResourceCacheData();
                     cache.isLoaded = true;
                     cache.data = <any>view;
-                    cache.url = value.preloadView.getPrefabUrl();
-                    cache.bundle = value.bundle;
+                    cache.info.url = value.preloadView.getPrefabUrl();
+                    cache.info.bundle = value.bundle;
                     this._onLoadResourceComplete(cache);
                 })
             }else{
@@ -177,10 +177,11 @@ export default class ResourceLoader {
         if (data && data.data instanceof cc.Asset ) {
             //排除掉界面管理器
             let info = new ResourceInfo;
-            info.url = data.url;
-            info.type = data.assetType;
+            info.url = data.info.url;
+            info.type = data.info.type;
             info.data = data.data;
-            info.bundle = data.bundle;
+            info.bundle = data.info.bundle;
+            Manager.assetManager.retainAsset(info);
             this._loadedResource.set(info.url,info);
         }
 

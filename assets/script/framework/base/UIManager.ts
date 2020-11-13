@@ -23,6 +23,7 @@ class ViewDynamicLoadData {
             }
             if (CC_DEBUG) Manager.uiManager.checkView(info.url, className);
             if (!this.local.has(info.url)) {
+                Manager.assetManager.retainAsset(info);
                 this.local.set(info.url, info);
             }
         }
@@ -167,16 +168,6 @@ export class UIManager {
         return className;
     }
 
-    /**@description GC的间隔时间,目前暂定为进入完成指定场景，后，多少时间内没有界面打开或关闭操作，做GC操作释放内存 */
-    private GC_INTERVAL = 1500;
-    /**@description 最后一次GC操作时间，当打开或关闭界面时，把当前GC时间重置为当前时间
-     * 在进入到大厅1秒后无界面的关闭与打开，做GC内存释放操作
-     */
-    private _lastGCTime = 0;
-
-    /**@description 是否需要做GC操作 */
-    private _isNeedGC = false;
-
     /**@description 无主资源 */
     public garbage = new ViewDynamicLoadData(DYNAMIC_LOAD_GARBAGE);
     /**@description 驻留内存资源 */
@@ -227,9 +218,6 @@ export class UIManager {
                 reslove(null);
                 return;
             }
-
-            //打开界面时，更新GC时间
-            this.recordGCTime();
             let viewData = this.getViewData(uiClass);
             if (viewData) {
                 viewData.isPreload = isPreload;
@@ -284,6 +272,7 @@ export class UIManager {
                         viewData.info.type = cc.Prefab;
                         viewData.info.data = prefab;
                         viewData.info.bundle = bundle;
+                        Manager.assetManager.retainAsset(viewData.info);
                         this.createNode(className, uiClass, reslove, prefab, args, zOrder,bundle);
                         Manager.uiLoading.hide();
                     }).catch((reason) => {
@@ -426,51 +415,6 @@ export class UIManager {
         return root;
     }
 
-    public onDirectorAfterDraw(): boolean {
-        let cando = true;
-        let hasWaitingClose = false;
-        this._viewDatas.forEach((viewData) => {
-            if (viewData) {
-                //只要有一个界面没加载完成，都不能进行处理
-                if (!viewData.isLoaded) cando = false;
-                if (viewData.status == ViewStatus.WAITTING_CLOSE) hasWaitingClose = true;
-            }
-        });
-        if (hasWaitingClose && cando) {
-            cc.time("释放资源");
-            this._viewDatas.forEach((viewData, className) => {
-                if (viewData && viewData.status == ViewStatus.WAITTING_CLOSE) {
-                    cc.time(`${this._logTag} close view : ${className}`);
-                    if (cc.isValid(viewData.node)) {
-                        viewData.node.removeFromParent(false);
-                        viewData.node.destroy();
-                    }
-                    viewData.loadData.clear();
-                    Manager.assetManager.releaseAsset(viewData.info);
-                    this._viewDatas.delete(className);
-                    cc.timeEnd(`${this._logTag} close view : ${className}`);
-                }
-            });
-            //删除无主加载数据
-            this.garbage.clear()
-            cc.timeEnd("释放资源");
-            //此处GC操作另行做优化，不能过度的GC会造成动画的卡顿，需要挑一个比较空闲的时间段来做GC操作
-            //cc.sys.garbageCollect();
-        }
-
-        //GC操作处理
-        if (this._isNeedGC) {
-            let now = Date.timeNowMillisecons();
-            if (now - this._lastGCTime > this.GC_INTERVAL) {
-                //抽时间做GC操作
-                cc.sys.garbageCollect();
-                if (CC_DEBUG) cc.log(`GC内存操作`);
-                this._isNeedGC = false;
-            }
-        }
-        return cando;
-    }
-
     /**@description 添加动态加载的本地资源 */
     public addLocal(info: ResourceInfo, className: string) {
         if (info) {
@@ -491,11 +435,6 @@ export class UIManager {
         }
     }
 
-    public recordGCTime(isNeedGC: boolean = null) {
-        if (isNeedGC != null) this._isNeedGC = isNeedGC;
-        this._lastGCTime = Date.timeNowMillisecons();
-    }
-
     public close<T extends UIView>(uiClass: UIClass<T>);
     public close(className: string);
     public close(data: any) {
@@ -504,9 +443,14 @@ export class UIManager {
         if (viewData) {
             viewData.status = ViewStatus.WAITTING_CLOSE;
             if (viewData.view && cc.isValid(viewData.node)) {
-                viewData.node.removeFromParent(false);
+                viewData.node.removeFromParent(true);
+                viewData.node.destroy();
             }
-            this.recordGCTime();
+            viewData.loadData.clear();
+            let className = this.getClassName(data);
+            Manager.assetManager.releaseAsset(viewData.info);
+            this._viewDatas.delete(className);
+            cc.log(`${this._logTag} close view : ${className}`);
         }
     }
 
