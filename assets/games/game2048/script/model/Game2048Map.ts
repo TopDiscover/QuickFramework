@@ -39,8 +39,5 @@ export default class Game2048Map extends cc.Component {
 
     onDestroy(){
         Game2048.gameData.clearItemCache();
-        super.onDestroy();
     }
-
-    private 
 }

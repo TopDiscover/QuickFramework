@@ -1,5 +1,5 @@
 import GameView from "../../../../script/common/base/GameView";
-import { dispatchEnterComplete, LogicType } from "../../../../script/common/event/LogicEvent";
+import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../script/common/event/LogicEvent";
 import { Game2048 } from "../data/Game2048GameData";
 import Game2048Map from "../model/Game2048Map";
 
@@ -27,6 +27,11 @@ export default class Game2048GameView extends GameView {
         this.score = cc.find("score",this.node).getComponent(cc.Label);
 
         Game2048.gameData.socre = 100;
+
+        let goback = cc.find("goback",this.node);
+        goback.on(cc.Node.EventType.TOUCH_END,()=>{
+            dispatch(LogicEvent.ENTER_HALL);
+        });
 
         dispatchEnterComplete( {type : LogicType.GAME,views:[this] });
     }
