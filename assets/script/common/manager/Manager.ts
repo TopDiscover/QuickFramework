@@ -9,14 +9,13 @@ import { extentionsInit } from "../../framework/extentions/Extentions";
 import { CocosExtentionInit } from "../../framework/extentions/CocosExtention";
 import { LanguageImpl } from "../language/LanguageImpl";
 import { getSingleton } from "../../framework/base/Singleton";
-import { USING_LAN_KEY } from "../../framework/base/Defines";
+import { USING_LAN_KEY, BUNDLE_TYPE, BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import GameView from "../base/GameView";
 import { GameData } from "../base/GameData";
-import { GameManager } from "./GameManager";
+import { BundleManager } from "./GameManager";
 import Tips from "../component/Tips";
 import UILoading from "../component/UILoading";
 import Alert from "../component/Alert";
-import { HallNetHelper } from "../../hall/controller/HallNetHelper";
 import Loading from "../component/Loading";
 
 /**@description 游戏所有运行单例的管理 */
@@ -32,14 +31,9 @@ class _Manager extends Framework._FramewokManager {
         return getSingleton(LogicManager);
     }
 
-    /**@description 大厅的NetHelper*/
-    get netHelper(){
-        return HallNetHelper;
-    }
-
-    /**@description 游戏管理器 */
-    get gameManager() {
-        return getSingleton(GameManager);
+    /**@description bundle管理器 */
+    get bundleManager() {
+        return getSingleton(BundleManager);
     }
 
     /**@description 弹出提示框,带一到两个按钮 */
@@ -86,7 +80,7 @@ class _Manager extends Framework._FramewokManager {
     /**
      * @description 把语言包转换成i18n.xxx形式
      * @param param 语言包配置
-     * @param isUsingAssetBundle 是否使用currentGameBundle进行转换如在某游戏内，需要获取某游戏的语言包路径
+     * @param bundle bundle
      * @example
      * export let TANK_LAN_ZH = {
      * language: cc.sys.LANGUAGE_CHINESE,
@@ -97,24 +91,49 @@ class _Manager extends Framework._FramewokManager {
      * }
      * }
      * //以上是坦克大战的语言包,assetBundle为tankBattle
-     * Manager.makeLanguage("title",true); //=> i18n.tankBattle.title 指向游戏特定的语言包
+     * Manager.makeLanguage("title","tankBattle"); //=> i18n.tankBattle.title 指向游戏特定的语言包
      * Manager.makeLanguage("title"); //=> i18n.title 指向的大厅的公共语言包
      */
-    makeLanguage( param : string | (string | number)[] , isUsingAssetBundle : boolean = false ) : (string | number )[] | string {
+    makeLanguage( param : string | (string | number)[] , bundle : BUNDLE_TYPE = BUNDLE_RESOURCES ) : (string | number )[] | string {
         if ( typeof param == "string" ){
-            if ( isUsingAssetBundle && this.gameData){
-                return `${USING_LAN_KEY}${this.gameData.bundle}.${param}`;
+            if ( bundle){
+                return `${USING_LAN_KEY}${bundle}.${param}`;
             }
             return `${USING_LAN_KEY}${param}`;
         }
         if( typeof param[0] == "string" && param instanceof Array ){
-            if ( isUsingAssetBundle && this.gameData ){
-                param[0] = `${USING_LAN_KEY}${this.gameData.bundle}.${param[0]}`;
+            if ( bundle ){
+                param[0] = `${USING_LAN_KEY}${bundle}.${param[0]}`;
             }else{
                 param[0] = `${USING_LAN_KEY}${param[0]}`;
             }
         }
         return param;
+    }
+
+    /**@description 获取语言包 
+     * 
+     */
+    getLanguage( param : string | (string|number)[], bundle : BUNDLE_TYPE = null) : string {
+        let key = "";
+        if ( typeof param == "string" ){
+            if ( bundle){
+                key = `${USING_LAN_KEY}${bundle}.${param}`;
+            }else{
+                key = `${USING_LAN_KEY}${param}`;
+            }
+            return this.language.get([key]);
+        }
+        if( typeof param[0] == "string" && param instanceof Array ){
+            if ( bundle ){
+                param[0] = `${USING_LAN_KEY}${bundle}.${param[0]}`;
+            }else{
+                param[0] = `${USING_LAN_KEY}${param[0]}`;
+            }
+            return this.language.get(param);
+        }
+        cc.error(`传入参数有误`);
+        return"";
     }
 
     init() {

@@ -76,10 +76,10 @@ export class LogicManager{
                     logic.onEnterComplete(data);
                 }
             }
-            if( data.type == LogicType.HALL){
-                //删除加载的子游戏bundle
-                Manager.gameManager.removeLoadedBundle();
-            }
+            // if( data.type == LogicType.HALL){
+            //     //删除加载的子游戏bundle
+            //     Manager.bundleManager.removeLoadedBundle();
+            // }
         }
     }
 }

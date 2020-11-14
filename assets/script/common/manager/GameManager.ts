@@ -5,13 +5,12 @@ import { Manager } from "../../framework/Framework";
 import { i18n } from "../language/LanguageImpl";
 
 /**
- * @description 子游戏管理器 
- * 子游戏的下载，检测更新，运行子游戏
+ * @description bundle管理器
  */
 
-export class GameManager {
-   private static _instance: GameManager = null;
-   public static Instance() { return this._instance || (this._instance = new GameManager()); }
+export class BundleManager {
+   private static _instance: BundleManager = null;
+   public static Instance() { return this._instance || (this._instance = new BundleManager()); }
    private curGame: GameConfig = null;
    private isLoading = false;
 
@@ -51,7 +50,7 @@ export class GameManager {
       if (this.isLoading) {
          this.isLoading = false;
       }
-      dispatch(LogicEvent.ENTER_GAME, this.curGame.bundle);
+      dispatch(this.curGame.event, this.curGame.bundle);
    }
 
    /**@description 检测子游戏更新 */

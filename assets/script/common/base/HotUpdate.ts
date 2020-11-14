@@ -1,4 +1,5 @@
 import { Config } from "../config/Config";
+import { LogicType, LogicEvent } from "../event/LogicEvent";
 
 interface Manifest {
     /**@description 大厅版本 */
@@ -100,10 +101,15 @@ export class GameConfig {
     /**@description 游戏名 */
     gameName: string = "";
     index = 0;
-    constructor( gameName : string , bundle : string , index : number){
+    /**@description 加载bundle完成后，发出的bundle事件 */
+    event : string = LogicEvent.ENTER_GAME;
+    constructor( gameName : string , bundle : string , index : number,event ?: string){
         this.gameName = gameName;
         this.bundle = bundle;
         this.index = index;
+        if( event ){
+            this.event = event;
+        }
     }
  }
 
