@@ -5,7 +5,7 @@ import { TestBinaryMessage } from "../protocol/CmdBinaryMessage";
 import { HttpPackage, HttpRequestType } from "../../../../script/framework/net/HttpClient";
 import { GameService } from "../../../../script/common/net/GameService";
 
-class _GameHelper extends NetHelper<LobbyService>{
+class _GameHelper extends NetHelper<GameService>{
     constructor() {
         super(GameService.instance);
     }
