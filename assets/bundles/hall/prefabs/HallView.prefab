@@ -3815,7 +3815,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 135.61,
+      "width": 102.25,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -3868,8 +3868,8 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_useOriginalSize": false,
-    "_string": "版本1.0",
-    "_N$string": "版本1.0",
+    "_string": "版本1",
+    "_N$string": "版本1",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,

@@ -18,7 +18,7 @@ export default class LoginView extends UIView {
         super.onLoad();
         this._login = cc.find("login",this.node);
         this._login.on(cc.Node.EventType.TOUCH_END,()=>{
-            Manager.bundleManager.enterGame(new GameConfig("大厅","hall",0,LogicEvent.ENTER_HALL));
+            Manager.bundleManager.enterBundle(new GameConfig("大厅","hall",0,LogicEvent.ENTER_HALL));
         });
         
         dispatchEnterComplete({type:LogicType.LOGIN,views:[this]})

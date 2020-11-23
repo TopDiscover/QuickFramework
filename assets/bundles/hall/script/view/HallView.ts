@@ -31,7 +31,7 @@ export default class HallView extends UIView{
     ];
 
     private onClick( ev : cc.Event.EventTouch ){
-        Manager.bundleManager.enterGame(this.games[ev.target.userData]);
+        Manager.bundleManager.enterBundle(this.games[ev.target.userData]);
     }
 
     onLoad() {
