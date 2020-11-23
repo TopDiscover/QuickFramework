@@ -1,0 +1,13 @@
+{
+    "packageUrl":"http://192.168.3.104/hotupdate",
+    "forceIncludeAllGameToApk": false,
+    "bundles":[
+        {  "id" : "0"    , "name" : "登录"     , "dir" : ""          , "version" : "1" , "includeApk" : false },
+        {  "id" : "1"    , "name" : "大厅"     , "dir" : "hall"          , "version" : "1" , "includeApk" : false },
+        {  "id" : "2"    , "name" : "游戏1"    , "dir" : "gameOne"   , "version" : "1" , "includeApk" : true },
+        {  "id" : "3"    , "name" : "游戏2"    , "dir" : "gameTwo"   , "version" : "1" , "includeApk" : false },
+        {  "id" : "4"    , "name" : "坦克大战"  , "dir" : "tankBattle"   , "version" : "1" , "includeApk" : false },
+        {  "id" : "5"    , "name" : "2048"     , "dir" : "game2048"   , "version" : "1" , "includeApk" : false }
+    ]
+}
+

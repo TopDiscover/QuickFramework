@@ -1,7 +1,7 @@
 <div id="view" class="scroll" xmlns:v-on="http://www.w3.org/1999/xhtml">
     <div class="section" style>
         <ui-section>
-            <div class="header greenColor">大厅生成Manifest配置</div>
+            <div class="header greenColor">主包Manifest配置</div>
             <div class="layout vertical start-justified">
                 <ui-prop name="版本号">
                     <div class="flex-1 layout horizontal center">
@@ -45,7 +45,7 @@
                     </div>
                 </ui-prop>
                 <div class="self-end">
-                    <ui-button class="self-end red" v-on:confirm="onClickDelSubGames">执行子游戏包剔除</ui-button>
+                    <ui-button class="self-end red" v-on:confirm="onClickDelSubGames">执行Bundle剔除</ui-button>
                     <ui-button class="self-end green" v-on:confirm="onClickGenCfg">生成</ui-button>
                     <ui-button class="self-end blue" v-on:confirm="onClickOpenVersionDir"><i
                             class="fa fa-folder-open">打开目录</i></ui-button>
@@ -54,7 +54,7 @@
         </ui-section>
 
         <ui-section>
-            <div class="header greenColor">子游戏生成Manifest配置<div
+            <div class="header greenColor">Bundles Manifest配置<div
                     class="layout horizontal flex-1 center self-end end-justified">
                 </div>
             </div>

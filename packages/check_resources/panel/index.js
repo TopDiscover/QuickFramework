@@ -9,7 +9,7 @@ const Electron = require("electron"),
 //读取界面
 let _template = fs.readFileSync(Editor.url("packages://check_resources/panel/index.html", "utf8")) + "";
 //先读取子游戏配置
-let _gamesPath = `${Editor.argv.panelArgv.path}/packages/config/games.json`;
+let _gamesPath = `${Editor.argv.panelArgv.path}/packages/config/bundles.json`;
 //_gamesPath = path.normalize(_gamesPath);
 let _gamesConfig = fs.readFileSync(_gamesPath);
 _gamesConfig = JSON.parse(_gamesConfig);
@@ -19,11 +19,11 @@ let _subGameVersion = {};
 let _subGameServerVersionView = ``;
 let _subGameDir = {};
 let _subGameName = {};
-for (let i = 0; i < _gamesConfig.games.length; i++) {
-    let gameInfo = _gamesConfig.games[i];
+for (let i = 0; i < _gamesConfig.bundles.length; i++) {
+    let gameInfo = _gamesConfig.bundles[i];
     if (gameInfo.dir && gameInfo.dir.length > 0) {
         _subGameVersion[`${gameInfo.dir}`] = gameInfo.version;
-        _subGameDir[`${gameInfo.dir}`] = `db://assets/games/${gameInfo.dir}`;
+        _subGameDir[`${gameInfo.dir}`] = `db://assets/bundles/${gameInfo.dir}`;
         _subGameServerVersionView += `
         <ui-prop name="${gameInfo.name}(${gameInfo.dir})">
             <div class="flex-1 layout horizontal center">
@@ -64,11 +64,11 @@ Editor.Panel.extend({
             computed: {},
             methods: {
                 _initPluginCfg() {
-                    this.gameRoot = `${Editor.Project.path}/assets/games`;
+                    this.gameRoot = `${Editor.Project.path}/assets/bundles`;
                 },
                 /**@description 选择子游戏目录 */
                 onSelectGameRoot(e) {
-                    let assetsPath = `${Editor.Project.path}/assets/games`;
+                    let assetsPath = `${Editor.Project.path}/assets/bundles`;
                     this.gameRoot && this.gameRoot.length > 0 && fs.existsSync(this.gameRoot) && (assetsPath = this.gameRoot);
                     let result = Editor.Dialog.openFile({
                         title: "选择本地测试服务器目录",
@@ -92,8 +92,12 @@ Editor.Panel.extend({
                 getOtherGameResources(gameName, outReults, completeCallback) {
                     let otherGames = JSON.parse(JSON.stringify(this.subGameDir));
                     delete otherGames[`${gameName}`];
+                    //排除大厅的资源,大厅资源，子游戏可讯问
+                    delete otherGames["hall"];
+                    
 
                     let otherKeys = Object.keys(otherGames);
+                    Editor.log(otherKeys);
                     for (let i = 0; i < otherKeys.length; i++) {
                         let key = otherKeys[i];
                         /**

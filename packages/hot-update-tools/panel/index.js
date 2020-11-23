@@ -11,7 +11,7 @@ const Electron = require("electron"),
 //读取界面
 let _template = fs.readFileSync(Editor.url("packages://hot-update-tools/panel/index.html", "utf8")) + "";
 //先读取子游戏配置
-let _gamesPath = `${Editor.Project.path}/packages/config/games.json`;
+let _gamesPath = `${Editor.Project.path}/packages/config/bundles.json`;
 //_gamesPath = path.normalize(_gamesPath);
 let _gamesConfig = fs.readFileSync(_gamesPath);
 _gamesConfig = JSON.parse(_gamesConfig);
@@ -24,8 +24,8 @@ let _subGameServerVersion = {};
 let _hallVersion = `1`;
 //子游戏是否包含
 let _subGameInclude = {};
-for (let i = 0; i < _gamesConfig.games.length; i++) {
-    let gameInfo = _gamesConfig.games[i];
+for (let i = 0; i < _gamesConfig.bundles.length; i++) {
+    let gameInfo = _gamesConfig.bundles[i];
     if (gameInfo.dir && gameInfo.dir.length > 0) {
         _subGameVersionView += `
         <ui-prop name="${gameInfo.name}(${gameInfo.dir})">
@@ -376,7 +376,7 @@ Editor.Panel.extend({
                 _genVersion(version, serverRootDir, resourceRootDir, genManifestDir) {
                     //Editor.log(version, serverRootDir, resourceRootDir, genManifestDir);
                     this._addLog("[Build] 开始生成manifest配置文件....");
-                    let games = Object.keys(this.subGameVersion);
+                    let bundles = Object.keys(this.subGameVersion);
 
                     let manifest = {
                         version: version,
@@ -385,7 +385,7 @@ Editor.Panel.extend({
                         remoteVersionUrl: "",
                         assets: {},
                         searchPaths: [],
-                        //games: games //此字段不需要了
+                        //bundles: bundles //此字段不需要了
                     };
                     if ("/" === serverRootDir[serverRootDir.length - 1]) {
                         manifest.remoteManifestUrl = serverRootDir + "manifest/project.manifest";
@@ -425,9 +425,9 @@ Editor.Panel.extend({
 
                     //子游戏manifest生成
                     // Editor.log("source",source);
-                    for (let i = 0; i < games.length; i++) {
+                    for (let i = 0; i < bundles.length; i++) {
 
-                        let key = games[i];
+                        let key = bundles[i];
                         let submanifest = {
                             version: this.subGameVersion[key],
                             packageUrl: serverRootDir,
@@ -819,11 +819,11 @@ Editor.Panel.extend({
                     let e = this.localGameProjectManifest.split("project.manifest")[0];
                     fs.existsSync(e) ? (Electron.shell.showItemInFolder(e), Electron.shell.beep()) : this._addLog("目录不存在：" + e)
                 },
-                onConfirmDelSubgames(){
-                    let games = Object.keys(this.subGameVersion);
+                onConfirmDelBundle(){
+                    let bundles = Object.keys(this.subGameVersion);
                     let isFind = false;
-                    for( let i = 0 ; i < games.length ; i++ ){
-                        let game = games[i];
+                    for( let i = 0 ; i < bundles.length ; i++ ){
+                        let game = bundles[i];
                         if ( !this.subGameInclude[game] ){
                             isFind = true;
                             
@@ -863,8 +863,8 @@ Editor.Panel.extend({
         "hot-update-tools:onBuildFinished"(e, t) {
             window.plugin.onBuildFinished(t)
         },
-        'hot-update-tools:onConfirmDelSubgames'(e,t){
-            window.plugin.onConfirmDelSubgames();
+        'hot-update-tools:onConfirmDelBundle'(e,t){
+            window.plugin.onConfirmDelBundle();
         }
     }
 });
