@@ -3,6 +3,7 @@ import { Config } from "../config/Config";
 import { CommonService } from "../net/CommonService";
 import { LobbyService } from "../net/LobbyService";
 import { Manager } from "./Manager";
+import { GameService } from "../net/GameService";
 
 /**
  * @description 主控制器 
@@ -82,6 +83,9 @@ export default class MainController extends Controller<CommonService> {
 
         //大厅网络连接调度
         LobbyService.instance.handMessage();
+
+        //游戏网络连接调试
+        GameService.instance.handMessage();
 
         //远程资源下载任务调度
         Manager.assetManager.remote.update();

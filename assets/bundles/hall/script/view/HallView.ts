@@ -9,6 +9,7 @@ import { HallData } from "../data/HallData";
 import { ProtoMessageHeader } from "../../../../script/framework/net/ProtoMessage";
 import { LobbyService } from "../../../../script/common/net/LobbyService";
 import { HeartbeatProto } from "../../../../script/common/protocol/HeartbetProto";
+import { GameService } from "../../../../script/common/net/GameService";
 
 
 const { ccclass, property } = cc._decorator;
@@ -142,6 +143,11 @@ export default class HallView extends UIView{
         // LobbyService.instance.heartbeat = HeartbeatBinary;
 
         LobbyService.instance.connect("echo.websocket.org");
+
+        GameService.instance.messageHeader = ProtoMessageHeader;
+        GameService.instance.heartbeat = HeartbeatProto;
+        GameService.instance.connect("echo.websocket.org");
+
     }
 
     onDestroy(){

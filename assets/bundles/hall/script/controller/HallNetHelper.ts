@@ -3,6 +3,7 @@ import { LobbyService } from "../../../../script/common/net/LobbyService";
 import { TestMsg, UpdateMoney } from "../protocol/HallMessage";
 import { TestBinaryMessage } from "../protocol/CmdBinaryMessage";
 import { HttpPackage, HttpRequestType } from "../../../../script/framework/net/HttpClient";
+import { GameService } from "../../../../script/common/net/GameService";
 
 
 class _HallNetHelper extends NetHelper<LobbyService>{
@@ -11,11 +12,14 @@ class _HallNetHelper extends NetHelper<LobbyService>{
         super(LobbyService.instance);
     }
 
+    private gameService : GameService  = GameService.instance;
+
     sendProtoMessage() {
         let testProto = new TestMsg();
         testProto.data.awesomeField = "这是一个中文的测试";
         testProto.data.afvalue = 4.5;
         this.service.send(testProto);
+        this.gameService.send(testProto);
     }
 
     sendJsonMessage() {
