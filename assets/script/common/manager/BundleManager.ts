@@ -11,7 +11,7 @@ import { i18n } from "../language/LanguageImpl";
 export class BundleManager {
    private static _instance: BundleManager = null;
    public static Instance() { return this._instance || (this._instance = new BundleManager()); }
-   private curGame: GameConfig = null;
+   private curBundle: GameConfig = null;
    private isLoading = false;
 
 
@@ -38,23 +38,23 @@ export class BundleManager {
    }
 
    /**
-    * 外部接口 进入游戏
-    * @param areaType
+    * 外部接口 进入Bundle
+    * @param config 配置
     */
-   public enterGame(config: GameConfig) {//进入游戏（输入房间号）
+   public enterBundle(config: GameConfig) {
       if (this.isLoading) {
          Manager.tips.show(i18n.updating);
          cc.log("正在更新游戏，请稍等");
          return;
       }
-      this.curGame = config;
+      this.curBundle = config;
       this.isLoading = true;
 
-      if (!HotUpdate.allGameConfig[this.curGame.bundle]) {
-         HotUpdate.allGameConfig[this.curGame.bundle] = config;
+      if (!HotUpdate.bundlesConfig[this.curBundle.bundle]) {
+         HotUpdate.bundlesConfig[this.curBundle.bundle] = config;
       }
 
-      let versionInfo = HotUpdate.allGameConfig[this.curGame.bundle];
+      let versionInfo = HotUpdate.bundlesConfig[this.curBundle.bundle];
       this.checkUpdate(versionInfo);
    }
 
@@ -62,14 +62,14 @@ export class BundleManager {
       if (this.isLoading) {
          this.isLoading = false;
       }
-      dispatch(this.curGame.event, this.curGame.bundle);
+      dispatch(this.curBundle.event, this.curBundle.bundle);
    }
 
    /**@description 检测子游戏更新 */
    private checkUpdate(versionInfo: GameConfig) {
       let self = this;
       cc.log(`检测更新信息:${versionInfo.gameName}(${versionInfo.bundle})`);
-      HotUpdate.checkGameUpdate(this.curGame.bundle, (code, state) => {
+      HotUpdate.checkGameUpdate(this.curBundle.bundle, (code, state) => {
          if (code == AssetManagerCode.NEW_VERSION_FOUND) {
             //有新版本
             HotUpdate.onDownload = this.onDownload.bind(this);
@@ -108,10 +108,10 @@ export class BundleManager {
 
    private loadBundle() {
       // Manager.assetManager.removeBundle(this.curGame.bundle);
-      cc.log(`updateGame : ${this.curGame.bundle}`);
+      cc.log(`updateGame : ${this.curBundle.bundle}`);
       let me = this;
       //加载子包
-      let versionInfo = HotUpdate.allGameConfig[this.curGame.bundle];
+      let versionInfo = HotUpdate.bundlesConfig[this.curBundle.bundle];
       Manager.assetManager.loadBundle(versionInfo.bundle, (err: Error, bundle: cc.AssetManager.Bundle) => {
          me.isLoading = false;
          if (err) {
@@ -172,20 +172,20 @@ needRestart : ${needRestart}
     ERROR_DECOMPRESS,
        */
 
-      let gameConfig = HotUpdate.getGameLocalName(this.curGame.bundle);
+      let config = HotUpdate.getBundleName(this.curBundle.bundle);
 
       if (code == AssetManagerCode.UPDATE_PROGRESSION) {
          newPercent = percent == Number.NaN ? 0 : percent;
-         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
+         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
       } else if (code == AssetManagerCode.ALREADY_UP_TO_DATE) {
          newPercent = 1;
-         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
+         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
       } else if (code == AssetManagerCode.UPDATE_FINISHED) {
          newPercent = 1.1;
-         cc.log(`更新${gameConfig.gameName}成功`);
-         cc.log(`正在加载${gameConfig.gameName}`);
+         cc.log(`更新${config.gameName}成功`);
+         cc.log(`正在加载${config.gameName}`);
          this.loadBundle();
-         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
+         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
       } else if (code == AssetManagerCode.UPDATE_FAILED ||
          code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||
          code == AssetManagerCode.ERROR_DOWNLOAD_MANIFEST ||
@@ -193,8 +193,8 @@ needRestart : ${needRestart}
          code == AssetManagerCode.ERROR_DECOMPRESS) {
          newPercent = -1;
          this.isLoading = false;
-         cc.error(`更新${gameConfig.gameName}失败`);
-         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: gameConfig });
+         cc.error(`更新${config.gameName}失败`);
+         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
       }
    }
 }

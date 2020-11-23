@@ -169,8 +169,8 @@ class _HotUpdate {
     /**@description 检测更新回调 */
     public checkCallback: (code: AssetManagerCode, state: AssetManagerState) => void = null;
 
-    /**@description 子游戏版本信息 */
-    public allGameConfig: { [key: string]: GameConfig } = {};
+    /**@description bundle版本信息 */
+    public bundlesConfig: { [key: string]: GameConfig } = {};
 
     /**@description 资源管理器 */
     private assetsManagers: { [key: string]: AssetsManager } = {};
@@ -200,9 +200,9 @@ class _HotUpdate {
     /**@description 当前热更新的资源管理器 */
     private currentAssetsManager: AssetsManager = null;
 
-    /**@description 获取子游戏名 */
-    public getGameLocalName(gameName: string) {
-        return this.allGameConfig[gameName];
+    /**@description 获取Bundle名 */
+    public getBundleName(gameName: string) {
+        return this.bundlesConfig[gameName];
     }
 
     /**@description 释放资源管理器，默认为hall 大厅资源管理器 */
