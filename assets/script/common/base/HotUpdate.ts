@@ -95,7 +95,7 @@ export enum AssetManagerState {
     TRY_DOWNLOAD_FAILED_ASSETS,
 }
 
-export class GameConfig {
+export class BundleConfig {
     /**@description Bundle名 如:hall*/
     bundle: string = "";
     /**@description Bundle名 如:大厅  */
@@ -103,6 +103,8 @@ export class GameConfig {
     index = 0;
     /**@description 加载bundle完成后，发出的bundle事件 */
     event : string = LogicEvent.ENTER_GAME;
+    /**@description 是否需要提示弹出框提示升级 */
+    isNeedPrompt : boolean = false;
     /**
      * 
      * @param name bundle名 如：大厅
@@ -177,7 +179,7 @@ class _HotUpdate {
     public checkCallback: (code: AssetManagerCode, state: AssetManagerState) => void = null;
 
     /**@description bundle版本信息 */
-    public bundlesConfig: { [key: string]: GameConfig } = {};
+    public bundlesConfig: { [key: string]: BundleConfig } = {};
 
     /**@description 资源管理器 */
     private assetsManagers: { [key: string]: AssetsManager } = {};

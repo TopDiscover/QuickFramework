@@ -1,5 +1,5 @@
 import UIView from "../../../../script/framework/ui/UIView";
-import { GameConfig } from "../../../../script/common/base/HotUpdate";
+import { BundleConfig } from "../../../../script/common/base/HotUpdate";
 import { i18n } from "../../../../script/common/language/LanguageImpl";
 import { HallNetHelper } from "../controller/HallNetHelper";
 import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../script/common/event/LogicEvent";
@@ -24,10 +24,10 @@ export default class HallView extends UIView{
     public _count = 10;
 
     private readonly games = [
-        new GameConfig(Manager.getLanguage("hall_view_game_name.0",HallData.bundle),"gameOne",1),
-        new GameConfig(Manager.getLanguage("hall_view_game_name.1",HallData.bundle),"gameTwo",2),
-        new GameConfig(Manager.getLanguage("hall_view_game_name.2",HallData.bundle),"tankBattle",3),
-        new GameConfig(Manager.getLanguage("hall_view_game_name.3",HallData.bundle),"game2048",4),
+        new BundleConfig(Manager.getLanguage("hall_view_game_name.0",HallData.bundle),"gameOne",1),
+        new BundleConfig(Manager.getLanguage("hall_view_game_name.1",HallData.bundle),"gameTwo",2),
+        new BundleConfig(Manager.getLanguage("hall_view_game_name.2",HallData.bundle),"tankBattle",3),
+        new BundleConfig(Manager.getLanguage("hall_view_game_name.3",HallData.bundle),"game2048",4),
     ];
 
     private onClick( ev : cc.Event.EventTouch ){
@@ -160,7 +160,7 @@ export default class HallView extends UIView{
          this.registerEvent(CommonEvent.DOWNLOAD_PROGRESS,this.onDownloadProgess);
      }
      
-     private onDownloadProgess( data : { progress: number, config: GameConfig }){
+     private onDownloadProgess( data : { progress: number, config: BundleConfig }){
 
         let progressBar : cc.ProgressBar = cc.find(`games/game_${data.config.index}/Background/progressBar`,this.node).getComponent(cc.ProgressBar);
         let progressLabel : cc.Label = cc.find(`games/game_${data.config.index}/Background/progressBar/progress`,this.node).getComponent(cc.Label);

@@ -1,5 +1,5 @@
 import { LogicEvent } from "../event/LogicEvent";
-import { HotUpdate, AssetManagerCode, AssetManagerState, GameConfig } from "../base/HotUpdate";
+import { HotUpdate, AssetManagerCode, AssetManagerState, BundleConfig } from "../base/HotUpdate";
 import { CommonEvent } from "../event/CommonEvent";
 import { Manager } from "../../framework/Framework";
 import { i18n } from "../language/LanguageImpl";
@@ -12,7 +12,7 @@ import { Config } from "../config/Config";
 export class BundleManager {
    private static _instance: BundleManager = null;
    public static Instance() { return this._instance || (this._instance = new BundleManager()); }
-   private curBundle: GameConfig = null;
+   private curBundle: BundleConfig = null;
    private isLoading = false;
 
 
@@ -42,7 +42,7 @@ export class BundleManager {
     * 外部接口 进入Bundle
     * @param config 配置
     */
-   public enterBundle(config: GameConfig) {
+   public enterBundle(config: BundleConfig) {
       if (this.isLoading) {
          Manager.tips.show(i18n.updating);
          cc.log("正在更新游戏，请稍等");
@@ -67,7 +67,7 @@ export class BundleManager {
    }
 
    /**@description 检测子游戏更新 */
-   private checkUpdate(versionInfo: GameConfig) {
+   private checkUpdate(versionInfo: BundleConfig) {
       let self = this;
       cc.log(`检测更新信息:${versionInfo.name}(${versionInfo.bundle})`);
       HotUpdate.checkGameUpdate(this.curBundle.bundle, (code, state) => {
