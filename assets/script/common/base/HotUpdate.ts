@@ -96,15 +96,22 @@ export enum AssetManagerState {
 }
 
 export class GameConfig {
-    /**@description Bundle名 */
+    /**@description Bundle名 如:hall*/
     bundle: string = "";
-    /**@description 游戏名 */
-    gameName: string = "";
+    /**@description Bundle名 如:大厅  */
+    name: string = "";
     index = 0;
     /**@description 加载bundle完成后，发出的bundle事件 */
     event : string = LogicEvent.ENTER_GAME;
-    constructor( gameName : string , bundle : string , index : number,event ?: string){
-        this.gameName = gameName;
+    /**
+     * 
+     * @param name bundle名 如：大厅
+     * @param bundle Bundle名 如:hall
+     * @param index 游戏index,可根据自己需要决定需不需要
+     * @param event 加载bundle完成后，派发事件
+     */
+    constructor( name : string , bundle : string , index : number,event ?: string){
+        this.name = name;
         this.bundle = bundle;
         this.index = index;
         if( event ){

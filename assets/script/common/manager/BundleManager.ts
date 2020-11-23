@@ -69,12 +69,12 @@ export class BundleManager {
    /**@description 检测子游戏更新 */
    private checkUpdate(versionInfo: GameConfig) {
       let self = this;
-      cc.log(`检测更新信息:${versionInfo.gameName}(${versionInfo.bundle})`);
+      cc.log(`检测更新信息:${versionInfo.name}(${versionInfo.bundle})`);
       HotUpdate.checkGameUpdate(this.curBundle.bundle, (code, state) => {
          if (code == AssetManagerCode.NEW_VERSION_FOUND) {
             //有新版本
             HotUpdate.onDownload = this.onDownload.bind(this);
-            cc.log(`检测到${versionInfo.gameName}(${versionInfo.bundle})有新的版本`);
+            cc.log(`检测到${versionInfo.name}(${versionInfo.bundle})有新的版本`);
             HotUpdate.hotUpdate();
          } else if (state == AssetManagerState.TRY_DOWNLOAD_FAILED_ASSETS) {
             //尝试重新下载之前下载失败的文件
@@ -117,7 +117,7 @@ export class BundleManager {
          me.isLoading = false;
          if (err) {
             cc.error(`load bundle : ${versionInfo.bundle} fail !!!`);
-            Manager.tips.show(String.format(i18n.updateFaild, versionInfo.gameName));
+            Manager.tips.show(String.format(i18n.updateFaild, versionInfo.name));
          } else {
             cc.log(`load bundle : ${versionInfo.bundle} success !!!`);
             this.loadedBundle.push(versionInfo.bundle);
@@ -183,8 +183,8 @@ needRestart : ${needRestart}
          dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
       } else if (code == AssetManagerCode.UPDATE_FINISHED) {
          newPercent = 1.1;
-         cc.log(`更新${config.gameName}成功`);
-         cc.log(`正在加载${config.gameName}`);
+         cc.log(`更新${config.name}成功`);
+         cc.log(`正在加载${config.name}`);
          this.loadBundle();
          dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
       } else if (code == AssetManagerCode.UPDATE_FAILED ||
@@ -194,7 +194,7 @@ needRestart : ${needRestart}
          code == AssetManagerCode.ERROR_DECOMPRESS) {
          newPercent = -1;
          this.isLoading = false;
-         cc.error(`更新${config.gameName}失败`);
+         cc.error(`更新${config.name}失败`);
          dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
       }
    }
