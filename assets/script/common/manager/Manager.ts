@@ -12,7 +12,7 @@ import { getSingleton } from "../../framework/base/Singleton";
 import { USING_LAN_KEY, BUNDLE_TYPE, BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import GameView from "../base/GameView";
 import { GameData } from "../base/GameData";
-import { BundleManager } from "./GameManager";
+import { BundleManager } from "./BundleManager";
 import Tips from "../component/Tips";
 import UILoading from "../component/UILoading";
 import Alert from "../component/Alert";
