@@ -622,4 +622,16 @@ export class UIManager {
         }
         cc.log(`${this._logTag}-----------printCanvasChildren--end-----------`);
     }
+
+    public printComponent(){
+        let canvas : any = this.getCanvas();
+        if( canvas ){
+            let comps : any[] = canvas._components;
+            cc.log(`${this._logTag} -------------- print component start --------------`);
+            for( let i = 0 ; i < comps.length ; i++ ){
+                cc.log(cc.js.getClassName(comps[i]));
+            }
+            cc.log(`${this._logTag} -------------- print component end --------------`);
+        }
+    }
 }

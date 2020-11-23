@@ -16,13 +16,25 @@ export class BundleManager {
 
 
    /**@description 已经加载的bundle */
-   private loadedBundle : string[] = []
+   private loadedBundle: string[] = []
 
-   public removeLoadedBundle(){
-      this.loadedBundle.forEach((value,index,origin)=>{
+   /**@description 删除已经加载的bundle */
+   public removeLoadedBundle() {
+      this.loadedBundle.forEach((value, index, origin) => {
          Manager.assetManager.removeBundle(value);
       });
       this.loadedBundle = [];
+   }
+
+   /**@description 删除所有加载子游戏的bundle */
+   public removeLoadedGamesBundle() {
+      let i = this.loadedBundle.length;
+      while (i--) {
+         if( this.loadedBundle[i] != "hall" ){
+            Manager.assetManager.removeBundle(this.loadedBundle[i]);
+            this.loadedBundle.splice(i,1);
+         }
+      }
    }
 
    /**
@@ -104,7 +116,7 @@ export class BundleManager {
          me.isLoading = false;
          if (err) {
             cc.error(`load bundle : ${versionInfo.bundle} fail !!!`);
-            Manager.tips.show(String.format(i18n.updateFaild,versionInfo.gameName));
+            Manager.tips.show(String.format(i18n.updateFaild, versionInfo.gameName));
          } else {
             cc.log(`load bundle : ${versionInfo.bundle} success !!!`);
             this.loadedBundle.push(versionInfo.bundle);

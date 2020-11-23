@@ -2617,7 +2617,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 331.45,
+      "width": 371.81,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -2670,8 +2670,8 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_useOriginalSize": false,
-    "_string": "i18n.hall_view_broadcast_content",
-    "_N$string": "i18n.hall_view_broadcast_content",
+    "_string": "i18n.hall.hall_view_broadcast_content",
+    "_N$string": "i18n.hall.hall_view_broadcast_content",
     "_fontSize": 22,
     "_lineHeight": 40,
     "_enableWrapText": true,

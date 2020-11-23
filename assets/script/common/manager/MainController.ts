@@ -28,8 +28,8 @@ export default class MainController extends Controller<CommonService> {
 
         Manager.resolutionHelper.onLoad(this.node);
 
-        //先添加全局的网络组件
-        Manager.netManager.addNetControllers(this.node);
+        //大厅网络管理器onLoad
+        Manager.netManager.onLoad(this.node);
 
         //预先加载下loading预置体
         Manager.tips.preloadPrefab();
@@ -42,11 +42,13 @@ export default class MainController extends Controller<CommonService> {
         let showUI = cc.find("showUI",this.node);
         let showNode = cc.find("showNode",this.node);
         let showRes = cc.find("showRes",this.node);
-        if ( showUI && showNode && showRes){
+        let showComp = cc.find("showComponent",this.node);
+        if ( showUI && showNode && showRes && showComp){
             showUI.zIndex = 9999;
             showNode.zIndex = 9999;
             showRes.zIndex = 9999;
-             let isShow = false;
+            showComp.zIndex = 9999;
+            let isShow = false;
             if ( Config.isShowDebugButton ){
                 isShow = true;
                 showUI.on(cc.Node.EventType.TOUCH_END,()=>{
@@ -58,10 +60,14 @@ export default class MainController extends Controller<CommonService> {
                 showRes.on(cc.Node.EventType.TOUCH_END,()=>{
                     Manager.cacheManager.printCaches();
                 });
+                showComp.on(cc.Node.EventType.TOUCH_END,()=>{
+                    Manager.uiManager.printComponent();
+                });
             }
             showUI.active = isShow;
             showNode.active = isShow;
             showRes.active = isShow;
+            showComp.active = isShow;
         }
 
         //游戏事件注册
@@ -85,8 +91,8 @@ export default class MainController extends Controller<CommonService> {
         
         Manager.resolutionHelper.onDestroy();
 
-        //移除网络组件 
-        Manager.netManager.removeNetControllers(this.node);
+        //大厅网络管理器onDestroy
+        Manager.netManager.onDestroy(this.node);
         //移除键盘事件
         cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP);
 
