@@ -5,13 +5,14 @@ import { HALL_ZH } from "./HallLanguageZH";
 import { Manager } from "../../../../script/common/manager/Manager";
 import { HALL_EN } from "./HallLanguageEN";
 import { i18n } from "../../../../script/common/language/LanguageImpl";
+import { Config } from "../../../../script/common/config/Config";
 /**@description 大厅数据 */
 class _HallData extends GameData {
     private static _instance: _HallData = null;
     public static Instance() { return this._instance || (this._instance = new _HallData()); }
 
     get bundle() {
-        return "hall";
+        return Config.BUNDLE_HALL;
     }
 
     onLanguageChange() {

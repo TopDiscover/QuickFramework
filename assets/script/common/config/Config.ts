@@ -35,6 +35,9 @@ export namespace Config {
      * Manager.uiManager.open({ type : LoginLayer, zIndex: ViewZOrder.zero, delay : 0.2});
      */
     export const LOAD_VIEW_DELAY = 0.1;
+
+    /**@description 大厅bundle名 */
+    export const BUNDLE_HALL = "hall";
 }
 
 /**

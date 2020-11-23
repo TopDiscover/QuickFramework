@@ -3,6 +3,7 @@ import { HotUpdate, AssetManagerCode, AssetManagerState, GameConfig } from "../b
 import { CommonEvent } from "../event/CommonEvent";
 import { Manager } from "../../framework/Framework";
 import { i18n } from "../language/LanguageImpl";
+import { Config } from "../config/Config";
 
 /**
  * @description bundle管理器
@@ -30,7 +31,7 @@ export class BundleManager {
    public removeLoadedGamesBundle() {
       let i = this.loadedBundle.length;
       while (i--) {
-         if( this.loadedBundle[i] != "hall" ){
+         if( this.loadedBundle[i] != Config.BUNDLE_HALL ){
             Manager.assetManager.removeBundle(this.loadedBundle[i]);
             this.loadedBundle.splice(i,1);
          }

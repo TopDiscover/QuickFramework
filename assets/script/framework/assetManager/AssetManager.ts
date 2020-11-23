@@ -191,6 +191,9 @@ export class AssetManager {
         type: typeof cc.Asset,
         onProgress: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
         onComplete: (data:ResourceCacheData) => void): void {
+            if( CC_DEBUG ) {
+                cc.log(`load bundle : ${bundle} path : ${path}`)
+            }
             let cache = Manager.cacheManager.get(bundle,path);
             if ( cache ){
                 //存在缓存信息

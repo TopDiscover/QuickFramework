@@ -2,8 +2,8 @@
   "ver": "1.1.2",
   "uuid": "a103fef2-5f18-413c-807b-f9a71e1ea7d6",
   "isBundle": true,
-  "bundleName": "gameTwo",
-  "priority": 5,
+  "bundleName": "",
+  "priority": "1",
   "compressionType": {
     "wechatgame": "default",
     "baidugame": "subpackage",
