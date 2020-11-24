@@ -144,9 +144,9 @@ export default class HallView extends UIView{
 
         LobbyService.instance.connect("echo.websocket.org");
 
-        GameService.instance.messageHeader = ProtoMessageHeader;
-        GameService.instance.heartbeat = HeartbeatProto;
-        GameService.instance.connect("echo.websocket.org");
+        // GameService.instance.messageHeader = ProtoMessageHeader;
+        // GameService.instance.heartbeat = HeartbeatProto;
+        // GameService.instance.connect("echo.websocket.org");
 
     }
 
