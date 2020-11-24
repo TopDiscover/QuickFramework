@@ -1,4 +1,5 @@
 import { Config } from "../config/Config";
+import { CommonEvent } from "../event/CommonEvent";
 import { LogicType, LogicEvent } from "../event/LogicEvent";
 
 interface Manifest {
@@ -29,6 +30,18 @@ class AssetsManager {
     name: string = "";
     /**@description 当前资源管理器的实体 jsb.AssetsManager */
     manager: jsb.AssetsManager = null;
+}
+
+export interface DownLoadInfo{
+    downloadedBytes: number,
+    totalBytes: number,
+    downloadedFiles: number,
+    totalFiles: number,
+    percent: number,
+    percentByFile: number,
+    code: AssetManagerCode,
+    state: AssetManagerState,
+    needRestart: boolean
 }
 
 export enum AssetManagerCode {
@@ -111,11 +124,18 @@ export class BundleConfig {
      * @param bundle Bundle名 如:hall
      * @param index 游戏index,可根据自己需要决定需不需要
      * @param event 加载bundle完成后，派发事件
+     * @param isNeedPrompt 是否需要弹出提示升级的弹出框
      */
-    constructor( name : string , bundle : string , index : number,event ?: string){
+    constructor( 
+        name : string , 
+        bundle : string , 
+        index : number,
+        event ?: string,
+        isNeedPrompt : boolean = false){
         this.name = name;
         this.bundle = bundle;
         this.index = index;
+        this.isNeedPrompt = isNeedPrompt;
         if( event ){
             this.event = event;
         }
@@ -160,17 +180,6 @@ class _HotUpdate {
         return this._projectManifest;
     }
 
-    /**@description 热更新回调 */
-    public onDownload: (
-        downloadedBytes: number,
-        totalBytes: number,
-        downloadedFiles: number,
-        totalFiles: number,
-        percent: number,
-        percentByFile: number,
-        code: AssetManagerCode,
-        state: AssetManagerState,
-        needRestart: boolean) => void = null;
     /**@description 大厅本地的版本项目更新文件配置路径 */
     public get hallProjectMainfest() {
         return `${this.manifestRoot}project.manifest`;
@@ -536,19 +545,19 @@ class _HotUpdate {
             }
         }
 
-        if (this.onDownload) {
-            this.onDownload(
-                event.getDownloadedBytes(),
-                event.getTotalBytes(),
-                event.getDownloadedFiles(),
-                event.getTotalFiles(),
-                event.getPercent(),
-                event.getPercentByFile(),
-                event.getEventCode(),
-                state,
-                isUpdateFinished
-            );
-        }
+        let info : DownLoadInfo = { 
+            downloadedBytes : event.getDownloadedBytes(),
+            totalBytes : event.getTotalBytes(),
+            downloadedFiles : event.getDownloadedFiles(),
+            totalFiles : event.getTotalFiles(),
+            percent : event.getPercent(),
+            percentByFile : event.getPercentByFile(),
+            code : event.getEventCode(),
+            state : state,
+            needRestart : isUpdateFinished,
+        };
+
+        dispatch(CommonEvent.HOTUPDATE_DOWNLOAD,info)
 
         cc.log(`update cb  failed : ${failed}  , need restart : ${isUpdateFinished} , updating : ${this.updating}`);
     }

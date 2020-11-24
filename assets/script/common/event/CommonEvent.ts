@@ -1,5 +1,7 @@
 /**@description 公共事件定义 */
 export enum CommonEvent{
+    /**@description 热更新事件*/
+    HOTUPDATE_DOWNLOAD = "HOTUPDATE_DOWNLOAD",
     /**@description 下载进度 */
     DOWNLOAD_PROGRESS = "DOWNLOAD_PROGRESS",
     /**@description 金钱变更  */

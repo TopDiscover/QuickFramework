@@ -178,8 +178,8 @@ class AlertDialog extends cc.Component {
         this._close(null);
     }
     private _close(complete: () => void) {
-        let selt = this;
         if (cc.isValid(this._content)) {
+            this._content.stopAllActions();
             cc.tween(this._content)
                 .to(0.2, { scale: 1.15 })
                 .to(0.1, { scale: 0.3 })

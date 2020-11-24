@@ -1,9 +1,9 @@
-import { LogicEvent } from "../event/LogicEvent";
-import { HotUpdate, AssetManagerCode, AssetManagerState, BundleConfig } from "../base/HotUpdate";
+import { HotUpdate, AssetManagerCode, AssetManagerState, BundleConfig, DownLoadInfo } from "../base/HotUpdate";
 import { CommonEvent } from "../event/CommonEvent";
-import { Manager } from "../../framework/Framework";
 import { i18n } from "../language/LanguageImpl";
-import { Config } from "../config/Config";
+import { Config, ViewZOrder } from "../config/Config";
+import { Manager } from "./Manager";
+import DownloadLoading from "../component/DownloadLoading";
 
 /**
  * @description bundle管理器
@@ -70,17 +70,46 @@ export class BundleManager {
    private checkUpdate(versionInfo: BundleConfig) {
       let self = this;
       cc.log(`检测更新信息:${versionInfo.name}(${versionInfo.bundle})`);
+      Manager.eventDispatcher.removeEventListener(CommonEvent.HOTUPDATE_DOWNLOAD,this);
       HotUpdate.checkGameUpdate(this.curBundle.bundle, (code, state) => {
          if (code == AssetManagerCode.NEW_VERSION_FOUND) {
             //有新版本
-            HotUpdate.onDownload = this.onDownload.bind(this);
+            Manager.eventDispatcher.addEventListener(CommonEvent.HOTUPDATE_DOWNLOAD,this.onDownload,this);
             cc.log(`检测到${versionInfo.name}(${versionInfo.bundle})有新的版本`);
-            HotUpdate.hotUpdate();
+            if( versionInfo.isNeedPrompt ){
+               Manager.alert.show({
+                  text:String.format(i18n.newVersionForBundle,versionInfo.name),
+                  confirmCb:(isOK)=>{
+                     if( isOK ){
+                        Manager.uiManager.open({type:DownloadLoading,zIndex:ViewZOrder.Loading,args:[state]});
+                     }else{
+                        //不更新
+                        //直接关闭掉游戏
+                        cc.game.end();
+                     }
+                  }
+               });
+            }else{
+               HotUpdate.hotUpdate();
+            }
          } else if (state == AssetManagerState.TRY_DOWNLOAD_FAILED_ASSETS) {
             //尝试重新下载之前下载失败的文件
-            HotUpdate.onDownload = this.onDownload.bind(this);
+            Manager.eventDispatcher.addEventListener(CommonEvent.HOTUPDATE_DOWNLOAD,this.onDownload,this);
             cc.log(`正在尝试重新下载之前下载失败的资源`);
-            HotUpdate.downloadFailedAssets();
+            if( versionInfo.isNeedPrompt ){
+               Manager.alert.show({
+                  text:String.format(i18n.newVersionForBundle,versionInfo.name),
+                  confirmCb:(isOK)=>{
+                     if( isOK ){
+                        Manager.uiManager.open({type:DownloadLoading,zIndex:ViewZOrder.Loading,args:[state]});
+                     }else{
+                        cc.game.end();
+                     }
+                  }
+               });
+            }else{
+               HotUpdate.downloadFailedAssets();
+            }
          } else if (code == AssetManagerCode.ALREADY_UP_TO_DATE) {
             //已经是最新版本
             //以最新的bundle为准
@@ -90,13 +119,13 @@ export class BundleManager {
             code == AssetManagerCode.ERROR_PARSE_MANIFEST) {
             //下载manifest文件失败
             this.isLoading = false;
-            let content = "下载版本文件失败!";
+            let content = i18n.downloadFailManifest;
             if (code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST) {
-               content = "找不到版本文件!";
+               content = i18n.noFindManifest;
             } else if (code == AssetManagerCode.ERROR_PARSE_MANIFEST) {
-               content = "版本文件解析错误!";
+               content = i18n.manifestError;
             }
-            //Manager.toast.show(content);
+            Manager.tips.show(content);
          } else if (code == AssetManagerCode.CHECKING) {
             //当前正在检测更新
             cc.log(`正在检测更新!!`);
@@ -125,29 +154,9 @@ export class BundleManager {
          }
       });
    }
-   private onDownload(
-      downloadedBytes: number,
-      totalBytes: number,
-      downloadedFiles: number,
-      totalFiles: number,
-      percent: number,
-      percentByFile: number,
-      code: AssetManagerCode,
-      state: AssetManagerState,
-      needRestart: boolean) {
-      if (CC_DEBUG) cc.log(`
-downloadedBytes : ${downloadedBytes}
-totalBytes : ${totalBytes}
-downloadedFiles : ${downloadedFiles}
-totalFiles : ${totalFiles}
-percent : ${percent}
-percentByFile : ${percentByFile}
-code : ${code}
-state : ${state}
-needRestart : ${needRestart}
-`);
+   private onDownload( info : DownLoadInfo ) {
+      if (CC_DEBUG) cc.log(JSON.stringify(info));
       let newPercent = 0;
-
       /**
        *  @description 找不到本地mainfest文件
     ERROR_NO_LOCAL_MANIFEST,
@@ -175,23 +184,23 @@ needRestart : ${needRestart}
 
       let config = HotUpdate.getBundleName(this.curBundle.bundle);
 
-      if (code == AssetManagerCode.UPDATE_PROGRESSION) {
-         newPercent = percent == Number.NaN ? 0 : percent;
+      if (info.code == AssetManagerCode.UPDATE_PROGRESSION) {
+         newPercent = info.percent == Number.NaN ? 0 : info.percent;
          dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
-      } else if (code == AssetManagerCode.ALREADY_UP_TO_DATE) {
+      } else if (info.code == AssetManagerCode.ALREADY_UP_TO_DATE) {
          newPercent = 1;
          dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
-      } else if (code == AssetManagerCode.UPDATE_FINISHED) {
+      } else if (info.code == AssetManagerCode.UPDATE_FINISHED) {
          newPercent = 1.1;
          cc.log(`更新${config.name}成功`);
          cc.log(`正在加载${config.name}`);
          this.loadBundle();
          dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
-      } else if (code == AssetManagerCode.UPDATE_FAILED ||
-         code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||
-         code == AssetManagerCode.ERROR_DOWNLOAD_MANIFEST ||
-         code == AssetManagerCode.ERROR_PARSE_MANIFEST ||
-         code == AssetManagerCode.ERROR_DECOMPRESS) {
+      } else if (info.code == AssetManagerCode.UPDATE_FAILED ||
+         info.code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||
+         info.code == AssetManagerCode.ERROR_DOWNLOAD_MANIFEST ||
+         info.code == AssetManagerCode.ERROR_PARSE_MANIFEST ||
+         info.code == AssetManagerCode.ERROR_DECOMPRESS) {
          newPercent = -1;
          this.isLoading = false;
          cc.error(`更新${config.name}失败`);

@@ -9,33 +9,74 @@ import { ViewZOrder } from "../common/config/Config";
 import { Manager } from "../common/manager/Manager";
 import LoginView from "./view/LoginView";
 import { BUNDLE_RESOURCES } from "../framework/base/Defines";
+import { HotUpdate, AssetManagerCode, AssetManagerState } from "../common/base/HotUpdate";
+import DownloadLoading from "../common/component/DownloadLoading";
+import { i18n } from "../common/language/LanguageImpl";
 
- class LoginLogic extends Logic {
-    
+class LoginLogic extends Logic {
+
     logicType: LogicType = LogicType.LOGIN;
 
-    protected bindingEvents(){
+    protected bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(LogicEvent.ENTER_LOGIN,this.onEnterLogin);
+        this.registerEvent(LogicEvent.ENTER_LOGIN, this.onEnterLogin);
     }
 
-    get bundle(){
+    get bundle() {
         return BUNDLE_RESOURCES;
     }
 
-    onLoad(){
+    onLoad() {
         super.onLoad();
         this.onEnterLogin();
     }
 
-    private onEnterLogin(data?){
+    private onEnterLogin(data?) {
         cc.log(`--------------onEnterLogin--------------`);
-        Manager.uiManager.open({ type : LoginView, zIndex: ViewZOrder.zero,bundle:this.bundle});
+        Manager.loading.show(i18n.checkingUpdate);
+        HotUpdate.checkHallUpdate((code, state) => {
+            if (code == AssetManagerCode.NEW_VERSION_FOUND || state == AssetManagerState.TRY_DOWNLOAD_FAILED_ASSETS) {
+                //有新版本
+                cc.log(`提示更新`);
+                Manager.loading.hide();
+                Manager.alert.show({
+                    text: i18n.newVersion, confirmCb: (isOK) => {
+                        if (isOK) {
+                            Manager.uiManager.open({ type: DownloadLoading, zIndex: ViewZOrder.UI, args: [state] });
+                        } else {
+                            //退出游戏
+                            cc.game.end();
+                        }
+                    }
+                });
+            } else if (code == AssetManagerCode.ALREADY_UP_TO_DATE) {
+                //已经是最新版本
+                cc.log(`已经是最新版本`);
+                Manager.loading.hide();
+            } else if (code == AssetManagerCode.ERROR_DOWNLOAD_MANIFEST ||
+                code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||
+                code == AssetManagerCode.ERROR_PARSE_MANIFEST) {
+                Manager.loading.hide();
+                let content = i18n.downloadFailManifest;
+                if (code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST) {
+                    content = i18n.noFindManifest;
+                } else if (code == AssetManagerCode.ERROR_PARSE_MANIFEST) {
+                    content = i18n.manifestError;
+                }
+                Manager.tips.show(content);
+            } else if (code == AssetManagerCode.CHECKING) {
+                //当前正在检测更新
+                cc.log(`正在检测更新!!`);
+            } else {
+                cc.log(`检测更新当前状态 code : ${code} state : ${state}`);
+            }
+        });
+        Manager.uiManager.open({ type: LoginView, zIndex: ViewZOrder.zero, bundle: this.bundle });
     }
 
-    public onEnterComplete(data : LogicEventData){
+    public onEnterComplete(data: LogicEventData) {
         super.onEnterComplete(data);
     }
 
- }
+}
 Manager.logicManager.push(LoginLogic);
