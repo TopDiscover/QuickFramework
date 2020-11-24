@@ -30,6 +30,8 @@ export default class DownloadLoading extends UIView {
     /**@description 下载的状态 */
     private state : AssetManagerState = null;
 
+    private updateName = "";
+
     bindingEvents(){
         super.bindingEvents();
         this.registerEvent(CommonEvent.HOTUPDATE_DOWNLOAD,this.onDownload);
@@ -38,6 +40,7 @@ export default class DownloadLoading extends UIView {
     onLoad(){
         super.onLoad();
         this.state = this.args[0];
+        this.updateName = this.args[1];
         this.tipsLabel = cc.find("tips",this.node).getComponent(cc.Label);
         this.progress = cc.find("progressBar",this.node).getComponent(cc.ProgressBar);
         this.startTips();
@@ -75,7 +78,7 @@ export default class DownloadLoading extends UIView {
         } else if (info.code == AssetManagerCode.ALREADY_UP_TO_DATE) {
             this.progress.progress = 1;
         } else if (info.code == AssetManagerCode.UPDATE_FINISHED) {
-            Manager.tips.show("已升级到最新");
+            Manager.tips.show(String.format(i18n.alreadyRemoteVersion,this.updateName));
             this.close();
         } else if (info.code == AssetManagerCode.UPDATE_FAILED ||
             info.code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||
@@ -83,7 +86,7 @@ export default class DownloadLoading extends UIView {
             info.code == AssetManagerCode.ERROR_PARSE_MANIFEST ||
             info.code == AssetManagerCode.ERROR_UPDATING ||
             info.code == AssetManagerCode.ERROR_DECOMPRESS) {
-            Manager.tips.show("更新失败！！");
+            Manager.tips.show(String.format(i18n.updateFaild,this.updateName));
             this.close();
         }
     }

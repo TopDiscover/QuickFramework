@@ -17,4 +17,6 @@ export let LanguageZH = {
   manifestError : "版本文件解析错误!",
   checkingUpdate : "检测更新中...",
   newVersionForBundle : "检测到{0}有新的版本，是否更新?",
+  alreadyRemoteVersion : "{0}已升级到最新",
+  hall : "大厅",
 }

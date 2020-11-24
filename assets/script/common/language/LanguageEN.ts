@@ -18,4 +18,6 @@ export let LanguageEN = {
     manifestError : "Manifest decode error!!!",
     checkingUpdate : "Checking update...",
     newVersionForBundle : "检测到{0}有新的版本，是否更新?",
+    alreadyRemoteVersion : "{0}已升级到最新",
+    hall : "hall",
 }

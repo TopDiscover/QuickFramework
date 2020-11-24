@@ -81,7 +81,7 @@ export class BundleManager {
                   text:String.format(i18n.newVersionForBundle,versionInfo.name),
                   confirmCb:(isOK)=>{
                      if( isOK ){
-                        Manager.uiManager.open({type:DownloadLoading,zIndex:ViewZOrder.Loading,args:[state]});
+                        Manager.uiManager.open({type:DownloadLoading,zIndex:ViewZOrder.Loading,args:[state,versionInfo.name]});
                      }else{
                         //不更新
                         //直接关闭掉游戏
@@ -101,7 +101,7 @@ export class BundleManager {
                   text:String.format(i18n.newVersionForBundle,versionInfo.name),
                   confirmCb:(isOK)=>{
                      if( isOK ){
-                        Manager.uiManager.open({type:DownloadLoading,zIndex:ViewZOrder.Loading,args:[state]});
+                        Manager.uiManager.open({type:DownloadLoading,zIndex:ViewZOrder.Loading,args:[state,versionInfo.name]});
                      }else{
                         cc.game.end();
                      }

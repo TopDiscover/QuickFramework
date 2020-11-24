@@ -42,7 +42,7 @@ class LoginLogic extends Logic {
                 Manager.alert.show({
                     text: i18n.newVersion, confirmCb: (isOK) => {
                         if (isOK) {
-                            Manager.uiManager.open({ type: DownloadLoading, zIndex: ViewZOrder.UI, args: [state] });
+                            Manager.uiManager.open({ type: DownloadLoading, zIndex: ViewZOrder.UI, args: [state,i18n.hall] });
                         } else {
                             //退出游戏
                             cc.game.end();
