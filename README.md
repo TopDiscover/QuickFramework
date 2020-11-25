@@ -6,13 +6,12 @@ CocosCreator 快速开发轻量级棋牌框架
 
 本项目基于 cocos creator 2.4.0版本
 
-cocos creator 升级
---------
-引擎修正插件可直接对 2.4.0 ~ 2.4.3版本
-可自行升级，升级后面使用一次引擎修正即可
-
 以Asset Bundle为基础的大厅+子游戏示例
 提供一个轻量级的棋牌开发框架,让你的开发更加简单
+
+cocos creator 升级
+--------
+引擎修正插件可直接对 2.4.0 ~ 2.4.3版本，可自行升级，升级后面使用一次引擎修正即可
 
 [界面管理器](https://gitee.com/top-discover/QuickFramework/tree/2.4.0/assets/script/framework/base/UIManager.ts)
 --------
