@@ -216,11 +216,15 @@ module.exports = {
             //     cocos2d: '2.1.2'
             // }
             //Editor.log(Editor.App.home);
-            if (creatorVersion == "2.4.0") {
+            if (creatorVersion == "2.4.0" ||
+            creatorVersion == "2.4.1" ||
+            creatorVersion == "2.4.2" ||
+            creatorVersion == "2.4.3"
+            ) {
                 Editor.log("Creator 版本 : " + Editor.versions.CocosCreator);
                 Editor.log("Creator cocos2d 版本 : " + Editor.versions.cocos2d);
             }else{
-                Editor.error(`该插件只能使用在2.4.0版本的Creator`);
+                Editor.error(`该插件只能使用在 2.4.0 ~ 2.4.3 版本的Creator`);
                 Editor.log(`请自己手动对比packages/engine目录下对引擎的改动`);
                 return;
             }
