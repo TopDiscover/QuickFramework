@@ -12,13 +12,14 @@ CocosCreator 快速开发轻量级棋牌框架
 cocos creator 升级
 --------
 引擎修正插件可直接对 2.4.0 ~ 2.4.3版本，可自行升级
+
 升级步骤
 
 1，升级后使用一次【引擎修正】插件
 
-2,删除build目录
+2，删除build目录
 
-3,重新构建项目
+3，重新构建项目
 
 [界面管理器](https://gitee.com/top-discover/QuickFramework/tree/2.4.0/assets/script/framework/base/UIManager.ts)
 --------
