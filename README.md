@@ -4,6 +4,10 @@ CocosCreator 快速开发轻量级棋牌框架
 项目说明
 --------
 
+QQ群
+--------
+984110852
+
 本项目基于 cocos creator 2.4.0版本
 
 以Asset Bundle为基础的大厅+子游戏示例
