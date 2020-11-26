@@ -1,4 +1,5 @@
 import { Config } from "../config/Config";
+import { Reconnect } from "../net/Reconnect";
 import { Manager } from "./Manager";
 
 /**
@@ -33,6 +34,7 @@ export default class MainController extends cc.Component {
         Manager.uiLoading.preloadPrefab();
         Manager.loading.preLoadPrefab();
         Manager.alert.preLoadPrefab();
+        Reconnect.preLoadPrefab();
         
 
         //调试按钮事件注册

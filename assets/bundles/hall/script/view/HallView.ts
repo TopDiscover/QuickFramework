@@ -10,6 +10,7 @@ import { ProtoMessageHeader } from "../../../../script/framework/net/ProtoMessag
 import { LobbyService } from "../../../../script/common/net/LobbyService";
 import { HeartbeatProto } from "../../../../script/common/protocol/HeartbetProto";
 import { GameService } from "../../../../script/common/net/GameService";
+import ReconnectController from "../../../../script/common/net/ReconnectController";
 
 
 const { ccclass, property } = cc._decorator;
@@ -142,7 +143,10 @@ export default class HallView extends UIView{
         // LobbyService.instance.messageHeader = BinaryStreamMessageHeader;
         // LobbyService.instance.heartbeat = HeartbeatBinary;
 
-        LobbyService.instance.connect("echo.websocket.org");
+        LobbyService.instance.connect();
+
+        let reconnect = this.addComponent(ReconnectController);
+        reconnect.service = LobbyService.instance;
 
         // GameService.instance.messageHeader = ProtoMessageHeader;
         // GameService.instance.heartbeat = HeartbeatProto;

@@ -1,4 +1,4 @@
-import WebSocketClinet from "./WebSocketClient";
+import WebSocketClinet, { WebSocketType } from "./WebSocketClient";
 import { IMessage } from "./Message";
 
 /**
@@ -103,7 +103,7 @@ export class ServerConnector {
      * @param port 
      * @param protocol 协议类型 ws / wss 
      */
-    public connect(ip: string, port: number | string = null, protocol: string = "wss") {
+    public connect(ip: string, port: number | string = null, protocol: WebSocketType = "wss") {
         if (port) {
             if (typeof port == "string" && port.length > 0) {
                 this._wsClient && this._wsClient.initWebSocket(ip, port, protocol);
