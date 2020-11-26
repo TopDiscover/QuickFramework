@@ -295,13 +295,18 @@ export class AssetManager {
                     return;
                 }
                 if( CC_DEBUG ) cc.log(`释放资源 : ${info.bundle}.${info.url}`);
-                Manager.cacheManager.remove(info.bundle,info.url);
-                let bundle = this.getBundle(info.bundle);
-                if ( bundle ){
-                    info && info.data && info.data.decRef();
-                    bundle.release(info.url,info.type);
-                    if( CC_DEBUG ) cc.log(`成功释放资源 : ${info.bundle}.${info.url}`);
+                if( Manager.cacheManager.removeWithInfo(info) ){
+                    let bundle = this.getBundle(info.bundle);
+                    if ( bundle ){
+                        bundle.release(info.url,info.type);
+                        if( CC_DEBUG ) cc.log(`成功释放资源 : ${info.bundle}.${info.url}`);
+                    }else{
+                        cc.error(`${info.bundle} no found`);
+                    }
+                }else{
+                    if( CC_DEBUG ) cc.warn(`资源bundle : ${info.bundle} url : ${info.url} 被其它界面引用 refCount : ${info.data.refCount}`)
                 }
+                
             }else{
                 cache.status = ResourceCacheStatus.WAITTING_FOR_RELEASE;
                 if( CC_DEBUG ) cc.warn(`${cache.info.url} 正在加载，等待加载完成后进行释放`);

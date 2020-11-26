@@ -1,4 +1,4 @@
-import { ResourceCacheData, BUNDLE_TYPE, ResourceInfo, BUNDLE_REMOTE } from "../base/Defines";
+import { ResourceCacheData, BUNDLE_TYPE, ResourceInfo, BUNDLE_REMOTE, BUNDLE_RESOURCES } from "../base/Defines";
 import UIView from "../ui/UIView";
 import { Manager } from "../Framework";
 
@@ -58,6 +58,15 @@ class ResourceCache {
 
     public remove(path: string) {
         return this._caches.delete(path);
+    }
+
+    public removeUnuseCaches(){
+        this._caches.forEach((value,key,origin)=>{
+            if( value.data && value.data.refCount == 0 ){
+                this._caches.delete(key);
+                if( CC_DEBUG ) cc.log(`删除不使用的资源 bundle : ${this.name} url : ${key}`);
+            }
+        });
     }
 
     public get size(){
@@ -313,18 +322,44 @@ export class CacheManager {
         return false;
     }
 
+    public removeWithInfo( info : ResourceInfo ){
+        if( info ){
+            if( info.data ){
+                info.data.decRef();
+                if( info.data.refCount == 0 ){
+                    this.remove(info.bundle,info.url);
+                    return true;
+                }
+            }else{
+                cc.error(`info.data is null , bundle : ${info.bundle} url : ${info.url}`); 
+            }
+        }else{
+            cc.error(`info is null`);
+        }
+        return false;
+    }
+
     public removeBundle( bundle : BUNDLE_TYPE ){
         let bundleName = this.getBundleName(bundle);
         if (bundleName && this._bundles.has(bundleName) ) {
             if( CC_DEBUG ) {
                 cc.log(`移除bundle cache : ${bundleName}`)
                 let data = this._bundles.get(bundleName);
+                this._removeUnuseCaches();
                 if( data.size > 0 ){
                     cc.error(`移除bundle ${bundleName} 还有未释放的缓存`);
                 }
             }
             this._bundles.delete(bundleName);
         }
+    }
+
+    private _removeUnuseCaches( ){
+        this._bundles.forEach((value,key,origin)=>{
+            if( value ){
+                value.removeUnuseCaches();
+            }
+        });
     }
 
     private _getGetCacheByAsyncArgs(): { url: string, type: typeof cc.Asset, bundle: BUNDLE_TYPE } {

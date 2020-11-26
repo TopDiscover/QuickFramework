@@ -13,12 +13,16 @@ import { GameService } from "../../../../script/common/net/GameService";
 import ReconnectController from "../../../../script/common/net/ReconnectController";
 import { ChatService } from "../../../../script/common/net/ChatService";
 import { Config } from "../../../../script/common/config/Config";
+import NumberView from "../../../../script/common/component/NumberView";
+import { BUNDLE_RESOURCES } from "../../../../script/framework/base/Defines";
 
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class HallView extends UIView{
+    num9: cc.Node;
+    numj: cc.Node;
 
     public static getPrefabUrl() {
         return "prefabs/HallView";
@@ -168,6 +172,23 @@ export default class HallView extends UIView{
         this.node.addChild(node);
         reconnect = node.addComponent(ReconnectController);
         reconnect.service = ChatService.instance;
+
+        //资源交叉引用释放测试
+        this.num9 = cc.find("num9", this.node);
+        if (this.num9) {
+            this.numj = cc.find("numj", this.num9);
+            if (this.numj) {
+                this.numj.active = false;
+            }
+        }
+
+        Manager.uiManager.open({type: NumberView, zIndex: 999, bundle: BUNDLE_RESOURCES}).then((view) => {
+        });
+        this.scheduleOnce(()=>{
+            if (this.numj) {
+                this.numj.active = true;
+            }
+        },5);
     }
 
      bindingEvents(){
