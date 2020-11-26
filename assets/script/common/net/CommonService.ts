@@ -3,8 +3,6 @@ import { Service } from "../../framework/base/Service";
 import { GameEventInterface } from "../../framework/base/GameEventInterface";
 import { IMessage } from "../../framework/net/Message";
 import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdNetID";
-import { Reconnect } from "./Reconnect";
-import { WebSocketType } from "../../framework/net/WebSocketClient";
 
 /**
  * @description service公共基类
@@ -15,35 +13,17 @@ export class CommonService extends Service implements GameEventInterface {
     protected static _instance: CommonService = null;
     public static get instance() { return this._instance || (this._instance = new CommonService()); }
 
-    protected ip = ""
-    protected port: number = null;
-    protected protocol: WebSocketType = "wss"
-
-    /**
-    * @description 连接网络
-    */
-    public connect() {
-        super.connect(this.ip, this.port, this.protocol);
-    }
-
-    /**@description 网络重连 */
-    public reconnect: Reconnect = null;
-    constructor() {
-        super();
-        this.reconnect = new Reconnect(this);
-    }
-
     /**
      * @description 发送心跳
      */
     protected sendHeartbeat() {
         //发送心跳
         if (this.heartbeat) {
-            this.send(new this.heartbeat());
-        } else {
+            this.send(new this.heartbeat() );
+        }else{
             cc.error("请先设置心跳解析类型")
         }
-    }
+    } 
     /**
      * @description 获取最大心跳超时的次数
      */

@@ -4,15 +4,12 @@ import { Manager } from "../Framework";
 /**
  * @description websocket封装
  */
-
-export type WebSocketType = "ws" | "wss";
-
 export default class WebSocketClinet {
 
     private _tag: string = "[WebSocketClinet]";
     private _ip: string = "";
     private _port: string = null;
-    private _protocol : WebSocketType = "wss";
+    private _protocol : string = "wss";
     private _dataArr = [];
     /**@description 是否处于等待连接状态 */
     private _isWaitingConnect = false;
@@ -74,7 +71,7 @@ export default class WebSocketClinet {
 
     private _closeEvent = null;
 
-    private init(ip: string, port: string , protocol : WebSocketType ) {
+    private init(ip: string, port: string , protocol : string ) {
         this._ip = ip;
         this._port = port;
         this._protocol = protocol;
@@ -85,7 +82,7 @@ export default class WebSocketClinet {
     }
 
 
-    private connectWebSocket( ip : string , port: string , protocol : WebSocketType ){
+    private connectWebSocket( ip : string , port: string , protocol : string ){
         this.init(ip, port,protocol);
         if (!this._ip ) return;
         let fullUrl = `${protocol}://${this._ip}`;
@@ -124,7 +121,7 @@ export default class WebSocketClinet {
      * @param ip ip
      * @param port 端口
      */
-    public initWebSocket(ip: string, port: string, protocol : WebSocketType ) {
+    public initWebSocket(ip: string, port: string, protocol : string ) {
         if ( ip == undefined || ip == null || ip.length < 0 ){
             if ( CC_DEBUG ) cc.error(this._tag,`init websocket error ip : ${ip} port : ${port}`);
             return;

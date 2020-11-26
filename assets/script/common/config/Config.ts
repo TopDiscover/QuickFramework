@@ -38,9 +38,6 @@ export namespace Config {
 
     /**@description 大厅bundle名 */
     export const BUNDLE_HALL = "hall";
-
-    /**@description 重连的超时时间 */
-    export const RECONNECT_TIME_OUT = 30;
 }
 
 /**

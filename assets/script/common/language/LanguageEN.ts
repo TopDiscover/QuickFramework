@@ -20,7 +20,4 @@ export let LanguageEN = {
     newVersionForBundle : "检测到{0}有新的版本，是否更新?",
     alreadyRemoteVersion : "{0}已升级到最新",
     hall : "hall",
-    reconnect : "Reconnect ... ",
-    warningReconnect : "您的网络不稳定，是否重新连接？",
-    tryReconnect : "正在尝试第{0}次连接"
 }
