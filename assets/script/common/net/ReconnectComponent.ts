@@ -2,7 +2,6 @@ import Controller from "../../framework/controller/Controller";
 import { CustomNetEventType } from "../../framework/event/EventApi";
 import { Config } from "../config/Config";
 import { LogicEvent, LogicEventData, LogicType } from "../event/LogicEvent";
-import { i18n } from "../language/LanguageImpl";
 import { Manager } from "../manager/Manager";
 import { CommonService } from "./CommonService";
 
@@ -38,9 +37,12 @@ export default class ReconnectComponent extends Controller<CommonService> {
         }
     }
 
-    onLoad() {
-        super.onLoad();
-        cc.log(`${this.logName} onLoad`);
+    start() {
+        cc.log(`${this.logName} start`);
+        this.tryReconnect();
+    }
+
+    public tryReconnect() {
         this.service && this.service.close();
         this._isDoConnect = true;
         this.delayConnect();
@@ -76,7 +78,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
             this.showReconnectDialog();
             return;
         }
-        this.service.reconnect.showNode(Manager.getLanguage(["tryReconnect", this._connectCount]));
+        this.service.reconnect.showNode(Manager.getLanguage(["tryReconnect", this.service.serviceName, this._connectCount]));
         this.service.connect();
     }
 
@@ -93,9 +95,10 @@ export default class ReconnectComponent extends Controller<CommonService> {
 
     private showReconnectDialog() {
         this.service && this.service.reconnect.hideNode();
+        cc.log(`${this.logName} ${this.service.serviceName} 断开`)
         Manager.alert.show({
-            tag: this.logTag,
-            text: i18n.warningReconnect,
+            tag: this.logName,
+            text: Manager.getLanguage(["warningReconnect", this.service.serviceName]),
             confirmCb: (isOK) => {
                 if (isOK) {
                     cc.log(`${this.logName} 重连连接网络`);
@@ -118,8 +121,9 @@ export default class ReconnectComponent extends Controller<CommonService> {
         //根据自己的业务，请示登录，拉游戏数据等操作
         this.service.reconnect.hide();
         this._connectCount = 0;
-        Manager.alert.close(this.logTag);
-        cc.log(`${this.logName} 服务器重连成功`);
+        Manager.alert.close(this.logName);
+        Manager.serviceManager.onReconnectSuccess(this.service);
+        cc.log(`${this.logName} ${this.service.serviceName}服务器重连成功`);
     }
 
     protected onNetError(ev: Event) {

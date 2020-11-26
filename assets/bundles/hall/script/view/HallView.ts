@@ -11,6 +11,7 @@ import { LobbyService } from "../../../../script/common/net/LobbyService";
 import { HeartbeatProto } from "../../../../script/common/protocol/HeartbetProto";
 import { GameService } from "../../../../script/common/net/GameService";
 import ReconnectController from "../../../../script/common/net/ReconnectController";
+import { ChatService } from "../../../../script/common/net/ChatService";
 
 
 const { ccclass, property } = cc._decorator;
@@ -145,13 +146,26 @@ export default class HallView extends UIView{
 
         LobbyService.instance.connect();
 
-        let reconnect = this.addComponent(ReconnectController);
+        let node = new cc.Node();
+        this.node.addChild(node);
+        let reconnect = node.addComponent(ReconnectController);
         reconnect.service = LobbyService.instance;
 
-        // GameService.instance.messageHeader = ProtoMessageHeader;
-        // GameService.instance.heartbeat = HeartbeatProto;
-        // GameService.instance.connect("echo.websocket.org");
+        GameService.instance.messageHeader = ProtoMessageHeader;
+        GameService.instance.heartbeat = HeartbeatProto;
+        GameService.instance.connect();
+        node = new cc.Node();
+        this.node.addChild(node);
+        reconnect = node.addComponent(ReconnectController);
+        reconnect.service = GameService.instance;
 
+        ChatService.instance.messageHeader = ProtoMessageHeader;
+        ChatService.instance.heartbeat = HeartbeatProto;
+        ChatService.instance.connect();
+        node = new cc.Node();
+        this.node.addChild(node);
+        reconnect = node.addComponent(ReconnectController);
+        reconnect.service = ChatService.instance;
     }
 
      bindingEvents(){

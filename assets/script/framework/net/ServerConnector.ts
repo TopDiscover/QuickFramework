@@ -157,4 +157,12 @@ export class ServerConnector {
         this._wsClient && this._wsClient.close(isEnd);
     }
 
+    /**@description 网络是否连接成功 */
+    public get isConnected(){
+        if( this._wsClient ){
+            return this._wsClient.isConnected;
+        }
+        return false;
+    }
+
 }

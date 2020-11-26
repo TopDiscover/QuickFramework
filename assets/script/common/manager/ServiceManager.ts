@@ -3,6 +3,7 @@
  */
 
 import { GameEventInterface } from "../../framework/base/GameEventInterface";
+import { ChatService } from "../net/ChatService";
 import { CommonService } from "../net/CommonService";
 import { GameService } from "../net/GameService";
 import { LobbyService } from "../net/LobbyService";
@@ -19,9 +20,10 @@ import { LobbyService } from "../net/LobbyService";
      * 可直接在这里添加，由ServiceManager统一处理 
      * */
     onLoad(){
-        //可根据自己项目需要，添加多个service
+        //可根据自己项目需要，添加多个service ,添加时必须从优先级 高->低 添加
         this.services.push(LobbyService.instance);
         this.services.push(GameService.instance);
+        this.services.push(ChatService.instance);
     }
 
     /**@description 网络事件调度 */
@@ -56,5 +58,30 @@ import { LobbyService } from "../net/LobbyService";
         this.services.forEach(value=>{
             value && value.onEnterForgeground(inBackgroundTime);
         });
+    }
+
+    isCanTryReconnect( service : CommonService ){
+        let prev : CommonService = null;
+        for( let i = 1 ; i < this.services.length ; i++ ){
+            //如果高优先级未连接成功时，低优先的网络不重连
+            prev = this.services[i-1];
+            if( !prev.isConnected ){
+                if( prev == service ){
+                    return true;
+                }
+                return false;
+            }
+        }
+        return false;
+    }
+
+    onReconnectSuccess( service : CommonService ){
+        for( let i = 0 ; i < this.services.length ; i++ ){
+            //优先级高的重连成功后，连接优先级低的
+            if( !this.services[i].isConnected ){
+                this.services[i].reconnect.show();
+                break;
+            }
+        }
     }
  }

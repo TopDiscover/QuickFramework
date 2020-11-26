@@ -18,7 +18,9 @@ export default class ReconnectController extends Controller<CommonService> {
             if (view) {
                 return;
             }
-            this.service && this.service.reconnect.show();
+            if( this.service && Manager.serviceManager.isCanTryReconnect(this.service) ){
+                this.service.reconnect.show();
+            }
         });
     }
 
@@ -32,7 +34,9 @@ export default class ReconnectController extends Controller<CommonService> {
             if (view) {
                 return;
             }
-            this.service && this.service.reconnect.show();
+            if( this.service && Manager.serviceManager.isCanTryReconnect(this.service) ){
+                this.service.reconnect.show();
+            }
         });
     }
 }

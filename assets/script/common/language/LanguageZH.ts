@@ -20,6 +20,6 @@ export let LanguageZH = {
   alreadyRemoteVersion : "{0}已升级到最新",
   hall : "大厅",
   reconnect : "正在重连...",
-  warningReconnect : "您的网络不稳定，是否重新连接？",
-  tryReconnect : "正在尝试第{0}次连接"
+  warningReconnect : "{0}网络已断开，是否重新连接？",
+  tryReconnect : "{0}网络:正在尝试第{1}次连接..."
 }

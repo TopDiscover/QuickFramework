@@ -5,6 +5,7 @@ import { IMessage } from "../../framework/net/Message";
 import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdNetID";
 import { Reconnect } from "./Reconnect";
 import { WebSocketType } from "../../framework/net/WebSocketClient";
+import { Config } from "../config/Config";
 
 /**
  * @description service公共基类
@@ -14,7 +15,7 @@ export class CommonService extends Service implements GameEventInterface {
 
     protected static _instance: CommonService = null;
     public static get instance() { return this._instance || (this._instance = new CommonService()); }
-
+    public serviceName = "CommonService";
     protected ip = ""
     protected port: number = null;
     protected protocol: WebSocketType = "wss"

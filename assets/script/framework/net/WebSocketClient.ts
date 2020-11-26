@@ -117,6 +117,8 @@ export default class WebSocketClinet {
 
         //错误处理
         this._ws.onerror = this.__onError.bind(this);
+
+        this._ws.readyState
     }
 
     /**
@@ -220,6 +222,14 @@ export default class WebSocketClinet {
             if ( CC_DEBUG ) cc.error(this._tag,`onError`);
         }
         if ( this.onError ) this.onError(event);
+    }
+
+    /**@description 网络是否连接成功 */
+    public get isConnected( ){
+        if( this._ws && this._ws.readyState === WebSocket.OPEN ){
+            return true
+        }
+        return false;
     }
 
     public send( data: string | ArrayBufferLike | Blob | ArrayBufferView ){
