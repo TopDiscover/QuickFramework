@@ -12,6 +12,7 @@ import { HeartbeatProto } from "../../../../script/common/protocol/HeartbetProto
 import { GameService } from "../../../../script/common/net/GameService";
 import ReconnectController from "../../../../script/common/net/ReconnectController";
 import { ChatService } from "../../../../script/common/net/ChatService";
+import { Config } from "../../../../script/common/config/Config";
 
 
 const { ccclass, property } = cc._decorator;
@@ -150,6 +151,7 @@ export default class HallView extends UIView{
         this.node.addChild(node);
         let reconnect = node.addComponent(ReconnectController);
         reconnect.service = LobbyService.instance;
+        LobbyService.instance.maxEnterBackgroundTime = Config.MIN_INBACKGROUND_TIME;
 
         GameService.instance.messageHeader = ProtoMessageHeader;
         GameService.instance.heartbeat = HeartbeatProto;

@@ -6,6 +6,7 @@ import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdNetID";
 import { Reconnect } from "./Reconnect";
 import { WebSocketType } from "../../framework/net/WebSocketClient";
 import { Config } from "../config/Config";
+import { Manager } from "../../framework/Framework";
 
 /**
  * @description service公共基类
@@ -19,6 +20,20 @@ export class CommonService extends Service implements GameEventInterface {
     protected ip = ""
     protected port: number = null;
     protected protocol: WebSocketType = "wss"
+    
+    private _maxEnterBackgroundTime: number = Config.MAX_INBACKGROUND_TIME;
+    private _backgroundTimeOutId = -1;
+    /**@description 进入后台的最大允许时间，超过了最大值，则进入网络重连 */
+    public get maxEnterBackgroundTime() {
+        return this._maxEnterBackgroundTime;
+    }
+    public set maxEnterBackgroundTime(value: number) {
+        if (value < Config.MIN_INBACKGROUND_TIME || value > Config.MAX_INBACKGROUND_TIME) {
+            value = Config.MIN_INBACKGROUND_TIME;
+        }
+        cc.log(this.serviceName, `maxEnterBackgroundTime ${value}`);
+        this._maxEnterBackgroundTime = value;
+    }
 
     /**
     * @description 连接网络
@@ -72,10 +87,33 @@ export class CommonService extends Service implements GameEventInterface {
     }
 
     onEnterBackground() {
-
+        let me = this;
+        Manager.uiManager.getView("LoginView").then(view=>{
+            me._backgroundTimeOutId = setTimeout(() => {
+                //进入后台超时，主动关闭网络
+                cc.log(`进入后台时间过长，主动关闭网络，等玩家切回前台重新连接网络`);
+                me.close();
+            }, me.maxEnterBackgroundTime * 1000);
+        });
     }
 
     onEnterForgeground(inBackgroundTime: number) {
-
+        if (this._backgroundTimeOutId != -1) {
+            cc.log(`清除进入后台的超时关闭网络定时器`);
+            clearTimeout(this._backgroundTimeOutId);
+            let self = this;
+            //登录界面，不做处理
+            Manager.uiManager.getView("LoginView").then((view) => {
+                cc.log(`在后台时间${inBackgroundTime} , 最大时间为: ${self.maxEnterBackgroundTime}`)
+                if (view) {
+                    return;
+                }
+                if (inBackgroundTime > self.maxEnterBackgroundTime) {
+                    cc.log(`从回台切换，显示重新连接网络`);
+                    self.close();
+                    self.reconnect.show();
+                }
+            });
+        }
     }
 }

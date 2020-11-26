@@ -41,6 +41,11 @@ export namespace Config {
 
     /**@description 重连的超时时间 */
     export const RECONNECT_TIME_OUT = 30;
+
+    /**@description 进入后台最大时间（单位秒）大于这个时间时就会进入重连*/
+    export let MAX_INBACKGROUND_TIME = 60;
+    /**@description 进入后台最小时间（单位秒）大于这个时间时就会进入重连*/
+    export let MIN_INBACKGROUND_TIME = 5;
 }
 
 /**
