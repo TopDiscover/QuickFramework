@@ -1,9 +1,5 @@
-import Controller from "../../framework/controller/Controller";
 import { Config } from "../config/Config";
-import { CommonService } from "../net/CommonService";
-import { LobbyService } from "../net/LobbyService";
 import { Manager } from "./Manager";
-import { GameService } from "../net/GameService";
 
 /**
  * @description 主控制器 
@@ -13,7 +9,7 @@ const {ccclass, property,menu} = cc._decorator;
 
 @ccclass
 @menu("manager/MainController")
-export default class MainController extends Controller<CommonService> {
+export default class MainController extends cc.Component {
     
     /**@description 进入后台的时间 */
     private _enterBackgroundTime = 0;
@@ -75,17 +71,17 @@ export default class MainController extends Controller<CommonService> {
         cc.game.on(cc.game.EVENT_HIDE,this.onEnterBackground,this);
         cc.game.on(cc.game.EVENT_SHOW,this.onEnterForgeground,this);
 
+        //Service onLoad
+        Manager.serviceManager.onLoad();
+
         //逻辑管理器
         Manager.logicManager.onLoad(this.node);
     }
 
     update(){
 
-        //大厅网络连接调度
-        LobbyService.instance.handMessage();
-
-        //游戏网络连接调试
-        GameService.instance.handMessage();
+        //Service 网络调试
+        Manager.serviceManager.update();
 
         //远程资源下载任务调度
         Manager.assetManager.remote.update();
@@ -104,6 +100,8 @@ export default class MainController extends Controller<CommonService> {
         cc.game.off(cc.game.EVENT_HIDE);
         cc.game.off(cc.game.EVENT_SHOW);
 
+        Manager.serviceManager.onDestroy();
+
         //逻辑管理器
         Manager.logicManager.onDestroy(this.node);
     }
@@ -112,7 +110,7 @@ export default class MainController extends Controller<CommonService> {
         this._enterBackgroundTime = Date.timeNow();
         cc.log(`[MainController]`,`onEnterBackground ${this._enterBackgroundTime}`);
         Manager.globalAudio.onEnterBackground();
-        this.service && this.service.onEnterBackground();
+        Manager.serviceManager.onEnterBackground();
     }
 
     private onEnterForgeground(){
@@ -120,6 +118,6 @@ export default class MainController extends Controller<CommonService> {
         let inBackgroundTime = now - this._enterBackgroundTime;
         cc.log(`[MainController]`,`onEnterForgeground ${now} background total time : ${inBackgroundTime}`);
         Manager.globalAudio.onEnterForgeground(inBackgroundTime);
-        this.service && this.service.onEnterForgeground(inBackgroundTime);
+        Manager.serviceManager.onEnterForgeground(inBackgroundTime);
     }
 }

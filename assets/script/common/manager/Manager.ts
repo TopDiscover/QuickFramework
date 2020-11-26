@@ -17,6 +17,7 @@ import Tips from "../component/Tips";
 import UILoading from "../component/UILoading";
 import Alert from "../component/Alert";
 import Loading from "../component/Loading";
+import { ServiceManager } from "./ServiceManager";
 
 /**@description 游戏所有运行单例的管理 */
 class _Manager extends Framework._FramewokManager {
@@ -24,6 +25,11 @@ class _Manager extends Framework._FramewokManager {
     /**@description 全局常驻网络组件管理器 */
     get netManager() {
         return getSingleton(NetManager);
+    }
+
+    /**@description 网络Service管理器 */
+    get serviceManager(){
+        return getSingleton(ServiceManager);
     }
 
     /**@description 逻辑控制器管理器 */

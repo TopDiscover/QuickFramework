@@ -241,10 +241,13 @@ export default class WebSocketClinet {
         }
     }
 
-    /**@description 关闭网络 */
-    public close( ){
+    /**@description 关闭网络 
+     * @param isEnd 只有在程序的关闭销毁时调用，
+     * 在MainController.onDestroy中使用
+     */
+    public close( isEnd : boolean){
         if ( this._ws ){
-            this._closeEvent = {type : CustomNetEventType.CLOSE};
+            this._closeEvent = {type : CustomNetEventType.CLOSE , isEnd : isEnd};
             this._ws.close();
         }
         //清空发送

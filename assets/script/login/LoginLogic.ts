@@ -76,6 +76,10 @@ class LoginLogic extends Logic {
 
     public onEnterComplete(data: LogicEventData) {
         super.onEnterComplete(data);
+        if( data.type == this.logicType ){
+            //进入到登录，关闭掉所有网络连接，请求登录成功后才连接网络
+            Manager.serviceManager.close();
+        }
     }
 
 }

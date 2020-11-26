@@ -150,11 +150,6 @@ export default class HallView extends UIView{
 
     }
 
-    onDestroy(){
-        LobbyService.instance.close();
-        super.onDestroy();
-    }
-
      bindingEvents(){
          super.bindingEvents();
          this.registerEvent(CommonEvent.DOWNLOAD_PROGRESS,this.onDownloadProgess);

@@ -152,9 +152,9 @@ export class ServerConnector {
         this._wsClient && this._wsClient.send(buffer);
     }
 
-    public close() {
+    public close( isEnd : boolean = false ) {
         this.stopSendHartSchedule();
-        this._wsClient && this._wsClient.close();
+        this._wsClient && this._wsClient.close(isEnd);
     }
 
 }
