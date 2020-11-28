@@ -6,7 +6,8 @@ import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdDefines";
 import { Reconnect } from "./Reconnect";
 import { WebSocketType } from "../../framework/net/WebSocketClient";
 import { Config } from "../config/Config";
-import { Manager } from "../../framework/Framework";
+import { Manager } from "../manager/Manager";
+import { LogicEvent } from "../event/LogicEvent";
 
 /**
  * @description service公共基类
@@ -75,7 +76,34 @@ export class CommonService extends Service implements GameEventInterface {
      */
     protected onHeartbeatTimeOut() {
         super.onHeartbeatTimeOut();
-        cc.warn(`心跳超时，您已经断开网络`);
+        cc.warn(`${this.serviceName} 心跳超时，您已经断开网络`);
+        this.close();
+
+        //登录界面，不做处理
+        Manager.uiManager.getView("LoginView").then((view) => {
+           if( view ) return;
+           this.reconnect.hide();
+           if( !Manager.serviceManager.isCanTryReconnect(this) ){
+               return;
+           }
+           cc.log(`${this.serviceName} 断开`)
+           Manager.alert.show({
+               tag: this.serviceName,
+               text: Manager.getLanguage(["warningReconnect", this.serviceName]),
+               confirmCb: (isOK) => {
+                   if (isOK) {
+                       this.reconnect.show();
+                   } else {
+                       cc.log(`${this.serviceName} 玩家网络不好，不重连，退回到登录界面`);
+                       dispatch(LogicEvent.ENTER_LOGIN, true);
+                   }
+               },
+               cancelCb: () => {
+                   cc.log(`${this.serviceName} 玩家网络不好，不重连，退回到登录界面`);
+                   dispatch(LogicEvent.ENTER_LOGIN, true);
+               }
+           });
+        });
     }
     /**
      * @description 是否为心跳消息
@@ -110,7 +138,9 @@ export class CommonService extends Service implements GameEventInterface {
                 if (inBackgroundTime > self.maxEnterBackgroundTime) {
                     cc.log(`从回台切换，显示重新连接网络`);
                     self.close();
-                    self.reconnect.show();
+                    if( Manager.serviceManager.isCanTryReconnect(self) ){
+                        self.reconnect.show();
+                    }
                 }
             });
         }
