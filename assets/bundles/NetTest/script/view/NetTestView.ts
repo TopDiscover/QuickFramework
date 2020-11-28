@@ -45,9 +45,25 @@ export default class NetTestView extends GameView {
     }
 
     private onNetClose(service : CommonService ) {
+        let isConnected = false;
+        if( service == LobbyService.instance ){
+            this.connects[NetTest.ServiceType.Lobby].isChecked = isConnected;
+        }else if( service == GameService.instance ){
+            this.connects[NetTest.ServiceType.Game].isChecked = isConnected;
+        }else if( service == ChatService.instance){
+            this.connects[NetTest.ServiceType.Chat].isChecked = isConnected;
+        }
         this.log(`${service.serviceName} 断开连接!`);
     }
     private onNetConnected(service : CommonService) {
+        let isConnected = true;
+        if( service == LobbyService.instance ){
+            this.connects[NetTest.ServiceType.Lobby].isChecked = isConnected;
+        }else if( service == GameService.instance ){
+            this.connects[NetTest.ServiceType.Game].isChecked = isConnected;
+        }else if( service == ChatService.instance){
+            this.connects[NetTest.ServiceType.Chat].isChecked = isConnected;
+        }
         this.log(`${service.serviceName} 连接成功!`);
     }
 
@@ -188,7 +204,9 @@ export default class NetTestView extends GameView {
 
     private _connect( service : CommonService ){
         if( service.isConnected ){
-            this.log(`${service.serviceName} 已经连接`);
+            //断开连接
+            this.log(`${service.serviceName} 断开连接中...`);
+            service.close();
             return;
         }
         this.log(`${service.serviceName} 连接中...`);
