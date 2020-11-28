@@ -22,5 +22,6 @@ export let LanguageEN = {
     hall : "hall",
     reconnect : "Reconnect ... ",
     warningReconnect : "{0}网络已断开，是否重新连接？",
-    tryReconnect : "{0}网络:正在尝试第{1}次连接..."
+    tryReconnect : "{0}网络:正在尝试第{1}次连接...",
+    quitGame : "您确定要退出游戏？",
 }

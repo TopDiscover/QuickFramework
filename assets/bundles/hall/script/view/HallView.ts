@@ -4,13 +4,7 @@ import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../script
 import { CommonEvent } from "../../../../script/common/event/CommonEvent";
 import { Manager } from "../../../../script/common/manager/Manager";
 import { HallData } from "../data/HallData";
-import { ProtoMessageHeader } from "../../../../script/framework/net/ProtoMessage";
-import { LobbyService } from "../../../../script/common/net/LobbyService";
-import { HeartbeatProto } from "../../../../script/common/protocol/HeartbetProto";
-import { GameService } from "../../../../script/common/net/GameService";
-import ReconnectController from "../../../../script/common/net/ReconnectController";
-import { ChatService } from "../../../../script/common/net/ChatService";
-import { Config } from "../../../../script/common/config/Config";
+import { i18n } from "../../../../script/common/language/LanguageImpl";
 
 
 const { ccclass, property } = cc._decorator;
@@ -58,7 +52,7 @@ export default class HallView extends UIView {
         setting.on(cc.Node.EventType.TOUCH_END, () => {
             Manager.alert.show({
                 immediatelyCallback: true,
-                text: `您确定要退出游戏？`,
+                text: i18n.quitGame,
                 confirmCb: (isOk) => {
                     if (isOk) {
                         dispatch(LogicEvent.ENTER_LOGIN);
@@ -68,44 +62,6 @@ export default class HallView extends UIView {
         });
 
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
-
-        //根据自己的需要，连接网络
-
-        //proto
-        LobbyService.instance.messageHeader = ProtoMessageHeader;
-        LobbyService.instance.heartbeat = HeartbeatProto;
-
-        //json
-        // LobbyService.instance.messageHeader = JsonMessageHeader;
-        // LobbyService.instance.heartbeat = HeartbeatJson;
-
-        //binaryStream
-        // LobbyService.instance.messageHeader = BinaryStreamMessageHeader;
-        // LobbyService.instance.heartbeat = HeartbeatBinary;
-
-        LobbyService.instance.connect();
-
-        let node = new cc.Node();
-        this.node.addChild(node);
-        let reconnect = node.addComponent(ReconnectController);
-        reconnect.service = LobbyService.instance;
-        LobbyService.instance.maxEnterBackgroundTime = Config.MIN_INBACKGROUND_TIME;
-
-        GameService.instance.messageHeader = ProtoMessageHeader;
-        GameService.instance.heartbeat = HeartbeatProto;
-        GameService.instance.connect();
-        node = new cc.Node();
-        this.node.addChild(node);
-        reconnect = node.addComponent(ReconnectController);
-        reconnect.service = GameService.instance;
-
-        ChatService.instance.messageHeader = ProtoMessageHeader;
-        ChatService.instance.heartbeat = HeartbeatProto;
-        ChatService.instance.connect();
-        node = new cc.Node();
-        this.node.addChild(node);
-        reconnect = node.addComponent(ReconnectController);
-        reconnect.service = ChatService.instance;
     }
 
     bindingEvents() {

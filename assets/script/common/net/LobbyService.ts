@@ -2,7 +2,6 @@
  * @description 子游戏连接服务
  */
 
-import { Config } from "../config/Config";
 import { CommonService } from "./CommonService";
 
 export class LobbyService extends CommonService {
