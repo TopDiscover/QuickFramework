@@ -1,6 +1,6 @@
 
 import { JsonMessage, serialize } from "../../../../script/framework/net/JsonMessage";
-import { MainCmd, SUB_CMD_LOBBY } from "../../../../script/common/protocol/CmdNetID";
+import { MainCmd, SUB_CMD_LOBBY } from "../../../../script/common/protocol/CmdDefines";
 import { ProtoMessage } from "../../../../script/framework/net/ProtoMessage";
 export class TestData extends JsonMessage{
 

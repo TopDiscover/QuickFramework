@@ -2,7 +2,7 @@
 import { Service } from "../../framework/base/Service";
 import { GameEventInterface } from "../../framework/base/GameEventInterface";
 import { IMessage } from "../../framework/net/Message";
-import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdNetID";
+import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdDefines";
 import { Reconnect } from "./Reconnect";
 import { WebSocketType } from "../../framework/net/WebSocketClient";
 import { Config } from "../config/Config";
@@ -83,7 +83,7 @@ export class CommonService extends Service implements GameEventInterface {
      */
     protected isHeartBeat(data: IMessage): boolean {
         //示例
-        return data.mainCmd == MainCmd.CMD_SYS && data.subCmd == SUB_CMD_SYS.CMD_SYS_HEART_ACK;
+        return data.mainCmd == MainCmd.CMD_SYS && data.subCmd == SUB_CMD_SYS.CMD_SYS_HEART;
     }
 
     onEnterBackground() {

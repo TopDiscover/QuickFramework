@@ -1,4 +1,4 @@
-import { MainCmd } from "../../../../script/common/protocol/CmdNetID";
+import { MainCmd } from "../../../../script/common/protocol/CmdDefines";
 import { serialize, JsonMessage } from "../../../../script/framework/net/JsonMessage";
 
 /**

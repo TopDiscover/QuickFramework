@@ -32,28 +32,7 @@ export let SUB_CMD_LOBBY = {
     CMD_LOBBY_TEST_BINARY : 4,
 }
 
-/**@description 支付类公共cmd定义 */
-export let SUB_CMD_PAY = {
-    /**@description 支付成功*/
-    CMD_PAY_PAY_SUCCESS: 1,
-}
-
-/**@description 聊天类公共cmd定义 */
-export let SUB_CMD_CHAT = {
-    /**@description 请求发送互动道具*/
-    CMD_CHAT_INTERACTIVE_PROPS_REQ: 1,
-    /**@description 收到互动道具*/
-    CMD_CHAT_INTERACTIVE_PROPS_RECV: 2,
-
-    /**@description 请求发送文字聊天*/
-    CMD_CHAT_CHAT_REQ: 3,
-    /**@description 收到文字聊天*/
-    CMD_CHAT_CHAT_RECV: 4,
-}
-
 export let SUB_CMD_SYS = {
-    /** 心跳请求 -- 客户端、服务器使用 **/
-    CMD_SYS_HEART_ASK: 1,
-    /** 心跳应答 -- 客户端、服务器使用 **/
-    CMD_SYS_HEART_ACK: 2,
+    /** 心跳 -- 客户端、服务器使用 **/
+    CMD_SYS_HEART: 1,
 }

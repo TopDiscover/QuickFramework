@@ -4,7 +4,7 @@
 
 import { injectService } from "../../../../script/framework/decorator/Decorators";
 import Controller from "../../../../script/framework/controller/Controller";
-import { MainCmd, SUB_CMD_LOBBY } from "../../../../script/common/protocol/CmdNetID";
+import { MainCmd, SUB_CMD_LOBBY } from "../../../../script/common/protocol/CmdDefines";
 import { UpdateMoney, TestMsg } from "../protocol/HallMessage";
 import { TestBinaryMessage } from "../protocol/CmdBinaryMessage";
 import { CommonEvent } from "../../../../script/common/event/CommonEvent";
