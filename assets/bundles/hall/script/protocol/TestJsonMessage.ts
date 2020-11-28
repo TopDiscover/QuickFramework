@@ -24,6 +24,9 @@ export class TestJsonMessage extends JsonMessage {
     @serialize("test",TestData)
     testData : TestData = new TestData();
 
+    @serialize("hello",String)
+    hello : string = "您好，我是Json消息！";
+
     constructor(){
         super();
         this.testMap.set(1,"ss");

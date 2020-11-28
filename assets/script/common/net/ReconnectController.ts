@@ -1,6 +1,7 @@
 
 /**@description 断线重连控制器 */
 
+import { ServiceEvent } from "../../framework/base/Defines";
 import Controller from "../../framework/controller/Controller";
 import { CustomNetEventType } from "../../framework/event/EventApi";
 import { Manager } from "../manager/Manager";
@@ -12,8 +13,8 @@ const { ccclass, property } = cc._decorator;
 export default class ReconnectController extends Controller<CommonService> {
 
     logTag = "[ReconnectController]"
-    protected onNetError(ev: Event) {
-        super.onNetError(ev);
+    protected onNetError(ev:ServiceEvent) {
+        let result = super.onNetError(ev);
         Manager.uiManager.getView("LoginView").then(view => {
             if (view) {
                 return;
@@ -22,11 +23,12 @@ export default class ReconnectController extends Controller<CommonService> {
                 this.service.reconnect.show();
             }
         });
+        return result;
     }
 
-    protected onNetClose(ev: Event) {
-        super.onNetClose(ev);
-        if (ev.type == CustomNetEventType.CLOSE) {
+    protected onNetClose(ev: ServiceEvent) {
+        let result = super.onNetClose(ev);
+        if (ev.event.type == CustomNetEventType.CLOSE) {
             cc.log(`${this.logTag} 应用层主动关闭socket`);
             return;
         }
@@ -38,5 +40,6 @@ export default class ReconnectController extends Controller<CommonService> {
                 this.service.reconnect.show();
             }
         });
+        return result;
     }
 }

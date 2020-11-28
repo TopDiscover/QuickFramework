@@ -50,6 +50,9 @@ export class TestBinaryMessage extends BinaryStreamMessage {
     @serialize("user",TestData)
     user : TestData = new TestData();
 
+    @serialize("hello",StringValue)
+    hello : string = "您好，我是Binary消息！"
+
     constructor(){
         super();
         // this.testMap.set("keyy_1",1);

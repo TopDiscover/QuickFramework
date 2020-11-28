@@ -16,7 +16,7 @@ import { SUB_CMD_LOBBY } from "./LobbyCmd";
 export class TestProtoData extends Message {
 
     @Field.d(1, "string", "required", "awesome default string")
-    public awesomeField: string;
+    public hello: string;
 
     @Field.d(2, AwesomeEnum,"required",AwesomeEnum.ONE)
     public awesomeEnum: AwesomeEnum;

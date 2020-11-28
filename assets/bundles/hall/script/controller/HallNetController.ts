@@ -1,5 +1,5 @@
 /**
- * @description 登录场景逻辑流程控制器  
+ * @description 大厅网络逻辑流程控制器  
  */
 
 import { injectService } from "../../../../script/framework/decorator/Decorators";
@@ -21,22 +21,21 @@ export default class HallNetController extends Controller<LobbyService> {
 
     protected bindingEvents() {
         super.bindingEvents()
-        this.registerEvent(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_JSON_MSG, this.onMoneyUpdate, TestJsonMessage);
-        this.registerEvent(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_PROTO_MSG, this.onTestMsg, TestProtoMessage);
-        this.registerEvent(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_BINARY_MSG, this.onTestBinary, TestBinaryMessage);
+        this.registerEvent(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_JSON_MSG, this.onTestJsonMessage, TestJsonMessage);
+        this.registerEvent(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_PROTO_MSG, this.onTestProtoMessage, TestProtoMessage);
+        this.registerEvent(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_BINARY_MSG, this.onTestBinaryMessage, TestBinaryMessage);
     }
 
-    private onMoneyUpdate(data: TestJsonMessage) {
-        //通知变更金钱
-        dispatch(CommonEvent.TEST_JSON_MSG, data.count);
+    private onTestJsonMessage(data: TestJsonMessage) {
+        dispatch(CommonEvent.TEST_JSON_MSG, data.hello);
     }
 
-    private onTestMsg(data: TestProtoMessage) {
-        dispatch(CommonEvent.TEST_PROTO_MSG, data.mainCmd);
+    private onTestProtoMessage(data: TestProtoMessage) {
+        dispatch(CommonEvent.TEST_PROTO_MSG, data.data.hello);
     }
 
-    private onTestBinary(data: TestBinaryMessage) {
-        dispatch(CommonEvent.TEST_BINARY_MSG, data.subCmd)
+    private onTestBinaryMessage(data: TestBinaryMessage) {
+        dispatch(CommonEvent.TEST_BINARY_MSG, data.hello)
     }
 
     protected onNetOpen(event: ServiceEvent) {

@@ -11,20 +11,22 @@ class _HallNetHelper extends NetHelper<LobbyService>{
         super(LobbyService.instance);
     }
 
-    sendProtoMessage() {
+    sendProtoMessage(hello: string) {
         let testProto = new TestProtoMessage();
-        testProto.data.awesomeField = "这是一个中文的测试";
+        testProto.data.hello = hello;
         testProto.data.afvalue = 4.5;
         this.service.send(testProto);
     }
 
-    sendJsonMessage() {
+    sendJsonMessage(hello: string) {
         let msg = new TestJsonMessage();
+        msg.hello = hello;
         this.service.send(msg);
     }
 
-    sendBinaryMessage() {
+    sendBinaryMessage(hello: string) {
         let binaryMessage = new TestBinaryMessage();
+        binaryMessage.hello = hello;
         this.service.send(binaryMessage);
     }
 

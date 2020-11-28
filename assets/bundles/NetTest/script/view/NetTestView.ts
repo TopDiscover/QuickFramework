@@ -1,4 +1,5 @@
 import GameView from "../../../../script/common/base/GameView";
+import { Config } from "../../../../script/common/config/Config";
 import { CommonEvent } from "../../../../script/common/event/CommonEvent";
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
 import { ChatService } from "../../../../script/common/net/ChatService";
@@ -11,7 +12,12 @@ import { HeartbeatJson } from "../../../../script/common/protocol/HeartbetJson";
 import { HeartbeatProto } from "../../../../script/common/protocol/HeartbetProto";
 import { BinaryStreamMessageHeader } from "../../../../script/framework/net/BinaryStreamMessage";
 import { JsonMessageHeader } from "../../../../script/framework/net/JsonMessage";
+import { Message } from "../../../../script/framework/net/Message";
 import { ProtoMessageHeader } from "../../../../script/framework/net/ProtoMessage";
+import { HallNetHelper } from "../../../hall/script/controller/HallNetHelper";
+import { INetHelper } from "../controller/INetHelper";
+import { TestChatNetHelper } from "../controller/TestChatNetHelper";
+import { TestGameNetHelper } from "../controller/TestGameNetHelper";
 import { NetTest } from "../data/NetTestData";
 
 
@@ -24,50 +30,59 @@ export default class NetTestView extends GameView {
         return "prefabs/NetTestView";
     }
 
-    private netType: cc.ToggleContainer = null;
+    private netToggleContainer: cc.ToggleContainer = null;
 
     private reconnects: cc.Toggle[] = [];
 
-    private logScorllView : cc.ScrollView = null;
-    private logItem : cc.Node =null;
-    private connects : cc.Toggle[] = [];
+    private logScorllView: cc.ScrollView = null;
+    private logItem: cc.Node = null;
+    private connects: cc.Toggle[] = [];
 
-    protected bindingEvents(){
+    private netType: NetTest.NetType = NetTest.NetType.JSON;
+
+    protected bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(CommonEvent.LOBBY_SERVICE_CONNECTED,this.onNetConnected);
-        this.registerEvent(CommonEvent.LOBBY_SERVICE_CLOSE,this.onNetClose);
+        this.registerEvent(CommonEvent.LOBBY_SERVICE_CONNECTED, this.onNetConnected);
+        this.registerEvent(CommonEvent.LOBBY_SERVICE_CLOSE, this.onNetClose);
 
-        this.registerEvent(CommonEvent.GAME_SERVICE_CONNECTED,this.onNetConnected);
-        this.registerEvent(CommonEvent.GAME_SERVICE_CLOSE,this.onNetClose);
+        this.registerEvent(CommonEvent.GAME_SERVICE_CONNECTED, this.onNetConnected);
+        this.registerEvent(CommonEvent.GAME_SERVICE_CLOSE, this.onNetClose);
 
-        this.registerEvent(CommonEvent.CHAT_SERVICE_CONNECTED,this.onNetConnected);
-        this.registerEvent(CommonEvent.CHAT_SERVICE_CLOSE,this.onNetClose);
+        this.registerEvent(CommonEvent.CHAT_SERVICE_CONNECTED, this.onNetConnected);
+        this.registerEvent(CommonEvent.CHAT_SERVICE_CLOSE, this.onNetClose);
+
+        this.registerEvent(CommonEvent.TEST_BINARY_MSG,this.onMessage);
+        this.registerEvent(CommonEvent.TEST_JSON_MSG,this.onMessage);
+        this.registerEvent(CommonEvent.TEST_PROTO_MSG,this.onMessage);
+    }
+    private onMessage( hello : string ) {
+        this.log(`收到：${hello}`);
     }
 
-    private onNetClose(service : CommonService ) {
+    private onNetClose(service: CommonService) {
         let isConnected = false;
-        if( service == LobbyService.instance ){
+        if (service == LobbyService.instance) {
             this.connects[NetTest.ServiceType.Lobby].isChecked = isConnected;
-        }else if( service == GameService.instance ){
+        } else if (service == GameService.instance) {
             this.connects[NetTest.ServiceType.Game].isChecked = isConnected;
-        }else if( service == ChatService.instance){
+        } else if (service == ChatService.instance) {
             this.connects[NetTest.ServiceType.Chat].isChecked = isConnected;
         }
         this.log(`${service.serviceName} 断开连接!`);
     }
-    private onNetConnected(service : CommonService) {
+    private onNetConnected(service: CommonService) {
         let isConnected = true;
-        if( service == LobbyService.instance ){
+        if (service == LobbyService.instance) {
             this.connects[NetTest.ServiceType.Lobby].isChecked = isConnected;
-        }else if( service == GameService.instance ){
+        } else if (service == GameService.instance) {
             this.connects[NetTest.ServiceType.Game].isChecked = isConnected;
-        }else if( service == ChatService.instance){
+        } else if (service == ChatService.instance) {
             this.connects[NetTest.ServiceType.Chat].isChecked = isConnected;
         }
         this.log(`${service.serviceName} 连接成功!`);
     }
 
-    onDestroy(){
+    onDestroy() {
         this.logItem.destroy();
         super.onDestroy();
     }
@@ -78,7 +93,7 @@ export default class NetTestView extends GameView {
             dispatch(LogicEvent.ENTER_HALL);
         });
 
-        this.netType = cc.find("netType", this.node).getComponent(cc.ToggleContainer);
+        this.netToggleContainer = cc.find("netType", this.node).getComponent(cc.ToggleContainer);
 
         let reconnect = cc.find("reconnet", this.node);
         for (let i = 0; i < 3; i++) {
@@ -86,17 +101,24 @@ export default class NetTestView extends GameView {
             this.reconnects.push(toggle);
         }
 
-        this.logScorllView = cc.find(`log`,this.node).getComponent(cc.ScrollView);
+        this.logScorllView = cc.find(`log`, this.node).getComponent(cc.ScrollView);
         this.logItem = this.logScorllView.content.getChildByName("item");
         this.logItem.removeFromParent(false);
 
-        let connects = cc.find("connet",this.node);
-        for( let i = 0 ; i < 3 ; i++){
-            let toggle = cc.find(`type${i}/toggle`,connects).getComponent(cc.Toggle);
+        let connects = cc.find("connet", this.node);
+        for (let i = 0; i < 3; i++) {
+            let toggle = cc.find(`type${i}/toggle`, connects).getComponent(cc.Toggle);
             this.connects.push(toggle);
-            let node = cc.find(`type${i}/title`,connects);
+            let node = cc.find(`type${i}/title`, connects);
             node.userData = i;
-            node.on(cc.Node.EventType.TOUCH_END,this.onConnect,this)
+            node.on(cc.Node.EventType.TOUCH_END, this.onConnect, this)
+        }
+
+        let send = cc.find("send", this.node);
+        for (let i = 0; i < 3; i++) {
+            let node = cc.find(`type${i}/title`, send);
+            node.userData = i;
+            node.on(cc.Node.EventType.TOUCH_END, this.onSend, this);
         }
 
         this.init();
@@ -106,12 +128,12 @@ export default class NetTestView extends GameView {
 
     private init() {
         //初始化网络类型设置
-        for (let i = 0; i < this.netType.toggleItems.length; i++) {
-            this.netType.toggleItems[i].node.userData = i;
-            if (this.netType.toggleItems[i].isChecked) {
+        for (let i = 0; i < this.netToggleContainer.toggleItems.length; i++) {
+            this.netToggleContainer.toggleItems[i].node.userData = i;
+            if (this.netToggleContainer.toggleItems[i].isChecked) {
                 this.changeNetType(i);
             }
-            this.netType.toggleItems[i].node.on("toggle", this.onNetType, this);
+            this.netToggleContainer.toggleItems[i].node.on("toggle", this.onNetType, this);
         }
 
         //重连组件挂载
@@ -121,13 +143,13 @@ export default class NetTestView extends GameView {
         }
 
         //连接网络 
-        for( let i = 0 ; i < this.connects.length;i++){
+        for (let i = 0; i < this.connects.length; i++) {
             this.connects[i].node.userData = i;
-            this.connects[i].node.on('toggle',this.onConnect,this);
+            this.connects[i].node.on('toggle', this.onConnect, this);
         }
     }
 
-    private onNetType( target : cc.Toggle) {
+    private onNetType(target: cc.Toggle) {
         this.changeNetType(target.node.userData);
     }
 
@@ -136,6 +158,7 @@ export default class NetTestView extends GameView {
             this.log(`${service.serviceName} 使用Json方式`);
             service.messageHeader = JsonMessageHeader;
             service.heartbeat = HeartbeatJson;
+            service.maxEnterBackgroundTime = Config.MIN_INBACKGROUND_TIME;
         } else if (type == NetTest.NetType.PROTO) {
             this.log(`${service.serviceName} 使用Proto方式`);
             service.messageHeader = ProtoMessageHeader;
@@ -147,6 +170,7 @@ export default class NetTestView extends GameView {
         } else {
             cc.error(`未知网络类型`);
         }
+        this.netType = type;
     }
 
     private changeNetType(type: NetTest.NetType) {
@@ -155,30 +179,30 @@ export default class NetTestView extends GameView {
         this._changeNetType(type, ChatService.instance);
     }
 
-    private onReconnectToggle(toggle : cc.Toggle) {
-        if( toggle.isChecked ){
+    private onReconnectToggle(toggle: cc.Toggle) {
+        if (toggle.isChecked) {
             //挂载
-            if( toggle.node.userData == NetTest.ServiceType.Lobby ){
+            if (toggle.node.userData == NetTest.ServiceType.Lobby) {
                 this.addReconnect(LobbyService.instance);
-            }else if( toggle.node.userData == NetTest.ServiceType.Game ){
+            } else if (toggle.node.userData == NetTest.ServiceType.Game) {
                 this.addReconnect(GameService.instance);
-            }else if( toggle.node.userData == NetTest.ServiceType.Chat ){
+            } else if (toggle.node.userData == NetTest.ServiceType.Chat) {
                 this.addReconnect(ChatService.instance);
             }
-        }else{
+        } else {
             //卸载
-            if( toggle.node.userData == NetTest.ServiceType.Lobby ){
+            if (toggle.node.userData == NetTest.ServiceType.Lobby) {
                 this.removeReconnect(LobbyService.instance);
-            }else if( toggle.node.userData == NetTest.ServiceType.Game ){
+            } else if (toggle.node.userData == NetTest.ServiceType.Game) {
                 this.removeReconnect(GameService.instance);
-            }else if( toggle.node.userData == NetTest.ServiceType.Chat ){
+            } else if (toggle.node.userData == NetTest.ServiceType.Chat) {
                 this.removeReconnect(ChatService.instance);
             }
         }
     }
 
-    private addReconnect( service : CommonService ){
-        if( !this.node.getChildByName(service.serviceName) ){
+    private addReconnect(service: CommonService) {
+        if (!this.node.getChildByName(service.serviceName)) {
             let node = new cc.Node();
             node.name = service.serviceName;
             this.node.addChild(node);
@@ -187,23 +211,23 @@ export default class NetTestView extends GameView {
             this.log(`添加${service.serviceName} 重连组件`)
         }
     }
-    private removeReconnect( service : CommonService ){
+    private removeReconnect(service: CommonService) {
         let node = this.node.getChildByName(service.serviceName);
-        if( node ){
+        if (node) {
             this.node.removeChild(node);
             this.log(`移除${service.serviceName} 重连组件`)
         }
     }
 
-    private log( data : string ){
+    private log(data: string) {
         let item = cc.instantiate(this.logItem);
         item.getComponent(cc.Label).string = data;
         this.logScorllView.content.addChild(item);
         this.logScorllView.scrollToBottom(1);
     }
 
-    private _connect( service : CommonService ){
-        if( service.isConnected ){
+    private _connect(service: CommonService) {
+        if (service.isConnected) {
             //断开连接
             this.log(`${service.serviceName} 断开连接中...`);
             service.close();
@@ -212,14 +236,39 @@ export default class NetTestView extends GameView {
         this.log(`${service.serviceName} 连接中...`);
         service.connect();
     }
-    private onConnect( ev : cc.Event.EventTouch ){
-        let target : cc.Node = ev.target;
-        if( target.userData == NetTest.ServiceType.Lobby ){
+    private onConnect(ev: cc.Event.EventTouch) {
+        let target: cc.Node = ev.target;
+        if (target.userData == NetTest.ServiceType.Lobby) {
             this._connect(LobbyService.instance);
-        }else if( target.userData == NetTest.ServiceType.Game ){
+        } else if (target.userData == NetTest.ServiceType.Game) {
             this._connect(GameService.instance);
-        }else if( target.userData == NetTest.ServiceType.Chat ){
+        } else if (target.userData == NetTest.ServiceType.Chat) {
             this._connect(ChatService.instance);
+        }
+    }
+
+    private send(helper: INetHelper) {
+        let msg = "";
+        if (this.netType == NetTest.NetType.JSON) {
+            msg = "您好，我是Json消息";
+            helper.sendJsonMessage(msg);
+        } else if (this.netType == NetTest.NetType.PROTO) {
+            msg = "您好，我是Proto消息";
+            helper.sendProtoMessage(msg);
+        } else if (this.netType == NetTest.NetType.BINARY) {
+            msg = "您好，我是Binary消息";
+            helper.sendBinaryMessage(msg);
+        }
+        this.log(`发送消息: ${msg}`);
+    }
+    private onSend(ev: cc.Event.EventTouch) {
+        let target: cc.Node = ev.target;
+        if (target.userData == NetTest.ServiceType.Lobby) {
+            this.send(HallNetHelper);
+        } else if (target.userData == NetTest.ServiceType.Game) {
+            this.send(TestGameNetHelper);
+        } else if (target.userData == NetTest.ServiceType.Chat) {
+            this.send(TestChatNetHelper);
         }
     }
 }
