@@ -36,6 +36,8 @@ export class Service extends ServerConnector {
         this._Heartbeat = value;
     }
 
+    public serviceName = "CommonService";
+
     /**
      * @description 发送心跳
      */
@@ -62,15 +64,15 @@ export class Service extends ServerConnector {
     }
     protected onOpen() {
         super.onOpen();
-        dispatch(EventApi.NetEvent.ON_OPEN);
+        dispatch(EventApi.NetEvent.ON_OPEN,{service: this,event : null});
     }
     protected onClose(ev: Event) {
         super.onClose(ev);
-        dispatch(EventApi.NetEvent.ON_CLOSE, ev);
+        dispatch(EventApi.NetEvent.ON_CLOSE,{service: this,event : ev});
     }
     protected onError(ev: Event) {
         super.onError(ev);
-        dispatch(EventApi.NetEvent.ON_ERROR, ev);
+        dispatch(EventApi.NetEvent.ON_ERROR,{service: this,event : ev});
     }
     protected onMessage(data: Uint8Array) {
 

@@ -16,7 +16,6 @@ export class CommonService extends Service implements GameEventInterface {
 
     protected static _instance: CommonService = null;
     public static get instance() { return this._instance || (this._instance = new CommonService()); }
-    public serviceName = "CommonService";
     protected ip = ""
     protected port: number = null;
     protected protocol: WebSocketType = "wss"

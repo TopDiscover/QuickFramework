@@ -1,3 +1,4 @@
+import { ServiceEvent } from "../../framework/base/Defines";
 import Controller from "../../framework/controller/Controller";
 import { CustomNetEventType } from "../../framework/event/EventApi";
 import { Config } from "../config/Config";
@@ -116,32 +117,41 @@ export default class ReconnectComponent extends Controller<CommonService> {
         });
     }
 
-    protected onNetOpen() {
-        super.onNetOpen();
-        //根据自己的业务，请示登录，拉游戏数据等操作
-        this.service.reconnect.hide();
-        this._connectCount = 0;
-        Manager.alert.close(this.logName);
-        Manager.serviceManager.onReconnectSuccess(this.service);
-        cc.log(`${this.logName} ${this.service.serviceName}服务器重连成功`);
-    }
-
-    protected onNetError(ev: Event) {
-        super.onNetError(ev);
-        Manager.loading.hide();
-        //先断开旧的socket连接
-        this.service.close();
-        this.delayConnect();
-    }
-
-    protected onNetClose(ev: Event) {
-        super.onNetClose(ev);
-        if (ev.type == CustomNetEventType.CLOSE) {
-            cc.log(`${this.logName} 应用层主动关闭socket`);
-            return;
+    protected onNetOpen(event: ServiceEvent) {
+        let result = super.onNetOpen(event);
+        if (result) {
+            //根据自己的业务，请示登录，拉游戏数据等操作
+            this.service.reconnect.hide();
+            this._connectCount = 0;
+            Manager.alert.close(this.logName);
+            Manager.serviceManager.onReconnectSuccess(this.service);
+            cc.log(`${this.logName} ${this.service.serviceName}服务器重连成功`);
         }
-        Manager.loading.hide();
-        this.delayConnect();
+        return result;
+    }
+
+    protected onNetError(event: ServiceEvent) {
+        let result = super.onNetError(event);
+        if (result) {
+            Manager.loading.hide();
+            //先断开旧的socket连接
+            this.service.close();
+            this.delayConnect();
+        }
+        return result;
+    }
+
+    protected onNetClose(event: ServiceEvent) {
+        let result = super.onNetClose(event);
+        if (result) {
+            if (event.event.type == CustomNetEventType.CLOSE) {
+                cc.log(`${this.logName} 应用层主动关闭socket`);
+                return;
+            }
+            Manager.loading.hide();
+            this.delayConnect();
+        }
+        return result;
     }
 
 }

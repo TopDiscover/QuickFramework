@@ -1,5 +1,6 @@
 
 import UIView, { UIClass } from "../ui/UIView";
+import { Service } from "./Service";
 
 /**
  * @description 资源加载缓存数据 
@@ -119,3 +120,8 @@ export const USING_LAN_KEY = "i18n.";
 
 /**@description 网络数据全以大端方式进行处理 */
 export const USING_LITTLE_ENDIAN = false;
+
+export interface ServiceEvent{
+    service: Service;
+    event : Event;
+}

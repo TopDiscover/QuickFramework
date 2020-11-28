@@ -1,4 +1,5 @@
 import GameView from "../../../../script/common/base/GameView";
+import { CommonEvent } from "../../../../script/common/event/CommonEvent";
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
 import { ChatService } from "../../../../script/common/net/ChatService";
 import { CommonService } from "../../../../script/common/net/CommonService";
@@ -29,6 +30,26 @@ export default class NetTestView extends GameView {
 
     private logScorllView : cc.ScrollView = null;
     private logItem : cc.Node =null;
+    private connects : cc.Toggle[] = [];
+
+    protected bindingEvents(){
+        super.bindingEvents();
+        this.registerEvent(CommonEvent.LOBBY_SERVICE_CONNECTED,this.onNetConnected);
+        this.registerEvent(CommonEvent.LOBBY_SERVICE_CLOSE,this.onNetClose);
+
+        this.registerEvent(CommonEvent.GAME_SERVICE_CONNECTED,this.onNetConnected);
+        this.registerEvent(CommonEvent.GAME_SERVICE_CLOSE,this.onNetClose);
+
+        this.registerEvent(CommonEvent.CHAT_SERVICE_CONNECTED,this.onNetConnected);
+        this.registerEvent(CommonEvent.CHAT_SERVICE_CLOSE,this.onNetClose);
+    }
+
+    private onNetClose(service : CommonService ) {
+        this.log(`${service.serviceName} 断开连接!`);
+    }
+    private onNetConnected(service : CommonService) {
+        this.log(`${service.serviceName} 连接成功!`);
+    }
 
     onDestroy(){
         this.logItem.destroy();
@@ -53,6 +74,15 @@ export default class NetTestView extends GameView {
         this.logItem = this.logScorllView.content.getChildByName("item");
         this.logItem.removeFromParent(false);
 
+        let connects = cc.find("connet",this.node);
+        for( let i = 0 ; i < 3 ; i++){
+            let toggle = cc.find(`type${i}/toggle`,connects).getComponent(cc.Toggle);
+            this.connects.push(toggle);
+            let node = cc.find(`type${i}/title`,connects);
+            node.userData = i;
+            node.on(cc.Node.EventType.TOUCH_END,this.onConnect,this)
+        }
+
         this.init();
 
         dispatchEnterComplete({ type: LogicType.GAME, views: [this] });
@@ -72,6 +102,12 @@ export default class NetTestView extends GameView {
         for (let i = 0; i < this.reconnects.length; i++) {
             this.reconnects[i].node.userData = i;
             this.reconnects[i].node.on("toggle", this.onReconnectToggle, this);
+        }
+
+        //连接网络 
+        for( let i = 0 ; i < this.connects.length;i++){
+            this.connects[i].node.userData = i;
+            this.connects[i].node.on('toggle',this.onConnect,this);
         }
     }
 
@@ -148,5 +184,24 @@ export default class NetTestView extends GameView {
         item.getComponent(cc.Label).string = data;
         this.logScorllView.content.addChild(item);
         this.logScorllView.scrollToBottom(1);
+    }
+
+    private _connect( service : CommonService ){
+        if( service.isConnected ){
+            this.log(`${service.serviceName} 已经连接`);
+            return;
+        }
+        this.log(`${service.serviceName} 连接中...`);
+        service.connect();
+    }
+    private onConnect( ev : cc.Event.EventTouch ){
+        let target : cc.Node = ev.target;
+        if( target.userData == NetTest.ServiceType.Lobby ){
+            this._connect(LobbyService.instance);
+        }else if( target.userData == NetTest.ServiceType.Game ){
+            this._connect(GameService.instance);
+        }else if( target.userData == NetTest.ServiceType.Chat ){
+            this._connect(ChatService.instance);
+        }
     }
 }
