@@ -43,9 +43,9 @@ export namespace Config {
     export const RECONNECT_TIME_OUT = 30;
 
     /**@description 进入后台最大时间（单位秒）大于这个时间时就会进入重连*/
-    export let MAX_INBACKGROUND_TIME = 60;
+    export const MAX_INBACKGROUND_TIME = 60;
     /**@description 进入后台最小时间（单位秒）大于这个时间时就会进入重连*/
-    export let MIN_INBACKGROUND_TIME = 5;
+    export const MIN_INBACKGROUND_TIME = 5;
 }
 
 /**

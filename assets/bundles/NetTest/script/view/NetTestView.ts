@@ -163,10 +163,12 @@ export default class NetTestView extends GameView {
             this.log(`${service.serviceName} 使用Proto方式`);
             service.messageHeader = ProtoMessageHeader;
             service.heartbeat = HeartbeatProto;
+            service.maxEnterBackgroundTime = Config.MAX_INBACKGROUND_TIME;
         } else if (type == NetTest.NetType.BINARY) {
             this.log(`${service.serviceName} 使用Binary方式`);
             service.messageHeader = BinaryStreamMessageHeader;
             service.heartbeat = HeartbeatBinary;
+            service.maxEnterBackgroundTime = Config.MAX_INBACKGROUND_TIME;
         } else {
             cc.error(`未知网络类型`);
         }
