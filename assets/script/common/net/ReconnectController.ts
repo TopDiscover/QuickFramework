@@ -15,31 +15,35 @@ export default class ReconnectController extends Controller<CommonService> {
     logTag = "[ReconnectController]"
     protected onNetError(ev:ServiceEvent) {
         let result = super.onNetError(ev);
-        Manager.uiManager.getView("LoginView").then(view => {
-            if (view) {
-                return;
-            }
-            if( this.service && Manager.serviceManager.isCanTryReconnect(this.service) ){
-                this.service.reconnect.show();
-            }
-        });
+        if( result ){
+            Manager.uiManager.getView("LoginView").then(view => {
+                if (view) {
+                    return;
+                }
+                if( this.service && Manager.serviceManager.isCanTryReconnect(this.service) ){
+                    this.service.reconnect.show();
+                }
+            });
+        }
         return result;
     }
 
     protected onNetClose(ev: ServiceEvent) {
         let result = super.onNetClose(ev);
-        if (ev.event.type == CustomNetEventType.CLOSE) {
-            cc.log(`${this.logTag} 应用层主动关闭socket`);
-            return;
-        }
-        Manager.uiManager.getView("LoginView").then(view => {
-            if (view) {
+        if( result ){
+            if (ev.event.type == CustomNetEventType.CLOSE) {
+                cc.log(`${this.logTag} 应用层主动关闭socket`);
                 return;
             }
-            if( this.service && Manager.serviceManager.isCanTryReconnect(this.service) ){
-                this.service.reconnect.show();
-            }
-        });
+            Manager.uiManager.getView("LoginView").then(view => {
+                if (view) {
+                    return;
+                }
+                if( this.service && Manager.serviceManager.isCanTryReconnect(this.service) ){
+                    this.service.reconnect.show();
+                }
+            });
+        }
         return result;
     }
 }
