@@ -69,6 +69,9 @@ export class ServiceManager implements GameEventInterface {
             cc.error(`service is null`);
             return;
         }
+        if( !service.enabled ){
+            return;
+        }
         if (isShowTips) {
             //登录界面，不做处理
             Manager.uiManager.getView("LoginView").then((view) => {
@@ -102,6 +105,10 @@ export class ServiceManager implements GameEventInterface {
             for (let i = 1; i < this.services.length; i++) {
                 //如果高优先级未连接成功时，低优先的网络不重连
                 prev = this.services[i - 1];
+                if( !prev.enabled ){
+                    //如果没有启用，直接跳过
+                    continue;
+                }
                 if (!prev.isConnected) {
                     if (prev == service) {
                         service.reconnect.show();
@@ -118,6 +125,10 @@ export class ServiceManager implements GameEventInterface {
     onReconnectSuccess(service: CommonService) {
         for (let i = 0; i < this.services.length; i++) {
             //优先级高的重连成功后，连接优先级低的
+            if( !this.services[i].enabled ){
+                //如果没有启用，直接跳过
+                continue;
+            }
             if (!this.services[i].isConnected) {
                 this.services[i].reconnect.show();
                 break;

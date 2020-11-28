@@ -37,6 +37,7 @@ export default class NetTestView extends GameView {
     private logScorllView: cc.ScrollView = null;
     private logItem: cc.Node = null;
     private connects: cc.Toggle[] = [];
+    private enabledServices: cc.Toggle[] = [];
 
     private netType: NetTest.NetType = NetTest.NetType.JSON;
 
@@ -51,11 +52,11 @@ export default class NetTestView extends GameView {
         this.registerEvent(CommonEvent.CHAT_SERVICE_CONNECTED, this.onNetConnected);
         this.registerEvent(CommonEvent.CHAT_SERVICE_CLOSE, this.onNetClose);
 
-        this.registerEvent(CommonEvent.TEST_BINARY_MSG,this.onMessage);
-        this.registerEvent(CommonEvent.TEST_JSON_MSG,this.onMessage);
-        this.registerEvent(CommonEvent.TEST_PROTO_MSG,this.onMessage);
+        this.registerEvent(CommonEvent.TEST_BINARY_MSG, this.onMessage);
+        this.registerEvent(CommonEvent.TEST_JSON_MSG, this.onMessage);
+        this.registerEvent(CommonEvent.TEST_PROTO_MSG, this.onMessage);
     }
-    private onMessage( hello : string ) {
+    private onMessage(hello: string) {
         this.log(`收到：${hello}`);
     }
 
@@ -121,6 +122,12 @@ export default class NetTestView extends GameView {
             node.on(cc.Node.EventType.TOUCH_END, this.onSend, this);
         }
 
+        let enabled = cc.find("enabled", this.node);
+        for (let i = 0; i < 3; i++) {
+            let toggle = cc.find(`type${i}`, enabled).getComponent(cc.Toggle);
+            this.enabledServices.push(toggle);
+        }
+
         this.init();
 
         dispatchEnterComplete({ type: LogicType.GAME, views: [this] });
@@ -146,6 +153,13 @@ export default class NetTestView extends GameView {
         for (let i = 0; i < this.connects.length; i++) {
             this.connects[i].node.userData = i;
             this.connects[i].node.on('toggle', this.onConnect, this);
+        }
+
+        //是否启用网络
+        for (let i = 0; i < this.enabledServices.length; i++) {
+            this.enabledServices[i].node.userData = i;
+            this.enabledServices[i].node.on("toggle", this.onEnableService, this);
+            this.onEnableService(this.enabledServices[i]);
         }
     }
 
@@ -271,6 +285,16 @@ export default class NetTestView extends GameView {
             this.send(TestGameNetHelper);
         } else if (target.userData == NetTest.ServiceType.Chat) {
             this.send(TestChatNetHelper);
+        }
+    }
+
+    private onEnableService(toggle: cc.Toggle) {
+        if( toggle.node.userData == NetTest.ServiceType.Lobby ){
+            LobbyService.instance.enabled = toggle.isChecked;
+        }else if( toggle.node.userData == NetTest.ServiceType.Game ){
+            GameService.instance.enabled = toggle.isChecked;
+        }else if( toggle.node.userData == NetTest.ServiceType.Chat){
+            ChatService.instance.enabled = toggle.isChecked;
         }
     }
 }

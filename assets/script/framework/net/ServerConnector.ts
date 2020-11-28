@@ -24,7 +24,7 @@ export class ServerConnector {
      * @description 发送心跳
      */
     protected sendHeartbeat() {
-        if ( CC_DEBUG ) cc.error(`请重写sendHeartbeat`);
+        if (CC_DEBUG) cc.error(`请重写sendHeartbeat`);
     }
 
     /**
@@ -36,7 +36,7 @@ export class ServerConnector {
     }
 
     /**@description 心跳发送间隔，默认为5秒 */
-    protected getHeartbeatInterval():number{
+    protected getHeartbeatInterval(): number {
         return 5000;
     }
 
@@ -97,6 +97,19 @@ export class ServerConnector {
     private _sendHartId: number = -1; //发送心跳包的间隔id
     private _curRecvHartTimeOutCount: number = 0;//当前接收心跳超时的次数
 
+
+    public _enabled = true;
+    /**@description 是否启用 */
+    public get enabled() {
+        return this._enabled;
+    }
+    public set enabled(value: boolean) {
+        this._enabled = value;
+        if (value == false) {
+            this.close();
+        }
+    }
+
     /**
      * @description 连接网络
      * @param ip 
@@ -104,6 +117,10 @@ export class ServerConnector {
      * @param protocol 协议类型 ws / wss 
      */
     public connect(ip: string, port: number | string = null, protocol: WebSocketType = "wss") {
+        if (!this.enabled) {
+            if (CC_DEBUG) cc.warn(`请求先启用`)
+            return;
+        }
         if (port) {
             if (typeof port == "string" && port.length > 0) {
                 this._wsClient && this._wsClient.initWebSocket(ip, port, protocol);
@@ -152,14 +169,14 @@ export class ServerConnector {
         this._wsClient && this._wsClient.send(buffer);
     }
 
-    public close( isEnd : boolean = false ) {
+    public close(isEnd: boolean = false) {
         this.stopSendHartSchedule();
         this._wsClient && this._wsClient.close(isEnd);
     }
 
     /**@description 网络是否连接成功 */
-    public get isConnected(){
-        if( this._wsClient ){
+    public get isConnected() {
+        if (this._wsClient) {
             return this._wsClient.isConnected;
         }
         return false;
