@@ -25,6 +25,8 @@ interface AlertConfig {
     richText?: string,
     /**@description true 回调后在关闭弹出 false 关闭弹出框在回调 默认为 : false */
     immediatelyCallback?: boolean,
+    /**@description 是否允许该tag的弹出框重复弹出，默认为true 会弹出同类型的多个 */
+    isRepeat?: boolean,
 }
 
 class AlertDialog extends cc.Component {
@@ -232,8 +234,32 @@ export default class Alert {
      * @param config 配置信息
      */
     public show(config: AlertConfig) {
+        if ( config.tag && config.isRepeat === false ){
+            if( this.isRepeat(config.tag) ){
+                cc.warn(`弹出框已经存在 config : ${JSON.stringify(config)}`);
+                return;
+            }
+        }
         this.queue.push(config);
         this._show(config);
+    }
+
+    /**@description 是否有该类型的弹出框 */
+    public isRepeat(tag: string | number) {
+        if (this.curPanel) {
+            let current = this.curPanel.getComponent(AlertDialog).config;
+            if (current.tag == tag) {
+                return true;
+            }
+        } else {
+            for (let i = 0; i < this.queue.length; i++) {
+                let data = this.queue[i];
+                if (data.tag == tag) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**@description 关闭当前显示的 
@@ -319,7 +345,7 @@ export default class Alert {
                         this._isLoadingPrefab = false;
                         if (data && data.data && data.data instanceof cc.Prefab) {
                             this.prefab = data.data;
-                            Manager.assetManager.addPersistAsset(Config.CommonPrefabs.alert,data.data,BUNDLE_RESOURCES);
+                            Manager.assetManager.addPersistAsset(Config.CommonPrefabs.alert, data.data, BUNDLE_RESOURCES);
                             if (this.finishLoadCb) {
                                 this.finishLoadCb(true);
                                 this.finishLoadCb = null;

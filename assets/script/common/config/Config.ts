@@ -46,6 +46,9 @@ export namespace Config {
     export const MAX_INBACKGROUND_TIME = 60;
     /**@description 进入后台最小时间（单位秒）大于这个时间时就会进入重连*/
     export const MIN_INBACKGROUND_TIME = 5;
+
+    /**@description 网络重连弹出框tag */
+    export const RECONNECT_ALERT_TAG = 100;
 }
 
 /**
