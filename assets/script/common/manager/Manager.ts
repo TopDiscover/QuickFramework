@@ -21,14 +21,26 @@ import { ServiceManager } from "./ServiceManager";
 
 /**@description 游戏所有运行单例的管理 */
 class _Manager extends Framework._FramewokManager {
-
-    /**@description 全局常驻网络组件管理器 */
+    private _netManager: NetManager = null;
+    /**@description 全局常驻网络组件管理器,注册到该管理器的网络组件会跟游戏的生命周期一致 */
     get netManager() {
-        return getSingleton(NetManager);
+        if (!this._netManager) {
+            this._netManager = new NetManager("netManager");
+        }
+        return this._netManager;
+    }
+
+    private _hallNetManager: NetManager = null;
+    /**@description 大厅的网络控制器组件管理器，注册到该管理器的网络组件，除登录界面外，都会被移除掉*/
+    get hallNetManager() {
+        if (!this._hallNetManager) {
+            this._hallNetManager = new NetManager("hallNetManager");
+        }
+        return this._hallNetManager;
     }
 
     /**@description 网络Service管理器 */
-    get serviceManager(){
+    get serviceManager() {
         return getSingleton(ServiceManager);
     }
 
@@ -43,25 +55,25 @@ class _Manager extends Framework._FramewokManager {
     }
 
     /**@description 弹出提示框,带一到两个按钮 */
-    get alert(){
+    get alert() {
         return getSingleton(Alert);
     }
 
     /**@description 公共loading */
-    get loading(){
+    get loading() {
         return getSingleton(Loading);
     }
 
     /**@description websocket wss 证书url地址 */
-    set wssCacertUrl(value){
+    set wssCacertUrl(value) {
         this._wssCacertUrl = value;
         Framework.Manager.wssCacertUrl = value;
     }
 
     /**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
-    private _globalAudio : GlobalAudio = null;
+    private _globalAudio: GlobalAudio = null;
     get globalAudio() {
-        if ( this._globalAudio ){
+        if (this._globalAudio) {
             return this._globalAudio;
         }
         this._globalAudio = this.uiManager.getCanvas().getComponent(GlobalAudio);
@@ -69,10 +81,10 @@ class _Manager extends Framework._FramewokManager {
     }
 
     /**@description 当前游戏GameView, GameView进入onLoad赋值 */
-    gameView : GameView = null;
+    gameView: GameView = null;
 
     /**@description 游戏数据 */
-    gameData : GameData = null;
+    gameData: GameData = null;
 
     /**@description 游戏控制器，在自己的模块内写函数有类型化读取,此值在Logic.addNetComponent赋值
      * @example 
@@ -81,7 +93,7 @@ class _Manager extends Framework._FramewokManager {
      * }
      * 
      */
-    gameController : any = null;
+    gameController: any = null;
 
     /**
      * @description 把语言包转换成i18n.xxx形式
@@ -100,17 +112,17 @@ class _Manager extends Framework._FramewokManager {
      * Manager.makeLanguage("title","tankBattle"); //=> i18n.tankBattle.title 指向游戏特定的语言包
      * Manager.makeLanguage("title"); //=> i18n.title 指向的大厅的公共语言包
      */
-    makeLanguage( param : string | (string | number)[] , bundle : BUNDLE_TYPE = BUNDLE_RESOURCES ) : (string | number )[] | string {
-        if ( typeof param == "string" ){
-            if ( bundle){
+    makeLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE = BUNDLE_RESOURCES): (string | number)[] | string {
+        if (typeof param == "string") {
+            if (bundle) {
                 return `${USING_LAN_KEY}${bundle}.${param}`;
             }
             return `${USING_LAN_KEY}${param}`;
         }
-        if( typeof param[0] == "string" && param instanceof Array ){
-            if ( bundle ){
+        if (typeof param[0] == "string" && param instanceof Array) {
+            if (bundle) {
                 param[0] = `${USING_LAN_KEY}${bundle}.${param[0]}`;
-            }else{
+            } else {
                 param[0] = `${USING_LAN_KEY}${param[0]}`;
             }
         }
@@ -120,26 +132,26 @@ class _Manager extends Framework._FramewokManager {
     /**@description 获取语言包 
      * 
      */
-    getLanguage( param : string | (string|number)[], bundle : BUNDLE_TYPE = null) : string {
+    getLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE = null): string {
         let key = "";
-        if ( typeof param == "string" ){
-            if ( bundle){
+        if (typeof param == "string") {
+            if (bundle) {
                 key = `${USING_LAN_KEY}${bundle}.${param}`;
-            }else{
+            } else {
                 key = `${USING_LAN_KEY}${param}`;
             }
             return this.language.get([key]);
         }
-        if( typeof param[0] == "string" && param instanceof Array ){
-            if ( bundle ){
+        if (typeof param[0] == "string" && param instanceof Array) {
+            if (bundle) {
                 param[0] = `${USING_LAN_KEY}${bundle}.${param[0]}`;
-            }else{
+            } else {
                 param[0] = `${USING_LAN_KEY}${param[0]}`;
             }
             return this.language.get(param);
         }
         cc.error(`传入参数有误`);
-        return"";
+        return "";
     }
 
     init() {

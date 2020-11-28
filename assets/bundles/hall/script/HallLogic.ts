@@ -23,7 +23,7 @@ class HallLogic extends Logic {
     private onEnterHall(){
         this.onLanguageChange();
         //添加大厅网络组件
-        Manager.netManager.addNetControllers();
+        Manager.hallNetManager.addNetControllers();
         Manager.uiManager.open({ type: HallView , bundle:this.bundle});
     }
 
@@ -35,7 +35,7 @@ class HallLogic extends Logic {
         super.onEnterComplete(data);
         if( data.type == LogicType.LOGIN){
             //进入登录界面，移除大厅的网络组件
-            Manager.netManager.removeNetControllers();
+            Manager.hallNetManager.removeNetControllers();
         }
     }
 }

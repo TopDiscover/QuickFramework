@@ -11,9 +11,6 @@ import { CommonEvent } from "../../../../script/common/event/CommonEvent";
 import { Manager } from "../../../../script/common/manager/Manager";
 import { GameService } from "../../../../script/common/net/GameService";
 
-
-
-
 const { ccclass, property } = cc._decorator;
 
 @ccclass
@@ -42,4 +39,4 @@ export default class HallGameNetController extends Controller<GameService> {
 
 }
 
-Manager.netManager.register(HallGameNetController);
+Manager.hallNetManager.register(HallGameNetController);

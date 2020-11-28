@@ -42,4 +42,4 @@ export default class HallNetController extends Controller<LobbyService> {
 
 }
 
-Manager.netManager.register(HallNetController);
+Manager.hallNetManager.register(HallNetController);

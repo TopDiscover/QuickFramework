@@ -26,8 +26,10 @@ export default class MainController extends cc.Component {
 
         Manager.resolutionHelper.onLoad(this.node);
 
-        //大厅网络管理器onLoad
+        //全局网络管理器onLoad
         Manager.netManager.onLoad(this.node);
+        //大厅
+        Manager.hallNetManager.onLoad(this.node);
 
         //预先加载下loading预置体
         Manager.tips.preloadPrefab();
@@ -93,8 +95,9 @@ export default class MainController extends cc.Component {
         
         Manager.resolutionHelper.onDestroy();
 
-        //大厅网络管理器onDestroy
+        //网络管理器onDestroy
         Manager.netManager.onDestroy(this.node);
+        Manager.hallNetManager.onDestroy(this.node);
         //移除键盘事件
         cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP);
 
