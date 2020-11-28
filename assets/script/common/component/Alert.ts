@@ -234,14 +234,26 @@ export default class Alert {
      * @param config 配置信息
      */
     public show(config: AlertConfig) {
-        if ( config.tag && config.isRepeat === false ){
-            if( this.isRepeat(config.tag) ){
+        if (config.tag && config.isRepeat === false) {
+            if (this.isRepeat(config.tag)) {
                 cc.warn(`弹出框已经存在 config : ${JSON.stringify(config)}`);
-                return;
+                return false;
             }
         }
         this.queue.push(config);
         this._show(config);
+        return true;
+    }
+
+    /**@description 当前显示的弹出框是否是tag */
+    public isCurrentShow(tag: string | number) {
+        if (this.curPanel) {
+            let current = this.curPanel.getComponent(AlertDialog).config;
+            if (current.tag == tag) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**@description 是否有该类型的弹出框 */
@@ -249,12 +261,14 @@ export default class Alert {
         if (this.curPanel) {
             let current = this.curPanel.getComponent(AlertDialog).config;
             if (current.tag == tag) {
+                cc.warn(`重复的弹出框 config ; ${JSON.stringify(current)}`)
                 return true;
             }
         } else {
             for (let i = 0; i < this.queue.length; i++) {
                 let data = this.queue[i];
                 if (data.tag == tag) {
+                    cc.warn(`重复的弹出框 config ; ${JSON.stringify(data)}`)
                     return true;
                 }
             }

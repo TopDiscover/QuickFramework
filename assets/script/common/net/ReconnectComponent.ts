@@ -98,7 +98,8 @@ export default class ReconnectComponent extends Controller<CommonService> {
         this.service && this.service.reconnect.hideNode();
         cc.log(`${this.logName} ${this.service.serviceName} 断开`)
         Manager.alert.show({
-            tag: this.logName,
+            tag: Config.RECONNECT_ALERT_TAG,
+            isRepeat:false,
             text: Manager.getLanguage(["warningReconnect", this.service.serviceName]),
             confirmCb: (isOK) => {
                 if (isOK) {
@@ -123,7 +124,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
             //根据自己的业务，请示登录，拉游戏数据等操作
             this.service.reconnect.hide();
             this._connectCount = 0;
-            Manager.alert.close(this.logName);
+            Manager.alert.close(Config.RECONNECT_ALERT_TAG);
             Manager.serviceManager.onReconnectSuccess(this.service);
             cc.log(`${this.logName} ${this.service.serviceName}服务器重连成功`);
         }

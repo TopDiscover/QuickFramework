@@ -62,6 +62,7 @@ export class Reconnect {
     }
 
     public async show(content: string = i18n.reconnect) {
+        if( CC_DEBUG ) cc.log(`${this.service.serviceName} 显示重连`);
         if (this.isExistReconnectComponent()) {
             return;
         }
