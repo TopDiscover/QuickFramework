@@ -27,6 +27,9 @@ export class ServiceManager implements GameEventInterface {
         this.services.push(LobbyService.instance);
         this.services.push(GameService.instance);
         this.services.push(ChatService.instance);
+        LobbyService.instance.priority = 3;
+        GameService.instance.priority = 2;
+        ChatService.instance.priority = 1;
     }
 
     /**@description 网络事件调度 */
@@ -78,9 +81,19 @@ export class ServiceManager implements GameEventInterface {
                 if (view) return;
                 service.reconnect.hide();
                 cc.log(`${service.serviceName} 断开`)
+                let current = Manager.alert.currentShow(Config.RECONNECT_ALERT_TAG);
+                if( current ){
+                    let showService : CommonService = current.userData;
+                    if( service.priority > showService.priority ){
+                        //如果尝试连接的优先级更高，显示优先级更高的连接
+                        cc.log(`显示更新优先级重连弹出框 : ${service.serviceName}`);
+                        Manager.alert.close(Config.RECONNECT_ALERT_TAG);
+                    }
+                }
                 Manager.alert.show({
                     tag: Config.RECONNECT_ALERT_TAG,
                     isRepeat: false,
+                    userData:service,
                     text: Manager.getLanguage(["warningReconnect", service.serviceName]),
                     confirmCb: (isOK) => {
                         if (isOK) {

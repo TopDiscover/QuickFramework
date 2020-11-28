@@ -37,6 +37,8 @@ export class Service extends ServerConnector {
     }
 
     public serviceName = "CommonService";
+    /**@description 值越大，优先级越高 */
+    public priority : number = 0;
 
     /**
      * @description 发送心跳

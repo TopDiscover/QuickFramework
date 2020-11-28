@@ -27,6 +27,8 @@ interface AlertConfig {
     immediatelyCallback?: boolean,
     /**@description 是否允许该tag的弹出框重复弹出，默认为true 会弹出同类型的多个 */
     isRepeat?: boolean,
+    /**@description 用户自定义数据 */
+    userData?: any,
 }
 
 class AlertDialog extends cc.Component {
@@ -229,6 +231,34 @@ export default class Alert {
         Manager.resolutionHelper.fullScreenAdapt(this.curPanel);
     }
 
+    private getConfig( config : AlertConfig ){
+        let result : AlertConfig = {};
+        if( config.tag ){
+            result.tag = config.tag;
+        }
+        if( config.text){
+            result.text = config.text;
+        }
+        if( config.title){
+            result.title = config.title;
+        }
+        if( config.confirmString){
+            result.confirmString = config.confirmString;
+        }
+        if( config.cancelString){
+            result.cancelString = config.cancelString;
+        }
+        if( config.richText){
+            result.richText = config.richText;
+        }
+        if( config.immediatelyCallback){
+            result.immediatelyCallback = config.immediatelyCallback;
+        }
+        if( config.isRepeat){
+            result.isRepeat = config.isRepeat;
+        }
+        return result;
+    }
     /**
      * @description 显示弹出框
      * @param config 配置信息
@@ -236,7 +266,7 @@ export default class Alert {
     public show(config: AlertConfig) {
         if (config.tag && config.isRepeat === false) {
             if (this.isRepeat(config.tag)) {
-                cc.warn(`弹出框已经存在 config : ${JSON.stringify(config)}`);
+                cc.warn(`弹出框已经存在 config : ${JSON.stringify(this.getConfig(config))}`);
                 return false;
             }
         }
@@ -256,19 +286,34 @@ export default class Alert {
         return false;
     }
 
+    /**@description 获取当前显示弹出的配置 */
+    public currentShow( tag? : string | number ){
+        if( this.curPanel ){
+            let current = this.curPanel.getComponent(AlertDialog).config;
+            if( tag ){
+                if( current.tag == tag ){
+                    return current;
+                }
+            }else{
+                return current;
+            }
+        }
+        return null;
+    }
+
     /**@description 是否有该类型的弹出框 */
     public isRepeat(tag: string | number) {
         if (this.curPanel) {
             let current = this.curPanel.getComponent(AlertDialog).config;
             if (current.tag == tag) {
-                cc.warn(`重复的弹出框 config ; ${JSON.stringify(current)}`)
+                cc.warn(`重复的弹出框 config ; ${JSON.stringify(this.getConfig(current))}`)
                 return true;
             }
         } else {
             for (let i = 0; i < this.queue.length; i++) {
                 let data = this.queue[i];
                 if (data.tag == tag) {
-                    cc.warn(`重复的弹出框 config ; ${JSON.stringify(data)}`)
+                    cc.warn(`重复的弹出框 config ; ${JSON.stringify(this.getConfig(data))}`)
                     return true;
                 }
             }
