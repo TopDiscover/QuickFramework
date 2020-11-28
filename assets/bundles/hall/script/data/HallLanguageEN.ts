@@ -8,7 +8,7 @@ export let HALL_EN = {
             `BATTLE
 CITY`,
             '2048',
-            'game5',
+            'Net Test',
             'game6',
         ],
         hall_view_broadcast_content: '[broadcast] congratulations!',

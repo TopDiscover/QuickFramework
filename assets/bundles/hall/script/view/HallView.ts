@@ -1,7 +1,5 @@
 import UIView from "../../../../script/framework/ui/UIView";
 import { BundleConfig } from "../../../../script/common/base/HotUpdate";
-import { i18n } from "../../../../script/common/language/LanguageImpl";
-import { HallNetHelper } from "../controller/HallNetHelper";
 import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../script/common/event/LogicEvent";
 import { CommonEvent } from "../../../../script/common/event/CommonEvent";
 import { Manager } from "../../../../script/common/manager/Manager";
@@ -13,124 +11,60 @@ import { GameService } from "../../../../script/common/net/GameService";
 import ReconnectController from "../../../../script/common/net/ReconnectController";
 import { ChatService } from "../../../../script/common/net/ChatService";
 import { Config } from "../../../../script/common/config/Config";
-import NumberView from "../../../../script/common/component/NumberView";
-import { BUNDLE_RESOURCES } from "../../../../script/framework/base/Defines";
 
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class HallView extends UIView{
-    num9: cc.Node;
-    numj: cc.Node;
-
+export default class HallView extends UIView {
     public static getPrefabUrl() {
         return "prefabs/HallView";
     }
 
-    public _count = 10;
+    private onClick(ev: cc.Event.EventTouch) {
+        Manager.bundleManager.enterBundle(this.bundles[ev.target.userData]);
+    }
 
-    private readonly games = [
-        new BundleConfig(Manager.getLanguage("hall_view_game_name.0",HallData.bundle),"gameOne",1),
-        new BundleConfig(Manager.getLanguage("hall_view_game_name.1",HallData.bundle),"gameTwo",2),
-        new BundleConfig(Manager.getLanguage("hall_view_game_name.2",HallData.bundle),"tankBattle",3),
-        new BundleConfig(Manager.getLanguage("hall_view_game_name.3",HallData.bundle),"game2048",4),
-    ];
-
-    private onClick( ev : cc.Event.EventTouch ){
-        Manager.bundleManager.enterBundle(this.games[ev.target.userData]);
+    private _bundles: BundleConfig[] = [];
+    private get bundles() {
+        if (this._bundles.length <= 0) {
+            this._bundles = [
+                new BundleConfig(Manager.getLanguage("hall_view_game_name.0", HallData.bundle), "gameOne", 1),
+                new BundleConfig(Manager.getLanguage("hall_view_game_name.1", HallData.bundle), "gameTwo", 2),
+                new BundleConfig(Manager.getLanguage("hall_view_game_name.2", HallData.bundle), "tankBattle", 3),
+                new BundleConfig(Manager.getLanguage("hall_view_game_name.3", HallData.bundle), "game2048", 4),
+                new BundleConfig(Manager.getLanguage("hall_view_game_name.4", HallData.bundle), "NetTest", 5)
+            ];
+        }
+        return this._bundles;
     }
 
     onLoad() {
         super.onLoad();
-
-        let nodeGames = cc.find("games",this.node);
-        let item = cc.find("gameItem",this.node);
-
-        let notice = cc.find("hall_msg_bg/label",this.node).getComponent(cc.Label);
-        for( let i = 1 ; i <= 6 ; i++ ){
+        let nodeGames = cc.find("games", this.node);
+        let item = cc.find("gameItem", this.node);
+        for (let i = 1; i <= this.bundles.length; i++) {
             let game = cc.instantiate(item);
             game.name = `game_${i}`;
             game.active = true;
-            game.userData = i-1
-            cc.find("Background/label",game).getComponent(cc.Label).language = Manager.makeLanguage(`hall_view_game_name.${i-1}`,this.bundle);
+            game.userData = i - 1
+            cc.find("Background/label", game).getComponent(cc.Label).language = Manager.makeLanguage(`hall_view_game_name.${i - 1}`, this.bundle);
             nodeGames.addChild(game);
-            if ( i -1 < this.games.length ){
-                game.on(cc.Node.EventType.TOUCH_END,this.onClick,this);
-                //删除
-                //game.off(cc.Node.EventType.TOUCH_END,this.onClick,this)
-            }else if( i == 6 ){
-                game.on(cc.Node.EventType.TOUCH_END,()=>{
-                    //websocket测试
-                    // HallNetHelper.sendBinaryMessage();
-                    // HallNetHelper.sendJsonMessage();
-                    HallNetHelper.sendProtoMessage();
-                    // HallNetHelper.sendHttpMessage();
-                });
-            }else if( i == 5 ){
-                game.on(cc.Node.EventType.TOUCH_END,()=>{
-                    //Manager.loading.show(["这是一个测试","测试内容1","测试内容2"],()=>{
-                    Manager.loading.show("这是一个测试",()=>{
-                        Manager.tips.show("超时关闭loading")
-                    })
-                });
-            }
-            else{
-                game.on(cc.Node.EventType.TOUCH_END,()=>{
-                    this._count ++;
-                    //notice.language = "i18n.hall_view_broadcast_content";
-                    notice.language = Manager.makeLanguage(["test",this._count,100,200,300],this.bundle);
-                    //notice.language = null;
-                    //notice.string = i18n.test;
-
-                    if ( Manager.language.getLanguage() == cc.sys.LANGUAGE_ENGLISH ){
-                        Manager.language.change(cc.sys.LANGUAGE_CHINESE);
-                    }else{
-                        Manager.language.change(cc.sys.LANGUAGE_ENGLISH);
-                    }
-
-                    // Manager.uiLoading.show(0.1,"牛B")
-                    // cc.tween(this.node).delay(0.2).call(()=>{
-                    //     Manager.uiLoading.updateProgress(99)
-                    // }).start();
-                    // Manager.tips.show("您好，你就是一个牛B大佬");
-                });
-            }
+            game.on(cc.Node.EventType.TOUCH_END, this.onClick, this);
         }
 
-        //
-        let bottom_op = cc.find("bottom_op",this.node);
-        let setting = cc.find("setting",bottom_op);
-        this._count = 0;
-        setting.on(cc.Node.EventType.TOUCH_END,()=>{
+        let bottom_op = cc.find("bottom_op", this.node);
+        let setting = cc.find("setting", bottom_op);
+        setting.on(cc.Node.EventType.TOUCH_END, () => {
             Manager.alert.show({
-                immediatelyCallback : true,
-                text:`您确定要退出游戏？`,
-                confirmCb:(isOk)=>{
-                    if( isOk ){
+                immediatelyCallback: true,
+                text: `您确定要退出游戏？`,
+                confirmCb: (isOk) => {
+                    if (isOk) {
                         dispatch(LogicEvent.ENTER_LOGIN);
                     }
                 },
             });
-            // this._count++;
-            // Manager.alert.show({ immediatelyCallback:true, text:`您好，这是第${this._count}个弹出框？`,confirmCb:(isOK)=>{
-            //     cc.log(`confirmCb => ${isOK}`);
-            //     Manager.alert.close(3);
-            // },cancelCb:(isOK)=>{
-            //     cc.log(`cancelCb => ${isOK}`);
-            //     Manager.alert.closeAll();
-            // }});
-            // this._count++;
-            // Manager.alert.show({text:`您好，这是第${this._count}个弹出框？`,confirmCb:(isOK)=>{
-            //     cc.log(`confirmCb => ${isOK}`);
-            // },cancelCb:(isOK)=>{
-            //     cc.log(`cancelCb => ${isOK}`);
-            // }});
-            // this._count++;
-            // Manager.alert.show({tag:3,text:`您好，这是第${this._count}个弹出框？`,confirmCb:(isOK)=>{
-            //     cc.log(`confirmCb => ${isOK}`);
-            // }});
-            // this._count = 0;
         });
 
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
@@ -172,42 +106,25 @@ export default class HallView extends UIView{
         this.node.addChild(node);
         reconnect = node.addComponent(ReconnectController);
         reconnect.service = ChatService.instance;
-
-        //资源交叉引用释放测试
-        this.num9 = cc.find("num9", this.node);
-        if (this.num9) {
-            this.numj = cc.find("numj", this.num9);
-            if (this.numj) {
-                this.numj.active = false;
-            }
-        }
-
-        Manager.uiManager.open({type: NumberView, zIndex: 999, bundle: BUNDLE_RESOURCES}).then((view) => {
-        });
-        this.scheduleOnce(()=>{
-            if (this.numj) {
-                this.numj.active = true;
-            }
-        },5);
     }
 
-     bindingEvents(){
-         super.bindingEvents();
-         this.registerEvent(CommonEvent.DOWNLOAD_PROGRESS,this.onDownloadProgess);
-     }
-     
-     private onDownloadProgess( data : { progress: number, config: BundleConfig }){
+    bindingEvents() {
+        super.bindingEvents();
+        this.registerEvent(CommonEvent.DOWNLOAD_PROGRESS, this.onDownloadProgess);
+    }
 
-        let progressBar : cc.ProgressBar = cc.find(`games/game_${data.config.index}/Background/progressBar`,this.node).getComponent(cc.ProgressBar);
-        let progressLabel : cc.Label = cc.find(`games/game_${data.config.index}/Background/progressBar/progress`,this.node).getComponent(cc.Label);
-        if ( data.progress == -1 ){
+    private onDownloadProgess(data: { progress: number, config: BundleConfig }) {
+
+        let progressBar: cc.ProgressBar = cc.find(`games/game_${data.config.index}/Background/progressBar`, this.node).getComponent(cc.ProgressBar);
+        let progressLabel: cc.Label = cc.find(`games/game_${data.config.index}/Background/progressBar/progress`, this.node).getComponent(cc.Label);
+        if (data.progress == -1) {
             progressBar.node.active = false;
-        }else if ( data.progress < 1 ){
+        } else if (data.progress < 1) {
             progressBar.node.active = true;
             progressBar.progress = data.progress;
             progressLabel.string = "" + Math.floor(data.progress * 100) + "%";
-        }else{
+        } else {
             progressBar.node.active = false;
         }
-     }
+    }
 }

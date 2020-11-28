@@ -6,7 +6,7 @@ export let HALL_ZH = {
       '游戏2',
       '坦克大战',
       '2048',
-      '游戏5',
+      '网络测试',
       '游戏6',
     ],
     hall_view_broadcast_content: '[系统广播] 恭喜大佬进入',

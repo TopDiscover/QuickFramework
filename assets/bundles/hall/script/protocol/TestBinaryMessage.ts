@@ -1,5 +1,6 @@
 import { BinaryStreamMessage, serialize, Int8Value, Int16Value, Int32Value, Float32Value, Float64Value, Uint8Value, Uint16Value, Uint32Value, StringValue, BinaryStream } from "../../../../script/framework/net/BinaryStreamMessage"
-import { MainCmd, SUB_CMD_LOBBY } from "../../../../script/common/protocol/CmdDefines";
+import { MainCmd } from "../../../../script/common/protocol/CmdDefines";
+import { SUB_CMD_LOBBY } from "./LobbyCmd";
 
 class TestData extends BinaryStream{
 
@@ -12,7 +13,7 @@ class TestData extends BinaryStream{
 
 export class TestBinaryMessage extends BinaryStreamMessage {
     mainCmd = MainCmd.CMD_LOBBY;
-    subCmd = SUB_CMD_LOBBY.CMD_LOBBY_TEST_BINARY;
+    subCmd = SUB_CMD_LOBBY.TEST_BINARY_MSG;
     // @serialize("value32",Float32Value)
     // float32 : number = 32;
 

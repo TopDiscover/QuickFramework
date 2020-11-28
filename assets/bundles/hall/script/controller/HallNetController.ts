@@ -5,15 +5,13 @@
 import { injectService } from "../../../../script/framework/decorator/Decorators";
 import { LobbyService } from "../../../../script/common/net/LobbyService";
 import Controller from "../../../../script/framework/controller/Controller";
-import { MainCmd, SUB_CMD_LOBBY } from "../../../../script/common/protocol/CmdDefines";
-import { UpdateMoney, TestMsg } from "../protocol/HallMessage";
-import { TestBinaryMessage } from "../protocol/CmdBinaryMessage";
+import { MainCmd } from "../../../../script/common/protocol/CmdDefines";
+import { TestProtoMessage } from "../protocol/TestProtoMessage";
+import { TestBinaryMessage } from "../protocol/TestBinaryMessage";
 import { CommonEvent } from "../../../../script/common/event/CommonEvent";
 import { Manager } from "../../../../script/common/manager/Manager";
-
-
-
-
+import { SUB_CMD_LOBBY } from "../protocol/LobbyCmd";
+import { TestJsonMessage } from "../protocol/TestJsonMessage";
 const { ccclass, property } = cc._decorator;
 
 @ccclass
@@ -22,17 +20,17 @@ export default class HallNetController extends Controller<LobbyService> {
 
     protected bindingEvents(){
         super.bindingEvents()
-        this.registerEvent(MainCmd.CMD_LOBBY,SUB_CMD_LOBBY.UPDATE_MONEY,this.onMoneyUpdate,UpdateMoney);
-        this.registerEvent(MainCmd.CMD_LOBBY,SUB_CMD_LOBBY.TEST_PROTO_MSG,this.onTestMsg,TestMsg);
-        this.registerEvent(MainCmd.CMD_LOBBY,SUB_CMD_LOBBY.CMD_LOBBY_TEST_BINARY,this.onTestBinary,TestBinaryMessage);
+        this.registerEvent(MainCmd.CMD_LOBBY,SUB_CMD_LOBBY.TEST_JSON_MSG,this.onMoneyUpdate,TestJsonMessage);
+        this.registerEvent(MainCmd.CMD_LOBBY,SUB_CMD_LOBBY.TEST_PROTO_MSG,this.onTestMsg,TestProtoMessage);
+        this.registerEvent(MainCmd.CMD_LOBBY,SUB_CMD_LOBBY.TEST_BINARY_MSG,this.onTestBinary,TestBinaryMessage);
     }
 
-    private onMoneyUpdate( data : UpdateMoney ){
+    private onMoneyUpdate( data : TestJsonMessage ){
         //通知变更金钱
-        dispatch(CommonEvent.UPDATE_MONEY,data.count);
+        dispatch(CommonEvent.TEST_JSON_MSG,data.count);
     }
 
-    private onTestMsg( data : TestMsg ){
+    private onTestMsg( data : TestProtoMessage ){
         dispatch(CommonEvent.TEST_PROTO_MSG,data.mainCmd);
     }
 

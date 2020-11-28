@@ -1,43 +1,25 @@
 import NetHelper from "../../../../script/framework/controller/NetHelper";
 import { LobbyService } from "../../../../script/common/net/LobbyService";
-import { TestMsg, UpdateMoney } from "../protocol/HallMessage";
-import { TestBinaryMessage } from "../protocol/CmdBinaryMessage";
+import { TestProtoMessage } from "../protocol/TestProtoMessage";
+import { TestBinaryMessage } from "../protocol/TestBinaryMessage";
 import { HttpPackage, HttpRequestType } from "../../../../script/framework/net/HttpClient";
-import { GameService } from "../../../../script/common/net/GameService";
-
-class _GameHelper extends NetHelper<GameService>{
-    constructor() {
-        super(GameService.instance);
-    }
-
-
-    sendProtoMessage() {
-        let testProto = new TestMsg();
-        testProto.data.awesomeField = "这是一个中文的测试";
-        testProto.data.afvalue = 4.5;
-        this.service.send(testProto);
-    }
-}
+import { TestJsonMessage } from "../protocol/TestJsonMessage";
 
 class _HallNetHelper extends NetHelper<LobbyService>{
-
-    
-    private gameHelper = new _GameHelper();
 
     constructor() {
         super(LobbyService.instance);
     }
 
     sendProtoMessage() {
-        let testProto = new TestMsg();
+        let testProto = new TestProtoMessage();
         testProto.data.awesomeField = "这是一个中文的测试";
         testProto.data.afvalue = 4.5;
         this.service.send(testProto);
-        this.gameHelper.sendProtoMessage();
     }
 
     sendJsonMessage() {
-        let msg = new UpdateMoney();
+        let msg = new TestJsonMessage();
         this.service.send(msg);
     }
 
