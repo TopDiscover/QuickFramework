@@ -32,6 +32,8 @@ export default class LoadTestView extends UIView {
         this.loadButton = cc.find("loadButton",op);
         this.loadButton.on(cc.Node.EventType.TOUCH_END,this.onLoadButton,this);
 
+        cc.find("loadParticle",op).on(cc.Node.EventType.TOUCH_END,this.onLoadParticle,this);
+
         dispatchEnterComplete({ type: LogicType.GAME, views: [this] });
     }
 
@@ -109,6 +111,22 @@ export default class LoadTestView extends UIView {
                     btn.target.setContentSize(spriteFrame.getOriginalSize());
                 }
             },
+        })
+    }
+
+    private onLoadParticle(){
+        let name = "onLoadParticle";
+        if( this.content.getChildByName(name)){
+            return;
+        }
+        this.content.removeAllChildren();
+        let node = new cc.Node();
+        node.name = name;
+        this.content.addChild(node);
+        let sys = node.addComponent(cc.ParticleSystem);
+        sys.loadFile({
+            url:"particle/test",
+            view:this,
         })
     }
 }
