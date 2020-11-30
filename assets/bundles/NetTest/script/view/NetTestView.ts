@@ -145,6 +145,7 @@ export default class NetTestView extends GameView {
         for (let i = 0; i < this.reconnects.length; i++) {
             this.reconnects[i].node.userData = i;
             this.reconnects[i].node.on("toggle", this.onReconnectToggle, this);
+            this.onReconnectToggle(this.reconnects[i]);
         }
 
         //连接网络 
