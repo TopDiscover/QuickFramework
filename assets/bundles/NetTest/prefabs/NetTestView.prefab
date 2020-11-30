@@ -2824,7 +2824,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 120,
+      "width": 180,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -2877,8 +2877,8 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_useOriginalSize": false,
-    "_string": "重连组件",
-    "_N$string": "重连组件",
+    "_string": "是否启用重连",
+    "_N$string": "是否启用重连",
     "_fontSize": 30,
     "_lineHeight": 40,
     "_enableWrapText": true,

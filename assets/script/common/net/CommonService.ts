@@ -7,6 +7,7 @@ import { Reconnect } from "./Reconnect";
 import { WebSocketType } from "../../framework/net/WebSocketClient";
 import { Config } from "../config/Config";
 import { Manager } from "../manager/Manager";
+import { CustomNetEventType } from "../../framework/event/EventApi";
 
 /**
  * @description service公共基类
@@ -116,5 +117,25 @@ export class CommonService extends Service implements GameEventInterface {
                 }
             });
         }
+    }
+
+    protected onError(ev:Event){
+        super.onError(ev)
+        Manager.uiManager.getView("LoginView").then(view=>{
+            if( view ) return;
+            Manager.serviceManager.tryReconnect(this);
+        });
+    }
+
+    protected onClose(ev:Event){
+        super.onClose(ev)
+        if( ev.type == CustomNetEventType.CLOSE){
+            cc.log(`${this.serviceName} 应用层主动关闭Socket`);
+            return;
+        }
+        Manager.uiManager.getView("LoginView").then(view=>{
+            if( view ) return;
+            Manager.serviceManager.tryReconnect(this);
+        });
     }
 }

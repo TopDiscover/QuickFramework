@@ -6,13 +6,11 @@ import { ChatService } from "../../../../script/common/net/ChatService";
 import { CommonService } from "../../../../script/common/net/CommonService";
 import { GameService } from "../../../../script/common/net/GameService";
 import { LobbyService } from "../../../../script/common/net/LobbyService";
-import ReconnectController from "../../../../script/common/net/ReconnectController";
 import { HeartbeatBinary } from "../../../../script/common/protocol/HeartbetBinary";
 import { HeartbeatJson } from "../../../../script/common/protocol/HeartbetJson";
 import { HeartbeatProto } from "../../../../script/common/protocol/HeartbetProto";
 import { BinaryStreamMessageHeader } from "../../../../script/framework/net/BinaryStreamMessage";
 import { JsonMessageHeader } from "../../../../script/framework/net/JsonMessage";
-import { Message } from "../../../../script/framework/net/Message";
 import { ProtoMessageHeader } from "../../../../script/framework/net/ProtoMessage";
 import { HallNetHelper } from "../../../hall/script/controller/HallNetHelper";
 import { INetHelper } from "../controller/INetHelper";
@@ -195,43 +193,21 @@ export default class NetTestView extends GameView {
         this._changeNetType(type, ChatService.instance);
     }
 
+    private enabledReconnect(service: CommonService, enabled: boolean) {
+        service.reconnect.enabled = enabled;
+        if( enabled ){
+            this.log(`${service.serviceName} 启用重连组件`);
+        }else{
+            this.log(`${service.serviceName} 禁用重连组件`);
+        }
+    }
     private onReconnectToggle(toggle: cc.Toggle) {
-        if (toggle.isChecked) {
-            //挂载
-            if (toggle.node.userData == NetTest.ServiceType.Lobby) {
-                this.addReconnect(LobbyService.instance);
-            } else if (toggle.node.userData == NetTest.ServiceType.Game) {
-                this.addReconnect(GameService.instance);
-            } else if (toggle.node.userData == NetTest.ServiceType.Chat) {
-                this.addReconnect(ChatService.instance);
-            }
-        } else {
-            //卸载
-            if (toggle.node.userData == NetTest.ServiceType.Lobby) {
-                this.removeReconnect(LobbyService.instance);
-            } else if (toggle.node.userData == NetTest.ServiceType.Game) {
-                this.removeReconnect(GameService.instance);
-            } else if (toggle.node.userData == NetTest.ServiceType.Chat) {
-                this.removeReconnect(ChatService.instance);
-            }
-        }
-    }
-
-    private addReconnect(service: CommonService) {
-        if (!this.node.getChildByName(service.serviceName)) {
-            let node = new cc.Node();
-            node.name = service.serviceName;
-            this.node.addChild(node);
-            let reconnect = node.addComponent(ReconnectController);
-            reconnect.service = service;
-            this.log(`添加${service.serviceName} 重连组件`)
-        }
-    }
-    private removeReconnect(service: CommonService) {
-        let node = this.node.getChildByName(service.serviceName);
-        if (node) {
-            this.node.removeChild(node);
-            this.log(`移除${service.serviceName} 重连组件`)
+        if (toggle.node.userData == NetTest.ServiceType.Lobby) {
+            this.enabledReconnect(LobbyService.instance,toggle.isChecked);
+        } else if (toggle.node.userData == NetTest.ServiceType.Game) {
+            this.enabledReconnect(GameService.instance,toggle.isChecked);
+        } else if (toggle.node.userData == NetTest.ServiceType.Chat) {
+            this.enabledReconnect(ChatService.instance,toggle.isChecked);
         }
     }
 
@@ -289,11 +265,11 @@ export default class NetTestView extends GameView {
     }
 
     private onEnableService(toggle: cc.Toggle) {
-        if( toggle.node.userData == NetTest.ServiceType.Lobby ){
+        if (toggle.node.userData == NetTest.ServiceType.Lobby) {
             LobbyService.instance.enabled = toggle.isChecked;
-        }else if( toggle.node.userData == NetTest.ServiceType.Game ){
+        } else if (toggle.node.userData == NetTest.ServiceType.Game) {
             GameService.instance.enabled = toggle.isChecked;
-        }else if( toggle.node.userData == NetTest.ServiceType.Chat){
+        } else if (toggle.node.userData == NetTest.ServiceType.Chat) {
             ChatService.instance.enabled = toggle.isChecked;
         }
     }

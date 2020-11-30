@@ -52,6 +52,14 @@ export class Reconnect {
     private node: cc.Node = null;
     private isWaitingHide = false;
     private service: CommonService = null;
+    private _enabled = true;
+    /**@description 是否启用 */
+    public get enabled() {
+        return this._enabled;
+    }
+    public set enabled(value: boolean) {
+        this._enabled = value;
+    }
     constructor(service: CommonService) {
         this.service = service;
         Manager.eventDispatcher.addEventListener(EventApi.AdaptScreenEvent, this.onAdaptScreen, this)
