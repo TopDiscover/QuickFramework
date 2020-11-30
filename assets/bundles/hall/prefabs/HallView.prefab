@@ -3116,7 +3116,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 555.86,
+      "width": 190,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -3129,7 +3129,7 @@
       "ctor": "Float64Array",
       "array": [
         0,
-        0,
+        5,
         0,
         0,
         0,
@@ -3163,11 +3163,11 @@
     "_enabled": true,
     "alignMode": 1,
     "_target": null,
-    "_alignFlags": 18,
-    "_left": 0,
-    "_right": 0,
-    "_top": 0,
-    "_bottom": 0,
+    "_alignFlags": 45,
+    "_left": 15,
+    "_right": 15,
+    "_top": 71.8,
+    "_bottom": 81.8,
     "_verticalCenter": 0,
     "_horizontalCenter": 0,
     "_isAbsLeft": true,
@@ -3176,8 +3176,8 @@
     "_isAbsBottom": true,
     "_isAbsHorizontalCenter": true,
     "_isAbsVerticalCenter": true,
-    "_originalWidth": 0,
-    "_originalHeight": 0,
+    "_originalWidth": 555.86,
+    "_originalHeight": 50.4,
     "_id": ""
   },
   {
@@ -3196,8 +3196,8 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_useOriginalSize": true,
-    "_string": "i18n.hall_view_game_name.0",
-    "_N$string": "i18n.hall_view_game_name.0",
+    "_string": "测试",
+    "_N$string": "测试",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -3208,9 +3208,9 @@
     "_styleFlags": 1,
     "_underlineHeight": 0,
     "_N$horizontalAlign": 1,
-    "_N$verticalAlign": 0,
+    "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
-    "_N$overflow": 0,
+    "_N$overflow": 3,
     "_N$cacheMode": 0,
     "_id": ""
   },

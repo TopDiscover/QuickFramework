@@ -26,7 +26,7 @@ export default class HallView extends UIView {
                 new BundleConfig(Manager.getLanguage("hall_view_game_name.0", HallData.bundle), "gameOne", 1),
                 new BundleConfig(Manager.getLanguage("hall_view_game_name.1", HallData.bundle), "gameTwo", 2),
                 new BundleConfig(Manager.getLanguage("hall_view_game_name.2", HallData.bundle), "tankBattle", 3),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.3", HallData.bundle), "game2048", 4),
+                new BundleConfig(Manager.getLanguage("hall_view_game_name.3", HallData.bundle), "LoadTest", 4),
                 new BundleConfig(Manager.getLanguage("hall_view_game_name.4", HallData.bundle), "NetTest", 5)
             ];
         }

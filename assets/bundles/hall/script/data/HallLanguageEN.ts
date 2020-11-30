@@ -7,7 +7,7 @@ export let HALL_EN = {
             'game2',
             `BATTLE
 CITY`,
-            '2048',
+            'Load Test',
             'Net Test',
             'game6',
         ],
