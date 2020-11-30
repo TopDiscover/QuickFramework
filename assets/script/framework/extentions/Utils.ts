@@ -30,8 +30,9 @@ export function addRemoteLoadResource(view: UIView, info: ResourceInfo) {
 
 /**@description 获取Bundle,如果没有传入，会默认指定当前View打开时的bundle,否则批定resources */
 export function getBundle( config : { bundle? : BUNDLE_TYPE , view? : UIView}){
-    let bundle : BUNDLE_TYPE = BUNDLE_RESOURCES;
-    if ( config.bundle != BUNDLE_RESOURCES ){
+    let bundle : BUNDLE_TYPE = config.bundle;
+    if ( config.bundle == undefined || config.bundle == null ){
+        bundle = BUNDLE_RESOURCES;
         if( config.view ){
             bundle = config.view.bundle;
         }

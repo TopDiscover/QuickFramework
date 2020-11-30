@@ -1,7 +1,9 @@
 
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
 import { BUNDLE_REMOTE } from "../../../../script/framework/base/Defines";
+import { ButtonSpriteMemberName } from "../../../../script/framework/extentions/Utils";
 import UIView from "../../../../script/framework/ui/UIView";
+import { HallData } from "../../../hall/script/data/HallData";
 
 const {ccclass, property} = cc._decorator;
 
@@ -11,6 +13,8 @@ export default class LoadTestView extends UIView {
     public static getPrefabUrl(){
         return "prefabs/LoadTestView";
     }
+
+    private loadButton : cc.Node = null;
 
     onLoad(){
         super.onLoad();
@@ -24,6 +28,9 @@ export default class LoadTestView extends UIView {
         cc.find("loadImg",op).on(cc.Node.EventType.TOUCH_END,this.onLoadImg,this);
 
         cc.find("loadNetImg",op).on(cc.Node.EventType.TOUCH_END,this.onLoadNetImg,this);
+
+        this.loadButton = cc.find("loadButton",op);
+        this.loadButton.on(cc.Node.EventType.TOUCH_END,this.onLoadButton,this);
 
         dispatchEnterComplete({ type: LogicType.GAME, views: [this] });
     }
@@ -77,5 +84,31 @@ export default class LoadTestView extends UIView {
             defaultBundle:this.bundle,
             defaultSpriteFrame:"texture/timg"
         });
+    }
+
+    private onLoadButton(){
+        let name = "button";
+        if( this.content.getChildByName(name)){
+            return;
+        }
+        this.content.removeAllChildren();
+        let button = cc.instantiate(this.loadButton);
+        this.content.addChild(button);
+        button.name = name;
+        button.position = cc.v3(0,0,0);
+        let btn = button.getComponent(cc.Button);
+        btn.loadButton({
+            normalSprite : "texture/btn_b",
+            pressedSprite: "texture/btn_y",
+            hoverSprite:"texture/btnbg",
+            view: this,
+            bundle : HallData.bundle,
+            completeCallback:(type,spriteFrame)=>{
+                if( type == ButtonSpriteMemberName.Norml ){
+                    button.setContentSize(spriteFrame.getOriginalSize());
+                    btn.target.setContentSize(spriteFrame.getOriginalSize());
+                }
+            },
+        })
     }
 }
