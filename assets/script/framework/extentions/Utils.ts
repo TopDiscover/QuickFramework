@@ -1,5 +1,5 @@
 import UIView from "../ui/UIView";
-import { ResourceInfo, ResourceType, BUNDLE_RESOURCES } from "../base/Defines";
+import { ResourceInfo, ResourceType, BUNDLE_RESOURCES, BUNDLE_REMOTE } from "../base/Defines";
 import { Manager } from "../Framework";
 
 /**@description 添加加载本地的资源 */
@@ -341,6 +341,7 @@ export function setSkeletonSkeletonData(
     info.retain = retain;
     info.bundle = getBundle(config);
     if (resourceType == ResourceType.Remote) {
+        info.bundle = BUNDLE_REMOTE;
         addRemoteLoadResource(config.view, info);
     } else {
         addExtraLoadResource(config.view, info);

@@ -1,6 +1,5 @@
 
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
-import { BUNDLE_REMOTE } from "../../../../script/framework/base/Defines";
 import { ButtonSpriteMemberName } from "../../../../script/framework/extentions/Utils";
 import UIView from "../../../../script/framework/ui/UIView";
 import { HallData } from "../../../hall/script/data/HallData";
@@ -33,6 +32,9 @@ export default class LoadTestView extends UIView {
         this.loadButton.on(cc.Node.EventType.TOUCH_END,this.onLoadButton,this);
 
         cc.find("loadParticle",op).on(cc.Node.EventType.TOUCH_END,this.onLoadParticle,this);
+
+        cc.find("loadSpine",op).on(cc.Node.EventType.TOUCH_END,this.onLoadSpine,this);
+        cc.find("loadNetSpine",op).on(cc.Node.EventType.TOUCH_END,this.onLoadNetSpine,this);
 
         dispatchEnterComplete({ type: LogicType.GAME, views: [this] });
     }
@@ -128,5 +130,49 @@ export default class LoadTestView extends UIView {
             url:"particle/test",
             view:this,
         })
+    }
+
+    private onLoadSpine(){
+        let name = "onLoadSpine";
+        if( this.content.getChildByName(name)){
+            return;
+        }
+
+        this.content.removeAllChildren();
+        let node = new cc.Node();
+        node.name = name;
+        this.content.addChild(node);
+        let spine = node.addComponent(sp.Skeleton);
+        spine.loadSkeleton({
+            view:this,
+            url:"spine/raptor",
+            completeCallback:()=>{
+                spine.setAnimation(0,"walk",true);
+            }})
+        node.y = - this.content.height /2;
+        node.scale = 0.5;
+    }
+
+    private onLoadNetSpine(){
+        let name = "onLoadNetSpine";
+        if( this.content.getChildByName(name)){
+            return;
+        }
+        this.content.removeAllChildren();
+        let node = new cc.Node();
+        this.content.addChild(node);
+        let spine = node.addComponent(sp.Skeleton);
+        spine.loadRemoteSkeleton({
+            view:this,
+            path:"http://192.168.3.104",
+            name:"raptor",
+            completeCallback:(data : sp.SkeletonData )=>{
+                if( data ){
+                    spine.setAnimation(0,"walk",true);
+                }
+            }
+        })
+        node.y = -this.content.height/2;
+        node.scale = 0.7;
     }
 }
