@@ -1,5 +1,5 @@
 import WebEditBoxImpl from "./WebEditBoxImpl";
-import { ResourceType, ENABLE_CHANGE_LANGUAGE,USING_LAN_KEY } from "../base/Defines";
+import { ResourceType, ENABLE_CHANGE_LANGUAGE,USING_LAN_KEY, BUNDLE_REMOTE } from "../base/Defines";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
@@ -53,11 +53,10 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
     if (config.retain) {
         isRetain = true;
     }
-    let bundle = getBundle(config);
     let defaultBundle = getBundle({bundle:config.defaultBundle,view:config.view})
     Manager.assetManager.remote.loadImage(config.url, config.isNeedCache).then((data) => {
         if (data) {
-            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback,bundle, ResourceType.Remote, isRetain);
+            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback,BUNDLE_REMOTE, ResourceType.Remote, isRetain);
         } else {
             if (config.defaultSpriteFrame) {
                 if (typeof config.defaultSpriteFrame == "string") {

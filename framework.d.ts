@@ -39,7 +39,6 @@ declare module cc {
 		 * @param defaultBundle 若指定了defaultSpriteFrame，不指定defaultBundle ,优先使用view.bundle,否则则为resources目录
 		 * @param isNeedCache 是否需要缓存到本地,如果不需要，每次都会从网络拉取资源,默认都会缓存到本地
 		 * @param config.retain 远程加载的资源是否驻留在内存中,默认都不驻留内存
-		 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
 		 * @example
 		 * 示例1：
 		 * let sprite = imageNode.getComponent(cc.Sprite);
@@ -63,8 +62,7 @@ declare module cc {
 			defaultSpriteFrame?: string, 
 			defaultBundle?:BUNDLE_TYPE,
 			isNeedCache?: boolean , 
-			retain? : boolean,
-			bundle?:BUNDLE_TYPE
+			retain? : boolean
 		});
 
         /**

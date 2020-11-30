@@ -5,6 +5,9 @@ import { CommonEvent } from "../../../../script/common/event/CommonEvent";
 import { Manager } from "../../../../script/common/manager/Manager";
 import { HallData } from "../data/HallData";
 import { i18n } from "../../../../script/common/language/LanguageImpl";
+import { LobbyService } from "../../../../script/common/net/LobbyService";
+import { GameService } from "../../../../script/common/net/GameService";
+import { ChatService } from "../../../../script/common/net/ChatService";
 
 
 const { ccclass, property } = cc._decorator;
@@ -60,6 +63,10 @@ export default class HallView extends UIView {
                 },
             });
         });
+
+        LobbyService.instance.enabled = false;
+        GameService.instance.enabled = false;
+        ChatService.instance.enabled = false;
 
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
     }
