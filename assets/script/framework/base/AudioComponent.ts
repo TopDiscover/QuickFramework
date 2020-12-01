@@ -1,6 +1,7 @@
 import UIView from "../ui/UIView";
 import { ResourceInfo, BUNDLE_TYPE } from "./Defines";
 import { Manager } from "../Framework";
+import EventComponent from "./EventComponent";
 
 /**
  * @description 声音组件
@@ -17,13 +18,18 @@ class AudioData {
         }
         return this._instance;
     }
-    public musicVolume = 100;
-    public effectVolume = 100;
+    public musicVolume = 1;
+    public effectVolume = 1;
     public isEffectOn = true;
     public isMusicOn = true;
     public curMusicUrl = "";
     public curEffectId = -1;
+    /**@description 当前背景音乐的Bundle */
     public curBundle : BUNDLE_TYPE = null;
+    /**@description 当前背景音乐是否循环播放 */
+    public curLoop : boolean = true;
+    /**@description 当前背景音乐是否正在播放 */
+    public isPlaying : boolean = false;
 
     private readonly _storeMusicKey: string = "default_save_music";
     private readonly _storeEffectKey: string = "default_save_effect";
@@ -54,9 +60,23 @@ class AudioData {
     }
 }
 
+const PLAY_MUSIC = "AudioComponent_PLAY_MUSIC";
+
 @ccclass
 @menu("framework/base/AudioComponent")
-export default class AudioComponent extends cc.Component {
+export default class AudioComponent extends EventComponent {
+
+
+    protected bindingEvents(){
+        super.bindingEvents();
+        this.registerEvent(PLAY_MUSIC,this.onPlayMusic);
+    }
+
+    private onPlayMusic( data ){
+        if( !this.isPlaying && this.curMusicUrl && this.curBundle ){
+            this.playMusic(this.curMusicUrl,this.curBundle,this.curLoop);
+        }
+    }
 
     protected audioData = AudioData.instance;
 
@@ -66,8 +86,7 @@ export default class AudioComponent extends cc.Component {
     /**@description 背景音乐音量 */
     public get musicVolume() { return this.audioData.musicVolume; }
     public set musicVolume(volume) {
-        let value = volume / 100;
-        cc.audioEngine.setMusicVolume(value);
+        cc.audioEngine.setMusicVolume(volume);
         if (volume <= 0) {
             this.stopMusic();
         }
@@ -76,8 +95,7 @@ export default class AudioComponent extends cc.Component {
     /**@description 音效音量 */
     public get effectVolume() { return this.audioData.effectVolume; }
     public set effectVolume(volume) {
-        let value = volume / 100;
-        cc.audioEngine.setEffectsVolume(value);
+        cc.audioEngine.setEffectsVolume(volume);
         if (volume <= 0) {
             this.stopEffect();
         }
@@ -97,16 +115,15 @@ export default class AudioComponent extends cc.Component {
     /**@description 背景音乐开关 */
     public get isMusicOn() { return this.audioData.isMusicOn; }
     /**@description 设置背景音乐开关 */
-    public setMusicEnabled(isOn: boolean, isPlay: boolean = true) {
+    public set isMusicOn(isOn: boolean) {
         this.audioData.isMusicOn = isOn;
         this.save();
         if (this.audioData.isMusicOn) {
             if (!this.curMusicUrl) {
                 return;
             }
-            if (isPlay) {
-                this.playMusic(this.curMusicUrl,this.curBundle,true);
-            }
+            //有多个AudioComponent ,通知所有的组件
+            dispatch(PLAY_MUSIC,this);
         } else {
             this.stopMusic();
         }
@@ -114,9 +131,12 @@ export default class AudioComponent extends cc.Component {
     /**@description 当前播放的背景音乐 */
     public get curMusicUrl() { return this.audioData.curMusicUrl; }
     public set curMusicUrl(value) { this.audioData.curMusicUrl = value };
-
     public get curBundle(){ return this.audioData.curBundle;}
     public set curBundle(value){ this.audioData.curBundle = value;}
+    protected get curLoop(){ return this.audioData.curLoop;}
+    protected set curLoop(value) { this.audioData.curLoop = value};
+    protected get isPlaying(){ return this.audioData.isPlaying;}
+    protected set isPlaying(value){ this.audioData.isPlaying = value};
 
     /**@description 存储 */
     public save() {
@@ -143,6 +163,7 @@ export default class AudioComponent extends cc.Component {
 
     public stopMusic() {
         cc.audioEngine.stopMusic();
+        this.isPlaying = false;
     }
 
     public playMusic(url: string, bundle : BUNDLE_TYPE , loop: boolean = true) {
@@ -154,7 +175,9 @@ export default class AudioComponent extends cc.Component {
                     return;
                 }
             }
-            this.audioData.curMusicUrl = url;
+            this.curMusicUrl = url;
+            this.curBundle = bundle;
+            this.curLoop = loop;
             if (this.audioData.isMusicOn) {
                 Manager.cacheManager.getCacheByAsync(url,cc.AudioClip,bundle).then((data) => {
                     if (data) {
@@ -172,6 +195,7 @@ export default class AudioComponent extends cc.Component {
                         this.stopMusic();
                         //播放新的背景音乐
                         cc.audioEngine.playMusic(data, loop);
+                        this.isPlaying = true;
                         resolve({ url: url, isSuccess: true });
                     } else {
                         resolve({ url: url, isSuccess: false });

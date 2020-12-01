@@ -8,6 +8,9 @@ import { i18n } from "../../../../script/common/language/LanguageImpl";
 import { LobbyService } from "../../../../script/common/net/LobbyService";
 import { GameService } from "../../../../script/common/net/GameService";
 import { ChatService } from "../../../../script/common/net/ChatService";
+import SettingView from "../../../../script/common/component/SettingView";
+import { BUNDLE_RESOURCES } from "../../../../script/framework/base/Defines";
+import { ViewZOrder } from "../../../../script/common/config/Config";
 
 
 const { ccclass, property } = cc._decorator;
@@ -53,21 +56,14 @@ export default class HallView extends UIView {
         let bottom_op = cc.find("bottom_op", this.node);
         let setting = cc.find("setting", bottom_op);
         setting.on(cc.Node.EventType.TOUCH_END, () => {
-            Manager.alert.show({
-                immediatelyCallback: true,
-                text: i18n.quitGame,
-                confirmCb: (isOk) => {
-                    if (isOk) {
-                        dispatch(LogicEvent.ENTER_LOGIN);
-                    }
-                },
-            });
+            Manager.uiManager.open({type:SettingView,bundle:BUNDLE_RESOURCES,zIndex:ViewZOrder.UI,name:"设置界面"});
         });
 
         LobbyService.instance.enabled = false;
         GameService.instance.enabled = false;
         ChatService.instance.enabled = false;
 
+        this.audioHelper.playMusic("audio/background",this.bundle)
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
     }
 
