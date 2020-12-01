@@ -14,6 +14,13 @@ export namespace Config {
         loading : "common/prefabs/Loading",
         alert : "common/prefabs/Alert",
     }
+
+    /**@description 公共音效路径 */
+    export const audioPath = {
+        dialog : "common/audio/dlg_open",
+        button : "common/audio/btn_click",
+    }
+
     /**@description 是否跳过热更新检测 */
     export const isSkipCheckUpdate = false;
 

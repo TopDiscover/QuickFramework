@@ -47,8 +47,8 @@ export default class SettingView extends UIView {
         effectStatusNode.on("toggle", this.onEffectStatusChange, this);
         this.musicStatus.isChecked = Manager.globalAudio.isMusicOn;
         this.effectStatus.isChecked = Manager.globalAudio.isEffectOn;
-        this.onMusicStatusChange(this.musicStatus);
-        this.onEffectStatusChange(this.effectStatus);
+        this.onMusicStatusChange(this.musicStatus, false);
+        this.onEffectStatusChange(this.effectStatus, false);
 
         this.showWithAction();
     }
@@ -80,12 +80,14 @@ export default class SettingView extends UIView {
         target.node.getComponent(cc.ProgressBar).progress = target.progress;
     }
 
-    private onMusicStatusChange(target: cc.Toggle) {
+    private onMusicStatusChange(target: cc.Toggle, isPlay: boolean) {
+        if( isPlay == undefined ) Manager.globalAudio.playButtonClick();
         target.node.getChildByName("off").active = !target.isChecked;
         Manager.globalAudio.isMusicOn = target.isChecked;
     }
 
-    private onEffectStatusChange(target: cc.Toggle) {
+    private onEffectStatusChange(target: cc.Toggle, isPlay: boolean) {
+        if( isPlay == undefined ) Manager.globalAudio.playButtonClick();
         target.node.getChildByName("off").active = !target.isChecked;
         Manager.globalAudio.isEffectOn = target.isChecked;
     }
