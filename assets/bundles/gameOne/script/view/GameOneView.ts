@@ -20,6 +20,9 @@ export default class GameOneView extends UIView {
             dispatch(LogicEvent.ENTER_HALL);
         });
         goback.zIndex = 10;
+
+        this.audioHelper.playMusic("audio/background",this.bundle);
+
         dispatchEnterComplete({type:LogicType.GAME,views:[this]});
     }
 }
