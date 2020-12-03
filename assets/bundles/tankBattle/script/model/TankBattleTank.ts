@@ -105,7 +105,6 @@ export default class TankBettleTank extends cc.Component {
             other.node.group == TankBettle.GROUP.StoneWall ||
             other.node.group == TankBettle.GROUP.Boundary ||
             other.node.group == TankBettle.GROUP.Home ||
-            other.node.group == TankBettle.GROUP.Player ||
             other.node.group == TankBettle.GROUP.Water) {
             let wordPos = me.world.preAabb.center
             this.node.stopAllActions()
@@ -121,6 +120,22 @@ export default class TankBettleTank extends cc.Component {
             }
             if (this.isAI) {
                 this.changeDirection(other);
+            }
+        }else if(other.node.group == TankBettle.GROUP.Player){
+            let player = this.getPlayer(other.node);
+            if( this.isAI ){
+                
+            }else{
+                //自己不是AI
+                if( player.isAI ){
+                    this.node.stopAllActions();
+                    let wordPos = me.world.preAabb.center;
+                    let pos = this.node.parent.convertToNodeSpaceAR(wordPos);
+                    this.checkPostion(pos)
+                    this.node.x = pos.x;
+                    this.node.y = pos.y;
+                    this.isMoving = false;
+                }
             }
         }
     }
@@ -304,6 +319,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
 
     private shootNode: cc.Node = null;
     private changeNode: cc.Node = null;
+    private delayChangeNode : cc.Node = null;
     public _type: TankBettle.EnemyType = null;
 
     public set type(value) {
@@ -332,6 +348,9 @@ export class TankBettleTankEnemy extends TankBettleTank {
         this.shootNode = node;
         this.changeNode = new cc.Node();
         this.node.addChild(this.changeNode);
+        this.delayChangeNode = new cc.Node();
+        this.node.addChild(this.delayChangeNode);
+        this.startDelayChange();
     }
 
     onDestroy() {
@@ -339,6 +358,18 @@ export class TankBettleTankEnemy extends TankBettleTank {
         if( this.changeNode ){
             this.changeNode.stopAllActions();
         }
+        if( this.delayChangeNode ){
+            this.delayChangeNode.stopAllActions();
+        }
+    }
+
+    private startDelayChange(){
+        let delay = cc.randomRange(this.config.changeInterval.min,this.config.changeInterval.max);
+        this.delayChangeNode.stopAllActions();
+        cc.tween(this.shootNode).delay(delay).call(() => {
+            this.changeDirection();
+            this.startDelayChange();
+        }).start();
     }
 
     public hurt() {
@@ -439,7 +470,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
 
     changeDirection(other?: cc.BoxCollider) {
 
-        if( other.node.group == TankBettle.GROUP.Player ){
+        if( other && other.node.group == TankBettle.GROUP.Player ){
             let player = this.getPlayer(other.node);
             if( !player.isAI ){
                 //玩家与自己相撞，无视

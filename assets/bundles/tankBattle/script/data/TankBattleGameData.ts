@@ -132,6 +132,8 @@ export namespace TankBettle {
         live = 1;
         /**@description 射击间隔时间 */
         shootInterval = { min: 2, max: 5 };
+        /**@description AI切换方向间隔时间 */
+        changeInterval = { min : 4 , max : 10};
     }
 
     /**@description 敌人出生点位置 */
