@@ -73,7 +73,7 @@ export default class AudioComponent extends EventComponent {
     }
 
     private onPlayMusic( data ){
-        if( !this.isPlaying && this.curMusicUrl && this.curBundle ){
+        if( this.curPlayMusicUrl == this.curMusicUrl && !this.isPlaying && this.curMusicUrl && this.curBundle ){
             this.playMusic(this.curMusicUrl,this.curBundle,this.curLoop);
         }
     }
@@ -137,6 +137,8 @@ export default class AudioComponent extends EventComponent {
     protected set curLoop(value) { this.audioData.curLoop = value};
     protected get isPlaying(){ return this.audioData.isPlaying;}
     protected set isPlaying(value){ this.audioData.isPlaying = value};
+    /**@description 指向当前组件的播放音乐 */
+    protected curPlayMusicUrl : string = null;
 
     /**@description 存储 */
     public save() {
@@ -175,6 +177,7 @@ export default class AudioComponent extends EventComponent {
                     return;
                 }
             }
+            this.curPlayMusicUrl = url;
             this.curMusicUrl = url;
             this.curBundle = bundle;
             this.curLoop = loop;
