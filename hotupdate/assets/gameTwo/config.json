@@ -1,0 +1,46 @@
+{
+    "paths": {
+        "7eolMhjupM1q3o9vLOm5zy": [
+            "prefabs/GameTwoView",
+            "cc.Prefab"
+        ],
+        "11h51xSmNFILtNnIWVerDf": [
+            "texture/tiger",
+            "cc.Texture2D"
+        ],
+        "325BpZW2xI96qqdF68bTM+": [
+            "texture/tiger",
+            "cc.SpriteFrame",
+            1
+        ]
+    },
+    "uuids": [
+        "11h51xSmNFILtNnIWVerDf",
+        "24K5QduqxL5IyvzumtSD48",
+        "325BpZW2xI96qqdF68bTM+",
+        "7eolMhjupM1q3o9vLOm5zy",
+        "b0ieFrQkJIcI7Vn/L+LUQ0",
+        "ecpdLyjvZBwrvm+cedCcQy"
+    ],
+    "scenes": {},
+    "redirect": [
+        "24K5QduqxL5IyvzumtSD48",
+        0,
+        "b0ieFrQkJIcI7Vn/L+LUQ0",
+        1,
+        "ecpdLyjvZBwrvm+cedCcQy",
+        2
+    ],
+    "deps": [
+        "resources",
+        "hall",
+        "internal"
+    ],
+    "packs": null,
+    "name": "gameTwo",
+    "importBase": "import",
+    "nativeBase": "native",
+    "debug": true,
+    "isZip": false,
+    "encrypted": false
+}

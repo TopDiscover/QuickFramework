@@ -1,0 +1,27 @@
+{
+  "__type__": "cc.SpriteFrame",
+  "content": {
+    "name": "timg",
+    "texture": "a6rWPJocxJzagk4W52n47V",
+    "rect": [
+      0,
+      0,
+      1036,
+      734
+    ],
+    "offset": [
+      0,
+      0
+    ],
+    "originalSize": [
+      1036,
+      734
+    ],
+    "capInsets": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

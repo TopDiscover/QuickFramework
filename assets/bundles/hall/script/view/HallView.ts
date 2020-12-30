@@ -64,6 +64,9 @@ export default class HallView extends UIView {
         ChatService.instance.enabled = false;
 
         this.audioHelper.playMusic("audio/background",this.bundle)
+
+        let version = cc.find("version", this.node).getComponent(cc.Label).string = "版本3";
+        
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
     }
 

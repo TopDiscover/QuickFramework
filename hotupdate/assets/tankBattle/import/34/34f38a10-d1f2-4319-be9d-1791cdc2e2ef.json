@@ -1,0 +1,198 @@
+{
+  "__type__": "cc.SpriteAtlas",
+  "_name": "images.plist",
+  "_spriteFrames": {
+    "tank_0_0": {
+      "__uuid__": "732qPSPk1EO4fjL9hemmmT"
+    },
+    "tank_0_1": {
+      "__uuid__": "ebsgyXiQRPJoodRzr0eEgu"
+    },
+    "tank_0_2": {
+      "__uuid__": "2dLgiPf9JBTrhPA0J2EtCo"
+    },
+    "tank_0_3": {
+      "__uuid__": "4fuvQdNnZMVqJGrcoTF5Rl"
+    },
+    "tank_1_0": {
+      "__uuid__": "40PF879JVFx5NuAYlKyx08"
+    },
+    "tank_1_1": {
+      "__uuid__": "8bXPo97K1BqaqNfvzteHrU"
+    },
+    "tank_1_2": {
+      "__uuid__": "17xjn9sjZFoITMcekiF8FE"
+    },
+    "tank_1_3": {
+      "__uuid__": "76EIcAz19Hd5adNfePYg9E"
+    },
+    "tank_2_0": {
+      "__uuid__": "50uQoLDvpLYprF9xYluh5K"
+    },
+    "tank_2_1": {
+      "__uuid__": "a75Pr2wH5H/KVHBGSv1hkz"
+    },
+    "tank_2_2": {
+      "__uuid__": "1aWT8+BoROBpy4QuLZ8OSl"
+    },
+    "tank_2_3": {
+      "__uuid__": "5e/oSI/FdAoKO4lvozw66B"
+    },
+    "heart_1": {
+      "__uuid__": "39HXDUuTRDwJ1m7x22cXSb"
+    },
+    "heart_0": {
+      "__uuid__": "c6JubTSzdM6bk7dc75Jaf/"
+    },
+    "tank_boom_0": {
+      "__uuid__": "3dx1vO96BEO6n9mxaUA2aK"
+    },
+    "tank_boom_1": {
+      "__uuid__": "5eFQyVP7BLY6naaOr1LgHy"
+    },
+    "tank_boom_2": {
+      "__uuid__": "e3HZCP24xMnb+Jy/OxoCLh"
+    },
+    "tank_3_0": {
+      "__uuid__": "9dFJVkxU9DD7y3fmR+Jxn/"
+    },
+    "tank_3_1": {
+      "__uuid__": "c1Ll9J4x1MOp10Z9OijXTs"
+    },
+    "tank_3_2": {
+      "__uuid__": "beL9pb6alAkbmaLxf4W44I"
+    },
+    "tank_3_3": {
+      "__uuid__": "db/QaA9DBLG69zWhj/8zA8"
+    },
+    "start_0": {
+      "__uuid__": "08/TEkt21KaalFEK0VjEL2"
+    },
+    "start_1": {
+      "__uuid__": "c2gq+edZ5GF5WdwY8qLqKj"
+    },
+    "start_2": {
+      "__uuid__": "2e/OpBe3pF3Y79dBHI3wZG"
+    },
+    "start_3": {
+      "__uuid__": "3a+RVoRGRJlruXNuxZ6B2b"
+    },
+    "start_4": {
+      "__uuid__": "42iU+ZuxpA25DzquV1+2jn"
+    },
+    "start_5": {
+      "__uuid__": "12TMIFm51Hmq0gQYV7fSv/"
+    },
+    "start_6": {
+      "__uuid__": "76zQhnj7lBDoILw4Jj7tS+"
+    },
+    "tank_4_0": {
+      "__uuid__": "f5FBatSTdH14HrPwkX14VN"
+    },
+    "tank_4_1": {
+      "__uuid__": "821AvUPWZHsY2EBJFbwq7b"
+    },
+    "tank_4_2": {
+      "__uuid__": "61rOFAArtN3pQBw+tZmyb4"
+    },
+    "tank_4_3": {
+      "__uuid__": "8d0kcFDZ9FSq1dFdTd0mYY"
+    },
+    "tank_5_0": {
+      "__uuid__": "cd0oQff6hFBqw+Emio8yc2"
+    },
+    "tank_5_1": {
+      "__uuid__": "7cJxWAxGJAMq4NtYbCJIWh"
+    },
+    "tank_5_2": {
+      "__uuid__": "896UKcnF9NnrcZXKgZSJZt"
+    },
+    "tank_5_3": {
+      "__uuid__": "2bVJzkn6ZEgZBjsRpusEXG"
+    },
+    "tank_6_0": {
+      "__uuid__": "1bmFeM+A5MvZqUMP7rxruq"
+    },
+    "tank_6_1": {
+      "__uuid__": "9aCH5ZiyBDOJgxm9Jidf27"
+    },
+    "tank_6_2": {
+      "__uuid__": "d9Nbf0N0lEobZCpM65QxcN"
+    },
+    "tank_6_3": {
+      "__uuid__": "a32On0JmtF/Lqb4J87MhWO"
+    },
+    "block_0": {
+      "__uuid__": "3f3NH9m+pMsZu80IZCAP0M"
+    },
+    "block_1": {
+      "__uuid__": "7fmnm5QWxI2om7OQTUecTH"
+    },
+    "block_2": {
+      "__uuid__": "91pttIbz1DKrS9ygK2Aiat"
+    },
+    "block_3": {
+      "__uuid__": "07r7PvVtlJfJGofZITsQx+"
+    },
+    "block_4": {
+      "__uuid__": "1cnoQo3VBK/IVeXJedWmWn"
+    },
+    "bullet_0": {
+      "__uuid__": "e75b5Kr3BFb6feS61Co4rU"
+    },
+    "bullet_1": {
+      "__uuid__": "7fzi6IuRNLYZLnQcHC3SMr"
+    },
+    "bullet_2": {
+      "__uuid__": "ddE8lHs7JIA44d1V8Tnlsa"
+    },
+    "bullet_3": {
+      "__uuid__": "2d9HcbvKNFyKTloih+GIY7"
+    },
+    "start_loop_0": {
+      "__uuid__": "84mKlPpqlOtaX8BoroC5Uv"
+    },
+    "start_loop_1": {
+      "__uuid__": "7dZrz0YLFFHLjhlo2jbXhW"
+    },
+    "item_0": {
+      "__uuid__": "83T9eJ9aZB+bW8eBz6a+YZ"
+    },
+    "item_1": {
+      "__uuid__": "498qdxDdxBPZeVU+tZIl6f"
+    },
+    "item_2": {
+      "__uuid__": "1a75ZmSiZBQZYKN+ejdpdP"
+    },
+    "item_3": {
+      "__uuid__": "344D4K/cdPrrhlhESE/gDJ"
+    },
+    "item_4": {
+      "__uuid__": "8eOl21m8JCraCTZ0SVTeFF"
+    },
+    "item_5": {
+      "__uuid__": "63wI5+mjtOYa63T1rPAv2B"
+    },
+    "my_tank_boom_0": {
+      "__uuid__": "469S/I42hLtpxMAixRBWe4"
+    },
+    "my_tank_boom_1": {
+      "__uuid__": "cdE9a4yV9N0pxTgfsCU85x"
+    },
+    "my_tank_boom_2": {
+      "__uuid__": "3d6mZ75hRLv5t8aT6v8zLK"
+    },
+    "my_tank_boom_3": {
+      "__uuid__": "1edcl7tqROdrfqZ7NCT5/L"
+    },
+    "tank_count_0": {
+      "__uuid__": "a8kvzNzRlN86iBL49TFPmk"
+    },
+    "tank_count_1": {
+      "__uuid__": "0bt6mrASNJyKHpAwxWRLjh"
+    },
+    "level": {
+      "__uuid__": "2cVkSJJ0ZPiqAas63fy3/Z"
+    }
+  }
+}

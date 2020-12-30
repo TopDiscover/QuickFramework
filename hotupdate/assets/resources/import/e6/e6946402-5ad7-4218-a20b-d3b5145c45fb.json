@@ -1,0 +1,27 @@
+{
+  "__type__": "cc.SpriteFrame",
+  "content": {
+    "name": "prograss",
+    "texture": "06b3yNxjNJnoR9htkm/zRh",
+    "rect": [
+      4,
+      3,
+      462,
+      37
+    ],
+    "offset": [
+      0,
+      0.5
+    ],
+    "originalSize": [
+      470,
+      44
+    ],
+    "capInsets": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

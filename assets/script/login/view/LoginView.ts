@@ -22,6 +22,8 @@ export default class LoginView extends UIView {
         this._login.on(cc.Node.EventType.TOUCH_END,()=>{
             Manager.bundleManager.enterBundle(new BundleConfig("大厅",Config.BUNDLE_HALL,0,LogicEvent.ENTER_HALL,true));
         });
+
+        let version = cc.find("version", this.node).getComponent(cc.Label).string = "版本3";
         
         dispatchEnterComplete({type:LogicType.LOGIN,views:[this,DownloadLoading]})
     }

@@ -1,0 +1,183 @@
+{
+    "paths": {
+        "ddfkR7TR9OkIe62Kkk7Vek": [
+            "animations/king_boom",
+            "cc.AnimationClip"
+        ],
+        "a5Kvtdd9pJHoJRWfzgApju": [
+            "animations/startEnter",
+            "cc.AnimationClip"
+        ],
+        "cdSsUE2alCX4/nDtES+SZV": [
+            "animations/startQuit",
+            "cc.AnimationClip"
+        ],
+        "c9kt+hflxDbaCk+n9zWRbM": [
+            "animations/tank_boom",
+            "cc.AnimationClip"
+        ],
+        "38P3bO9yNNiaxZMRQiAG6W": [
+            "animations/tank_protected",
+            "cc.AnimationClip"
+        ],
+        "e63H6gAk1NLLrgjhNaHoWX": [
+            "animations/tank_start",
+            "cc.AnimationClip"
+        ],
+        "beh4KAssZDyKLhk9JDrIoh": [
+            "audio/attack",
+            "cc.AudioClip"
+        ],
+        "cfxodKDc9EbZgA6R74CgeP": [
+            "audio/bulletCrack",
+            "cc.AudioClip"
+        ],
+        "74eCoKXJBNd4S0usu5lrPr": [
+            "audio/move",
+            "cc.AudioClip"
+        ],
+        "d4AskzjlZHbZdlTqnyKrh7": [
+            "audio/playerCrack",
+            "cc.AudioClip"
+        ],
+        "41JWFwNyBIb5KAIs4sMg3l": [
+            "audio/prop",
+            "cc.AudioClip"
+        ],
+        "3bHajj0slOmq6WOK5V801N": [
+            "audio/start",
+            "cc.AudioClip"
+        ],
+        "6a4vdyZV1HVKA9BU9rCsg9": [
+            "audio/tankCrack",
+            "cc.AudioClip"
+        ],
+        "efhcOl9GBCso9N8m3bVlN0": [
+            "prefabs/TankBattleChangeStageView",
+            "cc.Prefab"
+        ],
+        "1aTpDJDStMHKlPOOWji6B2": [
+            "prefabs/TankBattleGameOver",
+            "cc.Prefab"
+        ],
+        "53aKWKNnlNwIP51KmrfEzr": [
+            "prefabs/TankBattleGameView",
+            "cc.Prefab"
+        ],
+        "a25l//5pRNBYvV4/g6MP44": [
+            "prefabs/TankBattleStartView",
+            "cc.Prefab"
+        ],
+        "283B2KvyhB6LpkE53wY4g6": [
+            "texture/images",
+            "cc.Texture2D"
+        ],
+        "3484oQ0fJDGb6dF5HNwuLv": [
+            "texture/images",
+            "cc.SpriteAtlas"
+        ]
+    },
+    "uuids": [
+        "07r7PvVtlJfJGofZITsQx+",
+        "08/TEkt21KaalFEK0VjEL2",
+        "0bt6mrASNJyKHpAwxWRLjh",
+        "12TMIFm51Hmq0gQYV7fSv/",
+        "17xjn9sjZFoITMcekiF8FE",
+        "1aTpDJDStMHKlPOOWji6B2",
+        "1aWT8+BoROBpy4QuLZ8OSl",
+        "1a75ZmSiZBQZYKN+ejdpdP",
+        "1bmFeM+A5MvZqUMP7rxruq",
+        "1cnoQo3VBK/IVeXJedWmWn",
+        "1edcl7tqROdrfqZ7NCT5/L",
+        "283B2KvyhB6LpkE53wY4g6",
+        "2bVJzkn6ZEgZBjsRpusEXG",
+        "2cVkSJJ0ZPiqAas63fy3/Z",
+        "2dLgiPf9JBTrhPA0J2EtCo",
+        "2d9HcbvKNFyKTloih+GIY7",
+        "2e/OpBe3pF3Y79dBHI3wZG",
+        "344D4K/cdPrrhlhESE/gDJ",
+        "3484oQ0fJDGb6dF5HNwuLv",
+        "38P3bO9yNNiaxZMRQiAG6W",
+        "39HXDUuTRDwJ1m7x22cXSb",
+        "3a+RVoRGRJlruXNuxZ6B2b",
+        "3bHajj0slOmq6WOK5V801N",
+        "3dx1vO96BEO6n9mxaUA2aK",
+        "3d6mZ75hRLv5t8aT6v8zLK",
+        "3f3NH9m+pMsZu80IZCAP0M",
+        "40PF879JVFx5NuAYlKyx08",
+        "41JWFwNyBIb5KAIs4sMg3l",
+        "42iU+ZuxpA25DzquV1+2jn",
+        "469S/I42hLtpxMAixRBWe4",
+        "498qdxDdxBPZeVU+tZIl6f",
+        "4fuvQdNnZMVqJGrcoTF5Rl",
+        "50uQoLDvpLYprF9xYluh5K",
+        "53aKWKNnlNwIP51KmrfEzr",
+        "5eFQyVP7BLY6naaOr1LgHy",
+        "5e/oSI/FdAoKO4lvozw66B",
+        "61rOFAArtN3pQBw+tZmyb4",
+        "63wI5+mjtOYa63T1rPAv2B",
+        "6a4vdyZV1HVKA9BU9rCsg9",
+        "732qPSPk1EO4fjL9hemmmT",
+        "74eCoKXJBNd4S0usu5lrPr",
+        "76EIcAz19Hd5adNfePYg9E",
+        "76zQhnj7lBDoILw4Jj7tS+",
+        "7cJxWAxGJAMq4NtYbCJIWh",
+        "7dZrz0YLFFHLjhlo2jbXhW",
+        "7fmnm5QWxI2om7OQTUecTH",
+        "7fzi6IuRNLYZLnQcHC3SMr",
+        "821AvUPWZHsY2EBJFbwq7b",
+        "83T9eJ9aZB+bW8eBz6a+YZ",
+        "84mKlPpqlOtaX8BoroC5Uv",
+        "896UKcnF9NnrcZXKgZSJZt",
+        "8bXPo97K1BqaqNfvzteHrU",
+        "8d0kcFDZ9FSq1dFdTd0mYY",
+        "8eOl21m8JCraCTZ0SVTeFF",
+        "91pttIbz1DKrS9ygK2Aiat",
+        "9aCH5ZiyBDOJgxm9Jidf27",
+        "9bvaMerUlDyary99mJa6xp",
+        "9dFJVkxU9DD7y3fmR+Jxn/",
+        "a25l//5pRNBYvV4/g6MP44",
+        "a32On0JmtF/Lqb4J87MhWO",
+        "a5Kvtdd9pJHoJRWfzgApju",
+        "a75Pr2wH5H/KVHBGSv1hkz",
+        "a8kvzNzRlN86iBL49TFPmk",
+        "beL9pb6alAkbmaLxf4W44I",
+        "beh4KAssZDyKLhk9JDrIoh",
+        "c1Ll9J4x1MOp10Z9OijXTs",
+        "c2gq+edZ5GF5WdwY8qLqKj",
+        "c6JubTSzdM6bk7dc75Jaf/",
+        "c9kt+hflxDbaCk+n9zWRbM",
+        "cdE9a4yV9N0pxTgfsCU85x",
+        "cdSsUE2alCX4/nDtES+SZV",
+        "cd0oQff6hFBqw+Emio8yc2",
+        "cfxodKDc9EbZgA6R74CgeP",
+        "d4AskzjlZHbZdlTqnyKrh7",
+        "d8HsitJHxOYqo801xBk8ev",
+        "d9Nbf0N0lEobZCpM65QxcN",
+        "db/QaA9DBLG69zWhj/8zA8",
+        "ddE8lHs7JIA44d1V8Tnlsa",
+        "ddfkR7TR9OkIe62Kkk7Vek",
+        "e3HZCP24xMnb+Jy/OxoCLh",
+        "e63H6gAk1NLLrgjhNaHoWX",
+        "e75b5Kr3BFb6feS61Co4rU",
+        "ebsgyXiQRPJoodRzr0eEgu",
+        "ecpdLyjvZBwrvm+cedCcQy",
+        "efhcOl9GBCso9N8m3bVlN0",
+        "f5FBatSTdH14HrPwkX14VN"
+    ],
+    "scenes": {},
+    "redirect": [
+        "ecpdLyjvZBwrvm+cedCcQy",
+        0
+    ],
+    "deps": [
+        "internal"
+    ],
+    "packs": null,
+    "name": "tankBattle",
+    "importBase": "import",
+    "nativeBase": "native",
+    "debug": true,
+    "isZip": false,
+    "encrypted": false
+}

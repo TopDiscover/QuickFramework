@@ -1,0 +1,89 @@
+{
+    "paths": {
+        "4eXwOjWwhFA5hhICXLfAEN": [
+            "animation/VIP_CX1",
+            "cc.Asset"
+        ],
+        "75ZZlF62NNFrBhwQHR3p6M": [
+            "animation/VIP_CX1",
+            "cc.Texture2D"
+        ],
+        "d2Qx9hz7VJr4qE0eDjYihX": [
+            "animation/VIP_CX1",
+            "cc.SpriteFrame",
+            1
+        ],
+        "ebttFS5z9Em5ZMK54A6KRG": [
+            "animation/VIP_CX1",
+            "sp.SkeletonData"
+        ],
+        "64scK0Xt5Dk70UKP9KWwEh": [
+            "audio/background",
+            "cc.AudioClip"
+        ],
+        "2ftUCM0H5CR5QnPzehNsqy": [
+            "prefabs/GameOneView",
+            "cc.Prefab"
+        ],
+        "077IO5B/ZMaLz4SW9i06Yd": [
+            "texture/tiger",
+            "cc.SpriteFrame",
+            1
+        ],
+        "c4sZYcRktFY6JnRQAbaSTQ": [
+            "texture/tiger",
+            "cc.Texture2D"
+        ],
+        "159e6VaXhCV7YJyjTeuqwx": [
+            "texture/timg",
+            "cc.SpriteFrame",
+            1
+        ],
+        "a6rWPJocxJzagk4W52n47V": [
+            "texture/timg",
+            "cc.Texture2D"
+        ]
+    },
+    "uuids": [
+        "077IO5B/ZMaLz4SW9i06Yd",
+        "159e6VaXhCV7YJyjTeuqwx",
+        "24K5QduqxL5IyvzumtSD48",
+        "2ftUCM0H5CR5QnPzehNsqy",
+        "4eXwOjWwhFA5hhICXLfAEN",
+        "64scK0Xt5Dk70UKP9KWwEh",
+        "75ZZlF62NNFrBhwQHR3p6M",
+        "7a/QZLET9IDreTiBfRn2PD",
+        "a6rWPJocxJzagk4W52n47V",
+        "b0ieFrQkJIcI7Vn/L+LUQ0",
+        "c4sZYcRktFY6JnRQAbaSTQ",
+        "d2Qx9hz7VJr4qE0eDjYihX",
+        "ebttFS5z9Em5ZMK54A6KRG",
+        "ecpdLyjvZBwrvm+cedCcQy",
+        "f0BIwQ8D5Ml7nTNQbh1YlS"
+    ],
+    "scenes": {},
+    "redirect": [
+        "24K5QduqxL5IyvzumtSD48",
+        0,
+        "7a/QZLET9IDreTiBfRn2PD",
+        1,
+        "b0ieFrQkJIcI7Vn/L+LUQ0",
+        2,
+        "ecpdLyjvZBwrvm+cedCcQy",
+        1,
+        "f0BIwQ8D5Ml7nTNQbh1YlS",
+        0
+    ],
+    "deps": [
+        "resources",
+        "internal",
+        "hall"
+    ],
+    "packs": null,
+    "name": "gameOne",
+    "importBase": "import",
+    "nativeBase": "native",
+    "debug": true,
+    "isZip": false,
+    "encrypted": false
+}

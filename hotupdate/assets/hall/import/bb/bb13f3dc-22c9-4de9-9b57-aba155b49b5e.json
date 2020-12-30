@@ -1,0 +1,27 @@
+{
+  "__type__": "cc.SpriteFrame",
+  "content": {
+    "name": "hall_msg_bg",
+    "texture": "1d05941fc",
+    "rect": [
+      1236,
+      529,
+      769,
+      39
+    ],
+    "offset": [
+      1,
+      -1
+    ],
+    "originalSize": [
+      771,
+      41
+    ],
+    "capInsets": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

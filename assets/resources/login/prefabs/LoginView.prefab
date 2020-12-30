@@ -688,7 +688,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 102.25,
+      "width": 182.25,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -700,8 +700,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        491.06500000000005,
-        -284.8,
+        100.95799999999997,
+        63.85800000000002,
         0,
         0,
         0,
@@ -741,8 +741,8 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_useOriginalSize": false,
-    "_string": "版本1",
-    "_N$string": "版本1",
+    "_string": "版本版本3",
+    "_N$string": "版本版本3",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -771,9 +771,9 @@
     "_target": null,
     "_alignFlags": 36,
     "_left": 0,
-    "_right": 97.81,
+    "_right": 447.91700000000003,
     "_top": 0,
-    "_bottom": 50,
+    "_bottom": 398.658,
     "_verticalCenter": 0,
     "_horizontalCenter": 0,
     "_isAbsLeft": true,

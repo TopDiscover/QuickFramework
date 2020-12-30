@@ -1,0 +1,35 @@
+{
+  "__type__": "cc.Material",
+  "_name": "builtin-3d-particle",
+  "_effectAsset": {
+    "__uuid__": "82migssElAGb04Ws6NimQX"
+  },
+  "_techniqueData": {
+    "0": {
+      "props": {
+        "mainTiling_Offset": {
+          "__type__": "cc.Vec4",
+          "x": 1,
+          "y": 1
+        },
+        "tintColor": {
+          "__type__": "cc.Color",
+          "r": 172,
+          "g": 165,
+          "b": 165,
+          "a": 127
+        },
+        "mainTexture": {
+          "__uuid__": "60AwGqM1dKELCGhPAR+jK6"
+        }
+      },
+      "defines": {
+        "CC_USE_BILLBOARD": true,
+        "CC_USE_STRETCHED_BILLBOARD": false,
+        "CC_USE_HORIZONTAL_BILLBOARD": false,
+        "CC_USE_VERTICAL_BILLBOARD": false,
+        "CC_USE_MESH": false
+      }
+    }
+  }
+}
