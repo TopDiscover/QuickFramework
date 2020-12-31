@@ -154,7 +154,7 @@ class _HotUpdate {
     /**@description 本地存储热更新文件的路径 */
     private storagePath = "";
     /**@description 是否在热更新中或检测更新状态 */
-    private updating = true;
+    private updating = false;
 
     private _commonHotUpdateUrl = Config.TEST_HOT_UPDATE_URL_ROOT;
     /**@description 通用的热更新地址，当在子游戏或大厅未指定热更新地址时，都统一使用服务器传回来的默认全局更新地址 */
