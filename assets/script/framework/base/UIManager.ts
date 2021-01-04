@@ -606,7 +606,7 @@ export class UIManager {
     public printViews() {
         cc.log(`${this._logTag}---------views----start-----`);
         this._viewDatas.forEach((value: ViewData, key: string) => {
-            cc.log(`[${key}] isLoaded : ${value.isLoaded} status : ${value.status} view : ${value.view} active : ${value.view && value.view.node ? value.view.node.active : false}`);
+            cc.log(`[${key}] isLoaded : ${value.isLoaded} status : ${value.status} view : ${this.getClassName(value.view as any)} active : ${value.view && value.view.node ? value.view.node.active : false}`);
         });
         cc.log(`${this._logTag}---------views----end-----`);
     }
