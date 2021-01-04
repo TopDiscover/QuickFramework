@@ -450,7 +450,6 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_useOriginalSize": false,
     "_string": "登录",
     "_N$string": "登录",
     "_fontSize": 40,
@@ -688,7 +687,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 182.25,
+      "width": 102.25,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -700,7 +699,7 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        100.95799999999997,
+        100.95799999999991,
         63.85800000000002,
         0,
         0,
@@ -740,9 +739,8 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_useOriginalSize": false,
-    "_string": "版本版本1",
-    "_N$string": "版本版本1",
+    "_string": "版本1",
+    "_N$string": "版本1",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -771,7 +769,7 @@
     "_target": null,
     "_alignFlags": 36,
     "_left": 0,
-    "_right": 447.91700000000003,
+    "_right": 487.9170000000001,
     "_top": 0,
     "_bottom": 398.658,
     "_verticalCenter": 0,
@@ -805,7 +803,7 @@
     "asset": {
       "__uuid__": "cd4e4f47-df9d-4a79-86c1-d6612253551b"
     },
-    "fileId": "9a+BlXiZtHDrqSUOqm5ITS",
+    "fileId": "",
     "sync": false
   }
 ]

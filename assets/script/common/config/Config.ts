@@ -22,7 +22,7 @@ export namespace Config {
     }
 
     /**@description 是否跳过热更新检测 */
-    export const isSkipCheckUpdate = false;
+    export const isSkipCheckUpdate = true;
 
     /**@description 测试热更新服务器地址 */
     export const TEST_HOT_UPDATE_URL_ROOT = "";//"http://192.168.0.104:9945/hotupdate";
