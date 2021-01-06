@@ -50,13 +50,6 @@
             "dir": "netTest",
             "version": "1",
             "includeApk": false
-        },
-        {
-            "id": "7",
-            "name": "LeetCode示例",
-            "dir": "leetCode",
-            "version": "1",
-            "includeApk": false
         }
     ]
 }
