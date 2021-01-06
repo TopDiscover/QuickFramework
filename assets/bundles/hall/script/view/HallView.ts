@@ -32,8 +32,9 @@ export default class HallView extends UIView {
                 new BundleConfig(Manager.getLanguage("hall_view_game_name.0", HallData.bundle), "gameOne", 1),
                 new BundleConfig(Manager.getLanguage("hall_view_game_name.1", HallData.bundle), "gameTwo", 2),
                 new BundleConfig(Manager.getLanguage("hall_view_game_name.2", HallData.bundle), "tankBattle", 3),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.3", HallData.bundle), "LoadTest", 4),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.4", HallData.bundle), "NetTest", 5)
+                new BundleConfig(Manager.getLanguage("hall_view_game_name.3", HallData.bundle), "loadTest", 4),
+                new BundleConfig(Manager.getLanguage("hall_view_game_name.4", HallData.bundle), "netTest", 5),
+                new BundleConfig(Manager.getLanguage("hall_view_game_name.5", HallData.bundle), "leetCode", 6),
             ];
         }
         return this._bundles;
@@ -65,7 +66,7 @@ export default class HallView extends UIView {
 
         this.audioHelper.playMusic("audio/background",this.bundle)
 
-        let version = cc.find("version", this.node).getComponent(cc.Label).string = "版本3";
+        // let version = cc.find("version", this.node).getComponent(cc.Label).string = "版本3";
         
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
     }

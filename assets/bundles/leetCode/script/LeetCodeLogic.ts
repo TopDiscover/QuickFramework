@@ -1,9 +1,9 @@
 import { Logic } from "../../../script/common/base/Logic";
 import { LogicType, LogicEvent } from "../../../script/common/event/LogicEvent";
 import { Manager } from "../../../script/common/manager/Manager";
-import LoadTestView from "./view/LoadTestView";
+import LeetCodeView from "./view/LeetCodeView";
 
-class LoadTestLogic extends Logic {
+class LeetCodeLogic extends Logic {
 
     logicType: LogicType = LogicType.GAME;
 
@@ -17,14 +17,14 @@ class LoadTestLogic extends Logic {
     }
 
     protected get bundle() {
-        return "loadTest";
+        return "leetCode";
     }
 
     private onEnterGame(data) {
         if (data == this.bundle) {
-            Manager.uiManager.open({ type: LoadTestView, bundle: this.bundle });
+            Manager.uiManager.open({ type: LeetCodeView ,bundle:this.bundle});
         }
     }
 }
 
-Manager.logicManager.push(LoadTestLogic);
+Manager.logicManager.push(LeetCodeLogic);

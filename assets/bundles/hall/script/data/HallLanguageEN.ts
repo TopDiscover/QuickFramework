@@ -9,7 +9,7 @@ export let HALL_EN = {
 CITY`,
             'Load Test',
             'Net Test',
-            'game6',
+            'LeetCode',
         ],
         hall_view_broadcast_content: '[broadcast] congratulations!',
         hall_view_nogame_notice: '【{0}】developing!!!',

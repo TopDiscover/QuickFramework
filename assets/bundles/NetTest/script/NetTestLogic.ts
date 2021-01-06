@@ -17,7 +17,7 @@ class NetTestLogic extends Logic {
     }
 
     protected get bundle() {
-        return "NetTest";
+        return "netTest";
     }
 
     private onEnterGame(data) {

@@ -405,7 +405,6 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_useOriginalSize": false,
     "_string": "Game Two View",
     "_N$string": "Game Two View",
     "_fontSize": 60,
@@ -729,7 +728,7 @@
     "asset": {
       "__uuid__": "7ea25321-8eea-4cd6-ade8-f6f2ce9b9cf2"
     },
-    "fileId": "9a+BlXiZtHDrqSUOqm5ITS",
+    "fileId": "",
     "sync": false
   }
 ]
