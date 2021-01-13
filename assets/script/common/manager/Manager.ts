@@ -69,6 +69,9 @@ class _Manager extends Framework._FramewokManager {
         this._wssCacertUrl = value;
         Framework.Manager.wssCacertUrl = value;
     }
+    get wssCacertUrl(){
+        return this._wssCacertUrl;
+    }
 
     /**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
     private _globalAudio: GlobalAudio = null;
