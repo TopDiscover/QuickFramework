@@ -223,7 +223,7 @@ export default class Alert {
 
     private _isLoadingPrefab = false;
     private finishLoadCb = null;
-    public preLoadPrefab() {
+    public preloadPrefab() {
         this.loadPrefab();
     }
 

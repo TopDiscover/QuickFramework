@@ -40,7 +40,7 @@ export default class Loading {
     /**@description 显示的提示 */
     private _text : cc.Label = null;
 
-    public preLoadPrefab() {
+    public preloadPrefab() {
         this.loadPrefab();
     }
 

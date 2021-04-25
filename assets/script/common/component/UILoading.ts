@@ -26,7 +26,7 @@ export default class UILoading extends UILoadingDelegate {
     private _isLoadingPrefab = false;
     private finishLoadCb = null;
     private _uiName = null;
-    public preLoadPrefab() {
+    public preloadPrefab() {
         this.loadPrefab();
     }
 

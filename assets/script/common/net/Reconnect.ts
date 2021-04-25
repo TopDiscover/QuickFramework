@@ -12,7 +12,7 @@ import ReconnectComponent from "./ReconnectComponent";
 
 export class Reconnect {
 
-    static preLoadPrefab() {
+    static preloadPrefab() {
         this.loadPrefab();
     }
 

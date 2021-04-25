@@ -63,7 +63,7 @@ class ToastItem extends cc.Component {
     /**@description id*/
     private _id : number = 0;
 
-    public preLoadPrefab() {
+    public preloadPrefab() {
         this.loadPrefab();
     }
     private async loadPrefab( ){

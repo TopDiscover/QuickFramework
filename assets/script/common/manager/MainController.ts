@@ -34,9 +34,9 @@ export default class MainController extends cc.Component {
         //预先加载下loading预置体
         Manager.tips.preloadPrefab();
         Manager.uiLoading.preloadPrefab();
-        Manager.loading.preLoadPrefab();
-        Manager.alert.preLoadPrefab();
-        Reconnect.preLoadPrefab();
+        Manager.loading.preloadPrefab();
+        Manager.alert.preloadPrefab();
+        Reconnect.preloadPrefab();
         
 
         //调试按钮事件注册
