@@ -25,6 +25,11 @@ export default class HallView extends UIView {
         Manager.bundleManager.enterBundle(this.bundles[ev.target.userData]);
     }
 
+    private gamePage : cc.Node = null;
+    private gameItem : cc.Node = null;
+    private pageView : cc.PageView = null;
+    private readonly PAGE_COUNT = 6;
+
     private _bundles: BundleConfig[] = [];
     private get bundles() {
         if (this._bundles.length <= 0) {
@@ -35,24 +40,42 @@ export default class HallView extends UIView {
                 new BundleConfig(Manager.getLanguage("hall_view_game_name.3", HallData.bundle), "loadTest", 4),
                 new BundleConfig(Manager.getLanguage("hall_view_game_name.4", HallData.bundle), "netTest", 5),
                 new BundleConfig(Manager.getLanguage("hall_view_game_name.5", HallData.bundle), "aimLine", 6),
+                new BundleConfig(Manager.getLanguage("hall_view_game_name.6", HallData.bundle), "nodePoolTest", 7),
             ];
         }
         return this._bundles;
     }
 
+    private createPage(){
+
+        //计算出总页数
+        let pageCount = Math.ceil( this.bundles.length / this.PAGE_COUNT );
+        for( let i = 0 ;i < pageCount ; i++ ){
+            let page = cc.instantiate(this.gamePage);
+            page.active = true;
+            this.pageView.addPage(page);
+        }
+
+        for (let i = 0; i < this.bundles.length; i++) {
+            let game = cc.instantiate(this.gameItem);
+            game.name = `game_${i + 1}`;
+            game.active = true;
+            game.userData = i
+            cc.find("Background/label", game).getComponent(cc.Label).language = Manager.makeLanguage(`hall_view_game_name.${i}`, this.bundle);
+            game.on(cc.Node.EventType.TOUCH_END, this.onClick, this);
+
+            //计算出所有页
+            let page = Math.floor(i/this.PAGE_COUNT);
+            this.pageView.getPages()[page].addChild(game);
+        }
+    }
+
     onLoad() {
         super.onLoad();
-        let nodeGames = cc.find("games", this.node);
-        let item = cc.find("gameItem", this.node);
-        for (let i = 1; i <= this.bundles.length; i++) {
-            let game = cc.instantiate(item);
-            game.name = `game_${i}`;
-            game.active = true;
-            game.userData = i - 1
-            cc.find("Background/label", game).getComponent(cc.Label).language = Manager.makeLanguage(`hall_view_game_name.${i - 1}`, this.bundle);
-            nodeGames.addChild(game);
-            game.on(cc.Node.EventType.TOUCH_END, this.onClick, this);
-        }
+        this.gamePage = cc.find("games", this.node);
+        this.gameItem = cc.find("gameItem", this.node);
+        this.pageView = cc.find("pageview",this.node).getComponent(cc.PageView);
+        this.createPage();
 
         let bottom_op = cc.find("bottom_op", this.node);
         let setting = cc.find("setting", bottom_op);
@@ -64,9 +87,7 @@ export default class HallView extends UIView {
         GameService.instance.enabled = false;
         ChatService.instance.enabled = false;
 
-        this.audioHelper.playMusic("audio/background",this.bundle)
-
-        // let version = cc.find("version", this.node).getComponent(cc.Label).string = "版本3";
+        // this.audioHelper.playMusic("audio/background",this.bundle)
         
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
     }

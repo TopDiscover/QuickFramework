@@ -8,6 +8,7 @@ import { ResolutionHelper } from "./adaptor/ResolutionHelper";
 import { getSingleton } from "./base/Singleton";
 import TipsDelegate from "./ui/TipsDelegate";
 import UILoadingDelegate from "./ui/UILoadingDelegate";
+import { NodePoolManager } from "./base/NodePoolManager";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class _FramewokManager{
@@ -48,6 +49,11 @@ export class _FramewokManager{
     /**@description 屏幕适配 */
     get resolutionHelper(){
         return getSingleton(ResolutionHelper);
+    }
+
+    /**@description 对象池管理器 */
+    get nodePoolManager(){
+        return getSingleton(NodePoolManager);
     }
 
     private _tips : TipsDelegate = null
