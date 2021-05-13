@@ -61,8 +61,8 @@ class LoadTestLogic extends Logic {
     }
 
     protected getLoadResources():ResourceData[]{
-        return [];
-        // return [{ dir: "texture/sheep" , bundle : this.bundle,type : cc.SpriteFrame}];
+        // return [];
+        return [{ dir: "texture/sheep" , bundle : this.bundle,type : cc.SpriteFrame}];
     }
 }
 

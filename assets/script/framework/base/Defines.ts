@@ -25,7 +25,6 @@ export class ResourceInfo {
     url: string = "";
     type: typeof cc.Asset = null;
     data: cc.Asset | cc.Asset[] = null;
-    assetUrl: string = "";
     /**@description 是否常驻内存，远程加载资源有效 */
     retain: boolean = false;
     bundle: BUNDLE_TYPE = null;
