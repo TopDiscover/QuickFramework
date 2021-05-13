@@ -390,15 +390,20 @@ export function _loadDirRes( config:{
     onProgress?:(finish:number,total:number,item:cc.AssetManager.RequestItem) => void , 
     onComplete:(data:ResourceCacheData)=>void}){
         let bundle = getBundle(config);
+        let cache = Manager.cacheManager.get(bundle,config.url);
         //这里要做一个防止重复加载操作，以免对加载完成后的引用计数多加次数
         Manager.assetManager.loadDir(bundle,config.url,config.type,config.onProgress,(data)=>{
             
-            let info = new ResourceInfo;
-            info.url = config.url;
-            info.type = config.type;
-            info.data = data.data;
-            info.bundle = bundle;
-            addExtraLoadResource(config.view, info)
+            if( !cache ){
+                //如果已经有了，可能是从logic中加载过来的，不在进行引用计数操作
+                let info = new ResourceInfo;
+                info.url = config.url;
+                info.type = config.type;
+                info.data = data.data;
+                info.bundle = bundle;
+                addExtraLoadResource(config.view, info)
+            }
+            
             if (config.onComplete) {
                 config.onComplete(data);
             }
