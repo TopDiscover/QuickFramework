@@ -62,9 +62,22 @@ class ResourceCache {
 
     public removeUnuseCaches(){
         this._caches.forEach((value,key,origin)=>{
-            if( value.data && value.data.refCount == 0 ){
-                this._caches.delete(key);
-                if( CC_DEBUG ) cc.log(`删除不使用的资源 bundle : ${this.name} url : ${key}`);
+            if( Array.isArray(value.data) ){
+                let isAllDelete = true;
+                for( let i = 0 ; i < value.data.length ; i++){
+                    if( value.data[i] && value.data[i].refCount != 0 ){
+                        isAllDelete = false;
+                    }
+                }
+                if( isAllDelete ){
+                    this._caches.delete(key);
+                    if( CC_DEBUG ) cc.log(`删除不使用的资源目录 bundle : ${this.name} dir : ${key}`);
+                }
+            }else{
+                if( value.data && value.data.refCount == 0 ){
+                    this._caches.delete(key);
+                    if( CC_DEBUG ) cc.log(`删除不使用的资源 bundle : ${this.name} url : ${key}`);
+                }
             }
         });
     }
@@ -160,7 +173,8 @@ class RemoteCaches {
                 } else {
                     cache.retain = info.retain;
                 }
-                info.data.addRef();
+
+                (<cc.Asset>info.data).addRef();
                 cache.refCount++;
                 if (cache.retain) {
                     cache.refCount = 999999;
@@ -191,7 +205,7 @@ class RemoteCaches {
         //先删除精灵帧
         if (this._spriteFrameCaches.has(url)) {
             //先释放引用计数
-            this._spriteFrameCaches.get(url).data.decRef();
+            (<cc.Asset>this._spriteFrameCaches.get(url).data).decRef();
             this._spriteFrameCaches.delete(url);
             if (CC_DEBUG) cc.log(`remove remote sprite frames resource url : ${url}`);
         }
@@ -325,10 +339,24 @@ export class CacheManager {
     public removeWithInfo( info : ResourceInfo ){
         if( info ){
             if( info.data ){
-                info.data.decRef();
-                if( info.data.refCount == 0 ){
-                    this.remove(info.bundle,info.url);
-                    return true;
+                if( Array.isArray(info.data) ){
+                    let isAllDelete = true;
+                    for( let i = 0 ; i < info.data.length ; i++){
+                        info.data[i].decRef();
+                        if( info.data[i].refCount != 0 ){
+                            isAllDelete = false;
+                        }
+                    }
+                    if( isAllDelete ){
+                        this.remove(info.bundle,info.url);
+                        return true;
+                    }
+                }else{
+                    info.data.decRef();
+                    if( info.data.refCount == 0 ){
+                        this.remove(info.bundle,info.url);
+                        return true;
+                    }
                 }
             }else{
                 cc.error(`info.data is null , bundle : ${info.bundle} url : ${info.url}`); 

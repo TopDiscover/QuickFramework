@@ -3,7 +3,7 @@ import { ResourceType, ENABLE_CHANGE_LANGUAGE,USING_LAN_KEY, BUNDLE_REMOTE } fro
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
-    createNodeWithPrefab,getBundle
+    createNodeWithPrefab,getBundle,_loadDirRes
 } from "./Utils";
 import { EventApi } from "../event/EventApi";
 import { Manager } from "../Framework";
@@ -124,6 +124,20 @@ cc.createPrefab = function (config) {
     Manager.cacheManager.getCacheByAsync(url, cc.Prefab,bundle).then((data) => {
         createNodeWithPrefab(config, data)
     });
+}
+
+/**
+ * @description 扩展一个在界面中加载指定目录的接口
+ * @param config 配置信息
+ * @param config.url 资源路径
+ * @param config.view 资源持有者,继承自UIView
+ * @param config.onComplete 加载完成回调 data为ResourceCacheData，用之前先判断当前返回的data.data是否是数组
+ * @param config.onProgress 加载进度
+ * @param config.bundle 可不填，默认为view指向的bundle
+ * @param config.type 加载的资源类型
+ * */
+cc.loadDir = function(config){
+    _loadDirRes(config)
 }
 
 /**

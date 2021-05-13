@@ -30,6 +30,25 @@ declare module cc {
 	 */
 	export function createPrefab(config: { url: string, view: any, completeCallback: (node: cc.Node) => void ,bundle?:BUNDLE_TYPE});
 
+	/**
+	 * @description 扩展一个在界面中加载指定目录的接口
+	 * @param config 配置信息
+	 * @param config.url 资源路径
+	 * @param config.view 资源持有者,继承自UIView
+	 * @param config.onComplete 加载完成回调 data为ResourceCacheData，用之前先判断当前返回的data.data是否是数组
+	 * @param config.onProgress 加载进度
+	 * @param config.bundle 可不填，默认为view指向的bundle
+	 * @param config.type 加载的资源类型
+	 * */
+	export function loadDir( config:{ 
+		bundle?:BUNDLE_TYPE,
+		url : string , 
+		type : typeof cc.Asset, 
+		view : any, 
+		onProgress?:(finish:number,total:number,item:cc.AssetManager.RequestItem) => void , 
+		onComplete:(data:any)=>void
+		});
+
 	export interface Sprite {
         /**
 		 * @description 从网络加载图片，推荐使用第二种方式

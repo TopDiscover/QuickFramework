@@ -107,6 +107,8 @@ export default class ResourceLoader {
         res.forEach((value,index)=>{
             if ( value.url ){
                 this._resources.set(value.url,value);
+            }else if( value.dir ){
+                this._resources.set(value.dir,value);
             }else{
                 if ( value.preloadView) this._resources.set(value.preloadView.getPrefabUrl(),value);
             }
@@ -123,6 +125,8 @@ export default class ResourceLoader {
                     cache.info.bundle = value.bundle;
                     this._onLoadResourceComplete(cache);
                 })
+            }else if(value.dir){
+                Manager.assetManager.loadDir(value.bundle,value.dir,value.type,null,this._onLoadResourceComplete.bind(this));
             }else{
                 Manager.assetManager.load(value.bundle,value.url,value.type,null,this._onLoadResourceComplete.bind(this));
             }
@@ -154,6 +158,14 @@ export default class ResourceLoader {
                         }
                         this._loadedResource.delete(value.url);
                     }
+                }else if( value.dir ){
+                    if( this._loadedResource.has(value.dir)){
+                        let data = this._loadedResource.get(value.dir);
+                        if( data ){
+                            Manager.assetManager.releaseAsset(data);
+                        }
+                        this._loadedResource.delete(value.dir);
+                    }
                 }
             });
         }
@@ -174,7 +186,7 @@ export default class ResourceLoader {
             this._onLoadProgress(this._loadedCount, this._resources.size, data);
         }
 
-        if (data && data.data instanceof cc.Asset ) {
+        if (data && ( Array.isArray(data.data) || data.data instanceof cc.Asset ) ) {
             //排除掉界面管理器
             let info = new ResourceInfo;
             info.url = data.info.url;

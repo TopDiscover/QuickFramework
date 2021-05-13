@@ -24,7 +24,7 @@ export enum ResourceType {
 export class ResourceInfo {
     url: string = "";
     type: typeof cc.Asset = null;
-    data: cc.Asset = null;
+    data: cc.Asset | cc.Asset[] = null;
     assetUrl: string = "";
     /**@description 是否常驻内存，远程加载资源有效 */
     retain: boolean = false;
@@ -47,7 +47,7 @@ export class ResourceCacheData {
      * cc.Texture2D
      * cc.JsonAsset
      * */
-    data: cc.Asset = null;
+    data: cc.Asset | cc.Asset[] = null;
 
     info: ResourceInfo = new ResourceInfo();
 
@@ -91,6 +91,8 @@ export interface ResourceData {
      * */
     preloadView?: UIClass<UIView>,
     bundle?: BUNDLE_TYPE,
+    /**@description 如果是加载的目录，请用dir字段 */
+    dir?:string,
 }
 
 /**

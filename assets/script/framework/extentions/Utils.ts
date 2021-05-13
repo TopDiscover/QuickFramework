@@ -1,5 +1,5 @@
 import UIView from "../ui/UIView";
-import { ResourceInfo, ResourceType, BUNDLE_RESOURCES, BUNDLE_REMOTE } from "../base/Defines";
+import { ResourceInfo, ResourceType, BUNDLE_RESOURCES, BUNDLE_REMOTE, ResourceData, ResourceCacheData } from "../base/Defines";
 import { Manager } from "../Framework";
 
 /**@description 添加加载本地的资源 */
@@ -381,3 +381,26 @@ export function createNodeWithPrefab(config: { bundle:BUNDLE_TYPE , url: string,
         config.completeCallback(node);
     }
 }
+
+export function _loadDirRes( config:{ 
+    bundle?:BUNDLE_TYPE,
+    url : string , 
+    type : typeof cc.Asset, 
+    view : any, 
+    onProgress?:(finish:number,total:number,item:cc.AssetManager.RequestItem) => void , 
+    onComplete:(data:ResourceCacheData)=>void}){
+        let bundle = getBundle(config);
+        //这里要做一个防止重复加载操作，以免对加载完成后的引用计数多加次数
+        Manager.assetManager.loadDir(bundle,config.url,config.type,config.onProgress,(data)=>{
+            
+            let info = new ResourceInfo;
+            info.url = config.url;
+            info.type = config.type;
+            info.data = data.data;
+            info.bundle = bundle;
+            addExtraLoadResource(config.view, info)
+            if (config.onComplete) {
+                config.onComplete(data);
+            }
+        });
+    }

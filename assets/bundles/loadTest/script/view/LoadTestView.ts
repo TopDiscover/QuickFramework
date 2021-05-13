@@ -1,5 +1,6 @@
 
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
+import { ResourceCacheData } from "../../../../script/framework/base/Defines";
 import { ButtonSpriteMemberName } from "../../../../script/framework/extentions/Utils";
 import UIView from "../../../../script/framework/ui/UIView";
 import { HallData } from "../../../hall/script/data/HallData";
@@ -35,6 +36,8 @@ export default class LoadTestView extends UIView {
 
         cc.find("loadSpine",op).on(cc.Node.EventType.TOUCH_END,this.onLoadSpine,this);
         cc.find("loadNetSpine",op).on(cc.Node.EventType.TOUCH_END,this.onLoadNetSpine,this);
+
+        cc.find("loadDir",op).on(cc.Node.EventType.TOUCH_END,this.onLoadDir,this);
 
         dispatchEnterComplete({ type: LogicType.GAME, views: [this] });
     }
@@ -160,6 +163,7 @@ export default class LoadTestView extends UIView {
         }
         this.content.removeAllChildren();
         let node = new cc.Node();
+        node.name = name;
         this.content.addChild(node);
         let spine = node.addComponent(sp.Skeleton);
         spine.loadRemoteSkeleton({
@@ -174,5 +178,35 @@ export default class LoadTestView extends UIView {
         })
         node.y = -this.content.height/2;
         node.scale = 0.7;
+    }
+
+    private onLoadDir(){
+        let name = "onLoadDir";
+        if( this.content.getChildByName(name) ){
+            return;
+        }
+        this.content.removeAllChildren();
+        let node = new cc.Node();
+        node.name = name;
+        this.content.addChild(node);
+        //添加显示渲染节点
+        node.addComponent(cc.Sprite);
+        //添加动画
+        let ani = node.addComponent(cc.Animation);
+        cc.loadDir({
+            url:"texture/sheep",
+            type:cc.SpriteFrame,
+            view : this,
+            onComplete:(data:ResourceCacheData)=>{
+                if( data.data ){
+                    let arr : cc.SpriteFrame[] = (<cc.SpriteFrame[]>data.data);
+                    let clip = cc.AnimationClip.createWithSpriteFrames(arr,arr.length);
+                    clip.name = "run";
+                    clip.wrapMode = cc.WrapMode.Loop;
+                    ani.addClip(clip);
+                    ani.play("run");
+                }
+            }
+        })
     }
 }
