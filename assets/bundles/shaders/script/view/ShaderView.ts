@@ -1,4 +1,5 @@
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
+import { ResourceCacheData } from "../../../../script/framework/base/Defines";
 import UIView from "../../../../script/framework/ui/UIView";
 
 const {ccclass, property} = cc._decorator;
@@ -28,14 +29,51 @@ export default class ShaderView extends UIView {
 
         loading.on(cc.Node.EventType.TOUCH_END,this.onLoading,this);
 
+        let gray = cc.find("graySprite",op);
+        if( gray ){
+            gray.on(cc.Node.EventType.TOUCH_END,this.onGraySprite,this);
+        }
+
         dispatchEnterComplete({type:LogicType.GAME,views:[this]});
     }
 
     private onLoading(){
+        let name = "loading";
+        if( this.content.getChildByName(name) ){
+            return;
+        }
         this.content.removeAllChildren();
         let prefab = this.prefabs.getChildByName("loading");
         let loadingNode = cc.instantiate(prefab);
+        loadingNode.name = name;
         this.content.addChild(loadingNode);
         loadingNode.position = cc.v3();
+    }
+
+    private onGraySprite(){
+       let name = "graySprite";
+       if( this.content.getChildByName(name)){
+           return;
+       }
+       this.content.removeAllChildren();
+       let node = new cc.Node();
+       let sp = node.addComponent(cc.Sprite);
+       node.name = name;
+       this.content.addChild(node);
+       sp.loadImage({
+           url : "texture/content",
+           view : this,
+           completeCallback:(data)=>{
+               //加载新的灰色材质
+               cc.load({
+                   url : "material/sprite_gray",
+                   view:this,
+                   type : cc.Material,
+                   onComplete : (data : ResourceCacheData)=>{
+                       sp.setMaterial(0,(<cc.Material>data.data));
+                   }
+               })
+           }
+       });
     }
 }

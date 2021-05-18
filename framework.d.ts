@@ -49,6 +49,25 @@ declare module cc {
 		onComplete:(data:any)=>void
 		});
 
+	/**
+	 * @description 扩展一个在界面加载指定资源接口
+	 * @param config 配置信息
+	 * @param config.bundle 可不填，默认为view指向的bundle
+	 * @param config.url 资源路径
+	 * @param config.type 加载的资源类型
+	 * @param config.onProgress 加载进度
+	 * @param config.onComplete 加载完成回调 data为ResourceCacheData
+	 * @param config.view 资源持有者,继承自UIView
+	 */
+	export function load( config:{
+		bundle?: BUNDLE_TYPE,
+        url: string,
+        type: typeof cc.Asset,
+        onProgress?: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
+        onComplete: (data:any) => void,
+		view : any,
+	});
+
 	export interface Sprite {
         /**
 		 * @description 从网络加载图片，推荐使用第二种方式

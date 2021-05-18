@@ -3,7 +3,7 @@ import { ResourceType, ENABLE_CHANGE_LANGUAGE,USING_LAN_KEY, BUNDLE_REMOTE } fro
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
-    createNodeWithPrefab,getBundle,_loadDirRes
+    createNodeWithPrefab,getBundle,_loadDirRes,_loadRes
 } from "./Utils";
 import { EventApi } from "../event/EventApi";
 import { Manager } from "../Framework";
@@ -138,6 +138,20 @@ cc.createPrefab = function (config) {
  * */
 cc.loadDir = function(config){
     _loadDirRes(config)
+}
+
+/**
+ * @description 扩展一个在界面加载指定资源接口
+ * @param config 配置信息
+ * @param config.bundle 可不填，默认为view指向的bundle
+ * @param config.url 资源路径
+ * @param config.type 加载的资源类型
+ * @param config.onProgress 加载进度
+ * @param config.onComplete 加载完成回调 data为ResourceCacheData
+ * @param config.view 资源持有者,继承自UIView
+ */
+cc.load = function (config) {
+    _loadRes(config);
 }
 
 /**

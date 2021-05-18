@@ -409,3 +409,34 @@ export function _loadDirRes( config:{
             }
         });
     }
+
+export function _loadRes(config:{
+    bundle?: BUNDLE_TYPE,
+    url: string,
+    type: typeof cc.Asset,
+    onProgress?: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
+    onComplete: (data:any) => void,
+    view : any,
+}){
+    let bundle = getBundle(config);
+    let cache = Manager.cacheManager.get(bundle,config.url);
+    Manager.assetManager.load(
+        bundle,
+        config.url,
+        config.type,
+        config.onProgress,
+        (data)=>{
+            if( !cache ){
+                let info = new ResourceInfo;
+                info.url = config.url;
+                info.type = config.type;
+                info.data = data.data;
+                info.bundle = bundle;
+                addExtraLoadResource(config.view,info);
+            }
+            if(config.onComplete){
+                config.onComplete(data);
+            }
+        }
+    )
+}
