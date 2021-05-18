@@ -34,6 +34,11 @@ export default class ShaderView extends UIView {
             gray.on(cc.Node.EventType.TOUCH_END,this.onGraySprite,this);
         }
 
+        let circle = cc.find("circleSprite",op);
+        if( circle ){
+            circle.on(cc.Node.EventType.TOUCH_END,this.onCircleSprite,this);
+        }
+
         dispatchEnterComplete({type:LogicType.GAME,views:[this]});
     }
 
@@ -75,5 +80,34 @@ export default class ShaderView extends UIView {
                })
            }
        });
+    }
+
+    /**
+     * @description 使用shader使用图片显示成圆形
+     */
+    private onCircleSprite(){
+        let name = "circleSprite";
+        if( this.content.getChildByName(name)){
+            return;
+        }
+        this.content.removeAllChildren();
+        let node = new cc.Node();
+        let sp = node.addComponent(cc.Sprite);
+        node.name = name;
+        this.content.addChild(node);
+        sp.loadImage({
+            url:"texture/content",
+            view:this,
+            completeCallback:(data)=>{
+                cc.load({
+                    url:"material/sprite_circle",
+                    view:this,
+                    type:cc.Material,
+                    onComplete:(data:ResourceCacheData)=>{
+                        sp.setMaterial(0,(<cc.Material>data.data));
+                    }
+                });
+            }
+        })
     }
 }
