@@ -35,6 +35,7 @@ class EliminateLogic extends Logic {
 
     private onEnterGame(data) {
         if (data == this.bundle) {
+            Manager.loading.show(Manager.getLanguage("loading_game_resources"));
             this._loader.loadResources();
         } else {
             this._loader.unLoadResources();
@@ -46,6 +47,7 @@ class EliminateLogic extends Logic {
             return;
         }
         cc.log(`${this.bundle} 资源加载完成`);
+        Manager.loading.hide();
         super.onLoadResourceComplete(err);
         Manager.uiManager.open({ type: EliminateGameView, bundle: this.bundle });
     }
