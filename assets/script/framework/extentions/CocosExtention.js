@@ -119,11 +119,7 @@ cc.Sprite.prototype.loadImage = function (config) {
  * }});
  */
 cc.createPrefab = function (config) {
-    let url = config.url;
-    let bundle = getBundle(config);
-    Manager.cacheManager.getCacheByAsync(url, cc.Prefab,bundle).then((data) => {
-        createNodeWithPrefab(config, data)
-    });
+    createNodeWithPrefab(config);
 }
 
 /**

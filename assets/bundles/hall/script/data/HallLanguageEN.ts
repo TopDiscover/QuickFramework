@@ -12,6 +12,7 @@ CITY`,
             "Aim Line",
             "Node Pool",
             "Shader",
+            "三消"
         ],
         hall_view_broadcast_content: '[broadcast] congratulations!',
         hall_view_nogame_notice: '【{0}】developing!!!',

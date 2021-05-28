@@ -370,16 +370,24 @@ export function setSkeletonSkeletonData(
  * @param config 配置信息
  */
 export function createNodeWithPrefab(config: { bundle:BUNDLE_TYPE , url: string, view: any, completeCallback: (node: cc.Node) => void }, data: cc.Prefab) {
-    let info = new ResourceInfo;
-    info.url = config.url;
-    info.type = cc.Prefab;
-    info.data = data;
-    info.bundle = getBundle(config);
-    addExtraLoadResource(config.view, info);
-    if (data && isValidComponent(config.view) && config.completeCallback) {
-        let node = cc.instantiate(data);
-        config.completeCallback(node);
-    }
+    
+    let url = config.url;
+    let bundle = getBundle(config);
+    let cache = Manager.cacheManager.get(bundle,url);
+    Manager.cacheManager.getCacheByAsync(url, cc.Prefab,bundle).then((data) => {
+        if (!cache) {
+            let info = new ResourceInfo;
+            info.url = config.url;
+            info.type = cc.Prefab;
+            info.data = data;
+            info.bundle = getBundle(config);
+            addExtraLoadResource(config.view, info);
+        }
+        if (data && isValidComponent(config.view) && config.completeCallback) {
+            let node = cc.instantiate(data);
+            config.completeCallback(node);
+        }
+    });
 }
 
 export function _loadDirRes( config:{ 
