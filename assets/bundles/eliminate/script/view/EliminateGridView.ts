@@ -21,9 +21,9 @@ export default class EliminateGridView extends cc.Component {
     initWithCellModels(cells: EliminateCellModel[][]) {
         this.cellViews = [];
         let me = this;
-        for (let i = 1; i <= GRID_WIDTH; i++) {
+        for (let i = 1; i <= GRID_HEIGHT; i++) {
             this.cellViews[i] = [];
-            for (let j = 1; j <= GRID_HEIGHT; j++) {
+            for (let j = 1; j <= GRID_WIDTH; j++) {
                 let prefabUrl = cells[i][j].prefabUrl;
                 cc.createPrefab({
                     url: prefabUrl,
@@ -134,8 +134,8 @@ export default class EliminateGridView extends cc.Component {
      * @param model 
      */
     private findViewByModel(model: EliminateCellModel) {
-        for (let i = 1; i <= GRID_WIDTH; i++) {
-            for (let j = 1; j <= GRID_HEIGHT; j++) {
+        for (let i = 1; i <= GRID_HEIGHT; i++) {
+            for (let j = 1; j <= GRID_WIDTH; j++) {
                 if (this.cellViews[i][j] && this.cellViews[i][j].getComponent(EliminateCellView).model == model) {
                     return { view: this.cellViews[i][j], x: j, y: i };
                 }
@@ -172,8 +172,8 @@ export default class EliminateGridView extends cc.Component {
      * @param pos 
      */
     private updateSelect(pos: cc.Vec2) {
-        for (let i = 1; i <= GRID_WIDTH; i++) {
-            for (let j = 1; j <= GRID_HEIGHT; j++) {
+        for (let i = 1; i <= GRID_HEIGHT; i++) {
+            for (let j = 1; j <= GRID_WIDTH; j++) {
                 if (this.cellViews[i][j]) {
                     this.cellViews[i][j].getComponent(EliminateCellView).setSelect((pos.x == j && pos.y == i))
                 }

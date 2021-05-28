@@ -39,15 +39,15 @@ export default class EliminateGameModel {
 
     init() {
         this.cells = [];
-        for (let i = 1; i <= GRID_WIDTH; i++) {
+        for (let i = 1; i <= GRID_HEIGHT; i++) {
             this.cells[i] = [];
-            for (let j = 1; j <= GRID_HEIGHT; j++) {
+            for (let j = 1; j <= GRID_WIDTH; j++) {
                 this.cells[i][j] = new EliminateCellModel();
             }
         }
 
-        for (let i = 1; i <= GRID_WIDTH; i++) {
-            for (let j = 1; j <= GRID_HEIGHT; j++) {
+        for (let i = 1; i <= GRID_HEIGHT; i++) {
+            for (let j = 1; j <= GRID_WIDTH; j++) {
                 let flag = true;
                 //简单粗暴，生成一个不可消失的盘面
                 while (flag) {
@@ -267,8 +267,8 @@ export default class EliminateGameModel {
      */
     private down() {
         let newCheckPoint: EliminateCellModel[] = [];
-        for (var i = 1; i <= GRID_WIDTH; i++) {
-            for (var j = 1; j <= GRID_HEIGHT; j++) {
+        for (var i = 1; i <= GRID_HEIGHT; i++) {
+            for (var j = 1; j <= GRID_WIDTH; j++) {
                 if (this.cells[i][j] == null) {
                     var curRow = i;
                     for (var k = curRow; k <= GRID_HEIGHT; k++) {
@@ -456,8 +456,8 @@ export default class EliminateGameModel {
     }
 
     cleanCmd() {
-        for (let i = 1; i <= GRID_WIDTH; i++) {
-            for (let j = 1; j <= GRID_HEIGHT; j++) {
+        for (let i = 1; i <= GRID_HEIGHT; i++) {
+            for (let j = 1; j <= GRID_WIDTH; j++) {
                 if (this.cells[i][j]) {
                     this.cells[i][j].cmd = [];
                 }
