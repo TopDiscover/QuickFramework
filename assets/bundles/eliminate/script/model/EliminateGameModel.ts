@@ -253,7 +253,7 @@ export default class EliminateGameModel {
                         bombModels.push(model);
                     }
                 }
-                this.createNewCell(cc.v2(pos.x, pos.y), results.status, results.type);
+                this.createNewCell(pos, results.status, results.type);
 
             }
             this.processBomb(bombModels, cycleCount);
@@ -270,6 +270,7 @@ export default class EliminateGameModel {
         for (var i = 1; i <= GRID_HEIGHT; i++) {
             for (var j = 1; j <= GRID_WIDTH; j++) {
                 if (this.cells[i][j] == null) {
+                    //消除的格子，把上方的格子向下移动
                     var curRow = i;
                     for (var k = curRow; k <= GRID_HEIGHT; k++) {
                         if (this.cells[k][j]) {
@@ -282,6 +283,7 @@ export default class EliminateGameModel {
                             curRow++;
                         }
                     }
+                    //补足消除后未满最大行数时，在最上方添加格子
                     var count = 1;
                     for (var k = curRow; k <= GRID_HEIGHT; k++) {
                         this.cells[k][j] = new EliminateCellModel();
@@ -374,7 +376,7 @@ export default class EliminateGameModel {
         }
     }
 
-    private createNewCell(pos: cc.Vec2, status: string, type: CELL_TYPE) {
+    private createNewCell(pos: cc.Vec2 | EliminateCellModel, status: string, type: CELL_TYPE) {
         if (status == "") {
             return;
         }

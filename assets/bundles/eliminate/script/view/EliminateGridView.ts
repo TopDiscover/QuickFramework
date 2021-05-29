@@ -164,7 +164,7 @@ export default class EliminateGridView extends cc.Component {
     }
 
     private playEffect(effects: EliminateEffect[]) {
-        cc.warn(`未实现该功能`)
+        this.view.playEffect(effects);
     }
 
     /**
@@ -185,6 +185,7 @@ export default class EliminateGridView extends cc.Component {
         if (time <= 0) {
             return;
         }
+        cc.log(`disableTouch time : ${time} step : ${step}`);
         this.isPlayAni = true;
         this.node.runAction(cc.sequence(cc.delayTime(time), cc.callFunc(() => {
             this.isPlayAni = false;
@@ -212,7 +213,7 @@ export default class EliminateGridView extends cc.Component {
         if (!effects) {
             return 0;
         }
-        effects.reduce((maxValue, cmd) => {
+        return effects.reduce((maxValue, cmd) => {
             return Math.max(maxValue, cmd.step || 0);
         }, 0)
     }

@@ -4,7 +4,7 @@ import { Manager } from "../../../script/common/manager/Manager";
 import { ResourceLoaderError } from "../../../script/framework/assetManager/ResourceLoader";
 import { ResourceData } from "../../../script/framework/base/Defines";
 import { EliminateData } from "./data/EliminateData";
-import { CELL_PREFAB_URL } from "./data/EliminateDefines";
+import { CELL_PREFAB_URL, EFFECTS_CONFIG } from "./data/EliminateDefines";
 import EliminateGameView from "./view/EliminateGameView";
 
 class EliminateLogic extends Logic {
@@ -59,9 +59,10 @@ class EliminateLogic extends Logic {
             if (CELL_PREFAB_URL[i]) {
                 res.push({ url: CELL_PREFAB_URL[i], type: cc.Prefab, bundle: this.bundle })
             }
-
         }
 
+        res.push({url:EFFECTS_CONFIG.crush.url,type:cc.Prefab,bundle:this.bundle});
+        res.push({url:EFFECTS_CONFIG.colBomb.url,type:cc.Prefab,bundle:this.bundle});
         return res;
     }
 }

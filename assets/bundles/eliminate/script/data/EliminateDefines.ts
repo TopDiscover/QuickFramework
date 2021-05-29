@@ -29,13 +29,33 @@ export const CELL_PREFAB_URL = [
     "prefabs/Bird",
 ];
 
+/**@description 特效配置 */
+export const EFFECTS_CONFIG = {
+    crush : {
+        url : "prefabs/Crush",
+        action : "effect"
+    },
+    rowBomb : {
+        url : "prefabs/BombWhite",
+        action : "effect_line"
+    },
+    colBomb : {
+        url : "prefabs/BombWhite",
+        action : "effect_col"
+    }
+}
+
 /**@description 格子状态 */
 export const CELL_STATUS = {
     COMMON: "",
     CLICK: "click",
+    /**@description 横向消息单位>=4*/
     LINE: "line",
+    /**@description 纵向消息单位>=4*/
     COLUMN: "column",
+    /**@description 当横向跟纵向可消息单位>=3时 */
     WRAP: "wrap",
+    /**@description 当可消除的格子>=5个时，创建一个小鸟 */
     BIRD: "bird",
 }
 
