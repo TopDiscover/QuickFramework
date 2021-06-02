@@ -4,7 +4,7 @@ CocosCreator 快速开发轻量级棋牌框架
 项目说明
 --------
 
-本项目基于 cocos creator 2.4.0版本
+本项目基于 cocos creator 3.1.0版本
 
 以Asset Bundle为基础的大厅+子游戏示例
 提供一个轻量级的棋牌开发框架,让你的开发更加简单
