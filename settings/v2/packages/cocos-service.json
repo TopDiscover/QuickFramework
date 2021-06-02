@@ -7,13 +7,13 @@
   "appConfigMaps": [
     {
       "app_id": "UNKNOW",
-      "config_id": "bafa03"
+      "config_id": "ede423"
     }
   ],
   "configs": [
     {
       "app_id": "UNKNOW",
-      "config_id": "bafa03",
+      "config_id": "ede423",
       "config_name": "Default",
       "config_remarks": "",
       "services": []
