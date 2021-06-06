@@ -3,7 +3,7 @@ import { i18n } from "../language/LanguageImpl";
 import { AssetManagerState, AssetManagerCode, HotUpdate, DownLoadInfo } from "../base/HotUpdate";
 import { Manager } from "../manager/Manager";
 import { CommonEvent } from "../event/CommonEvent";
-import { find, Label, log, ProgressBar, tween, _decorator } from "cc";
+import { find, Label, ProgressBar, tween, _decorator } from "cc";
 import { DEBUG } from "cc/env";
 
 /**@description 下载界面 */

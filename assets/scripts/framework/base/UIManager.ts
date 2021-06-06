@@ -1,7 +1,7 @@
 import UIView, { UIClass } from "../ui/UIView";
 import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
 import { Manager } from "../Framework";
-import { error, isValid, js, log, warn, Node, Prefab, Widget, instantiate, director, Component } from "cc";
+import { isValid, js, Node, Prefab, Widget, instantiate, director, Component } from "cc";
 import { DEBUG } from "cc/env";
 
 /**@description 动态加载垃圾数据名 */

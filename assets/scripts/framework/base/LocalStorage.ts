@@ -1,4 +1,3 @@
-import { error, sys } from "cc";
 import { DEBUG } from "cc/env";
 import { BitEncrypt } from "../extentions/BitEncrypt";
 

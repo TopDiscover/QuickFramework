@@ -1,4 +1,4 @@
-import { Asset, error, log, warn } from "cc";
+import { Asset} from "cc";
 import { DEBUG } from "cc/env";
 import { ResourceData, ResourceCacheData, ResourceInfo, BUNDLE_TYPE } from "../base/Defines";
 import { Manager } from "../Framework";

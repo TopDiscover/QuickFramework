@@ -4,7 +4,7 @@ import { i18n } from "../language/LanguageImpl";
 import { Config} from "../config/Config";
 import { Manager } from "./Manager";
 import DownloadLoading from "../component/DownloadLoading";
-import { error, game, log } from "cc";
+import { game } from "cc";
 import { DEBUG } from "cc/env";
 import { ViewZOrder } from "../config/ViewZOrder";
 

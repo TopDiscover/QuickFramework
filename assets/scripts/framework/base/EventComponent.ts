@@ -1,6 +1,6 @@
 import { Service } from "./Service";
 import { Manager } from "../Framework";
-import { Component, error, js, _decorator } from "cc";
+import { Component, js, _decorator } from "cc";
 import { DEBUG } from "cc/env";
 
 /**

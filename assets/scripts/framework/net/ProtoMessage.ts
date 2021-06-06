@@ -1,4 +1,3 @@
-import { error } from "cc";
 import { Message, MessageHeader } from "./Message";
 /**
  * @description protobuf解析基类

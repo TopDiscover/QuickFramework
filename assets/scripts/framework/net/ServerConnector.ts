@@ -1,7 +1,6 @@
 import WebSocketClinet, { WebSocketType } from "./WebSocketClient";
 import { IMessage } from "./Message";
 import { DEBUG } from "cc/env";
-import { error, warn } from "cc";
 
 /**
  * @description 服务器连接器

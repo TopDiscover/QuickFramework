@@ -3,9 +3,8 @@ import EventComponent from "../../framework/base/EventComponent";
 import { ResourceData, ResourceCacheData, ENABLE_CHANGE_LANGUAGE } from "../../framework/base/Defines";
 import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
 import { EventApi } from "../../framework/event/EventApi";
-import { Config } from "../config/Config";
 import { Manager } from "../manager/Manager";
-import { error,Node } from "cc";
+import { Node } from "cc";
 
 
 /**@description 当前入子游戏时，在Logic.onLoad时初始设置 */

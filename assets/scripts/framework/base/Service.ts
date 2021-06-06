@@ -3,7 +3,6 @@ import { EventApi } from "../event/EventApi";
 import { makeKey } from "../decorator/Decorators";
 import { Message, MessageHeader, IMessage } from "../net/Message";
 import { Manager } from "../Framework";
-import { error, log, warn } from "cc";
 import { DEBUG } from "cc/env";
 
 /**

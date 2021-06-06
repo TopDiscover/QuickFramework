@@ -2,7 +2,7 @@ import { ResourceCacheData, BUNDLE_TYPE, ResourceInfo, BUNDLE_REMOTE, BUNDLE_RES
 import UIView from "../ui/UIView";
 import { Manager } from "../Framework";
 import { DEBUG } from "cc/env";
-import { Asset, assetManager, error, isValid, js, log, SpriteAtlas, SpriteFrame, sp, warn, Texture2D } from "cc";
+import { Asset, assetManager, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D } from "cc";
 
 class ResourceCache {
     print() {

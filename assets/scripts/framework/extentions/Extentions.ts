@@ -4,7 +4,6 @@
  * 
  */
 
-import { error } from "cc";
 import { EDITOR } from "cc/env";
 
 window.md5 = function md5(data) {

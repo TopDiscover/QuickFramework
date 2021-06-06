@@ -2,7 +2,6 @@
  * @description 网络Service服务管理
  */
 
- import { error, log, warn } from "cc";
 import { DEBUG } from "cc/env";
 import { GameEventInterface } from "../../framework/base/GameEventInterface";
  import { Config } from "../config/Config";

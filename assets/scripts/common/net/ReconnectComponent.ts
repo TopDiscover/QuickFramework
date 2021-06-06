@@ -1,4 +1,4 @@
-import { js, log, warn, _decorator } from "cc";
+import { js, _decorator } from "cc";
 import { ServiceEvent } from "../../framework/base/Defines";
 import Controller from "../../framework/controller/Controller";
 import { CustomNetEventType } from "../../framework/event/EventApi";

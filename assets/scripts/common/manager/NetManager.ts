@@ -2,7 +2,7 @@
  * @description 网络控制器管理器
  */
 
-import { error , js, Node} from "cc";
+import { js, Node} from "cc";
 
  export class NetManager {
     private name = "";

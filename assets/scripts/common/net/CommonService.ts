@@ -8,7 +8,6 @@ import { WebSocketType } from "../../framework/net/WebSocketClient";
 import { Config } from "../config/Config";
 import { Manager } from "../manager/Manager";
 import { CustomNetEventType } from "../../framework/event/EventApi";
-import { error, log, warn } from "cc";
 
 /**
  * @description service公共基类

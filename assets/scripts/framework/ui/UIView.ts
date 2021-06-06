@@ -1,8 +1,9 @@
 import EventComponent from "../base/EventComponent";
 import AudioComponent from "../base/AudioComponent";
 import { Manager } from "../Framework";
-import { error, _decorator, Node, game, Game, Event, EventKeyboard, tween, Tween, Vec3, systemEvent, SystemEvent, log, js, macro } from "cc";
+import { _decorator, Node, game, Game, EventKeyboard, tween, Tween, Vec3, systemEvent, SystemEvent, js, macro } from "cc";
 import { DEBUG } from "cc/env";
+import { BUNDLE_TYPE } from "../base/Defines"
 
 /**
  * @description 视图基类
@@ -64,7 +65,7 @@ export default abstract class UIView extends EventComponent {
         return this._className;
     }
 
-    private _bundle: BUNDLE_TYPE = null;
+    private _bundle: BUNDLE_TYPE = null!;
     /**指向当前View打开时的bundle */
     public set bundle(value) {
         this._bundle = value;

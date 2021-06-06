@@ -1,4 +1,4 @@
-import { AudioClip, error, _decorator } from "cc";
+import { AudioClip, _decorator } from "cc";
 import AudioComponent from "../../framework/base/AudioComponent";
 import { BUNDLE_TYPE, BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import { Config } from "../config/Config";

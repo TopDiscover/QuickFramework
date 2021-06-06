@@ -1,10 +1,11 @@
 /**@description 管理器 */
-
+//日志
+import { Log, LogLevel } from "../../framework/log/Log";
+Log.logLevel = LogLevel.ERROR | LogLevel.LOG | LogLevel.WARN | LogLevel.DUMP;
 import * as Framework from "../../framework/Framework";
 import { NetManager } from "./NetManager";
 import { LogicManager } from "./LogicManager";
 import GlobalAudio from "../component/GlobalAudio";
-import { Log, LogLevel } from "../../framework/log/Log";
 import { extentionsInit } from "../../framework/extentions/Extentions";
 import { CocosExtentionInit } from "../../framework/extentions/CocosExtention";
 import { LanguageImpl } from "../language/LanguageImpl";
@@ -18,7 +19,6 @@ import UILoading from "../component/UILoading";
 import Alert from "../component/Alert";
 import Loading from "../component/Loading";
 import { ServiceManager } from "./ServiceManager";
-import { error } from "cc";
 
 /**@description 游戏所有运行单例的管理 */
 class _Manager extends Framework._FramewokManager {
@@ -70,7 +70,7 @@ class _Manager extends Framework._FramewokManager {
         this._wssCacertUrl = value;
         Framework.Manager.wssCacertUrl = value;
     }
-    get wssCacertUrl(){
+    get wssCacertUrl() {
         return this._wssCacertUrl;
     }
 
@@ -159,8 +159,6 @@ class _Manager extends Framework._FramewokManager {
     }
 
     init() {
-        //日志
-        Log.logLevel = LogLevel.ERROR | LogLevel.LOG | LogLevel.WARN | LogLevel.DUMP;
 
         /**@description 初始化框架层使用的提示组件 */
         Framework.Manager.tips = getSingleton(Tips);

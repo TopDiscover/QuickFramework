@@ -1,4 +1,4 @@
-import { error,js,log,Node } from "cc";
+import { js,Node } from "cc";
 import { Logic } from "../base/Logic";
 import { LogicEvent, LogicEventData, LogicType } from "../event/LogicEvent";
 import { Manager } from "./Manager";

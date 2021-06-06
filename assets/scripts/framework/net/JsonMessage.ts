@@ -1,5 +1,4 @@
 
-import { warn } from "cc";
 import { Message, Utf8ArrayToStr, MessageHeader } from "./Message";
 
 type JsonMessageConstructor = typeof JsonMessage;

@@ -2,20 +2,26 @@
  * @description 日志封装
  */
 
-import { error, js, log, sys, warn } from "cc";
+import { js, sys } from "cc";
 import { DEBUG } from "cc/env";
 
- export enum LogLevel {
+export enum LogLevel {
     LOG = 0X00000001,
     DUMP = 0X00000010,
     WARN = 0X00000100,
     ERROR = 0X00001000,
-    ALL = LOG | DUMP | WARN | ERROR ,
+    ALL = LOG | DUMP | WARN | ERROR,
 }
 
+let _window: any = window;
+let _cc = _window["cc"];
 class _Log {
+    /**@description 当前日志等级 */
     private _level: number = LogLevel.ALL;
-    private _forceNativeLog: boolean = false;
+    /**@description 是否强制开户日志,如在非debug模式下，需要显示日志 */
+    private _forceShowLog: boolean = false;
+    /**@description 使用系统默认日志，还是自定义日志 */
+    private isUsingCustom = false;
     public get logLevel(): number {
         return this._level;
     }
@@ -25,133 +31,109 @@ class _Log {
     }
 
     public get forceNativeLog(): boolean {
-        return this._forceNativeLog;
+        return this._forceShowLog;
     }
     public set forceNativeLog(value: boolean) {
-        this._forceNativeLog = value;
-    }
-    /**@description 是否使用附加控制台方式,强制*/
-    private get isUsingConsole( ){
-        let win : any = window;
-        if ( win.vConsole ){
-            return true;
-        }
-        return false;
+        this._forceShowLog = value;
     }
 
-    public get isDebug( ){
-        if ( this.isUsingConsole ){
-            return true;
-        }
-        if (sys.isNative && this.forceNativeLog){
+    private get isDebug() {
+        if (sys.isNative && this.forceNativeLog) {
             return true;
         }
         return DEBUG;
     }
 
-    private _bindLogHanler( usingCustom : boolean ){
-        if (usingCustom) {
-            console.log("--------using custom log--------");
-            let backupcc = window["cc"];
-            if (!backupcc.dump) {
-                window["cc"].dump = this.dump.bind(this);
-            }
-            (<any>log) = this.log.bind(this);
-            (<any>warn) = this.warn.bind(this);
-            (<any>error) = this.error.bind(this);
-
-            if ( (this.logLevel & LogLevel.LOG) && this.isDebug ){
-                window["cc"].time = console.time;
-                window["cc"].timeEnd = console.timeEnd;
-            }else{
-                window["cc"].time = this.doNothing.bind(this);
-                window["cc"].timeEnd = this.doNothing.bind(this);
-            }
+    private bindLogHandler() {
+        if (sys.isMobile) {
+            console.log("--------isMobile-----------");
+            this.isUsingCustom = true;
         }
         else {
-            console.log(`--------using default log--------`);
+            console.log(`--------other------os-----${sys.os}`);
+            console.log(`isdebug : ${DEBUG}`);
+            this.isUsingCustom = false; 
+        }
 
-            if (this.logLevel & LogLevel.DUMP) {
-                let backupcc = window["cc"];
-                if (!backupcc.dump) {
-                    window["cc"].dump = this.dump.bind(this);
-                }
+        _window.dump = this.dump.bind(this);
+        _window.log = this.log.bind(this);
+        _window.warn = this.warn.bind(this);
+        _window.error = this.error.bind(this);
+    }
+
+    private canDo(type: number) {
+        //的调试状态且日志等级开放
+        if ((this.logLevel & type) && this.isDebug) {
+            return true;
+        }
+        return false;
+    }
+
+    private do(func: Function, head: string, args: any) {
+        func.call(_Log, `${this.getDateString()} ${head} : ` + js.formatStr.apply(_Log, args), this.stack());
+    }
+    private doOrigin(func: Function, params: any) {
+        let message = params[0];
+        let args: any[] | null = null;
+        for (let i = 1; i < params.length; i++) {
+            if (args == null) {
+                args = [];
+            }
+            args.push(params[i]);
+        }
+        if (args) {
+            func.call(_cc, message, ...args);
+        } else {
+            func.call(_cc, message);
+        }
+    }
+
+    private log() {
+        if (this.canDo(LogLevel.LOG)) {
+            if (this.isUsingCustom) {
+                this.do(console.log || _cc.log, "INFO", arguments);
             } else {
-                cc.dump = this.doNothing.bind(this);
-            }
-
-            if (this.logLevel & LogLevel.WARN) {
-
-            } else {
-                (<any>warn) = this.doNothing.bind(this);
-            }
-
-            if ( (this.logLevel & LogLevel.LOG) && this.isDebug ){
-                window["cc"].time = console.time;
-                window["cc"].timeEnd = console.timeEnd;
-            }else{
-                window["cc"].time = this.doNothing.bind(this);
-                window["cc"].timeEnd = this.doNothing.bind(this);
+                this.doOrigin(_cc.log,arguments);
             }
         }
     }
 
-    private bindLogHandler() {
-        if ( this.isUsingConsole ){
-            this._bindLogHanler(true);
-        }
-        else{
-            if (sys.isMobile) {
-                console.log("--------isMobile-----------");
-                this._bindLogHanler(true);
-            }
-            else {
-                console.log(`--------other------os-----${sys.os}`);
-                console.log(`isdebug : ${DEBUG}`);
-                this._bindLogHanler(false);
-            }
-        }
-    }
-
-    public log() {
-        if (this.logLevel & LogLevel.LOG) {
-            if (!this.isDebug) return;
-            let backupLog = console.log || log || (<any>window)["log"];
-            backupLog.call(_Log, `${this.getDateString()} INFO : ` + js.formatStr.apply(cc, <any>arguments), this.stack());
-        }
-    }
-
-    public dump() {
-        if (this.logLevel & LogLevel.DUMP) {
-            if (!this.isDebug) return;
+    private dump() {
+        if (this.canDo(LogLevel.DUMP)) {
             let ret = this._dump(arguments[0], arguments[1], arguments[2], arguments[4]);
-            let backupLog = console.info || log || (<any>window)["info"];
-            backupLog.call(_Log, `${this.getDateString()} DUMP : ` + js.formatStr.apply(cc, [ret]), this.stack());
+            this.do(console.info || _cc.log, "DUMP", [ret]);
         }
     }
 
-    public warn() {
-        if (this.logLevel & LogLevel.WARN) {
-            if (!this.isDebug) return;
-            let backupLog = console.warn || warn || (<any>window)["warn"];
-            backupLog.call(_Log, `${this.getDateString()} WARN : ` + js.formatStr.apply(cc, <any>arguments), this.stack());
+    private warn() {
+        if (this.canDo(LogLevel.WARN)) {
+            if (this.isUsingCustom) {
+                this.do(console.warn || _cc.warn, "WARN", arguments);
+            } else {
+                this.doOrigin(_cc.warn,arguments);
+            }
         }
     }
 
-    public error() {
-        if (this.logLevel & LogLevel.ERROR) {
-            if (!this.isDebug) return;
-            if ( sys.isNative ){
+    private error() {
+        if (this.canDo(LogLevel.ERROR)) {
+            if (sys.isNative) {
                 try {
-                    let backupLog = console.log || log || (<any>window)["log"];
-                    backupLog.call(_Log, `${this.getDateString()} ERROR : ` + js.formatStr.apply(cc, <any>arguments), this.stack());
+                    if (this.isUsingCustom) {
+                        this.do(console.log || _cc.log, "ERROR", arguments);
+                    } else {
+                        this.doOrigin(_cc.log,arguments);
+                    }
                 } catch (error) {
                     console.log(`---error---`);
                     console.error(error);
                 }
-            }else{
-                let backupLog = console.error || error || (<any>window)["error"];
-                backupLog.call(_Log, `${this.getDateString()} ERROR : ` + js.formatStr.apply(cc, <any>arguments), this.stack());
+            } else {
+                if (this.isUsingCustom) {
+                    this.do(console.error || _cc.error, "ERROR", arguments);
+                } else {
+                    this.doOrigin(_cc.error,arguments);
+                }
             }
         }
     }
@@ -182,7 +164,7 @@ class _Log {
         var e = new Error();
         var lines = e.stack?.split("\n") as string[];
         lines.shift();
-        var result:any[] = [];
+        var result: any[] = [];
         lines.forEach((line) => {
             line = line.substring(7);
             var lineBreak = line.split(" ");
@@ -192,17 +174,17 @@ class _Log {
                 result.push({ [lineBreak[0]]: lineBreak[1] });
             }
         });
-        if ( result.length > 2 ){
+        if (result.length > 2) {
             let temp = "\n" + JSON.stringify(result[2]);
             return temp;
-        }else{
+        } else {
             let temp = "";
             return temp;
         }
     }
 
 
-    private _dump(var_value: any, var_name: string = "unkown_dump_name", level: number = 2, indent_by: number = 0): string {
+    private _dump(var_value: any, var_name: string = "unkown_dump_name", level: number = 10, indent_by: number = 0): string {
         if (level < 0) {
             return "..."
         }
@@ -232,7 +214,7 @@ class _Log {
                 }
                 out = "Array(" + num_elem + ") " + (indent.length === 0 ? '' : '') + "[";
                 for (let i = 0; i < num_elem; ++i) {
-                    out += "\n" + (indent.length === 0 ? '' : '' + indent) + "   [" + i + "] = " + self._dump(v[i], '', level, indent_by);
+                    out += "\n" + (indent.length === 0 ? '' : '' + indent) + "   [" + i + "] = " + self._dump(v[i], '', level-1, indent_by);
                 }
                 out += "\n" + (indent.length === 0 ? '' : '' + indent + '') + "]";
                 return out;
@@ -242,7 +224,7 @@ class _Log {
                 }
                 out = "{";
                 for (let p in v) {
-                    out += "\n" + (indent.length === 0 ? '' : '' + indent) + "   [" + p + "] = " + self._dump(v[p], '', level, indent_by);
+                    out += "\n" + (indent.length === 0 ? '' : '' + indent) + "   [" + p + "] = " + self._dump(v[p], '', level-1, indent_by);
                 }
                 out += "\n" + (indent.length === 0 ? '' : '' + indent + '') + "}";
                 return out;
@@ -282,10 +264,6 @@ class _Log {
                 out += v_name + ' is unknown type!';
         }
         return out;
-    }
-
-    private doNothing() {
-
     }
 }
 

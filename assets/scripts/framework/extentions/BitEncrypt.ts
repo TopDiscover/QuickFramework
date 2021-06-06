@@ -3,7 +3,6 @@
  * @description 位加密,不增加数据本身大小进行位置加密
  */
 
-import { error } from "cc";
 import { DEBUG } from "cc/env";
 
 class _BitEncrypt {

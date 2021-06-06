@@ -1,4 +1,3 @@
-import { error, log, warn } from "cc";
 import { DEBUG, JSB } from "cc/env";
 import { CustomNetEventType } from "../event/EventApi";
 import { Manager } from "../Framework";

@@ -3,7 +3,7 @@ import { EventApi } from "../../framework/event/EventApi";
 import { Config } from "../config/Config";
 import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
 import { i18n } from "../language/LanguageImpl";
-import { Component,error,find,instantiate,isValid,Label,Node, Prefab, RichText, SystemEventType, tween, Vec3, warn } from "cc";
+import { Component,find,instantiate,isValid,Label,Node, Prefab, RichText, SystemEventType, tween, Vec3 } from "cc";
 import { ViewZOrder } from "../config/ViewZOrder";
 
 

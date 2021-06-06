@@ -1,4 +1,4 @@
-import { Asset, assetManager, AssetManager, error, JsonAsset, log, TextAsset, Texture2D, warn, sp, SpriteFrame } from "cc";
+import { Asset, assetManager, AssetManager, JsonAsset, TextAsset, Texture2D, sp, SpriteFrame } from "cc";
 import { DEBUG } from "cc/env";
 import { ResourceCacheData, ResourceCacheStatus, ResourceInfo, BUNDLE_TYPE, ResourceType, BUNDLE_REMOTE } from "../base/Defines";
 import { Manager } from "../Framework";
@@ -226,7 +226,7 @@ export class _AssetManager {
             cache.info.type = type;
             cache.info.bundle = bundle;
             Manager.cacheManager.set(bundle, path, cache);
-            cc.time(`加载资源 : ${cache.info.url}`);
+            console.time(`加载资源 : ${cache.info.url}`);
             let _bundle = this.getBundle(bundle);
             if (!_bundle) {
                 //如果bundle不存在
@@ -282,7 +282,7 @@ export class _AssetManager {
             }
         }
 
-        cc.timeEnd(`加载资源 : ${cache.info.url}`);
+        console.timeEnd(`加载资源 : ${cache.info.url}`);
     }
 
     public loadDir(
@@ -319,7 +319,7 @@ export class _AssetManager {
             cache.info.type = type;
             cache.info.bundle = bundle;
             Manager.cacheManager.set(bundle, path, cache);
-            cc.time(`加载资源 : ${cache.info.url}`);
+            console.time(`加载资源 : ${cache.info.url}`);
             let _bundle = this.getBundle(bundle);
             if (!_bundle) {
                 //如果bundle不存在

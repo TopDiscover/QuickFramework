@@ -4,7 +4,6 @@
 
 import { Message, Utf8ArrayToStr, MessageHeader } from "./Message";
 import { USING_LITTLE_ENDIAN } from "../base/Defines";
-import { error, warn } from "cc";
 
 type BinaryStreamConstructor = typeof BinaryStream;
 type NumberStreamValueConstructor = typeof NumberStreamValue;
@@ -118,7 +117,8 @@ export class StringValue extends StringStreamValue {
     write(dataView: DataView, offset: number) {
         //先写入字符串长度
         let writeLen = 0;
-        let buffer: Uint8Array = new Buffer(this.data);
+        let encoder = new TextEncoder()
+        let buffer: Uint8Array =  encoder.encode(this.data);
         let byteLenght = buffer.length;
         //可变长字符串
         dataView.setUint32(offset, byteLenght, this.littleEndian);

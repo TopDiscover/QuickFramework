@@ -3,7 +3,7 @@
  * @description 事件派发器，原生的，当前节点没有在运行时，无法收到消息
  */
 
-import { error, js, log } from "cc";
+import { js } from "cc";
 import { DEBUG, EDITOR } from "cc/env";
 
 interface IEvent {

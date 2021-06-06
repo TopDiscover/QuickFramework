@@ -7,7 +7,7 @@ import {
 } from "./Utils";
 import { EventApi } from "../event/EventApi";
 import { Manager } from "../Framework";
-import { isValid, SpriteFrame, sp, Font, ParticleSystem2D, ParticleAsset, error, sys, EditBox, log, Sprite,Node, Button, Label, randomRange} from "cc";
+import { isValid, SpriteFrame, sp, Font, ParticleSystem2D, ParticleAsset, sys, EditBox, Sprite,Node, Button, Label, randomRange} from "cc";
 import { DEBUG, EDITOR, PREVIEW } from "cc/env";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
@@ -109,6 +109,8 @@ prototype.loadImage = function (config: any) {
     }
 }
 
+let _window:any = window;
+let _cc = _window["cc"];
 /**@description 通过预置体路径创建节点 
  * @param config 配置信息
  * @param config.url 预置体路径
@@ -121,7 +123,7 @@ prototype.loadImage = function (config: any) {
  *     }
  * }});
  */
-cc.createPrefab = function (config: any) {
+ _cc.createPrefab = function (config: any) {
     createNodeWithPrefab(config);
 }
 
@@ -135,7 +137,7 @@ cc.createPrefab = function (config: any) {
  * @param config.bundle 可不填，默认为view指向的bundle
  * @param config.type 加载的资源类型
  * */
-cc.loadDir = function (config) {
+ _cc.loadDir = function (config:any) {
     _loadDirRes(config)
 }
 
@@ -149,7 +151,7 @@ cc.loadDir = function (config) {
  * @param config.onComplete 加载完成回调 data为ResourceCacheData
  * @param config.view 资源持有者,继承自UIView
  */
-cc.load = function (config) {
+ _cc.load = function (config:any) {
     _loadRes(config);
 }
 

@@ -2,7 +2,7 @@
  * @description http网络请求
  */
 
-import { error, log, sys, warn } from "cc";
+import { sys } from "cc";
 import { DEBUG, JSB, PREVIEW } from "cc/env";
 
 export enum HttpErrorType {

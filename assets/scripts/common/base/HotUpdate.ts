@@ -1,4 +1,4 @@
-import { error, game, log, sys } from "cc";
+import { game, sys } from "cc";
 import { DEBUG, JSB, PREVIEW } from "cc/env";
 import { Config } from "../config/Config";
 import { CommonEvent } from "../event/CommonEvent";
