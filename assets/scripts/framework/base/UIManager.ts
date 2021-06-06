@@ -425,17 +425,17 @@ export class UIManager {
         });
     }
 
-    public getCanvas(): Node | null {
+    public getCanvas(): Node {
         let rootScene = director.getScene();
         if (!rootScene) {
             if (DEBUG) error(`${this._logTag}当前场景为空`);
-            return null;
+            return <any>null;
         }
 
         let root: any = rootScene.getChildByName("Canvas");
         if (!root) {
             if (DEBUG) error(`${this._logTag}当前场景上找不到 Canvas 节点`);
-            return null;
+            return <any>null;
         }
         return root;
     }

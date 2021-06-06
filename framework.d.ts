@@ -10,10 +10,10 @@ declare module cc {
 	/**@description 相当于console.timeEnd */
 	export function timeEnd(...args);
 
-	// export interface Node {
-	// 	/**@description 用户自定义数据 */
-	// 	userData: any;
-	// }
+	export interface Node {
+		/**@description 用户自定义数据 */
+		userData: any;
+	}
 
 	/**@description 通过预置体路径创建节点 
  	 * @param config 配置信息
