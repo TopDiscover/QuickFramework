@@ -1,0 +1,68 @@
+{
+  "ver": "1.0.21",
+  "importer": "image",
+  "imported": true,
+  "uuid": "24a8cffd-330f-4f65-8c6a-298a8f3d67a0",
+  "files": [
+    ".png",
+    ".json"
+  ],
+  "subMetas": {
+    "prograssBg": {
+      "ver": "1.0.4",
+      "uuid": "b69b898c-6549-4bd1-bd7a-aec7a3698758",
+      "rawTextureUuid": "24a8cffd-330f-4f65-8c6a-298a8f3d67a0",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 462,
+      "height": 38,
+      "rawWidth": 462,
+      "rawHeight": 38,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {},
+      "importer": "*",
+      "imported": false,
+      "files": [],
+      "userData": {},
+      "displayName": "",
+      "id": "",
+      "name": ""
+    },
+    "6c48a": {
+      "importer": "texture",
+      "uuid": "24a8cffd-330f-4f65-8c6a-298a8f3d67a0@6c48a",
+      "displayName": "prograssBg",
+      "id": "6c48a",
+      "name": "texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "24a8cffd-330f-4f65-8c6a-298a8f3d67a0"
+      },
+      "ver": "1.0.21",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "hasAlpha": true,
+    "type": "texture",
+    "redirect": "24a8cffd-330f-4f65-8c6a-298a8f3d67a0@6c48a"
+  }
+}

@@ -1,6 +1,8 @@
 {
   /* Base configuration. Do not edit this field. */
-  "extends": "./temp/tsconfig.cocos.json" 
-
+  "extends": "./temp/tsconfig.cocos.json",
   /* Add your custom configuration here. */
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true, // 需要开启
+  }
 }

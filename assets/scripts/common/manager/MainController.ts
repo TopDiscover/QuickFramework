@@ -7,21 +7,21 @@ import { Manager } from "./Manager";
  * @description 主控制器 
  */
 
-const {ccclass, property,menu} = _decorator;
+const { ccclass, property, menu } = _decorator;
 
 @ccclass
 @menu("manager/MainController")
 export default class MainController extends Component {
-    
+
     /**@description 进入后台的时间 */
     private _enterBackgroundTime = 0;
 
     @property(Asset)
-    wssCacert : Asset = null!;
+    wssCacert: Asset = null!;
 
-    onLoad () {
+    onLoad() {
 
-        if( this.wssCacert ){
+        if (this.wssCacert) {
             Manager.wssCacertUrl = this.wssCacert.nativeUrl;
         }
 
@@ -38,43 +38,47 @@ export default class MainController extends Component {
         Manager.loading.preloadPrefab();
         Manager.alert.preloadPrefab();
         Reconnect.preloadPrefab();
-        
 
-        //调试按钮事件注册
-        let showUI = find("showUI",this.node);
-        let showNode = find("showNode",this.node);
-        let showRes = find("showRes",this.node);
-        let showComp = find("showComponent",this.node);
-        if ( showUI && showNode && showRes && showComp){
-            showUI.layer = 9999;
-            showNode.layer = 9999;
-            showRes.layer = 9999;
-            showComp.layer = 9999;
-            let isShow = false;
-            if ( Config.isShowDebugButton ){
-                isShow = true;
-                showUI.on( SystemEventType.TOUCH_END,()=>{
-                    Manager.uiManager.printViews();
-                });
-                showNode.on(SystemEventType.TOUCH_END,()=>{
-                    Manager.uiManager.printCanvasChildren();
-                });
-                showRes.on(SystemEventType.TOUCH_END,()=>{
-                    Manager.cacheManager.printCaches();
-                });
-                showComp.on(SystemEventType.TOUCH_END,()=>{
-                    Manager.uiManager.printComponent();
-                });
+
+        let show = find("show", this.node);
+        if (show) {
+            //调试按钮事件注册
+            let showUI = find("showUI", show);
+            let showNode = find("showNode", show);
+            let showRes = find("showRes", show);
+            let showComp = find("showComponent", show);
+            if (showUI && showNode && showRes && showComp) {
+                showUI.setSiblingIndex(9999);
+                showNode.setSiblingIndex(9999);
+                showRes.setSiblingIndex(9999);
+                showComp.setSiblingIndex(9999);
+                let isShow = false;
+                if (Config.isShowDebugButton) {
+                    isShow = true;
+                    showUI.on(SystemEventType.TOUCH_END, () => {
+                        Manager.uiManager.printViews();
+                    });
+                    showNode.on(SystemEventType.TOUCH_END, () => {
+                        Manager.uiManager.printCanvasChildren();
+                    });
+                    showRes.on(SystemEventType.TOUCH_END, () => {
+                        Manager.cacheManager.printCaches();
+                    });
+                    showComp.on(SystemEventType.TOUCH_END, () => {
+                        Manager.uiManager.printComponent();
+                    });
+                }
+                showUI.active = isShow;
+                showNode.active = isShow;
+                showRes.active = isShow;
+                showComp.active = isShow;
             }
-            showUI.active = isShow;
-            showNode.active = isShow;
-            showRes.active = isShow;
-            showComp.active = isShow;
         }
 
+
         //游戏事件注册
-        game.on(Game.EVENT_HIDE,this.onEnterBackground,this);
-        game.on(Game.EVENT_SHOW,this.onEnterForgeground,this);
+        game.on(Game.EVENT_HIDE, this.onEnterBackground, this);
+        game.on(Game.EVENT_SHOW, this.onEnterForgeground, this);
 
         //Service onLoad
         Manager.serviceManager.onLoad();
@@ -83,7 +87,7 @@ export default class MainController extends Component {
         Manager.logicManager.onLoad(this.node);
     }
 
-    update(){
+    update() {
 
         //Service 网络调试
         Manager.serviceManager.update();
@@ -92,8 +96,8 @@ export default class MainController extends Component {
         Manager.assetManager.remote.update();
     }
 
-    onDestroy(){
-        
+    onDestroy() {
+
         Manager.resolutionHelper.onDestroy();
 
         //网络管理器onDestroy
@@ -112,17 +116,17 @@ export default class MainController extends Component {
         Manager.logicManager.onDestroy(this.node);
     }
 
-    private onEnterBackground(){
+    private onEnterBackground() {
         this._enterBackgroundTime = Date.timeNow();
-        log(`[MainController]`,`onEnterBackground ${this._enterBackgroundTime}`);
+        log(`[MainController]`, `onEnterBackground ${this._enterBackgroundTime}`);
         Manager.globalAudio.onEnterBackground();
         Manager.serviceManager.onEnterBackground();
     }
 
-    private onEnterForgeground(){
+    private onEnterForgeground() {
         let now = Date.timeNow();
         let inBackgroundTime = now - this._enterBackgroundTime;
-        log(`[MainController]`,`onEnterForgeground ${now} background total time : ${inBackgroundTime}`);
+        log(`[MainController]`, `onEnterForgeground ${now} background total time : ${inBackgroundTime}`);
         Manager.globalAudio.onEnterForgeground(inBackgroundTime);
         Manager.serviceManager.onEnterForgeground(inBackgroundTime);
     }

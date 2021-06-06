@@ -28,7 +28,7 @@ export class LocalStorage {
     }
 
     public getItem(key: string, defaultValue: any = null) {
-        let value = sys.localStorage.getItem(key);
+        let value = null;//this.storage.getItem(key);
         if (value) {
             //解析
             try {
@@ -56,16 +56,21 @@ export class LocalStorage {
             //加密
             try {
                 let data = this.encrypt(saveObj);
-                sys.localStorage.setItem(key, data);
+                //this.storage.setItem(key, data);
             } catch (err) {
                 if (DEBUG) error(err);
             }
         } else {
-            if (DEBUG) error(`存储数据类型不支持 当前的存储类型: ${type}`);
+            //if (DEBUG) error(`存储数据类型不支持 当前的存储类型: ${type}`);
         }
     }
 
     public removeItem(key: string) {
-        sys.localStorage.removeItem(key);
+        //this.storage.removeItem(key);
+    }
+
+    private get storage() : any{
+        //return window.localStorage;
+        return null;
     }
 }

@@ -1,0 +1,68 @@
+{
+  "ver": "1.0.21",
+  "importer": "image",
+  "imported": true,
+  "uuid": "4e0dc37e-579e-4c1b-80be-c5151d8cdaec",
+  "files": [
+    ".png",
+    ".json"
+  ],
+  "subMetas": {
+    "music_open": {
+      "ver": "1.0.4",
+      "uuid": "7a6edd35-c921-4237-9a8f-5a174ba3dd08",
+      "rawTextureUuid": "4e0dc37e-579e-4c1b-80be-c5151d8cdaec",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0.5,
+      "trimX": 4,
+      "trimY": 8,
+      "width": 52,
+      "height": 43,
+      "rawWidth": 60,
+      "rawHeight": 60,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {},
+      "importer": "*",
+      "imported": false,
+      "files": [],
+      "userData": {},
+      "displayName": "",
+      "id": "",
+      "name": ""
+    },
+    "6c48a": {
+      "importer": "texture",
+      "uuid": "4e0dc37e-579e-4c1b-80be-c5151d8cdaec@6c48a",
+      "displayName": "music_open",
+      "id": "6c48a",
+      "name": "texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "4e0dc37e-579e-4c1b-80be-c5151d8cdaec"
+      },
+      "ver": "1.0.21",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "hasAlpha": true,
+    "type": "texture",
+    "redirect": "4e0dc37e-579e-4c1b-80be-c5151d8cdaec@6c48a"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "ver": "1.0.21",
+  "importer": "image",
+  "imported": true,
+  "uuid": "aae0acb5-caed-4481-9910-9c333bff81c2",
+  "files": [
+    ".png",
+    ".json"
+  ],
+  "subMetas": {
+    "music_off": {
+      "ver": "1.0.4",
+      "uuid": "d1c1077e-12e0-455d-8b03-fe19da6f077f",
+      "rawTextureUuid": "aae0acb5-caed-4481-9910-9c333bff81c2",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": -0.5,
+      "trimX": 5,
+      "trimY": 9,
+      "width": 50,
+      "height": 43,
+      "rawWidth": 60,
+      "rawHeight": 60,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {},
+      "importer": "*",
+      "imported": false,
+      "files": [],
+      "userData": {},
+      "displayName": "",
+      "id": "",
+      "name": ""
+    },
+    "6c48a": {
+      "importer": "texture",
+      "uuid": "aae0acb5-caed-4481-9910-9c333bff81c2@6c48a",
+      "displayName": "music_off",
+      "id": "6c48a",
+      "name": "texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "aae0acb5-caed-4481-9910-9c333bff81c2"
+      },
+      "ver": "1.0.21",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "hasAlpha": true,
+    "type": "texture",
+    "redirect": "aae0acb5-caed-4481-9910-9c333bff81c2@6c48a"
+  }
+}

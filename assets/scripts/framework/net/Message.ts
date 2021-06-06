@@ -1,26 +1,11 @@
 import { USING_LITTLE_ENDIAN } from "../base/Defines";
-const Buffer = require('buffer').Buffer;
-//ArrayBuffer转字符串
-export function ab2str(buffer: ArrayBuffer): Promise<string | ArrayBuffer | null> {
-    return new Promise((resolve) => {
-        var b = new Blob([buffer]);
-        var r = new FileReader();
-        r.readAsText(b, 'utf-8');
-        r.onload = () => { resolve(r.result) }
-    });
-}
-//字符串转字符串ArrayBuffer
-export function str2ab(str: string): Promise<string | ArrayBuffer | null> {
-    return new Promise((resolve) => {
-        var b = new Blob([str], { type: 'text/plain' });
-        var r = new FileReader();
-        r.readAsArrayBuffer(b);
-        r.onload = () => { resolve(r.result) }
-    });
-}
 
 /**@description utf-8 Uint8Array转字符串 */
 export function Utf8ArrayToStr(array: any) {
+
+    let decoder = new TextDecoder("utf-8");
+    let result = decoder.decode(array);
+
     let out, i, len, c;
     let char2, char3;
     out = "";
@@ -103,55 +88,27 @@ export class MessageHeader implements IMessage {
         let offset = 0;
 
         /**第一种写法 */
-        // if (msg.buffer) {
-        //     //如果有包体，先放入包体
-        //     this._dataSize = msg.buffer.length;
-        // }
-
-        // let buffer = new ArrayBuffer(this._dataSize + this.headerSize);
-        // let dataView = new DataView(buffer);
-        // dataView.setUint32(offset,this.mainCmd,USING_LITTLE_ENDIAN);
-        // offset += Uint32Array.BYTES_PER_ELEMENT;
-        // dataView.setUint32(offset,this.subCmd,USING_LITTLE_ENDIAN);
-        // offset += Uint32Array.BYTES_PER_ELEMENT;
-        // dataView.setUint32(offset,this._dataSize,USING_LITTLE_ENDIAN);
-        // offset += Uint32Array.BYTES_PER_ELEMENT;
-        // if( msg.buffer ){
-        //     //感觉这里的复制数据有点low啊
-        //     for( let i = 0 ; i < msg.buffer.byteLength ; i++ ){
-        //         dataView.setUint8(offset,msg.buffer[i]);
-        //         offset += Uint8Array.BYTES_PER_ELEMENT;
-        //     }
-        // }
-        // let result = new Uint8Array(dataView.buffer);
-
-        /**第二种写法 */
-        let data = null;
         if (msg.buffer) {
-            data = Buffer.from(msg.buffer);
+            //如果有包体，先放入包体
             this._dataSize = msg.buffer.length;
         }
-        let buffer = new Buffer(this.size);
-        if (USING_LITTLE_ENDIAN) {
-            //小端处理
-            buffer.writeUInt32LE(this.mainCmd, offset)
-            offset += Uint32Array.BYTES_PER_ELEMENT;
-            buffer.writeUInt32LE(this.subCmd, offset)
-            offset += Uint32Array.BYTES_PER_ELEMENT;
-            buffer.writeUInt32LE(this._dataSize, offset)
-            offset += Uint32Array.BYTES_PER_ELEMENT;
-        } else {
-            buffer.writeUInt32BE(this.mainCmd, offset)
-            offset += Uint32Array.BYTES_PER_ELEMENT;
-            buffer.writeUInt32BE(this.subCmd, offset)
-            offset += Uint32Array.BYTES_PER_ELEMENT;
-            buffer.writeUInt32BE(this._dataSize, offset)
-            offset += Uint32Array.BYTES_PER_ELEMENT;
+
+        let buffer = new ArrayBuffer(this._dataSize + this.headerSize);
+        let dataView = new DataView(buffer);
+        dataView.setUint32(offset,this.mainCmd,USING_LITTLE_ENDIAN);
+        offset += Uint32Array.BYTES_PER_ELEMENT;
+        dataView.setUint32(offset,this.subCmd,USING_LITTLE_ENDIAN);
+        offset += Uint32Array.BYTES_PER_ELEMENT;
+        dataView.setUint32(offset,this._dataSize,USING_LITTLE_ENDIAN);
+        offset += Uint32Array.BYTES_PER_ELEMENT;
+        if( msg.buffer ){
+            //感觉这里的复制数据有点low啊
+            for( let i = 0 ; i < msg.buffer.byteLength ; i++ ){
+                dataView.setUint8(offset,msg.buffer[i]);
+                offset += Uint8Array.BYTES_PER_ELEMENT;
+            }
         }
-        if (data) {
-            data.copy(buffer, this.headerSize);
-        }
-        let result = buffer;
+        let result = new Uint8Array(dataView.buffer);
 
         this.buffer = result;
         return true;

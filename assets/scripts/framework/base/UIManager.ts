@@ -235,7 +235,7 @@ export class UIManager {
                     viewData.status = ViewStatus.WAITTING_NONE;
                     if (!isPreload) {
                         if (viewData.view && isValid(viewData.node)) {
-                            viewData.node.layer = zOrder;
+                            viewData.node.setSiblingIndex(zOrder);
                             if (!viewData.node.parent) {
                                 viewData.node.parent = this.getCanvas();
                             }
@@ -354,7 +354,7 @@ export class UIManager {
 
             if (!viewData.isPreload) {
                 uiNode.parent = this.getCanvas();
-                uiNode.layer = zOrder;
+                uiNode.setSiblingIndex(zOrder);
             }
             return view;
         }

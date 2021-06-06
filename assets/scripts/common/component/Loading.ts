@@ -71,7 +71,7 @@ export default class Loading {
             Manager.resolutionHelper.fullScreenAdapt(this._node);
             this._node.removeFromParent();
             this._node.parent = Manager.uiManager.getCanvas();
-            this._node.layer = ViewZOrder.Loading;
+            this._node.setSiblingIndex(ViewZOrder.Loading);
             this._node.position = Vec3.ZERO;
             this._text = find("content/text",this._node)?.getComponent(Label) as Label;
             this._showContentIndex = 0;

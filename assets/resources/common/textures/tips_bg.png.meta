@@ -1,0 +1,68 @@
+{
+  "ver": "1.0.21",
+  "importer": "image",
+  "imported": true,
+  "uuid": "5d167784-f12f-459d-94d3-db92022d2f68",
+  "files": [
+    ".png",
+    ".json"
+  ],
+  "subMetas": {
+    "tips_bg": {
+      "ver": "1.0.4",
+      "uuid": "1e9d55d8-69e5-4670-b416-685d304a28a0",
+      "rawTextureUuid": "5d167784-f12f-459d-94d3-db92022d2f68",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0.5,
+      "offsetY": 0,
+      "trimX": 4,
+      "trimY": 0,
+      "width": 917,
+      "height": 56,
+      "rawWidth": 924,
+      "rawHeight": 56,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {},
+      "importer": "*",
+      "imported": false,
+      "files": [],
+      "userData": {},
+      "displayName": "",
+      "id": "",
+      "name": ""
+    },
+    "6c48a": {
+      "importer": "texture",
+      "uuid": "5d167784-f12f-459d-94d3-db92022d2f68@6c48a",
+      "displayName": "tips_bg",
+      "id": "6c48a",
+      "name": "texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "5d167784-f12f-459d-94d3-db92022d2f68"
+      },
+      "ver": "1.0.21",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "hasAlpha": true,
+    "type": "texture",
+    "redirect": "5d167784-f12f-459d-94d3-db92022d2f68@6c48a"
+  }
+}

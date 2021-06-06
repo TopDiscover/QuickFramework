@@ -31,7 +31,6 @@ export function serialize(key: string, type: any, arrTypeOrMapKeyType?: any, map
         target['__serialize__'][key] = [memberName, type, arrTypeOrMapKeyType, mapValueType];
     }
 }
-const Buffer = require('buffer').Buffer;
 /**
  * @description JSON的序列化与序列化
  */
@@ -42,7 +41,8 @@ export class JsonMessage extends Message {
     encode(): boolean {
         this.data = this.serialize();
         let result = JSON.stringify(this.data);
-        this.buffer = new Buffer(result);
+        let encoder = new TextEncoder();
+        this.buffer =  encoder.encode(result);
         return true;
     }
 

@@ -7,20 +7,18 @@ import {
 } from "./Utils";
 import { EventApi } from "../event/EventApi";
 import { Manager } from "../Framework";
-import { isValid, SpriteFrame, sp, Font, ParticleSystem2D, ParticleAsset, error, sys, EditBox, log } from "cc";
+import { isValid, SpriteFrame, sp, Font, ParticleSystem2D, ParticleAsset, error, sys, EditBox, log, Sprite,Node, Button, Label, randomRange} from "cc";
 import { DEBUG, EDITOR, PREVIEW } from "cc/env";
-
-let _cc: any = cc;
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
 if (typeof Reflect == "object") {
     //在浏览器中已经有反射
-    Reflect.defineProperty(_cc.Node.prototype, "userData", {
+    Reflect.defineProperty(Node.prototype, "userData", {
         value: null,
         writable: true,
     });
 } else {
-    _cc.Node.prototype.userData = null;
+    Node.prototype.userData = null;
 }
 
 /**
@@ -48,7 +46,8 @@ if (typeof Reflect == "object") {
  */
 
 //config : {url: string, view : any , completeCallback?: (data: cc.SpriteFrame) => void, defaultSpriteFrame?: string , isNeedCache ?: boolean }
-_cc.Sprite.prototype.loadRemoteImage = function (config: any) {
+let prototype:any = Sprite.prototype;
+prototype.loadRemoteImage = function (config: any) {
     let me = this;
     if (config.isNeedCache == undefined || config.isNeedCache == null) {
         config.isNeedCache = true;
@@ -87,7 +86,7 @@ _cc.Sprite.prototype.loadRemoteImage = function (config: any) {
  * sprite.getComponent(cc.Sprite).loadImage({url:"hall/a",view:this});
  */
 //loadImage( config : { url : string | {urls:string[],key:string} , view : any , completeCallback?:(data : SpriteFrame)=>void});
-_cc.Sprite.prototype.loadImage = function (config: any) {
+prototype.loadImage = function (config: any) {
 
     let me = this;
     let view = config.view;
@@ -174,7 +173,8 @@ cc.load = function (config) {
  * }});
  */
 
-_cc.sp.Skeleton.prototype.loadRemoteSkeleton = function (config: any) {
+prototype = sp.Skeleton.prototype;
+prototype.loadRemoteSkeleton = function (config: any) {
     let me = this;
     if (config.isNeedCache == undefined || config.isNeedCache == null) {
         config.isNeedCache = true;
@@ -195,7 +195,7 @@ _cc.sp.Skeleton.prototype.loadRemoteSkeleton = function (config: any) {
  *	}
  * }});
  */
-_cc.sp.Skeleton.prototype.loadSkeleton = function (config: any) {
+prototype.loadSkeleton = function (config: any) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
@@ -211,7 +211,8 @@ _cc.sp.Skeleton.prototype.loadSkeleton = function (config: any) {
  * button.getComponent(cc.Button).loadButton({normalSprite : "hall/a",view:this});
  * button.getComponent(cc.Button).loadButton({normalSprite : "hall/b",pressedSprite : "hall/c",view:this});
  */
-_cc.Button.prototype.loadButton = function (config: any) {
+prototype = Button.prototype;
+prototype.loadButton = function (config: any) {
     setButtonSpriteFrame(this, config);
 }
 
@@ -221,7 +222,8 @@ _cc.Button.prototype.loadButton = function (config: any) {
  * let content = cc.find("content",this.node); 
  * content.getComponent(cc.Label).loadFont({font:roomPath + dfFont,view:this});
  */
-_cc.Label.prototype.loadFont = function (config: any) {
+prototype = Label.prototype;
+prototype.loadFont = function (config: any) {
     let font = config.font;
     let me = this;
     let bundle = getBundle(config);
@@ -231,7 +233,7 @@ _cc.Label.prototype.loadFont = function (config: any) {
 }
 
 /**@description 强制label在当前帧进行绘制 */
-_cc.Label.prototype.forceDoLayout = function () {
+prototype.forceDoLayout = function () {
     //2.2.0
     if (this._forceUpdateRenderData) {
         this._forceUpdateRenderData();
@@ -250,44 +252,14 @@ _cc.Label.prototype.forceDoLayout = function () {
  * par.loadFile({url:GAME_RES( "res/action/DDZ_win_lizi" ),view:null});
  * this.node.addChild(node);
  */
-_cc.ParticleSystem2D.prototype.loadFile = function (config: any) {
+prototype = ParticleSystem2D.prototype;
+prototype.loadFile = function (config: any) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
     Manager.cacheManager.getCacheByAsync(url, ParticleAsset, bundle).then((data) => {
         setParticleSystemFile(me, config, data);
     });
-}
-
-/**
- * @description 强制节点在当前帧进行一次布局 
- * @example
- * cc.updateAlignment(this.node);
- * */
-_cc.updateAlignment = function (node: any) {
-    if (node) {
-        //强制当前节点进行本帧强制布局
-        if (_cc._widgetManager) {
-            _cc._widgetManager.updateAlignment(node);
-        } else {
-            if (DEBUG) error(this._logTag, `引擎变化,原始引擎版本2.1.2，找不到cc._widgetManager`);
-        }
-    }
-}
-
-if (!_cc.randomRangeInt) {
-    _cc.randomRangeInt = function (min: any, max: any) {
-        let value = (max - min) * Math.random() + min;
-        let result = Math.floor(value);
-        return result;
-    }
-}
-
-if (!_cc.randomRange) {
-    _cc.randomRange = function (min: any, max: any) {
-        let value = (max - min) * Math.random() + min;
-        return value;
-    }
 }
 
 
@@ -304,7 +276,7 @@ export function CocosExtentionInit() {
     //cc.log("CocosExtentionInit");
 }
 
-Reflect.defineProperty(_cc.Label.prototype, "language", {
+Reflect.defineProperty(Label.prototype, "language", {
     get: function () {
         return (<any>this)._language;
     },
@@ -347,21 +319,22 @@ Reflect.defineProperty(_cc.Label.prototype, "language", {
     }
 });
 
+prototype = Label.prototype;
 if (!EDITOR && ENABLE_CHANGE_LANGUAGE) {
-    _cc.Label.prototype._onChangeLanguage = function () {
+    prototype._onChangeLanguage = function () {
         this.language = this.language;
     }
 
-    let __label_onDestroy__ = _cc.Label.prototype.onDestroy;
-    _cc.Label.prototype.onDestroy = function () {
+    let __label_onDestroy__ = prototype.onDestroy;
+    prototype.onDestroy = function () {
         if (this._isUsinglanguage) {
             Manager.eventDispatcher.removeEventListener(EventApi.CHANGE_LANGUAGE, this);
         }
         __label_onDestroy__ && __label_onDestroy__.call(this);
     }
 
-    let __label_onLoad__ = _cc.Label.prototype.onLoad;
-    _cc.Label.prototype.onLoad = function () {
+    let __label_onLoad__ = prototype.onLoad;
+    prototype.onLoad = function () {
         if (this.string.indexOf(USING_LAN_KEY) > -1) {
             this.language = [this.string];
         }

@@ -102,7 +102,7 @@ class ToastItem extends Component {
                 itemComp.init(msg,this.FADE_TIME);
                 itemComp.fadeIn();
                 node.userData = this._id++;
-                node.layer = ViewZOrder.Tips;
+                node.setSiblingIndex(ViewZOrder.Tips);
                 node.name = `Tips${node.userData}`;
                 Manager.uiManager.getCanvas().addChild(node);
 
@@ -135,12 +135,12 @@ class ToastItem extends Component {
         this._show(msg);
     }
 
-    public finishShowItem( item : cc.Node ){
+    public finishShowItem( item : Node ){
         for ( let i = 0 ; i < this._queue.length ; i++ ){
             let tempItem = this._queue[i];
             if ( tempItem.userData == item.userData ){
                 this._queue.splice(i,1);
-                item.getComponent(ToastItem).fadeOut();
+                item.getComponent(ToastItem)?.fadeOut();
                 break;
             }
         }

@@ -279,7 +279,7 @@ class _HotUpdate {
 
     /**@description 是否是预览或浏览器 */
     public get isBrowser( ){
-        return sys.platform == sys.WECHAT_GAME || PREVIEW || sys.isBrowser;
+        return sys.platform == sys.Platform.WECHAT_GAME || PREVIEW || sys.isBrowser;
     }
 
     private isNeedUpdate( callback: (code: AssetManagerCode, state: AssetManagerState) => void ){
@@ -518,7 +518,7 @@ class _HotUpdate {
                 obj[searchPaths[i]] = true;
             }
             searchPaths = Object.keys(obj);
-            sys.localStorage.setItem('HotUpdateSearchPaths', JSON.stringify(searchPaths));
+            localStorage.setItem('HotUpdateSearchPaths', JSON.stringify(searchPaths));
             jsb.fileUtils.setSearchPaths(searchPaths);
         }
 

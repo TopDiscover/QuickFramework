@@ -87,7 +87,7 @@ import { ViewZOrder } from "../config/ViewZOrder";
              this.node.name = "Reconnect";
              this.node.removeFromParent();
              this.node.parent = Manager.uiManager.getCanvas();
-             this.node.layer = ViewZOrder.Loading;
+             this.node.setSiblingIndex(ViewZOrder.Loading);
              this.node.setPosition(new Vec3(0,0,0));
              if (this.isWaitingHide) {
                  this.isWaitingHide = false;

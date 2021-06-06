@@ -374,7 +374,7 @@ export default class Alert {
                 let canvas = Manager.uiManager.getCanvas();
                 if (canvas) {
                     this.curPanel.parent = canvas;
-                    this.curPanel.layer = ViewZOrder.Alert;
+                    this.curPanel.setSiblingIndex(ViewZOrder.Alert);
                     dialog.show(config);
                 }
             }

@@ -85,14 +85,14 @@ class StringStreamValue extends StreamValue<string>{
     data = "";
 }
 
-const Buffer = require('buffer').Buffer;
 /**@description 字符串类型 */
 export class StringValue extends StringStreamValue {
     size() {
         //先写入数据大小长度
         let byteSize = Uint32Array.BYTES_PER_ELEMENT;
         //加上当前字符串数量长度
-        let buffer = new Buffer(this.data);
+        let encoder = new TextEncoder();
+        let buffer = encoder.encode(this.data);
         byteSize += buffer.length;
         return byteSize;
     }
