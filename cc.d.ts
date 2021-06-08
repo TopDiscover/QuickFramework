@@ -50466,8 +50466,6 @@ declare module "cc" {
 
 	export type BUNDLE_TYPE = string | AssetManager.Bundle;
 
-	export function dump(...args:any[]):void;
-
 	/**@description 通过预置体路径创建节点 
  	 * @param config 配置信息
  	 * @param config.url 预置体路径
