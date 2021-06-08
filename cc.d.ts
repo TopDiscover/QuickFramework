@@ -50719,5 +50719,12 @@ declare module "cc" {
 				bundle?:BUNDLE_TYPE}):void;
 		}
 	}
+
+    /**
+ 	 * @description 强制节点在当前帧进行一次布局 
+ 	 * @example
+	 * cc.updateAlignment(this.node);
+	 * */
+	export function updateAlignment(node: Node): void;
 }
 
