@@ -58,11 +58,45 @@
         ".json"
       ],
       "subMetas": {}
+    },
+    "f9941": {
+      "importer": "sprite-frame",
+      "uuid": "4e0dc37e-579e-4c1b-80be-c5151d8cdaec@f9941",
+      "displayName": "music_open",
+      "id": "f9941",
+      "name": "spriteFrame",
+      "userData": {
+        "trimType": "auto",
+        "trimThreshold": 1,
+        "rotated": false,
+        "offsetX": 0,
+        "offsetY": 0.5,
+        "trimX": 4,
+        "trimY": 8,
+        "width": 52,
+        "height": 43,
+        "rawWidth": 60,
+        "rawHeight": 60,
+        "borderTop": 0,
+        "borderBottom": 0,
+        "borderLeft": 0,
+        "borderRight": 0,
+        "packable": true,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "4e0dc37e-579e-4c1b-80be-c5151d8cdaec@6c48a",
+        "atlasUuid": ""
+      },
+      "ver": "1.0.9",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
     }
   },
   "userData": {
     "hasAlpha": true,
-    "type": "texture",
-    "redirect": "4e0dc37e-579e-4c1b-80be-c5151d8cdaec@6c48a"
+    "type": "sprite-frame",
+    "redirect": "4e0dc37e-579e-4c1b-80be-c5151d8cdaec@f9941"
   }
 }

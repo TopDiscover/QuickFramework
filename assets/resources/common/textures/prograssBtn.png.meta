@@ -58,11 +58,45 @@
         ".json"
       ],
       "subMetas": {}
+    },
+    "f9941": {
+      "importer": "sprite-frame",
+      "uuid": "a22ceb56-2ab2-4f49-87fa-4743ba9eea49@f9941",
+      "displayName": "prograssBtn",
+      "id": "f9941",
+      "name": "spriteFrame",
+      "userData": {
+        "trimType": "auto",
+        "trimThreshold": 1,
+        "rotated": false,
+        "offsetX": 0,
+        "offsetY": 0,
+        "trimX": 0,
+        "trimY": 0,
+        "width": 50,
+        "height": 68,
+        "rawWidth": 50,
+        "rawHeight": 68,
+        "borderTop": 0,
+        "borderBottom": 0,
+        "borderLeft": 0,
+        "borderRight": 0,
+        "packable": true,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "a22ceb56-2ab2-4f49-87fa-4743ba9eea49@6c48a",
+        "atlasUuid": ""
+      },
+      "ver": "1.0.9",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
     }
   },
   "userData": {
     "hasAlpha": true,
-    "type": "texture",
-    "redirect": "a22ceb56-2ab2-4f49-87fa-4743ba9eea49@6c48a"
+    "type": "sprite-frame",
+    "redirect": "a22ceb56-2ab2-4f49-87fa-4743ba9eea49@f9941"
   }
 }

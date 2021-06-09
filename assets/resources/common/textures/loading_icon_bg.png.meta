@@ -58,11 +58,45 @@
         ".json"
       ],
       "subMetas": {}
+    },
+    "f9941": {
+      "importer": "sprite-frame",
+      "uuid": "7e322438-3e03-427f-8104-96171e14fc48@f9941",
+      "displayName": "loading_icon_bg",
+      "id": "f9941",
+      "name": "spriteFrame",
+      "userData": {
+        "trimType": "auto",
+        "trimThreshold": 1,
+        "rotated": false,
+        "offsetX": 0,
+        "offsetY": 0.5,
+        "trimX": 3,
+        "trimY": 2,
+        "width": 79,
+        "height": 79,
+        "rawWidth": 85,
+        "rawHeight": 84,
+        "borderTop": 0,
+        "borderBottom": 0,
+        "borderLeft": 0,
+        "borderRight": 0,
+        "packable": true,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "7e322438-3e03-427f-8104-96171e14fc48@6c48a",
+        "atlasUuid": ""
+      },
+      "ver": "1.0.9",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
     }
   },
   "userData": {
     "hasAlpha": true,
-    "type": "texture",
-    "redirect": "7e322438-3e03-427f-8104-96171e14fc48@6c48a"
+    "type": "sprite-frame",
+    "redirect": "7e322438-3e03-427f-8104-96171e14fc48@f9941"
   }
 }
