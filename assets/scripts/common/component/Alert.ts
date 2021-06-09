@@ -118,7 +118,7 @@ class AlertDialog extends Component {
 
         //写按钮
         if (config.confirmString) {
-            let title = find("Background/Label", this._confirm);
+            let title = find("Label", this._confirm);
             if (title) {
                 let lb = title.getComponent(Label);
                 if( lb ) lb.string = config.confirmString;
@@ -126,7 +126,7 @@ class AlertDialog extends Component {
         }
 
         if (config.cancelString) {
-            let title = find("Background/Label", this._cancel);
+            let title = find("Label", this._cancel);
             if (title) {
                 let lb = title.getComponent(Label);
                 if(lb)lb.string = config.cancelString;
