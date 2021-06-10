@@ -5,8 +5,6 @@ export let HALL_EN = {
     language: sys.Language.ENGLISH,
     data: {
         hall_view_game_name: [
-            'game1',
-            'game2',
             `BATTLE
 CITY`,
             'Load Test',

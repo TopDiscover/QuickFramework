@@ -31,20 +31,22 @@ export default class HallView extends UIView {
     private pageView : PageView = null!;
     private readonly PAGE_COUNT = 6;
 
+    private _bundleNames = [
+        "tankBattle",
+        "loadTest",
+        "netTest",
+        "aimLine",
+        "nodePoolTest",
+        "shaders",
+        "eliminate",
+    ];
     private _bundles: BundleConfig[] = [];
     private get bundles() {
         if (this._bundles.length <= 0) {
-            this._bundles = [
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.0", HallData.bundle), "gameOne", 1),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.1", HallData.bundle), "gameTwo", 2),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.2", HallData.bundle), "tankBattle", 3),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.3", HallData.bundle), "loadTest", 4),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.4", HallData.bundle), "netTest", 5),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.5", HallData.bundle), "aimLine", 6),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.6", HallData.bundle), "nodePoolTest", 7),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.7", HallData.bundle), "shaders", 8),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.8", HallData.bundle), "eliminate", 9),
-            ];
+            let names : string[] = Manager.getLanguage("hall_view_game_name",HallData.bundle);
+            for( let i = 0 ; i < this._bundleNames.length ;i++ ){
+                this._bundles.push(new BundleConfig(names[i],this._bundleNames[i],i+1));
+            }
         }
         return this._bundles;
     }

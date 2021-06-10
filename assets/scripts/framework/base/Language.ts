@@ -50,7 +50,7 @@ export class Language {
     }
 
     public get(args: (string | number)[]) {
-        let result = "";
+        let result : any = "";
         do {
             if (!!!args) break;
             if (args.length < 1) break;
@@ -83,11 +83,20 @@ export class Language {
                 if (i != keys.length) {
                     error(`语言包不存在 : ${keyString}`);
                 }
-                result = String.format(data, args);
+                if( typeof(data) == "string"){
+                    result = String.format(data, args);
+                }else{
+                    result = data;
+                }
+                
             } else {
                 //已经是取出的正确语言包，直接格式化
-                keyString = args.shift() as string;
-                return String.format(keyString, args);
+                let data = args.shift();
+                if( typeof(data) == "string" ){
+                    return String.format(data,args);
+                }else{
+                    result = data;
+                }
             }
         } while (0);
         return result;

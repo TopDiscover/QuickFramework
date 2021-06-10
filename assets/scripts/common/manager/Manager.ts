@@ -136,7 +136,7 @@ class _Manager extends Framework._FramewokManager {
     /**@description 获取语言包 
      * 
      */
-    getLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE | null = null): string {
+    getLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE | null = null): any {
         let key = "";
         if (typeof param == "string") {
             if (bundle) {
