@@ -2,7 +2,7 @@ import TipsDelegate from "../../framework/ui/TipsDelegate";
 import { Manager } from "../../framework/Framework";
 import { Config} from "../config/Config";
 import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
-import { Component ,find,instantiate,Label,log,Node, Prefab, tween} from "cc";
+import { Component ,find,instantiate,Label,log,Node, Prefab, Tween, tween, UIOpacity, Vec3} from "cc";
 import { ViewZOrder } from "../config/ViewZOrder";
 /**
  * @description 提示
@@ -27,27 +27,29 @@ class ToastItem extends Component {
 
     public fadeOut( ){
         let self = this;
-        // this.node.stopAllActions();
-        // this.node.runAction(cc.sequence(
-        //     cc.spawn(
-        //         cc.moveBy(0.5,0,50).easing(cc.easeExponentialOut()),
-        //         cc.fadeOut(1)
-        //     ),
-        //     cc.callFunc(()=>{
-        //         self.node.removeFromParent();
-        //     })
-        // ));
+        Tween.stopAllByTarget(this.node);
+        let op = this.node.getComponent(UIOpacity) as UIOpacity;
+        tween(this.node).sequence(
+            tween().parallel(
+                tween().target(this.node).by(0.5,{ position : new Vec3(0,50,0)},{ easing : "expoOut"}),
+                tween().target(op).by(1,{ opacity : 255})
+            ),
+            tween().call(()=>{
+            self.node.removeFromParent();
+        })).start();
         this.node.removeFromParent();
     }
 
     public fadeIn( ){
-        // this.node.stopAllActions();
-        // this.node.opacity = 0;
-        // let pos = this.node.position;
-        // this.node.runAction(cc.spawn(
-        //     cc.fadeIn(0.5),
-        //     cc.moveTo(0.5,pos.x,pos.y + 50).easing(cc.easeExponentialOut())
-        // ));
+        Tween.stopAllByTarget(this.node);
+        let op = this.node.getComponent(UIOpacity) as UIOpacity;
+        op.opacity = 0;
+        tween(this.node).parallel(
+            tween().target(this.node).to(0.5,{
+                 position : new Vec3(this.node.position.x,this.node.position.y + 50,this.node.position.z)},
+                 {easing : "expoOut"}),
+            tween().target(op).by(1,{opacity : 255})
+        ).start();
     }
  }
 
@@ -111,8 +113,7 @@ class ToastItem extends Component {
                 for ( let i = 0 ; i < length ; i++ ){
                     let item = this._queue[i];
                     item.opacity = 255;
-                    item.stopAllActions();
-                    // item.runAction(cc.moveTo(0.5,0,50 + (length - i ) * (node.height + 3) ).easing(cc.easeExponentialOut()))
+                    Tween.stopAllByTarget(item);
                 }
 
                 //压入
@@ -147,9 +148,9 @@ class ToastItem extends Component {
     }
 
     public clear( ){
-        let item = null;
-        while( item = this._queue.pop() ){
-            item.stopAllActions();
+        let item : Node = null!;
+        while( item = this._queue.pop() as Node ){
+            Tween.stopAllByTarget(item);
             item.removeFromParent();
         }
     }

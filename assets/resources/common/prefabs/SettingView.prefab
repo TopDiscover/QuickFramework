@@ -321,7 +321,7 @@
       "y": 1,
       "z": 1
     },
-    "_layer": 1073741824,
+    "_layer": 33554432,
     "_euler": {
       "__type__": "cc.Vec3",
       "x": 0,
@@ -1141,7 +1141,10 @@
       "b": 124,
       "a": 255
     },
-    "_normalSprite": null,
+    "_normalSprite": {
+      "__uuid__": "ee8ffe4b-1fe4-4e0c-8671-71d0825b1b90@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
     "_hoverSprite": null,
     "_pressedSprite": null,
     "_disabledSprite": null,
@@ -1922,7 +1925,7 @@
       "__id__": 84
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 86
@@ -2052,7 +2055,7 @@
       "__id__": 84
     },
     "_children": [],
-    "_active": false,
+    "_active": true,
     "_components": [
       {
         "__id__": 92
@@ -2258,7 +2261,7 @@
     "checkEvents": [],
     "_isChecked": true,
     "_checkMark": {
-      "__id__": 88
+      "__id__": 94
     },
     "_id": ""
   },
@@ -3032,7 +3035,7 @@
       "__id__": 136
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 138
@@ -3162,7 +3165,7 @@
       "__id__": 136
     },
     "_children": [],
-    "_active": false,
+    "_active": true,
     "_components": [
       {
         "__id__": 144
@@ -3368,7 +3371,7 @@
     "checkEvents": [],
     "_isChecked": true,
     "_checkMark": {
-      "__id__": 140
+      "__id__": 146
     },
     "_id": ""
   },

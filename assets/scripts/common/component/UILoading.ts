@@ -3,7 +3,7 @@ import { Manager } from "../manager/Manager";
 import { EventApi } from "../../framework/event/EventApi";
 import { Config } from "../config/Config";
 import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
-import { find, instantiate, Label ,Node, Prefab, tween, Vec3} from "cc";
+import { find, instantiate, Label ,Node, Prefab, Tween, tween, Vec3} from "cc";
 import { ViewZOrder } from "../config/ViewZOrder";
 /**
  * @description 加载动画
@@ -62,7 +62,7 @@ export default class UILoading extends UILoadingDelegate {
             this._node.setSiblingIndex(ViewZOrder.UILoading);
             this._node.position = Vec3.ZERO;
             this.content = find("content", this._node) as Node;
-            this.content.stopAllActions();
+            Tween.stopAllByTarget(this.content);
             this.text = find("text", this.content)?.getComponent(Label) as Label;
             this.text.string = "0%";
             this.content.opacity = 0;
@@ -150,7 +150,7 @@ export default class UILoading extends UILoadingDelegate {
     public hide() {
         this.stopTimeOutTimer();
         if (this._node) {
-            if (this.content) this.content.stopAllActions();
+            Tween.stopAllByTarget(this.content);
             this._isWaitingHide = true;
             this._node.active = false;
         } else {

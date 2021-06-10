@@ -2,7 +2,7 @@ import { sys } from "cc";
 
 export let LanguageEN = {
 
-    language: sys.Language.LANGUAGE_ENGLISH,
+    language: sys.Language.ENGLISH,
     alert_title: "Tips",
     alert_confirm: "Confirm",
     alert_cancel: "Cancel",

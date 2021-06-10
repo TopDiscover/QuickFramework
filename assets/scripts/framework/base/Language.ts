@@ -95,6 +95,6 @@ export class Language {
 
     /**@description 获取语言包名 */
     public getLanguage() {
-        return Manager.localStorage.getItem(LANG_KEY, sys.Language.LANGUAGE_CHINESE);
+        return Manager.localStorage.getItem(LANG_KEY, sys.Language.CHINESE);
     }
 }

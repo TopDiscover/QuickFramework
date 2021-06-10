@@ -1,7 +1,7 @@
 import { sys } from "cc";
 
 export let LanguageZH = {
-    language: sys.Language.LANGUAGE_CHINESE,
+    language: sys.Language.CHINESE,
     alert_title: "温馨提示",
     alert_confirm: "确 定",
     alert_cancel: "取 消",
