@@ -1,4 +1,4 @@
-import { DEBUG } from "cc/env";
+import { DEBUG, EDITOR } from "cc/env";
 import { BitEncrypt } from "../extentions/BitEncrypt";
 
 /**
@@ -27,7 +27,10 @@ export class LocalStorage {
     }
 
     public getItem(key: string, defaultValue: any = null) {
-        let value = null;//this.storage.getItem(key);
+        if( EDITOR ){
+            return defaultValue;
+        }
+        let value = this.storage.getItem(key);
         if (value) {
             //解析
             try {
@@ -48,28 +51,30 @@ export class LocalStorage {
     }
 
     public setItem(key: string, value: string | number | boolean | object) {
-
+        if( EDITOR ){
+            return;
+        }
         let type = typeof value;
         if (type == "number" || type == "string" || type == "boolean" || type == "object") {
             let saveObj: StorageData = { type: type, value: value };
             //加密
             try {
                 let data = this.encrypt(saveObj);
-                //this.storage.setItem(key, data);
+                this.storage.setItem(key, data);
             } catch (err) {
                 if (DEBUG) error(err);
             }
         } else {
-            //if (DEBUG) error(`存储数据类型不支持 当前的存储类型: ${type}`);
+            if (DEBUG) error(`存储数据类型不支持 当前的存储类型: ${type}`);
         }
     }
 
     public removeItem(key: string) {
-        //this.storage.removeItem(key);
+        if( EDITOR ) return;
+        this.storage.removeItem(key);
     }
 
-    private get storage() : any{
-        //return window.localStorage;
-        return null;
+    private get storage(){
+        return window.localStorage;
     }
 }
