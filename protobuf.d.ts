@@ -1,7 +1,7 @@
 // DO NOT EDIT! This is a generated file. Edit the JSDoc in src/*.js instead and run 'npm run types'.
 
 // version protobufjs@6.10.1
-// export namespace protobuf {
+declare namespace protobuf {
 
     /**
      * Provides common type definitions.
@@ -2728,4 +2728,4 @@
      * @returns Buffer slice
      */
     type PoolSlicer = (this: Uint8Array, start: number, end: number) => Uint8Array;
-// }
+}

@@ -1,6 +1,6 @@
 import NetHelper from "../../../../scripts/framework/controller/NetHelper";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
-// import { TestProtoMessage } from "../protocol/TestProtoMessage";
+import { TestProtoMessage } from "../protocol/TestProtoMessage";
 import { TestBinaryMessage } from "../protocol/TestBinaryMessage";
 import { HttpPackage, HttpRequestType } from "../../../../scripts/framework/net/HttpClient";
 import { TestJsonMessage } from "../protocol/TestJsonMessage";
@@ -12,10 +12,10 @@ class _HallNetHelper extends NetHelper<LobbyService>{
     }
 
     sendProtoMessage(hello: string) {
-        // let testProto = new TestProtoMessage();
-        // testProto.data.hello = hello;
-        // testProto.data.afvalue = 4.5;
-        // this.service.send(testProto);
+        let testProto = new TestProtoMessage();
+        testProto.data.hello = hello;
+        testProto.data.afvalue = 4.5;
+        this.service.send(testProto);
     }
 
     sendJsonMessage(hello: string) {
