@@ -1,5 +1,5 @@
 import UIView from "../ui/UIView";
-import { ResourceInfo, ResourceType, BUNDLE_RESOURCES, BUNDLE_REMOTE, ResourceData, ResourceCacheData } from "../base/Defines";
+import { ResourceInfo, ResourceType, BUNDLE_RESOURCES, BUNDLE_REMOTE, BUNDLE_TYPE, ResourceCacheData } from "../base/Defines";
 import { Manager } from "../Framework";
 import { Button, Component, Font, isValid, Label, ParticleAsset, ParticleSystem, ParticleSystem2D, Sprite, SpriteFrame, sp, Node, Prefab, instantiate, Asset, AssetManager } from "cc";
 
@@ -30,15 +30,15 @@ export function addRemoteLoadResource(view: UIView, info: ResourceInfo) {
 }
 
 /**@description 获取Bundle,如果没有传入，会默认指定当前View打开时的bundle,否则批定resources */
-export function getBundle(config: { bundle?: BUNDLE_TYPE, view?: UIView }) {
-    let bundle: BUNDLE_TYPE = config.bundle;
+export function getBundle(config: { bundle?: BUNDLE_TYPE, view?: UIView }):BUNDLE_TYPE {
+    let bundle = config.bundle;
     if (config.bundle == undefined || config.bundle == null) {
         bundle = BUNDLE_RESOURCES;
         if (config.view) {
             bundle = config.view.bundle;
         }
     }
-    return bundle;
+    return bundle as BUNDLE_TYPE;
 }
 
 function isValidComponent(component: Component): boolean {
@@ -205,16 +205,16 @@ function _setButtonWithType(
 ) {
     if (url) {
         if (typeof url == "string") {
-            Manager.cacheManager.getCacheByAsync(url, SpriteFrame, bundle).then((spriteFrame) => {
-                _setButtonSpriteFrame(button, memberName, view, url, spriteFrame, completeCallback as any, bundle);
+            Manager.cacheManager.getCacheByAsync(url, SpriteFrame, bundle as BUNDLE_TYPE).then((spriteFrame) => {
+                _setButtonSpriteFrame(button, memberName, view, url, spriteFrame, completeCallback as any, bundle as BUNDLE_TYPE);
             });
         } else {
             //在纹理图集中查找
-            Manager.cacheManager.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle).then((data) => {
+            Manager.cacheManager.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle as BUNDLE_TYPE).then((data) => {
                 if (data && data.isTryReload) {
                     //来到这里面，程序已经崩溃，无意义在处理
                 } else {
-                    _setButtonSpriteFrame(button, memberName, view, data.url, data.spriteFrame as SpriteFrame, completeCallback as any, bundle, true);
+                    _setButtonSpriteFrame(button, memberName, view, data.url, data.spriteFrame as SpriteFrame, completeCallback as any, bundle as BUNDLE_TYPE, true);
                 }
             });
         }
