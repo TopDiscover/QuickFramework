@@ -78,10 +78,6 @@ export namespace TankBettle {
         Props: (1 << 10),
     }
 
-    export enum ColliderType{
-        Check = 1,
-    }
-
     export enum EVENT {
         /**@description 显示地图 */
         SHOW_MAP_LEVEL = "SHOW_MAP_LEVEL",
@@ -101,10 +97,12 @@ export namespace TankBettle {
     export const PLAYER_STATUS_EXIST_TIME = 5;
 
     export enum ZIndex {
-        TANK = 9999,
+        MIN,
+        TANK,
         BULLET,
         BLOCK,
         PROPS,
+        MAX = PROPS,
     }
 
     export enum EnemyType {

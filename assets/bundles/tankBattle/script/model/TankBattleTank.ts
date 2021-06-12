@@ -37,6 +37,9 @@ export default class TankBettleTank extends TankBattleEntity {
     /**@description 移动之前的位置 */
     protected prevPosition = new Vec3();
 
+    /**@description 死亡动画 */
+    protected dieAction = new Vec3();
+
     move() {
 
     }
@@ -164,7 +167,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
     private _strongNode: Node = null!;
 
     protected stopAllActions(){
-        Tween.stopAllByTarget(this.node);
+        Tween.stopAllByTarget(this.dieAction);
         Tween.stopAllByTarget(this.curPosition);
     }
 
@@ -234,9 +237,10 @@ export class TankBettleTankPlayer extends TankBettleTank {
             //玩家销毁声音
             TankBettle.gameData.playerCrackAudio();
             aniNode.setPosition(new Vec3())
-            tween(this.node).delay(state.duration).call(() => {
+            tween(this.dieAction).delay(state.duration).call(() => {
+                this.stopAllActions();
                 TankBettle.gameData.gameMap?.removePlayer(this);
-            }).removeSelf().start()
+            }).start()
         }
         TankBettle.gameData.updateGameInfo();
     }
@@ -335,6 +339,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
         Tween.stopAllByTarget(this.curPosition);
         Tween.stopAllByTarget(this.changeNode);
         Tween.stopAllByTarget(this.delayChangeNode);
+        Tween.stopAllByTarget(this.dieAction);
     }
     private stopShootAction() {
         Tween.stopAllByTarget(this.shootNode);
@@ -389,9 +394,10 @@ export class TankBettleTankEnemy extends TankBettleTank {
 
         TankBettle.gameData.enemyCrackAudio();
         aniNode.setPosition(new Vec3());
-        tween(this.node).delay(state.duration).call(() => {
+        tween(this.dieAction).delay(state.duration).call(() => {
+            this.stopAllActions();
             TankBettle.gameData.gameMap?.removeEnemy(this.node);
-        }).removeSelf().start()
+        }).start()
     }
 
     /**@description 开始射击 */

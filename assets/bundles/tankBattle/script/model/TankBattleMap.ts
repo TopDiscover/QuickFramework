@@ -9,7 +9,7 @@
  import TankBattleBlock from "./TankBattleBlock";
  import TankBattleGameView from "../view/TankBattleGameView";
  import TankBattleProps from "./TankBattleProps";
-import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, randomRangeInt, UITransform, instantiate, BoxCollider2D, Rect, Size, randomRange, tween, macro, Sprite } from "cc";
+import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, randomRangeInt, UITransform, instantiate, BoxCollider2D, Rect, Size, randomRange, tween, macro, Sprite, size, Widget } from "cc";
  
  const { ccclass, property } = _decorator;
  
@@ -39,21 +39,41 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
      /**@description 老家 */
      private _heart: Node = null!;
  
-     /**@description 道具生成节点 */
-     public propsProductNode ?: Node;
      /**@description 待销毁的敌人 */
      private _waitingDestory : Node[] = [];
      /**@description 放入按钮事件 */
      private _keyboardEvents : Map<number,EventKeyboard> = new Map();
+
+     private nodes : Node[] = [];
  
      protected onLoad() {
          this.node.children.forEach(node => {
              this.outWall.push(node);
          })
          this.node.removeAllChildren();
-         let node = new Node();
-         this.node.addChild(node);
-         this.propsProductNode = node;
+        
+         let thisTransform = this.getComponent(UITransform) as UITransform;
+         for( let i = TankBettle.ZIndex.MIN ; i < TankBettle.ZIndex.MAX ; i++ ){
+            let node = new Node();
+            let transform = node.addComponent(UITransform);
+            transform.setAnchorPoint(thisTransform.anchorPoint);
+            transform.setContentSize(size(thisTransform.width,thisTransform.height));
+            let widget = node.addComponent(Widget);
+            widget.left = 0;
+            widget.right = 0;
+            widget.top = 0;
+            widget.bottom = 0;
+            this.node.addChild(node);
+            this.nodes.push(node);
+         }
+     }
+
+     private getNode( zIndex : TankBettle.ZIndex ){
+         return this.nodes[zIndex - 1];
+     }
+
+     private addNodeChild( node : Node , zIndex : TankBettle.ZIndex ){
+         this.getNode(zIndex).addChild(node);
      }
  
      protected onDestroy() {
@@ -62,8 +82,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
          });
          this.clear()
          this.outWall = [];
-         Tween.stopAllByTarget(this.propsProductNode);
-         this.propsProductNode = undefined;
+         Tween.stopAllByTarget(this.getNode(TankBettle.ZIndex.PROPS));
      }
  
      protected update() {
@@ -129,8 +148,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
              } else {
                  // cc.log("从上次未生成的敌人里面取出")
              }
-             this.node.addChild(enemyNode);
-             enemyNode.setSiblingIndex(TankBettle.ZIndex.TANK);
+             this.addNodeChild(enemyNode,TankBettle.ZIndex.TANK);
              let enemy = enemyNode.getComponent(TankBettleTankEnemy);
              if (!enemy) {
                  enemy = enemyNode.addComponent(TankBettleTankEnemy);
@@ -249,6 +267,12 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
          this.outWall.forEach((value) => {
              this.node.addChild(instantiate(value));
          });
+
+         //各层
+         this.nodes.forEach((node)=>{
+            node.removeAllChildren();
+            this.node.addChild(node);
+         });
  
          //清空
          this._enemys = [];
@@ -274,8 +298,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
                          if (blockData == TankBettle.BLOCK_TYPE.HOME) {
                              this._heart = node;
                          }
-                         this.node.addChild(node);
-                         node.setSiblingIndex(TankBettle.ZIndex.BLOCK);
+                         this.addNodeChild(node,TankBettle.ZIndex.BLOCK);
                          x = (j + 1) * prefebSize.width / 2 + j * prefebSize.width / 2;
                          node.setPosition(new Vec3(x,y));
                          if (blockData == TankBettle.BLOCK_TYPE.HOME) {
@@ -311,16 +334,15 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
          let node = instantiate(prefab) as Node;
          let props = node.addComponent(TankBattleProps);
          props.type = type;
-         this.node.addChild(node);
-         node.setSiblingIndex(TankBettle.ZIndex.PROPS);
+         this.addNodeChild(node,TankBettle.ZIndex.PROPS);
          node.position = this.randomPropPosition();
      }
  
      public startCreateProps() {
          if( TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME ){
              let time = randomRange(TankBettle.PROPS_CREATE_INTERVAL.min,TankBettle.PROPS_CREATE_INTERVAL.max);
-             Tween.stopAllByTarget(this.propsProductNode);
-             tween(this.propsProductNode).delay(time).call(()=>{
+             Tween.stopAllByTarget(this.getNode(TankBettle.ZIndex.PROPS));
+             tween(this.getNode(TankBettle.ZIndex.PROPS)).delay(time).call(()=>{
                  this.createProps();
                  this.startCreateProps();
              }).start();
@@ -339,8 +361,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
                 thisTrans.width/2 - 2 * playerTrans.width,
                 -thisTrans.height + playerTrans.height/2
              ));
-             this.node.addChild(playerNode);
-             playerNode.setSiblingIndex(TankBettle.ZIndex.TANK);
+             this.addNodeChild(playerNode,TankBettle.ZIndex.TANK);
              this.playerOne.born();
          } else {
              this.playerTwo = playerNode.addComponent(TankBettleTankPlayer);
@@ -349,8 +370,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
                  thisTrans.width / 2 + 2 * playerTrans.width,
                  -thisTrans.height + playerTrans.height/2
              ));
-             this.node.addChild(playerNode);
-             playerNode.setSiblingIndex(TankBettle.ZIndex.TANK);
+             this.addNodeChild(playerNode,TankBettle.ZIndex.TANK);
              this.playerTwo.born();
          }
      }
@@ -391,8 +411,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
      }
  
      public addBullet(bullet: TankBettleBullet) {
-         this.node.addChild(bullet.node);
-         bullet.node.setSiblingIndex(TankBettle.ZIndex.BULLET);
+         this.addNodeChild(bullet.node,TankBettle.ZIndex.BULLET);
      }
  
      public onKeyDown(ev: EventKeyboard) {
