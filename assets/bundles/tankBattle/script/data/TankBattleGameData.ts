@@ -64,18 +64,22 @@ export namespace TankBettle {
         ANOTHREHOME = 8
     }
 
-    export enum GROUP{
-        Wall = 1,
-        StoneWall,
-        Grass,
-        Water,
-        Ice,
-        Home,
-        Bullet,
-        Player,
+    export const GROUP = {
+        Wall: (1 << 1),
+        StoneWall: (1 << 2),
+        Grass: (1 << 3),
+        Water: (1 << 4),
+        Ice: (1 << 5),
+        Home: (1 << 6),
+        Bullet: (1 << 7),
+        Player: (1 << 8),
         /**@description 边界 */
-        Boundary,
-        Props,
+        Boundary: (1 << 9),
+        Props: (1 << 10),
+    }
+
+    export enum ColliderType{
+        Check = 1,
     }
 
     export enum EVENT {
@@ -97,7 +101,7 @@ export namespace TankBettle {
     export const PLAYER_STATUS_EXIST_TIME = 5;
 
     export enum ZIndex {
-        TANK,
+        TANK = 9999,
         BULLET,
         BLOCK,
         PROPS,

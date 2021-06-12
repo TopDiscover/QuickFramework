@@ -1,4 +1,4 @@
-import { Component, instantiate, _decorator, Node, BoxCollider2D, Tween, UITransform, Vec3,Animation, tween, Sprite, randomRange, randomRangeInt, IPhysics2DContact } from "cc";
+import { Component, instantiate, _decorator, Node, BoxCollider2D, Tween, UITransform, Vec3,Animation, tween, Sprite, randomRange, randomRangeInt, IPhysics2DContact, Rect } from "cc";
 import { TankBettle } from "../data/TankBattleGameData";
 import TankBettleBullet from "./TankBattleBullet";
 import { TankBattleEntity } from "./TankBattleEntity";
@@ -34,6 +34,8 @@ export default class TankBettleTank extends TankBattleEntity {
 
     /**@description 当前位置 */
     protected curPosition  = new Vec3();
+    /**@description 移动之前的位置 */
+    protected prevPosition = new Vec3();
 
     move() {
 
@@ -66,6 +68,10 @@ export default class TankBettleTank extends TankBattleEntity {
 
     }
 
+    protected stopAllActions(){
+
+    }
+
     changeDirection(other?: BoxCollider2D) {
 
     }
@@ -91,12 +97,10 @@ export default class TankBettleTank extends TankBattleEntity {
             other.group == TankBettle.GROUP.Boundary ||
             other.group == TankBettle.GROUP.Home ||
             other.group == TankBettle.GROUP.Water) {
-            let wordPos = new Vec3(self.worldAABB.center.x, self.worldAABB.center.y);
+            //停止移动的动作，恢复之前的位置
             Tween.stopAllByTarget(this.curPosition);
             //把自己恢复到未碰撞前的位置
-            let pos = (this.node.parent?.getComponent(UITransform) as UITransform).convertToNodeSpaceAR(wordPos)
-            this.checkPostion(pos);
-            this.node.setPosition(pos);
+            this.node.setPosition(this.prevPosition);
             this.isMoving = false;
             if (this.isAI && other.group == TankBettle.GROUP.Home) {
                 //如果是AI碰撞到老巢，直接GameOver
@@ -113,26 +117,15 @@ export default class TankBettleTank extends TankBattleEntity {
                 //自己不是AI
                 if (player.isAI) {
                     Tween.stopAllByTarget(this.curPosition);
-                    let wordPos = new Vec3(self.worldAABB.center.x, self.worldAABB.center.y);
-                    let pos = (this.node.parent?.getComponent(UITransform) as UITransform).convertToNodeSpaceAR(wordPos);
-                    this.checkPostion(pos)
-                    this.node.setPosition(pos);
+                    this.node.setPosition(this.prevPosition);
                     this.isMoving = false;
                 }
             }
         }
     }
 
-    private checkPostion(pos: Vec3) {
-        let trans = this.node.getComponent(UITransform) as UITransform;
-        if (pos.x < trans.width / 2) {
-            pos.x = trans.width / 2;
-            pos.y = this.node.position.y;
-        }
-    }
-
     /**@description 处理来自子弹的碰撞 */
-    private onBulletCollision(other: BoxCollider2D, me: BoxCollider2D) {
+    private onBulletCollision(self: BoxCollider2D, other: BoxCollider2D) {
         if (other.group == TankBettle.GROUP.Bullet) {
             let bullet = other.node.getComponent(TankBettleBullet);
             if (bullet)
@@ -170,6 +163,11 @@ export class TankBettleTankPlayer extends TankBettleTank {
     /**@description 打白色砖墙状态 */
     private _strongNode: Node = null!;
 
+    protected stopAllActions(){
+        Tween.stopAllByTarget(this.node);
+        Tween.stopAllByTarget(this.curPosition);
+    }
+
     onLoad() {
         this._strongNode = new Node();
         this.node.addChild(this._strongNode);
@@ -196,8 +194,6 @@ export class TankBettleTankPlayer extends TankBettleTank {
             animation.play("tank_protected");
             aniNode.setPosition(new Vec3());
             tween(aniNode).delay(TankBettle.PLAYER_STATUS_EXIST_TIME).call(() => {
-                aniNode.removeFromParent()
-                aniNode.destroy();
                 this.removeStatus(TankBettle.PLAYER_STATUS.PROTECTED)
             }).removeSelf().start()
         } else if (status == TankBettle.PLAYER_STATUS.STRONG) {
@@ -229,7 +225,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
         }
         this.config.live--;
         if (this.config.live == 0) {
-            Tween.stopAllByTarget(this.node);
+            this.stopAllActions();
             let aniNode = instantiate(TankBettle.gameData.animationPrefab) as Node;
             this.node.addChild(aniNode);
             let animation = aniNode.getComponent(Animation) as Animation;
@@ -257,6 +253,8 @@ export class TankBettleTankPlayer extends TankBettleTank {
             tween(this.curPosition)
                 .by(this.config.time, { y : this.config.distance },{onUpdate:(target)=>{
                     this.node.setPosition(target as Vec3);
+                },onStart:(target)=>{
+                    this.prevPosition.set(target as Vec3);
                 }})
                 .call(() => {
                     this.isMoving = false;
@@ -268,6 +266,8 @@ export class TankBettleTankPlayer extends TankBettleTank {
             tween(this.curPosition)
                 .by(this.config.time, { y : -this.config.distance },{onUpdate:(target)=>{
                     this.node.setPosition(target as Vec3);
+                },onStart:(target)=>{
+                    this.prevPosition.set(target as Vec3);
                 }})
                 .call(() => {
                     this.isMoving = false;
@@ -279,6 +279,8 @@ export class TankBettleTankPlayer extends TankBettleTank {
             tween(this.curPosition)
                 .by(this.config.time, { x : this.config.distance},{onUpdate : (target)=>{
                     this.node.setPosition(target as Vec3);
+                },onStart:(target)=>{
+                    this.prevPosition.set(target as Vec3);
                 }})
                 .call(() => {
                     this.isMoving = false;
@@ -290,6 +292,8 @@ export class TankBettleTankPlayer extends TankBettleTank {
             tween(this.curPosition)
                 .by(this.config.time, { x : -this.config.distance },{onUpdate:(target)=>{
                     this.node.setPosition(target as Vec3);
+                },onStart:(target)=>{
+                    this.prevPosition.set(target as Vec3);
                 }})
                 .call(() => {
                     this.isMoving = false;
@@ -326,6 +330,12 @@ export class TankBettleTankEnemy extends TankBettleTank {
         sprite.loadImage({ url: { urls: ["texture/images"], key: spriteFrameKey }, view: TankBettle.gameData.gameView, bundle: TankBettle.gameData.gameView.bundle });
     }
 
+    protected stopAllActions(){
+        this.stopShootAction();
+        Tween.stopAllByTarget(this.curPosition);
+        Tween.stopAllByTarget(this.changeNode);
+        Tween.stopAllByTarget(this.delayChangeNode);
+    }
     private stopShootAction() {
         Tween.stopAllByTarget(this.shootNode);
     }
@@ -342,10 +352,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
     }
 
     onDestroy() {
-        Tween.stopAllByTarget(this.curPosition);
-        this.stopShootAction();
-        Tween.stopAllByTarget(this.changeNode);
-        Tween.stopAllByTarget(this.delayChangeNode);
+        this.stopAllActions();
     }
 
     private startDelayChange() {
@@ -373,8 +380,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
     }
 
     public die() {
-        Tween.stopAllByTarget(this.node);
-        this.stopShootAction();
+        this.stopAllActions();
         let aniNode = instantiate(TankBettle.gameData.animationPrefab) as Node;
         this.node.addChild(aniNode);
         let animation = aniNode.getComponent(Animation) as Animation;
@@ -406,6 +412,8 @@ export class TankBettleTankEnemy extends TankBettleTank {
             tween().target(this.curPosition)
                 .by(this.config.time, { y : this.config.distance },{onUpdate:(target)=>{
                     this.node.setPosition(target as Vec3);
+                },onStart:(target)=>{
+                    this.prevPosition.set(target as Vec3);
                 }})
                 .repeatForever()
                 .start();
@@ -415,6 +423,8 @@ export class TankBettleTankEnemy extends TankBettleTank {
             tween().target(this.curPosition)
                 .by(this.config.time, { y : -this.config.distance },{onUpdate:(target)=>{
                     this.node.setPosition(target as Vec3);
+                },onStart:(target)=>{
+                    this.prevPosition.set(target as Vec3);
                 }})
                 .repeatForever()
                 .start();
@@ -424,6 +434,8 @@ export class TankBettleTankEnemy extends TankBettleTank {
             tween(this.curPosition).target(this.curPosition)
                 .by(this.config.time, { x : this.config.distance },{onUpdate:(target)=>{
                     this.node.setPosition(target as Vec3);
+                },onStart:(target)=>{
+                    this.prevPosition.set(target as Vec3);
                 }})
                 .repeatForever()
                 .start();
@@ -433,6 +445,8 @@ export class TankBettleTankEnemy extends TankBettleTank {
             tween().target(this.curPosition)
                 .by(this.config.time, { x: -this.config.distance },{onUpdate:(target)=>{
                     this.node.setPosition(target as Vec3);
+                },onStart:(target)=>{
+                    this.prevPosition.set(target as Vec3);
                 }})
                 .repeatForever()
                 .start();
