@@ -1,8 +1,8 @@
 import UIView from "../ui/UIView";
-import { ResourceInfo, BUNDLE_TYPE } from "./Defines";
+import { ResourceInfo, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
 import { Manager } from "../Framework";
 import EventComponent from "./EventComponent";
-import { AudioClip, _decorator } from "cc";
+import { AudioClip, AudioSource, _decorator } from "cc";
 import { DEBUG } from "cc/env";
 
 /**
@@ -62,12 +62,24 @@ class AudioData {
     }
 }
 
+class AudioInfo{
+    url : string = "";
+    bundle : BUNDLE_TYPE = BUNDLE_RESOURCES;
+    clip : AudioClip = null!;
+    source : AudioSource = null!;
+}
+
 const PLAY_MUSIC = "AudioComponent_PLAY_MUSIC";
 
 @ccclass
 @menu("framework/base/AudioComponent")
 export default class AudioComponent extends EventComponent {
 
+
+    /**@description 保存所有播放的音乐 */
+    private musicInfos : Map<string,AudioInfo> = new Map();
+    /**@description 保存所有播放的音效 */
+    private effectInfos : Map<string,AudioInfo> = new Map();
 
     protected bindingEvents() {
         super.bindingEvents();
@@ -88,7 +100,7 @@ export default class AudioComponent extends EventComponent {
     /**@description 背景音乐音量 */
     public get musicVolume() { return this.audioData.musicVolume; }
     public set musicVolume(volume) {
-        // audioEngine.setMusicVolume(volume);
+        this._setMusicVolume(volume);
         if (volume <= 0) {
             this.stopMusic();
         }
@@ -97,7 +109,7 @@ export default class AudioComponent extends EventComponent {
     /**@description 音效音量 */
     public get effectVolume() { return this.audioData.effectVolume; }
     public set effectVolume(volume) {
-        // cc.audioEngine.setEffectsVolume(volume);
+        this._setEffectVolume(volume);
         if (volume <= 0) {
             this.stopEffect();
         }
@@ -162,11 +174,19 @@ export default class AudioComponent extends EventComponent {
     }
 
     public stopAllEffects() {
-        // cc.audioEngine.stopAllEffects();
+        this.effectInfos.forEach((info,key,source)=>{
+            if( info.source && info.source.clip ){
+                info.source.stop();
+            }
+        });
     }
 
     public stopMusic() {
-        // cc.audioEngine.stopMusic();
+        this.musicInfos.forEach((info,key,source)=>{
+            if( info.source && info.source.clip ){
+                info.source.stop();
+            }
+        });
         this.isPlaying = false;
     }
 
@@ -254,6 +274,31 @@ export default class AudioComponent extends EventComponent {
     public onEnterForgeground(inBackgroundTime: number) {
         // cc.audioEngine.resumeMusic();
         // cc.audioEngine.resumeAllEffects();
+    }
+
+
+    /**@description 统一设置音乐的声音大小 */
+    protected _setMusicVolume( value : number ){
+        this.musicInfos.forEach((info,key,source)=>{
+            if( info.source && info.source.clip ){
+                info.source.volume = value;
+            }
+        });
+    }
+
+    /**@description 统一设置音效的声音大小 */
+    private _setEffectVolume( value : number ){
+        this.effectInfos.forEach((info,key,source)=>{
+            if( info.source && info.source.clip ){
+                info.source.volume = value;
+            }
+        });
+    }
+
+    private _pauseAudios(){
+        // this.musicInfos.forEach((info,key,source)=>{
+        //     if( info.source )
+        // })
     }
 
 }

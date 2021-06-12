@@ -1,0 +1,52 @@
+[
+  {
+    "__type__": "cc.AnimationClip",
+    "_name": "tank_protected",
+    "_objFlags": 0,
+    "_native": "",
+    "sample": 60,
+    "speed": 1,
+    "wrapMode": 2,
+    "events": [],
+    "_duration": 0.18333333333333332,
+    "_keys": [
+      [
+        0,
+        0.08333333333333333,
+        0.16666666666666666
+      ]
+    ],
+    "_stepness": 0,
+    "_curves": [
+      {
+        "modifiers": [
+          {
+            "__id__": 1
+          },
+          "spriteFrame"
+        ],
+        "data": {
+          "keys": 0,
+          "values": [
+            {
+              "__uuid__": "34f38a10-d1f2-4319-be9d-1791cdc2e2ef@dc759"
+            },
+            {
+              "__uuid__": "34f38a10-d1f2-4319-be9d-1791cdc2e2ef@a810d"
+            },
+            {
+              "__uuid__": "34f38a10-d1f2-4319-be9d-1791cdc2e2ef@dc759"
+            }
+          ],
+          "easingMethods": {}
+        }
+      }
+    ],
+    "_commonTargets": [],
+    "_hash": 0
+  },
+  {
+    "__type__": "cc.animation.ComponentPath",
+    "component": "cc.Sprite"
+  }
+]

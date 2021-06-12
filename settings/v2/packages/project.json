@@ -11,50 +11,63 @@
     {
       "name": "Default",
       "value": 1
-    },
-    {
-      "name": "Wall",
-      "value": 2
-    },
-    {
-      "name": "StoneWall",
-      "value": 4
-    },
-    {
-      "name": "Grass",
-      "value": 8
-    },
-    {
-      "name": "Water",
-      "value": 16
-    },
-    {
-      "name": "Ice",
-      "value": 32
-    },
-    {
-      "name": "Home",
-      "value": 64
-    },
-    {
-      "name": "Bullet",
-      "value": 128
-    },
-    {
-      "name": "Ui",
-      "value": 256
-    },
-    {
-      "name": "Player",
-      "value": 512
-    },
-    {
-      "name": "Boundary",
-      "value": 1024
-    },
-    {
-      "name": "Props",
-      "value": 2048
     }
-  ]
+  ],
+  "physics": {
+    "collisionGroups": [
+      {
+        "index": 1,
+        "name": "Wall"
+      },
+      {
+        "index": 2,
+        "name": "StoneWall"
+      },
+      {
+        "index": 3,
+        "name": "Grass"
+      },
+      {
+        "index": 4,
+        "name": "Water"
+      },
+      {
+        "index": 5,
+        "name": "Ice"
+      },
+      {
+        "index": 6,
+        "name": "Home"
+      },
+      {
+        "index": 7,
+        "name": "Bullet"
+      },
+      {
+        "index": 8,
+        "name": "Player"
+      },
+      {
+        "index": 9,
+        "name": "Boundary"
+      },
+      {
+        "index": 10,
+        "name": "Props"
+      }
+    ],
+    "collisionMatrix": {
+      "0": 0,
+      "1": 384,
+      "2": 384,
+      "3": 0,
+      "4": 256,
+      "5": 0,
+      "6": 384,
+      "7": 966,
+      "8": 2006,
+      "9": 384,
+      "10": 256
+    }
+  }
 }

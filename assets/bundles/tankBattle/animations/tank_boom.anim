@@ -1,0 +1,60 @@
+[
+  {
+    "__type__": "cc.AnimationClip",
+    "_name": "tank_boom",
+    "_objFlags": 0,
+    "_native": "",
+    "sample": 60,
+    "speed": 1,
+    "wrapMode": 1,
+    "events": [],
+    "_duration": 0.35,
+    "_keys": [
+      [
+        0,
+        0.08333333333333333,
+        0.16666666666666666,
+        0.25,
+        0.3333333333333333
+      ]
+    ],
+    "_stepness": 0,
+    "_curves": [
+      {
+        "modifiers": [
+          {
+            "__id__": 1
+          },
+          "spriteFrame"
+        ],
+        "data": {
+          "keys": 0,
+          "values": [
+            {
+              "__uuid__": "34f38a10-d1f2-4319-be9d-1791cdc2e2ef@347aa"
+            },
+            {
+              "__uuid__": "34f38a10-d1f2-4319-be9d-1791cdc2e2ef@6e7c0"
+            },
+            {
+              "__uuid__": "34f38a10-d1f2-4319-be9d-1791cdc2e2ef@05761"
+            },
+            {
+              "__uuid__": "34f38a10-d1f2-4319-be9d-1791cdc2e2ef@6e7c0"
+            },
+            {
+              "__uuid__": "34f38a10-d1f2-4319-be9d-1791cdc2e2ef@347aa"
+            }
+          ],
+          "easingMethods": {}
+        }
+      }
+    ],
+    "_commonTargets": [],
+    "_hash": 0
+  },
+  {
+    "__type__": "cc.animation.ComponentPath",
+    "component": "cc.Sprite"
+  }
+]

@@ -177,6 +177,17 @@ export class _AssetManager {
         return null;
     }
 
+    public getBundleName( bundle : BUNDLE_TYPE ) : string | null{
+        if( bundle ){
+            if( typeof bundle == "string" ){
+                return bundle;
+            }else{
+                return bundle.name;
+            }
+        }
+        return null;
+    }
+
     /**@description 加载bundle */
     public loadBundle(nameOrUrl: string, onComplete: (err: Error, bundle: AssetManager.Bundle) => void): void {
         assetManager.loadBundle(nameOrUrl, onComplete);
