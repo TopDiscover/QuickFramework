@@ -256,9 +256,8 @@ export class TankBettleTankPlayer extends TankBettleTank {
             this.curPosition.set(this.node.position);
             tween(this.curPosition)
                 .by(this.config.time, { y : this.config.distance },{onUpdate:(target)=>{
+                    this.prevPosition.set(this.node.position);
                     this.node.setPosition(target as Vec3);
-                },onStart:(target)=>{
-                    this.prevPosition.set(target as Vec3);
                 }})
                 .call(() => {
                     this.isMoving = false;
@@ -269,9 +268,8 @@ export class TankBettleTankPlayer extends TankBettleTank {
             this.curPosition.set(this.node.position);
             tween(this.curPosition)
                 .by(this.config.time, { y : -this.config.distance },{onUpdate:(target)=>{
+                    this.prevPosition.set(this.node.position);
                     this.node.setPosition(target as Vec3);
-                },onStart:(target)=>{
-                    this.prevPosition.set(target as Vec3);
                 }})
                 .call(() => {
                     this.isMoving = false;
@@ -282,9 +280,8 @@ export class TankBettleTankPlayer extends TankBettleTank {
             this.curPosition.set(this.node.position);
             tween(this.curPosition)
                 .by(this.config.time, { x : this.config.distance},{onUpdate : (target)=>{
+                    this.prevPosition.set(this.node.position);
                     this.node.setPosition(target as Vec3);
-                },onStart:(target)=>{
-                    this.prevPosition.set(target as Vec3);
                 }})
                 .call(() => {
                     this.isMoving = false;
@@ -295,9 +292,8 @@ export class TankBettleTankPlayer extends TankBettleTank {
             this.curPosition.set(this.node.position);
             tween(this.curPosition)
                 .by(this.config.time, { x : -this.config.distance },{onUpdate:(target)=>{
+                    this.prevPosition.set(this.node.position);
                     this.node.setPosition(target as Vec3);
-                },onStart:(target)=>{
-                    this.prevPosition.set(target as Vec3);
                 }})
                 .call(() => {
                     this.isMoving = false;
@@ -417,9 +413,8 @@ export class TankBettleTankEnemy extends TankBettleTank {
             this.curPosition.set(this.node.position);
             tween().target(this.curPosition)
                 .by(this.config.time, { y : this.config.distance },{onUpdate:(target)=>{
+                    this.prevPosition.set(this.node.position);
                     this.node.setPosition(target as Vec3);
-                },onStart:(target)=>{
-                    this.prevPosition.set(target as Vec3);
                 }})
                 .repeatForever()
                 .start();
@@ -428,9 +423,8 @@ export class TankBettleTankEnemy extends TankBettleTank {
             this.curPosition.set(this.node.position);
             tween().target(this.curPosition)
                 .by(this.config.time, { y : -this.config.distance },{onUpdate:(target)=>{
+                    this.prevPosition.set(this.node.position);
                     this.node.setPosition(target as Vec3);
-                },onStart:(target)=>{
-                    this.prevPosition.set(target as Vec3);
                 }})
                 .repeatForever()
                 .start();
@@ -439,9 +433,8 @@ export class TankBettleTankEnemy extends TankBettleTank {
             this.curPosition.set(this.node.position);
             tween(this.curPosition).target(this.curPosition)
                 .by(this.config.time, { x : this.config.distance },{onUpdate:(target)=>{
+                    this.prevPosition.set(this.node.position);
                     this.node.setPosition(target as Vec3);
-                },onStart:(target)=>{
-                    this.prevPosition.set(target as Vec3);
                 }})
                 .repeatForever()
                 .start();
@@ -450,9 +443,8 @@ export class TankBettleTankEnemy extends TankBettleTank {
             this.curPosition.set(this.node.position);
             tween().target(this.curPosition)
                 .by(this.config.time, { x: -this.config.distance },{onUpdate:(target)=>{
+                    this.prevPosition.set(this.node.position);
                     this.node.setPosition(target as Vec3);
-                },onStart:(target)=>{
-                    this.prevPosition.set(target as Vec3);
                 }})
                 .repeatForever()
                 .start();
