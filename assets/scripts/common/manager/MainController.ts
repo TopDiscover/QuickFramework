@@ -42,16 +42,13 @@ export default class MainController extends Component {
 
         let show = find("show", this.node);
         if (show) {
+            show.zIndex = 9999;
             //调试按钮事件注册
             let showUI = find("showUI", show);
             let showNode = find("showNode", show);
             let showRes = find("showRes", show);
             let showComp = find("showComponent", show);
             if (showUI && showNode && showRes && showComp) {
-                showUI.setSiblingIndex(9999);
-                showNode.setSiblingIndex(9999);
-                showRes.setSiblingIndex(9999);
-                showComp.setSiblingIndex(9999);
                 let isShow = false;
                 if (Config.isShowDebugButton) {
                     isShow = true;

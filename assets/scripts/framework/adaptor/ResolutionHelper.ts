@@ -2,7 +2,7 @@
 import { EventApi } from "../event/EventApi";
 import { Manager } from "../Framework";
 import { getSingleton } from "../base/Singleton";
-import { Canvas, director, log, Node, size, Size, sys, UITransform, updateAlignment, view } from "cc";
+import { Canvas, log, Node, size, Size, sys, UITransform, view, widgetManager } from "cc";
 import { DEBUG, EDITOR, JSB, PREVIEW } from "cc/env";
 
 type DeviceDirection = "" | "Landscape" | "Portrait";
@@ -59,8 +59,7 @@ export class ResolutionHelper {
         if (node && me.isNeedAdapt) {
             let trans = node.getComponent(UITransform)
             trans?.setContentSize(view.getVisibleSize());
-            //这里可能父节点还没有，就不管了，按当前节点大小，把子节点做布局
-            me.updateAlignment(node);
+            widgetManager.updateAlignment(node);
         }
     }
 
@@ -72,18 +71,6 @@ export class ResolutionHelper {
         }
         return false;
     }
-
-    private updateAlignment(node: Node) {
-        let me = instance();
-        let ch = node.children;
-        for (let i = 0; i < ch.length; i++) {
-            let child = ch[i];
-            updateAlignment(child);
-            me.updateAlignment(child);
-        }
-    }
-
-
 
     public onLoad(node: Node) {
         let me = instance();

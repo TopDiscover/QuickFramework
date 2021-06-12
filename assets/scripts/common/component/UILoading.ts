@@ -58,8 +58,7 @@ export default class UILoading extends UILoadingDelegate {
         if (finish) {
             Manager.resolutionHelper.fullScreenAdapt(this._node);
             this._node.removeFromParent();
-            this._node.parent = Manager.uiManager.getCanvas();
-            this._node.setSiblingIndex(ViewZOrder.UILoading);
+            Manager.uiManager.addChild(this._node,ViewZOrder.UILoading);
             this._node.position = Vec3.ZERO;
             this.content = find("content", this._node) as Node;
             Tween.stopAllByTarget(this.content);

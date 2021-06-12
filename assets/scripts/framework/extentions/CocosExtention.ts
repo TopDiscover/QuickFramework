@@ -1,5 +1,5 @@
 import WebEditBoxImpl from "./WebEditBoxImpl";
-import { ResourceType, ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY, BUNDLE_REMOTE } from "../base/Defines";
+import { ResourceType, ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY, BUNDLE_REMOTE, BUNDLE_TYPE } from "../base/Defines";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
@@ -7,8 +7,9 @@ import {
 } from "./Utils";
 import { EventApi } from "../event/EventApi";
 import { Manager } from "../Framework";
-import { isValid, SpriteFrame, sp, Font, ParticleSystem2D, ParticleAsset, sys, EditBox, Sprite,Node, Button, Label, randomRange} from "cc";
+import { isValid, SpriteFrame, sp, Font, ParticleSystem2D, ParticleAsset, sys, EditBox, Sprite,Node, Button, Label, randomRange, Asset, AssetManager} from "cc";
 import { DEBUG, EDITOR, PREVIEW } from "cc/env";
+import UIView from "../ui/UIView";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
 if (typeof Reflect == "object") {
@@ -20,6 +21,23 @@ if (typeof Reflect == "object") {
 } else {
     Node.prototype.userData = null;
 }
+
+Reflect.defineProperty(Node.prototype, "zIndex", {
+    get: function () {
+        let self : any = this;
+        if( typeof self._zIndex =="number"){
+            return self._zIndex;
+        }
+        else{
+            self._zIndex = 0;
+            return self._zIndex;
+        }
+    },
+    set: function (v) {
+        let self: any = this;
+        self._zIndex = v;
+    }
+});
 
 /**
  * @description 从网络加载图片，推荐使用第二种方式
@@ -107,52 +125,6 @@ prototype.loadImage = function (config: any) {
             }
         });
     }
-}
-
-let _window:any = window;
-let _cc = _window["cc"];
-/**@description 通过预置体路径创建节点 
- * @param config 配置信息
- * @param config.url 预置体路径
- * @param config.view 预置视图资源管理器，继承自UIView
- * @param config.completeCallback 创建完成回调 
- * @example 
- * cc.createPrefab({url :GAME_RES("res/animations/shzDealerCommon"),view:this,completeCallback:(node)=>{
- *     if ( node ){
- *         // to do 
- *     }
- * }});
- */
- _cc.createPrefab = function (config: any) {
-    createNodeWithPrefab(config);
-}
-
-/**
- * @description 扩展一个在界面中加载指定目录的接口
- * @param config 配置信息
- * @param config.url 资源路径
- * @param config.view 资源持有者,继承自UIView
- * @param config.onComplete 加载完成回调 data为ResourceCacheData，用之前先判断当前返回的data.data是否是数组
- * @param config.onProgress 加载进度
- * @param config.bundle 可不填，默认为view指向的bundle
- * @param config.type 加载的资源类型
- * */
- _cc.loadDir = function (config:any) {
-    _loadDirRes(config)
-}
-
-/**
- * @description 扩展一个在界面加载指定资源接口
- * @param config 配置信息
- * @param config.bundle 可不填，默认为view指向的bundle
- * @param config.url 资源路径
- * @param config.type 加载的资源类型
- * @param config.onProgress 加载进度
- * @param config.onComplete 加载完成回调 data为ResourceCacheData
- * @param config.view 资源持有者,继承自UIView
- */
- _cc.load = function (config:any) {
-    _loadRes(config);
 }
 
 /**
@@ -246,37 +218,6 @@ prototype.forceDoLayout = function () {
     }
 }
 
-/**
- * @description 加载特效文件 view 为null时，加载之前不会释
- * @example
- * let node = new cc.Node();
- * let par = node.addComponent(cc.ParticleSystem);
- * par.loadFile({url:GAME_RES( "res/action/DDZ_win_lizi" ),view:null});
- * this.node.addChild(node);
- */
-prototype = ParticleSystem2D.prototype;
-prototype.loadFile = function (config: any) {
-    let me = this;
-    let url = config.url;
-    let bundle = getBundle(config);
-    Manager.cacheManager.getCacheByAsync(url, ParticleAsset, bundle).then((data) => {
-        setParticleSystemFile(me, config, data);
-    });
-}
-
-
-if (!EDITOR) {
-
-    //对引擎输入框进行修改 ,原始引擎版本2.1.2
-    if (Manager.resolutionHelper.isBrowser && !PREVIEW && sys.os != sys.OS_WINDOWS) {
-        if (DEBUG) log(`浏览器`);
-        (<any>EditBox)._ImplClass = WebEditBoxImpl;
-    }
-}
-
-export function CocosExtentionInit() {
-    //cc.log("CocosExtentionInit");
-}
 
 Reflect.defineProperty(Label.prototype, "language", {
     get: function () {
@@ -343,4 +284,162 @@ if (!EDITOR && ENABLE_CHANGE_LANGUAGE) {
         __label_onLoad__ && __label_onLoad__.call(this);
     }
 
+}
+
+
+/**
+ * @description 加载特效文件 view 为null时，加载之前不会释
+ * @example
+ * let node = new cc.Node();
+ * let par = node.addComponent(cc.ParticleSystem);
+ * par.loadFile({url:GAME_RES( "res/action/DDZ_win_lizi" ),view:null});
+ * this.node.addChild(node);
+ */
+prototype = ParticleSystem2D.prototype;
+prototype.loadFile = function (config: any) {
+    let me = this;
+    let url = config.url;
+    let bundle = getBundle(config);
+    Manager.cacheManager.getCacheByAsync(url, ParticleAsset, bundle).then((data) => {
+        setParticleSystemFile(me, config, data);
+    });
+}
+
+
+
+
+if (!EDITOR) {
+
+    //对引擎输入框进行修改 ,原始引擎版本2.1.2
+    if (Manager.resolutionHelper.isBrowser && !PREVIEW && sys.os != sys.OS_WINDOWS) {
+        if (DEBUG) log(`浏览器`);
+        (<any>EditBox)._ImplClass = WebEditBoxImpl;
+    }
+}
+
+//全局函数扩展
+
+
+let _window:any = window;
+let _cc = _window["cc"];
+/**@description 通过预置体路径创建节点 
+ * @param config 配置信息
+ * @param config.url 预置体路径
+ * @param config.view 预置视图资源管理器，继承自UIView
+ * @param config.completeCallback 创建完成回调 
+ * @example 
+ * cc.createPrefab({url :GAME_RES("res/animations/shzDealerCommon"),view:this,completeCallback:(node)=>{
+ *     if ( node ){
+ *         // to do 
+ *     }
+ * }});
+ */
+_cc.createPrefab = function (config: any) {
+    createNodeWithPrefab(config);
+}
+/**@description 通过预置体路径创建节点 请使用全局的导入
+ 	 * @param config 配置信息
+ 	 * @param config.url 预置体路径
+	 * @param config.view 预置视图资源管理器，继承自UIView
+	 * @param config.completeCallback 创建完成回调 
+	 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
+	 * @example 
+	 * createPrefab({url :GAME_RES("res/animations/shzDealerCommon"),view:this,completeCallback:(node)=>{
+	 *     if ( node ){
+	 *         // to do 
+	 *     }
+	 * }});
+	 */
+export function createPrefab(config: { 
+    url: string, 
+    view: UIView, 
+    completeCallback: (node: Node) => void ,
+    bundle?:BUNDLE_TYPE}):void{
+    _cc.createPrefab(config);
+}
+
+/**
+ * @description 扩展一个在界面中加载指定目录的接口
+ * @param config 配置信息
+ * @param config.url 资源路径
+ * @param config.view 资源持有者,继承自UIView
+ * @param config.onComplete 加载完成回调 data为ResourceCacheData，用之前先判断当前返回的data.data是否是数组
+ * @param config.onProgress 加载进度
+ * @param config.bundle 可不填，默认为view指向的bundle
+ * @param config.type 加载的资源类型
+ * */
+ _cc.loadDirRes = function (config:any) {
+    _loadDirRes(config)
+}
+/**
+* @description 扩展一个在界面中加载指定目录的接口 请使用全局的导入
+* @param config 配置信息
+* @param config.url 资源路径
+* @param config.view 资源持有者,继承自UIView
+* @param config.onComplete 加载完成回调 data为ResourceCacheData，用之前先判断当前返回的data.data是否是数组
+* @param config.onProgress 加载进度
+* @param config.bundle 可不填，默认为view指向的bundle
+* @param config.type 加载的资源类型
+* */
+export function loadDirRes( config:{ 
+    bundle?:BUNDLE_TYPE,
+    url : string , 
+    type : typeof Asset, 
+    view : any, 
+    onProgress?:(finish:number,total:number,item:AssetManager.RequestItem) => void , 
+    onComplete:(data:any)=>void
+    }):void{
+    _cc.loadDirRes(config);  
+}
+
+/**
+ * @description 扩展一个在界面加载指定资源接口
+ * @param config 配置信息
+ * @param config.bundle 可不填，默认为view指向的bundle
+ * @param config.url 资源路径
+ * @param config.type 加载的资源类型
+ * @param config.onProgress 加载进度
+ * @param config.onComplete 加载完成回调 data为ResourceCacheData
+ * @param config.view 资源持有者,继承自UIView
+ */
+_cc.loadRes = function (config:any) {
+    _loadRes(config);
+}
+/**
+* @description 扩展一个在界面加载指定资源接口 请使用全局的导入
+* @param config 配置信息
+* @param config.bundle 可不填，默认为view指向的bundle
+* @param config.url 资源路径
+* @param config.type 加载的资源类型
+* @param config.onProgress 加载进度
+* @param config.onComplete 加载完成回调 data为ResourceCacheData
+* @param config.view 资源持有者,继承自UIView
+*/
+export function loadRes( config:{
+    bundle?: BUNDLE_TYPE,
+    url: string,
+    type: typeof Asset,
+    onProgress?: (finish: number, total: number, item: AssetManager.RequestItem) => void,
+    onComplete: (data:any) => void,
+    view : any
+ }):void{
+    _cc.loadRes(config);
+ }
+
+ /**@description 临时的替换方案，效率太底 */
+_cc.updateZIndex = function (node : Node) {
+    if( node.children.length > 1 ){
+        node.children.sort((a,b)=>{
+            return a.zIndex - b.zIndex;
+        });
+        node._updateSiblingIndex();
+    }
+}
+ /**@description 临时的替换方案，效率太底 */
+export function updateZIndex( node : Node ){
+    _cc.updateZIndex(node);
+}
+
+export function CocosExtentionInit() {
+    //cc.log("CocosExtentionInit");
 }

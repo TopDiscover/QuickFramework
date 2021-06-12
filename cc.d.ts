@@ -50462,67 +50462,10 @@ declare module "cc" {
 	export interface Node {
 		/**@description 用户自定义数据 */
 		userData: any;
+        zIndex:number;
 	}
 
 	export type BUNDLE_TYPE = string | AssetManager.Bundle;
-
-	/**@description 通过预置体路径创建节点 
- 	 * @param config 配置信息
- 	 * @param config.url 预置体路径
-	 * @param config.view 预置视图资源管理器，继承自UIView
-	 * @param config.completeCallback 创建完成回调 
-	 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
-	 * @example 
-	 * cc.createPrefab({url :GAME_RES("res/animations/shzDealerCommon"),view:this,completeCallback:(node)=>{
-	 *     if ( node ){
-	 *         // to do 
-	 *     }
-	 * }});
-	 */
-	 export function createPrefab(
-		 config: { 
-			 url: string, 
-			 view: any, 
-			 completeCallback: (node: Node) => void ,
-			 bundle?:BUNDLE_TYPE}):void;
-	
-	/**
-	 * @description 扩展一个在界面中加载指定目录的接口
-	 * @param config 配置信息
-	 * @param config.url 资源路径
-	 * @param config.view 资源持有者,继承自UIView
-	 * @param config.onComplete 加载完成回调 data为ResourceCacheData，用之前先判断当前返回的data.data是否是数组
-	 * @param config.onProgress 加载进度
-	 * @param config.bundle 可不填，默认为view指向的bundle
-	 * @param config.type 加载的资源类型
-	 * */
-	 export function loadDirRes( config:{ 
-		bundle?:BUNDLE_TYPE,
-		url : string , 
-		type : typeof Asset, 
-		view : any, 
-		onProgress?:(finish:number,total:number,item:AssetManager.RequestItem) => void , 
-		onComplete:(data:any)=>void
-		}):void;
-
-	/**
-	 * @description 扩展一个在界面加载指定资源接口
-	 * @param config 配置信息
-	 * @param config.bundle 可不填，默认为view指向的bundle
-	 * @param config.url 资源路径
-	 * @param config.type 加载的资源类型
-	 * @param config.onProgress 加载进度
-	 * @param config.onComplete 加载完成回调 data为ResourceCacheData
-	 * @param config.view 资源持有者,继承自UIView
-	 */
-	 export function loadRes( config:{
-		bundle?: BUNDLE_TYPE,
-        url: string,
-        type: typeof Asset,
-        onProgress?: (finish: number, total: number, item: AssetManager.RequestItem) => void,
-        onComplete: (data:any) => void,
-		view : any
-	}):void;
 
 	export interface Sprite {
         /**
@@ -50642,14 +50585,6 @@ declare module "cc" {
 		language : (string | number )[] | string ;
 	}
 
-
-	/**
- 	 * @description 强制节点在当前帧进行一次布局 
- 	 * @example
-	 * cc.updateAlignment(this.node);
-	 * */
-	export function updateAlignment(node: Node): void;
-
 	export interface ParticleSystem2D {
 
 		/**
@@ -50717,5 +50652,66 @@ declare module "cc" {
 				bundle?:BUNDLE_TYPE}):void;
 		}
 	}
-}
 
+
+//以下是对全局的扩展声明
+
+/**@description 通过预置体路径创建节点 请使用全局的导入
+ 	 * @param config 配置信息
+ 	 * @param config.url 预置体路径
+	 * @param config.view 预置视图资源管理器，继承自UIView
+	 * @param config.completeCallback 创建完成回调 
+	 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
+	 * @example 
+	 * createPrefab({url :GAME_RES("res/animations/shzDealerCommon"),view:this,completeCallback:(node)=>{
+	 *     if ( node ){
+	 *         // to do 
+	 *     }
+	 * }});
+	 */
+ export function createPrefab(
+    config: { 
+        url: string, 
+        view: any, 
+        completeCallback: (node: Node) => void ,
+        bundle?:BUNDLE_TYPE}):void;
+
+/**
+* @description 扩展一个在界面中加载指定目录的接口 请使用全局的导入
+* @param config 配置信息
+* @param config.url 资源路径
+* @param config.view 资源持有者,继承自UIView
+* @param config.onComplete 加载完成回调 data为ResourceCacheData，用之前先判断当前返回的data.data是否是数组
+* @param config.onProgress 加载进度
+* @param config.bundle 可不填，默认为view指向的bundle
+* @param config.type 加载的资源类型
+* */
+export function loadDirRes( config:{ 
+   bundle?:BUNDLE_TYPE,
+   url : string , 
+   type : typeof Asset, 
+   view : any, 
+   onProgress?:(finish:number,total:number,item:AssetManager.RequestItem) => void , 
+   onComplete:(data:any)=>void
+   }):void;
+
+/**
+* @description 扩展一个在界面加载指定资源接口 请使用全局的导入
+* @param config 配置信息
+* @param config.bundle 可不填，默认为view指向的bundle
+* @param config.url 资源路径
+* @param config.type 加载的资源类型
+* @param config.onProgress 加载进度
+* @param config.onComplete 加载完成回调 data为ResourceCacheData
+* @param config.view 资源持有者,继承自UIView
+*/
+export function loadRes( config:{
+   bundle?: BUNDLE_TYPE,
+   url: string,
+   type: typeof Asset,
+   onProgress?: (finish: number, total: number, item: AssetManager.RequestItem) => void,
+   onComplete: (data:any) => void,
+   view : any
+}):void;
+
+}

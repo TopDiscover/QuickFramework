@@ -371,12 +371,8 @@ export default class Alert {
                 this.curPanel = instantiate(this.prefab);
                 Manager.resolutionHelper.fullScreenAdapt(this.curPanel);
                 let dialog = this.curPanel.addComponent(AlertDialog);
-                let canvas = Manager.uiManager.getCanvas();
-                if (canvas) {
-                    this.curPanel.parent = canvas;
-                    this.curPanel.setSiblingIndex(ViewZOrder.Alert);
-                    dialog.show(config);
-                }
+                Manager.uiManager.addChild(this.curPanel,ViewZOrder.Alert);
+                dialog.show(config);
             }
         }
     }

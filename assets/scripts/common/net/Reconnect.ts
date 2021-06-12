@@ -86,8 +86,7 @@ import { ViewZOrder } from "../config/ViewZOrder";
              Manager.resolutionHelper.fullScreenAdapt(this.node);
              this.node.name = "Reconnect";
              this.node.removeFromParent();
-             this.node.parent = Manager.uiManager.getCanvas();
-             this.node.setSiblingIndex(ViewZOrder.Loading);
+             Manager.uiManager.addChild(this.node,ViewZOrder.Loading);
              this.node.setPosition(new Vec3(0,0,0));
              if (this.isWaitingHide) {
                  this.isWaitingHide = false;
