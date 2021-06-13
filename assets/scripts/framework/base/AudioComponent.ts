@@ -2,7 +2,7 @@ import UIView from "../ui/UIView";
 import { ResourceInfo, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
 import { Manager } from "../Framework";
 import EventComponent from "./EventComponent";
-import { AudioClip, AudioSource, tween, _decorator } from "cc";
+import { AudioClip, AudioSource, Tween, tween, Vec2, _decorator } from "cc";
 import { DEBUG } from "cc/env";
 
 /**
@@ -15,6 +15,7 @@ export class AudioInfo {
     bundle: BUNDLE_TYPE = BUNDLE_RESOURCES;
     source: AudioSource | null = null;
     owner: UIView | null = null;
+    action = new Vec2();
 
     play(): void {
         if (this.source) {
@@ -106,11 +107,13 @@ class AudioData {
     public remove(owner: UIView | null) {
         this.musicInfos.forEach((info, key, source) => {
             if (info.owner && info.owner == owner) {
+                Tween.stopAllByTarget(info.action);
                 source.delete(key);
             }
         });
         this.effectInfos.forEach((info, key, source) => {
             if (info.owner && info.owner == owner) {
+                Tween.stopAllByTarget(info.action);
                 source.delete(key);
             }
         })
@@ -276,13 +279,8 @@ export default class AudioComponent extends EventComponent {
                         audioInfo.source.clip = data;
                         audioInfo.source.loop = loop;
                         //如果当前音乐是开的，才播放
-                        if (this.isMusicOn) {
-                            tween(this.audioData).delay(0.1).call(() => {
-                                audioInfo?.play();
-                            }).start();
-                        }
+                        this.play(audioInfo,true,resolve);
                     }
-                    resolve(true);
                 } else {
                     resolve(false);
                 }
@@ -327,16 +325,35 @@ export default class AudioComponent extends EventComponent {
                     if (audioInfo && audioInfo.source) {
                         audioInfo.source.clip = data;
                         audioInfo.source.loop = loop;
-                        if (this.isEffectOn) {
-                            audioInfo.play();
-                        }
+                        this.play(audioInfo,false,resolve);
                     }
-                    resolve(true);
                 } else {
                     resolve(false);
                 }
             });
         });
+    }
+
+    protected play( info : AudioInfo , isMusic : boolean , resolve : (isSuccess : boolean)=>void){
+        if( info && info.source ){
+            if( isMusic ){
+                if( this.isMusicOn ){
+                    info.source.play();
+                    resolve(true)
+                }else{
+                    resolve(false);
+                }
+            }else{
+                if( this.isEffectOn ){
+                    info.source.play();
+                    resolve(true);
+                }else{
+                    resolve(false);
+                }
+            }
+        }else{
+            resolve(false);
+        }
     }
 
     public onEnterBackground() {

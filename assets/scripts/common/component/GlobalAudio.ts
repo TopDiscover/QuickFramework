@@ -48,9 +48,8 @@ export default class GlobalAudio extends AudioComponent {
                     if (audioInfo && audioInfo.source) {
                         audioInfo.source.clip = data;
                         audioInfo.source.loop = loop;
-                        if (this.isMusicOn) audioInfo.play();
+                        this.play(audioInfo,true,resolve);
                     }
-                    resolve(true);
                 } else {
                     resolve(false);
                 }
@@ -83,9 +82,8 @@ export default class GlobalAudio extends AudioComponent {
                     if (audioInfo && audioInfo.source) {
                         audioInfo.source.clip = data;
                         audioInfo.source.loop = loop;
-                        if (this.isEffectOn) audioInfo.play();
+                        this.play(audioInfo,false,resolve);
                     }
-                    resolve(true);
                 } else {
                     resolve(false);
                 }
