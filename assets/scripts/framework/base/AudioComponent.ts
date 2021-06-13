@@ -35,7 +35,7 @@ export class AudioInfo {
     }
 
     resume() {
-        if( this.source && this.source.currentTime < this.source.duration ){
+        if (this.source && this.source.currentTime < this.source.duration) {
             this.source.play();
         }
     }
@@ -103,38 +103,38 @@ class AudioData {
         }
     }
 
-    public remove( owner : UIView | null ){
-        this.musicInfos.forEach((info,key,source)=>{
-            if( info.owner && info.owner == owner ){
+    public remove(owner: UIView | null) {
+        this.musicInfos.forEach((info, key, source) => {
+            if (info.owner && info.owner == owner) {
                 source.delete(key);
             }
         });
-        this.effectInfos.forEach((info,key,source)=>{
-            if( info.owner && info.owner == owner ){
+        this.effectInfos.forEach((info, key, source) => {
+            if (info.owner && info.owner == owner) {
                 source.delete(key);
             }
         })
-    } 
+    }
 
-    public setMusicVolume( volume : number ){
-        this.musicInfos.forEach((info,key,source)=>{
+    public setMusicVolume(volume: number) {
+        this.musicInfos.forEach((info, key, source) => {
             info.volume = volume;
         });
     }
 
-    public setEffectVolume( volume : number ){
-        this.effectInfos.forEach((info,key,source)=>{
+    public setEffectVolume(volume: number) {
+        this.effectInfos.forEach((info, key, source) => {
             info.volume = volume;
         });
     }
 
-    public setMusicStatus( isOn : boolean ){
-        if( this.isMusicOn == isOn ){
+    public setMusicStatus(isOn: boolean) {
+        if (this.isMusicOn == isOn) {
             return;
         }
         this.isMusicOn = isOn;
         this.save();
-        if ( isOn ) {
+        if (isOn) {
             if (this.curMusic) {
                 this.curMusic.play();
             }
@@ -143,8 +143,8 @@ class AudioData {
         }
     }
 
-    public setEffectStatus( isOn : boolean ){
-        if( this.isEffectOn = isOn ){
+    public setEffectStatus(isOn: boolean) {
+        if (this.isEffectOn = isOn) {
             return;
         }
         this.isEffectOn = isOn;
@@ -154,14 +154,14 @@ class AudioData {
         }
     }
 
-    public stopAllEffects(){
-        this.effectInfos.forEach((info,key,source)=>{
+    public stopAllEffects() {
+        this.effectInfos.forEach((info, key, source) => {
             info.stop();
         });
     }
 
-    public stopMusic( ){
-        this.musicInfos.forEach((info,key,source)=>{
+    public stopMusic() {
+        this.musicInfos.forEach((info, key, source) => {
             info.stop();
         });
     }
@@ -178,20 +178,20 @@ class AudioData {
         }
     }
 
-    public resumeAll(){
-        this.musicInfos.forEach((info,key,source)=>{
+    public resumeAll() {
+        this.musicInfos.forEach((info, key, source) => {
             info.resume();
         });
-        this.effectInfos.forEach((info,key,source)=>{
+        this.effectInfos.forEach((info, key, source) => {
             info.resume();
         });
     }
 
-    public pauseAll(){
-        this.musicInfos.forEach((info,key,source)=>{
+    public pauseAll() {
+        this.musicInfos.forEach((info, key, source) => {
             info.pause();
         });
-        this.effectInfos.forEach((info,key,source)=>{
+        this.effectInfos.forEach((info, key, source) => {
             info.pause();
         });
     }
@@ -213,26 +213,26 @@ export default class AudioComponent extends EventComponent {
 
     /**@description 背景音乐音量 */
     public get musicVolume() { return this.audioData.musicVolume; }
-    public set musicVolume(volume) { this.audioData.setMusicVolume(volume);}
+    public set musicVolume(volume) { this.audioData.setMusicVolume(volume); }
     /**@description 音效音量 */
     public get effectVolume() { return this.audioData.effectVolume; }
-    public set effectVolume(volume) { this.audioData.setEffectVolume(volume);}
+    public set effectVolume(volume) { this.audioData.setEffectVolume(volume); }
 
     /**@description 音效开关 */
     public get isEffectOn() { return this.audioData.isEffectOn; }
-    public set isEffectOn(value) { this.audioData.setEffectStatus(value);}
+    public set isEffectOn(value) { this.audioData.setEffectStatus(value); }
 
     /**@description 背景音乐开关 */
     public get isMusicOn() { return this.audioData.isMusicOn; }
     /**@description 设置背景音乐开关 */
-    public set isMusicOn(isOn: boolean) { this.audioData.setMusicStatus(isOn);}
+    public set isMusicOn(isOn: boolean) { this.audioData.setMusicStatus(isOn); }
 
     /**@description 停止 */
-    public stopEffect(url: string, bundle: BUNDLE_TYPE) {this.audioData.stopEffect(url,bundle);}
+    public stopEffect(url: string, bundle: BUNDLE_TYPE) { this.audioData.stopEffect(url, bundle); }
 
-    public stopAllEffects() {this.audioData.stopAllEffects();}
+    public stopAllEffects() { this.audioData.stopAllEffects(); }
 
-    public stopMusic() {this.audioData.stopMusic();}
+    public stopMusic() { this.audioData.stopMusic(); }
 
     public playMusic(url: string, bundle: BUNDLE_TYPE, loop: boolean = true) {
         return new Promise<boolean>((resolve) => {
@@ -243,53 +243,51 @@ export default class AudioComponent extends EventComponent {
                     return;
                 }
             }
-            if (this.audioData.isMusicOn) {
-                let key = this.audioData.makeKey(url, bundle);
-                let audioInfo = this.audioData.musicInfos.get(key);
-                if (!audioInfo) {
-                    audioInfo = new AudioInfo;
-                    audioInfo.url = url;
-                    audioInfo.bundle = bundle;
-                    audioInfo.source = this.node.addComponent(AudioSource);
-                    audioInfo.owner = this.owner;
-                    audioInfo.source.name = key;
-                    audioInfo.source.playOnAwake = true;
-                    this.audioData.musicInfos.set(key, audioInfo);
-                }
-                this.audioData.curMusic = audioInfo;
-                Manager.cacheManager.getCacheByAsync(url, AudioClip, bundle).then((data) => {
-                    if (data) {
-                        let info = new ResourceInfo;
-                        info.url = url;
-                        info.type = AudioClip;
-                        info.data = data;
-                        info.bundle = bundle;
-                        if (this.owner) {
-                            Manager.uiManager.addLocal(info, this.owner.className);
-                        } else {
-                            Manager.uiManager.garbage.addLocal(info);
-                        }
-                        //停掉当前播放音乐
-                        this.stopMusic();
-                        //播放新的背景音乐
-                        if (audioInfo && audioInfo.source) {
-                            audioInfo.source.clip = data;
-                            audioInfo.source.loop = loop;
-                            //如果当前音乐是开的，才播放
-                            if( this.isMusicOn ){
-                                tween(this.audioData).delay(0.1).call(()=>{
-                                    audioInfo?.play();
-                                }).start();
-                            }
-                        }
-                        resolve(true);
-                    } else {
-                        resolve(false);
-                    }
-                });
-            }
-        });
 
+            let key = this.audioData.makeKey(url, bundle);
+            let audioInfo = this.audioData.musicInfos.get(key);
+            if (!audioInfo) {
+                audioInfo = new AudioInfo;
+                audioInfo.url = url;
+                audioInfo.bundle = bundle;
+                audioInfo.source = this.node.addComponent(AudioSource);
+                audioInfo.owner = this.owner;
+                audioInfo.source.name = key;
+                audioInfo.source.playOnAwake = true;
+                this.audioData.musicInfos.set(key, audioInfo);
+            }
+            this.audioData.curMusic = audioInfo;
+            Manager.cacheManager.getCacheByAsync(url, AudioClip, bundle).then((data) => {
+                if (data) {
+                    let info = new ResourceInfo;
+                    info.url = url;
+                    info.type = AudioClip;
+                    info.data = data;
+                    info.bundle = bundle;
+                    if (this.owner) {
+                        Manager.uiManager.addLocal(info, this.owner.className);
+                    } else {
+                        Manager.uiManager.garbage.addLocal(info);
+                    }
+                    //停掉当前播放音乐
+                    this.stopMusic();
+                    //播放新的背景音乐
+                    if (audioInfo && audioInfo.source) {
+                        audioInfo.source.clip = data;
+                        audioInfo.source.loop = loop;
+                        //如果当前音乐是开的，才播放
+                        if (this.isMusicOn) {
+                            tween(this.audioData).delay(0.1).call(() => {
+                                audioInfo?.play();
+                            }).start();
+                        }
+                    }
+                    resolve(true);
+                } else {
+                    resolve(false);
+                }
+            });
+        });
     }
 
     public playEffect(url: string, bundle: BUNDLE_TYPE, loop: boolean = false) {
@@ -301,47 +299,43 @@ export default class AudioComponent extends EventComponent {
                     return;
                 }
             }
-            if (this.audioData.isEffectOn) {
-                //检查是否已经加载过
-                let key = this.audioData.makeKey(url, bundle);
-                let audioInfo = this.audioData.effectInfos.get(key);
-                if (!audioInfo) {
-                    audioInfo = new AudioInfo();
-                    audioInfo.url = url;
-                    audioInfo.bundle = bundle;
-                    audioInfo.source = this.node.addComponent(AudioSource);
-                    audioInfo.owner = this.owner;
-                    audioInfo.source.name = key;
-                    audioInfo.source.playOnAwake = true;
-                    this.audioData.effectInfos.set(key, audioInfo);
-                }
-                Manager.cacheManager.getCacheByAsync(url, AudioClip, bundle).then((data) => {
-                    if (data) {
-                        let info = new ResourceInfo;
-                        info.url = url;
-                        info.type = AudioClip;
-                        info.data = data;
-                        info.bundle = bundle;
-                        if (this.owner) {
-                            Manager.uiManager.addLocal(info, this.owner.className);
-                        } else {
-                            Manager.uiManager.garbage.addLocal(info);
-                        }
-                        if (audioInfo && audioInfo.source) {
-                            audioInfo.source.clip = data;
-                            audioInfo.source.loop = loop;
-                            if( this.isEffectOn ){
-                                audioInfo.play();
-                            }
-                        }
-                        resolve(true);
-                    } else {
-                        resolve(false);
-                    }
-                });
-            } else {
-                resolve(false);
+            //检查是否已经加载过
+            let key = this.audioData.makeKey(url, bundle);
+            let audioInfo = this.audioData.effectInfos.get(key);
+            if (!audioInfo) {
+                audioInfo = new AudioInfo();
+                audioInfo.url = url;
+                audioInfo.bundle = bundle;
+                audioInfo.source = this.node.addComponent(AudioSource);
+                audioInfo.owner = this.owner;
+                audioInfo.source.name = key;
+                audioInfo.source.playOnAwake = true;
+                this.audioData.effectInfos.set(key, audioInfo);
             }
+            Manager.cacheManager.getCacheByAsync(url, AudioClip, bundle).then((data) => {
+                if (data) {
+                    let info = new ResourceInfo;
+                    info.url = url;
+                    info.type = AudioClip;
+                    info.data = data;
+                    info.bundle = bundle;
+                    if (this.owner) {
+                        Manager.uiManager.addLocal(info, this.owner.className);
+                    } else {
+                        Manager.uiManager.garbage.addLocal(info);
+                    }
+                    if (audioInfo && audioInfo.source) {
+                        audioInfo.source.clip = data;
+                        audioInfo.source.loop = loop;
+                        if (this.isEffectOn) {
+                            audioInfo.play();
+                        }
+                    }
+                    resolve(true);
+                } else {
+                    resolve(false);
+                }
+            });
         });
     }
 
