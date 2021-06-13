@@ -40,6 +40,12 @@ export default class TankBettleTank extends TankBattleEntity {
     /**@description 死亡动画 */
     protected dieAction = new Vec3();
 
+    onDestroy() {
+        Tween.stopAllByTarget(this.curPosition);
+        Tween.stopAllByTarget(this.dieAction);
+        this.stopAllActions();
+    }
+
     move() {
 
     }
@@ -350,10 +356,6 @@ export class TankBettleTankEnemy extends TankBettleTank {
         this.delayChangeNode = new Node();
         this.node.addChild(this.delayChangeNode);
         this.startDelayChange();
-    }
-
-    onDestroy() {
-        this.stopAllActions();
     }
 
     private startDelayChange() {

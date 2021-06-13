@@ -29,20 +29,19 @@ export default class GlobalAudio extends AudioComponent {
                 resolve(false);
                 return;
             }
-            this.audioData.curMusicUrl = url;
-            this.audioData.curBundle = bundle;
             if (this.audioData.isMusicOn) {
-                let key = this.makeKey(url,bundle);
-                let audioInfo = this.musicInfos.get(key);
+                let key = this.audioData.makeKey(url,bundle);
+                let audioInfo = this.audioData.musicInfos.get(key);
                 if( !audioInfo ){
                     audioInfo = new AudioInfo();
                     audioInfo.url = url;
                     audioInfo.bundle = bundle;
                     audioInfo.source = this.node.addComponent(AudioSource);
-                    audioInfo.source.playOnAwake = false;
+                    audioInfo.source.playOnAwake = true;
                     audioInfo.source.name = key;
-                    this.musicInfos.set(key,audioInfo);
+                    this.audioData.musicInfos.set(key,audioInfo);
                 }
+                this.audioData.curMusic = audioInfo;
                 Manager.cacheManager.getCacheByAsync(url, AudioClip,bundle).then((data) => {
                     if (data) {
                         Manager.assetManager.addPersistAsset(url,data,bundle);
@@ -50,9 +49,8 @@ export default class GlobalAudio extends AudioComponent {
                         if( audioInfo && audioInfo.source ){
                             audioInfo.source.clip = data;
                             audioInfo.source.loop = loop;
-                            audioInfo.play();
+                            if( this.isMusicOn ) audioInfo.play();
                         }
-                        this.isPlaying = true;
                         resolve(true);
                     } else {
                         resolve(false);
@@ -71,15 +69,15 @@ export default class GlobalAudio extends AudioComponent {
                 return;
             }
             if (this.audioData.isEffectOn) {
-                let key = this.makeKey(url,bundle);
-                let audioInfo = this.effectInfos.get(key);
+                let key = this.audioData.makeKey(url,bundle);
+                let audioInfo = this.audioData.effectInfos.get(key);
                 if( !audioInfo ){
                     audioInfo = new AudioInfo;
                     audioInfo.url = url;
                     audioInfo.bundle = bundle;
                     audioInfo.source = this.node.addComponent(AudioSource);
                     audioInfo.source.name = key;
-                    this.effectInfos.set(key,audioInfo);
+                    this.audioData.effectInfos.set(key,audioInfo);
                 }
                 Manager.cacheManager.getCacheByAsync(url, AudioClip,bundle).then((data) => {
                     if (data) {
@@ -87,7 +85,7 @@ export default class GlobalAudio extends AudioComponent {
                         if( audioInfo && audioInfo.source ){
                             audioInfo.source.clip = data;
                             audioInfo.source.loop = loop;
-                            audioInfo.play();
+                            if( this.isEffectOn ) audioInfo.play();
                         }
                         resolve(true);
                     } else {
@@ -98,10 +96,5 @@ export default class GlobalAudio extends AudioComponent {
                 resolve(false);
             }
         });
-    }
-
-    onLoad(){
-        this.effectVolume = this.audioData.effectVolume;
-        this.musicVolume = this.audioData.musicVolume;
     }
 }

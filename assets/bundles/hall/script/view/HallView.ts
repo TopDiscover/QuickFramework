@@ -109,7 +109,7 @@ export default class HallView extends UIView {
         GameService.instance.enabled = false;
         ChatService.instance.enabled = false;
 
-        // this.audioHelper.playMusic("audio/background",this.bundle)
+        this.audioHelper.playMusic("audio/background",this.bundle)
         
         dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
     }

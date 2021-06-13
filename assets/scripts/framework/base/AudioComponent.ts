@@ -2,13 +2,56 @@ import UIView from "../ui/UIView";
 import { ResourceInfo, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
 import { Manager } from "../Framework";
 import EventComponent from "./EventComponent";
-import { AudioClip, AudioSource, _decorator } from "cc";
+import { AudioClip, AudioSource, tween, _decorator } from "cc";
 import { DEBUG } from "cc/env";
 
 /**
  * @description 声音组件
  */
 const { ccclass, property, menu } = _decorator;
+
+export class AudioInfo {
+    url: string = "";
+    bundle: BUNDLE_TYPE = BUNDLE_RESOURCES;
+    source: AudioSource | null = null;
+    owner: UIView | null = null;
+
+    play(): void {
+        if (this.source) {
+            this.source.play();
+        }
+    }
+
+    pause(): void {
+        if (this.source) {
+            this.source.pause();
+        }
+    }
+
+    stop(): void {
+        if (this.source) {
+            this.source.stop();
+        }
+    }
+
+    resume() {
+        if( this.source && this.source.currentTime < this.source.duration ){
+            this.source.play();
+        }
+    }
+
+    set volume(val: number) {
+        if (this.source) {
+            this.source.volume = val;
+        }
+    }
+    get volume(): number {
+        if (this.source) {
+            return this.source.volume;
+        }
+        return 0;
+    }
+}
 
 /**@description 框架内部使用，外部请不要调用 */
 class AudioData {
@@ -24,13 +67,13 @@ class AudioData {
     public effectVolume = 1;
     public isEffectOn = true;
     public isMusicOn = true;
-    public curMusicUrl = "";
-    /**@description 当前背景音乐的Bundle */
-    public curBundle: BUNDLE_TYPE | null = null;
-    /**@description 当前背景音乐是否循环播放 */
-    public curLoop: boolean = true;
-    /**@description 当前背景音乐是否正在播放 */
-    public isPlaying: boolean = false;
+    /**@description 保存所有播放的音乐 */
+    public musicInfos: Map<string, AudioInfo> = new Map();
+    /**@description 保存所有播放的音效 */
+    public effectInfos: Map<string, AudioInfo> = new Map();
+
+    /**@description 当前正在播放的音效 */
+    public curMusic: AudioInfo | null = null;
 
     private readonly _storeMusicKey: string = "default_save_music";
     private readonly _storeEffectKey: string = "default_save_effect";
@@ -59,65 +102,108 @@ class AudioData {
         } catch (error) {
         }
     }
-}
 
-export class AudioInfo{
-    url : string = "";
-    bundle : BUNDLE_TYPE = BUNDLE_RESOURCES;
-    source : AudioSource | null = null;
+    public remove( owner : UIView | null ){
+        this.musicInfos.forEach((info,key,source)=>{
+            if( info.owner && info.owner == owner ){
+                source.delete(key);
+            }
+        });
+        this.effectInfos.forEach((info,key,source)=>{
+            if( info.owner && info.owner == owner ){
+                source.delete(key);
+            }
+        })
+    } 
 
-     play(): void{
-         if( this.source ){
-             this.source.play();
-         }
-     }
-     
-     pause(): void{
-         if( this.source ){
-            this.source.play();
-         }
-     }
-     
-     stop(): void{
-        if( this.source ){
-            this.source.play();
+    public setMusicVolume( volume : number ){
+        this.musicInfos.forEach((info,key,source)=>{
+            info.volume = volume;
+        });
+    }
+
+    public setEffectVolume( volume : number ){
+        this.effectInfos.forEach((info,key,source)=>{
+            info.volume = volume;
+        });
+    }
+
+    public setMusicStatus( isOn : boolean ){
+        if( this.isMusicOn == isOn ){
+            return;
         }
-     }
-
-    set volume(val: number){
-        if( this.source ){
-            this.source.volume = val;
+        this.isMusicOn = isOn;
+        this.save();
+        if ( isOn ) {
+            if (this.curMusic) {
+                this.curMusic.play();
+            }
+        } else {
+            this.stopMusic();
         }
     }
-    get volume(): number{
-        if( this.source ){
-            return this.source.volume;
+
+    public setEffectStatus( isOn : boolean ){
+        if( this.isEffectOn = isOn ){
+            return;
         }
-        return 0;
+        this.isEffectOn = isOn;
+        this.save();
+        if (!isOn) {
+            this.stopAllEffects();
+        }
+    }
+
+    public stopAllEffects(){
+        this.effectInfos.forEach((info,key,source)=>{
+            info.stop();
+        });
+    }
+
+    public stopMusic( ){
+        this.musicInfos.forEach((info,key,source)=>{
+            info.stop();
+        });
+    }
+
+    public makeKey(url: string, bundle: BUNDLE_TYPE) {
+        return `${Manager.assetManager.getBundleName(bundle)}_${url}`;
+    }
+
+    public stopEffect(url: string, bundle: BUNDLE_TYPE) {
+        let key = this.makeKey(url, bundle);
+        let info = this.effectInfos.get(key);
+        if (info) {
+            info.stop();
+        }
+    }
+
+    public resumeAll(){
+        this.musicInfos.forEach((info,key,source)=>{
+            info.resume();
+        });
+        this.effectInfos.forEach((info,key,source)=>{
+            info.resume();
+        });
+    }
+
+    public pauseAll(){
+        this.musicInfos.forEach((info,key,source)=>{
+            info.pause();
+        });
+        this.effectInfos.forEach((info,key,source)=>{
+            info.pause();
+        });
     }
 }
-
-const PLAY_MUSIC = "AudioComponent_PLAY_MUSIC";
 
 @ccclass
 @menu("framework/base/AudioComponent")
 export default class AudioComponent extends EventComponent {
 
-
-    /**@description 保存所有播放的音乐 */
-    protected musicInfos : Map<string,AudioInfo> = new Map();
-    /**@description 保存所有播放的音效 */
-    protected effectInfos : Map<string,AudioInfo> = new Map();
-
-    protected bindingEvents() {
-        super.bindingEvents();
-        this.registerEvent(PLAY_MUSIC, this.onPlayMusic);
-    }
-
-    private onPlayMusic(data: any) {
-        if (this.curPlayMusicUrl == this.curMusicUrl && !this.isPlaying && this.curMusicUrl && this.curBundle) {
-            this.playMusic(this.curMusicUrl, this.curBundle, this.curLoop);
-        }
+    onDestroy() {
+        this.audioData.remove(this.owner);
+        super.onDestroy();
     }
 
     protected audioData = AudioData.instance;
@@ -127,89 +213,26 @@ export default class AudioComponent extends EventComponent {
 
     /**@description 背景音乐音量 */
     public get musicVolume() { return this.audioData.musicVolume; }
-    public set musicVolume(volume) {
-        this._setMusicVolume(volume);
-        if (volume <= 0) {
-            this.stopMusic();
-        }
-        this.audioData.musicVolume = volume;
-    };
+    public set musicVolume(volume) { this.audioData.setMusicVolume(volume);}
     /**@description 音效音量 */
     public get effectVolume() { return this.audioData.effectVolume; }
-    public set effectVolume(volume) {
-        this._setEffectVolume(volume);
-        if (volume <= 0) {
-            this.stopAllEffects();
-        }
-        this.audioData.effectVolume = volume;
-    };
+    public set effectVolume(volume) { this.audioData.setEffectVolume(volume);}
 
     /**@description 音效开关 */
     public get isEffectOn() { return this.audioData.isEffectOn; }
-    public set isEffectOn(value) {
-        this.audioData.isEffectOn = value;
-        this.save();
-        if (!value) {
-            this.stopAllEffects();
-        }
-    };
+    public set isEffectOn(value) { this.audioData.setEffectStatus(value);}
 
     /**@description 背景音乐开关 */
     public get isMusicOn() { return this.audioData.isMusicOn; }
     /**@description 设置背景音乐开关 */
-    public set isMusicOn(isOn: boolean) {
-        this.audioData.isMusicOn = isOn;
-        this.save();
-        if (this.audioData.isMusicOn) {
-            if (!this.curMusicUrl) {
-                return;
-            }
-            //有多个AudioComponent ,通知所有的组件
-            dispatch(PLAY_MUSIC, this);
-        } else {
-            this.stopMusic();
-        }
-    };
-    /**@description 当前播放的背景音乐 */
-    public get curMusicUrl() { return this.audioData.curMusicUrl; }
-    public set curMusicUrl(value) { this.audioData.curMusicUrl = value };
-    public get curBundle() { return this.audioData.curBundle; }
-    public set curBundle(value) { this.audioData.curBundle = value; }
-    protected get curLoop() { return this.audioData.curLoop; }
-    protected set curLoop(value) { this.audioData.curLoop = value };
-    protected get isPlaying() { return this.audioData.isPlaying; }
-    protected set isPlaying(value) { this.audioData.isPlaying = value };
-    /**@description 指向当前组件的播放音乐 */
-    protected curPlayMusicUrl: string | null = null;
-
-    /**@description 存储 */
-    public save() {
-        this.audioData.save();
-    }
+    public set isMusicOn(isOn: boolean) { this.audioData.setMusicStatus(isOn);}
 
     /**@description 停止 */
-    public stopEffect(url : string , bundle : BUNDLE_TYPE) {
-        let key = this.makeKey(url,bundle);
-        let info = this.effectInfos.get(key);
-        if( info ){
-            info.stop();
-        }
-    }
+    public stopEffect(url: string, bundle: BUNDLE_TYPE) {this.audioData.stopEffect(url,bundle);}
 
-    public stopAllEffects() {
-        this.effectInfos.forEach((info,key,source)=>{
-            if( info.source && info.source.clip ){
-                info.source.stop();
-            }
-        });
-    }
+    public stopAllEffects() {this.audioData.stopAllEffects();}
 
-    public stopMusic() {
-        this.musicInfos.forEach((info,key,source)=>{
-            info.stop();
-        });
-        this.isPlaying = false;
-    }
+    public stopMusic() {this.audioData.stopMusic();}
 
     public playMusic(url: string, bundle: BUNDLE_TYPE, loop: boolean = true) {
         return new Promise<boolean>((resolve) => {
@@ -220,21 +243,20 @@ export default class AudioComponent extends EventComponent {
                     return;
                 }
             }
-            this.curPlayMusicUrl = url;
-            this.curMusicUrl = url;
-            this.curBundle = bundle;
-            this.curLoop = loop;
             if (this.audioData.isMusicOn) {
-                let key = this.makeKey(url,bundle);
-                let audioInfo = this.musicInfos.get(key);
-                if( !audioInfo ){
+                let key = this.audioData.makeKey(url, bundle);
+                let audioInfo = this.audioData.musicInfos.get(key);
+                if (!audioInfo) {
                     audioInfo = new AudioInfo;
                     audioInfo.url = url;
                     audioInfo.bundle = bundle;
                     audioInfo.source = this.node.addComponent(AudioSource);
-                    audioInfo.source.playOnAwake = false;
-                    this.musicInfos.set(key,audioInfo);
+                    audioInfo.owner = this.owner;
+                    audioInfo.source.name = key;
+                    audioInfo.source.playOnAwake = true;
+                    this.audioData.musicInfos.set(key, audioInfo);
                 }
+                this.audioData.curMusic = audioInfo;
                 Manager.cacheManager.getCacheByAsync(url, AudioClip, bundle).then((data) => {
                     if (data) {
                         let info = new ResourceInfo;
@@ -250,12 +272,16 @@ export default class AudioComponent extends EventComponent {
                         //停掉当前播放音乐
                         this.stopMusic();
                         //播放新的背景音乐
-                        if( audioInfo && audioInfo.source ){
+                        if (audioInfo && audioInfo.source) {
                             audioInfo.source.clip = data;
                             audioInfo.source.loop = loop;
-                            audioInfo.play();
+                            //如果当前音乐是开的，才播放
+                            if( this.isMusicOn ){
+                                tween(this.audioData).delay(0.1).call(()=>{
+                                    audioInfo?.play();
+                                }).start();
+                            }
                         }
-                        this.isPlaying = true;
                         resolve(true);
                     } else {
                         resolve(false);
@@ -277,15 +303,17 @@ export default class AudioComponent extends EventComponent {
             }
             if (this.audioData.isEffectOn) {
                 //检查是否已经加载过
-                let key = this.makeKey(url,bundle);
-                let audioInfo =this.effectInfos.get(key);
-                if( !audioInfo ){
+                let key = this.audioData.makeKey(url, bundle);
+                let audioInfo = this.audioData.effectInfos.get(key);
+                if (!audioInfo) {
                     audioInfo = new AudioInfo();
                     audioInfo.url = url;
                     audioInfo.bundle = bundle;
                     audioInfo.source = this.node.addComponent(AudioSource);
-                    audioInfo.source.playOnAwake = false;
-                    this.effectInfos.set(key,audioInfo);
+                    audioInfo.owner = this.owner;
+                    audioInfo.source.name = key;
+                    audioInfo.source.playOnAwake = true;
+                    this.audioData.effectInfos.set(key, audioInfo);
                 }
                 Manager.cacheManager.getCacheByAsync(url, AudioClip, bundle).then((data) => {
                     if (data) {
@@ -299,10 +327,12 @@ export default class AudioComponent extends EventComponent {
                         } else {
                             Manager.uiManager.garbage.addLocal(info);
                         }
-                        if( audioInfo && audioInfo.source ){
+                        if (audioInfo && audioInfo.source) {
                             audioInfo.source.clip = data;
                             audioInfo.source.loop = loop;
-                            audioInfo.play();
+                            if( this.isEffectOn ){
+                                audioInfo.play();
+                            }
                         }
                         resolve(true);
                     } else {
@@ -315,49 +345,11 @@ export default class AudioComponent extends EventComponent {
         });
     }
 
-    protected makeKey( url : string , bundle : BUNDLE_TYPE ){
-        return `${Manager.assetManager.getBundleName(bundle)}_${url}`;
-    }
-
     public onEnterBackground() {
-        this._pauseAudios();
+        this.audioData.pauseAll();
     }
 
     public onEnterForgeground(inBackgroundTime: number) {
-        this._resumeAudios();
+        this.audioData.resumeAll();
     }
-
-
-    /**@description 统一设置音乐的声音大小 */
-    protected _setMusicVolume( value : number ){
-        this.musicInfos.forEach((info,key,source)=>{
-            info.volume = value;
-        });
-    }
-
-    /**@description 统一设置音效的声音大小 */
-    private _setEffectVolume( value : number ){
-        this.effectInfos.forEach((info,key,source)=>{
-            info.volume = value;
-        });
-    }
-
-    private _pauseAudios(){
-       this.musicInfos.forEach((info,key,source)=>{
-           info.pause();
-       });
-       this.effectInfos.forEach((info,key,source)=>{
-           info.pause();
-       });
-    }
-
-    private _resumeAudios(){
-        this.musicInfos.forEach((info,key,source)=>{
-            info.play();
-        });
-        this.effectInfos.forEach((info,key,source)=>{
-            info.play();
-        });
-    }
-
 }
