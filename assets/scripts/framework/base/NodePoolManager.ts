@@ -93,14 +93,14 @@ export class NodePoolManager {
         if (!this.pools.has(type)) {
             this.pools.set(type, new NodePool(type));
         }
-        return this.pools.get(type);
+        return this.pools.get(type) as NodePool;
     }
 
     /**
      * @description 删除对象池 
      * @param type 对象池类型
      * */
-    deletePool(type: string | NodePool) {
+    deletePool(type: string | NodePool | null) {
         if (typeof (type) == "string") {
             if (this.pools.has(type)) {
                 let pool = this.pools.get(type);

@@ -34,7 +34,7 @@ export default class NetTestView extends GameView {
 
     private logScorllView: ScrollView = null!;
     private logItem: Node = null!;
-    private connects: Toggle[] = [];
+    private connects: Node[] = [];
     private enabledServices: Toggle[] = [];
     private netTypes: Toggle[] = [];
 
@@ -59,25 +59,33 @@ export default class NetTestView extends GameView {
         this.log(`收到：${hello}`);
     }
 
+    private setConnected( isConnected : boolean , node : Node ){
+        if( node ){
+            let mark = node.getChildByName("checkmark");
+            if( mark ){
+                mark.active = isConnected;
+            }
+        }
+    }
     private onNetClose(service: CommonService) {
         let isConnected = false;
         if (service == LobbyService.instance) {
-            this.connects[NetTest.ServiceType.Lobby].isChecked = isConnected;
+            this.setConnected(isConnected,this.connects[NetTest.ServiceType.Lobby])
         } else if (service == GameService.instance) {
-            this.connects[NetTest.ServiceType.Game].isChecked = isConnected;
+            this.setConnected(isConnected,this.connects[NetTest.ServiceType.Game])
         } else if (service == ChatService.instance) {
-            this.connects[NetTest.ServiceType.Chat].isChecked = isConnected;
+            this.setConnected(isConnected,this.connects[NetTest.ServiceType.Chat])
         }
         this.log(`${service.serviceName} 断开连接!`);
     }
     private onNetConnected(service: CommonService) {
         let isConnected = true;
         if (service == LobbyService.instance) {
-            this.connects[NetTest.ServiceType.Lobby].isChecked = isConnected;
+            this.setConnected(isConnected,this.connects[NetTest.ServiceType.Lobby])
         } else if (service == GameService.instance) {
-            this.connects[NetTest.ServiceType.Game].isChecked = isConnected;
+            this.setConnected(isConnected,this.connects[NetTest.ServiceType.Game])
         } else if (service == ChatService.instance) {
-            this.connects[NetTest.ServiceType.Chat].isChecked = isConnected;
+            this.setConnected(isConnected,this.connects[NetTest.ServiceType.Chat])
         }
         this.log(`${service.serviceName} 连接成功!`);
     }
@@ -109,7 +117,15 @@ export default class NetTestView extends GameView {
         this.initToggleNode(find("reconnet", this.node), this.reconnects);
 
         //连接网络
-        this.initToggleNode(find("connet", this.node), this.connects);
+        let connet = find("connet", this.node);
+        if( connet ){
+            for (let i = 0; i < 3; i++) {
+                let node = find(`type${i}`, connet);
+                if (node) {
+                    this.connects.push(node);
+                }
+            }
+        }
 
         //发送消息
         this.initToggleNode(find("send", this.node), this.sends);
@@ -152,8 +168,8 @@ export default class NetTestView extends GameView {
 
         //连接网络 
         for (let i = 0; i < this.connects.length; i++) {
-            this.connects[i].node.userData = i;
-            this.connects[i].node.on('toggle', this.onConnect, this);
+            this.connects[i].userData = i;
+            this.connects[i].on( Node.EventType.TOUCH_END, this.onConnect, this);
         }
 
         //发送消息
@@ -245,8 +261,8 @@ export default class NetTestView extends GameView {
         this.log(`${service.serviceName} 连接中...`);
         service.connect();
     }
-    private onConnect(toggle: Toggle) {
-        let target: Node = toggle.node;
+    private onConnect(ev: EventTouch) {
+        let target = ev.target as Node;
         if (target.userData == NetTest.ServiceType.Lobby) {
             this._connect(LobbyService.instance);
         } else if (target.userData == NetTest.ServiceType.Game) {
