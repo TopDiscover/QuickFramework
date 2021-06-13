@@ -11,6 +11,50 @@
     {
       "name": "Default",
       "value": 1
+    },
+    {
+      "name": "Wall",
+      "value": 2
+    },
+    {
+      "name": "StoneWall",
+      "value": 4
+    },
+    {
+      "name": "Grass",
+      "value": 8
+    },
+    {
+      "name": "Water",
+      "value": 16
+    },
+    {
+      "name": "Ice",
+      "value": 32
+    },
+    {
+      "name": "Home",
+      "value": 64
+    },
+    {
+      "name": "Bullet",
+      "value": 128
+    },
+    {
+      "name": "Ui",
+      "value": 256
+    },
+    {
+      "name": "Player",
+      "value": 512
+    },
+    {
+      "name": "Boundary",
+      "value": 1024
+    },
+    {
+      "name": "Props",
+      "value": 2048
     }
   ],
   "physics": {

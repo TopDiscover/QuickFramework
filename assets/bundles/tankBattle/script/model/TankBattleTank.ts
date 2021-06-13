@@ -55,10 +55,13 @@ export default class TankBettleTank extends TankBattleEntity {
             //正在发射
             return false;
         } else {
-            let bulletNode = instantiate(this.data.bulletPrefab) as Node;
-            this.bullet = bulletNode.addComponent(TankBettleBullet);
-            this.bullet.move(this);
-
+            let prefab = this.data.bulletPrefab;
+            if( !prefab ) return false;
+            let bulletNode = instantiate(this.data.bulletPrefab);
+            if( bulletNode ){
+                this.bullet = bulletNode.addComponent(TankBettleBullet);
+                this.bullet.move(this);
+            }
             return true;
         }
     }

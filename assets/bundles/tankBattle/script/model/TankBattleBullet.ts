@@ -41,7 +41,11 @@ export default class TankBettleBullet extends TankBattleEntity {
             this.curPosition.set(this.node.position);
             tween().target(this.curPosition)
                 .by(this.owner.config.bulletTime, { y : this.owner.config.bulletDistance},{onUpdate:(target)=>{
-                    this.node.setPosition(target as Vec3);
+                    if( this.node ) {
+                        this.node.setPosition(target as Vec3);
+                    }else{
+                        Tween.stopAllByTarget(this.curPosition);
+                    }
                 }})
                 .repeatForever()
                 .start();
@@ -49,7 +53,11 @@ export default class TankBettleBullet extends TankBattleEntity {
             this.curPosition.set(this.node.position);
             tween().target(this.curPosition)
                 .by(this.owner.config.bulletTime, { y : -this.owner.config.bulletDistance},{onUpdate:(target)=>{
-                    this.node.setPosition(target as Vec3);
+                    if( this.node ) {
+                        this.node.setPosition(target as Vec3);
+                    }else{
+                        Tween.stopAllByTarget(this.curPosition);
+                    }
                 }})
                 .repeatForever()
                 .start();
@@ -57,7 +65,11 @@ export default class TankBettleBullet extends TankBattleEntity {
             this.curPosition.set(this.node.position);
             tween().target(this.curPosition)
                 .by(this.owner.config.bulletTime, { x : this.owner.config.bulletDistance },{onUpdate:(target)=>{
-                    this.node.setPosition(target as Vec3);
+                    if( this.node ) {
+                        this.node.setPosition(target as Vec3);
+                    }else{
+                        Tween.stopAllByTarget(this.curPosition);
+                    }
                 }})
                 .repeatForever()
                 .start();
@@ -65,7 +77,11 @@ export default class TankBettleBullet extends TankBattleEntity {
             this.curPosition.set(this.node.position);
             tween().target(this.curPosition)
                 .by(this.owner.config.bulletTime, { x : -this.owner.config.bulletDistance },{onUpdate:(target)=>{
-                    this.node.setPosition(target as Vec3);
+                    if( this.node ) {
+                        this.node.setPosition(target as Vec3);
+                    }else{
+                        Tween.stopAllByTarget(this.curPosition);
+                    }
                 }})
                 .repeatForever()
                 .start();
