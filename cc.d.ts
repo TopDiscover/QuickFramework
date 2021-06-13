@@ -21652,7 +21652,7 @@ declare module "cc" {
         protected _eulerDirty: boolean;
         protected _poolHandle: renderer.NodeHandle;
         opacity: number;
-        height: number;
+        // height: number;
         constructor(name?: string);
         /**
          * @en Determine whether the given object is a normal Node. Will return false if [[Scene]] given.

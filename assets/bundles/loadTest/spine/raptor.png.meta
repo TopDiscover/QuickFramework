@@ -1,0 +1,74 @@
+{
+  "ver": "1.0.21",
+  "importer": "image",
+  "imported": true,
+  "uuid": "18eab85c-b072-4807-b924-b71937db417c",
+  "files": [
+    ".png",
+    ".json"
+  ],
+  "subMetas": {
+    "6c48a": {
+      "importer": "texture",
+      "uuid": "18eab85c-b072-4807-b924-b71937db417c@6c48a",
+      "displayName": "raptor",
+      "id": "6c48a",
+      "name": "texture",
+      "userData": {
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "wrapModeT": "clamp-to-edge",
+        "wrapModeS": "clamp-to-edge",
+        "mipfilter": "none",
+        "imageUuidOrDatabaseUri": "18eab85c-b072-4807-b924-b71937db417c",
+        "anisotropy": 0,
+        "isUuid": true
+      },
+      "ver": "1.0.21",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "f9941": {
+      "importer": "sprite-frame",
+      "uuid": "18eab85c-b072-4807-b924-b71937db417c@f9941",
+      "displayName": "raptor",
+      "id": "f9941",
+      "name": "spriteFrame",
+      "userData": {
+        "trimType": "auto",
+        "trimThreshold": 1,
+        "rotated": false,
+        "offsetX": 0,
+        "offsetY": 0,
+        "trimX": 2,
+        "trimY": 2,
+        "width": 1020,
+        "height": 1020,
+        "rawWidth": 1024,
+        "rawHeight": 1024,
+        "borderTop": 0,
+        "borderBottom": 0,
+        "borderLeft": 0,
+        "borderRight": 0,
+        "imageUuidOrDatabaseUri": "18eab85c-b072-4807-b924-b71937db417c@6c48a",
+        "packable": true,
+        "isUuid": true,
+        "atlasUuid": ""
+      },
+      "ver": "1.0.9",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "type": "sprite-frame",
+    "hasAlpha": true,
+    "redirect": "18eab85c-b072-4807-b924-b71937db417c@f9941"
+  }
+}

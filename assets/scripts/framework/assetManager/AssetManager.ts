@@ -1,4 +1,4 @@
-import { Asset, assetManager, AssetManager, JsonAsset, TextAsset, Texture2D, sp, SpriteFrame } from "cc";
+import { Asset, assetManager, AssetManager, JsonAsset, TextAsset, Texture2D, sp, SpriteFrame, ImageAsset } from "cc";
 import { DEBUG } from "cc/env";
 import { ResourceCacheData, ResourceCacheStatus, ResourceInfo, BUNDLE_TYPE, ResourceType, BUNDLE_REMOTE } from "../base/Defines";
 import { Manager } from "../Framework";
@@ -61,8 +61,8 @@ class RemoteLoader {
                     cache.info.type = sp.SkeletonData;
                     cache.info.bundle = BUNDLE_REMOTE;
                     Manager.cacheManager.remoteCaches.set(url, cache);
-                    me._loadRemoteRes(spinePng, Texture2D, isNeedCache).then((texture: Texture2D) => {
-                        if (texture) {
+                    me._loadRemoteRes(spinePng, Asset, isNeedCache).then((image: ImageAsset) => {
+                        if (image) {
                             me._loadRemoteRes(spineJson, JsonAsset, isNeedCache).then((json: JsonAsset) => {
                                 if (json) {
                                     me._loadRemoteRes(spineAtlas, JsonAsset, isNeedCache).then((atlas: TextAsset) => {
@@ -71,6 +71,8 @@ class RemoteLoader {
                                             let asset = new sp.SkeletonData;
                                             asset.skeletonJson = json.json;
                                             asset.atlasText = atlas.text;
+                                            let texture = new Texture2D();
+                                            texture.image = image;
                                             asset.textures = [texture];
                                             let pngName = name + ".png"
                                             asset["textureNames"] = [pngName];

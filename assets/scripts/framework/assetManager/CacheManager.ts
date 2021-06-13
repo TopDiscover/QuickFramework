@@ -2,7 +2,7 @@ import { ResourceCacheData, BUNDLE_TYPE, ResourceInfo, BUNDLE_REMOTE, BUNDLE_RES
 import UIView from "../ui/UIView";
 import { Manager } from "../Framework";
 import { DEBUG } from "cc/env";
-import { Asset, assetManager, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D } from "cc";
+import { Asset, assetManager, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D, ImageAsset } from "cc";
 
 class ResourceCache {
     print() {
@@ -127,7 +127,7 @@ class RemoteCaches {
         return null;
     }
     public setSpriteFrame(url: string, data: any): SpriteFrame | null {
-        if (data && data instanceof Texture2D) {
+        if (data && data instanceof ImageAsset) {
             //同一图片加载两次也会回调到这里，这里如果当前精灵缓存中有，不在重新创建
             let spriteFrame = this.getSpriteFrame(url);
             if (spriteFrame) {
@@ -135,7 +135,9 @@ class RemoteCaches {
             }
             let cache = new ResourceCacheData();
             let sp = new SpriteFrame();
-            sp.texture = data;
+            let texture = new Texture2D();
+            texture.image = data
+            sp.texture = texture;
             cache.data = sp;
             cache.isLoaded = true;
             cache.info.url = url;
