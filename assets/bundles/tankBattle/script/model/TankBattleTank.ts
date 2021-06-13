@@ -496,7 +496,8 @@ export class TankBettleTankEnemy extends TankBettleTank {
             // cc.log(`在最左`)
             except = TankBettle.Direction.LEFT;
         }
-        let parentTrans = this.node.parent?.getComponent(UITransform) as UITransform;
+        if( !this.node.parent ) return;
+        let parentTrans = this.node.parent.getComponent(UITransform) as UITransform;
         if (this.node.position.x >= parentTrans.width - trans.width) {
             // cc.log("在最右")
             except = TankBettle.Direction.RIGHT;
