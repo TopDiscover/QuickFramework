@@ -48,8 +48,8 @@ export default abstract class UIView extends EventComponent {
      * 使用hideWithAction 有动画隐藏
      * 使用closeWithAction 有动画关闭
      * */
-    private _content: Node = null!;
-    protected set content(value: Node) {
+    private _content: Node | null = null;
+    protected set content(value) {
         this._content = value;
     }
     protected get content() {
