@@ -1,5 +1,5 @@
-import { AudioClip, _decorator } from "cc";
-import AudioComponent from "../../framework/base/AudioComponent";
+import { AudioClip, AudioSource, _decorator } from "cc";
+import AudioComponent, { AudioInfo } from "../../framework/base/AudioComponent";
 import { BUNDLE_TYPE, BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import { Config } from "../config/Config";
 import { Manager } from "../manager/Manager";
@@ -23,24 +23,39 @@ export default class GlobalAudio extends AudioComponent {
 
     public playMusic(url: string, bundle: BUNDLE_TYPE, loop: boolean = true) {
         let me = this;
-        return new Promise<{ url: string, isSuccess: boolean }>((resolve) => {
+        return new Promise<boolean>((resolve) => {
             if( bundle != BUNDLE_RESOURCES ){
                 error(`${url} 不在 ${BUNDLE_RESOURCES} 全局播放的声音发现存放到${BUNDLE_RESOURCES}`)
-                resolve({ url:url,isSuccess:false});
+                resolve(false);
                 return;
             }
             this.audioData.curMusicUrl = url;
             this.audioData.curBundle = bundle;
             if (this.audioData.isMusicOn) {
+                let key = this.makeKey(url,bundle);
+                let audioInfo = this.musicInfos.get(key);
+                if( !audioInfo ){
+                    audioInfo = new AudioInfo();
+                    audioInfo.url = url;
+                    audioInfo.bundle = bundle;
+                    audioInfo.source = this.node.addComponent(AudioSource);
+                    audioInfo.source.playOnAwake = false;
+                    audioInfo.source.name = key;
+                    this.musicInfos.set(key,audioInfo);
+                }
                 Manager.cacheManager.getCacheByAsync(url, AudioClip,bundle).then((data) => {
                     if (data) {
                         Manager.assetManager.addPersistAsset(url,data,bundle);
                         me.stopMusic();
-                        // cc.audioEngine.playMusic(data, loop);
+                        if( audioInfo && audioInfo.source ){
+                            audioInfo.source.clip = data;
+                            audioInfo.source.loop = loop;
+                            audioInfo.play();
+                        }
                         this.isPlaying = true;
-                        resolve({ url: url, isSuccess: true });
+                        resolve(true);
                     } else {
-                        resolve({ url: url, isSuccess: false });
+                        resolve(false);
                     }
                 });
             }
@@ -49,25 +64,38 @@ export default class GlobalAudio extends AudioComponent {
     }
 
     public playEffect(url: string, bundle:BUNDLE_TYPE, loop: boolean = false) {
-        return new Promise<number>((resolve) => {
+        return new Promise<boolean>((resolve) => {
             if( bundle != BUNDLE_RESOURCES ){
                 error(`${url} 不在 ${BUNDLE_RESOURCES} 全局播放的声音发现存放到${BUNDLE_RESOURCES}`)
-                resolve(-1);
+                resolve(false);
                 return;
             }
             if (this.audioData.isEffectOn) {
+                let key = this.makeKey(url,bundle);
+                let audioInfo = this.effectInfos.get(key);
+                if( !audioInfo ){
+                    audioInfo = new AudioInfo;
+                    audioInfo.url = url;
+                    audioInfo.bundle = bundle;
+                    audioInfo.source = this.node.addComponent(AudioSource);
+                    audioInfo.source.name = key;
+                    this.effectInfos.set(key,audioInfo);
+                }
                 Manager.cacheManager.getCacheByAsync(url, AudioClip,bundle).then((data) => {
                     if (data) {
                         Manager.assetManager.addPersistAsset(url,data,bundle);
-                        // this.audioData.curEffectId = cc.audioEngine.playEffect(data, loop);
-                        resolve(this.audioData.curEffectId);
+                        if( audioInfo && audioInfo.source ){
+                            audioInfo.source.clip = data;
+                            audioInfo.source.loop = loop;
+                            audioInfo.play();
+                        }
+                        resolve(true);
                     } else {
-                        resolve(this.audioData.curEffectId);
+                        resolve(false);
                     }
                 });
             } else {
-                this.audioData.curEffectId = -1;
-                resolve(-1);
+                resolve(false);
             }
         });
     }

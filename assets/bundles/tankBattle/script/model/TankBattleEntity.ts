@@ -1,9 +1,15 @@
 
 import { _decorator, Component, Node, BoxCollider2D, Contact2DType, IPhysics2DContact } from 'cc';
+import { TankBettle } from '../data/TankBattleGameData';
 const { ccclass, property } = _decorator;
 
 @ccclass('TankBattleEntity')
 export class TankBattleEntity extends Component {
+
+
+    protected get data( ){
+        return TankBettle.gameData;
+    }
 
     start(){
         let collider = this.getComponent(BoxCollider2D) as BoxCollider2D;

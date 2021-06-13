@@ -30,12 +30,12 @@ export default class TankBattleProps extends TankBattleEntity {
         if (other.group == TankBettle.GROUP.Player) {
             let player = other.node.getComponent(TankBettleTankPlayer)
             if( player ){
-                TankBettle.gameData.playPropsAudio();
+                this.data.playPropsAudio();
                 if( this.type == TankBettle.PropsType.LIVE ){
-                    TankBettle.gameData.addPlayerLive(player.isOnePlayer);
+                    this.data.addPlayerLive(player.isOnePlayer);
                     
                 }else if( this.type == TankBettle.PropsType.BOOM_ALL_ENEMY ){
-                    TankBettle.gameData.gameMap?.removeAllEnemy();
+                    this.data.gameMap?.removeAllEnemy();
                 }else if( this.type == TankBettle.PropsType.GOD ){
                     player.addStatus(TankBettle.PLAYER_STATUS.PROTECTED)
                 }else if( this.type == TankBettle.PropsType.STRONG_BULLET){
@@ -43,7 +43,7 @@ export default class TankBattleProps extends TankBattleEntity {
                 }else if( this.type == TankBettle.PropsType.STRONG_MY_SELF){
                     player.addLive()
                 }else if( this.type == TankBettle.PropsType.TIME){
-                    TankBettle.gameData.addGameTime();
+                    this.data.addGameTime();
                 }
                 Tween.stopAllByTarget(this.curOpacity);
                 this.node.removeFromParent();

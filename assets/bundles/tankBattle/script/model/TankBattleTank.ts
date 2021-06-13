@@ -1,4 +1,4 @@
-import { Component, instantiate, _decorator, Node, BoxCollider2D, Tween, UITransform, Vec3,Animation, tween, Sprite, randomRange, randomRangeInt, IPhysics2DContact, Rect } from "cc";
+import { Component, instantiate, _decorator, Node, BoxCollider2D, Tween, UITransform, Vec3,Animation, tween, Sprite, randomRange, randomRangeInt, IPhysics2DContact, Rect, Vec2 } from "cc";
 import { TankBettle } from "../data/TankBattleGameData";
 import TankBettleBullet from "./TankBattleBullet";
 import { TankBattleEntity } from "./TankBattleEntity";
@@ -49,7 +49,7 @@ export default class TankBettleTank extends TankBattleEntity {
             //正在发射
             return false;
         } else {
-            let bulletNode = instantiate(TankBettle.gameData.bulletPrefab) as Node;
+            let bulletNode = instantiate(this.data.bulletPrefab) as Node;
             this.bullet = bulletNode.addComponent(TankBettleBullet);
             this.bullet.move(this);
 
@@ -107,7 +107,7 @@ export default class TankBettleTank extends TankBattleEntity {
             this.isMoving = false;
             if (this.isAI && other.group == TankBettle.GROUP.Home) {
                 //如果是AI碰撞到老巢，直接GameOver
-                TankBettle.gameData.gameOver();
+                this.data.gameOver();
             }
             if (this.isAI) {
                 this.changeDirection(other);
@@ -154,7 +154,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
 
     constructor() {
         super();
-        this.config = TankBettle.gameData.playerConfig;
+        this.config = this.data.playerConfig;
     }
 
     /**@description 是否是玩家1 */
@@ -178,12 +178,12 @@ export class TankBettleTankPlayer extends TankBettleTank {
 
     addLive() {
         this.config.live++;
-        TankBettle.gameData.updateGameInfo();
+        this.data.updateGameInfo();
     }
 
     shoot() {
         if (super.shoot()) {
-            TankBettle.gameData.playAttackAudio();
+            this.data.playAttackAudio();
         }
         return true;
     }
@@ -191,7 +191,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
     public addStatus(status: TankBettle.PLAYER_STATUS) {
         this._status.set(status, true);
         if (status == TankBettle.PLAYER_STATUS.PROTECTED) {
-            let aniNode = instantiate(TankBettle.gameData.animationPrefab) as Node;
+            let aniNode = instantiate(this.data.animationPrefab) as Node;
             this.node.addChild(aniNode);
             let animation = aniNode.getComponent(Animation) as Animation;
             animation.play("tank_protected");
@@ -229,20 +229,20 @@ export class TankBettleTankPlayer extends TankBettleTank {
         this.config.live--;
         if (this.config.live == 0) {
             this.stopAllActions();
-            let aniNode = instantiate(TankBettle.gameData.animationPrefab) as Node;
+            let aniNode = instantiate(this.data.animationPrefab) as Node;
             this.node.addChild(aniNode);
             let animation = aniNode.getComponent(Animation) as Animation;
             animation.play("tank_boom");
             let state = animation.getState("tank_boom");
             //玩家销毁声音
-            TankBettle.gameData.playerCrackAudio();
+            this.data.playerCrackAudio();
             aniNode.setPosition(new Vec3())
             tween(this.dieAction).delay(state.duration).call(() => {
                 this.stopAllActions();
-                TankBettle.gameData.gameMap?.removePlayer(this);
+                this.data.gameMap?.removePlayer(this);
             }).start()
         }
-        TankBettle.gameData.updateGameInfo();
+        this.data.updateGameInfo();
     }
 
     move() {
@@ -327,7 +327,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
             spriteFrameKey = "tank_4_0";
         }
         let sprite = this.node.getComponent(Sprite) as Sprite;
-        sprite.loadImage({ url: { urls: ["texture/images"], key: spriteFrameKey }, view: TankBettle.gameData.gameView, bundle: TankBettle.gameData.gameView.bundle });
+        sprite.loadImage({ url: { urls: ["texture/images"], key: spriteFrameKey }, view: this.data.gameView, bundle: this.data.gameView.bundle });
     }
 
     protected stopAllActions(){
@@ -373,7 +373,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
             if (this.config.live == 1) {
                 spriteFrameKey = "tank_6_0"
             }
-            sprite.loadImage({ url: { urls: ["texture/images"], key: spriteFrameKey }, view: TankBettle.gameData.gameView, bundle: TankBettle.gameData.gameView.bundle });
+            sprite.loadImage({ url: { urls: ["texture/images"], key: spriteFrameKey }, view: this.data.gameView, bundle: this.data.gameView.bundle });
         }
         if (this.config.live == 0) {
             this.die()
@@ -382,17 +382,17 @@ export class TankBettleTankEnemy extends TankBettleTank {
 
     public die() {
         this.stopAllActions();
-        let aniNode = instantiate(TankBettle.gameData.animationPrefab) as Node;
+        let aniNode = instantiate(this.data.animationPrefab) as Node;
         this.node.addChild(aniNode);
         let animation = aniNode.getComponent(Animation) as Animation;
         animation.play("tank_boom");
         let state = animation.getState("tank_boom");
 
-        TankBettle.gameData.enemyCrackAudio();
+        this.data.enemyCrackAudio();
         aniNode.setPosition(new Vec3());
         tween(this.dieAction).delay(state.duration).call(() => {
             this.stopAllActions();
-            TankBettle.gameData.gameMap?.removeEnemy(this.node);
+            this.data.gameMap?.removeEnemy(this.node);
         }).start()
     }
 
@@ -413,8 +413,16 @@ export class TankBettleTankEnemy extends TankBettleTank {
             this.curPosition.set(this.node.position);
             tween().target(this.curPosition)
                 .by(this.config.time, { y : this.config.distance },{onUpdate:(target)=>{
-                    this.prevPosition.set(this.node.position);
-                    this.node.setPosition(target as Vec3);
+                    if( this.data.isInMapRange( target as Vec3)){
+                        this.prevPosition.set(this.node.position);
+                        this.node.setPosition(target as Vec3);
+                    }else{
+                        //超出边界
+                        // log("超出边界");
+                        Tween.stopAllByTarget(this.curPosition);
+                        this.node.setPosition(this.prevPosition);
+                        this.changeDirection();
+                    }
                 }})
                 .repeatForever()
                 .start();
@@ -423,8 +431,16 @@ export class TankBettleTankEnemy extends TankBettleTank {
             this.curPosition.set(this.node.position);
             tween().target(this.curPosition)
                 .by(this.config.time, { y : -this.config.distance },{onUpdate:(target)=>{
-                    this.prevPosition.set(this.node.position);
-                    this.node.setPosition(target as Vec3);
+                    if( this.data.isInMapRange( target as Vec3)){
+                        this.prevPosition.set(this.node.position);
+                        this.node.setPosition(target as Vec3);
+                    }else{
+                        //超出边界
+                        // log("超出边界");
+                        Tween.stopAllByTarget(this.curPosition);
+                        this.node.setPosition(this.prevPosition);
+                        this.changeDirection();
+                    }
                 }})
                 .repeatForever()
                 .start();
@@ -433,8 +449,16 @@ export class TankBettleTankEnemy extends TankBettleTank {
             this.curPosition.set(this.node.position);
             tween(this.curPosition).target(this.curPosition)
                 .by(this.config.time, { x : this.config.distance },{onUpdate:(target)=>{
-                    this.prevPosition.set(this.node.position);
-                    this.node.setPosition(target as Vec3);
+                    if( this.data.isInMapRange( target as Vec3)){
+                        this.prevPosition.set(this.node.position);
+                        this.node.setPosition(target as Vec3);
+                    }else{
+                        //超出边界
+                        // log("超出边界");
+                        Tween.stopAllByTarget(this.curPosition);
+                        this.node.setPosition(this.prevPosition);
+                        this.changeDirection();
+                    }
                 }})
                 .repeatForever()
                 .start();
@@ -443,8 +467,16 @@ export class TankBettleTankEnemy extends TankBettleTank {
             this.curPosition.set(this.node.position);
             tween().target(this.curPosition)
                 .by(this.config.time, { x: -this.config.distance },{onUpdate:(target)=>{
-                    this.prevPosition.set(this.node.position);
-                    this.node.setPosition(target as Vec3);
+                    if( this.data.isInMapRange( target as Vec3)){
+                        this.prevPosition.set(this.node.position);
+                        this.node.setPosition(target as Vec3);
+                    }else{
+                        //超出边界
+                        // log("超出边界");
+                        Tween.stopAllByTarget(this.curPosition);
+                        this.node.setPosition(this.prevPosition);
+                        this.changeDirection();
+                    }
                 }})
                 .repeatForever()
                 .start();

@@ -16,7 +16,7 @@ export default class TankBettleBullet extends TankBattleEntity {
 
     private addBullet() {
         let transform = this.owner.node.getComponent(UITransform) as UITransform;
-        TankBettle.gameData.gameMap?.addBullet(this);
+        this.data.gameMap?.addBullet(this);
         if (this.owner.direction == TankBettle.Direction.UP) {
             this.node.setPosition(new Vec3(this.owner.node.position.x, this.owner.node.position.y + transform.height / 2));
             this.node.angle = 0;
@@ -118,7 +118,7 @@ export default class TankBettleBullet extends TankBattleEntity {
 
     private removeSelf() {
         //子弹销毁声音
-        TankBettle.gameData.bulletCrackAudio();
+        this.data.bulletCrackAudio();
         Tween.stopAllByTarget(this.curPosition);
         this.owner.bullet = null;
         this.node.removeFromParent();

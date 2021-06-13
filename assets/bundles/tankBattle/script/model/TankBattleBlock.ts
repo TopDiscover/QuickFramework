@@ -45,7 +45,7 @@ export default class TankBattleBlock extends TankBattleEntity {
                     break;
                 case TankBettle.BLOCK_TYPE.HOME: {
                     //老巢
-                    TankBettle.gameData.gameOver();
+                    this.data.gameOver();
                 }
                     break;
             }

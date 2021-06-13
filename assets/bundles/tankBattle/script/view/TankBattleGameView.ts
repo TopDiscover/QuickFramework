@@ -68,6 +68,7 @@ export default class TankBattleGameView extends GameView{
         this.data.gameMap = game.addComponent(TankBattleMap);
         this.data.gameMap.owner = this;
         this.data.gameMap.setPrefabs(prefabs);
+        this.data.initMapRange(game,this.data.getEnemyPrefab(TankBettle.EnemyType.NORMAL));
         let gameInfo = find("Info", this.node) as Node;
         this._enemyTankCount = find("enemy_count", gameInfo) as Node;
         this._enemyTankPrefab = find("enemy_tank_prefab", gameInfo) as Node;

@@ -12,7 +12,7 @@ import { getSingleton } from "../../../../scripts/framework/base/Singleton";
 import TankBattleChangeStageView from "../view/TankBattleChangeStageView";
 import TankBattleStartView from "../view/TankBattleStartView";
 import TankBattleGameOver from "../view/TankBattleGameOver";
-import { Node } from "cc"
+import { Node, Rect, UITransform, Vec2, Vec3 } from "cc"
 import { ViewZOrder } from "../../../../scripts/common/config/ViewZOrder";
 
 export namespace TankBettle {
@@ -391,6 +391,21 @@ export namespace TankBettle {
             this.gameStatus = GAME_STATUS.OVER;
             Manager.uiManager.open({ type: TankBattleGameOver, bundle: this.bundle, zIndex: ViewZOrder.UI });
             this.gameMap?.gameOver();
+        }
+
+        private mapRange : Rect = new Rect;
+        public initMapRange( mapNode : Node , tank : Node | null ){
+            let tankTrans = tank?.getComponent(UITransform) as UITransform;
+            let transform = mapNode.getComponent(UITransform) as UITransform;
+            this.mapRange.set(tankTrans.width/2,-(transform.height - tankTrans.height/2),transform.width - tankTrans.width,transform.height - tankTrans.height);
+            // log("mapRange",this.mapRange);
+        }
+
+        public isInMapRange( pos : Vec3){
+            if( this.mapRange.contains( new Vec2(pos.x,pos.y))){
+                return true;
+            }
+            return false;
         }
 
         /**@description 更新游戏信息 */
