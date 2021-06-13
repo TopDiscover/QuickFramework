@@ -8,7 +8,6 @@ import { LogicManager } from "./LogicManager";
 import GlobalAudio from "../component/GlobalAudio";
 import { extentionsInit } from "../../framework/extentions/Extentions";
 import { CocosExtentionInit } from "../../framework/extentions/CocosExtention";
-import { LanguageImpl } from "../language/LanguageImpl";
 import { getSingleton } from "../../framework/base/Singleton";
 import { USING_LAN_KEY, BUNDLE_TYPE, BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import GameView from "../base/GameView";
@@ -19,6 +18,7 @@ import UILoading from "../component/UILoading";
 import Alert from "../component/Alert";
 import Loading from "../component/Loading";
 import { ServiceManager } from "./ServiceManager";
+import { CommonLanguage } from "../language/CommonLanguage";
 
 /**@description 游戏所有运行单例的管理 */
 class _Manager extends Framework._FramewokManager {
@@ -177,7 +177,7 @@ class _Manager extends Framework._FramewokManager {
         CocosExtentionInit();
         //语言包初始化
         //cc.log("language init");
-        this.language.delegate = getSingleton(LanguageImpl)
+        this.language.addSourceDelegate(new CommonLanguage);
     }
 }
 

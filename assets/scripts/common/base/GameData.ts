@@ -16,8 +16,4 @@ export class GameData{
     public gameType(){
         return -1;
     }
-
-    onLanguageChange(){
-        
-    }
 }

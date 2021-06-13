@@ -20,7 +20,7 @@ export let LanguageZH = {
     checkingUpdate : "检测更新中...",
     newVersionForBundle : "检测到{0}有新的版本，是否更新?",
     alreadyRemoteVersion : "{0}已升级到最新",
-    hall : "大厅",
+    halltext : "大厅",
     reconnect : "正在重连...",
     warningReconnect : "{0}网络已断开，是否重新连接？",
     tryReconnect : "{0}网络:正在尝试第{1}次连接...",

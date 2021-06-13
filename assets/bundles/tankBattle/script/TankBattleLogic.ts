@@ -6,6 +6,7 @@ import { ResourceLoaderError } from "../../../scripts/framework/assetManager/Res
 import { Manager } from "../../../scripts/common/manager/Manager";
 import TankBattleGameView from "./view/TankBattleGameView";
 import { TankBettle } from "./data/TankBattleGameData";
+import { TankBattleLanguage } from "./data/TankBattleLanguage";
 
 /**
  * @description 坦克大战Logic 
@@ -16,6 +17,7 @@ class TankBattleLogic extends Logic {
 
     logicType: LogicType = LogicType.GAME;
 
+    language = new TankBattleLanguage;
     onLoad() {
         super.onLoad();
     }
@@ -35,6 +37,8 @@ class TankBattleLogic extends Logic {
         if( data.type == this.logicType ){
 
         }else{
+            //删除子包的语言包
+            Manager.language.removeSourceDelegate(this.language);
             //移除网络组件
             this.removeNetComponent();
             //卸载资源
@@ -65,7 +69,7 @@ class TankBattleLogic extends Logic {
             Manager.gameData.clear();
 
             //子游戏语言包初始化
-            this.onLanguageChange();
+            Manager.language.addSourceDelegate(this.language);
 
             //添加网络组件
             this.addNetComponent();
@@ -75,6 +79,7 @@ class TankBattleLogic extends Logic {
             //加载资源
             this._loader.loadResources();
         }else{
+
             //移除网络组件
             this.removeNetComponent();
             //卸载资源

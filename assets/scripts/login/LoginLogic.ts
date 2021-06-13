@@ -10,9 +10,9 @@
  import { BUNDLE_RESOURCES } from "../framework/base/Defines";
  import { HotUpdate, AssetManagerCode, AssetManagerState } from "../common/base/HotUpdate";
  import DownloadLoading from "../common/component/DownloadLoading";
- import { i18n } from "../common/language/LanguageImpl";
 import { game, log } from "cc";
 import { ViewZOrder } from "../common/config/ViewZOrder";
+import { i18n } from "../common/language/CommonLanguage";
  
  class LoginLogic extends Logic {
  
@@ -43,7 +43,7 @@ import { ViewZOrder } from "../common/config/ViewZOrder";
                  Manager.alert.show({
                      text: i18n.newVersion, confirmCb: (isOK) => {
                          if (isOK) {
-                             Manager.uiManager.open({ type: DownloadLoading, zIndex: ViewZOrder.UI, args: [state,i18n.hall] });
+                             Manager.uiManager.open({ type: DownloadLoading, zIndex: ViewZOrder.UI, args: [state,i18n.halltext] });
                          } else {
                              //退出游戏
                              game.end();

@@ -1,12 +1,12 @@
 import { HotUpdate, AssetManagerCode, AssetManagerState, BundleConfig, DownLoadInfo } from "../base/HotUpdate";
 import { CommonEvent } from "../event/CommonEvent";
-import { i18n } from "../language/LanguageImpl";
 import { Config} from "../config/Config";
 import { Manager } from "./Manager";
 import DownloadLoading from "../component/DownloadLoading";
 import { game } from "cc";
 import { DEBUG } from "cc/env";
 import { ViewZOrder } from "../config/ViewZOrder";
+import { i18n } from "../language/CommonLanguage";
 
 /**
  * @description bundle管理器

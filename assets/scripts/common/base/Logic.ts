@@ -1,10 +1,10 @@
 import { LogicEventData, LogicType } from "../event/LogicEvent";
 import EventComponent from "../../framework/base/EventComponent";
-import { ResourceData, ResourceCacheData, ENABLE_CHANGE_LANGUAGE } from "../../framework/base/Defines";
+import { ResourceData, ResourceCacheData } from "../../framework/base/Defines";
 import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
-import { EventApi } from "../../framework/event/EventApi";
 import { Manager } from "../manager/Manager";
 import { Node } from "cc";
+import { LanguageDataSourceDelegate } from "../../framework/base/Language";
 
 
 /**@description 当前入子游戏时，在Logic.onLoad时初始设置 */
@@ -20,6 +20,7 @@ export class Logic extends EventComponent {
     protected _loader: ResourceLoader = null!;
 
     protected logicType : LogicType = LogicType.UNKNOWN;
+    protected language : LanguageDataSourceDelegate =null!;
 
     constructor() {
         super();
@@ -33,13 +34,6 @@ export class Logic extends EventComponent {
         this._loader.onLoadProgress = this.onLoadResourceProgress.bind(this);
     }
 
-    protected bindingEvents(){
-        super.bindingEvents();
-        if ( ENABLE_CHANGE_LANGUAGE ){
-            this.registerEvent(EventApi.CHANGE_LANGUAGE,this.onLanguageChange);
-        }
-    }
-
     protected get bundle( ) : string{
         error(`请子类重写protected get bundle,返回游戏的包名,即 asset bundle name`);
         return "";
@@ -48,12 +42,6 @@ export class Logic extends EventComponent {
     /**@description 进入各模块完成回调 */
     public onEnterComplete(data: LogicEventData){
 
-    }
-
-    protected onLanguageChange(){
-        if( Manager.gameData ){
-            Manager.gameData.onLanguageChange();
-        }
     }
 
     public init( data : Node ){

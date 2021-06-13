@@ -21,7 +21,7 @@ export let LanguageEN = {
     checkingUpdate : "Checking update...",
     newVersionForBundle : "检测到{0}有新的版本，是否更新?",
     alreadyRemoteVersion : "{0}已升级到最新",
-    hall : "hall",
+    halltext : "hall",
     reconnect : "Reconnect ... ",
     warningReconnect : "{0}网络已断开，是否重新连接？",
     tryReconnect : "{0}网络:正在尝试第{1}次连接...",

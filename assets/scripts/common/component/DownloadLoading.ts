@@ -1,10 +1,10 @@
 import UIView from "../../framework/ui/UIView";
-import { i18n } from "../language/LanguageImpl";
 import { AssetManagerState, AssetManagerCode, HotUpdate, DownLoadInfo } from "../base/HotUpdate";
 import { Manager } from "../manager/Manager";
 import { CommonEvent } from "../event/CommonEvent";
 import { find, Label, ProgressBar, tween, _decorator } from "cc";
 import { DEBUG } from "cc/env";
+import { i18n } from "../language/CommonLanguage";
 
 /**@description 下载界面 */
 const { ccclass, property } = _decorator;

@@ -1,7 +1,7 @@
 import { find, Slider, Toggle, _decorator,Node, SystemEventType, ProgressBar } from "cc";
 import UIView from "../../framework/ui/UIView";
 import { LogicEvent } from "../event/LogicEvent";
-import { i18n } from "../language/LanguageImpl";
+import { i18n } from "../language/CommonLanguage";
 import { Manager } from "../manager/Manager";
 
 const { ccclass, property } = _decorator;
