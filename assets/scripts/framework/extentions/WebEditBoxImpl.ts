@@ -139,14 +139,14 @@ class WebEditBoxHelper {
 
 export default class WebEditBoxImpl {
 
-    private _delegate: any = null;
+    private _delegate: EditBox = null!;
     private _elem: HTMLElement = null!;
     private _isTextArea = false;
     // event listeners
     private _eventListeners: any = {};
     private _isFocus = false;
 
-    init(delegate: any) {
+    init(delegate: EditBox) {
         if (!delegate) {
             return;
         }
@@ -160,11 +160,11 @@ export default class WebEditBoxImpl {
         }
     }
 
-    enable() {
+    onEnable() {
         //do nothing
     }
 
-    disable() {
+    onDisable() {
         if (this._isFocus) {
             this._elem.blur();
         }
@@ -208,7 +208,7 @@ export default class WebEditBoxImpl {
         this._registerEventListeners();
         this._elem.focus();
 
-        this._delegate.editBoxEditingDidBegan();
+        this._delegate!._editBoxEditingDidBegan();
     }
 
     endEditing() {
@@ -328,7 +328,7 @@ export default class WebEditBoxImpl {
 
         cbs.compositionEnd = function () {
             inputLock = false;
-            impl._delegate.editBoxTextChanged((<any>elem).value);
+            impl._delegate!._editBoxTextChanged((<any>elem).value);
         };
 
         cbs.onInput = function () {
@@ -340,13 +340,13 @@ export default class WebEditBoxImpl {
 
             if (_elem.value.length > _elem.maxLength) _elem.value = _elem.value.slice(0, _elem.maxLength);
 
-            impl._delegate.editBoxTextChanged((<any>elem).value);
+            impl._delegate!._editBoxTextChanged((<any>elem).value);
         };
 
         cbs.onKeydown = function (e: any) {
             if (e.keyCode === macro.KEY.enter) {
                 e.stopPropagation();
-                impl._delegate.editBoxEditingReturn();
+                impl._delegate!._editBoxEditingReturn();
 
                 if (!impl._isTextArea) {
                     elem.blur();
@@ -364,7 +364,7 @@ export default class WebEditBoxImpl {
             Manager.resolutionHelper.isShowKeyboard = false;
             //删除注册事件
             impl._removeEventListeners();
-            impl._delegate.editBoxEditingDidEnded();
+            impl._delegate!._editBoxEditingDidEnded();
         };
 
         elem.addEventListener('compositionstart', cbs.compositionStart);

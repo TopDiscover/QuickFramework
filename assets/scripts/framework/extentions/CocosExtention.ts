@@ -309,11 +309,9 @@ prototype.loadFile = function (config: any) {
 
 
 if (!EDITOR) {
-
-    //对引擎输入框进行修改 ,原始引擎版本2.1.2
-    if (Manager.resolutionHelper.isBrowser && !PREVIEW && sys.os != sys.OS_WINDOWS) {
-        if (DEBUG) log(`浏览器`);
-        (<any>EditBox)._ImplClass = WebEditBoxImpl;
+    //对引擎输入框进行修改 
+    if (Manager.resolutionHelper.isBrowser) {
+        (<any>EditBox)._EditBoxImpl = WebEditBoxImpl;
     }
 }
 

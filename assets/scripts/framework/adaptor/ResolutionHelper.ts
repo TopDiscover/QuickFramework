@@ -75,6 +75,7 @@ export class ResolutionHelper {
     public onLoad(node: Node) {
         let me = instance();
         me.node = node;
+        me.canvas = node.getComponent(Canvas) as Canvas;
         me.designResolution = view.getDesignResolutionSize();
         me.onResize();
     }
