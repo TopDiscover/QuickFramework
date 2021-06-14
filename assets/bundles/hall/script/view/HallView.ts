@@ -9,7 +9,7 @@ import { GameService } from "../../../../scripts/common/net/GameService";
 import { ChatService } from "../../../../scripts/common/net/ChatService";
 import SettingView from "../../../../scripts/common/component/SettingView";
 import { BUNDLE_RESOURCES } from "../../../../scripts/framework/base/Defines";
-import { EventTouch, _decorator,Node, PageView, instantiate, find, Label, ProgressBar, sys } from "cc";
+import { EventTouch, _decorator,Node, PageView, instantiate, find, Label, ProgressBar, sys, PhysicsSystem2D } from "cc";
 import { ViewZOrder } from "../../../../scripts/common/config/ViewZOrder";
 
 
@@ -23,7 +23,22 @@ export default class HallView extends UIView {
 
     private onClick(ev: EventTouch) {
         let node : Node = ev.target as Node;
-        Manager.bundleManager.enterBundle(this.bundles[node.userData]);
+        let config = this.bundles[node.userData];
+        if( config ){
+            if( config.bundle == "aimLine"){
+                //瞄准线，需要使用box2d
+                if( !PhysicsSystem2D.PHYSICS_BOX2D ){
+                    Manager.tips.show("该功能请把2D物理引擎切换到Box2D");
+                    return;
+                }
+            }else if( config.bundle == "tankBattle" ){
+                if( !PhysicsSystem2D.PHYSICS_BUILTIN ){
+                    Manager.tips.show("该功能请把2D物理引擎切换到内置");
+                    return;
+                }
+            }
+            Manager.bundleManager.enterBundle(config);
+        }
     }
 
     private gamePage : Node = null!;
