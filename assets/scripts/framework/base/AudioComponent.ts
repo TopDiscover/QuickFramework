@@ -2,7 +2,7 @@ import UIView from "../ui/UIView";
 import { ResourceInfo, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
 import { Manager } from "../Framework";
 import EventComponent from "./EventComponent";
-import { AudioClip, AudioSource, Tween, tween, Vec2, _decorator } from "cc";
+import { AudioClip, AudioSource, _decorator } from "cc";
 import { DEBUG } from "cc/env";
 
 /**

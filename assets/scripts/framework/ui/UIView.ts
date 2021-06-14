@@ -131,7 +131,7 @@ export default abstract class UIView extends EventComponent {
                 .to(0.1, { scale: new Vec3(0.3, 0.3, 0.3) })
                 .call(() => {
                     this.hide();
-                    this.content.setScale(new Vec3(1, 1, 1));
+                    this.content!.setScale(new Vec3(1, 1, 1));
                     if (completeCallback) completeCallback();
                 })
                 .start();
