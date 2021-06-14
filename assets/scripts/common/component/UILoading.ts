@@ -3,7 +3,7 @@ import { Manager } from "../manager/Manager";
 import { EventApi } from "../../framework/event/EventApi";
 import { Config } from "../config/Config";
 import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
-import { find, instantiate, Label ,Node, Prefab, Tween, tween, Vec3} from "cc";
+import { find, instantiate, Label ,Node, Prefab, Tween, tween, UIOpacity, Vec3} from "cc";
 import { ViewZOrder } from "../config/ViewZOrder";
 /**
  * @description 加载动画
@@ -28,6 +28,17 @@ export default class UILoading extends UILoadingDelegate {
     private _isLoadingPrefab = false;
     private finishLoadCb : any = null;
     private _uiName:string = null!;
+
+    /**@description 显示节点的透明度 */
+    private _contentOpacity : UIOpacity = null!;
+
+    private get contentOpacity(){
+        if( this._contentOpacity ){
+            return this._contentOpacity;
+        }
+        return this.content.getComponent(UIOpacity) as UIOpacity;
+    }
+
     public preloadPrefab() {
         this.loadPrefab();
     }
@@ -61,12 +72,12 @@ export default class UILoading extends UILoadingDelegate {
             Manager.uiManager.addChild(this._node,ViewZOrder.UILoading);
             this._node.position = Vec3.ZERO;
             this.content = find("content", this._node) as Node;
-            Tween.stopAllByTarget(this.content);
+            Tween.stopAllByTarget(this.contentOpacity);
             this.text = find("text", this.content)?.getComponent(Label) as Label;
             this.text.string = "0%";
-            this.content.opacity = 0;
+            this.contentOpacity.opacity = 0;
             if ( this.delay > 0 ){
-                tween(this.content).delay(this.delay).set({ opacity: 255 }).start();
+                tween(this.contentOpacity).delay(this.delay).set({ opacity: 255 }).start();
             }
             //第一次在预置体没加载好就被隐藏
             if (this._isWaitingHide) {
