@@ -9,8 +9,8 @@ export let HALL_ZH = {
       '网络示例',
       "瞄准线",
       "节点对象池",
+      "三消",
       "Shader",
-      "三消"
     ],
     hall_view_broadcast_content: '[系统广播] 恭喜大佬进入',
     hall_view_nogame_notice: '【{0}】未实现，更多功能，敬请期待!!!',

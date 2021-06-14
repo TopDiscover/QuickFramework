@@ -21651,7 +21651,7 @@ declare module "cc" {
         protected _dirtyFlags: __private.cocos_core_scene_graph_node_enum_TransformBit;
         protected _eulerDirty: boolean;
         protected _poolHandle: renderer.NodeHandle;
-        opacity: number;
+        // opacity: number;
         // height: number;
         constructor(name?: string);
         /**

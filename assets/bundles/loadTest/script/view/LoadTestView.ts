@@ -49,6 +49,7 @@ export default class LoadTestView extends UIView {
     }
 
     private onLoadFont( ){
+        if( !this.content ) return;
         if( this.content.getChildByName("font") ){
             return;
         }
@@ -68,6 +69,7 @@ export default class LoadTestView extends UIView {
 
     private onLoadImg(){
         let name = "testImg";
+        if( !this.content ) return;
         if( this.content.getChildByName(name) ){
             return;
         }
@@ -82,6 +84,7 @@ export default class LoadTestView extends UIView {
 
     private onLoadNetImg(){
         let name = "netimg";
+        if( !this.content ) return;
         if( this.content.getChildByName(name)){
             return;
         }
@@ -101,6 +104,7 @@ export default class LoadTestView extends UIView {
 
     private onLoadButton(){
         let name = "button";
+        if( !this.content ) return;
         if( this.content.getChildByName(name)){
             return;
         }
@@ -129,6 +133,7 @@ export default class LoadTestView extends UIView {
 
     private onLoadParticle(){
         let name = "onLoadParticle";
+        if( !this.content ) return;
         if( this.content.getChildByName(name)){
             return;
         }
@@ -146,6 +151,7 @@ export default class LoadTestView extends UIView {
 
     private onLoadSpine(){
         let name = "onLoadSpine";
+        if( !this.content ) return;
         if( this.content.getChildByName(name)){
             return;
         }
@@ -169,6 +175,7 @@ export default class LoadTestView extends UIView {
 
     private onLoadNetSpine(){
         let name = "onLoadNetSpine";
+        if( !this.content ) return;
         if( this.content.getChildByName(name)){
             return;
         }
@@ -195,6 +202,7 @@ export default class LoadTestView extends UIView {
 
     private onLoadDir(){
         let name = "onLoadDir";
+        if( !this.content ) return;
         if( this.content.getChildByName(name) ){
             return;
         }
