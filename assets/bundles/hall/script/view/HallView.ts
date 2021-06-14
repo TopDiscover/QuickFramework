@@ -37,8 +37,8 @@ export default class HallView extends UIView {
         "netTest",
         "aimLine",
         "nodePoolTest",
-        "shaders",
         "eliminate",
+        "shaders",
     ];
     private _bundles: BundleConfig[] = [];
     private get bundles() {

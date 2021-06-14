@@ -15,30 +15,39 @@ export class AudioInfo {
     bundle: BUNDLE_TYPE = BUNDLE_RESOURCES;
     source: AudioSource | null = null;
     owner: UIView | null = null;
-    action = new Vec2();
+    isPause = false;
 
     play(): void {
+        this.isPause = false;
         if (this.source) {
             this.source.play();
         }
     }
 
     pause(): void {
+        this.isPause = false;
         if (this.source) {
-            this.source.pause();
+            if( this.source.playing ){
+                log(this.url,"isPlaying to pause");
+                this.isPause = true;
+                this.source.pause();
+            }
         }
     }
 
     stop(): void {
+        this.isPause = false;
         if (this.source) {
             this.source.stop();
         }
     }
 
     resume() {
-        if (this.source && this.source.currentTime < this.source.duration) {
+        if (this.source && this.isPause ) {
+            log(this.url,"resume play")
             this.source.play();
         }
+        this.isPause = false;
     }
 
     set volume(val: number) {
@@ -107,13 +116,11 @@ class AudioData {
     public remove(owner: UIView | null) {
         this.musicInfos.forEach((info, key, source) => {
             if (info.owner && info.owner == owner) {
-                Tween.stopAllByTarget(info.action);
                 source.delete(key);
             }
         });
         this.effectInfos.forEach((info, key, source) => {
             if (info.owner && info.owner == owner) {
-                Tween.stopAllByTarget(info.action);
                 source.delete(key);
             }
         })
@@ -181,12 +188,17 @@ class AudioData {
         }
     }
 
+    
     public resumeAll() {
         this.musicInfos.forEach((info, key, source) => {
-            info.resume();
+            if( this.isMusicOn ){
+                info.resume();
+            }
         });
         this.effectInfos.forEach((info, key, source) => {
-            info.resume();
+            if( this.isEffectOn ){
+                info.resume();
+            }
         });
     }
 
