@@ -131,7 +131,7 @@ export default class AimLineView extends GameView {
         let transform = this.graphics.node.getComponent(UITransform) as UITransform;
         this.tempVec3.set(startLocation.x,startLocation.y,0);
         transform.convertToNodeSpaceAR(this.tempVec3,this.outVec3);
-        log("start : " , this.tempVec3);
+        // log("start : " , this.tempVec3);
         this.graphics.moveTo(this.outVec3.x,this.outVec3.y);
 
         //画小圆点
