@@ -239,7 +239,6 @@ export class UIManager {
                             if (!viewData.node.parent) {
                                 this.addChild(viewData.node,zOrder);
                             }
-                            Manager.resolutionHelper.fullScreenAdapt(viewData.node);
                             viewData.view.show(args);
                         }
                     }
@@ -325,8 +324,6 @@ export class UIManager {
                     if (DEBUG) log(`${this._logTag}挂载脚本 : ${className}`);
                 }
             }
-
-            Manager.resolutionHelper.fullScreenAdapt(uiNode);
 
             view.className = className;
             view.bundle = bundle
@@ -443,6 +440,7 @@ export class UIManager {
         this.getCanvas().addChild(node);
         node.zIndex = zOrder;
         (<any>window)["cc"].updateZIndex(this.getCanvas());
+        Manager.resolutionHelper.fullScreenAdapt(node);
     }
 
     /**@description 添加动态加载的本地资源 */

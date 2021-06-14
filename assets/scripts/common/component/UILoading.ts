@@ -67,7 +67,6 @@ export default class UILoading extends UILoadingDelegate {
         this._isWaitingHide = false;
         let finish = await this.loadPrefab();
         if (finish) {
-            Manager.resolutionHelper.fullScreenAdapt(this._node);
             this._node.removeFromParent();
             Manager.uiManager.addChild(this._node,ViewZOrder.UILoading);
             this._node.position = Vec3.ZERO;

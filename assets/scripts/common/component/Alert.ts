@@ -369,7 +369,6 @@ export default class Alert {
         if (finish) {
             if (!this.curPanel) {
                 this.curPanel = instantiate(this.prefab);
-                Manager.resolutionHelper.fullScreenAdapt(this.curPanel);
                 let dialog = this.curPanel.addComponent(AlertDialog);
                 Manager.uiManager.addChild(this.curPanel,ViewZOrder.Alert);
                 dialog.show(config);

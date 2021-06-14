@@ -83,7 +83,6 @@ import { i18n } from "../language/CommonLanguage";
              if (!this.node) {
                  this.node = instantiate(Reconnect.prefab);
              }
-             Manager.resolutionHelper.fullScreenAdapt(this.node);
              this.node.name = "Reconnect";
              this.node.removeFromParent();
              Manager.uiManager.addChild(this.node,ViewZOrder.Loading);
