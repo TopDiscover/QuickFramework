@@ -2,7 +2,7 @@ import TipsDelegate from "../../framework/ui/TipsDelegate";
 import { Manager } from "../../framework/Framework";
 import { Config} from "../config/Config";
 import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
-import { Component ,find,instantiate,Label,log,Node, Prefab, Tween, tween, UIOpacity, Vec3} from "cc";
+import { Component ,find,instantiate,Label,log,Node, Prefab, Tween, tween, UIOpacity, UITransform, Vec2, Vec3} from "cc";
 import { ViewZOrder } from "../config/ViewZOrder";
 /**
  * @description 提示
@@ -10,12 +10,44 @@ import { ViewZOrder } from "../config/ViewZOrder";
 
 class ToastItem extends Component {
     private _content : Node = null!;
+    private _curPositon = new Vec3;
+    private _curOpacity : UIOpacity | null = null;
+    private _transform : UITransform = null!;
+
+    stopAllActions(){
+        Tween.stopAllByTarget(this._content);
+        Tween.stopAllByTarget(this._curPositon);
+        if( this.opacity ){
+            Tween.stopAllByTarget(this.opacity);
+        }
+    }
+
+    onDestroy(){
+        this.stopAllActions();
+    }
+
     init( content : string , time : number ){
         this._content = find("content",this.node) as Node;
         if ( this._content ){
             (this._content.getComponent(Label) as Label).string = content;
         }
         this.runTimeOut(time);
+    }
+
+    private get opacity(){
+        if( this._curOpacity ){
+            return this._curOpacity;
+        }
+        this._curOpacity = this.node.getComponent(UIOpacity);
+        return this._curOpacity;
+    }
+
+    private get transform(){
+        if( this._transform ){
+            return this._transform;
+        }
+        this._transform = this.node.getComponent(UITransform) as UITransform;
+        return this._transform;
     }
 
     private runTimeOut( time : number ){
@@ -26,30 +58,34 @@ class ToastItem extends Component {
     }
 
     public fadeOut( ){
-        let self = this;
-        Tween.stopAllByTarget(this.node);
-        let op = this.node.getComponent(UIOpacity) as UIOpacity;
-        tween(this.node).sequence(
-            tween().parallel(
-                tween().target(this.node).by(0.5,{ position : new Vec3(0,50,0)},{ easing : "expoOut"}),
-                tween().target(op).by(1,{ opacity : 255})
-            ),
-            tween().call(()=>{
-            self.node.removeFromParent();
-        })).start();
-        this.node.removeFromParent();
+        if( !this.opacity ) return;
+        Tween.stopAllByTarget(this.opacity);
+        tween(this.opacity)
+        .to(.5,{opacity : 0})
+        .call(()=>{
+            this.stopAllActions();
+            this.node?.removeFromParent();
+        })
+        .start();
+        this.moveTo(0,this.node.position.y + this.transform.height);
     }
 
     public fadeIn( ){
-        Tween.stopAllByTarget(this.node);
-        let op = this.node.getComponent(UIOpacity) as UIOpacity;
-        op.opacity = 0;
-        tween(this.node).parallel(
-            tween().target(this.node).to(0.5,{
-                 position : new Vec3(this.node.position.x,this.node.position.y + 50,this.node.position.z)},
-                 {easing : "expoOut"}),
-            tween().target(op).by(1,{opacity : 255})
-        ).start();
+        if( !this.opacity ) return;
+        Tween.stopAllByTarget(this.opacity);
+        this.opacity.opacity = 0;
+        tween(this.opacity)
+        .to(.5,{opacity:255})
+        .start();
+        this.moveTo(0,this.node.position.y + this.transform.height);
+    }
+
+    public moveTo( x : number , y : number ){
+        Tween.stopAllByTarget(this._curPositon);
+        this._curPositon.set(this.node.position);
+        tween(this._curPositon).to(0.5,{x:x,y : y},{onUpdate:(target)=>{
+            this.node?.setPosition(target as Vec3);
+        },easing:"expoOut"}).start();
     }
  }
 
@@ -67,6 +103,9 @@ class ToastItem extends Component {
 
     /**@description id*/
     private _id : number = 0;
+
+    /**@description 默认的显示开始位置 */
+    public startPosition = new Vec3(0,100);
 
     public preloadPrefab() {
         this.loadPrefab();
@@ -102,6 +141,7 @@ class ToastItem extends Component {
             if ( node ){
                 let itemComp = node.addComponent(ToastItem);
                 itemComp.init(msg,this.FADE_TIME);
+                node.setPosition(this.startPosition);
                 itemComp.fadeIn();
                 node.userData = this._id++;
                 node.name = `Tips${node.userData}`;
@@ -109,10 +149,13 @@ class ToastItem extends Component {
 
                 //整体上移
                 let length = this._queue.length;
-                for ( let i = 0 ; i < length ; i++ ){
+                for ( let i = 0 ; i < length && i < this.MAX_NUM; i++ ){
                     let item = this._queue[i];
-                    item.opacity = 255;
-                    Tween.stopAllByTarget(item);
+                    let itemComp = item.getComponent(ToastItem);
+                    let transform = item.getComponent(UITransform);
+                    if( itemComp && transform ){
+                        itemComp.moveTo(0,this.startPosition.y + transform.height + (length - i ) * (transform.height + 3) )
+                    }
                 }
 
                 //压入
@@ -149,7 +192,10 @@ class ToastItem extends Component {
     public clear( ){
         let item : Node = null!;
         while( item = this._queue.pop() as Node ){
-            Tween.stopAllByTarget(item);
+            let comp = item.getComponent(ToastItem);
+            if( comp ){
+                comp.stopAllActions();
+            }
             item.removeFromParent();
         }
     }
