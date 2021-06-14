@@ -1,5 +1,5 @@
 
-import { _decorator,Node, find,Animation, Label, Sprite, instantiate, Button, Vec2, Vec3, UITransform, ParticleSystem, ParticleSystem2D, sp, SpriteFrame, AnimationClip, Layers } from "cc";
+import { _decorator,Node, find,Animation, Label, Sprite, instantiate, Button, Vec2, Vec3, UITransform, ParticleSystem, ParticleSystem2D, sp, SpriteFrame, AnimationClip, Layers, Widget } from "cc";
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../scripts/common/event/LogicEvent";
 import { ResourceCacheData } from "../../../../scripts/framework/base/Defines";
 import { loadDirRes } from "../../../../scripts/framework/extentions/CocosExtention";
@@ -110,6 +110,7 @@ export default class LoadTestView extends UIView {
         }
         this.content.removeAllChildren();
         let button = instantiate(this.loadButton);
+        button.getComponent(Widget)?.destroy();
         this.content.addChild(button);
         button.name = name;
         button.setPosition(new Vec3());
