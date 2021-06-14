@@ -61,7 +61,7 @@ export default class EliminateGridView extends Component {
         if (this.isPlayAni) {
             return true;
         }
-        let touchPos = event.getLocation();
+        let touchPos = event.getUILocation();
         let cellPos = this.convertTouchPositionToCellPosition(touchPos);
         if (cellPos) {
             let changeModels = this.selectCell(new Vec2(cellPos.x,cellPos.y));
@@ -73,9 +73,9 @@ export default class EliminateGridView extends Component {
     }
     private onTouchMove(event: EventTouch) {
         if (this.isCanMove) {
-            let start = event.getStartLocation();
+            let start = event.getUIStartLocation();
             let startCellPos = this.convertTouchPositionToCellPosition(start);
-            let touchPos = event.getLocation();
+            let touchPos = event.getUILocation();
             let cellPos = this.convertTouchPositionToCellPosition(touchPos);
             if (cellPos && startCellPos && (startCellPos.x != cellPos.x || startCellPos.y != cellPos.y)) {
                 this.isCanMove = false;

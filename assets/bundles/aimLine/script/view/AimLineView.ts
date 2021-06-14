@@ -1,6 +1,6 @@
 import { LogicEvent, dispatchEnterComplete, LogicType } from "../../../../scripts/common/event/LogicEvent";
 import GameView from "../../../../scripts/common/base/GameView";
-import { Graphics, _decorator ,Node, find, EventTouch, Vec2, UITransform, Vec3, PhysicsSystem2D, physics, EPhysics2DDrawFlags, ERaycast2DType} from "cc";
+import { Graphics, _decorator ,Node, find, EventTouch, Vec2, UITransform, Vec3, PhysicsSystem2D, physics, EPhysics2DDrawFlags, ERaycast2DType, view} from "cc";
 
 /**
  * @description 瞄准线视图
@@ -55,8 +55,9 @@ export default class AimLineView extends GameView {
     private onTouchMove( ev : EventTouch ){
         this.graphics.clear();
         this.curLenght = 0;
-        const startLocation = ev.getStartLocation();
-        const location = ev.getLocation();
+
+        const startLocation = ev.getUIStartLocation();
+        const location = ev.getUILocation();
 
         //测试画线
         // this.drawAimLine(startLocation,location);
