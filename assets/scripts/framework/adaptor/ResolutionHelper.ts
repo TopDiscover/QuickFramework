@@ -2,7 +2,7 @@
 import { EventApi } from "../event/EventApi";
 import { Manager } from "../Framework";
 import { getSingleton } from "../base/Singleton";
-import { Canvas, log, Node, size, Size, sys, UITransform, view, widgetManager } from "cc";
+import { Canvas, log, Node, size, Size, sys, UITransform, view, Widget, widgetManager } from "cc";
 import { DEBUG, EDITOR, JSB, PREVIEW } from "cc/env";
 
 type DeviceDirection = "" | "Landscape" | "Portrait";
@@ -57,6 +57,9 @@ export class ResolutionHelper {
     public fullScreenAdapt(node: Node) {
         let me = instance();
         if (node && me.isNeedAdapt) {
+            //只有该节点有适配组件，才适配到全屏
+            let widget = node.getComponent(Widget);
+            if( !widget ) return;
             let trans = node.getComponent(UITransform)
             trans?.setContentSize(view.getVisibleSize());
             widgetManager.updateAlignment(node);
@@ -114,6 +117,7 @@ export class ResolutionHelper {
         let me = instance();
         if (me.isBrowser && !EDITOR) {
             view.resizeWithBrowserSize(true);
+            view.setResizeCallback(me.onResize)
 
             //调试浏览器
             if (PREVIEW || sys.platform == sys.Platform.WECHAT_GAME) {
@@ -121,7 +125,6 @@ export class ResolutionHelper {
             } else {
                 window.addEventListener("load", () => {
                     me.recordHeight();
-                    window.addEventListener("resize", me.onResize, false);
                     window.addEventListener("orientationchange", me.onOrientationChange, false);
                 }, false);
             }
@@ -257,7 +260,6 @@ export class ResolutionHelper {
                 me._maxLandscapeHeight = Math.max(me._maxLandscapeHeight, me.landscapeHeight);
             } else if (me.dviceDirection == "Portrait") {
                 me.protraitHeight = Math.max(window.innerWidth, window.innerHeight);
-
             }
         }
     }
@@ -285,7 +287,7 @@ export class ResolutionHelper {
         let innerSize = me.windowInnerSize;
         let size = frameSize.clone();
         if (!JSB && !PREVIEW) {
-            size = innerSize;
+            size = innerSize;  
         }
         return size;
     }
