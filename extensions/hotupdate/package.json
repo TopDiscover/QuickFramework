@@ -1,0 +1,31 @@
+{
+    "name": "hotupdate",
+    "version": "1.0.0",
+    "main": "./browser.js",
+    "description": "热更新版本文件生成工具",
+    "author": "zheng_fasheng",
+    "contributions": {
+        "menu": [
+            {
+                "path": "项目工具",
+                "label": "热更新",
+                "message": "showPanel"
+            }
+        ],
+        "messages": {
+            "showPanel": {
+                "methods": [
+                    "showPanel"
+                ]
+            }
+        }
+    },
+    "panels": {
+        "default":{
+            "main": "./panels/index.js",
+            "type": "dockable",
+            "title": "热更新工具",
+            "size" : {"width" : 900 , "height" : 900,"min-width" : 500,"min-height":500}
+        }
+    }
+}
