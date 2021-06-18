@@ -2,6 +2,14 @@
 
     <ui-section class="greenColor config" header="主包Manifest配置" expand>
         <ui-prop>
+            <ui-label slot="label" class="titleColor" tooltip="生成平台">生成平台</ui-label>
+            <ui-select id="platform" slot="content">
+                <option value="0">android</option>
+                <option value="1">windows</option>
+            </ui-select>
+        </ui-prop>
+
+        <ui-prop>
             <ui-label slot="label" class="titleColor" tooltip="主包的版本号设置">版本号</ui-label>
             <ui-input id="version" slot="content" class="contentColor"></ui-input>
         </ui-prop>
@@ -12,22 +20,23 @@
         </ui-prop>
         <ui-prop>
             <ui-label slot="label" class="titleColor" tooltip="游戏热更新历史配置服务器地址">服务器历史地址</ui-label>
-            <ui-select id = "historyServerIPSelect" slot="content">
+            <ui-select id="historyServerIPSelect" slot="content">
                 <!-- 需要动态添加 -->
             </ui-select>
         </ui-prop>
         <ui-prop>
-            <ui-label slot="label" class="titleColor" tooltip="构建项目资源文件目录">构建项目</ui-label>
-            <ui-file id = "buildDir" slot="content"></ui-file>
+            <ui-label slot="label" class="titleColor" tooltip="该目录指定Manifest生成目录的上一级目录">构建目录</ui-label>
+            <ui-input id="buildDir" slot="content" disabled class="contentColor"></ui-input>
         </ui-prop>
         <ui-prop>
             <ui-label slot="label" class="titleColor" tooltip="Manifest输出目录">Manifest输出目录</ui-label>
-            <ui-file id = "outManifestDir" slot="content"></ui-file>
+            <ui-input id="manifestDir" slot="content" disabled class="contentColor"></ui-input>
         </ui-prop>
         <ui-prop>
-            <ui-button id = "delBunles" class="red">执行Bundle剔除</ui-button>
-            <ui-button id = "createManifest" class="green">生成</ui-button>
-            <ui-button if = "openManifestDir" class="green">打开目录</ui-button>
+            <ui-button id="selectManifestDir" slot="content">选择构建目录</ui-button>
+            <ui-button id="openManifestDir" slot="content" slot="content">打开构建目录</ui-button>
+            <ui-button id="delBunles" slot="content" class="red">执行Bundle剔除</ui-button>
+            <ui-button id="createManifest" slot="content" class="green">生成</ui-button>
         </ui-prop>
     </ui-section>
 
@@ -45,16 +54,15 @@
     <!-- 测试环境 -->
     <ui-section class="greenColor config" header="测试环境" expand>
         <ui-prop>
-            <ui-label slot="label" class="titleColor" tooltip="主包版本">主包版本</ui-label>
-            <ui-label slot="content" class="titleColor">-</ui-label>
+            <ui-label slot="label" class="titleColor" tooltip="主包地址">主包地址</ui-label>
+            <ui-label id="remoteUrl" slot="content" class="titleColor">-</ui-label>
             <ui-button slot="content">刷新</ui-button>
         </ui-prop>
         <!--subgame test start-->
         <!--subgame test end-->
         <ui-prop>
             <ui-label slot="label" class="titleColor" tooltip="当点击部署时会直接部署到这个地址上">本机服务器路径</ui-label>
-            <ui-label slot="content" class="titleColor">-</ui-label>
-            <ui-file slot="content"></ui-file>
+            <ui-input id="remoteDir" disabled slot="content" class="titleColor"></ui-input>
         </ui-prop>
         <ui-prop>
             <ui-label slot="label" class="titleColor">本地测试服务器部署操作</ui-label>
@@ -63,12 +71,14 @@
             <ui-progress style="width: 100%;" value="100"></ui-progress>
         </ui-prop>
         <ui-prop>
-            <ui-button>部署</ui-button>
+            <ui-button id="selectRemoteDir" slot="content">选择本地服务器</ui-button>
+            <ui-button id="openRemoteDir" slot="content">打开本地服务器</ui-button>
+            <ui-button id="deployToRemote" slot="content">部署</ui-button>
         </ui-prop>
     </ui-section>
 
     <!-- 日志 -->
     <ui-section class="greenColor config" header="日志" expand>
-        <ui-textarea value="test"></ui-textarea>
+        <ui-textarea id="logView"></ui-textarea>
     </ui-section>
 </div>
