@@ -23,7 +23,8 @@ const elements = {
     remoteDir: "#remoteDir",//主包本地测试服务器目录
 }
 
-const gamesConfig = JSON.parse(fs.readFileSync(path.join(__dirname, "../../config/bundles.json")));
+const gamesConfigPath = path.join(__dirname, "../../config/bundles.json");
+const gamesConfig = JSON.parse(fs.readFileSync(gamesConfigPath));
 let bundles = {};
 //html文本
 function GenerateTemplate() {
@@ -123,6 +124,7 @@ exports.$ = elements;
 //本来想使用vue,但似乎在methods中调用this的函数，居然都未定义，所以就不用vue了
 //面板上的方法,似乎不响应，郁闷
 exports.methods = {
+    /**@description 保存当前用户设置 */
     saveUserCache() {
         let cacheString = JSON.stringify(userCache);
         fs.writeFileSync(userCachePath, cacheString);
@@ -174,6 +176,7 @@ exports.methods = {
         });
         userCache.remoteDir = "-";
     },
+    /**@description 读取本地缓存 */
     readCache() {
         if (fs.existsSync(userCachePath)) {
             let data = fs.readFileSync(userCachePath, "utf-8")
@@ -195,7 +198,7 @@ exports.methods = {
         this.$.version.value = userCache.version;
         this.$.serverIP.value = userCache.serverIP;
         setTimeout(() => {
-            this.updateShowUseAddrBtn();
+            this.updateHistoryUrl();
             if (userCache.historySelectedUrl = "") {
                 userCache.historySelectedUrl = userCache.historyIps[0];
             }
@@ -233,34 +236,68 @@ exports.methods = {
         });
         this.$.remoteDir.value = userCache.remoteDir;
     },
+    /**@description 初始化数据 */
     initDatas() {
         this.readCache();
         this.initUIDatas()
     },
+    /**@description 绑定界面事件 */
     bindingEvents() {
         this.$.useLocalIP.addEventListener("confirm", this.onUseLocalIP.bind(this));
         this.$.serverIP.addEventListener("blur", this.onInputServerUrlOver.bind(this, this.$.serverIP));
         this.$.historyServerIPSelect.addEventListener("change", this.onHistoryServerIPChange.bind(this, this.$.historyServerIPSelect));
+        this.$.version.addEventListener("blur", this.onVersionChange.bind(this, this.$.version));
     },
     //初始化
     init() {
         this.initDatas();
         this.bindingEvents();
     },
+    /**
+     * @description 版本比较 curVersion > prevVersion 返回ture 
+     * @example (1.0.1 > 1.0)  (1.0.1 <= 1.0.1) (1.0.1 < 1.0.2) (1.0.1 > 1.0.0) 
+     * @param curVersion 当前构建版本
+     * @param prevVersion 之前构建的版本
+     */
+    isVersionPass(curVersion, prevVersion) {
+        if (undefined === curVersion || null === curVersion || undefined === prevVersion || null === prevVersion) return false;
+        let curVersionArr = curVersion.split(".");
+        let prevVersionArr = prevVersion.split(".");
+        let len = curVersionArr.length > prevVersionArr.length ? curVersionArr.length : prevVersionArr.length;
+        for (let i = 0; i < len; i++) {
+            let curValue = curVersionArr[i],
+                genValue = prevVersionArr[i];
+            if (undefined === curValue && undefined !== genValue) return false;
+            if (undefined !== curValue && undefined === genValue) return true;
+            if (curValue && genValue && parseInt(curValue) > parseInt(genValue)) return true;
+        }
+        return false;
+    },
+    /** @description 主版本号输入*/
+    onVersionChange(element) {
+        let version = element.value;
+        if (this.isVersionPass(version, userCache.version)) {
+            //有效版本
+            return;
+        }
+        this.addLog(`无效版本号,${version} 应大于 ${userCache.version}`);
+    },
+    /** 
+     * @description 切换历史地址 
+     * @param element 控件自身 
+     */
     onHistoryServerIPChange(element) {
         //先拿到选中项
-        let url = this.serverUrl;
         let options = this.$.historyServerIPSelect.$select.options;
         for (let i = 0; i < options.length; i++) {
             if (options[i].value == element.value) {
-                url = options[i].text;
+                userCache.serverIP = options[i].text;
                 break;
             }
         }
-        this.serverUrl = url;
         this.onInputServerUrlOver();
     },
-    //点击了使用本机
+    /** @description 点击了使用本机*/
     onUseLocalIP() {
         let network = require("os").networkInterfaces();
         let url = "";
@@ -272,13 +309,17 @@ exports.methods = {
             });
         });
         if (url.length > 0) {
-            this.serverUrl = "http://" + url;
+            userCache.serverIP = "http://" + url;
         }
         this.onInputServerUrlOver();
     },
-    //输入主版本号结束
+    /**
+     * @description 输入服务器地址结束
+     * @param {*} element 
+     * @returns 
+     */
     onInputServerUrlOver(element) {
-        let url = this.serverUrl;
+        let url = userCache.serverIP;
         if (element) {
             //从输入框过来的
             url = element.value;
@@ -288,17 +329,18 @@ exports.methods = {
         }
 
         if (/^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/)(([A-Za-z0-9-~]+)\.)+([A-Za-z0-9-~\/])+$/.test(url) == false) {
-            this.addLog(url + " 不是以http://https://开头，或者不是网址,已为你修改成本机地址");
-            this._getRemoteServerVersion()
+            this.addLog(url + `不是以http://https://开头，或者不是网址`);
+            return;
         }
 
         this.$.serverIP.value = url;
         if (this.addHotAddress(url)) {
-            this.updateShowUseAddrBtn();
-            //this._saveConfig()
+            this.updateHistoryUrl();
         }
+        this.saveUserCache();
     },
-    updateShowUseAddrBtn() {
+    /**@description 更新历史地址 */
+    updateHistoryUrl() {
         this.$.historyServerIPSelect.$select.options.length = 0;
         for (let i = 0; i < userCache.historyIps.length; i++) {
             let option = document.createElement("option");
@@ -307,15 +349,24 @@ exports.methods = {
             this.$.historyServerIPSelect.$select.options.add(option);
         }
     },
+    /**
+     * @description 添加历史地址 
+     * @param url
+     * */
     addHotAddress(url) {
-        if (this.historyServerIPs.indexOf(url) == -1) {
-            this.historyServerIPs.push(url);
+        if (userCache.historyIps.indexOf(url) == -1) {
+            userCache.historyIps.push(url);
             this.addLog(`添加历史记录 :${url} 成功`);
             return true;
         }
         return false;
     },
-
+    /**
+     * @description 添加日志
+     * @param {*} message 
+     * @param {*} obj 
+     * @returns 
+     */
     addLog(message, obj = null) {
         if (typeof obj == "function") {
             return;
