@@ -8,7 +8,7 @@
         "menu": [
             {
                 "path": "项目工具",
-                "label": "引擎修改",
+                "label": "引擎修正",
                 "message": "fixEngine"
             }
         ],
