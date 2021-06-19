@@ -19,6 +19,7 @@ const elements = {
     deployToRemote: "#deployToRemote",//部署
     logView: "#logView",//日志
     deployProgress: "#deployProgress",//部署进度
+    refreshMainVersion:"#refreshMainVersion",//主包地址刷新
 }
 
 const gamesConfigPath = path.join(__dirname, "../../config/bundles.json");
@@ -56,13 +57,14 @@ function GenerateTemplate() {
             elements[`${gameInfo.dir}Version`] = `#${gameInfo.dir}Version`;
             _subGameServerVersionView += `
         <ui-prop>
-            <ui-label slot="label" class="titleColor" tooltip="${gameInfo.name}(${gameInfo.dir})测试环境地址">${gameInfo.name}(${gameInfo.dir})</ui-label>
+            <ui-label slot="label" class="titleColor" tooltip="${gameInfo.name}(${gameInfo.dir})测试环境地址,显示格式 [版本号]:地址">${gameInfo.name}(${gameInfo.dir})</ui-label>
             <ui-label id = "${gameInfo.dir}remoteUrl" slot="content" class="titleColor">${_gamesConfig.packageUrl}</ui-label>
-            <ui-button slot="content">刷新</ui-button>
+            <ui-button id = "refresh${gameInfo.dir}Version" slot="content">刷新</ui-button>
         </ui-prop>
         `;
             //子包的远程本机测试地址
             elements[`${gameInfo.dir}remoteUrl`] = `#${gameInfo.dir}remoteUrl`;
+            elements[`refresh${gameInfo.dir}Version`] = `#refresh${gameInfo.dir}Version`;
             bundles[gameInfo.dir] = JSON.parse(JSON.stringify(gameInfo));
         }
     }
@@ -224,11 +226,19 @@ exports.methods = {
         });
 
         //测试环境
-        this.$.remoteUrl.value = userCache.remoteUrl;
+        this.$.remoteUrl.value = this.getShowRemoteString();
         Object.keys(userCache.remoteBundleUrls).forEach((key) => {
-            this.$[`${key}remoteUrl`].value = userCache.remoteBundleUrls[key];
+            this.$[`${key}remoteUrl`].value = this.getShowRemoteString(key);
         });
         this.$.remoteDir.value = userCache.remoteDir;
+    },
+    /**@description 返回远程显示地址+版本号 */
+    getShowRemoteString(bundleName){
+        if( bundleName ){
+            return `[${userCache.bundles[bundleName].version}] : ${userCache.remoteBundleUrls[bundleName]}`; 
+        }else{
+            return `[${userCache.version}] : ${userCache.remoteUrl}`; 
+        }
     },
     /**@description 初始化数据 */
     initDatas() {
@@ -243,7 +253,8 @@ exports.methods = {
         this.$.historyServerIPSelect.addEventListener("change", this.onHistoryServerIPChange.bind(this, this.$.historyServerIPSelect));
         this.$.version.addEventListener("blur", this.onVersionChange.bind(this, this.$.version));
         //bundles 版本设置
-        Object.keys(userCache.bundles).forEach((key) => {
+        let keys = Object.keys(userCache.bundles);
+        keys.forEach((key) => {
             //是否在包内
             //this.$[`is${key}includeApp`].value = userCache.bundles[key].includeApk;
             //版本号
@@ -257,11 +268,51 @@ exports.methods = {
         this.$.createManifest.addEventListener("confirm", this.onCreateManifest.bind(this, this.$.createManifest));
         //部署
         this.$.deployToRemote.addEventListener("confirm", this.onDeployToRemote.bind(this));
+        //主包地址刷新 
+        this.$.refreshMainVersion.addEventListener("confirm",this.onRefreshMainVersion.bind(this));
+        //refresh${gameInfo.dir}Version 子包地址刷新
+        keys.forEach((key)=>{
+            this.$[`refresh${key}Version`].addEventListener("confirm",this.onRefreshBundleLocalServerVersion.bind(this,key))
+        });
     },
     //初始化
     init() {
         this.initDatas();
         this.bindingEvents();
+    },
+    onRefreshMainVersion(){
+        if( userCache.remoteDir.length > 0 ){
+            let versionManifestPath = path.join(userCache.remoteDir,"manifest/version.manifest");
+            fs.readFile(versionManifestPath,"utf-8",(err,data)=>{
+                if( err ){
+                    this.addLog(`找不到 : ${versionManifestPath}`);
+                }else{
+                    let versionConfig = JSON.parse(data);
+                    userCache.remoteUrl = versionConfig.packageUrl;
+                    this.$.remoteUrl.value = this.getShowRemoteString();
+                    this.saveUserCache();
+                }
+            });
+        }else{
+            this.addLog(`只能刷新部署在本地的版本`);
+        }
+    },
+    onRefreshBundleLocalServerVersion(key){
+        if( userCache.remoteDir.length > 0 ){
+            let versionManifestPath = path.join(userCache.remoteDir,`manifest/${key}_version.manifest`);
+            fs.readFile(versionManifestPath,"utf-8",(err,data)=>{
+                if( err ){
+                    this.addLog(`找不到 : ${versionManifestPath}`);
+                }else{
+                    let versionConfig = JSON.parse(data);
+                    userCache.remoteBundleUrls[key] = versionConfig.packageUrl;
+                    this.$[`${key}remoteUrl`].value = this.getShowRemoteString(key);
+                    this.saveUserCache();
+                }
+            });
+        }else{
+            this.addLog(`只能刷新部署在本地的版本`);
+        }
     },
     /**
      * @description 部署
@@ -414,14 +465,14 @@ exports.methods = {
 
         //生成project.manifest
         let projectManifestPath = path.join(manifestDir, "project.manifest");
-        let versionManifestPaht = path.join(manifestDir, "version.manifest");
+        let versionManifestPath = path.join(manifestDir, "version.manifest");
 
         fs.writeFileSync(projectManifestPath, JSON.stringify(manifest));
         this.addLog(`生成${projectManifestPath}成功`);
         delete manifest.assets;
         delete manifest.searchPaths;
-        fs.writeFileSync(versionManifestPaht, JSON.stringify(manifest));
-        this.addLog(`生成${versionManifestPaht}成功`);
+        fs.writeFileSync(versionManifestPath, JSON.stringify(manifest));
+        this.addLog(`生成${versionManifestPath}成功`);
 
         //生成各bundles版本文件
         for (let i = 0; i < subBundles.length; i++) {
@@ -443,14 +494,14 @@ exports.methods = {
 
             this.readDir(path.join(buildDir, `assets/${key}`), manifest.assets, buildDir);
             projectManifestPath = path.join(manifestDir, `${key}_project.manifest`);
-            versionManifestPaht = path.join(manifestDir, `${key}_version.manifest`);
+            versionManifestPath = path.join(manifestDir, `${key}_version.manifest`);
 
             fs.writeFileSync(projectManifestPath, JSON.stringify(manifest));
             this.addLog(`生成${projectManifestPath}成功`);
             delete manifest.assets;
             delete manifest.searchPaths;
-            fs.writeFileSync(versionManifestPaht, JSON.stringify(manifest));
-            this.addLog(`生成${versionManifestPaht}成功`);
+            fs.writeFileSync(versionManifestPath, JSON.stringify(manifest));
+            this.addLog(`生成${versionManifestPath}成功`);
         }
         this._isDoCreate = false;
     },
@@ -641,6 +692,7 @@ exports.methods = {
         }
 
         this.$.serverIP.value = url;
+        userCache.serverIP = url;
         if (this.addHotAddress(url)) {
             this.updateHistoryUrl();
         }
