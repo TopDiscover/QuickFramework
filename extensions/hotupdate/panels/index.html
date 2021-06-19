@@ -2,6 +2,9 @@
 
     <ui-section class="greenColor config" header="主包Manifest配置" expand>
         <ui-prop>
+            <ui-label class="contentColor" >注意，主包版本目前只包含了 assets/main & assets/resources,如果对src目录下有需要升级的，请在extensions/hotupdate/panels/index.js的getMainBundleIncludes函数中添加进入版本</ui-label>
+        </ui-prop>
+        <ui-prop>
             <ui-label slot="label" class="titleColor" tooltip="主包的版本号设置">版本号</ui-label>
             <ui-input id="version" slot="content" class="contentColor"></ui-input>
         </ui-prop>

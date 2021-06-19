@@ -1,7 +1,6 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const Electron = require("electron");
 //样式文本
 exports.style = fs.readFileSync(path.join(__dirname, "./index.css"), "utf8");
 
@@ -19,7 +18,7 @@ const elements = {
     deployToRemote: "#deployToRemote",//部署
     logView: "#logView",//日志
     deployProgress: "#deployProgress",//部署进度
-    refreshMainVersion:"#refreshMainVersion",//主包地址刷新
+    refreshMainVersion: "#refreshMainVersion",//主包地址刷新
 }
 
 const gamesConfigPath = path.join(__dirname, "../../config/bundles.json");
@@ -233,11 +232,11 @@ exports.methods = {
         this.$.remoteDir.value = userCache.remoteDir;
     },
     /**@description 返回远程显示地址+版本号 */
-    getShowRemoteString(bundleName){
-        if( bundleName ){
-            return `[${userCache.bundles[bundleName].version}] : ${userCache.remoteBundleUrls[bundleName]}`; 
-        }else{
-            return `[${userCache.version}] : ${userCache.remoteUrl}`; 
+    getShowRemoteString(bundleName) {
+        if (bundleName) {
+            return `[${userCache.bundles[bundleName].version}] : ${userCache.remoteBundleUrls[bundleName]}`;
+        } else {
+            return `[${userCache.version}] : ${userCache.remoteUrl}`;
         }
     },
     /**@description 初始化数据 */
@@ -269,48 +268,101 @@ exports.methods = {
         //部署
         this.$.deployToRemote.addEventListener("confirm", this.onDeployToRemote.bind(this));
         //主包地址刷新 
-        this.$.refreshMainVersion.addEventListener("confirm",this.onRefreshMainVersion.bind(this));
+        this.$.refreshMainVersion.addEventListener("confirm", this.onRefreshMainVersion.bind(this));
         //refresh${gameInfo.dir}Version 子包地址刷新
-        keys.forEach((key)=>{
-            this.$[`refresh${key}Version`].addEventListener("confirm",this.onRefreshBundleLocalServerVersion.bind(this,key))
+        keys.forEach((key) => {
+            this.$[`refresh${key}Version`].addEventListener("confirm", this.onRefreshBundleLocalServerVersion.bind(this, key))
         });
+        //删除不包含在包内的bundles
+        this.$.delBunles.addEventListener("confirm", this.onDelBundles.bind(this));
     },
     //初始化
     init() {
         this.initDatas();
         this.bindingEvents();
     },
-    onRefreshMainVersion(){
-        if( userCache.remoteDir.length > 0 ){
-            let versionManifestPath = path.join(userCache.remoteDir,"manifest/version.manifest");
-            fs.readFile(versionManifestPath,"utf-8",(err,data)=>{
-                if( err ){
+    /**@description 删除不包含在包内的bundles */
+    async onDelBundles() {
+        if( this.isDoCreate()) return;
+        const config = {
+            title: '警告',
+            detail: '',
+            buttons: ['取消', '确定'],
+        };
+        const code = await Editor.Dialog.info('执行此操作将会删除不包含在包内的所有bundles,是否继续？', config);
+        if (code.response == 1) {
+            this.removeNotInApkBundle();
+        }
+    },
+    /**@description 删除不包含在包内的所有bundles */
+    removeNotInApkBundle() {
+        let keys = Object.keys(userCache.bundles);
+        let removeBundles = [];
+        keys.forEach((key) => {
+            if (!userCache.bundles[key].includeApk) {
+                removeBundles.push(key);
+            }
+        });
+        let manifests = [];
+        let removeDirs = [];
+        for (let i = 0; i < removeBundles.length; i++) {
+            let key = removeBundles[i];
+            removeDirs.push(path.join(userCache.buildDir, `assets/${key}`));
+            manifests.push(path.join(userCache.buildDir, `manifest/${key}_project.manifest`));
+            manifests.push(path.join(userCache.buildDir, `manifest/${key}_version.manifest`));
+        }
+
+        for (let i = 0; i < removeDirs.length; i++) {
+            this.addLog(`删除目录 : ${removeDirs[i]}`);
+            this.delDir(removeDirs[i], true);
+        }
+
+        for (let i = 0; i < manifests.length; i++) {
+            this.addLog(`删除版本文件 : ${manifests[i]}`);
+            this.delFile(manifests[i]);
+        }
+
+    },
+    /**
+     * @description 刷新测试环境主包信息
+     */
+    onRefreshMainVersion() {
+        if( this.isDoCreate()) return;
+        if (userCache.remoteDir.length > 0) {
+            let versionManifestPath = path.join(userCache.remoteDir, "manifest/version.manifest");
+            fs.readFile(versionManifestPath, "utf-8", (err, data) => {
+                if (err) {
                     this.addLog(`找不到 : ${versionManifestPath}`);
-                }else{
+                } else {
                     let versionConfig = JSON.parse(data);
                     userCache.remoteUrl = versionConfig.packageUrl;
                     this.$.remoteUrl.value = this.getShowRemoteString();
                     this.saveUserCache();
                 }
             });
-        }else{
+        } else {
             this.addLog(`只能刷新部署在本地的版本`);
         }
     },
-    onRefreshBundleLocalServerVersion(key){
-        if( userCache.remoteDir.length > 0 ){
-            let versionManifestPath = path.join(userCache.remoteDir,`manifest/${key}_version.manifest`);
-            fs.readFile(versionManifestPath,"utf-8",(err,data)=>{
-                if( err ){
+    /**
+     * @description 刷新测试环境子包信息
+     * @param {*} key 
+     */
+    onRefreshBundleLocalServerVersion(key) {
+        if( this.isDoCreate()) return;
+        if (userCache.remoteDir.length > 0) {
+            let versionManifestPath = path.join(userCache.remoteDir, `manifest/${key}_version.manifest`);
+            fs.readFile(versionManifestPath, "utf-8", (err, data) => {
+                if (err) {
                     this.addLog(`找不到 : ${versionManifestPath}`);
-                }else{
+                } else {
                     let versionConfig = JSON.parse(data);
                     userCache.remoteBundleUrls[key] = versionConfig.packageUrl;
                     this.$[`${key}remoteUrl`].value = this.getShowRemoteString(key);
                     this.saveUserCache();
                 }
             });
-        }else{
+        } else {
             this.addLog(`只能刷新部署在本地的版本`);
         }
     },
@@ -318,6 +370,7 @@ exports.methods = {
      * @description 部署
      */
     onDeployToRemote() {
+        if( this.isDoCreate() ) return;
         if (userCache.remoteDir.length <= 0) {
             this.addLog("[部署]请先选择本地服务器目录");
             return;
@@ -331,7 +384,26 @@ exports.methods = {
             return;
         }
 
-        let copyDirs = ["src", "assets", "manifest"];
+        let includes = this.getMainBundleIncludes();
+
+        let temps = [];
+        for( let i = 0 ; i < includes.length ; i++ ){
+            //只保留根目录
+            let dir = includes[i];
+            let index = dir.search(/\\|\//);
+            if( index == -1){
+                if( temps.indexOf(dir) == -1){
+                    temps.push(dir);
+                }
+            }else{
+                dir = dir.substr(0,index);
+                if( temps.indexOf(dir) == -1){
+                    temps.push(dir);
+                }
+            }
+        }
+
+        let copyDirs = ["manifest"].concat(temps);
         for (let i = 0; i < copyDirs.length; i++) {
             let dir = path.join(userCache.buildDir, copyDirs[i]);
             if (!fs.existsSync(dir)) {
@@ -349,13 +421,11 @@ exports.methods = {
 
         count = 0;
         for (let i = 0; i < copyDirs.length; i++) {
-            let dir = path.join(userCache.buildDir,copyDirs[i]);
-            console.log("dir",dir);
+            let dir = path.join(userCache.buildDir, copyDirs[i]);
             count += this.getFileCount(dir);
         }
 
         this.addLog(`[部署]复制文件个数 : ${count}`);
-        console.log(userCache.buildDir);
 
         for (let i = 0; i < copyDirs.length; i++) {
             this.copySourceDirToDesDir(path.join(userCache.buildDir, copyDirs[i]), path.join(userCache.remoteDir, copyDirs[i]));
@@ -416,12 +486,21 @@ exports.methods = {
         };
         return counter(dir), count
     },
+    /**@description 返回需要添加到主包版本的文件目录 */
+    getMainBundleIncludes() {
+        return [
+            // "src", //这个里面会包含工程的插件脚本，如该工程的protobuf.js CryptoJS.js,如果考虑后面会升级，加入到里面
+            // "jsb-adapter", //这个东西一般不会变，不用加载到版本控制中
+            "assets/main",
+            "assets/resources",
+        ];
+    },
     /**@description 生成manifest版本文件 */
     onCreateManifest(element) {
         if (this.isDoCreate()) return;
         this._isDoCreate = true;
         this.saveUserCache();
-        this.addLog(`当前用户配置为 : ` , userCache);
+        this.addLog(`当前用户配置为 : `, userCache);
         this.addLog("开始生成Manifest配置文件...");
         let version = userCache.version;
         this.addLog("主包版本号:", version);
@@ -460,8 +539,10 @@ exports.methods = {
         this.mkdirSync(manifestDir);
 
         //读出主包资源，生成主包版本
-        this.readDir(path.join(buildDir, "src"), manifest.assets, buildDir);
-        this.readDir(path.join(buildDir, "assets/resources"), manifest.assets, buildDir);
+        let mainIncludes = this.getMainBundleIncludes();
+        for (let i = 0; i < mainIncludes.length; i++) {
+            this.readDir(path.join(buildDir, mainIncludes[i]), manifest.assets, buildDir);
+        }
 
         //生成project.manifest
         let projectManifestPath = path.join(manifestDir, "project.manifest");
@@ -505,7 +586,7 @@ exports.methods = {
         }
         this._isDoCreate = false;
     },
-    delDir(sourceDir) {
+    delDir(sourceDir, isRemoveSourceDir = false) {
         let delFile = function (dir) {
             let readDir = fs.readdirSync(dir);
             for (let i in readDir) {
@@ -520,13 +601,20 @@ exports.methods = {
                     let fullPath = path.join(dir, readDir[i]);
                     delDir(fullPath)
                 }
-                dir !== sourceDir && fs.rmdirSync(dir)
+                (dir !== sourceDir || isRemoveSourceDir) && fs.rmdirSync(dir)
             } else {
-                dir !== sourceDir && fs.rmdirSync(dir)
+                (dir !== sourceDir || isRemoveSourceDir) && fs.rmdirSync(dir)
             }
         };
         delFile(sourceDir);
         delDir(sourceDir)
+    },
+    delFile(filePath) {
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+            return true;
+        }
+        return false;
     },
     mkdirSync(dir) {
         try {
