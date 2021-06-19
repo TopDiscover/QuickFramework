@@ -1,5 +1,5 @@
 {
-    "packageUrl": "http://192.168.0.104/hotupdate",
+    "packageUrl": "http://192.168.3.153/hotupdate",
     "forceIncludeAllGameToApk": false,
     "version" : "1",
     "description" :"主包,其实只包含了登录界面，该字段只是做说明使用，无实际意义，注意版本号必须>=1",
