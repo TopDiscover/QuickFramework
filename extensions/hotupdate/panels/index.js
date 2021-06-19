@@ -21,7 +21,7 @@ const elements = {
     refreshMainVersion: "#refreshMainVersion",//主包地址刷新
 }
 
-const gamesConfigPath = path.join(__dirname, "../../config/bundles.json");
+const gamesConfigPath = path.join(__dirname, "../../../config/bundles.json");
 const gamesConfig = JSON.parse(fs.readFileSync(gamesConfigPath));
 let bundles = {};
 //html文本
