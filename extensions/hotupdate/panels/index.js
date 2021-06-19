@@ -864,9 +864,9 @@ exports.ready = async function () {
 };
 // 尝试关闭面板的时候触发
 exports.beforeClose = async function () {
-    console.log("beforeClose");
+    
 };
 // 当面板实际关闭后触发
 exports.close = async function () {
-    console.log("close");
+    
 };
