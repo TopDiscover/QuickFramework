@@ -18,7 +18,7 @@ const elements = {
     remoteDir: "#remoteDir",//主包本地测试服务器目录
     deployToRemote: "#deployToRemote",//部署
     logView: "#logView",//日志
-
+    deployProgress: "#deployProgress",//部署进度
 }
 
 const gamesConfigPath = path.join(__dirname, "../../config/bundles.json");
@@ -126,7 +126,7 @@ exports.methods = {
     saveUserCache() {
         let cacheString = JSON.stringify(userCache);
         fs.writeFileSync(userCachePath, cacheString);
-        this.addLog(`写入缓存 :`, userCache);
+        // this.addLog(`写入缓存 :`, userCache);
     },
     /**@description 检证数据 */
     checkUserCache() {
@@ -179,9 +179,9 @@ exports.methods = {
             if (this.checkUserCache()) {
                 this.saveUserCache();
             }
-            this.addLog(`存在缓存 : ${userCachePath}`, userCache);
+            //this.addLog(`存在缓存 : ${userCachePath}`, userCache);
         } else {
-            this.addLog(`不存在缓存 : ${userCachePath}`);
+            //this.addLog(`不存在缓存 : ${userCachePath}`);
             this.generateDefaultUseCache();
             this.addLog(`生存默认缓存 : `, userCache);
             this.saveUserCache();
@@ -255,16 +255,122 @@ exports.methods = {
         this.$.remoteDir.addEventListener("confirm", this.onRemoteDirConfirm.bind(this, this.$.remoteDir));
         //生成
         this.$.createManifest.addEventListener("confirm", this.onCreateManifest.bind(this, this.$.createManifest));
+        //部署
+        this.$.deployToRemote.addEventListener("confirm", this.onDeployToRemote.bind(this));
     },
     //初始化
     init() {
         this.initDatas();
         this.bindingEvents();
     },
+    /**
+     * @description 部署
+     */
+    onDeployToRemote() {
+        if (userCache.remoteDir.length <= 0) {
+            this.addLog("[部署]请先选择本地服务器目录");
+            return;
+        }
+        if (!fs.existsSync(userCache.remoteDir)) {
+            this.addLog(`[部署]本地测试服务器目录不存在 : ${userCache.remoteDir}`);
+            return;
+        }
+        if (!fs.existsSync(userCache.buildDir)) {
+            this.addLog(`[部署]构建目录不存在 : ${userCache.buildDir} , 请先构建`);
+            return;
+        }
+
+        let copyDirs = ["src", "assets", "manifest"];
+        for (let i = 0; i < copyDirs.length; i++) {
+            let dir = path.join(userCache.buildDir, copyDirs[i]);
+            if (!fs.existsSync(dir)) {
+                this.addLog(`${userCache.buildDir} [部署]不存在${copyDirs[i]}目录,无法拷贝文件`);
+                return;
+            }
+        }
+
+        this.addLog(`[部署]开始拷贝文件到 : ${userCache.remoteDir}`);
+        this.$.deployProgress.value = 0;
+        this.addLog(`[部署]删除旧目录 : ${userCache.remoteDir}`);
+        let count = this.getFileCount(userCache.remoteDir);
+        this.addLog(`[部署]删除文件个数:${count}`);
+        this.delDir(userCache.remoteDir);
+
+        count = 0;
+        for (let i = 0; i < copyDirs.length; i++) {
+            let dir = path.join(userCache.buildDir,copyDirs[i]);
+            console.log("dir",dir);
+            count += this.getFileCount(dir);
+        }
+
+        this.addLog(`[部署]复制文件个数 : ${count}`);
+        console.log(userCache.buildDir);
+
+        for (let i = 0; i < copyDirs.length; i++) {
+            this.copySourceDirToDesDir(path.join(userCache.buildDir, copyDirs[i]), path.join(userCache.remoteDir, copyDirs[i]));
+        }
+
+    },
+    addProgress() {
+        let value = this.$.deployProgress.value;
+        value = value + 1;
+        if (value > 100) {
+            value = 100;
+        }
+        this.$.deployProgress.value = value;
+    },
+    copySourceDirToDesDir(source, dest) {
+        this.addLog(`[部署]复制${source} => ${dest}`);
+        let self = this;
+        let makeDir = function (_source, _dest, _copyFileCb) {
+            fs.exists(_dest, function (isExist) {
+                isExist ? _copyFileCb(_source, _dest) : fs.mkdir(_dest, function () {
+                    self.addProgress(), _copyFileCb(_source, _dest)
+                })
+            })
+        };
+        let copyFile = function (_source, _dest) {
+            fs.readdir(_source, function (err, files) {
+                if (err) throw err;
+                files.forEach(function (filename) {
+                    let readStream;
+                    let writeStram;
+                    let sourcePath = _source + "/" + filename;
+                    let destPath = _dest + "/" + filename;
+                    fs.stat(sourcePath, function (err, stats) {
+                        if (err) throw err;
+                        if (stats.isFile()) {
+                            readStream = fs.createReadStream(sourcePath);
+                            writeStram = fs.createWriteStream(destPath);
+                            readStream.pipe(writeStram);
+                            self.addProgress();
+                        } else {
+                            stats.isDirectory() && makeDir(sourcePath, destPath, copyFile)
+                        }
+                    })
+                })
+            })
+        };
+        makeDir(source, dest, copyFile)
+    },
+    getFileCount(dir) {
+        let count = 0;
+        let counter = function (dir) {
+            let readdir = fs.readdirSync(dir);
+            for (let i in readdir) {
+                count++;
+                let fullPath = path.join(dir, readdir[i]);
+                fs.statSync(fullPath).isDirectory() && counter(fullPath)
+            }
+        };
+        return counter(dir), count
+    },
     /**@description 生成manifest版本文件 */
     onCreateManifest(element) {
         if (this.isDoCreate()) return;
         this._isDoCreate = true;
+        this.saveUserCache();
+        this.addLog(`当前用户配置为 : ` , userCache);
         this.addLog("开始生成Manifest配置文件...");
         let version = userCache.version;
         this.addLog("主包版本号:", version);
@@ -304,7 +410,7 @@ exports.methods = {
 
         //读出主包资源，生成主包版本
         this.readDir(path.join(buildDir, "src"), manifest.assets, buildDir);
-        this.readDir(path.join(buildDir, "assets/resources"),manifest.assets,buildDir);
+        this.readDir(path.join(buildDir, "assets/resources"), manifest.assets, buildDir);
 
         //生成project.manifest
         let projectManifestPath = path.join(manifestDir, "project.manifest");
