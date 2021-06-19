@@ -2,14 +2,6 @@
 
     <ui-section class="greenColor config" header="主包Manifest配置" expand>
         <ui-prop>
-            <ui-label slot="label" class="titleColor" tooltip="生成平台">生成平台</ui-label>
-            <ui-select id="platform" slot="content">
-                <option value="0">android</option>
-                <option value="1">windows</option>
-            </ui-select>
-        </ui-prop>
-
-        <ui-prop>
             <ui-label slot="label" class="titleColor" tooltip="主包的版本号设置">版本号</ui-label>
             <ui-input id="version" slot="content" class="contentColor"></ui-input>
         </ui-prop>
@@ -25,16 +17,14 @@
             </ui-select>
         </ui-prop>
         <ui-prop>
-            <ui-label slot="label" class="titleColor" tooltip="该目录指定Manifest生成目录的上一级目录">构建目录</ui-label>
-            <ui-input id="buildDir" slot="content" disabled class="contentColor"></ui-input>
+            <ui-label slot="label" class="titleColor" tooltip="该目录指向构建生成的bulid/(android|windows)/assets目录，manifest文件将会生成在这个目录下">构建目录</ui-label>
+            <ui-file id = "buildDir" slot="content" type="directory" ></ui-file>
         </ui-prop>
         <ui-prop>
             <ui-label slot="label" class="titleColor" tooltip="Manifest输出目录">Manifest输出目录</ui-label>
-            <ui-input id="manifestDir" slot="content" disabled class="contentColor"></ui-input>
+            <ui-file id = "manifestDir" slot="content" type="directory" disabled></ui-file>
         </ui-prop>
         <ui-prop>
-            <ui-button id="selectManifestDir" slot="content">选择构建目录</ui-button>
-            <ui-button id="openManifestDir" slot="content" slot="content">打开构建目录</ui-button>
             <ui-button id="delBunles" slot="content" class="red">执行Bundle剔除</ui-button>
             <ui-button id="createManifest" slot="content" class="green">生成</ui-button>
         </ui-prop>
@@ -44,7 +34,7 @@
     <ui-section class="greenColor config" header="Bundles Manifest配置" expand>
         <!--subgame start-->
         <!--subgame end-->
-        <!-- <ui-prop id = "bundlesProp">
+        <!-- <ui-prop>
             <ui-label slot="label" class="titleColor" tooltip="大厅">大厅</ui-label>
             <ui-checkbox slot="content" class="contentColor" value="true">是否包含在原始包内</ui-checkbox>
             <ui-input slot="content" class="contentColor"></ui-input>
@@ -62,7 +52,7 @@
         <!--subgame test end-->
         <ui-prop>
             <ui-label slot="label" class="titleColor" tooltip="当点击部署时会直接部署到这个地址上">本机服务器路径</ui-label>
-            <ui-input id="remoteDir" disabled slot="content" class="titleColor"></ui-input>
+            <ui-file id = "remoteDir" slot="content" type="directory" ></ui-file>
         </ui-prop>
         <ui-prop>
             <ui-label slot="label" class="titleColor">本地测试服务器部署操作</ui-label>
@@ -71,9 +61,7 @@
             <ui-progress style="width: 100%;" value="100"></ui-progress>
         </ui-prop>
         <ui-prop>
-            <ui-button id="selectRemoteDir" slot="content">选择本地服务器</ui-button>
-            <ui-button id="openRemoteDir" slot="content">打开本地服务器</ui-button>
-            <ui-button id="deployToRemote" slot="content">部署</ui-button>
+            <ui-button id="deployToRemote">部署</ui-button>
         </ui-prop>
     </ui-section>
 

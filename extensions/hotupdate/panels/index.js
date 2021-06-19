@@ -12,15 +12,13 @@ const elements = {
     historyServerIPSelect: "#historyServerIPSelect",//服务器历史地址
     buildDir: "#buildDir",//构建目录
     manifestDir: "#manifestDir",//Manifest输出目录
-    outManifestDir: "#outManifestDir",//Manifest输出目录
     delBunles: "#delBunles",//删除bundle
     createManifest: "#createManifest",//生成Manifest
-    openManifestDir: "#openManifestDir",//打开Manifest目录
-    bundlesProp: "#bundlesProp",//bundles Manifest配置
-    logView: "#logView",//日志
-    platform: "#platform",//平台
     remoteUrl: "#remoteUrl",//主包远程服务器地址
     remoteDir: "#remoteDir",//主包本地测试服务器目录
+    deployToRemote: "#deployToRemote",//部署
+    logView: "#logView",//日志
+
 }
 
 const gamesConfigPath = path.join(__dirname, "../../config/bundles.json");
@@ -84,13 +82,8 @@ function GenerateTemplate() {
     return _template;
 }
 
-//平台生成的路径
-let PlatformBuildPaths = [`${Editor.Project.path}/build/android/assets`, `${Editor.Project.path}build/windows/assets`];
-
 /**@description 本地缓存 */
 let userCache = {
-    /**@description 默认为安装平台 */
-    platform: 0,
     /**@description 主包版本号 */
     version: "",
     /**@description 当前服务器地址 */
@@ -100,8 +93,6 @@ let userCache = {
     historySelectedUrl: "",
     /**@description 构建项目目录 */
     buildDir: "",
-    /**@description 输出Manifest目录 */
-    manifestDir: "",
 
 
     /**@description 各bundle的版本配置 */
@@ -124,6 +115,13 @@ exports.$ = elements;
 //本来想使用vue,但似乎在methods中调用this的函数，居然都未定义，所以就不用vue了
 //面板上的方法,似乎不响应，郁闷
 exports.methods = {
+    getManifestDir(buildDir) {
+        if (buildDir && buildDir.length > 0) {
+            return buildDir + "\\manifest";
+        } else {
+            return "";
+        }
+    },
     /**@description 保存当前用户设置 */
     saveUserCache() {
         let cacheString = JSON.stringify(userCache);
@@ -162,19 +160,16 @@ exports.methods = {
     },
     /**@description 生成默认缓存 */
     generateDefaultUseCache() {
-        userCache.platform = 0;
         userCache.version = gamesConfig.version;
         userCache.serverIP = gamesConfig.packageUrl;
         userCache.historyIps = [userCache.serverIP];
-        userCache.buildDir = path.normalize(PlatformBuildPaths[userCache.platform]);
-        userCache.buildDir = userCache.buildDir.replace(/\\/g, "/");
-        userCache.manifestDir = userCache.buildDir + "/manifest";
+        userCache.buildDir = "";
         userCache.bundles = bundles;
         userCache.remoteUrl = "-";
         Object.keys(bundles).forEach((key) => {
             userCache.remoteBundleUrls[key] = "-";
         });
-        userCache.remoteDir = "-";
+        userCache.remoteDir = "";
     },
     /**@description 读取本地缓存 */
     readCache() {
@@ -194,7 +189,6 @@ exports.methods = {
     },
     /**@description 初始化UI数据 */
     initUIDatas() {
-        this.$.platform.value = userCache.platform;
         this.$.version.value = userCache.version;
         this.$.serverIP.value = userCache.serverIP;
         setTimeout(() => {
@@ -218,7 +212,7 @@ exports.methods = {
             }
         }, 10);
         this.$.buildDir.value = userCache.buildDir;
-        this.$.manifestDir.value = userCache.manifestDir;
+        this.$.manifestDir.value = this.getManifestDir(userCache.buildDir);
 
         //bundles 配置
         //`is${gameInfo.dir}includeApp`
@@ -238,6 +232,7 @@ exports.methods = {
     },
     /**@description 初始化数据 */
     initDatas() {
+        this._isDoCreate = false;
         this.readCache();
         this.initUIDatas()
     },
@@ -247,14 +242,198 @@ exports.methods = {
         this.$.serverIP.addEventListener("blur", this.onInputServerUrlOver.bind(this, this.$.serverIP));
         this.$.historyServerIPSelect.addEventListener("change", this.onHistoryServerIPChange.bind(this, this.$.historyServerIPSelect));
         this.$.version.addEventListener("blur", this.onVersionChange.bind(this, this.$.version));
+        //bundles 版本设置
+        Object.keys(userCache.bundles).forEach((key) => {
+            //是否在包内
+            //this.$[`is${key}includeApp`].value = userCache.bundles[key].includeApk;
+            //版本号
+            this.$[`${key}Version`].addEventListener('blur', this.onBundleVersionChange.bind(this, this.$[`${key}Version`], key));
+        });
+        //选择构建目录
+        this.$.buildDir.addEventListener("confirm", this.onBuildDirConfirm.bind(this, this.$.buildDir));
+        //本地测试目录
+        this.$.remoteDir.addEventListener("confirm", this.onRemoteDirConfirm.bind(this, this.$.remoteDir));
+        //生成
+        this.$.createManifest.addEventListener("confirm", this.onCreateManifest.bind(this, this.$.createManifest));
     },
     //初始化
     init() {
         this.initDatas();
         this.bindingEvents();
     },
+    /**@description 生成manifest版本文件 */
+    onCreateManifest(element) {
+        if (this.isDoCreate()) return;
+        this._isDoCreate = true;
+        this.addLog("开始生成Manifest配置文件...");
+        let version = userCache.version;
+        this.addLog("主包版本号:", version);
+        let buildDir = userCache.buildDir;
+        buildDir = buildDir.replace(/\\/g, "/");
+        this.addLog("构建目录:", buildDir);
+        let manifestDir = this.getManifestDir(buildDir);
+        manifestDir = manifestDir.replace(/\\/g, "/");
+        this.addLog("构建目录下的Manifest目录:", manifestDir);
+        let serverUrl = userCache.serverIP;
+        this.addLog("热更新地址:", serverUrl);
+        let subBundles = Object.keys(userCache.bundles);
+        this.addLog("所有子包:", subBundles);
+        let manifest = {
+            version: version,
+            packageUrl: serverUrl,
+            remoteManifestUrl: "",
+            remoteVersionUrl: "",
+            assets: {},
+            searchPaths: [],
+        };
+        if ("/" == serverUrl[serverUrl.length - 1]) {
+            manifest.remoteManifestUrl = serverUrl + "manifest/project.manifest";
+            manifest.remoteVersionUrl = serverUrl + "manifest/version.manifest";
+        } else {
+            manifest.remoteManifestUrl = serverUrl + "/manifest/project.manifest";
+            manifest.remoteVersionUrl = serverUrl + "/manifest/version.manifest";
+        }
+
+        //删除旧的版本控件文件
+        this.addLog("删除旧的Manifest目录", manifestDir);
+        if (fs.existsSync(manifestDir)) {
+            this.addLog("存在旧的，删除掉");
+            this.delDir(manifestDir);
+        }
+        this.mkdirSync(manifestDir);
+
+        //读出主包资源，生成主包版本
+        this.readDir(path.join(buildDir, "src"), manifest.assets, buildDir);
+        this.readDir(path.join(buildDir, "assets/resources"),manifest.assets,buildDir);
+
+        //生成project.manifest
+        let projectManifestPath = path.join(manifestDir, "project.manifest");
+        let versionManifestPaht = path.join(manifestDir, "version.manifest");
+
+        fs.writeFileSync(projectManifestPath, JSON.stringify(manifest));
+        this.addLog(`生成${projectManifestPath}成功`);
+        delete manifest.assets;
+        delete manifest.searchPaths;
+        fs.writeFileSync(versionManifestPaht, JSON.stringify(manifest));
+        this.addLog(`生成${versionManifestPaht}成功`);
+
+        //生成各bundles版本文件
+        for (let i = 0; i < subBundles.length; i++) {
+            let key = subBundles[i];
+            this.addLog(`正在生成:${key}`);
+            manifest.version = userCache.bundles[key].version;
+            manifest.remoteVersionUrl = "";
+            manifest.remoteManifestUrl = "";
+            manifest.assets = {};
+            manifest.searchPaths = [];
+
+            if ("/" == serverUrl[serverUrl.length - 1]) {
+                manifest.remoteManifestUrl = serverUrl + `manifest/${key}_project.manifest`;
+                manifest.remoteVersionUrl = serverUrl + `manifest/${key}_version.manifest`;
+            } else {
+                manifest.remoteManifestUrl = serverUrl + `/manifest/${key}_project.manifest`;
+                manifest.remoteVersionUrl = serverUrl + `/manifest/${key}_version.manifest`;
+            }
+
+            this.readDir(path.join(buildDir, `assets/${key}`), manifest.assets, buildDir);
+            projectManifestPath = path.join(manifestDir, `${key}_project.manifest`);
+            versionManifestPaht = path.join(manifestDir, `${key}_version.manifest`);
+
+            fs.writeFileSync(projectManifestPath, JSON.stringify(manifest));
+            this.addLog(`生成${projectManifestPath}成功`);
+            delete manifest.assets;
+            delete manifest.searchPaths;
+            fs.writeFileSync(versionManifestPaht, JSON.stringify(manifest));
+            this.addLog(`生成${versionManifestPaht}成功`);
+        }
+        this._isDoCreate = false;
+    },
+    delDir(sourceDir) {
+        let delFile = function (dir) {
+            let readDir = fs.readdirSync(dir);
+            for (let i in readDir) {
+                let fullPath = path.join(dir, readDir[i]);
+                fs.statSync(fullPath).isDirectory() ? delFile(fullPath) : fs.unlinkSync(fullPath)
+            }
+        };
+        let delDir = function (dir) {
+            let readDir = fs.readdirSync(dir);
+            if (readDir.length > 0) {
+                for (let i in readDir) {
+                    let fullPath = path.join(dir, readDir[i]);
+                    delDir(fullPath)
+                }
+                dir !== sourceDir && fs.rmdirSync(dir)
+            } else {
+                dir !== sourceDir && fs.rmdirSync(dir)
+            }
+        };
+        delFile(sourceDir);
+        delDir(sourceDir)
+    },
+    mkdirSync(dir) {
+        try {
+            fs.mkdirSync(dir)
+        } catch (e) {
+            if ("EEXIST" !== e.code) throw e
+        }
+    },
+    readDir(dir, obj, source) {
+        var stat = fs.statSync(dir);
+        if (!stat.isDirectory()) {
+            return;
+        }
+        var subpaths = fs.readdirSync(dir),
+            subpath, size, md5, compressed, relative;
+        for (var i = 0; i < subpaths.length; ++i) {
+            if (subpaths[i][0] === '.') {
+                continue;
+            }
+            subpath = path.join(dir, subpaths[i]);
+            stat = fs.statSync(subpath);
+            if (stat.isDirectory()) {
+                this.readDir(subpath, obj, source);
+            } else if (stat.isFile()) {
+                // Size in Bytes
+                size = stat['size'];
+                md5 = require("crypto").createHash('md5').update(fs.readFileSync(subpath)).digest('hex');
+                compressed = path.extname(subpath).toLowerCase() === '.zip';
+                relative = path.relative(source, subpath);
+                relative = relative.replace(/\\/g, '/');
+                relative = encodeURI(relative);
+
+                obj[relative] = {
+                    'size': size,
+                    'md5': md5
+                };
+
+                if (compressed) {
+                    obj[relative].compressed = true;
+                }
+            }
+        }
+    },
     /**
-     * @description 版本比较 curVersion > prevVersion 返回ture 
+     * @description 本地测试服务器选择确定
+     * @param {*} element 
+     */
+    onRemoteDirConfirm(element) {
+        if (this.isDoCreate()) return;
+        userCache.remoteDir = element.value;
+        this.saveUserCache();
+    },
+    /**
+     * @description 构建目录选择
+     * @param {*} element 
+     */
+    onBuildDirConfirm(element) {
+        if (this.isDoCreate()) return;
+        userCache.buildDir = element.value;
+        this.$.manifestDir.value = this.getManifestDir(userCache.buildDir);
+        this.saveUserCache();
+    },
+    /**
+     * @description 版本比较 curVersion >= prevVersion 返回ture 
      * @example (1.0.1 > 1.0)  (1.0.1 <= 1.0.1) (1.0.1 < 1.0.2) (1.0.1 > 1.0.0) 
      * @param curVersion 当前构建版本
      * @param prevVersion 之前构建的版本
@@ -269,24 +448,44 @@ exports.methods = {
                 genValue = prevVersionArr[i];
             if (undefined === curValue && undefined !== genValue) return false;
             if (undefined !== curValue && undefined === genValue) return true;
-            if (curValue && genValue && parseInt(curValue) > parseInt(genValue)) return true;
+            if (curValue && genValue && parseInt(curValue) >= parseInt(genValue)) return true;
         }
         return false;
     },
     /** @description 主版本号输入*/
     onVersionChange(element) {
+        if (this.isDoCreate()) return;
         let version = element.value;
         if (this.isVersionPass(version, userCache.version)) {
             //有效版本
+            userCache.version = version;
+            this.saveUserCache();
             return;
         }
         this.addLog(`无效版本号,${version} 应大于 ${userCache.version}`);
+    },
+    /**
+     * @description bundle输入版本号变化
+     * @param {*} element 
+     * @param {*} key 
+     * @returns 
+     */
+    onBundleVersionChange(element, key) {
+        if (this.isDoCreate()) return;
+        let version = element.value;
+        if (this.isVersionPass(version, userCache.bundles[key].version)) {
+            userCache.bundles[key].version = version;
+            this.saveUserCache();
+            return;
+        }
+        this.addLog(`${userCache.bundles[key].name}设置版本号无效,${version} 应大于 ${userCache.bundles[key].version}`);
     },
     /** 
      * @description 切换历史地址 
      * @param element 控件自身 
      */
     onHistoryServerIPChange(element) {
+        if (this.isDoCreate()) return;
         //先拿到选中项
         let options = this.$.historyServerIPSelect.$select.options;
         for (let i = 0; i < options.length; i++) {
@@ -299,6 +498,7 @@ exports.methods = {
     },
     /** @description 点击了使用本机*/
     onUseLocalIP() {
+        if (this.isDoCreate()) return;
         let network = require("os").networkInterfaces();
         let url = "";
         Object.keys(network).forEach((key) => {
@@ -319,6 +519,7 @@ exports.methods = {
      * @returns 
      */
     onInputServerUrlOver(element) {
+        if (this.isDoCreate()) return;
         let url = userCache.serverIP;
         if (element) {
             //从输入框过来的
@@ -360,6 +561,16 @@ exports.methods = {
             return true;
         }
         return false;
+    },
+    /**
+     * @description 是否正在创建
+     * @returns 
+     */
+    isDoCreate() {
+        if (this._isDoCreate) {
+            this.addLog(`正在执行生成操作，请勿操作`);
+        }
+        return this._isDoCreate;
     },
     /**
      * @description 添加日志

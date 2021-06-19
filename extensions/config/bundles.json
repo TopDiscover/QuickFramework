@@ -13,36 +13,43 @@
         },
         {
             "id": "2",
-            "name": "游戏1",
-            "dir": "gameOne",
+            "name": "瞄准线",
+            "dir": "aimLine",
             "version": "1",
             "includeApk": true
         },
         {
             "id": "3",
-            "name": "游戏2",
-            "dir": "gameTwo",
+            "name": "三消",
+            "dir": "eliminate",
             "version": "1",
             "includeApk": false
         },
         {
             "id": "4",
-            "name": "坦克大战",
-            "dir": "tankBattle",
+            "name": "加载示例",
+            "dir": "loadTest",
             "version": "1",
             "includeApk": true
         },
         {
             "id": "5",
-            "name": "加载测试示例",
-            "dir": "loadTest",
+            "name": "网络测试示例",
+            "dir": "netTest",
             "version": "1",
             "includeApk": false
         },
         {
             "id": "6",
-            "name": "网络测试示例",
-            "dir": "netTest",
+            "name": "缓冲池测试示例",
+            "dir": "nodePoolTest",
+            "version": "1",
+            "includeApk": false
+        },
+        {
+            "id": "7",
+            "name": "坦克大战",
+            "dir": "tankBattle",
             "version": "1",
             "includeApk": false
         }
