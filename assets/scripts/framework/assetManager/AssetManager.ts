@@ -75,7 +75,7 @@ class RemoteLoader {
                                             texture.image = image;
                                             asset.textures = [texture];
                                             let pngName = name + ".png"
-                                            asset["textureNames"] = [pngName];
+                                            asset.textureNames = [pngName];
                                             cache = cache as ResourceCacheData;
                                             cache.info.url = url;
                                             asset.name = url;
@@ -129,7 +129,7 @@ class RemoteLoader {
                 cache.info.resourceType = ResourceType.Remote;
                 cache.info.type = type;
                 Manager.cacheManager.remoteCaches.set(url, cache);
-                assetManager.loadRemote(url, (error, data) => {
+                assetManager.loadRemote(url,{cacheAsset : isNeedCache } ,  (error, data) => {
                     if (cache) {
                         cache.isLoaded = true;
                         if (data) {
