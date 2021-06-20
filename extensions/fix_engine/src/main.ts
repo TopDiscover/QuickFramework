@@ -47,7 +47,56 @@ export class _Helper {
         return this._config;
     }
 
+    private _curPluginVersion : number = -1;
+    /**@description 当前目录下的插件版本 */
+    private get curPluginVersion(){
+        if( this._curPluginVersion == -1 ){
+            let versionPath = `${path.join(__dirname,"../engine/version.json")}`;
+            versionPath = path.normalize(versionPath);
+            let data = fs.readFileSync(versionPath,"utf-8");
+            let source = JSON.parse(data);
+            this._curPluginVersion = source.version;
+        }
+        return this._curPluginVersion;
+    }
+
+    private _creatorPluginVersion : number = -1;
+    /**@description 当前Creator目录下的引擎修正插件版本 */
+    private get creatorPluginVersion(){
+        if( this._creatorPluginVersion -= -1 ){
+            let versionPath = `${this.appPath}/version.json`;
+            versionPath = path.normalize(versionPath);
+            if( fs.existsSync(versionPath) ){
+                let data = fs.readFileSync(versionPath,"utf-8");
+                let source = JSON.parse(data);
+                this._creatorPluginVersion = source.version;
+            }else{
+              this._creatorPluginVersion = 0;  
+            }
+        }       
+        return this._creatorPluginVersion; 
+    }
+
+    private get isNeedUpdateVersion(){
+        if( this.creatorPluginVersion == 0 ){
+            //不存在
+            return true;
+        }
+        if( this.creatorPluginVersion < this.curPluginVersion ){
+            return true;
+        }
+        return false;
+    }
+
     run(){
+        console.log(`Creator Version : ${this.creatorPluginVersion}`);
+        console.log(`Plugin Version : ${this.curPluginVersion}`);
+
+        if( !this.isNeedUpdateVersion ){
+            console.log(`您目录Creator 目录下的插件版本已经是最新`);
+            return;
+        }
+
         if (this.appVersion == "3.1.0") {
             console.log("Creator 版本 : " + this.appVersion);
         }else{
@@ -57,6 +106,7 @@ export class _Helper {
         }
         console.log("Creator 安装路径 : " + this.appPath);
         console.log("Creator 引擎路径 : " + this.engineRoot);
+        
 
         let keys = Object.keys(this.config);
         for( let i = 0 ; i < keys.length ; i++ ){
