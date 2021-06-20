@@ -271,6 +271,7 @@ exports.methods = {
         this.$.refreshMainVersion.addEventListener("confirm", this.onRefreshMainVersion.bind(this));
         //refresh${gameInfo.dir}Version 子包地址刷新
         keys.forEach((key) => {
+            this.$[`is${key}includeApp`].addEventListener("confirm",this.onIncludeAppChange.bind(this,this.$[`is${key}includeApp`],key));
             this.$[`refresh${key}Version`].addEventListener("confirm", this.onRefreshBundleLocalServerVersion.bind(this, key))
         });
         //删除不包含在包内的bundles
@@ -280,6 +281,13 @@ exports.methods = {
     init() {
         this.initDatas();
         this.bindingEvents();
+    },
+    onIncludeAppChange(element,key){
+        // console.log("element",element);
+        // console.log("key",key);
+        // console.log("value",element.value);
+        userCache.bundles[key].includeApk = element.value;
+        this.saveUserCache();
     },
     /**@description 删除不包含在包内的bundles */
     async onDelBundles() {
@@ -588,6 +596,7 @@ exports.methods = {
     },
     delDir(sourceDir, isRemoveSourceDir = false) {
         let delFile = function (dir) {
+            if( !fs.existsSync(dir) ) return;
             let readDir = fs.readdirSync(dir);
             for (let i in readDir) {
                 let fullPath = path.join(dir, readDir[i]);
@@ -595,6 +604,7 @@ exports.methods = {
             }
         };
         let delDir = function (dir) {
+            if( !fs.existsSync(dir)) return;
             let readDir = fs.readdirSync(dir);
             if (readDir.length > 0) {
                 for (let i in readDir) {
