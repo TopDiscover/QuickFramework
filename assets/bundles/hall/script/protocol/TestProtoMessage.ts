@@ -12,7 +12,7 @@ import { SUB_CMD_LOBBY } from "./LobbyCmd";
 @protobuf.Type.d("TestProtoData")
 export class TestProtoData extends protobuf.Message {
 
-    @protobuf.Field.d(1, "string", "required", "awesome default string")
+    @protobuf.Field.d(1, "string", "required", "awesome default string 我是一个proto")
     public hello: string = "";
 
     @protobuf.Field.d(2, AwesomeEnum, "required", AwesomeEnum.ONE)

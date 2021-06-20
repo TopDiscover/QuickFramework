@@ -1,5 +1,5 @@
 
-import { Message, Utf8ArrayToStr, MessageHeader } from "./Message";
+import { Message, Utf8ArrayToStr, MessageHeader, StringToUtf8Array } from "./Message";
 
 type JsonMessageConstructor = typeof JsonMessage;
 
@@ -40,8 +40,7 @@ export class JsonMessage extends Message {
     encode(): boolean {
         this.data = this.serialize();
         let result = JSON.stringify(this.data);
-        let encoder = new TextEncoder();
-        this.buffer =  encoder.encode(result);
+        this.buffer =  StringToUtf8Array(result);
         return true;
     }
 
