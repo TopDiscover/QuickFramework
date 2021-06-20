@@ -4,5 +4,8 @@
   /* Add your custom configuration here. */
   "compilerOptions": {
     "allowSyntheticDefaultImports": true, // 需要开启
-  }
+  },
+  "exclude": [
+    "extensions"
+  ]
 }

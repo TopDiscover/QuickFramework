@@ -10,7 +10,8 @@
     "rootDir": "src",
     "outDir": "dist",
     "types": [
-      "../../@types/index"
+      "../@types/index",
+      "../@types/node"
     ]
   }
 }
