@@ -1,3 +1,0 @@
-function xyz(){
-    return 'xyz';
-}
