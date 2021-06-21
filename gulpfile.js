@@ -1,16 +1,8 @@
-
-//1:安装好node、npm、npx环境
-//2:安装 gulp 命令行工具 npm install --global gulp-cli
-//3:在项目目录下npm init
-//4:安装 gulp，作为开发时依赖项npm install --save-dev gulp
-//5:装载对应插件
-//gulp-imagemin                  npm i gulp-imagemin
-//gulp-htmlmin                   npm i gulp-htmlmin
-//gulp-file-inline               npm i gulp-file-inline
-//gulp-javascript-obfuscator     npm i gulp-javascript-obfuscator   依赖 npm i vinyl-sourcemaps-apply
-//npm install --save-dev gulp del
-//npm install --save-dev gulp-html-replace (目前不用)
-//npm i gulp-dom
+//1:安装好node、npm、npx环境  
+//2:执行 npm install -s
+//3:执行 sudo npm install -g cnpm --registry=https://registry.npm.taobao.org
+//4:执行 cnpm install gulp-imagemin --save-dev
+//3和4是为了解决gulp-imagemin 提示异常问题
 
 
 //删除无用文件（需要手动配置）、图片无损压缩、js混淆、添加js脚本、html压缩合并js和scc     (目前只测试过h5、原生没试过）
