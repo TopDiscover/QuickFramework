@@ -10,7 +10,7 @@ jsb-binary/
 web-desktop/
 web-mobile/
 runtime/
-build/
+node_modules/
 jsb/
 export/
 
