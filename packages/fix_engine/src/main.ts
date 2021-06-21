@@ -99,7 +99,7 @@ export class _Helper {
 
     /**@description 对哪些creator版本有效 */
     private get validVersions(){
-        return ["2.4.0","2.4.1","2.4.2","2.4.3"];
+        return ["2.4.0","2.4.1","2.4.2","2.4.3","2.4.4"];
     }
 
     run(){
