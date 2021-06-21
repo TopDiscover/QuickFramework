@@ -36,6 +36,9 @@
     // Be nice to CommonJS
     if (typeof module === "object" && module && module.exports)
         module.exports = protobuf;
+    if( window.protobuf == undefined ){
+        window.protobuf = protobuf;
+    }
 
 })/* end of prelude */({1:[function(require,module,exports){
 "use strict";
