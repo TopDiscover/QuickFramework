@@ -1,0 +1,27 @@
+{
+  "name": "quickframework",
+  "version": "1.0.0",
+  "description": "CocosCreator 快速开发轻量级棋牌框架 ========",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/top-discover/QuickFramework.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "del": "^6.0.0",
+    "gulp": "^4.0.2"
+  },
+  "dependencies": {
+    "gulp-dom": "^1.0.0",
+    "gulp-file-inline": "^2.2.3",
+    "gulp-htmlmin": "^5.0.1",
+    "gulp-imagemin": "^7.1.0",
+    "gulp-javascript-obfuscator": "^1.1.6",
+    "vinyl-sourcemaps-apply": "^0.2.1"
+  }
+}
