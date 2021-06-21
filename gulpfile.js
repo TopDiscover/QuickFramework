@@ -4,7 +4,7 @@
 //3:在项目目录下npm init
 //4:安装 gulp，作为开发时依赖项npm install --save-dev gulp
 //5:装载对应插件
-//gulp-imagemin                  npm i gulp-imagemin
+//gulp-imagemin                  npm i gulp-imagemin  &&  npm i imagemin-gifsicle@1.0.0  &&   npm i imagemin-optipng
 //gulp-htmlmin                   npm i gulp-htmlmin
 //gulp-file-inline               npm i gulp-file-inline
 //gulp-javascript-obfuscator     npm i gulp-javascript-obfuscator   依赖 npm i vinyl-sourcemaps-apply
@@ -116,7 +116,7 @@ function js(cb) {
 function delefile(cb) {
     del([
         './build/web-mobile/style-mobile.*.css', './build/web-mobile/style-desktop.*.css',
-        './build/web-mobile/src', './build/web-mobile/main.*.js', './build/web-mobile/index.js',
+        './build/web-mobile/src', './build/web-mobile/main.*.js',
     ]);
     cb();
 }
