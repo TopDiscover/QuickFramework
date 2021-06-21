@@ -193,6 +193,10 @@ public:
      */
     void setEventCallback(const EventCallback& callback) {_eventCallback = callback;};
 
+    /** @brief Cancel update
+     */
+    void cancelUpdate();
+	
 	/**
 	 * @brief 设置热更新地址,由于热更新地址会动态的发生变化，热更新的地址以下发的地址为准,设置热更新地址后，会自动的替换所有热更新的源地址
 	 */
@@ -404,6 +408,10 @@ private:
     //! Marker for whether the assets manager is inited
     bool _inited;
 
+    //! Marker for whether the update is canceled
+    bool _canceled;
+    //! Downloading task container
+    std::unordered_map<std::string, std::shared_ptr<const network::DownloadTask>> _downloadingTask;
 	/*是否启用资源下载类型*/
 	bool _isUsingAssetsType;
 	/*资源类型 ""为大厅 其它为子游戏包名*/

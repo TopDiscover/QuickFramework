@@ -79,6 +79,7 @@ AssetsManagerEx::AssetsManagerEx(const std::string& manifestUrl, const std::stri
 , _currConcurrentTask(0)
 , _verifyCallback(nullptr)
 , _inited(false)
+, _canceled(false)
 {
     init(manifestUrl, storagePath);
 }
@@ -208,6 +209,7 @@ AssetsManagerEx* AssetsManagerEx::create(const std::string& manifestUrl, const s
 void AssetsManagerEx::initManifests()
 {
     _inited = true;
+    _canceled = false;
     // Init and load temporary manifest
     _tempManifest = new (std::nothrow) Manifest();
     if (_tempManifest)
@@ -269,6 +271,7 @@ bool AssetsManagerEx::loadLocalManifest(Manifest* localManifest, const std::stri
         return false;
     }
     _inited = true;
+    _canceled = false;
     // Reset storage path
     if (storagePath.size() > 0)
     {
@@ -1011,7 +1014,7 @@ void AssetsManagerEx::updateSucceed()
             }
 
             // Remove from delete list for safe, although this is not the case in general.
-            auto diff_itr = diff_map.find(dstPath);
+            auto diff_itr = diff_map.find(relativePath);
             if (diff_itr != diff_map.end()) {
                 diff_map.erase(diff_itr);
             }
@@ -1271,6 +1274,9 @@ void AssetsManagerEx::onError(const network::DownloadTask& task,
     }
     else
     {
+        if (_downloadingTask.find(task.identifier) != _downloadingTask.end()) {
+            _downloadingTask.erase(task.identifier);
+        }
         fileError(task.identifier, errorStr, errorCode, errorCodeInternal);
     }
 }
@@ -1345,6 +1351,10 @@ void AssetsManagerEx::onSuccess(const std::string &/*srcUrl*/, const std::string
     }
     else
     {
+        if (_downloadingTask.find(customId) != _downloadingTask.end()) {
+            _downloadingTask.erase(customId);
+        }
+
         bool ok = true;
         auto &assets = _remoteManifest->getAssets();
         auto assetIt = assets.find(customId);
@@ -1407,13 +1417,13 @@ void AssetsManagerEx::batchDownload()
 
 void AssetsManagerEx::queueDowload()
 {
-    if (_totalWaitToDownload == 0)
+    if (_totalWaitToDownload == 0 || (_canceled && _currConcurrentTask == 0))
     {
         this->onDownloadUnitsFinished();
         return;
     }
 
-    while (_currConcurrentTask < _maxConcurrentTask && _queue.size() > 0)
+    while (_currConcurrentTask < _maxConcurrentTask && _queue.size() > 0 && !_canceled)
     {
         std::string key = _queue.back();
         _queue.pop_back();
@@ -1421,8 +1431,8 @@ void AssetsManagerEx::queueDowload()
         _currConcurrentTask++;
         DownloadUnit& unit = _downloadUnits[key];
         _fileUtils->createDirectory(basename(unit.storagePath));
-        _downloader->createDownloadFileTask(unit.srcUrl, unit.storagePath, unit.customId);
-
+        auto downloadTask = _downloader->createDownloadFileTask(unit.srcUrl, unit.storagePath, unit.customId);
+        _downloadingTask.emplace(unit.customId, downloadTask);
         _tempManifest->setAssetDownloadState(key, Manifest::DownloadState::DOWNLOADING);
     }
     if (_percentByFile / 100 > _nextSavePoint)
@@ -1448,6 +1458,25 @@ void AssetsManagerEx::onDownloadUnitsFinished()
     {
         updateSucceed();
     }
+}
+
+void AssetsManagerEx::cancelUpdate()
+{
+    if (_canceled)
+	{
+        return;
+    }
+    _canceled = true;
+    std::vector<std::shared_ptr<const network::DownloadTask>> tasks;
+    for (const auto& it : _downloadingTask)
+    {
+        tasks.push_back(it.second);
+    }
+    for (const auto& it : tasks)
+    {
+        _downloader->abort(*it);
+    }
+    _downloadingTask.clear();
 }
 
 NS_CC_EXT_END
