@@ -310,11 +310,13 @@ class _Helper {
     //选择构建目录
     this.view.selectBulidDir.addEventListener("confirm", this.onBuildDirConfirm.bind(this, this.view.selectBulidDir));
     //打开构建目录
-    this.view.openSelectBulidDir.addEventListener("confirm",this.onOpenSelectBulidDir.bind(this));
+    this.view.openSelectBulidDir.addEventListener("confirm", this.onOpenSelectBulidDir.bind(this));
     //打开Manifest目录
-    this.view.openManifestDir.addEventListener("confirm",this.onOpenManifestDir.bind(this));
+    this.view.openManifestDir.addEventListener("confirm", this.onOpenManifestDir.bind(this));
     //本地测试目录
-    this.view.remoteDir.addEventListener("confirm", this.onRemoteDirConfirm.bind(this, this.view.remoteDir));
+    //打开本地测试服务器路径
+    this.view.selectRemoteDir.addEventListener("confirm", this.onRemoteDirConfirm.bind(this));
+    this.view.openSelectRemoteDir.addEventListener("confirm", this.onOpenRemoteDir.bind(this));
     //生成
     this.view.createManifest.addEventListener("confirm", this.onCreateManifest.bind(this, this.view.createManifest));
     //部署
@@ -345,15 +347,11 @@ class _Helper {
   /**@description 删除不包含在包内的bundles */
   async onDelBundles() {
     if (this.isDoCreate()) return;
-    const config = {
-      title: '警告',
-      detail: '',
-      buttons: ['取消', '确定'],
-    };
-    // const code = await Editor.Dialog.info('执行此操作将会删除不包含在包内的所有bundles,是否继续？', config);
-    // if (code.response == 1) {
-    //   this.removeNotInApkBundle();
-    // }
+    //弹出提示确定是否需要删除当前的子游戏
+    Editor.Panel.open('confirm_del_subgames');
+  }
+  onConfirmDelBundle() {
+    this.removeNotInApkBundle();
   }
   /**@description 删除不包含在包内的所有bundles */
   removeNotInApkBundle() {
@@ -727,20 +725,32 @@ class _Helper {
    */
   onRemoteDirConfirm(element: any) {
     if (this.isDoCreate()) return;
-    this.userCache.remoteDir = element.value;
-    this.saveUserCache();
+    let result = Editor.Dialog.openFile({
+      title: "选择本地测试服务器路径",
+      defaultPath: Editor.Project.path,
+      properties: ["openDirectory"]
+    });
+    if (-1 !== result) {
+      let fullPath = result[0];
+      this.userCache.remoteDir = fullPath;
+      this.view.remoteDir.value = fullPath;
+      this.saveUserCache();
+    }
   }
-  onOpenSelectBulidDir(){
+  onOpenRemoteDir() {
+    this.openDir(this.userCache.remoteDir);
+  }
+  onOpenSelectBulidDir() {
     this.openDir(this.userCache.buildDir);
   }
-  onOpenManifestDir(){
+  onOpenManifestDir() {
     this.openDir(this.getManifestDir(this.userCache.buildDir));
   }
-  openDir(dir:string){
-    if ( fs.existsSync(dir) ){
-      Electron.shell.showItemInFolder(dir); 
-      Electron.shell.beep(); 
-    }else{
+  openDir(dir: string) {
+    if (fs.existsSync(dir)) {
+      Electron.shell.showItemInFolder(dir);
+      Electron.shell.beep();
+    } else {
       this.addLog("目录不存在：" + dir)
     }
   }
@@ -757,7 +767,7 @@ class _Helper {
     });
     if (-1 !== result) {
       let fullPath = result[0];
-      if( this.checkBuildDir(fullPath) ){
+      if (this.checkBuildDir(fullPath)) {
         this.userCache.buildDir = fullPath;
         this.view.buildDir.value = fullPath;
         this.view.manifestDir.value = this.getManifestDir(this.userCache.buildDir);
@@ -765,12 +775,12 @@ class _Helper {
       }
     }
   }
-  checkBuildDir(fullPath:string){
-    if( fs.existsSync(fullPath) ){
+  checkBuildDir(fullPath: string) {
+    if (fs.existsSync(fullPath)) {
       //检测是否存在src / assets目录
-      let srcPath = path.join(fullPath,"src");
-      let assetsPath = path.join(fullPath,"assets");
-      if( fs.existsSync(srcPath) && fs.existsSync(assetsPath) ){
+      let srcPath = path.join(fullPath, "src");
+      let assetsPath = path.join(fullPath, "assets");
+      if (fs.existsSync(srcPath) && fs.existsSync(assetsPath)) {
         return true;
       }
     }
@@ -997,7 +1007,7 @@ class _Helper {
         _subGameServerVersionView += `
         <ui-prop name="${gameInfo.name}(${gameInfo.dir})">
             <div class="flex-1 layout horizontal center">
-                <h4 id = "${gameInfo.dir}remoteUrl" class="flex-2"></h4>
+                <ui-input disabled="disabled" id = "${gameInfo.dir}remoteUrl" class="flex-2"></ui-input>
                 <ui-button class="end-justified" id = "refresh${gameInfo.dir}Version"><i
                     class="icon-arrows-cw"></i></ui-button>
             </div>
@@ -1049,6 +1059,8 @@ Editor.Panel.extend({
     Helper.init(view);
   },
   messages: {
-
+    'hot-update-tools:onConfirmDelBundle'() {
+      Helper.onConfirmDelBundle();
+    }
   }
 });

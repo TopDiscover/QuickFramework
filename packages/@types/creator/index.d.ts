@@ -46,7 +46,7 @@ declare module Editor {
     }
 
     export namespace Panel {
-        export function open(packageName: string, params: any);
+        export function open(packageName: string, params?: any);
         export function extend(options:{style:string,template:string,$,ready:()=>void,messages:{}});
     }
 

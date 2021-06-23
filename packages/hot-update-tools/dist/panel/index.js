@@ -267,7 +267,9 @@ var _Helper = /** @class */ (function () {
         //打开Manifest目录
         this.view.openManifestDir.addEventListener("confirm", this.onOpenManifestDir.bind(this));
         //本地测试目录
-        this.view.remoteDir.addEventListener("confirm", this.onRemoteDirConfirm.bind(this, this.view.remoteDir));
+        //打开本地测试服务器路径
+        this.view.selectRemoteDir.addEventListener("confirm", this.onRemoteDirConfirm.bind(this));
+        this.view.openSelectRemoteDir.addEventListener("confirm", this.onOpenRemoteDir.bind(this));
         //生成
         this.view.createManifest.addEventListener("confirm", this.onCreateManifest.bind(this, this.view.createManifest));
         //部署
@@ -298,18 +300,17 @@ var _Helper = /** @class */ (function () {
     /**@description 删除不包含在包内的bundles */
     _Helper.prototype.onDelBundles = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var config;
             return __generator(this, function (_a) {
                 if (this.isDoCreate())
                     return [2 /*return*/];
-                config = {
-                    title: '警告',
-                    detail: '',
-                    buttons: ['取消', '确定'],
-                };
+                //弹出提示确定是否需要删除当前的子游戏
+                Editor.Panel.open('confirm_del_subgames');
                 return [2 /*return*/];
             });
         });
+    };
+    _Helper.prototype.onConfirmDelBundle = function () {
+        this.removeNotInApkBundle();
     };
     /**@description 删除不包含在包内的所有bundles */
     _Helper.prototype.removeNotInApkBundle = function () {
@@ -686,8 +687,20 @@ var _Helper = /** @class */ (function () {
     _Helper.prototype.onRemoteDirConfirm = function (element) {
         if (this.isDoCreate())
             return;
-        this.userCache.remoteDir = element.value;
-        this.saveUserCache();
+        var result = Editor.Dialog.openFile({
+            title: "选择本地测试服务器路径",
+            defaultPath: Editor.Project.path,
+            properties: ["openDirectory"]
+        });
+        if (-1 !== result) {
+            var fullPath = result[0];
+            this.userCache.remoteDir = fullPath;
+            this.view.remoteDir.value = fullPath;
+            this.saveUserCache();
+        }
+    };
+    _Helper.prototype.onOpenRemoteDir = function () {
+        this.openDir(this.userCache.remoteDir);
     };
     _Helper.prototype.onOpenSelectBulidDir = function () {
         this.openDir(this.userCache.buildDir);
@@ -964,7 +977,7 @@ var _Helper = /** @class */ (function () {
                 _subGameVersionView += "\n        <ui-prop name=\"" + gameInfo.name + "(" + gameInfo.dir + ")\">\n            <div class=\"flex-1 layout horizontal center\">\n                <ui-checkbox id = \"is" + gameInfo.dir + "includeApp\"> \u662F\u5426\u5305\u542B\u5728\u539F\u59CB\u5305\u5185 </ui-checkbox>\n                <ui-input class=\"flex-1\" id = \"" + gameInfo.dir + "Version\"></ui-input>\n            </div>\n        </ui-prop>\n        ";
                 this.elements["is" + gameInfo.dir + "includeApp"] = "#is" + gameInfo.dir + "includeApp";
                 this.elements[gameInfo.dir + "Version"] = "#" + gameInfo.dir + "Version";
-                _subGameServerVersionView += "\n        <ui-prop name=\"" + gameInfo.name + "(" + gameInfo.dir + ")\">\n            <div class=\"flex-1 layout horizontal center\">\n                <h4 id = \"" + gameInfo.dir + "remoteUrl\" class=\"flex-2\"></h4>\n                <ui-button class=\"end-justified\" id = \"refresh" + gameInfo.dir + "Version\"><i\n                    class=\"icon-arrows-cw\"></i></ui-button>\n            </div>\n        </ui-prop>\n        ";
+                _subGameServerVersionView += "\n        <ui-prop name=\"" + gameInfo.name + "(" + gameInfo.dir + ")\">\n            <div class=\"flex-1 layout horizontal center\">\n                <ui-input disabled=\"disabled\" id = \"" + gameInfo.dir + "remoteUrl\" class=\"flex-2\"></ui-input>\n                <ui-button class=\"end-justified\" id = \"refresh" + gameInfo.dir + "Version\"><i\n                    class=\"icon-arrows-cw\"></i></ui-button>\n            </div>\n        </ui-prop>\n        ";
                 this.elements[gameInfo.dir + "remoteUrl"] = "#" + gameInfo.dir + "remoteUrl";
                 this.elements["refresh" + gameInfo.dir + "Version"] = "#refresh" + gameInfo.dir + "Version";
                 this.bundles[gameInfo.dir] = JSON.parse(JSON.stringify(gameInfo));
@@ -1009,5 +1022,9 @@ Editor.Panel.extend({
         });
         Helper.init(view);
     },
-    messages: {}
+    messages: {
+        'hot-update-tools:onConfirmDelBundle': function () {
+            Helper.onConfirmDelBundle();
+        }
+    }
 });
