@@ -1,14 +1,9 @@
 {
     "packageUrl": "http://192.168.0.104:9945/hotupdate",
     "forceIncludeAllGameToApk": false,
+    "version" : "1",
+    "description" :"主包,其实只包含了登录界面，该字段只是做说明使用，无实际意义，注意版本号必须>=1",
     "bundles": [
-        {
-            "id": "0",
-            "name": "登录",
-            "dir": "",
-            "version": "3",
-            "includeApk": false
-        },
         {
             "id": "1",
             "name": "大厅",

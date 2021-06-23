@@ -1,0 +1,93 @@
+<div id="view" class="scroll" xmlns:v-on="http://www.w3.org/1999/xhtml">
+    <div class="section" style>
+        <ui-section>
+            <div class="header greenColor">主包Manifest配置</div>
+            <div class="layout vertical start-justified">
+                <ui-prop name="版本号">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-input id = "version" class="flex-1" ></ui-input>
+                    </div>
+                </ui-prop>
+                <ui-prop name="资源服务器url" tooltip="游戏热更新服务器的url">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-input id = "serverIP" class="flex-2" ></ui-input>
+                        <ui-button id ="userLocalIP">使用本机IP</ui-button>
+                    </div>
+                </ui-prop>
+                <ui-prop name="资源服务器url配置历史">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-select id="historyServerIPSelect" class="flex-2" style="width: auto">
+                                <!-- 需要动态添加 -->
+                        </ui-select>
+                    </div>
+                </ui-prop>
+                <ui-prop name="build项目资源文件目录">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-input id = "buildDir" class="flex-2" readonly="readonly" disabled="disabled">
+                        </ui-input>
+                        <ui-button id = "selectBulidDir">选择</ui-button>
+                        <ui-button id = "openSelectBulidDir"><i class="icon-doc-text"></i></ui-button>
+                    </div>
+                </ui-prop>
+                <ui-prop name="manifest存储目录">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-input id = "manifestDir" class="flex-2" readonly="readonly" disabled="disabled">
+                        </ui-input>
+                        <ui-button id="openManifestDir"><i class="icon-doc-text"></i></ui-button>
+                    </div>
+                </ui-prop>
+                <div class="self-end">
+                    <ui-button class="self-end red" id="delBunles">执行Bundle剔除</ui-button>
+                    <ui-button class="self-end green" id="createManifest">生成</ui-button>
+                </div>
+            </div>
+        </ui-section>
+
+        <ui-section>
+            <div class="header greenColor">Bundles Manifest配置<div
+                    class="layout horizontal flex-1 center self-end end-justified">
+                </div>
+            </div>
+
+            <div class="layout vertical start-justified">
+                <!--subgame start-->
+                <!--subgame end-->
+            </div>
+
+        </ui-section>
+
+        <ui-section>
+            <div class="header greenColor">测试环境</div>
+            <div class="layout vertical">
+                <ui-prop name="主包版本">
+                    <div class="flex-1 layout horizontal center">
+                        <h4 class="flex-2" id = "remoteUrl"></h4>
+                        <ui-button class="end-justified" id = "refreshMainVersion"><i
+                                class="icon-arrows-cw"></i></ui-button>
+                    </div>
+                </ui-prop>
+                <!--subgame test start-->
+                <!--subgame test end-->
+                <ui-prop name="本机server物理路径">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-input id = "remoteDir" class="flex-2" disabled="disabled"></ui-input>
+                        <ui-button id = "selectRemoteDir">选择</ui-button>
+                        <ui-button id = "openSelectRemoteDir"><i class="icon-doc-text"></i></ui-button>
+                    </div>
+                </ui-prop>
+                <ui-prop name="操作">
+                    <div class="flex-1 layout horizontal center">
+                        <h3 class="flex-2"></h3>
+                        <ui-button id = "deployToRemote" class="end-justified green" >部署</ui-button>
+                    </div>
+                </ui-prop>
+                <ui-progress id = "deployProgress" style="width: 100%;">40</ui-progress>
+            </div>
+        </ui-section>
+    </div>
+</div>
+<div style="width: 100%; height: 150px;margin: 0 0 0 0;">
+    <hr style="margin: 0 0 0 0;">
+    <h2 style="margin: 0 0 0 0">日志:</h2><textarea class="flex-1" id="logView"
+        style="width: 100%; height: 120px; background: #252525;	resize: none; color: #fd942b;	border-color: #fd942b;"></textarea>
+</div>
