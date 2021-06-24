@@ -2,9 +2,10 @@
   "name": "quickframework",
   "version": "1.0.0",
   "description": "CocosCreator 快速开发轻量级棋牌框架 ========",
-  "main": "gulpfile.js",
+  "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "ts-node ./src/index.ts"
   },
   "repository": {
     "type": "git",
