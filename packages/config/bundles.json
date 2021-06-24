@@ -6,43 +6,71 @@
     "bundles": [
         {
             "id": "1",
-            "name": "大厅",
-            "dir": "hall",
+            "name": "瞄准线",
+            "dir": "aimLine",
             "version": "1",
             "includeApk": true
         },
         {
             "id": "2",
-            "name": "游戏1",
-            "dir": "gameOne",
+            "name": "三消",
+            "dir": "eliminate",
             "version": "1",
-            "includeApk": true
+            "includeApk": false
         },
         {
             "id": "3",
+            "name": "游戏1",
+            "dir": "gameOne",
+            "version": "1",
+            "includeApk": false
+        },
+        {
+            "id": "4",
             "name": "游戏2",
             "dir": "gameTwo",
             "version": "1",
             "includeApk": false
         },
         {
-            "id": "4",
-            "name": "坦克大战",
-            "dir": "tankBattle",
+            "id": "5",
+            "name": "大厅",
+            "dir": "hall",
             "version": "1",
-            "includeApk": false
+            "includeApk": true
         },
         {
-            "id": "5",
-            "name": "加载测试示例",
+            "id": "6",
+            "name": "动态加载测试示例",
             "dir": "loadTest",
             "version": "1",
             "includeApk": false
         },
         {
-            "id": "6",
+            "id": "7",
             "name": "网络测试示例",
             "dir": "netTest",
+            "version": "1",
+            "includeApk": false
+        },
+        {
+            "id": "8",
+            "name": "节点缓存测试示例",
+            "dir": "nodePoolTest",
+            "version": "1",
+            "includeApk": false
+        },
+        {
+            "id": "9",
+            "name": "shaders",
+            "dir": "shaders",
+            "version": "1",
+            "includeApk": false
+        },
+        {
+            "id": "10",
+            "name": "坦克大战",
+            "dir": "tankBattle",
             "version": "1",
             "includeApk": false
         }

@@ -21,9 +21,6 @@
         "min-width": 550
     },
     "dependencies": {
-        "jszip": "^3.2.2",
-        "node-localstorage": "^2.1.5",
-        "universal-analytics": "^0.4.20",
-        "uuid": "^3.3.3"
+        "jszip": "^3.2.2"
     }
 }

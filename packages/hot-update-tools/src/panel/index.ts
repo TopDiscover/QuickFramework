@@ -2,6 +2,8 @@ import * as fs from "fs"
 import * as path from "path"
 import * as os from "os"
 const Electron = require("electron")
+import * as JSZIP from "jszip";
+import JSZip = require("jszip");
 
 interface BundleInfo {
   id: string;
@@ -643,6 +645,92 @@ class _Helper {
       fs.writeFileSync(versionManifestPath, JSON.stringify(manifest));
       this.addLog(`生成${versionManifestPath}成功`);
     }
+    // this._isDoCreate = false;
+    this.packageZip(mainIncludes);
+  }
+  packageDir(dir: string, jszip: JSZIP) {
+    if (!fs.existsSync(dir)) {
+      return
+    }
+    let readDirs = fs.readdirSync(dir);
+    for (let i = 0; i < readDirs.length; i++) {
+      let file = readDirs[i];
+      let fullPath = path.join(dir, file);
+      let stat = fs.statSync(fullPath);
+      if (stat.isFile()) {
+        jszip.file(file, fs.readFileSync(fullPath))
+      } else {
+        stat.isDirectory() && this.packageDir(fullPath, jszip.folder(file) as JSZIP)
+      }
+    }
+  }
+  packageZip(mainIncludes: string[]) {
+    this.addLog(`[打包] 开始打包版本...`);
+    let versionManifest = path.join(this.getManifestDir(this.userCache.buildDir), "version.manifest");
+    let jszip = new JSZIP();
+    for (let index = 0; index < mainIncludes.length; index++) {
+      const element = mainIncludes[index];
+      let fullPath = path.join(this.userCache.buildDir, element);
+      this.packageDir(fullPath, jszip.folder(element) as JSZIP);
+
+    }
+
+    //打包manifest的版本文件
+    let manifest = path.join(this.userCache.buildDir, "manifest");
+    this.packageDir(manifest, jszip.folder("manifest") as JSZIP);
+
+    let mainVersionManifest = fs.readFileSync(versionManifest, "utf-8");
+    let mainVersion = JSON.parse(mainVersionManifest).version;
+    if (this.addLog("[打包] 打包版本:" + mainVersion), mainVersion !== this.userCache.version) {
+      this.addLog("[打包] 打包版本和当前填写的版本不一致,出现异常,停止打包!");
+      return;
+    }
+    let packZipName = "ver_main_" + (mainVersion = mainVersion.replace(".", "_")) + ".zip";
+    let packZipRootPath = Editor.Project.path + "/PackageVersion";
+    fs.existsSync(packZipRootPath) || fs.mkdirSync(packZipRootPath);
+    let packVersionZipPath = path.join(packZipRootPath, packZipName);
+    if (fs.existsSync(packVersionZipPath)) {
+      fs.unlinkSync(packVersionZipPath);
+      this.addLog("[打包] 发现该版本的zip, 已经删除!")
+    }
+    jszip.generateNodeStream({
+      type: "nodebuffer",
+      streamFiles: !0
+    }).pipe(fs.createWriteStream(packVersionZipPath)).on("finish", () => {
+      this.addLog("[打包] 打包成功: " + packVersionZipPath)
+    }).on("error", (e: Error) => {
+      this.addLog("[打包] 打包失败:" + e.message)
+    })
+
+    //打包子版本
+    let bundles = this.config.bundles
+    for (let index = 0; index < bundles.length; index++) {
+      const element = bundles[index];
+      let versionManifest = path.join(this.getManifestDir(this.userCache.buildDir), `${element.dir}_version.manifest`);
+      let mainVersionManifest = fs.readFileSync(versionManifest, "utf-8");
+      let mainVersion = JSON.parse(mainVersionManifest).version;
+      let packZipName = `ver_${element.dir}_${(mainVersion = mainVersion.replace(".", "_"))}.zip`;
+      let packVersionZipPath = path.join(packZipRootPath, packZipName);
+      let jszip = new JSZIP();
+     
+      let fullPath = path.join(this.userCache.buildDir, `assets/${element.dir}`);
+      this.packageDir(fullPath, jszip.folder(`assets/${element.dir}`) as JSZIP);
+
+      if (fs.existsSync(packVersionZipPath)) {
+        fs.unlinkSync(packVersionZipPath);
+        this.addLog("[打包] 发现该版本的zip, 已经删除!")
+      }
+      this.addLog(`[打包] ${element.name} ${element.dir} ...`);
+      jszip.generateNodeStream({
+        type: "nodebuffer",
+        streamFiles: !0
+      }).pipe(fs.createWriteStream(packVersionZipPath)).on("finish", () => {
+        this.addLog("[打包] 打包成功: " + packVersionZipPath)
+      }).on("error", (e: Error) => {
+        this.addLog("[打包] 打包失败:" + e.message)
+      })
+    }
+
     this._isDoCreate = false;
   }
   delDir(sourceDir: string, isRemoveSourceDir = false) {

@@ -40,6 +40,7 @@ var fs = require("fs");
 var path = require("path");
 var os = require("os");
 var Electron = require("electron");
+var JSZIP = require("jszip");
 var _Helper = /** @class */ (function () {
     function _Helper() {
         this.elements = {
@@ -599,6 +600,91 @@ var _Helper = /** @class */ (function () {
             delete manifest.searchPaths;
             fs.writeFileSync(versionManifestPath, JSON.stringify(manifest));
             this.addLog("\u751F\u6210" + versionManifestPath + "\u6210\u529F");
+        }
+        // this._isDoCreate = false;
+        this.packageZip(mainIncludes);
+    };
+    _Helper.prototype.packageDir = function (dir, jszip) {
+        if (!fs.existsSync(dir)) {
+            return;
+        }
+        var readDirs = fs.readdirSync(dir);
+        for (var i = 0; i < readDirs.length; i++) {
+            var file = readDirs[i];
+            var fullPath = path.join(dir, file);
+            var stat = fs.statSync(fullPath);
+            if (stat.isFile()) {
+                jszip.file(file, fs.readFileSync(fullPath));
+            }
+            else {
+                stat.isDirectory() && this.packageDir(fullPath, jszip.folder(file));
+            }
+        }
+    };
+    _Helper.prototype.packageZip = function (mainIncludes) {
+        var _this = this;
+        this.addLog("[\u6253\u5305] \u5F00\u59CB\u6253\u5305\u7248\u672C...");
+        var versionManifest = path.join(this.getManifestDir(this.userCache.buildDir), "version.manifest");
+        var jszip = new JSZIP();
+        for (var index = 0; index < mainIncludes.length; index++) {
+            var element = mainIncludes[index];
+            var fullPath = path.join(this.userCache.buildDir, element);
+            this.packageDir(fullPath, jszip.folder(element));
+        }
+        //打包manifest的版本文件
+        var manifest = path.join(this.userCache.buildDir, "manifest");
+        this.packageDir(manifest, jszip.folder("manifest"));
+        var mainVersionManifest = fs.readFileSync(versionManifest, "utf-8");
+        var mainVersion = JSON.parse(mainVersionManifest).version;
+        if (this.addLog("[打包] 打包版本:" + mainVersion), mainVersion !== this.userCache.version) {
+            this.addLog("[打包] 打包版本和当前填写的版本不一致,出现异常,停止打包!");
+            return;
+        }
+        var packZipName = "ver_main_" + (mainVersion = mainVersion.replace(".", "_")) + ".zip";
+        var packZipRootPath = Editor.Project.path + "/PackageVersion";
+        fs.existsSync(packZipRootPath) || fs.mkdirSync(packZipRootPath);
+        var packVersionZipPath = path.join(packZipRootPath, packZipName);
+        if (fs.existsSync(packVersionZipPath)) {
+            fs.unlinkSync(packVersionZipPath);
+            this.addLog("[打包] 发现该版本的zip, 已经删除!");
+        }
+        jszip.generateNodeStream({
+            type: "nodebuffer",
+            streamFiles: !0
+        }).pipe(fs.createWriteStream(packVersionZipPath)).on("finish", function () {
+            _this.addLog("[打包] 打包成功: " + packVersionZipPath);
+        }).on("error", function (e) {
+            _this.addLog("[打包] 打包失败:" + e.message);
+        });
+        //打包子版本
+        var bundles = this.config.bundles;
+        var _loop_1 = function (index) {
+            var element = bundles[index];
+            var versionManifest_1 = path.join(this_1.getManifestDir(this_1.userCache.buildDir), element.dir + "_version.manifest");
+            var mainVersionManifest_1 = fs.readFileSync(versionManifest_1, "utf-8");
+            var mainVersion_1 = JSON.parse(mainVersionManifest_1).version;
+            var packZipName_1 = "ver_" + element.dir + "_" + (mainVersion_1 = mainVersion_1.replace(".", "_")) + ".zip";
+            var packVersionZipPath_1 = path.join(packZipRootPath, packZipName_1);
+            var jszip_1 = new JSZIP();
+            var fullPath = path.join(this_1.userCache.buildDir, "assets/" + element.dir);
+            this_1.packageDir(fullPath, jszip_1.folder("assets/" + element.dir));
+            if (fs.existsSync(packVersionZipPath_1)) {
+                fs.unlinkSync(packVersionZipPath_1);
+                this_1.addLog("[打包] 发现该版本的zip, 已经删除!");
+            }
+            this_1.addLog("[\u6253\u5305] " + element.name + " " + element.dir + " ...");
+            jszip_1.generateNodeStream({
+                type: "nodebuffer",
+                streamFiles: !0
+            }).pipe(fs.createWriteStream(packVersionZipPath_1)).on("finish", function () {
+                _this.addLog("[打包] 打包成功: " + packVersionZipPath_1);
+            }).on("error", function (e) {
+                _this.addLog("[打包] 打包失败:" + e.message);
+            });
+        };
+        var this_1 = this;
+        for (var index = 0; index < bundles.length; index++) {
+            _loop_1(index);
         }
         this._isDoCreate = false;
     };
