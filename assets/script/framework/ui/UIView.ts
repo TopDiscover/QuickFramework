@@ -2,6 +2,7 @@ import EventComponent from "../base/EventComponent";
 import AudioComponent from "../base/AudioComponent";
 import { Manager } from "../Framework";
 import { getSingleton } from "../base/Singleton";
+import { IFullScreenAdapt } from "./IFullScreenAdapter";
 
 /**
  * @description 视图基类
@@ -14,11 +15,6 @@ export interface UIClass<T extends UIView> {
      *@description 视图prefab 地址 resources目录下如z_panels/WeiZoneLayer 
      */
     getPrefabUrl(): string;
-}
-
-export interface IFullScreenAdapt{
-    /**@description 请用全屏幕适配 */
-    onFullScreenAdapt();
 }
 
 @ccclass

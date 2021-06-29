@@ -2,6 +2,7 @@
 import { EventApi } from "../event/EventApi";
 import { Manager } from "../Framework";
 import { getSingleton } from "../base/Singleton";
+import { IFullScreenAdapt } from "../ui/IFullScreenAdapter";
 
 type DeviceDirection = "" | "Landscape" | "Portrait";
 
@@ -55,7 +56,7 @@ export class ResolutionHelper {
     }
 
     /**@description 全屏适配 */
-    public fullScreenAdapt(node: cc.Node) {
+    public fullScreenAdapt(node: cc.Node,adapter ?: IFullScreenAdapt) {
         let me = instance();
         if (node && me.isNeedAdapt) {
             //这里，做下优化，只有该节点有选配组件，才适配到全屏
@@ -64,6 +65,9 @@ export class ResolutionHelper {
             node.setContentSize(cc.winSize);
             //这里可能父节点还没有，就不管了，按当前节点大小，把子节点做布局
             me.updateAlignment(node);
+            if( adapter ){
+                adapter.onFullScreenAdapt();
+            }
         }
     }
 

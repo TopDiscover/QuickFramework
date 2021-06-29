@@ -1,6 +1,7 @@
-import UIView, { IFullScreenAdapt, UIClass } from "../ui/UIView";
+import UIView, { UIClass } from "../ui/UIView";
 import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
 import { Manager } from "../Framework";
+import { IFullScreenAdapt } from "../ui/IFullScreenAdapter";
 
 /**@description 动态加载垃圾数据名 */
 const DYNAMIC_LOAD_GARBAGE = "DYNAMIC_LOAD_GARBAGE";
@@ -415,10 +416,7 @@ export class UIManager {
         if( !node ) return;
         this.getCanvas().addChild(node);
         node.zIndex = zOrder;
-        Manager.resolutionHelper.fullScreenAdapt(node);
-        if( adpater ){
-            adpater.onFullScreenAdapt();
-        }
+        Manager.resolutionHelper.fullScreenAdapt(node,adpater);
     }
 
     /**@description 添加动态加载的本地资源 */
@@ -572,8 +570,7 @@ export class UIManager {
     public fullScreenAdapt() {
         this._viewDatas.forEach((data) => {
             if (data.isLoaded && data.view) {
-                Manager.resolutionHelper.fullScreenAdapt(data.view.node);
-                data.view.onFullScreenAdapt();
+                Manager.resolutionHelper.fullScreenAdapt(data.view.node,data.view);
             }
         });
     }
