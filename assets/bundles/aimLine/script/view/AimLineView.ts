@@ -41,17 +41,47 @@ export default class AimLineView extends UIView {
         this.graphics.node.on(cc.Node.EventType.TOUCH_END,this.onTouchEnd,this);
         this.graphics.node.on(cc.Node.EventType.TOUCH_CANCEL,this.onTouchEnd,this);
 
+        
+        //通知进入bundle完成
+        dispatchEnterComplete({type :LogicType.GAME,views:[this]});
+    }
+
+    onFullScreenAdapt(){
         let walls = cc.find("walls",this.node);
         let left = cc.find("left",walls).getComponent(cc.PhysicsBoxCollider);
         let right = cc.find("right",walls).getComponent(cc.PhysicsBoxCollider);
         let top = cc.find("top",walls).getComponent(cc.PhysicsBoxCollider);
         let bottom = cc.find("bottom",walls).getComponent(cc.PhysicsBoxCollider);
-        left.size.height = this.node.height;
-        right.size.height = this.node.height;
-        top.size.width = this.node.width;
-        bottom.size.width = this.node.width;
-        //通知进入bundle完成
-        dispatchEnterComplete({type :LogicType.GAME,views:[this]});
+
+        
+        // left.size.height = this.node.height;
+        // right.size.height = this.node.height;
+        // top.size.width = this.node.width;
+        // bottom.size.width = this.node.width;
+        let items = cc.find("items",this.node);
+        let item8 = cc.find("item_8",items);
+        let item9 = cc.find("item_9",items);
+        let item10 = cc.find("item_10",items);
+        let item11 = cc.find("item_11",items);
+        //这物理组件有bug,位置没有刷新 
+        item8.userData = item8.position;
+        item9.userData = item9.position;
+        item10.userData = item10.position;
+        item11.userData = item11.position;
+
+        cc.tween(items).delay(0.01).call(()=>{
+            item8.position = item8.userData;
+            item9.position = item9.userData;
+            item10.position = item10.userData;
+            item11.position = item11.userData;
+
+        }).start();
+
+        // let pos = items.convertToWorldSpaceAR(item8.position);
+        // pos = items.convertToNodeSpaceAR(pos);
+        // item8.position = pos;
+        
+        // cc.log(item8.position);
     }
 
     private onTouchStart( ev : cc.Event.EventTouch ){

@@ -16,8 +16,16 @@ export interface UIClass<T extends UIView> {
     getPrefabUrl(): string;
 }
 
+export interface IFullScreenAdapt{
+    /**@description 请用全屏幕适配 */
+    onFullScreenAdapt();
+}
+
 @ccclass
-export default abstract class UIView extends EventComponent {
+export default abstract class UIView extends EventComponent implements IFullScreenAdapt {
+    onFullScreenAdapt() {
+        
+    }
 
     /**@description 是否允许接受键盘事件 */
     private _isEnableKey = false;

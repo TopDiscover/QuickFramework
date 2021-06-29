@@ -1,4 +1,4 @@
-import UIView, { UIClass } from "../ui/UIView";
+import UIView, { IFullScreenAdapt, UIClass } from "../ui/UIView";
 import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
 import { Manager } from "../Framework";
 
@@ -228,7 +228,7 @@ export class UIManager {
                         if (viewData.view && cc.isValid(viewData.node)) {
                             viewData.node.zIndex = zOrder;
                             if (!viewData.node.parent) {
-                                this.addChild(viewData.node,zOrder);
+                                this.addChild(viewData.node,zOrder,viewData.view);
                             }
                             viewData.view.show(args);
                         }
@@ -333,7 +333,7 @@ export class UIManager {
             }
 
             if (!viewData.isPreload) {
-                this.addChild(uiNode,zOrder);
+                this.addChild(uiNode,zOrder,view);
             }
             return view;
         }
@@ -411,11 +411,14 @@ export class UIManager {
         return root;
     }
 
-    public addChild( node : cc.Node , zOrder : number){
+    public addChild( node : cc.Node , zOrder : number , adpater : IFullScreenAdapt = null ){
         if( !node ) return;
         this.getCanvas().addChild(node);
         node.zIndex = zOrder;
         Manager.resolutionHelper.fullScreenAdapt(node);
+        if( adpater ){
+            adpater.onFullScreenAdapt();
+        }
     }
 
     /**@description 添加动态加载的本地资源 */
