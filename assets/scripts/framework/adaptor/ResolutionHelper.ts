@@ -4,6 +4,7 @@ import { Manager } from "../Framework";
 import { getSingleton } from "../base/Singleton";
 import { Canvas, log, Node, size, Size, sys, UITransform, view, Widget, widgetManager } from "cc";
 import { DEBUG, EDITOR, JSB, PREVIEW } from "cc/env";
+import { IFullScreenAdapt } from "../ui/IFullScreenAdapter";
 
 type DeviceDirection = "" | "Landscape" | "Portrait";
 
@@ -54,7 +55,7 @@ export class ResolutionHelper {
     }
 
     /**@description 全屏适配 */
-    public fullScreenAdapt(node: Node) {
+    public fullScreenAdapt(node: Node,adpater ?: IFullScreenAdapt) {
         let me = instance();
         if (node && me.isNeedAdapt) {
             //只有该节点有适配组件，才适配到全屏
@@ -63,6 +64,9 @@ export class ResolutionHelper {
             let trans = node.getComponent(UITransform)
             trans?.setContentSize(view.getVisibleSize());
             widgetManager.updateAlignment(node);
+            if( adpater ){
+                adpater.onFullScreenAdapt();
+            }
         }
     }
 

@@ -4,6 +4,7 @@ import { Manager } from "../Framework";
 import { _decorator, Node, game, Game, EventKeyboard, tween, Tween, Vec3, systemEvent, SystemEvent, js, macro } from "cc";
 import { DEBUG } from "cc/env";
 import { BUNDLE_TYPE } from "../base/Defines"
+import { IFullScreenAdapt } from "./IFullScreenAdapter";
 
 /**
  * @description 视图基类
@@ -19,7 +20,10 @@ export interface UIClass<T extends UIView> {
 }
 
 @ccclass
-export default abstract class UIView extends EventComponent {
+export default abstract class UIView extends EventComponent implements IFullScreenAdapt {
+    onFullScreenAdapt(): void {
+        
+    }
 
     /**@description 是否允许接受键盘事件 */
     private _isEnableKey = false;
