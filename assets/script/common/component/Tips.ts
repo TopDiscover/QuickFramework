@@ -99,9 +99,8 @@ class ToastItem extends cc.Component {
                 itemComp.init(msg,this.FADE_TIME);
                 itemComp.fadeIn();
                 node.userData = this._id++;
-
-                Manager.uiManager.getCanvas().addChild(node,ViewZOrder.Tips,`Tips${node.userData}`);
-
+                node.name = `Tips${node.userData}`;
+                Manager.uiManager.addChild(node,ViewZOrder.Tips)
                 //整体上移
                 let length = this._queue.length;
                 for ( let i = 0 ; i < length ; i++ ){

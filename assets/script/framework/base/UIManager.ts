@@ -228,9 +228,8 @@ export class UIManager {
                         if (viewData.view && cc.isValid(viewData.node)) {
                             viewData.node.zIndex = zOrder;
                             if (!viewData.node.parent) {
-                                viewData.node.parent = this.getCanvas();
+                                this.addChild(viewData.node,zOrder);
                             }
-                            Manager.resolutionHelper.fullScreenAdapt(viewData.node);
                             viewData.view.show(args);
                         }
                     }
@@ -310,8 +309,6 @@ export class UIManager {
                 }
             }
 
-            Manager.resolutionHelper.fullScreenAdapt(uiNode);
-
             view.className = className;
             view.bundle = bundle
             viewData.view = view;
@@ -336,8 +333,7 @@ export class UIManager {
             }
 
             if (!viewData.isPreload) {
-                uiNode.parent = this.getCanvas();
-                uiNode.zIndex = zOrder;
+                this.addChild(uiNode,zOrder);
             }
             return view;
         }
@@ -413,6 +409,13 @@ export class UIManager {
             return null;
         }
         return root;
+    }
+
+    public addChild( node : cc.Node , zOrder : number){
+        if( !node ) return;
+        this.getCanvas().addChild(node);
+        node.zIndex = zOrder;
+        Manager.resolutionHelper.fullScreenAdapt(node);
     }
 
     /**@description 添加动态加载的本地资源 */

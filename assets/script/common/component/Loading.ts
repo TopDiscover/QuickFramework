@@ -66,10 +66,8 @@ export default class Loading {
         this._isWaitingHide = false;
         let finish = await this.loadPrefab();
         if (finish) {
-            Manager.resolutionHelper.fullScreenAdapt(this._node);
             this._node.removeFromParent();
-            this._node.parent = Manager.uiManager.getCanvas();
-            this._node.zIndex = ViewZOrder.Loading;
+            Manager.uiManager.addChild(this._node,ViewZOrder.Loading);
             this._node.position = cc.Vec3.ZERO;
             this._text = cc.find("content/text",this._node).getComponent(cc.Label);
             this._showContentIndex = 0;

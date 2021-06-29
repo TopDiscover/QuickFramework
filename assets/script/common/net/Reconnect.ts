@@ -80,11 +80,9 @@ export class Reconnect {
             if (!this.node) {
                 this.node = cc.instantiate(Reconnect.prefab);
             }
-            Manager.resolutionHelper.fullScreenAdapt(this.node);
             this.node.name = "Reconnect";
             this.node.removeFromParent();
-            this.node.parent = Manager.uiManager.getCanvas();
-            this.node.zIndex = ViewZOrder.Loading;
+            Manager.uiManager.addChild(this.node,ViewZOrder.Loading);
             this.node.position = cc.v3(0, 0, 0);
             if (this.isWaitingHide) {
                 this.isWaitingHide = false;

@@ -54,10 +54,8 @@ export default class UILoading extends UILoadingDelegate {
         this._isWaitingHide = false;
         let finish = await this.loadPrefab();
         if (finish) {
-            Manager.resolutionHelper.fullScreenAdapt(this._node);
             this._node.removeFromParent();
-            this._node.parent = Manager.uiManager.getCanvas();
-            this._node.zIndex = ViewZOrder.UILoading;
+            Manager.uiManager.addChild(this._node,ViewZOrder.UILoading);
             this._node.position = cc.Vec3.ZERO;
             this.content = cc.find("content", this._node);
             this.content.stopAllActions();
