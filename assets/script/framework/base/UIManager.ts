@@ -573,6 +573,7 @@ export class UIManager {
         this._viewDatas.forEach((data) => {
             if (data.isLoaded && data.view) {
                 Manager.resolutionHelper.fullScreenAdapt(data.view.node);
+                data.view.onFullScreenAdapt();
             }
         });
     }
