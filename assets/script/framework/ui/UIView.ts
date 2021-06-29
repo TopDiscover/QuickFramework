@@ -140,7 +140,7 @@ export default abstract class UIView extends EventComponent {
     public showWithAction(isOverrideShow = false, completeCallback?: () => void) {
         if (this.content) {
             if (!isOverrideShow) this.show(this.args);
-            this.content.stopAllActions();
+            cc.Tween.stopAllByTarget(this.content);
             cc.tween(this.content)
                 .set({ scale: 0.2 })
                 .to(0.2, { scale: 1.15 })
@@ -159,7 +159,7 @@ export default abstract class UIView extends EventComponent {
      */
     public hideWithAction(completeCallback?: () => void) {
         if (this.content) {
-            this.content.stopAllActions();
+            cc.Tween.stopAllByTarget(this.content);
             cc.tween(this.content)
                 .to(0.2, { scale: 1.15 })
                 .to(0.1, { scale: 0.3 })
@@ -177,7 +177,7 @@ export default abstract class UIView extends EventComponent {
      */
     public closeWithAction(completeCallback?: () => void) {
         if (this.content) {
-            this.content.stopAllActions();
+            cc.Tween.stopAllByTarget(this.content);
             cc.tween(this.content)
                 .to(0.2, { scale: 1.15 })
                 .to(0.1, { scale: 0.3 })

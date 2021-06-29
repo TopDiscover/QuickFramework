@@ -38,7 +38,7 @@ export default class TankBattleProps extends cc.Component {
                 }else if( this.type == TankBettle.PropsType.TIME){
                     TankBettle.gameData.addGameTime();
                 }
-                this.node.stopAllActions();
+                cc.Tween.stopAllByTarget(this.node);
                 this.node.removeFromParent();
                 this.node.destroy();
             }

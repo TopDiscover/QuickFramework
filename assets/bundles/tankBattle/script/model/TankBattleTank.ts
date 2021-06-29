@@ -106,8 +106,8 @@ export default class TankBettleTank extends cc.Component {
             other.node.group == TankBettle.GROUP.Boundary ||
             other.node.group == TankBettle.GROUP.Home ||
             other.node.group == TankBettle.GROUP.Water) {
-            let wordPos = me.world.preAabb.center
-            this.node.stopAllActions()
+            let wordPos = me.world.preAabb.center;
+            cc.Tween.stopAllByTarget(this.node);
             //把自己恢复到未碰撞前的位置
             let pos = this.node.parent.convertToNodeSpaceAR(wordPos)
             this.checkPostion(pos);
@@ -128,7 +128,7 @@ export default class TankBettleTank extends cc.Component {
             }else{
                 //自己不是AI
                 if( player.isAI ){
-                    this.node.stopAllActions();
+                    cc.Tween.stopAllByTarget(this.node);
                     let wordPos = me.world.preAabb.center;
                     let pos = this.node.parent.convertToNodeSpaceAR(wordPos);
                     this.checkPostion(pos)
@@ -217,7 +217,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
                 this.removeStatus(TankBettle.PLAYER_STATUS.PROTECTED)
             }).removeSelf().start()
         } else if (status == TankBettle.PLAYER_STATUS.STRONG) {
-            this._strongNode.stopAllActions();
+            cc.Tween.stopAllByTarget(this._strongNode);
             cc.tween(this._strongNode).delay(TankBettle.PLAYER_STATUS_EXIST_TIME).call(() => {
                 this.removeStatus(status);
             }).start();
@@ -245,7 +245,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
         }
         this.config.live--;
         if (this.config.live == 0) {
-            this.node.stopAllActions();
+            cc.Tween.stopAllByTarget(this.node);
             let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
             this.node.addChild(aniNode);
             let animation = aniNode.getComponent(cc.Animation);
@@ -266,8 +266,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
         if (this.isMoving) {
             return;
         }
-
-        this.node.stopAllActions();
+        cc.Tween.stopAllByTarget(this.node);
         this.isMoving = true;
         if (this.direction == TankBettle.Direction.UP) {
             this.node.angle = 0;
@@ -338,7 +337,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
 
     private stopShootAction() {
         if (this.shootNode) {
-            this.shootNode.stopAllActions();
+            cc.Tween.stopAllByTarget(this.shootNode);
         }
     }
 
@@ -356,16 +355,16 @@ export class TankBettleTankEnemy extends TankBettleTank {
     onDestroy() {
         this.stopShootAction();
         if( this.changeNode ){
-            this.changeNode.stopAllActions();
+            cc.Tween.stopAllByTarget(this.changeNode);
         }
         if( this.delayChangeNode ){
-            this.delayChangeNode.stopAllActions();
+            cc.Tween.stopAllByTarget(this.delayChangeNode);
         }
     }
 
     private startDelayChange(){
         let delay = cc.randomRange(this.config.changeInterval.min,this.config.changeInterval.max);
-        this.delayChangeNode.stopAllActions();
+        cc.Tween.stopAllByTarget(this.delayChangeNode);
         cc.tween(this.shootNode).delay(delay).call(() => {
             this.changeDirection();
             this.startDelayChange();
@@ -388,7 +387,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
     }
 
     public die() {
-        this.node.stopAllActions();
+        cc.Tween.stopAllByTarget(this.node);
         this.stopShootAction();
         let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
         this.node.addChild(aniNode);
@@ -415,7 +414,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
     }
 
     public move() {
-        this.node.stopAllActions();
+        cc.Tween.stopAllByTarget(this.node);
         if (this.direction == TankBettle.Direction.UP) {
             this.node.angle = 0;
             cc.tween(this.node).delay(0)
@@ -484,7 +483,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
         }
         this.isWaitingChange = true;
         let delay = cc.randomRange(0.5, 1);
-        this.changeNode.stopAllActions();
+        cc.Tween.stopAllByTarget(this.changeNode);
         cc.tween(this.changeNode).delay(delay).call(() => { this.delayMove(other) }).start();
     }
 }

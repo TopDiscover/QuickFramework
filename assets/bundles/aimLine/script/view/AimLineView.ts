@@ -41,7 +41,15 @@ export default class AimLineView extends UIView {
         this.graphics.node.on(cc.Node.EventType.TOUCH_END,this.onTouchEnd,this);
         this.graphics.node.on(cc.Node.EventType.TOUCH_CANCEL,this.onTouchEnd,this);
 
-
+        let walls = cc.find("walls",this.node);
+        let left = cc.find("left",walls).getComponent(cc.PhysicsBoxCollider);
+        let right = cc.find("right",walls).getComponent(cc.PhysicsBoxCollider);
+        let top = cc.find("top",walls).getComponent(cc.PhysicsBoxCollider);
+        let bottom = cc.find("bottom",walls).getComponent(cc.PhysicsBoxCollider);
+        left.size.height = this.node.height;
+        right.size.height = this.node.height;
+        top.size.width = this.node.width;
+        bottom.size.width = this.node.width;
         //通知进入bundle完成
         dispatchEnterComplete({type :LogicType.GAME,views:[this]});
     }

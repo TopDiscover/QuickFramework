@@ -58,7 +58,7 @@ export default class UILoading extends UILoadingDelegate {
             Manager.uiManager.addChild(this._node,ViewZOrder.UILoading);
             this._node.position = cc.Vec3.ZERO;
             this.content = cc.find("content", this._node);
-            this.content.stopAllActions();
+            cc.Tween.stopAllByTarget(this.content);
             this.text = cc.find("text", this.content).getComponent(cc.Label);
             this.text.string = "0%";
             this.content.opacity = 0;
@@ -146,7 +146,7 @@ export default class UILoading extends UILoadingDelegate {
     public hide() {
         this.stopTimeOutTimer();
         if (this._node) {
-            if (this.content) this.content.stopAllActions();
+            cc.Tween.stopAllByTarget(this.content);
             this._isWaitingHide = true;
             this._node.active = false;
         } else {

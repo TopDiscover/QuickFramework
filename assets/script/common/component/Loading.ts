@@ -88,7 +88,7 @@ export default class Loading {
         if( this._content.length == 1 ){
             this._text.string = this._content[0];
         }else{
-            this._text.node.stopAllActions();
+            cc.Tween.stopAllByTarget(this._text.node);
             cc.tween(this._text.node)
             .call(()=>{
                 this._text.string = this._content[this._showContentIndex];
@@ -107,7 +107,7 @@ export default class Loading {
 
     private stopShowContent(){
         if( this._text ){
-            this._text.node.stopAllActions();
+            cc.Tween.stopAllByTarget(this._text.node);
         }
     }
 
