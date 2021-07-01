@@ -1,7 +1,6 @@
 import EventComponent from "../base/EventComponent";
 import AudioComponent from "../base/AudioComponent";
 import { Manager } from "../Framework";
-import { getSingleton } from "../base/Singleton";
 import { IFullScreenAdapt } from "./IFullScreenAdapter";
 
 /**
@@ -38,45 +37,6 @@ export default abstract class UIView extends EventComponent implements IFullScre
     /**@description 当前传入参数，即通过UI管理器打开时的传入参数 */
     public get args() {
         return this._args;
-    }
-
-    /**
-     * @description 查找子节点
-     * @param path 子节点路径
-     * @param referenceNode 从哪一个节点开始查找，
-     * referenceNode如果有值，从传入节点中查找，
-     * referenceNode如果没有值，this.content有值，默认从this.content进行查找
-     * referenceNode如不传入，且this.content没有值，相当于使用了cc.find
-     */
-    protected find(path: string, referenceNode?: cc.Node) {
-        if (referenceNode) {
-            return cc.find(path, referenceNode);
-        } else {
-            if (this.content) {
-                return cc.find(path, this.content);
-            } else {
-                return cc.find(path, referenceNode);
-            }
-        }
-    }
-
-    private _presenterAny : any = null;
-    protected get presenterAny() : any{
-        let __presenter_type__ = Reflect.getPrototypeOf(this)['__presenter_type__'];
-        if( __presenter_type__ ){
-            if( __presenter_type__.Instance){
-                return getSingleton(__presenter_type__);
-            }else{
-                if( this._presenterAny ){
-                    return this._presenterAny;
-                }
-                this._presenterAny = new __presenter_type__();
-                return this._presenterAny;
-            }
-        }else{
-            if( CC_DEBUG ) cc.error(`请先使用injectPresenter注入Presenter`);
-            return null;
-        }
     }
 
     /**
@@ -241,7 +201,6 @@ export default abstract class UIView extends EventComponent implements IFullScre
     onDestroy(){
         this.setEnabledKeyBack(false);
         this.enableFrontAndBackgroundSwitch = false;
-        this._presenterAny = null;
         super.onDestroy();
     }
 

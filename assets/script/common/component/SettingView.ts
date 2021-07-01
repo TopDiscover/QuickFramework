@@ -21,16 +21,16 @@ export default class SettingView extends UIView {
         super.onLoad();
 
         this.content = cc.find("content", this.node);
-        let close = this.find("close");
+        let close = cc.find("close",this.content);
         close.on(cc.Node.EventType.TOUCH_END, this.onClose, this);
 
-        let quit = this.find("background/quit");
+        let quit = cc.find("background/quit",this.content);
         quit.on(cc.Node.EventType.TOUCH_END, this.onQuit, this);
 
-        let music = this.find("background/musicVolume");
+        let music = cc.find("background/musicVolume",this.content);
         music.on("slide", this.onMusicVolumeChange, this);
 
-        let effect = this.find("background/effectVolume");
+        let effect = cc.find("background/effectVolume",this.content);
         effect.on('slide', this.onEffectVolumeChange, this);
         this.musicVolume = music.getComponent(cc.Slider);
         this.effectVolume = effect.getComponent(cc.Slider);
@@ -39,9 +39,9 @@ export default class SettingView extends UIView {
         this.onMusicVolumeChange(this.musicVolume);
         this.onEffectVolumeChange(this.effectVolume);
 
-        let musicStatusNode = this.find("background/musicStatus");
+        let musicStatusNode = cc.find("background/musicStatus",this.content);
         this.musicStatus = musicStatusNode.getComponent(cc.Toggle);
-        let effectStatusNode = this.find("background/effectStatus");
+        let effectStatusNode = cc.find("background/effectStatus",this.content);
         this.effectStatus = effectStatusNode.getComponent(cc.Toggle);
         musicStatusNode.on("toggle", this.onMusicStatusChange, this);
         effectStatusNode.on("toggle", this.onEffectStatusChange, this);

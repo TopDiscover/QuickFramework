@@ -1,7 +1,6 @@
-import { Presenter } from "../../framework/base/Presenter";
 
 /**@description 游戏内数据的公共基类 */
-export class GameData extends Presenter{
+export class GameData{
 
     /**@description 当前的asset bundle name */
     public get bundle(){

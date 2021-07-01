@@ -2,16 +2,13 @@ import UIView from "../../../../script/framework/ui/UIView";
 import { LogicEvent } from "../../../../script/common/event/LogicEvent";
 import { Manager } from "../../../../script/common/manager/Manager";
 import { TankBettle } from "../data/TankBattleGameData";
-import { injectPresenter } from "../../../../script/framework/decorator/Decorators";
-import { IPresenter } from "../../../../script/framework/base/Presenter";
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-@injectPresenter(TankBettle.TankBettleGameData)
-export default class TankBattleStartView extends UIView implements IPresenter<TankBettle.TankBettleGameData>{
-    get presenter(): TankBettle.TankBettleGameData{
-        return this.presenterAny;
+export default class TankBattleStartView extends UIView {
+    get data(){
+        return TankBettle.gameData;
     }
 
     public static getPrefabUrl() {
@@ -53,7 +50,7 @@ export default class TankBattleStartView extends UIView implements IPresenter<Ta
 
     protected onKeyUp(ev: cc.Event.EventKeyboard) {
         super.onKeyUp(ev);
-        if( this.presenter.gameStatus != TankBettle.GAME_STATUS.SELECTED ){
+        if( this.data.gameStatus != TankBettle.GAME_STATUS.SELECTED ){
             return;
         }
         if (ev.keyCode == cc.macro.KEY.down || ev.keyCode == cc.macro.KEY.up ) {
@@ -64,10 +61,10 @@ export default class TankBattleStartView extends UIView implements IPresenter<Ta
                 this.selectTank.y = this.singlePlayer.y;
                 isSingle = true;
             }
-            this.presenter.isSingle = isSingle;
+            this.data.isSingle = isSingle;
         }else if( ev.keyCode == cc.macro.KEY.space || ev.keyCode == cc.macro.KEY.enter ){
-            this.presenter.isSingle = this.presenter.isSingle;
-            this.presenter.enterGame();
+            this.data.isSingle = this.data.isSingle;
+            this.data.enterGame();
         }
     }
 
