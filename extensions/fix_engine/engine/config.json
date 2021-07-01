@@ -28,5 +28,21 @@
         "path" : "cocos/bindings/auto/jsb_extension_auto.cpp",
         "name" : "jsb_extension_auto.cpp",
         "desc" : "执更新修改,jsb_extension_auto.cpp"
+    },
+    "Scheduler.cpp":{
+        "path" : "cocos/base/Scheduler.cpp",
+        "name" : "Scheduler.cpp",
+        "desc" : "执更新修改game.restart崩溃的问题,Scheduler.cpp"
+    },
+    "Application.cpp":{
+        "path" : "cocos/platform/Application.cpp",
+        "name" : "Application.cpp",
+        "desc" : "执更新修改game.restart崩溃的问题,Application.cpp"
+    },
+    "GFXDeviceManager.h":{
+        "path" : "cocos/renderer/GFXDeviceManager.h",
+        "name" : "GFXDeviceManager.h",
+        "desc" : "执更新修改game.restart崩溃的问题,GFXDeviceManager.h"
     }
+
 }
