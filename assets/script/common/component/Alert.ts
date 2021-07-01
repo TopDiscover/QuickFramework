@@ -2,7 +2,7 @@ import { Manager } from "../manager/Manager";
 import { EventApi } from "../../framework/event/EventApi";
 import { ViewZOrder, Config } from "../config/Config";
 import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
-import { i18n } from "../language/LanguageImpl";
+import { i18n } from "../language/CommonLanguage";
 
 
 /**@description 提示弹出框配置 */

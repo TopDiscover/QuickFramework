@@ -4,7 +4,6 @@ import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../script
 import { CommonEvent } from "../../../../script/common/event/CommonEvent";
 import { Manager } from "../../../../script/common/manager/Manager";
 import { HallData } from "../data/HallData";
-import { i18n } from "../../../../script/common/language/LanguageImpl";
 import { LobbyService } from "../../../../script/common/net/LobbyService";
 import { GameService } from "../../../../script/common/net/GameService";
 import { ChatService } from "../../../../script/common/net/ChatService";
@@ -88,6 +87,17 @@ export default class HallView extends UIView {
         LobbyService.instance.enabled = false;
         GameService.instance.enabled = false;
         ChatService.instance.enabled = false;
+
+        let mail = cc.find("mial",bottom_op);
+        mail.on(cc.Node.EventType.TOUCH_END,()=>{
+            let lan = Manager.language.getLanguage();
+            if( lan == cc.sys.LANGUAGE_CHINESE){
+                lan = cc.sys.LANGUAGE_ENGLISH
+            }else if( lan == cc.sys.LANGUAGE_ENGLISH ) {
+                lan = cc.sys.LANGUAGE_CHINESE;
+            }
+            Manager.language.change(lan);
+        });
 
         // this.audioHelper.playMusic("audio/background",this.bundle)
         

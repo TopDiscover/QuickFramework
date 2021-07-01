@@ -3,12 +3,15 @@ import { LogicType, LogicEvent, LogicEventData } from "../../../script/common/ev
 import HallView from "./view/HallView";
 import { Manager } from "../../../script/common/manager/Manager";
 import { HallData } from "./data/HallData";
+import { HallLanguage } from "./data/HallLanguage";
 
 
 
 class HallLogic extends Logic {
 
     logicType: LogicType = LogicType.HALL;
+
+    language = new HallLanguage;
 
     get bundle(){
         return HallData.bundle;
@@ -21,14 +24,10 @@ class HallLogic extends Logic {
     }
 
     private onEnterHall(){
-        this.onLanguageChange();
+        Manager.language.addSourceDelegate(this.language);
         //添加大厅网络组件
         Manager.hallNetManager.addNetControllers();
         Manager.uiManager.open({ type: HallView , bundle:this.bundle});
-    }
-
-    protected onLanguageChange(){
-        HallData.onLanguageChange();
     }
 
     public onEnterComplete(data: LogicEventData){

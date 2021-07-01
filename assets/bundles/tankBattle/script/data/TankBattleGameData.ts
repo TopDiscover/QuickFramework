@@ -1,9 +1,6 @@
 /**@@description 坦克大战游戏数据 */
 
 import { GameData } from "../../../../script/common/base/GameData";
-import { TANK_LAN_ZH } from "./TankBattleLanguageZH";
-import { TANK_LAN_EN } from "./TankBattleLanguageEN";
-import { i18n } from "../../../../script/common/language/LanguageImpl";
 import { MapLevel } from "./TankBattleLevel";
 import { Manager } from "../../../../script/common/manager/Manager";
 import TankBattleNetController from "../controller/TankBattleNetController";
@@ -184,14 +181,6 @@ export namespace TankBettle {
         public static Instance() { return this._instance || (this._instance = new TankBettleGameData()); }
         addGameTime() {
             //待处理
-        }
-        onLanguageChange() {
-            let lan = TANK_LAN_ZH;
-            if (Manager.language.getLanguage() == TANK_LAN_EN.language) {
-                lan = TANK_LAN_EN;
-            }
-            i18n[`${this.bundle}`] = {};
-            i18n[`${this.bundle}`] = lan.data;
         }
 
         /**@description 子弹预置 */

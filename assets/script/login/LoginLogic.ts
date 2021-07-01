@@ -11,7 +11,7 @@ import LoginView from "./view/LoginView";
 import { BUNDLE_RESOURCES } from "../framework/base/Defines";
 import { HotUpdate, AssetManagerCode, AssetManagerState } from "../common/base/HotUpdate";
 import DownloadLoading from "../common/component/DownloadLoading";
-import { i18n } from "../common/language/LanguageImpl";
+import { i18n } from "../common/language/CommonLanguage";
 
 class LoginLogic extends Logic {
 
@@ -42,7 +42,7 @@ class LoginLogic extends Logic {
                 Manager.alert.show({
                     text: i18n.newVersion, confirmCb: (isOK) => {
                         if (isOK) {
-                            Manager.uiManager.open({ type: DownloadLoading, zIndex: ViewZOrder.UI, args: [state,i18n.hall] });
+                            Manager.uiManager.open({ type: DownloadLoading, zIndex: ViewZOrder.UI, args: [state,i18n.hallText] });
                         } else {
                             //退出游戏
                             cc.game.end();

@@ -6,8 +6,13 @@ const LANG_KEY: string = "using_language";
 export interface LanguageData {
     language: string;
 }
-
-export interface LanguageDelegate {
+export const COMMON_LANGUAGE_NAME = "COMMON_LANGUAGE_NAME";
+/**
+ * @description 数据代理
+ * 如果是公共总合，name使用 COMMON_LANGUAGE_NAME
+ */
+export interface LanguageDataSourceDelegate {
+    name : string;
     data(language: string): LanguageData;
 }
 
@@ -17,13 +22,30 @@ export class Language {
     public static Instance() { return this._instance || (this._instance = new Language()); }
 
     private _data: LanguageData = { language: "unknown" };
-    private _delegate: LanguageDelegate;
-    public set delegate(value) {
-        this._delegate = value;
-        this.change(this.getLanguage());
+    private delegates: LanguageDataSourceDelegate[] = [];
+
+    public addSourceDelegate(delegate: LanguageDataSourceDelegate) {
+        if (this.delegates.indexOf(delegate) == -1) {
+            this.delegates.push(delegate);
+            this.updateSource(this.getLanguage());
+        }
     }
-    public get delegate() {
-        return this._delegate;
+
+    private updateSource(language: string) {
+        this.delegates.forEach((delegate, index, source) => {
+            this._data = delegate.data(language);
+        });
+    }
+
+    public removeSourceDelegate(delegate: LanguageDataSourceDelegate) {
+        let index = this.delegates.indexOf(delegate);
+        if (index != -1) {
+            this.delegates.splice(index, 1);
+            let data: any = this._data;
+            if (delegate.name != COMMON_LANGUAGE_NAME && data[delegate.name]) {
+                data[delegate.name] = {};
+            }
+        }
     }
 
     /**
@@ -31,7 +53,7 @@ export class Language {
      * @param language 语言包类型
      */
     public change(language: string) {
-        if (!this.delegate) {
+        if (this.delegates.length <= 0) {
             //请先设置代理
             return;
         }
@@ -40,16 +62,22 @@ export class Language {
             return;
         }
         if ( ENABLE_CHANGE_LANGUAGE ){
-            this._data = this.delegate.data(language);
-            dispatch(EventApi.CHANGE_LANGUAGE,language);
+            //先更新所有数据
+            this.delegates.forEach((delegate, index, source) => {
+                this._data = delegate.data(language);
+            });
+            //通知更新
+            dispatch(EventApi.CHANGE_LANGUAGE, language);
         }else{
-            this._data = this.delegate.data(this.getLanguage());
+            this.delegates.forEach((delegate, index, source) => {
+                this._data = delegate.data(this.getLanguage());
+            });
         }
         Manager.localStorage.setItem(LANG_KEY, this._data.language);
     }
 
     public get(args: (string | number)[]) {
-        let result = "";
+        let result: any = "";
         do {
             if (!!!args) break;
             if (args.length < 1) break;
@@ -58,7 +86,7 @@ export class Language {
                 cc.error("key error");
                 break;
             }
-            if (keyString.indexOf(USING_LAN_KEY) > -1 ) {
+            if (keyString.indexOf(USING_LAN_KEY) > -1) {
 
                 let keys = keyString.split(".");
                 if (keys.length < 2) {
@@ -67,26 +95,35 @@ export class Language {
                 }
                 keys.shift();//删除掉i18n.的头部
                 args.shift();
-                result = this._data[keys[0]];
-                if (!result) {
+                let data = (<any>this._data)[keys[0]];
+                if (!data) {
                     cc.error(`语言包不存在 : ${keyString}`);
                     break;
                 }
                 let i = 1;
                 for (; i < keys.length; i++) {
-                    if (result[keys[i]] == undefined) {
+                    if (data[keys[i]] == undefined) {
                         break;
                     }
-                    result = result[keys[i]];
+                    data = data[keys[i]];
                 }
                 if (i != keys.length) {
                     cc.error(`语言包不存在 : ${keyString}`);
                 }
-                result = String.format(result, args);
+                if (typeof (data) == "string") {
+                    result = String.format(data, args);
+                } else {
+                    result = data;
+                }
+
             } else {
                 //已经是取出的正确语言包，直接格式化
-                keyString = args.shift();
-                return String.format(keyString, args);
+                let data = args.shift();
+                if (typeof (data) == "string") {
+                    return String.format(data, args);
+                } else {
+                    result = data;
+                }
             }
         } while (0);
         return result;

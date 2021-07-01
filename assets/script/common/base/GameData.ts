@@ -17,8 +17,4 @@ export class GameData extends Presenter{
     public gameType(){
         return -1;
     }
-
-    onLanguageChange(){
-        
-    }
 }
