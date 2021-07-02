@@ -1,18 +1,18 @@
 import { HotUpdate, AssetManagerCode, AssetManagerState, BundleConfig, DownLoadInfo } from "../base/HotUpdate";
 import { CommonEvent } from "../event/CommonEvent";
 import { Config} from "../config/Config";
+import { Manager } from "./Manager";
 import DownloadLoading from "../component/DownloadLoading";
 import { game } from "cc";
 import { DEBUG } from "cc/env";
 import { ViewZOrder } from "../config/ViewZOrder";
 import { i18n } from "../language/CommonLanguage";
-import { Manager } from "../../framework/Framework";
 
 /**
  * @description bundle管理器
  */
 
-class BundleManager {
+export class BundleManager {
    private static _instance: BundleManager = null!;
    public static Instance() { return this._instance || (this._instance = new BundleManager()); }
    private curBundle: BundleConfig = null!;
@@ -210,9 +210,4 @@ class BundleManager {
          dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
       }
    }
-}
-
-export function bundleManagerInit() {
-   log("Bundle管理器初始化");
-   Manager.bundleManager = BundleManager.Instance();
 }

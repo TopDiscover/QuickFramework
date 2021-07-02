@@ -1,8 +1,7 @@
 import { EventApi } from "../event/EventApi";
 import { ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY } from "./Defines";
 import { Manager } from "../Framework";
-import { sys , Node } from "cc";
-import { ILanguage } from "../interface/ILanguage";
+import { sys } from "cc";
 const LANG_KEY: string = "using_language";
 
 export interface LanguageData {
@@ -19,10 +18,7 @@ export interface LanguageDataSourceDelegate {
     data(language: string): LanguageData;
 }
 
-class Language implements ILanguage{
-
-    onLoad(node: Node): void{}
-    onDestroy(node:Node): void{}
+export class Language {
 
     private static _instance: Language = null!;
     public static Instance() { return this._instance || (this._instance = new Language()); }
@@ -139,9 +135,4 @@ class Language implements ILanguage{
     public getLanguage() {
         return Manager.localStorage.getItem(LANG_KEY, sys.Language.CHINESE);
     }
-}
-
-export function languageInit() {
-    log("语言包初始化");
-    Manager.language = Language.Instance();
 }

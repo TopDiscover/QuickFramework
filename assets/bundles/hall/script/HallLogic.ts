@@ -1,10 +1,9 @@
 import { Logic } from "../../../scripts/common/base/Logic";
 import { LogicType, LogicEvent, LogicEventData } from "../../../scripts/common/event/LogicEvent";
 import HallView from "./view/HallView";
+import { Manager } from "../../../scripts/common/manager/Manager";
 import { HallData } from "./data/HallData";
 import { HallLanguage } from "./data/HallLanguage";
-import { Manager } from "../../../scripts/framework/Framework";
-import { registerTypeManager } from "../../../scripts/framework/base/RegisterTypeManager";
 
 
 
@@ -40,4 +39,4 @@ class HallLogic extends Logic {
     }
 }
 
-registerTypeManager.registerLogicType(HallLogic);
+Manager.logicManager.push(HallLogic);

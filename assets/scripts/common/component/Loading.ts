@@ -1,24 +1,20 @@
+import { Manager } from "../manager/Manager";
 import { EventApi } from "../../framework/event/EventApi";
 import { Config } from "../config/Config";
 import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import { find ,instantiate,Label,Node, Prefab, tween, Vec3} from "cc";
 import { ViewZOrder } from "../config/ViewZOrder";
-import { Manager } from "../../framework/Framework";
-import { Iloading } from "../../framework/interface/Iloading";
 /**
  * @description 加载动画
  */
 
-class Loading implements Iloading{
+export default class Loading {
     private static _instance: Loading = null!;
     public static Instance() { return this._instance || (this._instance = new Loading()); }
     /**@description 当前loading节点 */
     private _node: Node = null!;
-    onLoad(node: Node): void {
+    constructor() {
         Manager.eventDispatcher.addEventListener(EventApi.AdaptScreenEvent, this.onAdaptScreen, this);
-    }
-    onDestroy(node: Node): void {
-        Manager.eventDispatcher.removeEventListener(EventApi.AdaptScreenEvent, this);
     }
     private onAdaptScreen() {
         Manager.resolutionHelper.fullScreenAdapt(this._node);
@@ -180,9 +176,4 @@ class Loading implements Iloading{
             this._isWaitingHide = true;
         }
     }
-}
-
-export function loadingInit() {
-    log("Loading初始化");
-    Manager.loading = Loading.Instance();
 }

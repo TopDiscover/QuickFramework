@@ -1,8 +1,7 @@
 import { Asset, Component, find, Game, game, SystemEvent, systemEvent, SystemEventType, _decorator } from "cc";
-import { Manager } from "../../framework/Framework";
-import GlobalAudio from "../component/GlobalAudio";
 import { Config } from "../config/Config";
 import { Reconnect } from "../net/Reconnect";
+import { Manager } from "./Manager";
 
 /**
  * @description 主控制器 
@@ -26,7 +25,12 @@ export default class MainController extends Component {
             Manager.wssCacertUrl = this.wssCacert.nativeUrl;
         }
 
-        Manager.onLoad(this.node);
+        Manager.resolutionHelper.onLoad(this.node);
+
+        //全局网络管理器onLoad
+        Manager.netManager.onLoad(this.node);
+        //大厅
+        Manager.hallNetManager.onLoad(this.node);
 
         //预先加载下loading预置体
         Manager.tips.preloadPrefab();
@@ -72,15 +76,30 @@ export default class MainController extends Component {
         //游戏事件注册
         game.on(Game.EVENT_HIDE, this.onEnterBackground, this);
         game.on(Game.EVENT_SHOW, this.onEnterForgeground, this);
+
+        //Service onLoad
+        Manager.serviceManager.onLoad();
+
+        //逻辑管理器
+        Manager.logicManager.onLoad(this.node);
     }
 
     update() {
 
         //Service 网络调试
         Manager.serviceManager.update();
+
+        //远程资源下载任务调度
+        Manager.assetManager.remote.update();
     }
 
     onDestroy() {
+
+        Manager.resolutionHelper.onDestroy();
+
+        //网络管理器onDestroy
+        Manager.netManager.onDestroy(this.node);
+        Manager.hallNetManager.onDestroy(this.node);
         //移除键盘事件
         systemEvent.off(SystemEvent.EventType.KEY_UP);
 
@@ -88,7 +107,10 @@ export default class MainController extends Component {
         game.off(Game.EVENT_HIDE);
         game.off(Game.EVENT_SHOW);
 
-        Manager.onDestroy(this.node);
+        Manager.serviceManager.onDestroy();
+
+        //逻辑管理器
+        Manager.logicManager.onDestroy(this.node);
     }
 
     private onEnterBackground() {

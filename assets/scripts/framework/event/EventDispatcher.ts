@@ -3,10 +3,8 @@
  * @description 事件派发器，原生的，当前节点没有在运行时，无法收到消息
  */
 
-import { js,Node} from "cc";
+import { js } from "cc";
 import { DEBUG, EDITOR } from "cc/env";
-import { Manager } from "../Framework";
-import { IEventDispatcher } from "../interface/IEventDispatcher";
 
 interface IEvent {
     type: string, // 事件类型
@@ -14,10 +12,8 @@ interface IEvent {
     callback: ((data: any) => void) | string;//事件回调
 }
 
-class EventDispatcher implements IEventDispatcher{
+export class EventDispatcher {
 
-    onLoad(node: Node): void{}
-    onDestroy(node:Node): void{}
     private static _instance: EventDispatcher = null!;
     public static Instance() { return this._instance || (this._instance = new EventDispatcher()); }
     private logTag = `[EventDispatcher] `;
@@ -130,9 +126,4 @@ window.dispatch = function (name: string, data?: any) {
     if (DEBUG && !EDITOR) log(`[dispatch] ${name} data : ${data}`);
     //向自己封闭的管理器中也分发
     EventDispatcher.Instance().dispatchEvent(name, data);
-}
-
-export function eventDispatcherInit() {
-    log("事件派发器初始化");
-    Manager.eventDispatcher = EventDispatcher.Instance();
 }

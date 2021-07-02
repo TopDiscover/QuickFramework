@@ -2,6 +2,7 @@
 
 import { GameData } from "../../../../scripts/common/base/GameData";
 import { MapLevel } from "./TankBattleLevel";
+import { Manager } from "../../../../scripts/common/manager/Manager";
 import TankBattleMap from "../model/TankBattleMap";
 import TankBattleGameView from "../view/TankBattleGameView";
 import { getSingleton } from "../../../../scripts/framework/base/Singleton";
@@ -10,7 +11,6 @@ import TankBattleStartView from "../view/TankBattleStartView";
 import TankBattleGameOver from "../view/TankBattleGameOver";
 import { Node, Rect, UITransform, Vec2, Vec3 } from "cc"
 import { ViewZOrder } from "../../../../scripts/common/config/ViewZOrder";
-import { Manager } from "../../../../scripts/framework/Framework";
 
 export namespace TankBettle {
     export enum Direction {

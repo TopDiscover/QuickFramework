@@ -1,10 +1,10 @@
 import UIView from "../../framework/ui/UIView";
+import { Manager } from "../../common/manager/Manager";
 import { BundleConfig } from "../../common/base/HotUpdate";
 import { LogicEvent, dispatchEnterComplete, LogicType } from "../../common/event/LogicEvent";
 import { Config } from "../../common/config/Config";
 import DownloadLoading from "../../common/component/DownloadLoading";
 import { _decorator,Node, find, SystemEventType } from "cc";
-import { Manager } from "../../framework/Framework";
 
 const {ccclass, property} = _decorator;
 

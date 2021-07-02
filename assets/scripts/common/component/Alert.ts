@@ -1,11 +1,10 @@
+import { Manager } from "../manager/Manager";
 import { EventApi } from "../../framework/event/EventApi";
 import { Config } from "../config/Config";
 import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
 import { Component,find,instantiate,isValid,Label,Node, Prefab, RichText, SystemEventType, tween, Vec3 } from "cc";
 import { ViewZOrder } from "../config/ViewZOrder";
 import { i18n } from "../language/CommonLanguage";
-import { Manager } from "../../framework/Framework";
-import { IAlert } from "../../framework/interface/IAlert";
 
 
 /**@description 提示弹出框配置 */
@@ -212,7 +211,7 @@ class AlertDialog extends Component {
     }
 }
 
-class Alert implements IAlert{
+export default class Alert {
 
     private static _instance: Alert = null!;
     public static Instance() { return this._instance || (this._instance = new Alert()); }
@@ -222,11 +221,8 @@ class Alert implements IAlert{
 
     private prefab: Prefab = null!;
 
-    onLoad(node: Node): void {
+    constructor() {
         Manager.eventDispatcher.addEventListener(EventApi.AdaptScreenEvent, this.onAdaptScreen, this);
-    }
-    onDestroy(node: Node): void {
-        Manager.eventDispatcher.removeEventListener(EventApi.AdaptScreenEvent, this);
     }
 
     private _isLoadingPrefab = false;
@@ -425,7 +421,3 @@ class Alert implements IAlert{
     }
 }
 
-export function alertInit() {
-    log("提示框管理初始化");
-    Manager.alert = Alert.Instance();
-}

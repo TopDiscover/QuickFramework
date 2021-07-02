@@ -1,7 +1,7 @@
 import UIView from "../../../../scripts/framework/ui/UIView";
+import { Manager } from "../../../../scripts/common/manager/Manager";
 import { TankBettle } from "../data/TankBattleGameData";
 import { _decorator,Node, find, Label, tween, Vec3, UITransform } from "cc";
-import { Manager } from "../../../../scripts/framework/Framework";
 
 const { ccclass, property } = _decorator;
 

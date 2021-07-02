@@ -5,6 +5,7 @@
 
  import { Logic } from "../common/base/Logic";
  import { LogicType, LogicEvent, LogicEventData } from "../common/event/LogicEvent";
+ import { Manager } from "../common/manager/Manager";
  import LoginView from "./view/LoginView";
  import { BUNDLE_RESOURCES } from "../framework/base/Defines";
  import { HotUpdate, AssetManagerCode, AssetManagerState } from "../common/base/HotUpdate";
@@ -12,8 +13,6 @@
 import { game, log } from "cc";
 import { ViewZOrder } from "../common/config/ViewZOrder";
 import { i18n } from "../common/language/CommonLanguage";
-import { registerTypeManager } from "../framework/base/RegisterTypeManager";
-import { Manager } from "../framework/Framework";
  
  class LoginLogic extends Logic {
  
@@ -85,5 +84,5 @@ import { Manager } from "../framework/Framework";
      }
  
  }
- registerTypeManager.registerLogicType(LoginLogic);
+ Manager.logicManager.push(LoginLogic);
  

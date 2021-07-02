@@ -1,7 +1,6 @@
 import { Logic } from "../../../scripts/common/base/Logic";
 import { LogicType, LogicEvent } from "../../../scripts/common/event/LogicEvent";
-import { registerTypeManager } from "../../../scripts/framework/base/RegisterTypeManager";
-import { Manager } from "../../../scripts/framework/Framework";
+import { Manager } from "../../../scripts/common/manager/Manager";
 import NetTestView from "./view/NetTestView";
 
 class NetTestLogic extends Logic {
@@ -28,4 +27,4 @@ class NetTestLogic extends Logic {
     }
 }
 
-registerTypeManager.registerLogicType(NetTestLogic);
+Manager.logicManager.push(NetTestLogic);

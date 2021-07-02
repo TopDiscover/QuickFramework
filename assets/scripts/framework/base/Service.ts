@@ -357,7 +357,7 @@ export class Service extends ServerConnector {
             this._isDoingMessage = false;
         }
         else {
-            Manager.uiManager.getComponent()?.scheduleOnce(() => {
+            Manager.uiManager.getCanvasComponent()?.scheduleOnce(() => {
                 this._isDoingMessage = false;
             }, handleTime);
         }

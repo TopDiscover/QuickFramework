@@ -5,6 +5,7 @@
  import { injectService } from "../../../../scripts/framework/decorator/Decorators";
  import Controller from "../../../../scripts/framework/controller/Controller";
  import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
+ import { Manager } from "../../../../scripts/common/manager/Manager";
  import { GameService } from "../../../../scripts/common/net/GameService";
  import { ServiceEvent } from "../../../../scripts/framework/base/Defines";
  import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
@@ -13,8 +14,6 @@
  import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
  import { TestProtoMessage } from "../../../hall/script/protocol/TestProtoMessage";
 import { _decorator } from "cc";
-import { Manager } from "../../../../scripts/framework/Framework";
-import { registerTypeManager } from "../../../../scripts/framework/base/RegisterTypeManager";
  const { ccclass, property } = _decorator;
  
  @ccclass
@@ -53,5 +52,5 @@ import { registerTypeManager } from "../../../../scripts/framework/base/Register
  
  }
  
- registerTypeManager.registerHallNetType(TestGameNetController);
+ Manager.hallNetManager.register(TestGameNetController);
  

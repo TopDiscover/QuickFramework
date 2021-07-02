@@ -1,7 +1,6 @@
 import { Logic } from "../../../scripts/common/base/Logic";
 import { LogicType, LogicEvent } from "../../../scripts/common/event/LogicEvent";
-import { registerTypeManager } from "../../../scripts/framework/base/RegisterTypeManager";
-import { Manager } from "../../../scripts/framework/Framework";
+import { Manager } from "../../../scripts/common/manager/Manager";
 import { AimLineData } from "./data/AimLineData";
 import AimLineView from "./view/AimLineView";
 
@@ -29,4 +28,4 @@ class AimLineLogic extends Logic {
     }
 }
 
-registerTypeManager.registerLogicType(AimLineLogic);
+Manager.logicManager.push(AimLineLogic);

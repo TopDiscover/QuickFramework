@@ -3,13 +3,8 @@
  */
 
 import { js, Node} from "cc";
-import { registerTypeManager } from "../../framework/base/RegisterTypeManager";
-import { Manager } from "../../framework/Framework";
 
-const MAIN_NET = "netManager";
-const HALL_NET = "hallNetManager";
-
-class NetManager {
+ export class NetManager {
     private name = "";
     constructor(name : string) {
         this.name = name;
@@ -21,11 +16,6 @@ class NetManager {
     private node: Node | null = null;
     public onLoad(node: Node) {
         this.node = node;
-        if( this.name == MAIN_NET ){
-            registerTypeManager.netManager = this;
-        }else if( this.name == HALL_NET ){
-            registerTypeManager.hallNetManager = this;
-        }
     }
 
     public onDestroy(node: Node) {
@@ -35,9 +25,11 @@ class NetManager {
 
     /**@description 网络控制器注册 Controller<T>的子类 */
     public register(controllerType: any) {
-        if( this.types.indexOf(controllerType) != -1){
-            error(this.name, `重复添加${js.getClassName(controllerType)}`);
-            return;
+        for (let i = 0; i < this.types.length; i++) {
+            if (this.types[i] == controllerType) {
+                error(this.name, `重复添加${js.getClassName(controllerType)}`);
+                return;
+            }
         }
         this.types.push(controllerType);
     }
@@ -45,17 +37,6 @@ class NetManager {
     /**@description 添加网络控制组件 */
     public addNetControllers() {
         if (this.node) {
-            if( this.name == MAIN_NET ){
-                registerTypeManager.netTypes.forEach((value)=>{
-                    this.register(value);
-                });
-                registerTypeManager.netTypes = [];
-            }else if ( this.name == HALL_NET ){
-                registerTypeManager.hallNetTypes.forEach((value)=>{
-                    this.register(value);
-                });
-                registerTypeManager.hallNetTypes = [];
-            }
             for (let i = 0; i < this.types.length; i++) {
                 let controllerType = this.types[i];
                 if (controllerType && !this.node.getComponent(controllerType)) {
@@ -78,10 +59,4 @@ class NetManager {
         }
     }
     
-}
-
-export function netManagerInit() {
-    log("网络管理器初始化");
-    Manager.netManager = new NetManager("netManager");
-    Manager.hallNetManager = new NetManager("hallNetManager");
 }

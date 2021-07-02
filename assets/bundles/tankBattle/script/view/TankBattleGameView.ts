@@ -1,10 +1,10 @@
 import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../scripts/common/event/LogicEvent";
 import TankBattleStartView from "./TankBattleStartView";
+import { Manager } from "../../../../scripts/common/manager/Manager";
 import TankBattleMap from "../model/TankBattleMap";
 import { TankBettle } from "../data/TankBattleGameData";
 import GameView from "../../../../scripts/common/base/GameView";
 import { _decorator,Node, Label, director, PhysicsSystem2D, find, systemEvent, SystemEvent, EventKeyboard, macro, instantiate } from "cc";
-import { Manager } from "../../../../scripts/framework/Framework";
 
 
 const { ccclass, property } = _decorator;

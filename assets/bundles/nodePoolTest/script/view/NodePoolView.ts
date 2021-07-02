@@ -1,8 +1,8 @@
 import { _decorator ,Node, find, instantiate, Vec3, randomRangeInt, UITransform} from "cc";
 import GameView from "../../../../scripts/common/base/GameView";
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../scripts/common/event/LogicEvent";
-import { Manager } from "../../../../scripts/framework/Framework";
-import { NodePool } from "../../../../scripts/framework/interface/INodePoolManager";
+import { Manager } from "../../../../scripts/common/manager/Manager";
+import { NodePool, NodePoolManager } from "../../../../scripts/framework/base/NodePoolManager";
 
 const {ccclass, property} = _decorator;
 

@@ -2,9 +2,9 @@ import { LogicEventData, LogicType } from "../event/LogicEvent";
 import EventComponent from "../../framework/base/EventComponent";
 import { ResourceData, ResourceCacheData } from "../../framework/base/Defines";
 import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
+import { Manager } from "../manager/Manager";
 import { Node } from "cc";
 import { LanguageDataSourceDelegate } from "../../framework/base/Language";
-import { Manager } from "../../framework/Framework";
 
 
 /**@description 当前入子游戏时，在Logic.onLoad时初始设置 */

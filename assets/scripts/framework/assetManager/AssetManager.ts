@@ -1,8 +1,7 @@
-import { Asset, assetManager, AssetManager, JsonAsset, TextAsset, Texture2D, sp, SpriteFrame, ImageAsset , Node } from "cc";
+import { Asset, assetManager, AssetManager, JsonAsset, TextAsset, Texture2D, sp, SpriteFrame, ImageAsset } from "cc";
 import { DEBUG } from "cc/env";
 import { ResourceCacheData, ResourceCacheStatus, ResourceInfo, BUNDLE_TYPE, ResourceType, BUNDLE_REMOTE } from "../base/Defines";
 import { Manager } from "../Framework";
-import { IAssetManager } from "../interface/IAssetManager";
 
 class RemoteLoader {
 
@@ -156,11 +155,8 @@ class RemoteLoader {
     }
 }
 
-class _AssetManager implements IAssetManager{
-    
-    onLoad(node: Node): void{}
-    onDestroy(node:Node): void{}
 
+export class _AssetManager {
     private logTag = `[AssetManager]: `;
     private static _instance: _AssetManager = null!;
     public static Instance() {
@@ -447,9 +443,4 @@ class _AssetManager implements IAssetManager{
         info.retain = true;
         this.retainAsset(info);
     }
-}
-
-export function assetManagerInit() {
-    log("资源管理器初始化");
-    Manager.assetManager = _AssetManager.Instance();
 }

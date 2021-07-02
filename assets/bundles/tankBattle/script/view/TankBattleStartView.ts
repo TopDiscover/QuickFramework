@@ -1,8 +1,8 @@
 import UIView from "../../../../scripts/framework/ui/UIView";
 import { LogicEvent } from "../../../../scripts/common/event/LogicEvent";
+import { Manager } from "../../../../scripts/common/manager/Manager";
 import { TankBettle } from "../data/TankBattleGameData";
 import { _decorator,Node, find, Label, Vec3, EventKeyboard, macro } from "cc";
-import { Manager } from "../../../../scripts/framework/Framework";
 
 const { ccclass, property } = _decorator;
 

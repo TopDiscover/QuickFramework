@@ -6,10 +6,10 @@
 import { DEBUG } from "cc/env";
 import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
  import { EventApi } from "../../framework/event/EventApi";
-import { Manager } from "../../framework/Framework";
  import { Config } from "../config/Config";
 import { ViewZOrder } from "../config/ViewZOrder";
 import { i18n } from "../language/CommonLanguage";
+ import { Manager } from "../manager/Manager";
  import { CommonService } from "./CommonService";
  import ReconnectComponent from "./ReconnectComponent";
  
@@ -65,6 +65,11 @@ import { i18n } from "../language/CommonLanguage";
      }
      constructor(service: CommonService) {
          this.service = service;
+         Manager.eventDispatcher.addEventListener(EventApi.AdaptScreenEvent, this.onAdaptScreen, this)
+     }
+ 
+     private onAdaptScreen() {
+         Manager.resolutionHelper.fullScreenAdapt(this.node);
      }
  
      public async show(content: string = i18n.reconnect) {
