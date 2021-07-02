@@ -1,5 +1,5 @@
 import { Component, tween, _decorator,Animation, instantiate, Prefab ,Node, Vec3} from "cc";
-import { Manager } from "../../../../scripts/common/manager/Manager";
+import { Manager } from "../../../../scripts/framework/Framework";
 import { CELL_SIZE, EFFECTS_CONFIG, EliminateEffect } from "../data/EliminateDefines";
 import EliminateGameView from "./EliminateGameView";
 

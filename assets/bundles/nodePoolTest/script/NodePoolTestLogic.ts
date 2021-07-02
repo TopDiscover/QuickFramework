@@ -1,6 +1,7 @@
 import { Logic } from "../../../scripts/common/base/Logic";
 import { LogicType, LogicEvent } from "../../../scripts/common/event/LogicEvent";
-import { Manager } from "../../../scripts/common/manager/Manager";
+import { registerTypeManager } from "../../../scripts/framework/base/RegisterTypeManager";
+import { Manager } from "../../../scripts/framework/Framework";
 import NodePoolView from "./view/NodePoolView";
 
 class NodePoolTestLogic extends Logic {
@@ -27,4 +28,4 @@ class NodePoolTestLogic extends Logic {
     }
 }
 
-Manager.logicManager.push(NodePoolTestLogic);
+registerTypeManager.registerLogicType(NodePoolTestLogic);

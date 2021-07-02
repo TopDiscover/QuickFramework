@@ -3,10 +3,11 @@ import { LogicType, LogicEvent, LogicEventData } from "../../../scripts/common/e
 import { ResourceData } from "../../../scripts/framework/base/Defines";
 import { LobbyService } from "../../../scripts/common/net/LobbyService";
 import { ResourceLoaderError } from "../../../scripts/framework/assetManager/ResourceLoader";
-import { Manager } from "../../../scripts/common/manager/Manager";
 import TankBattleGameView from "./view/TankBattleGameView";
 import { TankBettle } from "./data/TankBattleGameData";
 import { TankBattleLanguage } from "./data/TankBattleLanguage";
+import { Manager } from "../../../scripts/framework/Framework";
+import { registerTypeManager } from "../../../scripts/framework/base/RegisterTypeManager";
 
 /**
  * @description 坦克大战Logic 
@@ -92,4 +93,4 @@ class TankBattleLogic extends Logic {
     }
 }
 
-Manager.logicManager.push(TankBattleLogic);
+registerTypeManager.registerLogicType(TankBattleLogic);

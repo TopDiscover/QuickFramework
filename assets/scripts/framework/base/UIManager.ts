@@ -4,144 +4,15 @@ import { Manager } from "../Framework";
 import { isValid, js, Node, Prefab, Widget, instantiate, director, Component } from "cc";
 import { DEBUG } from "cc/env";
 import { IFullScreenAdapt } from "../ui/IFullScreenAdapter";
+import { DYNAMIC_LOAD_GARBAGE, DYNAMIC_LOAD_RETAIN_MEMORY, IUIManager, ViewData, ViewDynamicLoadData } from "../interface/IUIManager";
 
-/**@description 动态加载垃圾数据名 */
-const DYNAMIC_LOAD_GARBAGE = "DYNAMIC_LOAD_GARBAGE";
-/**@description 动画加载全局数据名 */
-const DYNAMIC_LOAD_RETAIN_MEMORY = "DYNAMIC_LOAD_RETAIN_MEMORY";
-class ViewDynamicLoadData {
-    private local = new Map<string, ResourceInfo>();
-    private remote = new Map<string, ResourceInfo>();
-    public name: string | null;
-
-    constructor(name: string | null = null) {
-        this.name = name;
+class UIManager implements IUIManager{
+    onLoad(node: Node): void {
+        
     }
-
-    /**@description 添加动态加载的本地资源 */
-    public addLocal(info: ResourceInfo, className: string | null = null) {
-        if (info && info.url) {
-            if (this.name == DYNAMIC_LOAD_GARBAGE) {
-                error(`找不到资源持有者: ${info.url}`);
-            }
-            if (DEBUG) Manager.uiManager.checkView(info.url, className);
-            if (!this.local.has(info.url)) {
-                Manager.assetManager.retainAsset(info);
-                this.local.set(info.url, info);
-            }
-        }
+    onDestroy(node: Node): void {
+        
     }
-
-    /**@description 添加动态加载的远程资源 */
-    public addRemote(info: ResourceInfo, className: string | null = null) {
-        if (info && info.data && !this.remote.has(info.url)) {
-            if (this.name == DYNAMIC_LOAD_GARBAGE) {
-                error(`找不到资源持有者 : ${info.url}`);
-            }
-            if (DEBUG) Manager.uiManager.checkView(info.url, className);
-            Manager.cacheManager.remoteCaches.retainAsset(info);
-            this.remote.set(info.url, info);
-        }
-    }
-
-    /**@description 清除远程加载资源 */
-    public clear() {
-        if (this.name == DYNAMIC_LOAD_GARBAGE) {
-            //先输出
-            let isShow = this.local.size > 0 || this.remote.size > 0;
-            if (isShow) {
-                error(`当前未能释放资源如下:`);
-            }
-            if (this.local && this.local.size > 0) {
-                error("-----------local-----------");
-                if (this.local) {
-                    this.local.forEach((info) => {
-                        error(info.url);
-                    });
-                }
-            }
-            if (this.remote && this.remote.size > 0) {
-                error("-----------remote-----------");
-                if (this.remote) {
-                    this.remote.forEach((info, url) => {
-                        error(info.url);
-                    });
-                }
-            }
-
-        } else {
-            //先清除当前资源的引用关系
-            if (this.local) {
-                this.local.forEach((info) => {
-                    Manager.assetManager.releaseAsset(info);
-                });
-                this.local.clear();
-            }
-            if (this.remote) {
-                this.remote.forEach((info, url) => {
-                    Manager.cacheManager.remoteCaches.releaseAsset(info);
-                });
-                this.remote.clear();
-            }
-        }
-
-    }
-}
-
-/**@description 界面数据，这里需要处理一个问题，当一个界面打开，收到另一个人的关闭，此时如果界面未加载完成
- * 可能导致另一个人关闭无效，等界面加载完成后，又显示出来
- */
-class ViewData {
-    /**@description 界面是否已经加载 */
-    isLoaded: boolean = false;
-    /**@description 界面当前等待操作状态 */
-    status: ViewStatus = ViewStatus.WAITTING_NONE;
-    /**@description 实际显示界面 */
-    view: UIView = null!;
-    /**@description 等待加载完成回调 */
-    finishCb: ((view: any) => void)[] = [];
-    /**@description 等待获取界面回调 */
-    getViewCb: ((view: any) => void)[] = [];
-    /**是否预加载,不显示出来，但会加到当前场景上 */
-    isPreload: boolean = false;
-    /**@description 资源信息 */
-    info: ResourceInfo = null!;
-
-    /**@description 界面动态加载的数据 */
-    loadData: ViewDynamicLoadData = new ViewDynamicLoadData();
-
-    node: Node = null!;
-
-    private doGet(view: UIView | null, className: string, msg: string) {
-        for (let i = 0; i < this.getViewCb.length; i++) {
-            let cb = this.getViewCb[i];
-            if (cb) {
-                cb(view);
-                if (DEBUG) warn(`ViewData do get view : ${className} msg : ${msg}`);
-            }
-        }
-
-        this.getViewCb = [];
-    }
-
-    private doFinish(view: UIView | null, className: string, msg: string) {
-        for (let i = 0; i < this.finishCb.length; i++) {
-            let cb = this.finishCb[i];
-            if (cb) {
-                cb(view);
-                if (DEBUG) warn(`ViewData do finish view : ${className} msg : ${msg}`);
-            }
-        }
-        this.finishCb = [];
-    }
-
-    doCallback(view: UIView | null, className: string, msg: string) {
-        this.doFinish(view, className, msg);
-        this.doGet(view, className, msg);
-    }
-}
-
-export class UIManager {
 
     private static _instance: UIManager = null!;
     public static Instance() { return this._instance || (this._instance = new UIManager()); }
@@ -601,10 +472,18 @@ export class UIManager {
     }
 
     /*获取当前canvas的组件 */
-    public getCanvasComponent(): Component | null {
+    public getComponent(type ?: typeof Component | string): Component | null {
         let canvas = this.getCanvas();
         if (canvas) {
-            return canvas.getComponent("MainController");
+            if( type ){
+                if( typeof type == "string"){
+                    return canvas.getComponent(type);
+                }else{
+                    return canvas.getComponent(type);
+                }
+            }else{
+                return canvas.getComponent("MainController");
+            }
         }
         return null;
     }
@@ -672,4 +551,9 @@ export class UIManager {
             log(`${this._logTag} -------------- print component end --------------`);
         }
     }
+}
+
+export function uiManagerInit() {
+    log("界面管理器初始化")
+    Manager.uiManager = UIManager.Instance();
 }

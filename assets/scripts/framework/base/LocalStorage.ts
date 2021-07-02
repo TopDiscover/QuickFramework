@@ -1,5 +1,8 @@
 import { DEBUG, EDITOR } from "cc/env";
 import { BitEncrypt } from "../extentions/BitEncrypt";
+import { Manager } from "../Framework";
+import { ILocalStorage } from "../interface/ILocalStorage";
+import { Node } from "cc"
 
 /**
  * @description 本地数据存储，为了后面可能需要对数据进入加密保存等，把cocos的封闭一层
@@ -11,7 +14,10 @@ interface StorageData {
     value: string | number | boolean | object;
 }
 
-export class LocalStorage {
+class LocalStorage implements ILocalStorage{
+
+    onLoad(node: Node): void{}
+    onDestroy(node:Node): void{}
 
     private static _instance: LocalStorage = null!;
     public static Instance() { return this._instance || (this._instance = new LocalStorage()); }
@@ -77,4 +83,9 @@ export class LocalStorage {
     private get storage(){
         return window.localStorage;
     }
+}
+
+export function localStorageInit() {
+    log("本地储存初始化");
+    Manager.localStorage = LocalStorage.Instance();
 }

@@ -23,7 +23,13 @@ function instance() {
     return getSingleton(ResolutionHelper);
 }
 
-export class ResolutionHelper {
+export function resolutionHelperInit() {
+    log("屏幕适配器初始化")
+    Manager.resolutionHelper = instance();
+    Manager.resolutionHelper.initBrowserAdaptor();
+}
+
+class ResolutionHelper {
     private _logTag = "[ResolutionHelper]";
     private static _instance: ResolutionHelper = null!;
     public static Instance() { return this._instance || (this._instance = new ResolutionHelper()); }

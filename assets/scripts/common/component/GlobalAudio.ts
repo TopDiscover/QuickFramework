@@ -1,8 +1,8 @@
 import { AudioClip, AudioSource, _decorator } from "cc";
 import AudioComponent, { AudioInfo } from "../../framework/base/AudioComponent";
 import { BUNDLE_TYPE, BUNDLE_RESOURCES } from "../../framework/base/Defines";
+import { Manager } from "../../framework/Framework";
 import { Config } from "../config/Config";
-import { Manager } from "../manager/Manager";
 
 /**
  * @description 全局音频播放组棒
@@ -19,6 +19,11 @@ export default class GlobalAudio extends AudioComponent {
 
     playButtonClick() {
         this.playEffect(Config.audioPath.button, BUNDLE_RESOURCES, false);
+    }
+
+    onLoad(){
+        super.onLoad();
+        Manager.globalAudio = this;
     }
 
     public playMusic(url: string, bundle: BUNDLE_TYPE, loop: boolean = true) {
@@ -91,3 +96,5 @@ export default class GlobalAudio extends AudioComponent {
         });
     }
 }
+
+

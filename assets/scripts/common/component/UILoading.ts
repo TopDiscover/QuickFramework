@@ -1,10 +1,10 @@
 import UILoadingDelegate from "../../framework/ui/UILoadingDelegate";
-import { Manager } from "../manager/Manager";
 import { EventApi } from "../../framework/event/EventApi";
 import { Config } from "../config/Config";
 import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import { find, instantiate, Label ,Node, Prefab, Tween, tween, UIOpacity, Vec3} from "cc";
 import { ViewZOrder } from "../config/ViewZOrder";
+import { Manager } from "../../framework/Framework";
 /**
  * @description 加载动画
  */
@@ -14,12 +14,15 @@ export default class UILoading extends UILoadingDelegate {
     public static Instance() { return this._instance || (this._instance = new UILoading()); }
     /**@description 当前loading节点 */
     private _node: Node = null!;
-    constructor() {
-        super();
-        Manager.eventDispatcher.addEventListener(EventApi.AdaptScreenEvent, this.onAdaptScreen, this);
-    }
     private onAdaptScreen() {
         Manager.resolutionHelper.fullScreenAdapt(this._node);
+    }
+    onLoad(node: Node): void{
+        Manager.eventDispatcher.addEventListener(EventApi.AdaptScreenEvent, this.onAdaptScreen, this);
+    }
+
+    onDestroy(node:Node): void{
+        Manager.eventDispatcher.removeEventListener(EventApi.AdaptScreenEvent, this);
     }
     private _isWaitingHide = false;
     private delay : number = 0;
@@ -179,4 +182,9 @@ export default class UILoading extends UILoadingDelegate {
             }
         }
     }
+}
+
+export function uiLoadingInit() {
+    log("UILoading初始化")
+    Manager.uiLoading = UILoading.Instance();
 }

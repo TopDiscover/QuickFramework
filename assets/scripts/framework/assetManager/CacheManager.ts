@@ -2,7 +2,8 @@ import { ResourceCacheData, BUNDLE_TYPE, ResourceInfo, BUNDLE_REMOTE, BUNDLE_RES
 import UIView from "../ui/UIView";
 import { Manager } from "../Framework";
 import { DEBUG } from "cc/env";
-import { Asset, assetManager, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D, ImageAsset } from "cc";
+import { Asset, assetManager, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D, ImageAsset,Node } from "cc";
+import { ICacheManager } from "../interface/ICacheManager";
 
 class ResourceCache {
     print() {
@@ -290,7 +291,11 @@ class RemoteCaches {
     }
 }
 
-export class CacheManager {
+class CacheManager implements ICacheManager{
+    
+    onLoad(node: Node): void{}
+    onDestroy(node:Node): void{}
+
     private logTag = `[CacheManager]: `;
     private static _instance: CacheManager = null!;
     public static Instance() {
@@ -540,4 +545,9 @@ export class CacheManager {
 
         this.remoteCaches.showCaches();
     }
+}
+
+export function cacheManagerInit() {
+    log("缓存管理器初始化");
+    Manager.cacheManager = CacheManager.Instance();
 }
