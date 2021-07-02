@@ -1,7 +1,8 @@
 import { js,Node } from "cc";
+import { registerTypeManager } from "../../framework/base/RegisterTypeManager";
+import { Manager } from "../../framework/Framework";
 import { Logic } from "../base/Logic";
 import { LogicEvent, LogicEventData, LogicType } from "../event/LogicEvent";
-import { Manager } from "./Manager";
 
 /**
  * @description 逻辑控制器管理器 
@@ -9,7 +10,7 @@ import { Manager } from "./Manager";
  * 如，坦克大战的TankBattleLogic
  * 收到LogicEvent.ENTER_COMPLETE 时，会自动关闭掉除传入的views之外的所有继续息UIView的界面
  */
-export class LogicManager{
+class LogicManager{
     
     private _logTag = `[LogicManager]`;
     private static _instance: LogicManager = null!;
@@ -20,11 +21,9 @@ export class LogicManager{
     private node : Node = null!;
 
     public push( logicType : any ){
-        for ( let i = 0 ; i < this._logicTypes.length ; i++ ){
-            if ( this._logicTypes[i] == logicType ){
-                error(this._logTag, `重复添加${js.getClassName(logicType)}`);
-                return;
-            }
+        if( this._logicTypes.indexOf(logicType) != -1 ){
+            error(this._logTag, `重复添加${js.getClassName(logicType)}`);
+            return;
         }
         if ( this.node ){
             //已经进入过onLoad,这里需要单独的进行初始化
@@ -39,6 +38,13 @@ export class LogicManager{
 
     public onLoad( node : Node ){
         this.node = node;
+        //把注册好的类型全部放入
+        registerTypeManager.logicMgr = this;
+        registerTypeManager.logicTypes.forEach((value)=>{
+            this.push(value);
+        });
+        registerTypeManager.logicTypes = [];
+
         Manager.eventDispatcher.addEventListener(LogicEvent.ENTER_COMPLETE,this.onEnterComplete,this);
         if ( this._logics.length == 0 ){
             for ( let i = 0 ; i < this._logicTypes.length ; i++ ){
@@ -86,4 +92,9 @@ export class LogicManager{
             }
         }
     }
+}
+
+export function logicManagerInit() {
+    log("主逻辑控制器初始化")
+    Manager.logicManager = LogicManager.Instance();
 }

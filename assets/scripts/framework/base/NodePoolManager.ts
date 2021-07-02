@@ -1,84 +1,14 @@
-import { instantiate, isValid, Node } from "cc";
-
-export class NodePool {
-    name: string = "unknown";
-    private pool: Array<Node> = [];
-    /**@description 用来克隆的节点 */
-    private node: Node | null = null;
-    /**
-     * @description 用来克隆的节点，在get时，如果发现对象池中不存在，会直接用此节点进行克隆
-     * 注意，设置的克隆对象会从父节点移除，但不会进行cleanup操作
-     * 在clear时，对该克隆节点进行释放操作
-     * */
-    public get cloneNode() {
-        return this.node;
-    }
-    public set cloneNode(node: Node | null) {
-        if (node && isValid(node)) {
-            this.node = node;
-            this.node.removeFromParent();
-        }
-    }
-
-
-    constructor(name: string) {
-        this.name = name;
-    }
-
-    /**@description 当前对象池数据大小 */
-    get size() {
-        return this.pool.length;
-    }
-
-    /**@description 销毁对象池中缓存的所有节点 */
-    clear() {
-        let count = this.pool.length;
-        for (let i = 0; i < count; ++i) {
-            this.pool[i].destroy();
-        }
-        this.pool = [];
-        if (this.node && isValid(this.node)) {
-            this.node.destroy();
-        }
-        this.node = null;
-    }
-
-    /**
-     * @description 向缓冲池中存入一个不需要的节点对象
-     * 这个函数会自动将目标节点从父节点移除，但不会进行 cleanup 操作
-     * 
-     */
-    put(obj: Node) {
-        if (obj && this.pool.indexOf(obj) === -1) {
-            //从父节点移除，但不会对进入 cleanup 操作
-            obj.removeFromParent();
-            this.pool.push(obj);
-        }
-    }
-
-    /**
-     * @description 从对象池中取缓冲节点
-     * */
-    get() {
-        if (this.pool.length <= 0) {
-            if (this.node) {
-                let node = instantiate(this.node);
-                return node;
-            }
-            return null;
-        }
-        let last = this.pool.length - 1;
-        let obj = this.pool[last];
-        this.pool.length = last;
-        return obj;
-    }
-
-}
+import { Manager } from "../Framework";
+import { INodePoolManager, NodePool } from "../interface/INodePoolManager";
+import{Node} from "cc"
 
 /**
  * 对象池管理器
  */
-export class NodePoolManager {
+class NodePoolManager implements INodePoolManager{
+
+    onLoad(node: Node): void{}
+    onDestroy(node:Node): void{}
 
     private static _instance: NodePoolManager = null!;
     public static Instance() { return this._instance || (this._instance = new NodePoolManager()); }
@@ -131,4 +61,9 @@ export class NodePoolManager {
         }
     }
 
+}
+
+export function nodePoolManagerInit() {
+    log("对象池初始化");
+    Manager.nodePoolManager = NodePoolManager.Instance();
 }

@@ -1,10 +1,10 @@
 import { js, _decorator } from "cc";
 import { ServiceEvent } from "../../framework/base/Defines";
 import Controller from "../../framework/controller/Controller";
-import { CustomNetEventType } from "../../framework/event/EventApi";
+import { CustomNetEventType, EventApi } from "../../framework/event/EventApi";
+import { Manager } from "../../framework/Framework";
 import { Config } from "../config/Config";
 import { LogicEvent, LogicEventData, LogicType } from "../event/LogicEvent";
-import { Manager } from "../manager/Manager";
 import { CommonService } from "./CommonService";
 
 /**
@@ -41,7 +41,12 @@ export default class ReconnectComponent extends Controller<CommonService> {
 
     start() {
         log(`${this.logName} start`);
+        Manager.eventDispatcher.addEventListener(EventApi.AdaptScreenEvent, this.onAdaptScreen, this)
         this.tryReconnect();
+    }
+
+    private onAdaptScreen() {
+        Manager.resolutionHelper.fullScreenAdapt(this.node);
     }
 
     public tryReconnect() {

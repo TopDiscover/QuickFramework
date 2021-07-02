@@ -6,7 +6,6 @@
  import Controller from "../../../../scripts/framework/controller/Controller";
  import { ChatService } from "../../../../scripts/common/net/ChatService";
  import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
- import { Manager } from "../../../../scripts/common/manager/Manager";
  import { ServiceEvent } from "../../../../scripts/framework/base/Defines";
  import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
  import { SUB_CMD_LOBBY } from "../../../hall/script/protocol/LobbyCmd";
@@ -14,6 +13,8 @@
  import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
  import { TestProtoMessage } from "../../../hall/script/protocol/TestProtoMessage";
 import { _decorator } from "cc";
+import { Manager } from "../../../../scripts/framework/Framework";
+import { registerTypeManager } from "../../../../scripts/framework/base/RegisterTypeManager";
  const { ccclass, property } = _decorator;
  
  @ccclass
@@ -53,5 +54,5 @@ import { _decorator } from "cc";
  
  }
  
- Manager.hallNetManager.register(TestChatNetController);
+ registerTypeManager.registerHallNetType(TestChatNetController);
  

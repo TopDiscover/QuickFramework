@@ -2,7 +2,6 @@ import UIView from "../../../../scripts/framework/ui/UIView";
 import { BundleConfig } from "../../../../scripts/common/base/HotUpdate";
 import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../scripts/common/event/LogicEvent";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
-import { Manager } from "../../../../scripts/common/manager/Manager";
 import { HallData } from "../data/HallData";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import { GameService } from "../../../../scripts/common/net/GameService";
@@ -11,6 +10,7 @@ import SettingView from "../../../../scripts/common/component/SettingView";
 import { BUNDLE_RESOURCES } from "../../../../scripts/framework/base/Defines";
 import { EventTouch, _decorator,Node, PageView, instantiate, find, Label, ProgressBar, sys, PhysicsSystem2D } from "cc";
 import { ViewZOrder } from "../../../../scripts/common/config/ViewZOrder";
+import { Manager } from "../../../../scripts/framework/Framework";
 
 
 const { ccclass, property } = _decorator;

@@ -9,11 +9,12 @@ import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { TestProtoMessage } from "../protocol/TestProtoMessage";
 import { TestBinaryMessage } from "../protocol/TestBinaryMessage";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
-import { Manager } from "../../../../scripts/common/manager/Manager";
 import { SUB_CMD_LOBBY } from "../protocol/LobbyCmd";
 import { TestJsonMessage } from "../protocol/TestJsonMessage";
 import { ServiceEvent } from "../../../../scripts/framework/base/Defines";
 import { _decorator } from "cc";
+import { Manager } from "../../../../scripts/framework/Framework";
+import { registerTypeManager } from "../../../../scripts/framework/base/RegisterTypeManager";
 const { ccclass, property } = _decorator;
 
 @ccclass
@@ -53,4 +54,4 @@ export default class HallNetController extends Controller<LobbyService> {
 
 }
 
-Manager.hallNetManager.register(HallNetController);
+registerTypeManager.registerHallNetType(HallNetController);

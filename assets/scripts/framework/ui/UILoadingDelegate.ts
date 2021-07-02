@@ -1,6 +1,7 @@
-
+import { ISingleManager } from "../interface/ISingleManager";
+import { Node } from "cc";
 /**@description 界面加载动画，web端在下载界面时，如果超过了一定时间，需要弹出动画，告诉用户当前加载界面的进度 */
-export default class UILoadingDelegate {
+export default class UILoadingDelegate implements ISingleManager {
 
     /**
      * @description 显示全屏幕加载动画
@@ -25,5 +26,13 @@ export default class UILoadingDelegate {
     /**@description 预加载预置体 */
     public preloadPrefab() {
 
+    }
+
+    onLoad(node: Node): void{
+        
+    }
+
+    onDestroy(node:Node): void{
+        
     }
 }

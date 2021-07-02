@@ -201,3 +201,8 @@ class ToastItem extends Component {
     }
 
  }
+
+ export function tipsInit() {
+     log("Tips初始化");
+     Manager.tips = Tips.Instance();
+ }

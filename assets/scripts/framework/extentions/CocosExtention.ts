@@ -306,15 +306,6 @@ prototype.loadFile = function (config: any) {
 }
 
 
-
-
-if (!EDITOR) {
-    //对引擎输入框进行修改 
-    if (Manager.resolutionHelper.isBrowser) {
-        (<any>EditBox)._EditBoxImpl = WebEditBoxImpl;
-    }
-}
-
 //全局函数扩展
 
 
@@ -440,4 +431,10 @@ export function updateZIndex( node : Node ){
 
 export function CocosExtentionInit() {
     //cc.log("CocosExtentionInit");
+    if (!EDITOR) {
+        //对引擎输入框进行修改 
+        if (Manager.resolutionHelper.isBrowser) {
+            (<any>EditBox)._EditBoxImpl = WebEditBoxImpl;
+        }
+    }
 }

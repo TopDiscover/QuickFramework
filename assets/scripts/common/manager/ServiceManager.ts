@@ -4,15 +4,15 @@
 
 import { DEBUG } from "cc/env";
 import { GameEventInterface } from "../../framework/base/GameEventInterface";
+import { Manager } from "../../framework/Framework";
  import { Config } from "../config/Config";
  import { LogicEvent } from "../event/LogicEvent";
  import { ChatService } from "../net/ChatService";
  import { CommonService } from "../net/CommonService";
  import { GameService } from "../net/GameService";
  import { LobbyService } from "../net/LobbyService";
- import { Manager } from "./Manager";
  
- export class ServiceManager implements GameEventInterface {
+ class ServiceManager implements GameEventInterface {
  
      private static _instance: ServiceManager = null!;
      public static Instance() { return this._instance || (this._instance = new ServiceManager()); }
@@ -155,4 +155,9 @@ import { GameEventInterface } from "../../framework/base/GameEventInterface";
              }
          }
      }
+ }
+
+ export function serviceManagerInit() {
+     log("Service管理器初始化");
+     Manager.serviceManager = ServiceManager.Instance();
  }

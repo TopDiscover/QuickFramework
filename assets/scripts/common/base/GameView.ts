@@ -1,8 +1,8 @@
 /**@description 游戏层公共基类 */
 
 import { _decorator } from "cc";
+import { Manager } from "../../framework/Framework";
 import UIView from "../../framework/ui/UIView";
-import { Manager } from "../manager/Manager";
 
 /**
  * @description 游戏视图基类,处理了前后台切换对网络进行后台最大允许时间做统一处理,

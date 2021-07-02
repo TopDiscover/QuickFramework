@@ -1,9 +1,10 @@
 import { SpriteFrame } from "cc";
 import { Logic } from "../../../scripts/common/base/Logic";
 import { LogicType, LogicEvent, LogicEventData } from "../../../scripts/common/event/LogicEvent";
-import { Manager } from "../../../scripts/common/manager/Manager";
 import { ResourceLoaderError } from "../../../scripts/framework/assetManager/ResourceLoader";
 import { ResourceData } from "../../../scripts/framework/base/Defines";
+import { registerTypeManager } from "../../../scripts/framework/base/RegisterTypeManager";
+import { Manager } from "../../../scripts/framework/Framework";
 import LoadTestView from "./view/LoadTestView";
 
 class LoadTestLogic extends Logic {
@@ -65,4 +66,4 @@ class LoadTestLogic extends Logic {
     }
 }
 
-Manager.logicManager.push(LoadTestLogic);
+registerTypeManager.registerLogicType(LoadTestLogic);
