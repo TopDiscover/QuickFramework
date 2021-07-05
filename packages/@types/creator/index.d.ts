@@ -59,5 +59,12 @@ declare module Editor {
     export namespace Dialog{
         export function openFile(options : { title : string , defaultPath : string , properties:string[]}):any;
     }
+    
+    export class CocosBuilder{
+        on( eventName :string , callback : (options : any , callback:Function)=>void);
+        removeListener(eventName : string,callback:(options:any,callback:Function)=>void);
+    }
+    
+    export const Builder : CocosBuilder;
 
 }
