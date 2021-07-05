@@ -88,7 +88,7 @@ class _Helper {
     }
     /**@description 对哪些creator版本有效 */
     get validVersions() {
-        return ["2.4.0", "2.4.1", "2.4.2", "2.4.3", "2.4.4"];
+        return ["2.4.0", "2.4.1", "2.4.2", "2.4.3", "2.4.4", "2.4.5"];
     }
     run() {
         Editor.log(`Creator Version : ${this.creatorPluginVersion}`);
@@ -134,10 +134,40 @@ class _Helper {
             }
         }
     }
+    /**@description 生成Cocos Creator 安装目录环境变量*/
+    generateEnv() {
+        Editor.log("Creator 安装路径 : " + this.appPath);
+        Editor.log("项目路径 : ", Editor.Project.path);
+        //windows 处理
+        let setupEnvPath = `${Editor.Project.path}/tools/builder/env/setup_win.bat`;
+        setupEnvPath = path.normalize(setupEnvPath);
+        let content = fs.readFileSync(setupEnvPath, "utf8");
+        let appPath = this.appPath;
+        appPath = appPath.replace(/\\/g, "/");
+        if (!this.isMac) {
+            content = content.replace(/(COCOS_CREATOR_ROOT=)(%~dp0|"\w:([\/\w.]{0,}){1,}")/g, (substring, param1, param2, param3, param4) => {
+                Editor.log(`请执行${setupEnvPath}设置环境变量`);
+                return `${param1}"${appPath}"`;
+            });
+            fs.writeFileSync(setupEnvPath, content, { encoding: "utf8" });
+        }
+        //Mac处理
+        if (this.isMac) {
+            setupEnvPath = `${Editor.Project.path}/tools/builder/env/setup_mac.sh`;
+            setupEnvPath = path.normalize(setupEnvPath);
+            content = fs.readFileSync(setupEnvPath, "utf8");
+            content = content.replace(/(COCOS_CREATOR_ROOT=)("\$DIR"|"Applications[\/\w.]{1,}")/g, (substring, param1, param2, param3, param4) => {
+                Editor.log(`请执行${setupEnvPath}设置环境变量`);
+                return `${param1}"${appPath}"`;
+            });
+            fs.writeFileSync(setupEnvPath, content, { encoding: "utf8" });
+        }
+    }
 }
 exports._Helper = _Helper;
 const Helper = new _Helper();
 function load() {
+    Helper.generateEnv();
 }
 exports.load = load;
 function unload() {
