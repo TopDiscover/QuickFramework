@@ -1,5 +1,5 @@
 @echo off
-set COCOS_CREATOR_ROOT = %~dp0
+set COCOS_CREATOR_ROOT=%~dp0
 
 set SETX=setx
 
