@@ -1,7 +1,6 @@
 @echo off
-rem {==Creator 根目录
-set COCOS_CREATOR_ROOT=%~dp0
-rem ==Creator 根据目录}
+set COCOS_CREATOR_ROOT = %~dp0
+
 set SETX=setx
 
 echo.
