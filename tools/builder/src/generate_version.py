@@ -7,6 +7,7 @@ import json
 import io
 import sys
 import shutil
+import hashlib
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -96,6 +97,50 @@ class GenerateVersion :
         result = result.replace("\\","/")
         return result
 
+    #获取文件md5值
+    def md5(self,file):
+        m = hashlib.md5()
+        with open(file,"rb") as f:
+            for line in f:
+                m.update(line)
+        md5code = m.hexdigest()
+        return md5code
+
+    #读取目录
+    def readDir(self , dir , obj , source ) :
+        # print(dir,obj,source)
+        if os.path.isdir(dir) == False :
+            return
+        dirLen = len(self.buildDir)
+        assetsObj = {}
+        for root,dirs,files in os.walk(dir):
+            # print(files)
+            for fileName in files:
+                srcFilePath = os.path.join(root,fileName)
+                pathValue = srcFilePath[dirLen+1:len(srcFilePath)]
+                pathValue = pathValue.replace("\\","/")
+                # print(srcFilePath)
+                md5Value = self.md5(srcFilePath)
+                sizeValue = os.path.getsize(srcFilePath)
+                singleObj = {
+                    pathValue:{
+                        "size" : sizeValue,
+                        "md5" : md5Value
+                    }
+                }
+                assetsObj.update(singleObj)
+        obj.update(assetsObj)
+
+    #写Manifest文件
+    def writeManifest(self,filePath,contentObj):
+        jsonFile = open(filePath,"w")
+        jsonFile.write(json.dumps(contentObj,sort_keys=True))
+        jsonFile.close()
+
+    #获取bundle远程地址
+    def getBundleManifestUrl(self,packageUrl,bundleDir,fileName):
+        return packageUrl + "/" + pubfunc.manifestDirName + "/" + bundleDir + "_" + fileName
+
     def run(self):
         print(self.toGBK("开始生成Manifest文件..."))
         print(self.toGBK("当前主包版本号 : " + self.version))
@@ -104,16 +149,45 @@ class GenerateVersion :
         print(self.toGBK("热更新地址 : " + self.packageUrl))
         # print(self.toGBK("所有Bundles : "))
         # print(self.bundles)
-        manifestFormat = self.manifestFormat(self.version,self.packageUrl)
-        manifestFormat["remoteManifestUrl"] = self.getProjectManifestUrl()
-        manifestFormat["remoteVersionUrl"] = self.getVersionManifestUrl()
-        print(manifestFormat)
+        manifest = self.manifestFormat(self.version,self.packageUrl)
+        manifest["remoteManifestUrl"] = self.getProjectManifestUrl()
+        manifest["remoteVersionUrl"] = self.getVersionManifestUrl()
+        print(manifest)
         
 
-        
+        print(self.toGBK("删除旧的Manifest目录") + self.BuildManifestDir)
         self.removeDir(self.BuildManifestDir)
         self.mkdir(self.BuildManifestDir)
+        mainIncludes = self.getMainBundleIncludes()
+        for path in mainIncludes:
+            # print("========================" + path + "===========================")
+            self.readDir(os.path.join(self.buildDir,path),manifest["assets"],self.buildDir)
+        # 生成project.mainfest
+        projectManifestPath = os.path.join(self.BuildManifestDir,pubfunc.projectFileName)
+        versionManifestPath = os.path.join(self.BuildManifestDir,pubfunc.versionFileName)
+        self.writeManifest(projectManifestPath,manifest)
+        print(self.toGBK("生成成功") + projectManifestPath)   
+        del manifest["assets"]
+        del manifest["searchPaths"]
+        self.writeManifest(versionManifestPath,manifest)
+        print(self.toGBK("生成成功") + versionManifestPath)   
 
+        #生成各bundles版本文件
+        for bundle in self.bundles:
+            print(self.toGBK("正在生成:") + self.toGBK(bundle["name"]) + self.toGBK("(" + bundle["dir"] + ")"))
+            manifest = self.manifestFormat(bundle["version"],self.packageUrl)
+            manifest["remoteManifestUrl"] = self.getBundleManifestUrl(self.packageUrl,bundle["dir"],pubfunc.projectFileName)
+            manifest["remoteVersionUrl"] = self.getBundleManifestUrl(self.packageUrl,bundle["dir"],pubfunc.versionFileName)
+            # print(manifest)
+            self.readDir(os.path.join(self.buildDir,"assets/" + bundle["dir"]),manifest["assets"],self.buildDir)
+            projectManifestPath = os.path.join(self.BuildManifestDir,bundle["dir"] + "_" + pubfunc.projectFileName)
+            versionManifestPath = os.path.join(self.BuildManifestDir,bundle["dir"] + "_" + pubfunc.versionFileName)
+            self.writeManifest(projectManifestPath,manifest)
+            print(self.toGBK("生成成功") + self.toGBK(projectManifestPath))   
+            del manifest["assets"]
+            del manifest["searchPaths"]
+            self.writeManifest(versionManifestPath,manifest)
+            print(self.toGBK("生成成功") + self.toGBK(versionManifestPath))  
 
 
 if __name__ == "__main__":
