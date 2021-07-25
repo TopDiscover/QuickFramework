@@ -1,8 +1,8 @@
 /**@description 语言包具体的代码实现 */
 
-import { COMMON_LANGUAGE_NAME, LanguageData, LanguageDataSourceDelegate } from "../../framework/base/Language";
 import { LanguageZH } from "./LanguageZH";
 import { LanguageEN } from "./LanguageEN";
+import { COMMON_LANGUAGE_NAME } from "../../framework/base/Global";
 
 export let i18n = LanguageZH;
 

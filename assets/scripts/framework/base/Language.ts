@@ -1,21 +1,8 @@
 import { EventApi } from "../event/EventApi";
 import { ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY } from "./Defines";
 import { sys } from "cc";
+import { COMMON_LANGUAGE_NAME } from "./Global";
 const LANG_KEY: string = "using_language";
-
-export interface LanguageData {
-    language: string;
-}
-
-export const COMMON_LANGUAGE_NAME = "COMMON_LANGUAGE_NAME";
-/**
- * @description 数据代理
- * 如果是公共总合，name使用 COMMON_LANGUAGE_NAME
- */
-export interface LanguageDataSourceDelegate {
-    name: string;
-    data(language: string): LanguageData;
-}
 
 export class Language {
 

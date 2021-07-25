@@ -75,7 +75,7 @@ declare interface LanguageData {
 
 /**
  * @description 数据代理
- * 如果是公共总合，name使用 td.COMMON_LANGUAGE_NAME
+ * 如果是公共总合，name使用 COMMON_LANGUAGE_NAME
  */
 declare interface LanguageDataSourceDelegate {
     name: string;
@@ -164,7 +164,6 @@ declare interface GameEventInterface {
 }
 
 declare namespace td {
-    export let COMMON_LANGUAGE_NAME: string;
     export class EventComponent extends import("cc").Component {
         /**
           * @description 注册网络事件 ，在onLoad中注册，在onDestroy自动移除

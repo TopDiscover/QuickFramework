@@ -14,3 +14,5 @@ export function createNamespace() {
         (<any>window.td) = {};
     }
 }
+
+export const COMMON_LANGUAGE_NAME = "COMMON_LANGUAGE_NAME";

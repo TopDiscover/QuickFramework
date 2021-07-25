@@ -3,7 +3,6 @@ import EventComponent from "../../framework/base/EventComponent";
 import { ResourceData, ResourceCacheData } from "../../framework/base/Defines";
 import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
 import { Node } from "cc";
-import { LanguageDataSourceDelegate } from "../../framework/base/Language";
 
 
 /**@description 当前入子游戏时，在Logic.onLoad时初始设置 */
