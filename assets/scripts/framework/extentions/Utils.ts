@@ -1,7 +1,6 @@
 import UIView from "../ui/UIView";
-import { ResourceInfo, ResourceType, ResourceCacheData } from "../base/Defines";
 import { Button, Component, Font, isValid, Label, ParticleAsset, ParticleSystem2D, Sprite, SpriteFrame, sp, Node, Prefab, instantiate, Asset, AssetManager } from "cc";
-import { BUNDLE_REMOTE, BUNDLE_RESOURCES } from "../base/Global";
+import { BUNDLE_REMOTE, BUNDLE_RESOURCES, ResourceInfo, ResourceType } from "../base/Global";
 
 /**@description 添加加载本地的资源 */
 export function addExtraLoadResource(view: td.UIView, info: td.ResourceInfo) {
@@ -399,7 +398,7 @@ export function _loadDirRes(config: {
     type: typeof Asset,
     view: any,
     onProgress?: (finish: number, total: number, item: AssetManager.RequestItem) => void,
-    onComplete: (data: ResourceCacheData) => void
+    onComplete: (data: td.ResourceCacheData) => void
 }) {
     let bundle = getBundle(config);
     let cache = Manager.cacheManager.get(bundle, config.url);

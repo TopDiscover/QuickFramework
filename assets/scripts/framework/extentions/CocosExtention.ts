@@ -1,5 +1,4 @@
 import WebEditBoxImpl from "./WebEditBoxImpl";
-import { ResourceType } from "../base/Defines";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
@@ -8,7 +7,7 @@ import {
 import { isValid, SpriteFrame, sp, Font, ParticleSystem2D, ParticleAsset, sys, EditBox, Sprite,Node, Button, Label, randomRange, Asset, AssetManager} from "cc";
 import { DEBUG, EDITOR, PREVIEW } from "cc/env";
 import UIView from "../ui/UIView";
-import { BUNDLE_REMOTE, ENABLE_CHANGE_LANGUAGE, EventApi, USING_LAN_KEY } from "../base/Global";
+import { BUNDLE_REMOTE, ENABLE_CHANGE_LANGUAGE, EventApi, ResourceType, USING_LAN_KEY } from "../base/Global";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
 if (typeof Reflect == "object") {
@@ -374,7 +373,7 @@ export function loadDirRes( config:{
     type : typeof Asset, 
     view : any, 
     onProgress?:(finish:number,total:number,item:AssetManager.RequestItem) => void , 
-    onComplete:(data:any)=>void
+    onComplete:(data:td.ResourceCacheData)=>void
     }):void{
     _cc.loadDirRes(config);  
 }

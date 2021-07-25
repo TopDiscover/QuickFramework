@@ -1,5 +1,4 @@
 import { Config } from "../config/Config";
-import { ResourceCacheData } from "../../framework/base/Defines";
 import { Component,find,instantiate,isValid,Label,Node, Prefab, RichText, SystemEventType, tween, Vec3 } from "cc";
 import { ViewZOrder } from "../config/ViewZOrder";
 import { i18n } from "../language/CommonLanguage";
@@ -396,7 +395,7 @@ export default class Alert {
                     Config.CommonPrefabs.alert,
                     Prefab,
                     (finish, total, item) => { },
-                    (data: ResourceCacheData) => {
+                    (data) => {
                         this._isLoadingPrefab = false;
                         if (data && data.data && data.data instanceof Prefab) {
                             this.prefab = data.data;

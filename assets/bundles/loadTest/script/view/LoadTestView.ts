@@ -1,7 +1,6 @@
 
 import { _decorator,Node, find,Animation, Label, Sprite, instantiate, Button, Vec2, Vec3, UITransform, ParticleSystem, ParticleSystem2D, sp, SpriteFrame, AnimationClip, Layers, Widget } from "cc";
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../scripts/common/event/LogicEvent";
-import { ResourceCacheData } from "../../../../scripts/framework/base/Defines";
 import { loadDirRes } from "../../../../scripts/framework/extentions/CocosExtention";
 import { ButtonSpriteMemberName } from "../../../../scripts/framework/extentions/Utils";
 import UIView from "../../../../scripts/framework/ui/UIView";
@@ -220,7 +219,7 @@ export default class LoadTestView extends UIView {
             url:"texture/sheep",
             type:SpriteFrame,
             view : this,
-            onComplete:(data:ResourceCacheData)=>{
+            onComplete:(data)=>{
                 if( data.data ){
                     let arr : SpriteFrame[] = (<SpriteFrame[]>data.data);
                     let clip = AnimationClip.createWithSpriteFrames(arr,arr.length) as AnimationClip;

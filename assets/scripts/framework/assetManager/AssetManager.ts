@@ -1,7 +1,6 @@
 import { Asset, assetManager, AssetManager, JsonAsset, TextAsset, Texture2D, sp, SpriteFrame, ImageAsset } from "cc";
 import { DEBUG } from "cc/env";
-import { ResourceCacheData, ResourceCacheStatus, ResourceInfo, ResourceType } from "../base/Defines";
-import { BUNDLE_REMOTE } from "../base/Global";
+import { BUNDLE_REMOTE, ResourceCacheData, ResourceCacheStatus, ResourceInfo, ResourceType } from "../base/Global";
 
 class RemoteLoader {
 

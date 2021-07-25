@@ -1,8 +1,7 @@
 import UIView, {UIClass } from "../ui/UIView";
-import { ResourceInfo, ResourceCacheData, ViewStatus } from "./Defines";
 import { isValid, js, Node, Prefab, Widget, instantiate, director, Component } from "cc";
 import { DEBUG } from "cc/env";
-import { BUNDLE_RESOURCES } from "./Global";
+import { BUNDLE_RESOURCES, ResourceInfo, ViewStatus } from "./Global";
 
 /**@description 动态加载垃圾数据名 */
 const DYNAMIC_LOAD_GARBAGE = "DYNAMIC_LOAD_GARBAGE";
@@ -410,7 +409,7 @@ export class UIManager {
             if (bundle == undefined || bundle == "" || bundle == null) {
                 bundle = BUNDLE_RESOURCES;
             }
-            Manager.assetManager.load(bundle, url, Prefab, progressCallback, (data: ResourceCacheData) => {
+            Manager.assetManager.load(bundle, url, Prefab, progressCallback, (data) => {
                 if (data && data.data && data.data instanceof Prefab) {
                     resolove(data.data);
                 }
