@@ -1,6 +1,4 @@
 import { GameData } from "../../../../script/common/base/GameData";
-import { getSingleton } from "../../../../script/framework/base/Singleton";
-import EliminateCellModel from "../model/EliminateCellModel";
 import EliminateGameModel from "../model/EliminateGameModel";
 import { CELL_PREFAB_URL, CELL_TYPE } from "./EliminateDefines";
 

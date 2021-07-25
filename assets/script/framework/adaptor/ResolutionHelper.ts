@@ -1,5 +1,3 @@
-
-import { getSingleton } from "../base/Singleton";
 import { EventApi } from "../event/EventApi";
 
 type DeviceDirection = "" | "Landscape" | "Portrait";

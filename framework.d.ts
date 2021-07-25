@@ -396,6 +396,17 @@ declare interface GameEventInterface {
 	onEnterForgeground(inBackgroundTime: number);
 }
 
+declare interface Singleton<T> {
+    new(): T;
+    /**
+     *@description 单例统一实现 
+     */
+    Instance(): T;
+}
+
+/**@description 获取根据类型获取单列 */
+declare function getSingleton<T>( SingletonClass : Singleton<T>):T;
+
 declare namespace td {
 	export let COMMON_LANGUAGE_NAME: string;
 

@@ -6,7 +6,6 @@ import { LogicManager } from "./LogicManager";
 import GlobalAudio from "../component/GlobalAudio";
 import { extentionsInit } from "../../framework/extentions/Extentions";
 import { CocosExtentionInit } from "../../framework/extentions/CocosExtention";
-import { getSingleton } from "../../framework/base/Singleton";
 import GameView from "../base/GameView";
 import { GameData } from "../base/GameData";
 import { BundleManager } from "./BundleManager";

@@ -5,7 +5,6 @@ import { MapLevel } from "./TankBattleLevel";
 import TankBattleNetController from "../controller/TankBattleNetController";
 import TankBattleMap from "../model/TankBattleMap";
 import TankBattleGameView from "../view/TankBattleGameView";
-import { getSingleton } from "../../../../script/framework/base/Singleton";
 import TankBattleChangeStageView from "../view/TankBattleChangeStageView";
 import { ViewZOrder } from "../../../../script/common/config/Config";
 import TankBattleStartView from "../view/TankBattleStartView";

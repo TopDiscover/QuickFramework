@@ -1,3 +1,9 @@
+/**@description 获取根据类型获取单列 */
+function getSingleton<T>( SingletonClass : Singleton<T>){
+    return SingletonClass.Instance();
+}
+window.getSingleton = getSingleton;
+
 import { Language } from "./base/Language";
 import { EventDispatcher } from "./event/EventDispatcher";
 import { UIManager } from "./base/UIManager";
@@ -5,7 +11,6 @@ import { LocalStorage } from "./base/LocalStorage";
 import { AssetManager } from "./assetManager/AssetManager";
 import { CacheManager } from "./assetManager/CacheManager";
 import { ResolutionHelper } from "./adaptor/ResolutionHelper";
-import { getSingleton } from "./base/Singleton";
 import { NodePoolManager } from "./base/NodePoolManager";
 import { BUNDLE_RESOURCES, USING_LAN_KEY } from "./base/Defines";
 
@@ -128,5 +133,4 @@ export class Framewok{
         cc.error(`传入参数有误`);
         return "";
     }
-    
 }

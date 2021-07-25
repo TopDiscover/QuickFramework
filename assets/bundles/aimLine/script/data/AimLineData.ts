@@ -1,5 +1,4 @@
 import { GameData } from "../../../../script/common/base/GameData";
-import { getSingleton } from "../../../../script/framework/base/Singleton";
 
 class _AimLineData extends GameData {
     private static _instance: _AimLineData = null;
