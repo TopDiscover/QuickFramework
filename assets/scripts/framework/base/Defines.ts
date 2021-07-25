@@ -74,7 +74,10 @@ export class ResourceCacheData {
     }
 
     public get isInvalid() {
-        return this.isLoaded && this.data && !isValid(this.data);
+        if (this.isLoaded && this.data && !isValid(this.data)){
+            return true;
+        }
+        return false;
     }
 }
 

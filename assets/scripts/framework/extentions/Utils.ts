@@ -3,7 +3,7 @@ import { ResourceInfo, ResourceType, BUNDLE_RESOURCES, BUNDLE_REMOTE, BUNDLE_TYP
 import { Button, Component, Font, isValid, Label, ParticleAsset, ParticleSystem2D, Sprite, SpriteFrame, sp, Node, Prefab, instantiate, Asset, AssetManager } from "cc";
 
 /**@description 添加加载本地的资源 */
-export function addExtraLoadResource(view: UIView, info: ResourceInfo) {
+export function addExtraLoadResource(view: td.UIView, info: td.ResourceInfo) {
     let uiManager = Manager.uiManager;
     if (view == <any>(uiManager.retainMemory)) {
         uiManager.retainMemory.addLocal(info);

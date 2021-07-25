@@ -247,7 +247,7 @@ export class UIManager {
                 else {
                     viewData.status = ViewStatus.WAITTING_NONE;
                     if (!isPreload) {
-                        Manager.uiLoading.show(delay, name);
+                        Manager.uiLoading.show(delay as number, name as string);
                     }
                     //正在加载中
                     if (DEBUG) warn(`${this._logTag}${className} 正在加载中...`);
@@ -265,7 +265,7 @@ export class UIManager {
                 let progressCallback: (completedCount: number, totalCount: number, item: any) => void = null!;
 
                 if (!isPreload) {
-                    Manager.uiLoading.show(delay, name);
+                    Manager.uiLoading.show(delay as number, name as string);
                     //预加载界面不显示进度
                     progressCallback = (completedCount: number, totalCount: number, item: any) => {
                         let progress = Math.ceil((completedCount / totalCount) * 100);

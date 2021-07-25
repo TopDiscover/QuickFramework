@@ -1,7 +1,6 @@
 import { _decorator ,Node, find, instantiate, Vec3, randomRangeInt, UITransform} from "cc";
 import GameView from "../../../../scripts/common/base/GameView";
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../scripts/common/event/LogicEvent";
-import { NodePool, NodePoolManager } from "../../../../scripts/framework/base/NodePoolManager";
 
 const {ccclass, property} = _decorator;
 
@@ -12,7 +11,7 @@ export default class NodePoolView extends GameView {
         return "prefabs/NodePoolView";
     }
 
-    private pool : NodePool | null = null;
+    private pool : td.NodePool|null = null;
     private star : Node = null!;
 
     onLoad() {
@@ -41,7 +40,9 @@ export default class NodePoolView extends GameView {
 
     private onCreate( ){
         this.pool = Manager.nodePoolManager.createPool("Star");
-        this.pool.cloneNode = instantiate(this.star);
+        if ( this.pool) {
+            this.pool.cloneNode = instantiate(this.star);
+        }
     }
 
     private onDelete(){

@@ -1,6 +1,8 @@
 import { instantiate, isValid, Node } from "cc";
+import { EDITOR } from "cc/env";
+import { toNamespace } from "./Global";
 
-export class NodePool {
+class NodePool {
     name: string = "unknown";
     private pool: Array<Node> = [];
     /**@description 用来克隆的节点 */
@@ -74,7 +76,9 @@ export class NodePool {
     }
 
 }
-
+if (!EDITOR){
+    toNamespace("NodePool",NodePool);
+}
 /**
  * 对象池管理器
  */
@@ -89,7 +93,7 @@ export class NodePoolManager {
      * @description 创建对象池
      * @param type 对象池类型
      */
-    createPool(type: string) {
+    createPool(type: string) : NodePool | null{
         if (!this.pools.has(type)) {
             this.pools.set(type, new NodePool(type));
         }
@@ -121,7 +125,7 @@ export class NodePoolManager {
      * */
     getPool(type: string, isCreate = true) {
         if (this.pools.has(type)) {
-            return this.pools.get(type);
+            return this.pools.get(type) as NodePool;
         } else {
             if (isCreate) {
                 return this.createPool(type);

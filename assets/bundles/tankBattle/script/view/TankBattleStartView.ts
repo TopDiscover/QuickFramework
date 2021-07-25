@@ -44,12 +44,12 @@ export default class TankBattleStartView extends UIView{
         this.setEnabledKeyBack(true);
     }
 
-    protected onKeyBack(ev: EventKeyboard) {
+    onKeyBack(ev: EventKeyboard) {
         super.onKeyBack(ev);
         dispatch(LogicEvent.ENTER_HALL);
     }
 
-    protected onKeyUp(ev: EventKeyboard) {
+    onKeyUp(ev: EventKeyboard) {
         super.onKeyUp(ev);
         if( this.data.gameStatus != TankBettle.GAME_STATUS.SELECTED ){
             return;

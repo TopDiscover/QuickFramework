@@ -214,7 +214,7 @@ declare namespace td {
 
     export class AudioComponent extends EventComponent {
         /**@description 音频控件资源拥有者，该对象由UIManager打开的界面 */
-        owner: UIView
+        owner: UIView | null;
         /**@description 背景音乐音量 */
         musicVolume: number;
         /**@description 音效音量 */
@@ -231,6 +231,7 @@ declare namespace td {
         playEffect(url: string, bundle: BUNDLE_TYPE, loop?: boolean): Promise<boolean>;
         onEnterBackground(): void;
         onEnterForgeground(inBackgroundTime: number): void;
+        onDestroy():void;
     }
 
     export class UIView extends EventComponent implements IFullScreenAdapt {
@@ -490,7 +491,7 @@ declare namespace td {
          * cc.Texture2D
          * cc.JsonAsset
          * */
-        data: import("cc").Asset | import("cc").Asset[];
+        data: import("cc").Asset | import("cc").Asset[] | null;
 
         info: ResourceInfo;
 
@@ -579,7 +580,7 @@ declare namespace td {
            * 注意，设置的克隆对象会从父节点移除，但不会进行cleanup操作
            * 在clear时，对该克隆节点进行释放操作
            * */
-        cloneNode: import("cc").Node;
+        cloneNode: import("cc").Node|null;
         /**@description 当前对象池数据大小 */
         get size(): number;
         /**@description 销毁对象池中缓存的所有节点 */
@@ -593,7 +594,7 @@ declare namespace td {
         /**
            * @description 从对象池中取缓冲节点
            * */
-        get(): import("cc").Node;
+        get(): import("cc").Node|null;
     }
     /**
        * 对象池管理器
@@ -603,18 +604,18 @@ declare namespace td {
            * @description 创建对象池
            * @param type 对象池类型
            */
-        createPool(type: string): NodePool;
+        createPool(type: string): NodePool|null;
         /**
            * @description 删除对象池 
            * @param type 对象池类型
            * */
-        deletePool(type: string | NodePool): void;
+        deletePool(type: string | NodePool|null): void;
         /**
            * @description 获取对象池
            * @param type 对象池类型 
            * @param isCreate 当找不到该对象池时，会默认创建一个对象池
            * */
-        getPool(type: string, isCreate?: boolean): NodePool;
+        getPool(type: string, isCreate?: boolean): NodePool|null;
     }
 
     export class Alert {
@@ -820,9 +821,9 @@ declare namespace td {
         /**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
         readonly globalAudio: GlobalAudio;
         /**@description 当前游戏GameView, GameView进入onLoad赋值 */
-        gameView: GameView;
+        gameView: GameView|null;
         /**@description 游戏数据 */
-        gameData: GameData;
+        gameData: GameData|null;
         /**
          * @description 游戏控制器，在自己的模块内写函数有类型化读取,此值在Logic.addNetComponent赋值
          * @example 

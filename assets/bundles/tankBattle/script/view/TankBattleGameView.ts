@@ -87,7 +87,7 @@ export default class TankBattleGameView extends GameView{
         systemEvent.on(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
     }
 
-    protected onKeyUp(ev: EventKeyboard) {
+    onKeyUp(ev: EventKeyboard) {
         if( this.data.gameMap){
             this.data.gameMap.onKeyUp(ev);
         }
@@ -106,7 +106,7 @@ export default class TankBattleGameView extends GameView{
         }
     }
 
-    protected onKeyDown(ev: EventKeyboard) {
+    onKeyDown(ev: EventKeyboard) {
         if (this.data.gameMap) {
             this.data.gameMap.onKeyDown(ev)
         }
