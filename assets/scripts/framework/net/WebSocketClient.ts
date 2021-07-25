@@ -1,5 +1,5 @@
 import { DEBUG, JSB } from "cc/env";
-import { CustomNetEventType } from "../event/EventApi";
+import { CustomNetEventType } from "../base/Global";
 
 /**
  * @description websocket封装

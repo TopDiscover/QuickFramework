@@ -1,8 +1,8 @@
 import { ServerConnector } from "../net/ServerConnector";
-import { EventApi } from "../event/EventApi";
 import { makeKey } from "../decorator/Decorators";
 import { Message, MessageHeader, IMessage } from "../net/Message";
 import { DEBUG } from "cc/env";
+import { EventApi } from "./Global";
 
 /**
  * @description 与服务器之间消息收发基类,注册消息并转发

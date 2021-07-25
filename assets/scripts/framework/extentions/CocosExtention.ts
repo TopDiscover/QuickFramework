@@ -5,10 +5,10 @@ import {
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
     createNodeWithPrefab, getBundle, _loadDirRes, _loadRes
 } from "./Utils";
-import { EventApi } from "../event/EventApi";
 import { isValid, SpriteFrame, sp, Font, ParticleSystem2D, ParticleAsset, sys, EditBox, Sprite,Node, Button, Label, randomRange, Asset, AssetManager} from "cc";
 import { DEBUG, EDITOR, PREVIEW } from "cc/env";
 import UIView from "../ui/UIView";
+import { EventApi } from "../base/Global";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
 if (typeof Reflect == "object") {

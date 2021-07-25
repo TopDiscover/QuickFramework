@@ -1,7 +1,6 @@
-import { EventApi } from "../event/EventApi";
 import { ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY } from "./Defines";
 import { sys } from "cc";
-import { COMMON_LANGUAGE_NAME } from "./Global";
+import { COMMON_LANGUAGE_NAME, EventApi } from "./Global";
 const LANG_KEY: string = "using_language";
 
 export class Language {

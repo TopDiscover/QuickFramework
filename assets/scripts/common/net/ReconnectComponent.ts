@@ -1,7 +1,7 @@
 import { js, _decorator } from "cc";
 import { ServiceEvent } from "../../framework/base/Defines";
+import { CustomNetEventType } from "../../framework/base/Global";
 import Controller from "../../framework/controller/Controller";
-import { CustomNetEventType } from "../../framework/event/EventApi";
 import { Config } from "../config/Config";
 import { LogicEvent, LogicEventData, LogicType } from "../event/LogicEvent";
 import { CommonService } from "./CommonService";
