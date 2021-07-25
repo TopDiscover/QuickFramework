@@ -316,7 +316,7 @@ declare interface LanguageDataSourceDelegate {
 }
 
 /**@description 提示代理 */
-declare interface TipsDelegate {
+declare interface Tips {
 	/**
 	 * @description tips提示
 	 * @param msg 提示内容
@@ -328,7 +328,7 @@ declare interface TipsDelegate {
 }
 
 /**@description 界面加载动画，web端在下载界面时，如果超过了一定时间，需要弹出动画，告诉用户当前加载界面的进度 */
-declare interface UILoadingDelegate {
+declare interface UILoading {
 	/**
 	 * @description 显示全屏幕加载动画
 	 * @param delay 延迟显示时间 当为null时，不会显示loading进度，但会显示阻隔层 >0时为延迟显示的时间
@@ -1040,9 +1040,9 @@ declare namespace td {
 		/**@description 对象池管理器 */
 		readonly nodePoolManager: NodePoolManager;
 		/**@description 小提示 */
-		readonly tips: TipsDelegate;
+		readonly tips: Tips;
 		/**@description 界面加载时的全屏Loading,显示加载进度 */
-		readonly uiLoading: UILoadingDelegate;
+		readonly uiLoading: UILoading;
 		/**@description websocket wss 证书url地址 */
 		wssCacertUrl: string;
 		/**@description 提示框 */

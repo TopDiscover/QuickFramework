@@ -248,7 +248,7 @@ export function setButtonSpriteFrame(button: cc.Button, config: {
  */
 export function setParticleSystemFile(
     component: cc.ParticleSystem,
-    config: { url: string, view: any, completeCallback?: (file: cc.ParticleAsset) => void , bundle:BUNDLE_TYPE},
+    config: { url: string, view: any, completeCallback?: (file: cc.ParticleAsset) => void , bundle?:BUNDLE_TYPE},
     data: cc.ParticleAsset
 ) {
     let info = new ResourceInfo;
@@ -284,7 +284,7 @@ export function setParticleSystemFile(
  */
 export function setLabelFont(
     component: cc.Label,
-    config: { font: string, view: any, completeCallback?: (font: cc.Font) => void , bundle:BUNDLE_TYPE },
+    config: { font: string, view: any, completeCallback?: (font: cc.Font) => void , bundle?:BUNDLE_TYPE },
     data: cc.Font) {
     let info = new ResourceInfo;
     info.url = config.font;
@@ -319,8 +319,8 @@ export function setLabelFont(
  */
 export function setSkeletonSkeletonData(
     component: sp.Skeleton,
-    config: { url: string, view: any, completeCallback: (data: sp.SkeletonData) => void , bundle:BUNDLE_TYPE} |
-    { view: any, path: string, name: string, completeCallback: (data: sp.SkeletonData) => void, bundle:BUNDLE_TYPE , isNeedCache?: boolean, retain?: boolean },
+    config: { url: string, view: any, completeCallback: (data: sp.SkeletonData) => void , bundle?:BUNDLE_TYPE} |
+    { view: any, path: string, name: string, completeCallback: (data: sp.SkeletonData) => void, bundle?:BUNDLE_TYPE , isNeedCache?: boolean, retain?: boolean },
     data: sp.SkeletonData,
     resourceType: ResourceType = ResourceType.Local) {
     let url = "";
@@ -368,7 +368,7 @@ export function setSkeletonSkeletonData(
  * @description 通过预置体创建Node
  * @param config 配置信息
  */
-export function createNodeWithPrefab(config: { bundle:BUNDLE_TYPE , url: string, view: any, completeCallback: (node: cc.Node) => void }, data: cc.Prefab) {
+export function createNodeWithPrefab(config: { bundle?:BUNDLE_TYPE , url: string, view: any, completeCallback: (node: cc.Node) => void }) {
     
     let url = config.url;
     let bundle = getBundle(config);

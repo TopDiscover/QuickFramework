@@ -121,5 +121,7 @@ class _Manager extends Framewok {
 export function applicationInit() {
     //日志
     Log.logLevel = LogLevel.ERROR | LogLevel.LOG | LogLevel.WARN | LogLevel.DUMP;
-    window["Manager"] = new _Manager();
+    let mgr = new _Manager();
+    window["Manager"] = mgr;
+    mgr.init();
 }

@@ -91,7 +91,7 @@ cc.Sprite.prototype.loadImage = function (config) {
     let bundle = getBundle(config);
     if (typeof url == "string") {
         Manager.cacheManager.getCacheByAsync(url, cc.SpriteFrame,bundle).then((spriteFrame) => {
-            setSpriteSpriteFrame(view, url, me, spriteFrame, completeCallback,bundle);
+            setSpriteSpriteFrame(view, url as string, me, spriteFrame, completeCallback,bundle);
         });
     } else {
         //在纹理图集中查找
@@ -262,7 +262,7 @@ cc.ParticleSystem.prototype.loadFile = function (config) {
 cc.updateAlignment = function (node) {
     if (node) {
         //强制当前节点进行本帧强制布局
-        let backcc = cc;
+        let backcc : any = cc;
         if (backcc._widgetManager) {
             backcc._widgetManager.updateAlignment(node);
         } else {
@@ -292,7 +292,7 @@ export function CocosExtentionInit() {
         //对引擎输入框进行修改 ,原始引擎版本2.1.2
         if ( Manager.resolutionHelper.isBrowser && !CC_PREVIEW && cc.sys.os != cc.sys.OS_WINDOWS) {
             if (CC_DEBUG) cc.log(`浏览器`);
-            cc.EditBox._ImplClass = WebEditBoxImpl;
+            (<any>cc.EditBox)._ImplClass = WebEditBoxImpl;
         }
     }
     //cc.log("CocosExtentionInit");
@@ -342,20 +342,21 @@ Reflect.defineProperty(cc.Label.prototype, "language", {
 });
 
 if ( !CC_EDITOR && ENABLE_CHANGE_LANGUAGE ){
-    cc.Label.prototype._onChangeLanguage = function(){
+    let __Label__Proto : any = cc.Label.prototype;
+    __Label__Proto._onChangeLanguage = function(){
         this.language = this.language;
     }
     
-    let __label_onDestroy__ = cc.Label.prototype.onDestroy;
-    cc.Label.prototype.onDestroy = function () {
+    let __label_onDestroy__ = __Label__Proto.onDestroy;
+    __Label__Proto.onDestroy = function () {
         if ( this._isUsinglanguage ){
             Manager.eventDispatcher.removeEventListener(EventApi.CHANGE_LANGUAGE,this);
         }
         __label_onDestroy__ && __label_onDestroy__.call(this);
     }
 
-    let __label_onLoad__ = cc.Label.prototype.onLoad;
-    cc.Label.prototype.onLoad = function () {
+    let __label_onLoad__ = __Label__Proto.onLoad;
+    __Label__Proto.onLoad = function () {
         if ( this.string.indexOf(USING_LAN_KEY) > -1){
             this.language = [this.string];
         }
