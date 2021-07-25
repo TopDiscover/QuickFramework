@@ -3,7 +3,6 @@
  */
 
 import { DEBUG } from "cc/env";
-import { GameEventInterface } from "../../framework/base/GameEventInterface";
  import { Config } from "../config/Config";
  import { LogicEvent } from "../event/LogicEvent";
  import { ChatService } from "../net/ChatService";

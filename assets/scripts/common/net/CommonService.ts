@@ -1,6 +1,5 @@
 
 import { Service } from "../../framework/base/Service";
-import { GameEventInterface } from "../../framework/base/GameEventInterface";
 import { IMessage } from "../../framework/net/Message";
 import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdDefines";
 import { Reconnect } from "./Reconnect";
