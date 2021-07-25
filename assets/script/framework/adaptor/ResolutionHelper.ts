@@ -1,11 +1,10 @@
 
-import { EventApi } from "../event/EventApi";
-import { Manager } from "../Framework";
 import { getSingleton } from "../base/Singleton";
+import { EventApi } from "../event/EventApi";
 
 type DeviceDirection = "" | "Landscape" | "Portrait";
 
-export enum ScreenAdaptType {
+enum ScreenAdaptType {
     /**@description 无处理 */
     None,
     /**@description 放大 */
@@ -37,9 +36,8 @@ export class ResolutionHelper {
     private protraitHeight = 0;
     private waitScorllY = null;
     private isFirstResize = true;
-    public _isShowKeyboard = false;
-    public _keybordChangeTimerId = -1;
-    public _maxLandscapeHeight = 0;
+    private _isShowKeyboard = false;
+    private _maxLandscapeHeight = 0;
     public get isShowKeyboard() {
         return instance()._isShowKeyboard;
     }
@@ -144,7 +142,7 @@ export class ResolutionHelper {
         }
     }
 
-    private get isBrowser() {
+    public get isBrowser() {
         if (cc.sys.isBrowser) {
             return true;
         }
@@ -364,3 +362,5 @@ export class ResolutionHelper {
         return size;
     }
 } 
+
+td.ResolutionHelper = ResolutionHelper;

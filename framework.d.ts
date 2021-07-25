@@ -386,7 +386,7 @@ declare namespace td{
 		public dispatchEvent( type : string , data? : any );
 	}
 	export class UIManager {
-		
+		fullScreenAdapt():void;
 	}
 	export class LocalStorage {
 		
@@ -398,7 +398,16 @@ declare namespace td{
 		
 	}
 	export class ResolutionHelper{
-
+		isShowKeyboard:boolean;
+		/**@description 全屏适配 */
+		public fullScreenAdapt(node: cc.Node,adapter ?: IFullScreenAdapt):void;
+		/**@description 是否需要做适配操作，当分辨率发生变化，只要ScreenAdaptType 不是None的情况 */
+		public get isNeedAdapt():boolean;
+		public onLoad(node: cc.Node):void;
+		public onDestroy():void;
+		/**@description 浏览器适配初始化 */
+		public initBrowserAdaptor():void;
+		get isBrowser():boolean;
 	}
 	export class NodePool {
 		constructor(name: string);
