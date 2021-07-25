@@ -5,7 +5,7 @@ import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Define
  * @description 加载动画
  */
 
-export default class UILoading implements UILoadingDelegate {
+export default class UILoading {
     private static _instance: UILoading = null;
     public static Instance() { return this._instance || (this._instance = new UILoading()); }
     /**@description 当前loading节点 */

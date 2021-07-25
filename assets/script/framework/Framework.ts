@@ -61,11 +61,11 @@ export class Framewok{
     }
 
     /**@description 小提示 */
-    get tips() : TipsDelegate{
+    get tips() : Tips{
         return null;
     }
     /**@description 界面加载时的全屏Loading,显示加载进度 */
-    get uiLoading():UILoadingDelegate{
+    get uiLoading():UILoading{
         return null;
     }
 

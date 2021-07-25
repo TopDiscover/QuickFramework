@@ -57,7 +57,7 @@ class _Manager extends Framewok {
     }
 
     /**@description 界面加载时的全屏Loading,显示加载进度 */
-    get uiLoading():UILoadingDelegate{
+    get uiLoading():UILoading{
         return getSingleton(UILoading);
     }
 
