@@ -1,9 +1,8 @@
 import SettingView from "../../../../script/common/component/SettingView";
 import { ViewZOrder } from "../../../../script/common/config/Config";
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
-import { Manager } from "../../../../script/common/manager/Manager";
 import { BUNDLE_RESOURCES } from "../../../../script/framework/base/Defines";
-import UIView from "../../../../script/framework/ui/UIView";
+import { UIView } from "../../../../script/framework/ui/UIView";
 
 
 const {ccclass, property} = cc._decorator;

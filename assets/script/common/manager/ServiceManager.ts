@@ -2,14 +2,12 @@
  * @description 网络Service服务管理
  */
 
-import { GameEventInterface } from "../../framework/base/GameEventInterface";
 import { Config } from "../config/Config";
 import { LogicEvent } from "../event/LogicEvent";
 import { ChatService } from "../net/ChatService";
 import { CommonService } from "../net/CommonService";
 import { GameService } from "../net/GameService";
 import { LobbyService } from "../net/LobbyService";
-import { Manager } from "./Manager";
 
 export class ServiceManager implements GameEventInterface {
 

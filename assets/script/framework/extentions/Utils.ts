@@ -1,6 +1,5 @@
-import UIView from "../ui/UIView";
-import { ResourceInfo, ResourceType, BUNDLE_RESOURCES, BUNDLE_REMOTE, ResourceData, ResourceCacheData } from "../base/Defines";
-import { Manager } from "../Framework";
+import { UIView } from "../ui/UIView";
+import { ResourceInfo, ResourceType, BUNDLE_RESOURCES, BUNDLE_REMOTE, ResourceCacheData } from "../base/Defines";
 
 /**@description 添加加载本地的资源 */
 export function addExtraLoadResource(view: UIView, info: ResourceInfo) {

@@ -1,4 +1,3 @@
-import { Manager } from "../../framework/Framework";
 import { Config, ViewZOrder } from "../config/Config";
 import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
 /**

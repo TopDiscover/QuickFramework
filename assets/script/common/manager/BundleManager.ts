@@ -1,7 +1,6 @@
 import { HotUpdate, AssetManagerCode, AssetManagerState, BundleConfig, DownLoadInfo } from "../base/HotUpdate";
 import { CommonEvent } from "../event/CommonEvent";
 import { Config, ViewZOrder } from "../config/Config";
-import { Manager } from "./Manager";
 import DownloadLoading from "../component/DownloadLoading";
 import { i18n } from "../language/CommonLanguage";
 

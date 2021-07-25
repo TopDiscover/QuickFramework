@@ -1,6 +1,5 @@
-import UIView from "../../../../script/framework/ui/UIView";
+import { UIView } from "../../../../script/framework/ui/UIView";
 import { LogicEvent } from "../../../../script/common/event/LogicEvent";
-import { Manager } from "../../../../script/common/manager/Manager";
 import { TankBettle } from "../data/TankBattleGameData";
 
 const { ccclass, property } = cc._decorator;
@@ -43,12 +42,12 @@ export default class TankBattleStartView extends UIView {
         this.setEnabledKeyBack(true);
     }
 
-    protected onKeyBack(ev: cc.Event.EventKeyboard) {
+    onKeyBack(ev: cc.Event.EventKeyboard) {
         super.onKeyBack(ev);
         dispatch(LogicEvent.ENTER_HALL);
     }
 
-    protected onKeyUp(ev: cc.Event.EventKeyboard) {
+    onKeyUp(ev: cc.Event.EventKeyboard) {
         super.onKeyUp(ev);
         if( this.data.gameStatus != TankBettle.GAME_STATUS.SELECTED ){
             return;

@@ -1,6 +1,5 @@
-import UIView from "../../framework/ui/UIView";
+import { UIView } from "../../framework/ui/UIView";
 import { AssetManagerState, AssetManagerCode, HotUpdate, DownLoadInfo } from "../base/HotUpdate";
-import { Manager } from "../manager/Manager";
 import { CommonEvent } from "../event/CommonEvent";
 import { i18n } from "../language/CommonLanguage";
 

@@ -1,6 +1,5 @@
-import UIView from "../../../../script/framework/ui/UIView";
+import { UIView } from "../../../../script/framework/ui/UIView";
 import { TankBettle } from "../data/TankBattleGameData";
-import { Manager } from "../../../../script/common/manager/Manager";
 
 
 const {ccclass, property} = cc._decorator;

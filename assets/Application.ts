@@ -1,3 +1,3 @@
 (<any>window["td"]) ={};
-import { Manager } from "./script/common/manager/Manager";
-Manager.init();
+import { applicationInit } from "./script/common/manager/Manager";
+applicationInit();

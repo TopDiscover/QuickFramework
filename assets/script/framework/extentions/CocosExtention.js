@@ -6,7 +6,6 @@ import {
     createNodeWithPrefab,getBundle,_loadDirRes,_loadRes
 } from "./Utils";
 import { EventApi } from "../event/EventApi";
-import { Manager } from "../Framework";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
 if (typeof Reflect == "object") {
@@ -287,17 +286,15 @@ if( !cc.randomRange ){
     }
 }
 
-
-if (!CC_EDITOR) {
-
-    //对引擎输入框进行修改 ,原始引擎版本2.1.2
-    if ( Manager.resolutionHelper.isBrowser && !CC_PREVIEW && cc.sys.os != cc.sys.OS_WINDOWS) {
-        if (CC_DEBUG) cc.log(`浏览器`);
-        cc.EditBox._ImplClass = WebEditBoxImpl;
-    }
-}
-
 export function CocosExtentionInit() {
+    if (!CC_EDITOR) {
+
+        //对引擎输入框进行修改 ,原始引擎版本2.1.2
+        if ( Manager.resolutionHelper.isBrowser && !CC_PREVIEW && cc.sys.os != cc.sys.OS_WINDOWS) {
+            if (CC_DEBUG) cc.log(`浏览器`);
+            cc.EditBox._ImplClass = WebEditBoxImpl;
+        }
+    }
     //cc.log("CocosExtentionInit");
 }
 

@@ -1,6 +1,5 @@
 import { Logic } from "../../../script/common/base/Logic";
 import { LogicType, LogicEvent } from "../../../script/common/event/LogicEvent";
-import { Manager } from "../../../script/common/manager/Manager";
 import NetTestView from "./view/NetTestView";
 
 class NetTestLogic extends Logic {

@@ -1,6 +1,5 @@
 import { EventApi } from "../event/EventApi";
 import { ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY } from "./Defines";
-import { Manager } from "../Framework";
 const LANG_KEY: string = "using_language";
 
 const COMMON_LANGUAGE_NAME = "COMMON_LANGUAGE_NAME";

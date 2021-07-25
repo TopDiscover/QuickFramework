@@ -1,5 +1,5 @@
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
-import UIView from "../../../../script/framework/ui/UIView";
+import { UIView } from "../../../../script/framework/ui/UIView";
 
 const {ccclass, property} = cc._decorator;
 

@@ -1,4 +1,4 @@
-import UIView from "../../../../script/framework/ui/UIView";
+import { UIView } from "../../../../script/framework/ui/UIView";
 import { LogicEvent, dispatchEnterComplete, LogicType } from "../../../../script/common/event/LogicEvent";
 
 /**

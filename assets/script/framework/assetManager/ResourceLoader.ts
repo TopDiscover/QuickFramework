@@ -1,5 +1,4 @@
 import { ResourceData, ResourceCacheData, ResourceInfo } from "../base/Defines";
-import { Manager } from "../Framework";
 
 export enum ResourceLoaderError {
     /**@description 加载中 */

@@ -1,4 +1,4 @@
-import UIView, { UIClass } from "../../framework/ui/UIView";
+import { UIView ,UIClass} from "../../framework/ui/UIView";
 
 /**
  * @description 逻辑模块类型

@@ -6,7 +6,6 @@ import { injectService } from "../../../../script/framework/decorator/Decorators
 import Controller from "../../../../script/framework/controller/Controller";
 import { ChatService } from "../../../../script/common/net/ChatService";
 import { CommonEvent } from "../../../../script/common/event/CommonEvent";
-import { Manager } from "../../../../script/common/manager/Manager";
 import { ServiceEvent } from "../../../../script/framework/base/Defines";
 import { MainCmd } from "../../../../script/common/protocol/CmdDefines";
 import { SUB_CMD_LOBBY } from "../../../hall/script/protocol/LobbyCmd";

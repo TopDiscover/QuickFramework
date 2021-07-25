@@ -1,6 +1,5 @@
 import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../script/common/event/LogicEvent";
 import TankBattleStartView from "./TankBattleStartView";
-import { Manager } from "../../../../script/common/manager/Manager";
 import TankBattleMap from "../model/TankBattleMap";
 import { TankBettle } from "../data/TankBattleGameData";
 import GameView from "../../../../script/common/base/GameView";
@@ -85,7 +84,7 @@ export default class TankBattleGameView extends GameView{
         cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
     }
 
-    protected onKeyUp(ev: cc.Event.EventKeyboard) {
+    onKeyUp(ev: cc.Event.EventKeyboard) {
         if( this.data.gameMap){
             this.data.gameMap.onKeyUp(ev);
         }
@@ -104,7 +103,7 @@ export default class TankBattleGameView extends GameView{
         }
     }
 
-    protected onKeyDown(ev: cc.Event.EventKeyboard) {
+    onKeyDown(ev: cc.Event.EventKeyboard) {
         if (this.data.gameMap) {
             this.data.gameMap.onKeyDown(ev)
         }

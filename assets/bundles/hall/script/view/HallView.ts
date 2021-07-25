@@ -1,8 +1,7 @@
-import UIView from "../../../../script/framework/ui/UIView";
+import { UIView } from "../../../../script/framework/ui/UIView";
 import { BundleConfig } from "../../../../script/common/base/HotUpdate";
 import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../script/common/event/LogicEvent";
 import { CommonEvent } from "../../../../script/common/event/CommonEvent";
-import { Manager } from "../../../../script/common/manager/Manager";
 import { HallData } from "../data/HallData";
 import { LobbyService } from "../../../../script/common/net/LobbyService";
 import { GameService } from "../../../../script/common/net/GameService";

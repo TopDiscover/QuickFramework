@@ -9,7 +9,6 @@ import { MainCmd } from "../../../../script/common/protocol/CmdDefines";
 import { TestProtoMessage } from "../protocol/TestProtoMessage";
 import { TestBinaryMessage } from "../protocol/TestBinaryMessage";
 import { CommonEvent } from "../../../../script/common/event/CommonEvent";
-import { Manager } from "../../../../script/common/manager/Manager";
 import { SUB_CMD_LOBBY } from "../protocol/LobbyCmd";
 import { TestJsonMessage } from "../protocol/TestJsonMessage";
 import { ServiceEvent } from "../../../../script/framework/base/Defines";

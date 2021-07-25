@@ -1,7 +1,6 @@
-import UIView from "../ui/UIView";
 import { ResourceInfo } from "./Defines";
-import { Manager } from "../Framework";
 import EventComponent from "./EventComponent";
+import { UIView } from "../ui/UIView";
 
 /**
  * @description 声音组件

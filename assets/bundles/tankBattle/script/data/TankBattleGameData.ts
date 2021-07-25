@@ -2,7 +2,6 @@
 
 import { GameData } from "../../../../script/common/base/GameData";
 import { MapLevel } from "./TankBattleLevel";
-import { Manager } from "../../../../script/common/manager/Manager";
 import TankBattleNetController from "../controller/TankBattleNetController";
 import TankBattleMap from "../model/TankBattleMap";
 import TankBattleGameView from "../view/TankBattleGameView";
@@ -11,7 +10,6 @@ import TankBattleChangeStageView from "../view/TankBattleChangeStageView";
 import { ViewZOrder } from "../../../../script/common/config/Config";
 import TankBattleStartView from "../view/TankBattleStartView";
 import TankBattleGameOver from "../view/TankBattleGameOver";
-import UIView from "../../../../script/framework/ui/UIView";
 
 export namespace TankBettle {
     export enum Direction {

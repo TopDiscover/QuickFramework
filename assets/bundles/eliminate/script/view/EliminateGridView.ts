@@ -1,4 +1,3 @@
-import { Manager } from "../../../../script/framework/Framework";
 import { EliminateData } from "../data/EliminateData";
 import { CELL_SIZE, EliminateEffect, GRID_HEIGHT, GRID_PIXEL_HEIGHT, GRID_PIXEL_WIDTH, GRID_WIDTH } from "../data/EliminateDefines";
 import EliminateCellModel from "../model/EliminateCellModel";

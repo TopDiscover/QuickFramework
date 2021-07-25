@@ -1,6 +1,5 @@
 import { Logic } from "../../../script/common/base/Logic";
 import { LogicType, LogicEvent, LogicEventData } from "../../../script/common/event/LogicEvent";
-import { Manager } from "../../../script/common/manager/Manager";
 import { ResourceLoaderError } from "../../../script/framework/assetManager/ResourceLoader";
 import { ResourceData } from "../../../script/framework/base/Defines";
 import LoadTestView from "./view/LoadTestView";

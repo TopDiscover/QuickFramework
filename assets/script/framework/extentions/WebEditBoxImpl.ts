@@ -1,4 +1,3 @@
-import { Manager } from "../Framework";
 
 class WebEditBoxHelper {
     private static _instance: WebEditBoxHelper = null;

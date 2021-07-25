@@ -1,5 +1,4 @@
 import { ResourceCacheData, ResourceCacheStatus, ResourceInfo, ResourceType, BUNDLE_REMOTE } from "../base/Defines";
-import { Manager } from "../Framework";
 
 class RemoteLoader {
 
@@ -145,6 +144,7 @@ class RemoteLoader {
         
     }
 }
+td.RemoteLoader = RemoteLoader;
 
 
 export class AssetManager {
@@ -424,3 +424,4 @@ export class AssetManager {
         this.retainAsset(info);
     }
 }
+td.AssetManager = AssetManager;

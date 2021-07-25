@@ -1,5 +1,4 @@
-import UIView from "../../framework/ui/UIView";
-import { Manager } from "../../common/manager/Manager";
+import { UIView } from "../../framework/ui/UIView";
 import { BundleConfig } from "../../common/base/HotUpdate";
 import { LogicEvent, dispatchEnterComplete, LogicType } from "../../common/event/LogicEvent";
 import { Config } from "../../common/config/Config";

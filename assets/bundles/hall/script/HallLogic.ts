@@ -1,7 +1,6 @@
 import { Logic } from "../../../script/common/base/Logic";
 import { LogicType, LogicEvent, LogicEventData } from "../../../script/common/event/LogicEvent";
 import HallView from "./view/HallView";
-import { Manager } from "../../../script/common/manager/Manager";
 import { HallData } from "./data/HallData";
 import { HallLanguage } from "./data/HallLanguage";
 

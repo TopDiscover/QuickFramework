@@ -1,6 +1,5 @@
-import { ResourceCacheData, ResourceInfo, BUNDLE_REMOTE, BUNDLE_RESOURCES } from "../base/Defines";
-import UIView from "../ui/UIView";
-import { Manager } from "../Framework";
+import { ResourceCacheData, ResourceInfo } from "../base/Defines";
+import { UIView } from "../ui/UIView";
 
 class ResourceCache {
     print() {
@@ -282,6 +281,7 @@ class RemoteCaches {
         }
     }
 }
+td.RemoteCaches = RemoteCaches;
 
 export class CacheManager {
     private logTag = `[CacheManager]: `;
@@ -532,3 +532,4 @@ export class CacheManager {
         this.remoteCaches.showCaches();
     }
 }
+td.CacheManager = CacheManager;

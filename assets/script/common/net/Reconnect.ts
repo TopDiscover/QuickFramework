@@ -6,7 +6,6 @@ import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Define
 import { EventApi } from "../../framework/event/EventApi";
 import { Config, ViewZOrder } from "../config/Config";
 import { i18n } from "../language/CommonLanguage";
-import { Manager } from "../manager/Manager";
 import { CommonService } from "./CommonService";
 import ReconnectComponent from "./ReconnectComponent";
 

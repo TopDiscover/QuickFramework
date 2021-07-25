@@ -3,7 +3,6 @@ import EventComponent from "../../framework/base/EventComponent";
 import { ResourceData, ResourceCacheData } from "../../framework/base/Defines";
 import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
 import { Config } from "../config/Config";
-import { Manager } from "../manager/Manager";
 
 /**
  * @description 逻辑控制器

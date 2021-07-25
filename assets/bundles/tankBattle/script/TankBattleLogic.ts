@@ -3,7 +3,6 @@ import { LogicType, LogicEvent, LogicEventData } from "../../../script/common/ev
 import { ResourceData } from "../../../script/framework/base/Defines";
 import { LobbyService } from "../../../script/common/net/LobbyService";
 import { ResourceLoaderError } from "../../../script/framework/assetManager/ResourceLoader";
-import { Manager } from "../../../script/common/manager/Manager";
 import TankBattleGameView from "./view/TankBattleGameView";
 import { TankBettle } from "./data/TankBattleGameData";
 import TankBattleNetController from "./controller/TankBattleNetController";

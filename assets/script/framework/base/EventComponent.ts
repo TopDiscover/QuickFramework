@@ -1,5 +1,4 @@
 import { Service } from "./Service";
-import { Manager } from "../Framework";
 
 /**
  * @description 事件处理组件

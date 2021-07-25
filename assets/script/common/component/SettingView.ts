@@ -1,7 +1,6 @@
-import UIView from "../../framework/ui/UIView";
+import { UIView } from "../../framework/ui/UIView";
 import { LogicEvent } from "../event/LogicEvent";
 import { i18n } from "../language/CommonLanguage";
-import { Manager } from "../manager/Manager";
 
 const { ccclass, property } = cc._decorator;
 

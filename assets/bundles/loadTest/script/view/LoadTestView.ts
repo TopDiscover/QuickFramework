@@ -2,7 +2,7 @@
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
 import { ResourceCacheData } from "../../../../script/framework/base/Defines";
 import { ButtonSpriteMemberName } from "../../../../script/framework/extentions/Utils";
-import UIView from "../../../../script/framework/ui/UIView";
+import { UIView } from "../../../../script/framework/ui/UIView";
 import { HallData } from "../../../hall/script/data/HallData";
 
 const {ccclass, property} = cc._decorator;

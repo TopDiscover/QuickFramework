@@ -5,7 +5,6 @@
 import { injectService } from "../../../../script/framework/decorator/Decorators";
 import Controller from "../../../../script/framework/controller/Controller";
 import { CommonEvent } from "../../../../script/common/event/CommonEvent";
-import { Manager } from "../../../../script/common/manager/Manager";
 import { GameService } from "../../../../script/common/net/GameService";
 import { ServiceEvent } from "../../../../script/framework/base/Defines";
 import { MainCmd } from "../../../../script/common/protocol/CmdDefines";

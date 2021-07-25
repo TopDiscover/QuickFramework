@@ -1,6 +1,5 @@
 import { Logic } from "../base/Logic";
 import { LogicEvent, LogicEventData, LogicType } from "../event/LogicEvent";
-import { Manager } from "./Manager";
 
 /**
  * @description 逻辑控制器管理器 

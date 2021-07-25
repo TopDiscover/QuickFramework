@@ -1,4 +1,3 @@
-import { Manager } from "../../../../script/common/manager/Manager";
 import { CELL_SIZE, EFFECTS_CONFIG, EliminateEffect } from "../data/EliminateDefines";
 import EliminateGameView from "./EliminateGameView";
 

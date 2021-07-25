@@ -1,7 +1,6 @@
 import AudioComponent from "../../framework/base/AudioComponent";
 import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import { Config } from "../config/Config";
-import { Manager } from "../manager/Manager";
 
 /**
  * @description 全局音频播放组棒

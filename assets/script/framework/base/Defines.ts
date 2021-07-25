@@ -1,5 +1,5 @@
 
-import UIView, { UIClass } from "../ui/UIView";
+import { UIClass, UIView } from "../ui/UIView";
 import { Service } from "./Service";
 
 /**
@@ -11,6 +11,7 @@ export enum ResourceCacheStatus {
     /**@description 等待释放 */
     WAITTING_FOR_RELEASE,
 }
+td.ResourceCacheStatus = ResourceCacheStatus;
 
 /**@description 资源类型 */
 export enum ResourceType {
@@ -19,6 +20,7 @@ export enum ResourceType {
     /**@description 远程资源 */
     Remote,
 }
+td.ResourceType = ResourceType;
 
 /**@description 资源信息 */
 export class ResourceInfo {
@@ -31,6 +33,7 @@ export class ResourceInfo {
     /**@description 默认为本地资源 */
     resourceType: ResourceType = ResourceType.Local;
 }
+td.ResourceInfo = ResourceInfo;
 
 export class ResourceCacheData {
     /**@description 是否已经加载完成 */
@@ -76,6 +79,7 @@ export class ResourceCacheData {
         return this.isLoaded && this.data && !cc.isValid(this.data);
     }
 }
+td.ResourceCacheData = ResourceCacheData;
 
 export interface ResourceData {
     /**@description resources 目录url 与 type 必须成对出现*/
