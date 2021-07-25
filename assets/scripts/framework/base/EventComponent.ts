@@ -102,7 +102,7 @@ export default class EventComponent extends Component {
             this._events.push(event);
 
             if (event.name) {
-                Manager.eventDispatcher.addEventListener(event.name, event.func, this);
+                Manager.eventDispatcher.addEventListener(event.name, event.func as any, this);
             } else {
                 //网络消息事件注册
                 if (this._service) {
@@ -186,7 +186,7 @@ export default class EventComponent extends Component {
             let event = this._events[i];
             if (event.name) {
                 //普通事件注册
-                Manager.eventDispatcher.addEventListener(event.name, event.func, this);
+                Manager.eventDispatcher.addEventListener(event.name, event.func as any, this);
             } else {
                 //网络消息事件注册
                 if (this._service) {

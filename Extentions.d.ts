@@ -223,20 +223,12 @@ declare namespace td {
         isEffectOn: boolean;
         /**@description 背景音乐开关 */
         isMusicOn: boolean;
-        /**@description 当前播放的背景音乐 */
-        curMusicUrl: string;
-        curBundle: BUNDLE_TYPE;
-        /**@description 存储 */
-        save(): void;
         /**@description 停止 */
-        stopEffect(effectId?: number): void;
-        stopAllEffects(): void;
-        stopMusic(): void;
-        playMusic(url: string, bundle: BUNDLE_TYPE, loop?: boolean): Promise<{
-            url: string;
-            isSuccess: boolean;
-        }>;
-        playEffect(url: string, bundle: BUNDLE_TYPE, loop?: boolean): Promise<number>;
+        stopEffect(url: string, bundle: BUNDLE_TYPE):void;
+        stopAllEffects():void;
+        stopMusic():void;
+        playMusic(url: string, bundle: BUNDLE_TYPE, loop?: boolean): Promise<boolean>;
+        playEffect(url: string, bundle: BUNDLE_TYPE, loop?: boolean): Promise<boolean>;
         onEnterBackground(): void;
         onEnterForgeground(inBackgroundTime: number): void;
     }
@@ -246,7 +238,7 @@ declare namespace td {
         /**@description 全屏幕适配 调用 */
         onFullScreenAdapt(): void;
         /**@description 当前传入参数，即通过UI管理器打开时的传入参数 */
-        get args(): any[];
+        get args(): any[] | undefined;
         /**指向当前View打开时的bundle */
         bundle: BUNDLE_TYPE;
         close(): void;
@@ -391,7 +383,7 @@ declare namespace td {
         hide<T extends UIView>(uiClass: UIClass<T>): void;
         getView(className: string): Promise<any>;
         getView<T extends UIView>(uiClass: UIClass<T>): Promise<T>;
-        checkView(url: string, className: string): void;
+        checkView(url: string, className: string|null): void;
         isShow(className: string): boolean;
         isShow<T extends UIView>(uiClass: UIClass<T>): boolean;
         fullScreenAdapt(): void;
@@ -419,6 +411,7 @@ declare namespace td {
     }
     export class AssetManager {
         get remote(): RemoteLoader;
+        getBundleName( bundle : BUNDLE_TYPE ) : string | null;
         getBundle(bundle: BUNDLE_TYPE): import("cc").AssetManager.Bundle;
         /**@description 加载bundle */
         loadBundle(nameOrUrl: string, onComplete: (err: Error, bundle: import("cc").AssetManager.Bundle) => void): void;
