@@ -1,5 +1,5 @@
 import UIView from "../ui/UIView";
-import { ResourceInfo, ResourceType, BUNDLE_RESOURCES, BUNDLE_REMOTE, BUNDLE_TYPE, ResourceCacheData } from "../base/Defines";
+import { ResourceInfo, ResourceType, BUNDLE_RESOURCES, BUNDLE_REMOTE, ResourceCacheData } from "../base/Defines";
 import { Button, Component, Font, isValid, Label, ParticleAsset, ParticleSystem2D, Sprite, SpriteFrame, sp, Node, Prefab, instantiate, Asset, AssetManager } from "cc";
 
 /**@description 添加加载本地的资源 */

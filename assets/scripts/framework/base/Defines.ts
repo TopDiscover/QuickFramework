@@ -1,5 +1,5 @@
 
-import { Asset, AssetManager, isValid } from "cc";
+import { Asset, isValid } from "cc";
 import UIView, { UIClass } from "../ui/UIView";
 import { Service } from "./Service";
 
@@ -111,8 +111,6 @@ export enum ViewStatus {
     /**@description 无状态 */
     WAITTING_NONE,
 }
-
-export type BUNDLE_TYPE = string | AssetManager.Bundle;
 
 export const BUNDLE_RESOURCES = 'resources';
 

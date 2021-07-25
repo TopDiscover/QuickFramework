@@ -1,5 +1,5 @@
 import UIView, {UIClass } from "../ui/UIView";
-import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
+import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_RESOURCES } from "./Defines";
 import { isValid, js, Node, Prefab, Widget, instantiate, director, Component } from "cc";
 import { DEBUG } from "cc/env";
 

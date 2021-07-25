@@ -1,5 +1,5 @@
 import UIView from "../ui/UIView";
-import { ResourceInfo, BUNDLE_TYPE, BUNDLE_RESOURCES } from "./Defines";
+import { ResourceInfo, BUNDLE_RESOURCES } from "./Defines";
 import EventComponent from "./EventComponent";
 import { AudioClip, AudioSource, _decorator } from "cc";
 import { DEBUG } from "cc/env";

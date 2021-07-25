@@ -1,6 +1,6 @@
 import { AudioClip, AudioSource, _decorator } from "cc";
 import AudioComponent, { AudioInfo } from "../../framework/base/AudioComponent";
-import { BUNDLE_TYPE, BUNDLE_RESOURCES } from "../../framework/base/Defines";
+import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import { Config } from "../config/Config";
 
 /**

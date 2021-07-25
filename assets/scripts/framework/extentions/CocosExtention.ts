@@ -1,5 +1,5 @@
 import WebEditBoxImpl from "./WebEditBoxImpl";
-import { ResourceType, ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY, BUNDLE_REMOTE, BUNDLE_TYPE } from "../base/Defines";
+import { ResourceType, ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY, BUNDLE_REMOTE } from "../base/Defines";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
