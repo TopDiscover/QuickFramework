@@ -8,7 +8,6 @@ import { LogicManager } from "./LogicManager";
 import GlobalAudio from "../component/GlobalAudio";
 import { extentionsInit } from "../../framework/extentions/Extentions";
 import { CocosExtentionInit } from "../../framework/extentions/CocosExtention";
-import { getSingleton } from "../../framework/base/Singleton";
 import { USING_LAN_KEY, BUNDLE_TYPE, BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import GameView from "../base/GameView";
 import { GameData } from "../base/GameData";
@@ -182,3 +181,8 @@ class _Manager extends Framework._FramewokManager {
 }
 
 export const Manager = new _Manager();
+
+export function applicationInit() {
+    (<any>window)["Manager"] = Manager;
+    Manager.init();
+}

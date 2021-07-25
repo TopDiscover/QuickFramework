@@ -1,6 +1,5 @@
 
 import { GameData } from "../../../../scripts/common/base/GameData";
-import { getSingleton } from "../../../../scripts/framework/base/Singleton";
 import { Config } from "../../../../scripts/common/config/Config";
 /**@description 大厅数据 */
 class _HallData extends GameData {
