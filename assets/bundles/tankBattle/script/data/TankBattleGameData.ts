@@ -4,11 +4,9 @@ import { GameData } from "../../../../scripts/common/base/GameData";
 import { MapLevel } from "./TankBattleLevel";
 import TankBattleMap from "../model/TankBattleMap";
 import TankBattleGameView from "../view/TankBattleGameView";
-import TankBattleChangeStageView from "../view/TankBattleChangeStageView";
-import TankBattleStartView from "../view/TankBattleStartView";
-import TankBattleGameOver from "../view/TankBattleGameOver";
 import { Node, Rect, UITransform, Vec2, Vec3 } from "cc"
 import { ViewZOrder } from "../../../../scripts/common/config/ViewZOrder";
+import UIView from "../../../../scripts/framework/ui/UIView";
 
 export namespace TankBettle {
     export enum Direction {
@@ -308,16 +306,20 @@ export namespace TankBettle {
         /**@description 玩家2的生命数量 */
         playerTwoLive = 0;
 
+        TankBattleChangeStageView : typeof UIView = null!;
+        TankBattleStartView : typeof UIView = null!;
+        TankBattleGameOver : typeof UIView = null!;
+
         /**@description 进入游戏 */
         enterGame() {
             this.gameStatus = GAME_STATUS.INIT;
-            Manager.uiManager.open({ bundle: this.bundle, type: TankBattleChangeStageView, zIndex: ViewZOrder.UI, args: [this.currentLevel] })
+            Manager.uiManager.open({ bundle: this.bundle, type: this.TankBattleChangeStageView, zIndex: ViewZOrder.UI, args: [this.currentLevel] })
         }
 
         /**@description 进入选人界面 */
         enterStart() {
             this.gameStatus = GAME_STATUS.SELECTED;
-            Manager.uiManager.open({ type: TankBattleStartView, bundle: this.bundle, zIndex: ViewZOrder.UI });
+            Manager.uiManager.open({ type: this.TankBattleStartView, bundle: this.bundle, zIndex: ViewZOrder.UI });
         }
 
         /**@description 下一关 */
@@ -376,7 +378,7 @@ export namespace TankBettle {
                 return;
             }
             this.gameStatus = GAME_STATUS.OVER;
-            Manager.uiManager.open({ type: TankBattleGameOver, bundle: this.bundle, zIndex: ViewZOrder.UI });
+            Manager.uiManager.open({ type: this.TankBattleGameOver, bundle: this.bundle, zIndex: ViewZOrder.UI });
             this.gameMap?.gameOver();
         }
 
@@ -427,3 +429,4 @@ export namespace TankBettle {
     }
     export const gameData = getSingleton(TankBettleGameData);
 }
+ 

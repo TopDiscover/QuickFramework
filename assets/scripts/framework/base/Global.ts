@@ -7,15 +7,23 @@ import { Asset, isValid } from "cc";
  * @param key 
  * @param value 
  */
-export function toNamespace(key:string,value:any):void{
-    createNamespace();
-    (<any>td)[key] = value;
+export function toNamespace(key:string,value:any,namespace?:string):void{
+    let space = createNamespace(namespace);
+    space[key] = value;
 }
 
-export function createNamespace() {
-    if (!window.td){
-        (<any>window.td) = {};
+export function createNamespace(namespace?:string) {
+    let _window : any = window;
+    if ( namespace && namespace.length > 0 ){
+        if ( !_window[namespace] ){
+            _window[namespace] = {}
+        }
+        return _window[namespace];
     }
+    if (!_window.td){
+        _window.td = {};
+    }
+    return _window.td;
 }
 
 export const COMMON_LANGUAGE_NAME = "COMMON_LANGUAGE_NAME";

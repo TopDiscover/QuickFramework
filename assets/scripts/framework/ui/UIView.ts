@@ -17,7 +17,7 @@ export interface UIClass<T extends UIView> {
 }
 
 @ccclass
-export default abstract class UIView extends EventComponent implements IFullScreenAdapt {
+export default class UIView extends EventComponent implements IFullScreenAdapt {
     onFullScreenAdapt(): void {
         
     }

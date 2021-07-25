@@ -6,6 +6,9 @@ import { ResourceLoaderError } from "../../../scripts/framework/assetManager/Res
 import TankBattleGameView from "./view/TankBattleGameView";
 import { TankBettle } from "./data/TankBattleGameData";
 import { TankBattleLanguage } from "./data/TankBattleLanguage";
+import TankBattleChangeStageView from "./view/TankBattleChangeStageView";
+import TankBattleStartView from "./view/TankBattleStartView";
+import TankBattleGameOver from "./view/TankBattleGameOver";
 
 /**
  * @description 坦克大战Logic 
@@ -66,6 +69,9 @@ class TankBattleLogic extends Logic {
             //游戏数据初始化
             Manager.gameData = TankBettle.gameData;
             Manager.gameData.clear();
+            TankBettle.gameData.TankBattleChangeStageView = TankBattleChangeStageView;
+            TankBettle.gameData.TankBattleStartView = TankBattleStartView;
+            TankBettle.gameData.TankBattleGameOver = TankBattleGameOver;
 
             //子游戏语言包初始化
             Manager.language.addSourceDelegate(this.language);

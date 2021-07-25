@@ -1,4 +1,4 @@
-import { Component, instantiate, _decorator, Node, BoxCollider2D, Tween, UITransform, Vec3,Animation, tween, Sprite, randomRange, randomRangeInt, IPhysics2DContact, Rect, Vec2 } from "cc";
+import { instantiate, _decorator, Node, BoxCollider2D, Tween, UITransform, Vec3,Animation, tween, Sprite, randomRange, randomRangeInt, IPhysics2DContact, Rect, Vec2 } from "cc";
 import { TankBettle } from "../data/TankBattleGameData";
 import TankBettleBullet from "./TankBattleBullet";
 import { TankBattleEntity } from "./TankBattleEntity";
