@@ -1,6 +1,5 @@
 import { Logic } from "../../../scripts/common/base/Logic";
 import { LogicType, LogicEvent } from "../../../scripts/common/event/LogicEvent";
-import { Manager } from "../../../scripts/common/manager/Manager";
 import { AimLineData } from "./data/AimLineData";
 import AimLineView from "./view/AimLineView";
 

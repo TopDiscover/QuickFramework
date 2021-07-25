@@ -10,7 +10,6 @@ import { GameEventInterface } from "../../framework/base/GameEventInterface";
  import { CommonService } from "../net/CommonService";
  import { GameService } from "../net/GameService";
  import { LobbyService } from "../net/LobbyService";
- import { Manager } from "./Manager";
  
  export class ServiceManager implements GameEventInterface {
  

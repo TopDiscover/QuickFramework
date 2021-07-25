@@ -6,7 +6,6 @@ import {
     createNodeWithPrefab, getBundle, _loadDirRes, _loadRes
 } from "./Utils";
 import { EventApi } from "../event/EventApi";
-import { Manager } from "../Framework";
 import { isValid, SpriteFrame, sp, Font, ParticleSystem2D, ParticleAsset, sys, EditBox, Sprite,Node, Button, Label, randomRange, Asset, AssetManager} from "cc";
 import { DEBUG, EDITOR, PREVIEW } from "cc/env";
 import UIView from "../ui/UIView";
@@ -305,16 +304,6 @@ prototype.loadFile = function (config: any) {
     });
 }
 
-
-
-
-if (!EDITOR) {
-    //对引擎输入框进行修改 
-    if (Manager.resolutionHelper.isBrowser) {
-        (<any>EditBox)._EditBoxImpl = WebEditBoxImpl;
-    }
-}
-
 //全局函数扩展
 
 
@@ -439,5 +428,11 @@ export function updateZIndex( node : Node ){
 }
 
 export function CocosExtentionInit() {
+    if (!EDITOR) {
+        //对引擎输入框进行修改 
+        if (Manager.resolutionHelper.isBrowser) {
+            (<any>EditBox)._EditBoxImpl = WebEditBoxImpl;
+        }
+    }
     //cc.log("CocosExtentionInit");
 }

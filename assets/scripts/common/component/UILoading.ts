@@ -1,5 +1,3 @@
-import UILoadingDelegate from "../../framework/ui/UILoadingDelegate";
-import { Manager } from "../manager/Manager";
 import { EventApi } from "../../framework/event/EventApi";
 import { Config } from "../config/Config";
 import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
@@ -9,13 +7,12 @@ import { ViewZOrder } from "../config/ViewZOrder";
  * @description 加载动画
  */
 
-export default class UILoading extends UILoadingDelegate {
+export default class UILoading {
     private static _instance: UILoading = null!;
     public static Instance() { return this._instance || (this._instance = new UILoading()); }
     /**@description 当前loading节点 */
     private _node: Node = null!;
     constructor() {
-        super();
         Manager.eventDispatcher.addEventListener(EventApi.AdaptScreenEvent, this.onAdaptScreen, this);
     }
     private onAdaptScreen() {

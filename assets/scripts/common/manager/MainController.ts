@@ -1,7 +1,6 @@
 import { Asset, Component, find, Game, game, SystemEvent, systemEvent, SystemEventType, _decorator } from "cc";
 import { Config } from "../config/Config";
 import { Reconnect } from "../net/Reconnect";
-import { Manager } from "./Manager";
 
 /**
  * @description 主控制器 

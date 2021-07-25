@@ -5,7 +5,6 @@
 
  import { Logic } from "../common/base/Logic";
  import { LogicType, LogicEvent, LogicEventData } from "../common/event/LogicEvent";
- import { Manager } from "../common/manager/Manager";
  import LoginView from "./view/LoginView";
  import { BUNDLE_RESOURCES } from "../framework/base/Defines";
  import { HotUpdate, AssetManagerCode, AssetManagerState } from "../common/base/HotUpdate";

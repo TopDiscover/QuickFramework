@@ -1,7 +1,6 @@
 import { HotUpdate, AssetManagerCode, AssetManagerState, BundleConfig, DownLoadInfo } from "../base/HotUpdate";
 import { CommonEvent } from "../event/CommonEvent";
 import { Config} from "../config/Config";
-import { Manager } from "./Manager";
 import DownloadLoading from "../component/DownloadLoading";
 import { game } from "cc";
 import { DEBUG } from "cc/env";

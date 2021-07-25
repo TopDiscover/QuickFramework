@@ -1,6 +1,5 @@
 import UIView from "../../framework/ui/UIView";
 import { AssetManagerState, AssetManagerCode, HotUpdate, DownLoadInfo } from "../base/HotUpdate";
-import { Manager } from "../manager/Manager";
 import { CommonEvent } from "../event/CommonEvent";
 import { find, Label, ProgressBar, tween, _decorator } from "cc";
 import { DEBUG } from "cc/env";

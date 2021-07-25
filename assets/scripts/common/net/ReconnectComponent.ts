@@ -4,7 +4,6 @@ import Controller from "../../framework/controller/Controller";
 import { CustomNetEventType } from "../../framework/event/EventApi";
 import { Config } from "../config/Config";
 import { LogicEvent, LogicEventData, LogicType } from "../event/LogicEvent";
-import { Manager } from "../manager/Manager";
 import { CommonService } from "./CommonService";
 
 /**

@@ -1,5 +1,3 @@
-import TipsDelegate from "../../framework/ui/TipsDelegate";
-import { Manager } from "../../framework/Framework";
 import { Config} from "../config/Config";
 import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import { Component ,find,instantiate,Label,log,Node, Prefab, Tween, tween, UIOpacity, UITransform, Vec2, Vec3} from "cc";
@@ -89,7 +87,7 @@ class ToastItem extends Component {
     }
  }
 
- export default class Tips extends TipsDelegate {
+ export default class Tips {
 
     private static _instance: Tips = null!;
     public static Instance() { return this._instance || (this._instance = new Tips()); }

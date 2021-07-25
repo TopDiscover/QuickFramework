@@ -1,5 +1,4 @@
 import { EditBox, game, macro } from "cc";
-import { Manager } from "../Framework";
 
 class WebEditBoxHelper {
     private static _instance: WebEditBoxHelper = null!;

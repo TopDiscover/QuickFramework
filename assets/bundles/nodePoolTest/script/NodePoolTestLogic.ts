@@ -1,6 +1,5 @@
 import { Logic } from "../../../scripts/common/base/Logic";
 import { LogicType, LogicEvent } from "../../../scripts/common/event/LogicEvent";
-import { Manager } from "../../../scripts/common/manager/Manager";
 import NodePoolView from "./view/NodePoolView";
 
 class NodePoolTestLogic extends Logic {

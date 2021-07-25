@@ -9,7 +9,6 @@ import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
  import { Config } from "../config/Config";
 import { ViewZOrder } from "../config/ViewZOrder";
 import { i18n } from "../language/CommonLanguage";
- import { Manager } from "../manager/Manager";
  import { CommonService } from "./CommonService";
  import ReconnectComponent from "./ReconnectComponent";
  

@@ -2,7 +2,6 @@
 
 import { GameData } from "../../../../scripts/common/base/GameData";
 import { MapLevel } from "./TankBattleLevel";
-import { Manager } from "../../../../scripts/common/manager/Manager";
 import TankBattleMap from "../model/TankBattleMap";
 import TankBattleGameView from "../view/TankBattleGameView";
 import TankBattleChangeStageView from "../view/TankBattleChangeStageView";

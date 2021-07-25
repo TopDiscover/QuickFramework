@@ -1,4 +1,3 @@
-import { Manager } from "../manager/Manager";
 import { EventApi } from "../../framework/event/EventApi";
 import { Config } from "../config/Config";
 import { BUNDLE_RESOURCES } from "../../framework/base/Defines";

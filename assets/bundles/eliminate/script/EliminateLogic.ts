@@ -1,7 +1,6 @@
 import { Prefab } from "cc";
 import { Logic } from "../../../scripts/common/base/Logic";
 import { LogicType, LogicEvent, LogicEventData } from "../../../scripts/common/event/LogicEvent";
-import { Manager } from "../../../scripts/common/manager/Manager";
 import { ResourceLoaderError } from "../../../scripts/framework/assetManager/ResourceLoader";
 import { ResourceData } from "../../../scripts/framework/base/Defines";
 import { EliminateData } from "./data/EliminateData";

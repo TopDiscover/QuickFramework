@@ -1,6 +1,5 @@
 import { Component, _decorator,Node, EventTouch, Vec2, UITransform, Vec3, instantiate, Prefab, tween } from "cc";
 import { createPrefab } from "../../../../scripts/framework/extentions/CocosExtention";
-import { Manager } from "../../../../scripts/framework/Framework";
 import { EliminateData } from "../data/EliminateData";
 import { CELL_SIZE, EliminateEffect, GRID_HEIGHT, GRID_PIXEL_HEIGHT, GRID_PIXEL_WIDTH, GRID_WIDTH } from "../data/EliminateDefines";
 import EliminateCellModel from "../model/EliminateCellModel";

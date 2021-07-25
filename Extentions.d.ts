@@ -69,6 +69,40 @@ declare interface Singleton<T> {
 /**@description 获取根据类型获取单列 */
 declare function getSingleton<T>(SingletonClass: Singleton<T>):T;
 
+/**@description 提示代理 */
+declare interface Tips {
+	/**
+	 * @description tips提示
+	 * @param msg 提示内容
+	 */
+	show(msg: string):void;
+	/**@description 预加载预置体 */
+	preloadPrefab():void;
+	finishShowItem(node: import("cc").Node):void;
+}
+
+/**@description 界面加载动画，web端在下载界面时，如果超过了一定时间，需要弹出动画，告诉用户当前加载界面的进度 */
+declare interface UILoading {
+	/**
+	 * @description 显示全屏幕加载动画
+	 * @param delay 延迟显示时间 当为null时，不会显示loading进度，但会显示阻隔层 >0时为延迟显示的时间
+	 */
+	show(delay: number, name: string):void;
+	/**
+	 * @description 更新进度，0-100
+	 * @param progress 0-100
+	 */
+	updateProgress(progress: number):void;
+	hide():void;
+	/**@description 预加载预置体 */
+	preloadPrefab():void;
+}
+
+declare interface IFullScreenAdapt{
+    /**@description 全屏幕适配 调用 */
+    onFullScreenAdapt() : void;
+}
+
 declare namespace td {
     export class FramewokManager {
         /**@description 常驻资源指定的模拟view */
@@ -144,7 +178,7 @@ declare namespace td {
         /**
          * @description 获取语言包 
          */
-        getLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE | null): any
+        getLanguage(param: string | (string | number)[], bundle?: BUNDLE_TYPE | null): any
     }
 }
 

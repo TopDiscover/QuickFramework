@@ -1,6 +1,5 @@
 import { ResourceCacheData, BUNDLE_TYPE, ResourceInfo, BUNDLE_REMOTE, BUNDLE_RESOURCES } from "../base/Defines";
 import UIView from "../ui/UIView";
-import { Manager } from "../Framework";
 import { DEBUG } from "cc/env";
 import { Asset, assetManager, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D, ImageAsset } from "cc";
 

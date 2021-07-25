@@ -2,7 +2,6 @@ import { LogicEventData, LogicType } from "../event/LogicEvent";
 import EventComponent from "../../framework/base/EventComponent";
 import { ResourceData, ResourceCacheData } from "../../framework/base/Defines";
 import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
-import { Manager } from "../manager/Manager";
 import { Node } from "cc";
 import { LanguageDataSourceDelegate } from "../../framework/base/Language";
 

@@ -2,13 +2,12 @@
 //日志
 import { Log, LogLevel } from "../../framework/log/Log";
 Log.logLevel = LogLevel.ERROR | LogLevel.LOG | LogLevel.WARN | LogLevel.DUMP;
-import * as Framework from "../../framework/Framework";
+import { Framewok } from "../../framework/Framework";
 import { NetManager } from "./NetManager";
 import { LogicManager } from "./LogicManager";
 import GlobalAudio from "../component/GlobalAudio";
 import { extentionsInit } from "../../framework/extentions/Extentions";
 import { CocosExtentionInit } from "../../framework/extentions/CocosExtention";
-import { USING_LAN_KEY, BUNDLE_TYPE, BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import GameView from "../base/GameView";
 import { GameData } from "../base/GameData";
 import { BundleManager } from "./BundleManager";
@@ -20,7 +19,7 @@ import { ServiceManager } from "./ServiceManager";
 import { CommonLanguage } from "../language/CommonLanguage";
 
 /**@description 游戏所有运行单例的管理 */
-class _Manager extends Framework._FramewokManager {
+class _Manager extends Framewok {
     private _netManager: NetManager = null!;
     /**@description 全局常驻网络组件管理器,注册到该管理器的网络组件会跟游戏的生命周期一致 */
     get netManager() {
@@ -59,15 +58,25 @@ class _Manager extends Framework._FramewokManager {
         return getSingleton(Alert);
     }
 
+    /**@description 小提示 */
+    get tips():Tips {
+        return getSingleton(Tips);
+    }
+
+    /**@description 界面加载时的全屏Loading,显示加载进度 */
+    get uiLoading():UILoading {
+        return getSingleton(UILoading);
+    }
+
     /**@description 公共loading */
     get loading() {
         return getSingleton(Loading);
     }
 
+    private _wssCacertUrl = "";
     /**@description websocket wss 证书url地址 */
     set wssCacertUrl(value) {
         this._wssCacertUrl = value;
-        Framework.Manager.wssCacertUrl = value;
     }
     get wssCacertUrl() {
         return this._wssCacertUrl;
@@ -98,75 +107,7 @@ class _Manager extends Framework._FramewokManager {
      */
     gameController: any = null;
 
-    /**
-     * @description 把语言包转换成i18n.xxx形式
-     * @param param 语言包配置
-     * @param bundle bundle
-     * @example
-     * export let TANK_LAN_ZH = {
-     * language: cc.sys.LANGUAGE_CHINESE,
-     * data: {
-     * title: `坦克大战`,
-     * player: '单人模式 ',
-     * palyers: '双人模式',
-     * }
-     * }
-     * //以上是坦克大战的语言包,assetBundle为tankBattle
-     * Manager.makeLanguage("title","tankBattle"); //=> i18n.tankBattle.title 指向游戏特定的语言包
-     * Manager.makeLanguage("title"); //=> i18n.title 指向的大厅的公共语言包
-     */
-    makeLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE = BUNDLE_RESOURCES): (string | number)[] | string {
-        if (typeof param == "string") {
-            if (bundle) {
-                return `${USING_LAN_KEY}${bundle}.${param}`;
-            }
-            return `${USING_LAN_KEY}${param}`;
-        }
-        if (typeof param[0] == "string" && param instanceof Array) {
-            if (bundle) {
-                param[0] = `${USING_LAN_KEY}${bundle}.${param[0]}`;
-            } else {
-                param[0] = `${USING_LAN_KEY}${param[0]}`;
-            }
-        }
-        return param;
-    }
-
-    /**@description 获取语言包 
-     * 
-     */
-    getLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE | null = null): any {
-        let key = "";
-        if (typeof param == "string") {
-            if (bundle) {
-                key = `${USING_LAN_KEY}${bundle}.${param}`;
-            } else {
-                key = `${USING_LAN_KEY}${param}`;
-            }
-            return this.language.get([key]);
-        }
-        if (typeof param[0] == "string" && param instanceof Array) {
-            if (bundle) {
-                param[0] = `${USING_LAN_KEY}${bundle}.${param[0]}`;
-            } else {
-                param[0] = `${USING_LAN_KEY}${param[0]}`;
-            }
-            return this.language.get(param);
-        }
-        error(`传入参数有误`);
-        return "";
-    }
-
     init() {
-
-        /**@description 初始化框架层使用的提示组件 */
-        Framework.Manager.tips = getSingleton(Tips);
-        /**@description 应用层的tips初始化 */
-        this.tips = Framework.Manager.tips;
-
-        /**@description 初始框架层使用的UILoading */
-        Framework.Manager.uiLoading = getSingleton(UILoading);
-        this.uiLoading = Framework.Manager.uiLoading;
 
         //适配
         this.resolutionHelper.initBrowserAdaptor();
@@ -180,9 +121,8 @@ class _Manager extends Framework._FramewokManager {
     }
 }
 
-export const Manager = new _Manager();
-
 export function applicationInit() {
+    const Manager = new _Manager();
     (<any>window)["Manager"] = Manager;
     Manager.init();
 }

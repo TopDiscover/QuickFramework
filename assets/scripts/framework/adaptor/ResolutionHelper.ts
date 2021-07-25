@@ -1,9 +1,7 @@
 
 import { EventApi } from "../event/EventApi";
-import { Manager } from "../Framework";
 import { Canvas, log, Node, size, Size, sys, UITransform, view, Widget, widgetManager } from "cc";
 import { DEBUG, EDITOR, JSB, PREVIEW } from "cc/env";
-import { IFullScreenAdapt } from "../ui/IFullScreenAdapter";
 
 type DeviceDirection = "" | "Landscape" | "Portrait";
 

@@ -1,10 +1,8 @@
 import EventComponent from "../base/EventComponent";
 import AudioComponent from "../base/AudioComponent";
-import { Manager } from "../Framework";
 import { _decorator, Node, game, Game, EventKeyboard, tween, Tween, Vec3, systemEvent, SystemEvent, js, macro } from "cc";
 import { DEBUG } from "cc/env";
 import { BUNDLE_TYPE } from "../base/Defines"
-import { IFullScreenAdapt } from "./IFullScreenAdapter";
 
 /**
  * @description 视图基类

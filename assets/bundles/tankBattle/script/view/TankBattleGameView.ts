@@ -1,6 +1,5 @@
 import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../scripts/common/event/LogicEvent";
 import TankBattleStartView from "./TankBattleStartView";
-import { Manager } from "../../../../scripts/common/manager/Manager";
 import TankBattleMap from "../model/TankBattleMap";
 import { TankBettle } from "../data/TankBattleGameData";
 import GameView from "../../../../scripts/common/base/GameView";
