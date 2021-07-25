@@ -108,8 +108,6 @@ export enum ViewStatus {
     WAITTING_NONE,
 }
 
-export type BUNDLE_TYPE = string | cc.AssetManager.Bundle;
-
 export const BUNDLE_RESOURCES = 'resources';
 
 export const BUNDLE_REMOTE = "__Remote__Caches__";

@@ -1,5 +1,5 @@
 import AudioComponent from "../../framework/base/AudioComponent";
-import { BUNDLE_TYPE, BUNDLE_RESOURCES } from "../../framework/base/Defines";
+import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import { Config } from "../config/Config";
 import { Manager } from "../manager/Manager";
 

@@ -25,8 +25,6 @@ class LoadTestLogic extends Logic {
     private onEnterGame(data) {
         if (data == this.bundle) {
             //游戏数据初始化
-            //子游戏语言包初始化
-            this.onLanguageChange();
             //加载资源
             this._loader.loadResources();
         }else{

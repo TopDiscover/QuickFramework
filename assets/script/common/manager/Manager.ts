@@ -8,7 +8,7 @@ import { Log, LogLevel } from "../../framework/log/Log";
 import { extentionsInit } from "../../framework/extentions/Extentions";
 import { CocosExtentionInit } from "../../framework/extentions/CocosExtention";
 import { getSingleton } from "../../framework/base/Singleton";
-import { USING_LAN_KEY, BUNDLE_TYPE, BUNDLE_RESOURCES } from "../../framework/base/Defines";
+import { USING_LAN_KEY, BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import GameView from "../base/GameView";
 import { GameData } from "../base/GameData";
 import { BundleManager } from "./BundleManager";

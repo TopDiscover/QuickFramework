@@ -395,6 +395,8 @@ declare namespace td{
 
 	}
 	export class CacheManager {
+		/**@description 远程资源缓存管理器 */
+		public get remoteCaches():RemoteCaches;
 		
 	}
 	export class ResolutionHelper{

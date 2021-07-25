@@ -1,5 +1,5 @@
 import UIView from "../ui/UIView";
-import { ResourceInfo, BUNDLE_TYPE } from "./Defines";
+import { ResourceInfo } from "./Defines";
 import { Manager } from "../Framework";
 import EventComponent from "./EventComponent";
 

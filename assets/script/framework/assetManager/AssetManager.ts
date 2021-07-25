@@ -1,4 +1,4 @@
-import { ResourceCacheData, ResourceCacheStatus, ResourceInfo, BUNDLE_TYPE, ResourceType, BUNDLE_REMOTE } from "../base/Defines";
+import { ResourceCacheData, ResourceCacheStatus, ResourceInfo, ResourceType, BUNDLE_REMOTE } from "../base/Defines";
 import { Manager } from "../Framework";
 
 class RemoteLoader {
