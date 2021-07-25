@@ -1,15 +1,14 @@
-import { BoxCollider2D, Component, tween, UITransform, Vec3, _decorator ,Node, Tween, IPhysics2DContact} from "cc";
+import { BoxCollider2D, tween, UITransform, Vec3, _decorator ,Node, Tween, IPhysics2DContact} from "cc";
 import { TankBettle } from "../data/TankBattleGameData";
-import { TankBattleEntity } from "./TankBattleEntity";
-import TankBettleTank, { TankBettleTankEnemy, TankBettleTankPlayer } from "./TankBattleTank";
+import { TankBattleAI } from "./TankBattleAI";
 
 const { ccclass, property } = _decorator;
 
 @ccclass
-export default class TankBettleBullet extends TankBattleEntity {
+export default class TankBettleBullet extends TankBattleAI {
 
     /**@description 拥有者 */
-    public owner: TankBettleTank = null!;
+    public owner: TankBattleAI = null!;
 
     /**@description 当前的位置 */
     private curPosition = new Vec3();
@@ -32,7 +31,7 @@ export default class TankBettleBullet extends TankBattleEntity {
         }
     }
 
-    move(owner: TankBettleTank) {
+    move(owner: TankBattleAI) {
         this.owner = owner;
         //设置子弹的位置
         this.addBullet();
@@ -117,11 +116,11 @@ export default class TankBettleBullet extends TankBattleEntity {
             let tank = this.getPlayer(other.node);
             if (this.owner.isAI) {
                 //敌人子弹不参打敌人
-                if (!tank.isAI) {
+                if ( tank && !tank.isAI) {
                     this.removeSelf();
                 }
             } else {
-                if (tank.isAI) {
+                if ( tank && tank.isAI) {
                     //只有打到敌人才消失
                     this.removeSelf();
                 }
@@ -141,12 +140,8 @@ export default class TankBettleBullet extends TankBattleEntity {
         this.node.destroy();
     }
 
-    private getPlayer(node: Node): TankBettleTank {
-        let player = node.getComponent(TankBettleTankPlayer);
-        if (player) {
-            return player;
-        }
-        return node.getComponent(TankBettleTankEnemy) as TankBettleTankEnemy;
+    private getPlayer(node: Node): TankBattleAI | null {
+        return node.getComponent(this.thisType) as TankBattleAI;
     }
 
 }

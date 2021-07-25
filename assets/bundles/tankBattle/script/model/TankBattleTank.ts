@@ -1,36 +1,12 @@
 import { instantiate, _decorator, Node, BoxCollider2D, Tween, UITransform, Vec3,Animation, tween, Sprite, randomRange, randomRangeInt, IPhysics2DContact, Rect, Vec2 } from "cc";
 import { TankBettle } from "../data/TankBattleGameData";
-import TankBettleBullet from "./TankBattleBullet";
-import { TankBattleEntity } from "./TankBattleEntity";
+import { TankBattleAI } from "./TankBattleAI";
 
 const { ccclass, property } = _decorator;
 @ccclass
-export default class TankBettleTank extends TankBattleEntity {
-
-    /** @description 是否是AI敌人*/
-    public isAI = false;
-    public config: TankBettle.TankConfig = null!;
-    /** @description 子弹 */
-    public bullet: TankBettleBullet | null= null;
-
-    public _direction: TankBettle.Direction = TankBettle.Direction.UP;
-    /**@description 移动方向 */
-    public get direction() {
-        return this._direction;
-    }
-    public set direction(value) {
-        let old = this._direction;
-        this._direction = value;
-        if (old != this._direction) {
-            //改变了动画，立即响应
-            this.isMoving = false;
-        }
-    }
+export default class TankBettleTank extends TankBattleAI {
 
     protected isWaitingChange = false;
-
-    /**@description 当前是否正常移动 */
-    protected isMoving = false;
 
     /**@description 当前位置 */
     protected curPosition  = new Vec3();
@@ -59,7 +35,7 @@ export default class TankBettleTank extends TankBattleEntity {
             if( !prefab ) return false;
             let bulletNode = instantiate(this.data.bulletPrefab);
             if( bulletNode ){
-                this.bullet = bulletNode.addComponent(TankBettleBullet);
+                this.bullet = bulletNode.addComponent(this.bulletType);
                 this.bullet.move(this);
             }
             return true;
@@ -139,7 +115,7 @@ export default class TankBettleTank extends TankBattleEntity {
     /**@description 处理来自子弹的碰撞 */
     private onBulletCollision(self: BoxCollider2D, other: BoxCollider2D) {
         if (other.group == TankBettle.GROUP.Bullet) {
-            let bullet = other.node.getComponent(TankBettleBullet);
+            let bullet = other.node.getComponent(this.bulletType);
             if (bullet)
                 if (this.isAI) {
                     if (bullet.owner.isAI) {
@@ -164,6 +140,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
     constructor() {
         super();
         this.config = this.data.playerConfig;
+        this.thisType = "TankBettleTankPlayer";
     }
 
     /**@description 是否是玩家1 */
@@ -318,6 +295,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
         super();
         this.isAI = true;
         this.config = new TankBettle.TankConfig();
+        this.thisType = "TankBettleTankEnemy";
     }
 
     private shootNode: Node = null!;

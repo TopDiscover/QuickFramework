@@ -152,6 +152,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
              let enemy = enemyNode.getComponent(TankBettleTankEnemy);
              if (!enemy) {
                  enemy = enemyNode.addComponent(TankBettleTankEnemy);
+                 enemy.bulletType = TankBettleBullet;
              }
              enemy.type = type;
              enemy.config = TankBettle.gameData.getEnemyConfig(type);
@@ -356,6 +357,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
          let thisTrans = this.node.getComponent(UITransform) as UITransform;
          if (isOne) {
              this.playerOne = playerNode.addComponent(TankBettleTankPlayer);
+             this.playerOne.bulletType = TankBettleBullet;
              this.playerOne.isOnePlayer = isOne;
              playerNode.setPosition( new Vec3(
                 thisTrans.width/2 - 2 * playerTrans.width,
@@ -365,6 +367,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
              this.playerOne.born();
          } else {
              this.playerTwo = playerNode.addComponent(TankBettleTankPlayer);
+             this.playerTwo.bulletType = TankBettleBullet;
              this.playerTwo.isOnePlayer = isOne;
              playerNode.setPosition(new Vec3(
                  thisTrans.width / 2 + 2 * playerTrans.width,
