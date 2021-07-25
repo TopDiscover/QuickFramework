@@ -1,9 +1,9 @@
 import { Config } from "../config/Config";
-import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
+import { ResourceCacheData } from "../../framework/base/Defines";
 import { Component,find,instantiate,isValid,Label,Node, Prefab, RichText, SystemEventType, tween, Vec3 } from "cc";
 import { ViewZOrder } from "../config/ViewZOrder";
 import { i18n } from "../language/CommonLanguage";
-import { EventApi } from "../../framework/base/Global";
+import { BUNDLE_RESOURCES, EventApi } from "../../framework/base/Global";
 
 
 /**@description 提示弹出框配置 */

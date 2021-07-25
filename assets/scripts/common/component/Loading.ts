@@ -1,8 +1,7 @@
 import { Config } from "../config/Config";
-import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import { find ,instantiate,Label,Node, Prefab, tween, Vec3} from "cc";
 import { ViewZOrder } from "../config/ViewZOrder";
-import { EventApi } from "../../framework/base/Global";
+import { BUNDLE_RESOURCES, EventApi } from "../../framework/base/Global";
 /**
  * @description 加载动画
  */

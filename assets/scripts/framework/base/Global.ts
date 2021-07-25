@@ -35,3 +35,18 @@ export enum CustomNetEventType {
     /**@description 应用层主动调用网络层close */
     CLOSE = "CustomClose",
 }
+
+/**@description 网络数据全以大端方式进行处理 */
+export const USING_LITTLE_ENDIAN = false;
+
+/**@description 语言包路径使用前缀 */
+export const USING_LAN_KEY = "i18n.";
+
+/**@description 是否允许游戏启动后切换语言 */
+export const ENABLE_CHANGE_LANGUAGE = true;
+
+/**@description 远程资源bundle名 */
+export const BUNDLE_REMOTE = "__Remote__Caches__";
+
+/**@description resources 目录bundle名 */
+export const BUNDLE_RESOURCES = 'resources';

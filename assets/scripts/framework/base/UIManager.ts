@@ -1,7 +1,8 @@
 import UIView, {UIClass } from "../ui/UIView";
-import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_RESOURCES } from "./Defines";
+import { ResourceInfo, ResourceCacheData, ViewStatus } from "./Defines";
 import { isValid, js, Node, Prefab, Widget, instantiate, director, Component } from "cc";
 import { DEBUG } from "cc/env";
+import { BUNDLE_RESOURCES } from "./Global";
 
 /**@description 动态加载垃圾数据名 */
 const DYNAMIC_LOAD_GARBAGE = "DYNAMIC_LOAD_GARBAGE";

@@ -7,9 +7,9 @@ import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import { GameService } from "../../../../scripts/common/net/GameService";
 import { ChatService } from "../../../../scripts/common/net/ChatService";
 import SettingView from "../../../../scripts/common/component/SettingView";
-import { BUNDLE_RESOURCES } from "../../../../scripts/framework/base/Defines";
 import { EventTouch, _decorator,Node, PageView, instantiate, find, Label, ProgressBar, sys, PhysicsSystem2D } from "cc";
 import { ViewZOrder } from "../../../../scripts/common/config/ViewZOrder";
+import { BUNDLE_RESOURCES } from "../../../../scripts/framework/base/Global";
 
 
 const { ccclass, property } = _decorator;

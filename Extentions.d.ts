@@ -58,6 +58,8 @@ declare function dump(value: any, name?: string, level?: number): void;
 
 declare type BUNDLE_TYPE = string | import("cc").AssetManager.Bundle;
 
+declare type WebSocketType = "ws" | "wss";
+
 declare interface Singleton<T> {
     new(): T;
     /**

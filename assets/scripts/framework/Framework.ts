@@ -6,7 +6,7 @@ import { LocalStorage } from "./base/LocalStorage";
 import { _AssetManager } from "./assetManager/AssetManager";
 import { CacheManager } from "./assetManager/CacheManager";
 import { ResolutionHelper } from "./adaptor/ResolutionHelper";
-import { BUNDLE_RESOURCES, USING_LAN_KEY } from "./base/Defines";
+import { BUNDLE_RESOURCES, USING_LAN_KEY } from "./base/Global";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {

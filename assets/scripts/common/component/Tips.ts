@@ -1,7 +1,7 @@
 import { Config} from "../config/Config";
-import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
 import { Component ,find,instantiate,Label,log,Node, Prefab, Tween, tween, UIOpacity, UITransform, Vec2, Vec3} from "cc";
 import { ViewZOrder } from "../config/ViewZOrder";
+import { BUNDLE_RESOURCES } from "../../framework/base/Global";
 /**
  * @description 提示
  */

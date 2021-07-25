@@ -4,8 +4,7 @@
 
  import { Prefab, Node, instantiate, Vec3, find, Label } from "cc";
 import { DEBUG } from "cc/env";
-import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
-import { EventApi } from "../../framework/base/Global";
+import { BUNDLE_RESOURCES, EventApi } from "../../framework/base/Global";
  import { Config } from "../config/Config";
 import { ViewZOrder } from "../config/ViewZOrder";
 import { i18n } from "../language/CommonLanguage";

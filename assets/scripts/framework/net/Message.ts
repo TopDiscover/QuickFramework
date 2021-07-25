@@ -1,5 +1,4 @@
-import { sys } from "cc";
-import { USING_LITTLE_ENDIAN } from "../base/Defines";
+import { USING_LITTLE_ENDIAN } from "../base/Global";
 
 /**@description utf-8 Uint8Array转字符串 */
 export function Utf8ArrayToStr(array: any) {

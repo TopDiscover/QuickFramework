@@ -6,12 +6,12 @@
  import { Logic } from "../common/base/Logic";
  import { LogicType, LogicEvent, LogicEventData } from "../common/event/LogicEvent";
  import LoginView from "./view/LoginView";
- import { BUNDLE_RESOURCES } from "../framework/base/Defines";
  import { HotUpdate, AssetManagerCode, AssetManagerState } from "../common/base/HotUpdate";
  import DownloadLoading from "../common/component/DownloadLoading";
 import { game, log } from "cc";
 import { ViewZOrder } from "../common/config/ViewZOrder";
 import { i18n } from "../common/language/CommonLanguage";
+import { BUNDLE_RESOURCES } from "../framework/base/Global";
  
  class LoginLogic extends Logic {
  

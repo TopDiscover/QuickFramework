@@ -2,8 +2,8 @@
  * @description 二进制数据流解析
  */
 
+import { USING_LITTLE_ENDIAN } from "../base/Global";
 import { Message, Utf8ArrayToStr, MessageHeader, StringToUtf8Array } from "./Message";
-import { USING_LITTLE_ENDIAN } from "../base/Defines";
 
 type BinaryStreamConstructor = typeof BinaryStream;
 type NumberStreamValueConstructor = typeof NumberStreamValue;

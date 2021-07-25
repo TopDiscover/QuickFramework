@@ -1,4 +1,4 @@
-import WebSocketClinet, { WebSocketType } from "./WebSocketClient";
+import WebSocketClinet from "./WebSocketClient";
 import { IMessage } from "./Message";
 import { DEBUG } from "cc/env";
 

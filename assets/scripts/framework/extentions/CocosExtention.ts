@@ -1,5 +1,5 @@
 import WebEditBoxImpl from "./WebEditBoxImpl";
-import { ResourceType, ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY, BUNDLE_REMOTE } from "../base/Defines";
+import { ResourceType } from "../base/Defines";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
@@ -8,7 +8,7 @@ import {
 import { isValid, SpriteFrame, sp, Font, ParticleSystem2D, ParticleAsset, sys, EditBox, Sprite,Node, Button, Label, randomRange, Asset, AssetManager} from "cc";
 import { DEBUG, EDITOR, PREVIEW } from "cc/env";
 import UIView from "../ui/UIView";
-import { EventApi } from "../base/Global";
+import { BUNDLE_REMOTE, ENABLE_CHANGE_LANGUAGE, EventApi, USING_LAN_KEY } from "../base/Global";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
 if (typeof Reflect == "object") {

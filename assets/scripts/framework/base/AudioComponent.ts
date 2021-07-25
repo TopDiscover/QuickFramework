@@ -1,8 +1,9 @@
 import UIView from "../ui/UIView";
-import { ResourceInfo, BUNDLE_RESOURCES } from "./Defines";
+import { ResourceInfo } from "./Defines";
 import EventComponent from "./EventComponent";
 import { AudioClip, AudioSource, _decorator } from "cc";
 import { DEBUG } from "cc/env";
+import { BUNDLE_RESOURCES } from "./Global";
 
 /**
  * @description 声音组件

@@ -112,18 +112,6 @@ export enum ViewStatus {
     WAITTING_NONE,
 }
 
-export const BUNDLE_RESOURCES = 'resources';
-
-export const BUNDLE_REMOTE = "__Remote__Caches__";
-
-/**@description 是否允许游戏启动后切换语言 */
-export const ENABLE_CHANGE_LANGUAGE = true;
-/**@description 语言包路径使用前缀 */
-export const USING_LAN_KEY = "i18n.";
-
-/**@description 网络数据全以大端方式进行处理 */
-export const USING_LITTLE_ENDIAN = false;
-
 export interface ServiceEvent {
     service: Service;
     event: Event;

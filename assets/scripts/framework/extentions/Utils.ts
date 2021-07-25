@@ -1,6 +1,7 @@
 import UIView from "../ui/UIView";
-import { ResourceInfo, ResourceType, BUNDLE_RESOURCES, BUNDLE_REMOTE, ResourceCacheData } from "../base/Defines";
+import { ResourceInfo, ResourceType, ResourceCacheData } from "../base/Defines";
 import { Button, Component, Font, isValid, Label, ParticleAsset, ParticleSystem2D, Sprite, SpriteFrame, sp, Node, Prefab, instantiate, Asset, AssetManager } from "cc";
+import { BUNDLE_REMOTE, BUNDLE_RESOURCES } from "../base/Global";
 
 /**@description 添加加载本地的资源 */
 export function addExtraLoadResource(view: td.UIView, info: td.ResourceInfo) {
