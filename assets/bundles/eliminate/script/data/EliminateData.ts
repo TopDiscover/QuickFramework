@@ -17,10 +17,5 @@ class _EliminateData extends GameData {
         this.gameModel.init();
     }
 
-    /**@description 获取Cell的预置路径 */
-    getCellPrefabUrl(type: CELL_TYPE) {
-        return CELL_PREFAB_URL[type];
-    }
-
 }
 export const EliminateData = getSingleton(_EliminateData);
