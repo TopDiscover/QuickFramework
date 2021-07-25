@@ -1,4 +1,3 @@
-import TipsDelegate from "../../framework/ui/TipsDelegate";
 import { Manager } from "../../framework/Framework";
 import { Config, ViewZOrder } from "../config/Config";
 import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
@@ -48,7 +47,7 @@ class ToastItem extends cc.Component {
     }
  }
 
- export default class Tips extends TipsDelegate {
+ export default class Tips implements TipsDelegate {
 
     private static _instance: Tips = null;
     public static Instance() { return this._instance || (this._instance = new Tips()); }

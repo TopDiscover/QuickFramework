@@ -1,7 +1,6 @@
 import EventComponent from "../base/EventComponent";
 import AudioComponent from "../base/AudioComponent";
 import { Manager } from "../Framework";
-import { IFullScreenAdapt } from "./IFullScreenAdapter";
 
 /**
  * @description 视图基类

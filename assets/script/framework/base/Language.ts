@@ -3,19 +3,8 @@ import { ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY } from "./Defines";
 import { Manager } from "../Framework";
 const LANG_KEY: string = "using_language";
 
-export interface LanguageData {
-    language: string;
-}
-export const COMMON_LANGUAGE_NAME = "COMMON_LANGUAGE_NAME";
-/**
- * @description 数据代理
- * 如果是公共总合，name使用 COMMON_LANGUAGE_NAME
- */
-export interface LanguageDataSourceDelegate {
-    name : string;
-    data(language: string): LanguageData;
-}
-
+const COMMON_LANGUAGE_NAME = "COMMON_LANGUAGE_NAME";
+td.COMMON_LANGUAGE_NAME = COMMON_LANGUAGE_NAME;
 export class Language {
 
     private static _instance: Language = null;
@@ -134,3 +123,4 @@ export class Language {
         return Manager.localStorage.getItem(LANG_KEY, cc.sys.LANGUAGE_CHINESE);
     }
 }
+td.Language = Language;

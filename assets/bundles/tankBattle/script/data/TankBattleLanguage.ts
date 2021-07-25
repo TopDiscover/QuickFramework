@@ -1,7 +1,6 @@
 /**@description 语言包具体的代码实现 */
 
 import { i18n } from "../../../../script/common/language/CommonLanguage";
-import { LanguageData, LanguageDataSourceDelegate } from "../../../../script/framework/base/Language";
 import { TankBettle } from "./TankBattleGameData";
 import { TANK_LAN_EN } from "./TankBattleLanguageEN";
 import { TANK_LAN_ZH } from "./TankBattleLanguageZH";

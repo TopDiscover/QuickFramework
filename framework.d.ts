@@ -299,3 +299,179 @@ declare interface StringConstructor {
 }
 
 declare function md5(data: any): any;
+
+
+declare interface LanguageData {
+    language: string;
+}
+
+/**
+ * @description 数据代理
+ * 如果是公共总合，name使用 td.COMMON_LANGUAGE_NAME
+ */
+declare interface LanguageDataSourceDelegate {
+    name : string;
+    data(language: string): LanguageData;
+}
+
+/**@description 提示代理 */
+declare interface TipsDelegate {
+	/**
+	 * @description tips提示
+	 * @param msg 提示内容
+	 */
+	show( msg : string );
+	/**@description 预加载预置体 */
+	preloadPrefab();
+	finishShowItem( node : cc.Node );
+}
+
+/**@description 界面加载动画，web端在下载界面时，如果超过了一定时间，需要弹出动画，告诉用户当前加载界面的进度 */
+declare interface UILoadingDelegate {
+    /**
+     * @description 显示全屏幕加载动画
+     * @param delay 延迟显示时间 当为null时，不会显示loading进度，但会显示阻隔层 >0时为延迟显示的时间
+     */
+    show( delay : number , name : string);
+    /**
+     * @description 更新进度，0-100
+     * @param progress 0-100
+     */
+    public updateProgress( progress : number );
+    public hide( );
+    /**@description 预加载预置体 */
+    public preloadPrefab();
+}
+
+declare interface IFullScreenAdapt{
+    /**@description 全屏幕适配 调用 */
+    onFullScreenAdapt() : void;
+}
+
+declare namespace td{
+	export let COMMON_LANGUAGE_NAME:string;
+	export class Language {
+		/**@description 添加数据代理 */
+		public addSourceDelegate(delegate: LanguageDataSourceDelegate);
+		/**@description 删除数据代理 */
+		public removeSourceDelegate(delegate: LanguageDataSourceDelegate);
+		/**
+     	 * @description 改变语言包
+     	 * @param language 语言包类型
+     	 */
+		public change(language: string);
+		public get(args: (string | number)[]);
+		/**@description 获取语言包名 */
+		public getLanguage();
+	}
+	export class EventDispatcher{
+		/**
+     	 * @description 添加事件
+     	 * @param type 事件类型
+     	 * @param callback 事件回调
+     	 * @param target target
+     	 */
+		public addEventListener( type : string , callback : ( ( data : any )=>void ) | string, target : any );
+		/**
+     	 * @description 移除事件
+     	 * @param type 事件类型
+     	 * @param target 
+     	 */
+		public removeEventListener( type : string , target : any );
+		/**
+     	 * @description 派发事件
+     	 * @param type 事件类型
+     	 * @param data 事件数据
+     	 */
+		public dispatchEvent( type : string , data? : any );
+	}
+	export class UIManager {
+		
+	}
+	export class LocalStorage {
+		
+	}
+	export class AssetManager {
+
+	}
+	export class CacheManager {
+		
+	}
+	export class ResolutionHelper{
+
+	}
+	export class NodePool {
+		constructor(name: string);
+		name: string;
+		/**
+     	 * @description 用来克隆的节点，在get时，如果发现对象池中不存在，会直接用此节点进行克隆
+     	 * 注意，设置的克隆对象会从父节点移除，但不会进行cleanup操作
+     	 * 在clear时，对该克隆节点进行释放操作
+     	 * */
+		cloneNode : cc.Node;
+		/**@description 当前对象池数据大小 */
+		get size():number;
+		/**@description 销毁对象池中缓存的所有节点 */
+		clear();
+		/**
+     	 * @description 向缓冲池中存入一个不需要的节点对象
+     	 * 这个函数会自动将目标节点从父节点移除，但不会进行 cleanup 操作
+     	 * 
+     	 */
+		put(obj: cc.Node);
+		/**
+     	 * @description 从对象池中取缓冲节点
+     	 * */
+		get( );
+	}
+	/**
+ 	 * 对象池管理器
+ 	 */
+	export class NodePoolManager {
+		/**
+     	 * @description 创建对象池
+     	 * @param type 对象池类型
+     	 */
+		createPool(type: string);
+		/**
+     	 * @description 删除对象池 
+     	 * @param type 对象池类型
+     	 * */
+		deletePool(type: string | NodePool);
+		/**
+     	 * @description 获取对象池
+     	 * @param type 对象池类型 
+     	 * @param isCreate 当找不到该对象池时，会默认创建一个对象池
+     	 * */
+		getPool(type: string, isCreate = true);
+	}
+
+	export class FramewokManager{
+		/**@description 常驻资源指定的模拟view */
+		readonly retainMemory:any;
+		/**@description 语言包 */
+		readonly language:Language;
+		/**@description 事件派发器 */
+		readonly eventDispatcher:EventDispatcher;
+		/**@description 界面管理器 */
+		readonly uiManager:UIManager;
+		/**@description 本地仓库 */
+		readonly localStorage:LocalStorage;
+		/**@description 资源管理器 */
+		readonly assetManager:AssetManager;
+		/**@description 资源缓存管理器 */
+		readonly cacheManager:CacheManager;
+		/**@description 屏幕适配 */
+		readonly resolutionHelper:ResolutionHelper;
+		/**@description 对象池管理器 */
+		readonly nodePoolManager:NodePoolManager;
+		/**@description 小提示 */
+		tips:TipsDelegate;
+		/**@description 界面加载时的全屏Loading,显示加载进度 */
+		uiLoading:UILoadingDelegate;
+		/**@description websocket wss 证书url地址 */
+		wssCacertUrl:string;
+	}
+}
+
+declare let Manager : td.FramewokManager;

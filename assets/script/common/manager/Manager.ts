@@ -183,3 +183,4 @@ class _Manager extends Framework._FramewokManager {
 }
 
 export const Manager = new _Manager();
+window["Manager"] = Manager;

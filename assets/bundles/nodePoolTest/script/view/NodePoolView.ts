@@ -1,6 +1,4 @@
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
-import { Manager } from "../../../../script/common/manager/Manager";
-import { NodePool, NodePoolManager } from "../../../../script/framework/base/NodePoolManager";
 import UIView from "../../../../script/framework/ui/UIView";
 
 const {ccclass, property} = cc._decorator;
@@ -12,7 +10,7 @@ export default class NodePoolView extends UIView {
         return "prefabs/NodePoolView";
     }
 
-    private pool : NodePool = null;
+    private pool : td.NodePool = null;
     private star : cc.Node = null;
 
     onLoad() {

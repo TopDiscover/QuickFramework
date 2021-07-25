@@ -4,7 +4,6 @@ import { ResourceData, ResourceCacheData } from "../../framework/base/Defines";
 import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
 import { Config } from "../config/Config";
 import { Manager } from "../manager/Manager";
-import { LanguageDataSourceDelegate } from "../../framework/base/Language";
 
 /**
  * @description 逻辑控制器

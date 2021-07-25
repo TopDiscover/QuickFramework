@@ -6,8 +6,6 @@ import { AssetManager } from "./assetManager/AssetManager";
 import { CacheManager } from "./assetManager/CacheManager";
 import { ResolutionHelper } from "./adaptor/ResolutionHelper";
 import { getSingleton } from "./base/Singleton";
-import TipsDelegate from "./ui/TipsDelegate";
-import UILoadingDelegate from "./ui/UILoadingDelegate";
 import { NodePoolManager } from "./base/NodePoolManager";
 
 /**@description 框架层使用的各管理器单例的管理 */

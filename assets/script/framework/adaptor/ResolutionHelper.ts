@@ -2,7 +2,6 @@
 import { EventApi } from "../event/EventApi";
 import { Manager } from "../Framework";
 import { getSingleton } from "../base/Singleton";
-import { IFullScreenAdapt } from "../ui/IFullScreenAdapter";
 
 type DeviceDirection = "" | "Landscape" | "Portrait";
 
