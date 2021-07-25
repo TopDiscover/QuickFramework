@@ -163,7 +163,7 @@ export default abstract class UIView extends EventComponent implements IFullScre
      * @param isEnabled true 启用，
      * @example 重写onKeyBack方法
      */
-    protected setEnabledKeyBack(isEnabled: boolean) {
+    setEnabledKeyBack(isEnabled: boolean) {
         if (isEnabled) {
             systemEvent.off(SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
             systemEvent.on(SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
@@ -174,11 +174,11 @@ export default abstract class UIView extends EventComponent implements IFullScre
         this._isEnableKey = isEnabled;
     }
 
-    protected isEnabledKeyBack() {
+    isEnabledKeyBack() {
         return this._isEnableKey;
     }
 
-    protected onKeyUp(ev: EventKeyboard) {
+    onKeyUp(ev: EventKeyboard) {
         if (DEBUG) {
             log(`[${js.getClassName(this)}] onKeyUp keyCode : ${ev.keyCode}`);
         }
@@ -189,12 +189,12 @@ export default abstract class UIView extends EventComponent implements IFullScre
         }
     }
 
-    protected onKeyBack(ev: EventKeyboard) {
+    onKeyBack(ev: EventKeyboard) {
         //只有一个接受，不再向上传播
         //ev.stopPropagation();
     }
 
-    public audioHelper: AudioComponent = null!;
+    audioHelper: AudioComponent = null!;
 
     onLoad() {
         this.audioHelper = <AudioComponent>(this.addComponent(AudioComponent));
@@ -235,10 +235,10 @@ export default abstract class UIView extends EventComponent implements IFullScre
         this.onEnterForgeground(inBackgroundTime);
     }
 
-    protected onEnterForgeground(inBackgroundTime: number) {
+    onEnterForgeground(inBackgroundTime: number) {
 
     }
-    protected onEnterBackground() {
+    onEnterBackground() {
 
     }
 }
