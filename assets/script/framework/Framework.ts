@@ -1,9 +1,5 @@
-/**@description 获取根据类型获取单列 */
-function getSingleton<T>( SingletonClass : Singleton<T>){
-    return SingletonClass.Instance();
-}
-window.getSingleton = getSingleton;
-
+import { extentionsInit } from "./extentions/Extentions";
+extentionsInit();
 import { Language } from "./base/Language";
 import { EventDispatcher } from "./event/EventDispatcher";
 import { UIManager } from "./base/UIManager";
@@ -13,6 +9,8 @@ import { CacheManager } from "./assetManager/CacheManager";
 import { ResolutionHelper } from "./adaptor/ResolutionHelper";
 import { NodePoolManager } from "./base/NodePoolManager";
 import { BUNDLE_RESOURCES, USING_LAN_KEY } from "./base/Defines";
+
+
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok{

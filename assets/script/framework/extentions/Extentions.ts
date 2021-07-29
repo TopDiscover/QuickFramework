@@ -60,8 +60,37 @@ String.format = function () {
     });
 }
 
+function toNamespace(key:string,value:any,namespace?:string):void{
+    let space = createNamespace(namespace);
+    space[key] = value;
+}
+
+function createNamespace(namespace?:string) {
+    let _window : any = window;
+    if ( namespace && namespace.length > 0 ){
+        if ( !_window[namespace] ){
+            _window[namespace] = {}
+        }
+        return _window[namespace];
+    }
+    if (!_window.td){
+        _window.td = {};
+    }
+    return _window.td;
+}
+
+window.toNamespace = toNamespace;
+
+window.createNamespace = createNamespace;
+
+/**@description 获取根据类型获取单列 */
+function getSingleton<T>( SingletonClass : Singleton<T>){
+    return SingletonClass.Instance();
+}
+window.getSingleton = getSingleton;
+
 export function extentionsInit(){
-    //cc.log(`extentionsInit`);
+    createNamespace();
 }
 
 

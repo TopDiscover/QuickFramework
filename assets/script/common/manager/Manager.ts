@@ -4,7 +4,6 @@ import { Log, LogLevel } from "../../framework/log/Log";
 import { NetManager } from "./NetManager";
 import { LogicManager } from "./LogicManager";
 import GlobalAudio from "../component/GlobalAudio";
-import { extentionsInit } from "../../framework/extentions/Extentions";
 import { CocosExtentionInit } from "../../framework/extentions/CocosExtention";
 import GameView from "../base/GameView";
 import { GameData } from "../base/GameData";
@@ -15,6 +14,7 @@ import Alert from "../component/Alert";
 import Loading from "../component/Loading";
 import { ServiceManager } from "./ServiceManager";
 import { CommonLanguage } from "../language/CommonLanguage";
+
 
 /**@description 游戏所有运行单例的管理 */
 class _Manager extends Framewok {
@@ -108,8 +108,6 @@ class _Manager extends Framewok {
     init() {
         //适配
         this.resolutionHelper.initBrowserAdaptor();
-        //扩展
-        extentionsInit();
         //引擎扩展初始化
         CocosExtentionInit();
         //语言包初始化
