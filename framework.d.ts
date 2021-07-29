@@ -306,6 +306,9 @@ declare interface LanguageData {
 	language: string;
 }
 
+
+declare type WebSocketType = "ws" | "wss";
+
 /**
  * @description 数据代理
  * 如果是公共总合，name使用 td.COMMON_LANGUAGE_NAME

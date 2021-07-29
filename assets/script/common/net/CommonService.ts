@@ -3,7 +3,6 @@ import { Service } from "../../framework/base/Service";
 import { IMessage } from "../../framework/net/Message";
 import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdDefines";
 import { Reconnect } from "./Reconnect";
-import { WebSocketType } from "../../framework/net/WebSocketClient";
 import { Config } from "../config/Config";
 import { CustomNetEventType } from "../../framework/event/EventApi";
 

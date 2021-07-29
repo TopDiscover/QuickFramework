@@ -4,8 +4,6 @@ import { CustomNetEventType } from "../event/EventApi";
  * @description websocket封装
  */
 
-export type WebSocketType = "ws" | "wss";
-
 export default class WebSocketClinet {
 
     private _tag: string = "[WebSocketClinet]";
