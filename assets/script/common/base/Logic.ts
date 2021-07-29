@@ -46,11 +46,7 @@ export class Logic extends EventComponent {
     }
 
     public onLoad() {
-        if ( !!this.bundle ){
-            Config.assetBundle[`${this.bundle}`] = this.bundle;
-        }else{
-            cc.error(`请子类重写protected get bundle,返回游戏的包名,即 asset bundle name`);
-        }
+        this.bundle;
         super.onLoad();
     }
 

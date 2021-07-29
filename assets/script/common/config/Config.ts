@@ -4,9 +4,6 @@ export namespace Config {
     /**@description 是否显示调试按钮 */
     export const isShowDebugButton = true;
 
-    /**@description 当前入子游戏时，在Logic.onLoad时初始设置 */
-    export let assetBundle = {};
-
     /**@description 公共Prefabs预置路径 */
     export let CommonPrefabs = {
         tips : "common/prefabs/Tips",
