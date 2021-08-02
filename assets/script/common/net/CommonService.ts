@@ -3,7 +3,6 @@ import { Service } from "../../framework/base/Service";
 import { IMessage } from "../../framework/net/Message";
 import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdDefines";
 import { Reconnect } from "./Reconnect";
-import { Config } from "../config/Config";
 import { CustomNetEventType } from "../../framework/event/EventApi";
 
 /**
@@ -18,15 +17,15 @@ export class CommonService extends Service implements GameEventInterface {
     protected port: number = null;
     protected protocol: WebSocketType = "wss"
     
-    private _maxEnterBackgroundTime: number = Config.MAX_INBACKGROUND_TIME;
+    private _maxEnterBackgroundTime: number = td.Config.MAX_INBACKGROUND_TIME;
     private _backgroundTimeOutId = -1;
     /**@description 进入后台的最大允许时间，超过了最大值，则进入网络重连 */
     public get maxEnterBackgroundTime() {
         return this._maxEnterBackgroundTime;
     }
     public set maxEnterBackgroundTime(value: number) {
-        if (value < Config.MIN_INBACKGROUND_TIME || value > Config.MAX_INBACKGROUND_TIME) {
-            value = Config.MIN_INBACKGROUND_TIME;
+        if (value < td.Config.MIN_INBACKGROUND_TIME || value > td.Config.MAX_INBACKGROUND_TIME) {
+            value = td.Config.MIN_INBACKGROUND_TIME;
         }
         cc.log(this.serviceName, `maxEnterBackgroundTime ${value}`);
         this._maxEnterBackgroundTime = value;

@@ -4,7 +4,6 @@
 
 import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
 import { EventApi } from "../../framework/event/EventApi";
-import { Config, ViewZOrder } from "../config/Config";
 import { i18n } from "../language/CommonLanguage";
 import { CommonService } from "./CommonService";
 import ReconnectComponent from "./ReconnectComponent";
@@ -31,13 +30,13 @@ export class Reconnect {
             this.isLoadingPrefab = true;
             Manager.assetManager.load(
                 BUNDLE_RESOURCES,
-                Config.CommonPrefabs.loading,
+                td.Config.CommonPrefabs.loading,
                 cc.Prefab,
                 (finish: number, total: number, item: cc.AssetManager.RequestItem) => { },
                 (data: ResourceCacheData) => {
                     this.isLoadingPrefab = false;
                     if (data && data.data && data.data instanceof cc.Prefab) {
-                        Manager.assetManager.addPersistAsset(Config.CommonPrefabs.loading, data.data, BUNDLE_RESOURCES)
+                        Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.loading, data.data, BUNDLE_RESOURCES)
                         this.prefab = data.data;
                         resolove(true);
                     }
@@ -81,7 +80,7 @@ export class Reconnect {
             }
             this.node.name = "Reconnect";
             this.node.removeFromParent();
-            Manager.uiManager.addChild(this.node,ViewZOrder.Loading);
+            Manager.uiManager.addChild(this.node,td.ViewZOrder.Loading);
             this.node.position = cc.v3(0, 0, 0);
             if (this.isWaitingHide) {
                 this.isWaitingHide = false;

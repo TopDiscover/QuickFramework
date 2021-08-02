@@ -62,19 +62,30 @@ String.format = function () {
 
 function toNamespace(key:string,value:any,namespace?:string):void{
     let space = createNamespace(namespace);
-    space[key] = value;
+    if (typeof value == "object" ){
+        if (!space[key]){
+            space[key] = value;
+        }else{
+            let keys = Object.keys(value);
+            keys.forEach((subKey,index,source)=>{
+                space[key][subKey] = value[subKey];
+            });
+        }
+    }else{
+        space[key] = value;
+    }
 }
 
 function createNamespace(namespace?:string) {
     let _window : any = window;
-    if ( namespace && namespace.length > 0 ){
-        if ( !_window[namespace] ){
-            _window[namespace] = {}
-        }
-        return _window[namespace];
-    }
     if (!_window.td){
         _window.td = {};
+    }
+    if ( namespace && namespace.length > 0 ){
+        if ( !_window.td[namespace] ){
+            _window.td[namespace] = {}
+        }
+        return _window.td[namespace];
     }
     return _window.td;
 }
@@ -88,7 +99,7 @@ function getSingleton<T>( SingletonClass : Singleton<T>){
     return SingletonClass.Instance();
 }
 window.getSingleton = getSingleton;
-
+createNamespace();
 export function extentionsInit(){
     createNamespace();
 }

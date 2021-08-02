@@ -1,5 +1,4 @@
 import { EventApi } from "../../framework/event/EventApi";
-import { ViewZOrder, Config } from "../config/Config";
 import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
 /**
  * @description 加载动画
@@ -49,7 +48,7 @@ export default class Loading {
      * @param timeOutCb 超时回调
      * @param timeout 显示超时时间
      */
-    public show( content : string | string[] , timeOutCb?:()=>void,timeout = Config.LOADING_TIME_OUT ) {
+    public show( content : string | string[] , timeOutCb?:()=>void,timeout = td.Config.LOADING_TIME_OUT ) {
         this._timeOutCb = timeOutCb;
         if( Array.isArray(content) ){
             this._content = content;
@@ -66,7 +65,7 @@ export default class Loading {
         let finish = await this.loadPrefab();
         if (finish) {
             this._node.removeFromParent();
-            Manager.uiManager.addChild(this._node,ViewZOrder.Loading);
+            Manager.uiManager.addChild(this._node,td.ViewZOrder.Loading);
             this._node.position = cc.Vec3.ZERO;
             this._text = cc.find("content/text",this._node).getComponent(cc.Label);
             this._showContentIndex = 0;
@@ -92,7 +91,7 @@ export default class Loading {
             .call(()=>{
                 this._text.string = this._content[this._showContentIndex];
             })
-            .delay(Config.LOADING_CONTENT_CHANGE_INTERVAL)
+            .delay(td.Config.LOADING_CONTENT_CHANGE_INTERVAL)
             .call(()=>{
                 this._showContentIndex ++;
                 if( this._showContentIndex >= this._content.length ){
@@ -145,13 +144,13 @@ export default class Loading {
             this._isLoadingPrefab = true;
             Manager.assetManager.load(
                 BUNDLE_RESOURCES, 
-                Config.CommonPrefabs.loading,
+                td.Config.CommonPrefabs.loading,
                 cc.Prefab,
                 (finish: number, total: number, item: cc.AssetManager.RequestItem)=>{},
                 (data: ResourceCacheData) => {
                 this._isLoadingPrefab = false;
                 if (data && data.data && data.data instanceof cc.Prefab) {
-                    Manager.assetManager.addPersistAsset(Config.CommonPrefabs.loading,data.data,BUNDLE_RESOURCES)
+                    Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.loading,data.data,BUNDLE_RESOURCES)
                     this._node = cc.instantiate(data.data);
                     resolove(true);
                 }

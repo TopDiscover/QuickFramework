@@ -1,4 +1,3 @@
-import { Config } from "../config/Config";
 import { CommonEvent } from "../event/CommonEvent";
 import { LogicType, LogicEvent } from "../event/LogicEvent";
 
@@ -156,7 +155,7 @@ class _HotUpdate {
     /**@description 是否在热更新中或检测更新状态 */
     private updating = false;
 
-    private _commonHotUpdateUrl = Config.TEST_HOT_UPDATE_URL_ROOT;
+    private _commonHotUpdateUrl = td.Config.TEST_HOT_UPDATE_URL_ROOT;
     /**@description 通用的热更新地址，当在子游戏或大厅未指定热更新地址时，都统一使用服务器传回来的默认全局更新地址 */
     public get commonHotUpdateUrl(): string {
         if (this._commonHotUpdateUrl.length > 0) {
@@ -290,12 +289,12 @@ class _HotUpdate {
             callback(AssetManagerCode.ALREADY_UP_TO_DATE, AssetManagerState.UP_TO_DATE);
             return false;
         }else{
-            if( Config.isSkipCheckUpdate ){
+            if( td.Config.isSkipCheckUpdate ){
                 cc.log("跳过热更新，直接使用本地资源代码");
                 this.updating = false;
                 callback(AssetManagerCode.ALREADY_UP_TO_DATE, AssetManagerState.UP_TO_DATE);
             }
-            return !Config.isSkipCheckUpdate;
+            return !td.Config.isSkipCheckUpdate;
         }
     }
 

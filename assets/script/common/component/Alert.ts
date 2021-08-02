@@ -1,5 +1,4 @@
 import { EventApi } from "../../framework/event/EventApi";
-import { ViewZOrder, Config } from "../config/Config";
 import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
 import { i18n } from "../language/CommonLanguage";
 
@@ -340,7 +339,7 @@ export default class Alert {
             if (!this.curPanel) {
                 this.curPanel = cc.instantiate(this.prefab);
                 let dialog = this.curPanel.addComponent(AlertDialog);
-                Manager.uiManager.addChild(this.curPanel,ViewZOrder.Alert)
+                Manager.uiManager.addChild(this.curPanel,td.ViewZOrder.Alert)
                 dialog.show(config);
             }
         }
@@ -364,14 +363,14 @@ export default class Alert {
                 this._isLoadingPrefab = true;
                 Manager.assetManager.load(
                     BUNDLE_RESOURCES,
-                    Config.CommonPrefabs.alert,
+                    td.Config.CommonPrefabs.alert,
                     cc.Prefab,
                     (finish: number, total: number, item: cc.AssetManager.RequestItem) => { },
                     (data: ResourceCacheData) => {
                         this._isLoadingPrefab = false;
                         if (data && data.data && data.data instanceof cc.Prefab) {
                             this.prefab = data.data;
-                            Manager.assetManager.addPersistAsset(Config.CommonPrefabs.alert, data.data, BUNDLE_RESOURCES);
+                            Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.alert, data.data, BUNDLE_RESOURCES);
                             if (this.finishLoadCb) {
                                 this.finishLoadCb(true);
                                 this.finishLoadCb = null;

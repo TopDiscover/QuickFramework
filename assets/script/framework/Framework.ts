@@ -1,5 +1,7 @@
 import { extentionsInit } from "./extentions/Extentions";
 extentionsInit();
+import { configurationInit } from "./base/Configuration";
+configurationInit();
 import { Language } from "./base/Language";
 import { EventDispatcher } from "./event/EventDispatcher";
 import { UIManager } from "./base/UIManager";
@@ -9,6 +11,7 @@ import { CacheManager } from "./assetManager/CacheManager";
 import { ResolutionHelper } from "./adaptor/ResolutionHelper";
 import { NodePoolManager } from "./base/NodePoolManager";
 import { BUNDLE_RESOURCES, USING_LAN_KEY } from "./base/Defines";
+
 
 
 

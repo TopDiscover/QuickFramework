@@ -1,5 +1,4 @@
 import SettingView from "../../../../script/common/component/SettingView";
-import { ViewZOrder } from "../../../../script/common/config/Config";
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
 import { BUNDLE_RESOURCES } from "../../../../script/framework/base/Defines";
 import { UIView } from "../../../../script/framework/ui/UIView";
@@ -35,7 +34,7 @@ export default class GameOneView extends UIView {
         Manager.uiManager.open({
             type:SettingView,
             bundle:BUNDLE_RESOURCES,
-            zIndex:ViewZOrder.UI,
+            zIndex:td.ViewZOrder.UI,
             name:"设置界面"
         })
     }

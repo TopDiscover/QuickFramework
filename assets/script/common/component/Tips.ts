@@ -1,4 +1,3 @@
-import { Config, ViewZOrder } from "../config/Config";
 import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
 /**
  * @description 提示
@@ -72,12 +71,12 @@ class ToastItem extends cc.Component {
             }else{
                 Manager.assetManager.load( 
                     BUNDLE_RESOURCES, 
-                    Config.CommonPrefabs.tips,
+                    td.Config.CommonPrefabs.tips,
                     cc.Prefab,
                     (finish: number, total: number, item: cc.AssetManager.RequestItem)=>{},
                     (data : ResourceCacheData)=>{
                     if ( data && data.data && data.data instanceof cc.Prefab ){
-                        Manager.assetManager.addPersistAsset(Config.CommonPrefabs.tips,data.data,BUNDLE_RESOURCES);
+                        Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.tips,data.data,BUNDLE_RESOURCES);
                         this._prefab = data.data;
                         resolve(true);
                     }else{
@@ -98,7 +97,7 @@ class ToastItem extends cc.Component {
                 itemComp.fadeIn();
                 node.userData = this._id++;
                 node.name = `Tips${node.userData}`;
-                Manager.uiManager.addChild(node,ViewZOrder.Tips)
+                Manager.uiManager.addChild(node,td.ViewZOrder.Tips)
                 //整体上移
                 let length = this._queue.length;
                 for ( let i = 0 ; i < length ; i++ ){

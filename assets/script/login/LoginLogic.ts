@@ -5,7 +5,6 @@
 
 import { Logic } from "../common/base/Logic";
 import { LogicType, LogicEvent, LogicEventData } from "../common/event/LogicEvent";
-import { ViewZOrder } from "../common/config/Config";
 import LoginView from "./view/LoginView";
 import { BUNDLE_RESOURCES } from "../framework/base/Defines";
 import { HotUpdate, AssetManagerCode, AssetManagerState } from "../common/base/HotUpdate";
@@ -41,7 +40,7 @@ class LoginLogic extends Logic {
                 Manager.alert.show({
                     text: i18n.newVersion, confirmCb: (isOK) => {
                         if (isOK) {
-                            Manager.uiManager.open({ type: DownloadLoading, zIndex: ViewZOrder.UI, args: [state,i18n.hallText] });
+                            Manager.uiManager.open({ type: DownloadLoading, zIndex: td.ViewZOrder.UI, args: [state,i18n.hallText] });
                         } else {
                             //退出游戏
                             cc.game.end();
@@ -70,7 +69,7 @@ class LoginLogic extends Logic {
                 cc.log(`检测更新当前状态 code : ${code} state : ${state}`);
             }
         });
-        Manager.uiManager.open({ type: LoginView, zIndex: ViewZOrder.zero, bundle: this.bundle });
+        Manager.uiManager.open({ type: LoginView, zIndex: td.ViewZOrder.zero, bundle: this.bundle });
     }
 
     public onEnterComplete(data: LogicEventData) {

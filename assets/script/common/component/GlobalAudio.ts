@@ -1,6 +1,5 @@
 import AudioComponent from "../../framework/base/AudioComponent";
 import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
-import { Config } from "../config/Config";
 
 /**
  * @description 全局音频播放组棒
@@ -12,11 +11,11 @@ const {ccclass, property,menu} = cc._decorator;
 @menu("common/component/GlobalAudio")
 export default class GlobalAudio extends AudioComponent {
     playDialogOpen() {
-        this.playEffect(Config.audioPath.dialog,BUNDLE_RESOURCES,false);   
+        this.playEffect(td.Config.audioPath.dialog,BUNDLE_RESOURCES,false);   
     }
 
     playButtonClick() {
-        this.playEffect(Config.audioPath.button,BUNDLE_RESOURCES,false);
+        this.playEffect(td.Config.audioPath.button,BUNDLE_RESOURCES,false);
     }
 
     public playMusic(url: string, bundle: BUNDLE_TYPE, loop: boolean = true) {
