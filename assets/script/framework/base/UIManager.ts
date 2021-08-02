@@ -1,4 +1,4 @@
-import { UIClass, UIView } from "../ui/UIView";
+import { UIView } from "../ui/UIView";
 import { ResourceInfo, ResourceCacheData, ViewStatus } from "./Defines";
 
 /**@description 动态加载垃圾数据名 */
@@ -145,7 +145,7 @@ export class UIManager {
     /**@description 视图 */
     private _viewDatas: Map<string, ViewData> = new Map<string, ViewData>();
     private getViewData(className: string): ViewData;
-    private getViewData<T extends UIView>(uiClass: UIClass<T>): ViewData;
+    private getViewData<T extends UIView>(uiClass: td.UIClass<T>): ViewData;
     private getViewData(data: any): ViewData {
         let className = this.getClassName(data);
         if (!className) return null;
@@ -154,7 +154,7 @@ export class UIManager {
     }
 
     private getClassName(className: string): string;
-    private getClassName<T extends UIView>(uiClass: UIClass<T>): string;
+    private getClassName<T extends UIView>(uiClass: td.UIClass<T>): string;
     private getClassName(data: any): string {
         if (!data) return null;
         let className = null;
@@ -172,7 +172,7 @@ export class UIManager {
     /**@description 驻留内存资源 */
     public retainMemory = new ViewDynamicLoadData(DYNAMIC_LOAD_RETAIN_MEMORY);
 
-    public preload<T extends UIView>(uiClass: UIClass<T>,bundle:BUNDLE_TYPE) {
+    public preload<T extends UIView>(uiClass: td.UIClass<T>,bundle:BUNDLE_TYPE) {
         return this._open(uiClass,bundle, 0, true, null,null);
     }
 
@@ -198,11 +198,11 @@ export class UIManager {
      * @param zIndex 节点层级 
      * @param args 传入参数列表
      */
-    public open<T extends UIView>(config: { type: UIClass<T>, bundle?:BUNDLE_TYPE , zIndex?: number, args?: any[] , delay?: number,name?:string}) : Promise<T>{
+    public open<T extends UIView>(config: { type: td.UIClass<T>, bundle?:BUNDLE_TYPE , zIndex?: number, args?: any[] , delay?: number,name?:string}) : Promise<T>{
         return this._open(config.type,config.bundle, config.zIndex ? config.zIndex : 0, false, config.args,config.delay,config.name);
     }
 
-    private _open<T extends UIView>(uiClass: UIClass<T>, bundle:BUNDLE_TYPE, zOrder: number = 0, isPreload: boolean, args: any[],delay : number,name?:string) {
+    private _open<T extends UIView>(uiClass: td.UIClass<T>, bundle:BUNDLE_TYPE, zOrder: number = 0, isPreload: boolean, args: any[],delay : number,name?:string) {
         return new Promise<T>((reslove, reject) => {
             if (!uiClass) {
                 if (CC_DEBUG) cc.log(`${this._logTag}open ui class error`);
@@ -293,7 +293,7 @@ export class UIManager {
         });
     }
 
-    private _addComponent<T extends UIView>(uiNode: cc.Node, uiClass: UIClass<T>, viewData: ViewData, className: string, zOrder: number, args: any[],bundle:BUNDLE_TYPE): UIView {
+    private _addComponent<T extends UIView>(uiNode: cc.Node, uiClass: td.UIClass<T>, viewData: ViewData, className: string, zOrder: number, args: any[],bundle:BUNDLE_TYPE): UIView {
         if (uiNode) {
             //挂载脚本
             let view = uiNode.getComponent(uiClass) as UIView;
@@ -341,7 +341,7 @@ export class UIManager {
         }
     }
 
-    private createNode<T extends UIView>(className: string, uiClass: UIClass<T>, reslove, data: cc.Prefab, args: any[], zOrder: number,bundle:BUNDLE_TYPE) {
+    private createNode<T extends UIView>(className: string, uiClass: td.UIClass<T>, reslove, data: cc.Prefab, args: any[], zOrder: number,bundle:BUNDLE_TYPE) {
         let viewData = this._viewDatas.get(className);
         viewData.isLoaded = true;
         if (viewData.status == ViewStatus.WAITTING_CLOSE) {
@@ -437,7 +437,7 @@ export class UIManager {
         }
     }
 
-    public close<T extends UIView>(uiClass: UIClass<T>);
+    public close<T extends UIView>(uiClass: td.UIClass<T>);
     public close(className: string);
     public close(data: any) {
         //当前所有界面都已经加载完成
@@ -457,7 +457,7 @@ export class UIManager {
     }
 
     /**@description 关闭除传入参数以外的所有其它界面,不传入，关闭所有界面 */
-    public closeExcept(views: (UIClass<UIView> | string | UIView)[]) {
+    public closeExcept(views: (td.UIClass<UIView> | string | UIView)[]) {
         let self = this;
         if (views == undefined || views == null || views.length == 0) {
             //关闭所有界面
@@ -486,7 +486,7 @@ export class UIManager {
     }
 
     public hide(className: string);
-    public hide<T extends UIView>(uiClass: UIClass<T>);
+    public hide<T extends UIView>(uiClass: td.UIClass<T>);
     public hide(data: any) {
         let viewData = this.getViewData(data);
         if (viewData) {
@@ -505,7 +505,7 @@ export class UIManager {
     }
 
     public getView(className: string): Promise<any>;
-    public getView<T extends UIView>(uiClass: UIClass<T>): Promise<T>;
+    public getView<T extends UIView>(uiClass: td.UIClass<T>): Promise<T>;
     public getView(data: any): any {
         return new Promise<any>((resolove, reject) => {
             if (data == undefined || data == null) {
@@ -553,7 +553,7 @@ export class UIManager {
     }
 
     public isShow(className: string): boolean;
-    public isShow<T extends UIView>(uiClass: UIClass<T>): boolean;
+    public isShow<T extends UIView>(uiClass: td.UIClass<T>): boolean;
     public isShow(data: any) {
         let viewData = this.getViewData(data);
         if (!viewData) {

@@ -1,5 +1,5 @@
 
-import { UIClass, UIView } from "../ui/UIView";
+import { UIView } from "../ui/UIView";
 import { Service } from "./Service";
 
 /**
@@ -88,7 +88,7 @@ export interface ResourceData {
      * 在网络消息来的时间，用预置体加载界面还是需要一定的时间，
      * 从而会造成消息处理不是顺序执行 
      * */
-    preloadView?: UIClass<UIView>,
+    preloadView?: td.UIClass<UIView>,
     bundle?: BUNDLE_TYPE,
     /**@description 如果是加载的目录，请用dir字段 */
     dir?:string,
