@@ -1,8 +1,5 @@
 import { ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY } from "./Defines";
 const LANG_KEY: string = "using_language";
-
-const COMMON_LANGUAGE_NAME = "COMMON_LANGUAGE_NAME";
-td.COMMON_LANGUAGE_NAME = COMMON_LANGUAGE_NAME;
 export class Language {
 
     private static _instance: Language = null;
@@ -29,7 +26,7 @@ export class Language {
         if (index != -1) {
             this.delegates.splice(index, 1);
             let data: any = this._data;
-            if (delegate.name != COMMON_LANGUAGE_NAME && data[delegate.name]) {
+            if (delegate.name != td.Macro.COMMON_LANGUAGE_NAME && data[delegate.name]) {
                 data[delegate.name] = {};
             }
         }

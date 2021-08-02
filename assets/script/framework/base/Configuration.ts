@@ -107,3 +107,8 @@ namespace Event {
     export const CHANGE_LANGUAGE = "Event_CHANGE_LANGUAGE";
 }
 toNamespace("Event",Event);
+
+namespace Macro{
+    export const COMMON_LANGUAGE_NAME = "COMMON_LANGUAGE_NAME";
+}
+toNamespace("Macro",Macro);
