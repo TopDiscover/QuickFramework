@@ -1,5 +1,5 @@
 import WebEditBoxImpl from "./WebEditBoxImpl";
-import { ResourceType, ENABLE_CHANGE_LANGUAGE,USING_LAN_KEY, BUNDLE_REMOTE } from "../base/Defines";
+import { ResourceType } from "../base/Defines";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
@@ -54,7 +54,7 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
     let defaultBundle = getBundle({bundle:config.defaultBundle,view:config.view})
     Manager.assetManager.remote.loadImage(config.url, config.isNeedCache).then((data) => {
         if (data) {
-            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback,BUNDLE_REMOTE, ResourceType.Remote, isRetain);
+            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback,td.Macro.BUNDLE_REMOTE, ResourceType.Remote, isRetain);
         } else {
             if (config.defaultSpriteFrame) {
                 if (typeof config.defaultSpriteFrame == "string") {
@@ -321,7 +321,7 @@ Reflect.defineProperty(cc.Label.prototype, "language", {
                 self.string = "";
             }
         }
-        if (ENABLE_CHANGE_LANGUAGE) {
+        if (td.Macro.ENABLE_CHANGE_LANGUAGE) {
             updateLanguage(v,(isUsing)=>{
                 if ( isUsing ){
                     if (!!!self._isUsinglanguage) {
@@ -340,7 +340,7 @@ Reflect.defineProperty(cc.Label.prototype, "language", {
     }
 });
 
-if ( !CC_EDITOR && ENABLE_CHANGE_LANGUAGE ){
+if ( !CC_EDITOR && td.Macro.ENABLE_CHANGE_LANGUAGE ){
     let __Label__Proto : any = cc.Label.prototype;
     __Label__Proto._onChangeLanguage = function(){
         this.language = this.language;
@@ -356,7 +356,7 @@ if ( !CC_EDITOR && ENABLE_CHANGE_LANGUAGE ){
 
     let __label_onLoad__ = __Label__Proto.onLoad;
     __Label__Proto.onLoad = function () {
-        if ( this.string.indexOf(USING_LAN_KEY) > -1){
+        if ( this.string.indexOf(td.Macro.USING_LAN_KEY) > -1){
             this.language = [this.string];
         }
         __label_onLoad__ && __label_onLoad__.call(this);

@@ -1,4 +1,4 @@
-import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
+import { ResourceCacheData } from "../../framework/base/Defines";
 /**
  * @description 加载动画
  */
@@ -112,14 +112,14 @@ export default class UILoading {
             }
             this._isLoadingPrefab = true;
             Manager.assetManager.load(
-                BUNDLE_RESOURCES, 
+                td.Macro.BUNDLE_RESOURCES, 
                 td.Config.CommonPrefabs.uiLoading,
                 cc.Prefab,
                 (finish: number, total: number, item: cc.AssetManager.RequestItem)=>{},
                 (data: ResourceCacheData) => {
                 this._isLoadingPrefab = false;
                 if (data && data.data && data.data instanceof cc.Prefab) {
-                    Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.uiLoading,data.data,BUNDLE_RESOURCES);
+                    Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.uiLoading,data.data,td.Macro.BUNDLE_RESOURCES);
                     this._node = cc.instantiate(data.data);
                     if (this.finishLoadCb) {
                         this.finishLoadCb(true);

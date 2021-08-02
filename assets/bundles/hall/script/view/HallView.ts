@@ -7,7 +7,6 @@ import { LobbyService } from "../../../../script/common/net/LobbyService";
 import { GameService } from "../../../../script/common/net/GameService";
 import { ChatService } from "../../../../script/common/net/ChatService";
 import SettingView from "../../../../script/common/component/SettingView";
-import { BUNDLE_RESOURCES } from "../../../../script/framework/base/Defines";
 
 
 const { ccclass, property } = cc._decorator;
@@ -79,7 +78,7 @@ export default class HallView extends UIView {
         let bottom_op = cc.find("bottom_op", this.node);
         let setting = cc.find("setting", bottom_op);
         setting.on(cc.Node.EventType.TOUCH_END, () => {
-            Manager.uiManager.open({type:SettingView,bundle:BUNDLE_RESOURCES,zIndex:td.ViewZOrder.UI,name:"设置界面"});
+            Manager.uiManager.open({type:SettingView,bundle:td.Macro.BUNDLE_RESOURCES,zIndex:td.ViewZOrder.UI,name:"设置界面"});
         });
 
         LobbyService.instance.enabled = false;

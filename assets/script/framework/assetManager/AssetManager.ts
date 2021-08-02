@@ -1,4 +1,4 @@
-import { ResourceCacheData, ResourceCacheStatus, ResourceInfo, ResourceType, BUNDLE_REMOTE } from "../base/Defines";
+import { ResourceCacheData, ResourceCacheStatus, ResourceInfo, ResourceType } from "../base/Defines";
 
 class RemoteLoader {
 
@@ -56,7 +56,7 @@ class RemoteLoader {
                     cache = new ResourceCacheData();
                     cache.info.resourceType = ResourceType.Remote;
                     cache.info.type = sp.SkeletonData;
-                    cache.info.bundle = BUNDLE_REMOTE;
+                    cache.info.bundle = td.Macro.BUNDLE_REMOTE;
                     Manager.cacheManager.remoteCaches.set(url,cache);
                     me._loadRemoteRes(spinePng,cc.Texture2D, isNeedCache).then((texture:cc.Texture2D) => {
                         if (texture) {

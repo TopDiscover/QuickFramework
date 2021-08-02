@@ -1,4 +1,3 @@
-import { ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY } from "./Defines";
 const LANG_KEY: string = "using_language";
 export class Language {
 
@@ -45,7 +44,7 @@ export class Language {
             //当前有语言包数据 相同语言包，不再进行设置
             return;
         }
-        if ( ENABLE_CHANGE_LANGUAGE ){
+        if ( td.Macro.ENABLE_CHANGE_LANGUAGE ){
             //先更新所有数据
             this.delegates.forEach((delegate, index, source) => {
                 this._data = delegate.data(language);
@@ -70,7 +69,7 @@ export class Language {
                 cc.error("key error");
                 break;
             }
-            if (keyString.indexOf(USING_LAN_KEY) > -1) {
+            if (keyString.indexOf(td.Macro.USING_LAN_KEY) > -1) {
 
                 let keys = keyString.split(".");
                 if (keys.length < 2) {

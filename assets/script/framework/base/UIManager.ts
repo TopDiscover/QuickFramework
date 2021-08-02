@@ -1,5 +1,5 @@
 import { UIClass, UIView } from "../ui/UIView";
-import { ResourceInfo, ResourceCacheData, ViewStatus, BUNDLE_RESOURCES } from "./Defines";
+import { ResourceInfo, ResourceCacheData, ViewStatus } from "./Defines";
 
 /**@description 动态加载垃圾数据名 */
 const DYNAMIC_LOAD_GARBAGE = "DYNAMIC_LOAD_GARBAGE";
@@ -382,7 +382,7 @@ export class UIManager {
     private loadPrefab( bundle: BUNDLE_TYPE, url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
         return new Promise<cc.Prefab>((resolove, reject) => {
             if ( bundle == undefined || bundle == "" || bundle == null ){
-                bundle = BUNDLE_RESOURCES;
+                bundle = td.Macro.BUNDLE_RESOURCES;
             }
             Manager.assetManager.load(bundle,url,cc.Prefab,progressCallback,(data: ResourceCacheData) => {
                 if (data && data.data && data.data instanceof cc.Prefab) {

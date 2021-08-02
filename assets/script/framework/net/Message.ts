@@ -1,4 +1,3 @@
-import { USING_LITTLE_ENDIAN } from "../base/Defines";
 const Buffer = require('buffer').Buffer;
 //ArrayBuffer转字符串
 export function ab2str(buffer: ArrayBuffer): Promise<string | ArrayBuffer> {
@@ -132,7 +131,7 @@ export class MessageHeader implements IMessage {
             this._dataSize = msg.buffer.length;
         }
         let buffer = new Buffer(this.size);
-        if( USING_LITTLE_ENDIAN ){
+        if( td.Macro.USING_LITTLE_ENDIAN ){
             //小端处理
             buffer.writeUInt32LE(this.mainCmd,offset)
             offset += Uint32Array.BYTES_PER_ELEMENT;
@@ -165,11 +164,11 @@ export class MessageHeader implements IMessage {
         let dataView = new DataView(data.buffer);
         //取包头
         let offset = 0;
-        this.mainCmd = dataView.getUint32(offset, USING_LITTLE_ENDIAN);
+        this.mainCmd = dataView.getUint32(offset, td.Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
-        this.subCmd = dataView.getUint32(offset, USING_LITTLE_ENDIAN);
+        this.subCmd = dataView.getUint32(offset, td.Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
-        this._dataSize = dataView.getUint32(offset, USING_LITTLE_ENDIAN);
+        this._dataSize = dataView.getUint32(offset, td.Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
         let buffer = dataView.buffer.slice(offset, dataView.buffer.byteLength)
         this.buffer = new Uint8Array(buffer);

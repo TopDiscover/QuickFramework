@@ -6,7 +6,6 @@
 import { Logic } from "../common/base/Logic";
 import { LogicType, LogicEvent, LogicEventData } from "../common/event/LogicEvent";
 import LoginView from "./view/LoginView";
-import { BUNDLE_RESOURCES } from "../framework/base/Defines";
 import { HotUpdate, AssetManagerCode, AssetManagerState } from "../common/base/HotUpdate";
 import DownloadLoading from "../common/component/DownloadLoading";
 import { i18n } from "../common/language/CommonLanguage";
@@ -21,7 +20,7 @@ class LoginLogic extends Logic {
     }
 
     get bundle() {
-        return BUNDLE_RESOURCES;
+        return td.Macro.BUNDLE_RESOURCES;
     }
 
     onLoad() {

@@ -1,4 +1,4 @@
-import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
+import { ResourceCacheData } from "../../framework/base/Defines";
 import { i18n } from "../language/CommonLanguage";
 
 class AlertDialog extends cc.Component {
@@ -361,7 +361,7 @@ export default class Alert {
             else {
                 this._isLoadingPrefab = true;
                 Manager.assetManager.load(
-                    BUNDLE_RESOURCES,
+                    td.Macro.BUNDLE_RESOURCES,
                     td.Config.CommonPrefabs.alert,
                     cc.Prefab,
                     (finish: number, total: number, item: cc.AssetManager.RequestItem) => { },
@@ -369,7 +369,7 @@ export default class Alert {
                         this._isLoadingPrefab = false;
                         if (data && data.data && data.data instanceof cc.Prefab) {
                             this.prefab = data.data;
-                            Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.alert, data.data, BUNDLE_RESOURCES);
+                            Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.alert, data.data, td.Macro.BUNDLE_RESOURCES);
                             if (this.finishLoadCb) {
                                 this.finishLoadCb(true);
                                 this.finishLoadCb = null;

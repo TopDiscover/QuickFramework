@@ -1,4 +1,4 @@
-import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
+import { ResourceCacheData } from "../../framework/base/Defines";
 /**
  * @description 提示
  */
@@ -70,13 +70,13 @@ class ToastItem extends cc.Component {
                 return;
             }else{
                 Manager.assetManager.load( 
-                    BUNDLE_RESOURCES, 
+                    td.Macro.BUNDLE_RESOURCES, 
                     td.Config.CommonPrefabs.tips,
                     cc.Prefab,
                     (finish: number, total: number, item: cc.AssetManager.RequestItem)=>{},
                     (data : ResourceCacheData)=>{
                     if ( data && data.data && data.data instanceof cc.Prefab ){
-                        Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.tips,data.data,BUNDLE_RESOURCES);
+                        Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.tips,data.data,td.Macro.BUNDLE_RESOURCES);
                         this._prefab = data.data;
                         resolve(true);
                     }else{

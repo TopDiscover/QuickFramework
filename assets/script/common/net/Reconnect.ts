@@ -2,7 +2,7 @@
  * @description 断线重连
  */
 
-import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
+import { ResourceCacheData } from "../../framework/base/Defines";
 import { i18n } from "../language/CommonLanguage";
 import { CommonService } from "./CommonService";
 import ReconnectComponent from "./ReconnectComponent";
@@ -28,14 +28,14 @@ export class Reconnect {
             }
             this.isLoadingPrefab = true;
             Manager.assetManager.load(
-                BUNDLE_RESOURCES,
+                td.Macro.BUNDLE_RESOURCES,
                 td.Config.CommonPrefabs.loading,
                 cc.Prefab,
                 (finish: number, total: number, item: cc.AssetManager.RequestItem) => { },
                 (data: ResourceCacheData) => {
                     this.isLoadingPrefab = false;
                     if (data && data.data && data.data instanceof cc.Prefab) {
-                        Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.loading, data.data, BUNDLE_RESOURCES)
+                        Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.loading, data.data, td.Macro.BUNDLE_RESOURCES)
                         this.prefab = data.data;
                         resolove(true);
                     }
