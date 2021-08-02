@@ -144,8 +144,6 @@ class RemoteLoader {
         
     }
 }
-td.RemoteLoader = RemoteLoader;
-
 
 export class AssetManager {
     private logTag = `[AssetManager]: `;
@@ -424,4 +422,3 @@ export class AssetManager {
         this.retainAsset(info);
     }
 }
-td.AssetManager = AssetManager;

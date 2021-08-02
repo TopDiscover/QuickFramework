@@ -236,4 +236,3 @@ export class UIView extends EventComponent implements IFullScreenAdapt {
 
     }
 }
-td.UIView = UIView;

@@ -122,4 +122,3 @@ export class Language {
         return Manager.localStorage.getItem(LANG_KEY, cc.sys.LANGUAGE_CHINESE);
     }
 }
-td.Language = Language;

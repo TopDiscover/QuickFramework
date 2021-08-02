@@ -359,6 +359,4 @@ export class ResolutionHelper {
         }
         return size;
     }
-} 
-
-td.ResolutionHelper = ResolutionHelper;
+}
