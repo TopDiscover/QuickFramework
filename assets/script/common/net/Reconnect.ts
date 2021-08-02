@@ -3,7 +3,6 @@
  */
 
 import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
-import { EventApi } from "../../framework/event/EventApi";
 import { i18n } from "../language/CommonLanguage";
 import { CommonService } from "./CommonService";
 import ReconnectComponent from "./ReconnectComponent";
@@ -60,7 +59,7 @@ export class Reconnect {
     }
     constructor(service: CommonService) {
         this.service = service;
-        Manager.eventDispatcher.addEventListener(EventApi.AdaptScreenEvent, this.onAdaptScreen, this)
+        Manager.eventDispatcher.addEventListener(td.Event.ADAPT_SCREEN, this.onAdaptScreen, this)
     }
 
     private onAdaptScreen() {

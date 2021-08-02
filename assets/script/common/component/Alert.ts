@@ -1,4 +1,3 @@
-import { EventApi } from "../../framework/event/EventApi";
 import { BUNDLE_RESOURCES, ResourceCacheData } from "../../framework/base/Defines";
 import { i18n } from "../language/CommonLanguage";
 
@@ -189,7 +188,7 @@ export default class Alert {
     private prefab: cc.Prefab = null;
 
     constructor() {
-        Manager.eventDispatcher.addEventListener(EventApi.AdaptScreenEvent, this.onAdaptScreen, this);
+        Manager.eventDispatcher.addEventListener(td.Event.ADAPT_SCREEN, this.onAdaptScreen, this);
     }
 
     private _isLoadingPrefab = false;

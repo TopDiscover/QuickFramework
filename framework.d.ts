@@ -499,6 +499,23 @@ declare namespace td {
 		export const UILoading = 700;
 	}
 
+	namespace Event {
+		export enum Net{
+			/**@description 网络打开 */
+			ON_OPEN = "NetEvent_ON_OPEN",
+			/**@description 网络关闭 */
+			ON_CLOSE = "NetEvent_ON_CLOSE",
+			/**@description 网络错误 */
+			ON_ERROR = "NetEvent_ON_ERROR",
+			/**@description 应用层主动调用网络层close */
+			ON_CUSTOM_CLOSE = "NetEvent_ON_CUSTOM_CLOSE",
+		}
+		/**@description 屏幕适配 */
+		export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
+		/**@description 语言变更 */
+		export const CHANGE_LANGUAGE = "Event_CHANGE_LANGUAGE";
+	}
+
 	export let COMMON_LANGUAGE_NAME: string;
 
 	export class EventComponent extends cc.Component {

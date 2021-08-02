@@ -3,7 +3,6 @@ import { Service } from "../../framework/base/Service";
 import { IMessage } from "../../framework/net/Message";
 import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdDefines";
 import { Reconnect } from "./Reconnect";
-import { CustomNetEventType } from "../../framework/event/EventApi";
 
 /**
  * @description service公共基类
@@ -125,7 +124,7 @@ export class CommonService extends Service implements GameEventInterface {
 
     protected onClose(ev:Event){
         super.onClose(ev)
-        if( ev.type == CustomNetEventType.CLOSE){
+        if( ev.type == td.Event.Net.ON_CUSTOM_CLOSE){
             cc.log(`${this.serviceName} 应用层主动关闭Socket`);
             return;
         }

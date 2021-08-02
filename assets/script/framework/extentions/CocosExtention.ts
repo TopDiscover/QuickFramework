@@ -5,7 +5,6 @@ import {
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
     createNodeWithPrefab,getBundle,_loadDirRes,_loadRes
 } from "./Utils";
-import { EventApi } from "../event/EventApi";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
 if (typeof Reflect == "object") {
@@ -327,11 +326,11 @@ Reflect.defineProperty(cc.Label.prototype, "language", {
                 if ( isUsing ){
                     if (!!!self._isUsinglanguage) {
                         self._isUsinglanguage = true;
-                        Manager.eventDispatcher.addEventListener(EventApi.CHANGE_LANGUAGE, self._onChangeLanguage, self);
+                        Manager.eventDispatcher.addEventListener(td.Event.CHANGE_LANGUAGE, self._onChangeLanguage, self);
                     }
                 }else{
                     if (self._language) {
-                        Manager.eventDispatcher.removeEventListener(EventApi.CHANGE_LANGUAGE, self);
+                        Manager.eventDispatcher.removeEventListener(td.Event.CHANGE_LANGUAGE, self);
                     }
                 }
             })
@@ -350,7 +349,7 @@ if ( !CC_EDITOR && ENABLE_CHANGE_LANGUAGE ){
     let __label_onDestroy__ = __Label__Proto.onDestroy;
     __Label__Proto.onDestroy = function () {
         if ( this._isUsinglanguage ){
-            Manager.eventDispatcher.removeEventListener(EventApi.CHANGE_LANGUAGE,this);
+            Manager.eventDispatcher.removeEventListener(td.Event.CHANGE_LANGUAGE,this);
         }
         __label_onDestroy__ && __label_onDestroy__.call(this);
     }

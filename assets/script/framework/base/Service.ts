@@ -1,5 +1,4 @@
 import { ServerConnector } from "../net/ServerConnector";
-import { EventApi } from "../event/EventApi";
 import { makeKey } from "../decorator/Decorators";
 import { Message, MessageHeader, IMessage } from "../net/Message";
 
@@ -65,15 +64,15 @@ export class Service extends ServerConnector {
     }
     protected onOpen() {
         super.onOpen();
-        dispatch(EventApi.NetEvent.ON_OPEN,{service: this,event : null});
+        dispatch(td.Event.Net.ON_OPEN,{service: this,event : null});
     }
     protected onClose(ev: Event) {
         super.onClose(ev);
-        dispatch(EventApi.NetEvent.ON_CLOSE,{service: this,event : ev});
+        dispatch(td.Event.Net.ON_CLOSE,{service: this,event : ev});
     }
     protected onError(ev: Event) {
         super.onError(ev);
-        dispatch(EventApi.NetEvent.ON_ERROR,{service: this,event : ev});
+        dispatch(td.Event.Net.ON_ERROR,{service: this,event : ev});
     }
     protected onMessage(data: Uint8Array) {
 

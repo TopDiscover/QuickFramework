@@ -1,6 +1,5 @@
 import { ServiceEvent } from "../../framework/base/Defines";
 import Controller from "../../framework/controller/Controller";
-import { CustomNetEventType } from "../../framework/event/EventApi";
 import { LogicEvent, LogicEventData, LogicType } from "../event/LogicEvent";
 import { CommonService } from "./CommonService";
 
@@ -143,7 +142,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
     protected onNetClose(event: ServiceEvent) {
         let result = super.onNetClose(event);
         if (result) {
-            if (event.event.type == CustomNetEventType.CLOSE) {
+            if (event.event.type == td.Event.Net.ON_CUSTOM_CLOSE) {
                 cc.log(`${this.logName} 应用层主动关闭socket`);
                 return;
             }

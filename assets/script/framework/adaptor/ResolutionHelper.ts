@@ -1,5 +1,3 @@
-import { EventApi } from "../event/EventApi";
-
 type DeviceDirection = "" | "Landscape" | "Portrait";
 
 enum ScreenAdaptType {
@@ -115,7 +113,7 @@ export class ResolutionHelper {
             me.canvas.designResolution = me.designResolution;
         }
         if (me.isNeedAdapt) {
-            dispatch(EventApi.AdaptScreenEvent);
+            dispatch(td.Event.ADAPT_SCREEN);
             Manager.uiManager.fullScreenAdapt();
         }
     }

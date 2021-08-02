@@ -1,4 +1,3 @@
-import { EventApi } from "../event/EventApi";
 import { ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY } from "./Defines";
 const LANG_KEY: string = "using_language";
 
@@ -55,7 +54,7 @@ export class Language {
                 this._data = delegate.data(language);
             });
             //通知更新
-            dispatch(EventApi.CHANGE_LANGUAGE, language);
+            dispatch(td.Event.CHANGE_LANGUAGE, language);
         }else{
             this.delegates.forEach((delegate, index, source) => {
                 this._data = delegate.data(this.getLanguage());
