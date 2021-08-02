@@ -1,5 +1,7 @@
 /**@description 管理器 */
 import { Framewok } from "../../framework/Framework";
+import { commonConfigInit } from "../config/Config";
+commonConfigInit();
 import { Log, LogLevel } from "../../framework/log/Log";
 import { NetManager } from "./NetManager";
 import { LogicManager } from "./LogicManager";
@@ -14,6 +16,7 @@ import Alert from "../component/Alert";
 import Loading from "../component/Loading";
 import { ServiceManager } from "./ServiceManager";
 import { CommonLanguage } from "../language/CommonLanguage";
+
 
 
 /**@description 游戏所有运行单例的管理 */
