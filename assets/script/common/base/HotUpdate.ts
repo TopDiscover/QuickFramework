@@ -268,11 +268,12 @@ class _HotUpdate {
 
     /**@description 判断是否需要重新尝试下载之前下载失败的文件 */
     private isTryDownloadFailedAssets( ) {
-        if (this.currentAssetsManager &&
-            this.currentAssetsManager.manager.getState() == AssetManagerState.FAIL_TO_UPDATE &&
-            this.currentAssetsManager.code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST &&
-            this.currentAssetsManager.code == AssetManagerCode.ERROR_DOWNLOAD_MANIFEST &&
-            this.currentAssetsManager.code == AssetManagerCode.ERROR_PARSE_MANIFEST) {
+        if (this.currentAssetsManager &&(
+            this.currentAssetsManager.manager.getState() == AssetManagerState.FAIL_TO_UPDATE ||
+            this.currentAssetsManager.code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||
+            this.currentAssetsManager.code == AssetManagerCode.ERROR_DOWNLOAD_MANIFEST ||
+            this.currentAssetsManager.code == AssetManagerCode.ERROR_PARSE_MANIFEST)
+            ) {
             return true;
         }
         return false;
