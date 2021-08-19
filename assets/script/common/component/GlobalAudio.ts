@@ -1,6 +1,4 @@
 import AudioComponent from "../../framework/base/AudioComponent";
-import { BUNDLE_RESOURCES } from "../../framework/base/Defines";
-import { Config } from "../config/Config";
 
 /**
  * @description 全局音频播放组棒
@@ -12,18 +10,18 @@ const {ccclass, property,menu} = cc._decorator;
 @menu("common/component/GlobalAudio")
 export default class GlobalAudio extends AudioComponent {
     playDialogOpen() {
-        this.playEffect(Config.audioPath.dialog,BUNDLE_RESOURCES,false);   
+        this.playEffect(td.Config.audioPath.dialog,td.Macro.BUNDLE_RESOURCES,false);   
     }
 
     playButtonClick() {
-        this.playEffect(Config.audioPath.button,BUNDLE_RESOURCES,false);
+        this.playEffect(td.Config.audioPath.button,td.Macro.BUNDLE_RESOURCES,false);
     }
 
     public playMusic(url: string, bundle: BUNDLE_TYPE, loop: boolean = true) {
         let me = this;
         return new Promise<{ url: string, isSuccess: boolean }>((resolve) => {
-            if( bundle != BUNDLE_RESOURCES ){
-                cc.error(`${url} 不在 ${BUNDLE_RESOURCES} 全局播放的声音发现存放到${BUNDLE_RESOURCES}`)
+            if( bundle != td.Macro.BUNDLE_RESOURCES ){
+                cc.error(`${url} 不在 ${td.Macro.BUNDLE_RESOURCES} 全局播放的声音发现存放到${td.Macro.BUNDLE_RESOURCES}`)
                 resolve({ url:url,isSuccess:false});
                 return;
             }
@@ -48,8 +46,8 @@ export default class GlobalAudio extends AudioComponent {
 
     public playEffect(url: string, bundle:BUNDLE_TYPE, loop: boolean = false) {
         return new Promise<number>((resolve) => {
-            if( bundle != BUNDLE_RESOURCES ){
-                cc.error(`${url} 不在 ${BUNDLE_RESOURCES} 全局播放的声音发现存放到${BUNDLE_RESOURCES}`)
+            if( bundle != td.Macro.BUNDLE_RESOURCES ){
+                cc.error(`${url} 不在 ${td.Macro.BUNDLE_RESOURCES} 全局播放的声音发现存放到${td.Macro.BUNDLE_RESOURCES}`)
                 resolve(-1);
                 return;
             }

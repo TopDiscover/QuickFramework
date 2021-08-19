@@ -6,14 +6,6 @@ import AudioComponent from "../base/AudioComponent";
  */
 const { ccclass, property } = cc._decorator;
 
-export interface UIClass<T extends UIView> {
-    new(): T;
-    /**
-     *@description 视图prefab 地址 resources目录下如z_panels/WeiZoneLayer 
-     */
-    getPrefabUrl(): string;
-}
-
 @ccclass
 export class UIView extends EventComponent implements IFullScreenAdapt {
     onFullScreenAdapt() {
@@ -236,4 +228,3 @@ export class UIView extends EventComponent implements IFullScreenAdapt {
 
     }
 }
-td.UIView = UIView;

@@ -1,5 +1,4 @@
 import GameView from "../../../../script/common/base/GameView";
-import { Config } from "../../../../script/common/config/Config";
 import { CommonEvent } from "../../../../script/common/event/CommonEvent";
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
 import { ChatService } from "../../../../script/common/net/ChatService";
@@ -171,17 +170,17 @@ export default class NetTestView extends GameView {
             this.log(`${service.serviceName} 使用Json方式`);
             service.messageHeader = JsonMessageHeader;
             service.heartbeat = HeartbeatJson;
-            service.maxEnterBackgroundTime = Config.MIN_INBACKGROUND_TIME;
+            service.maxEnterBackgroundTime = td.Config.MIN_INBACKGROUND_TIME;
         } else if (type == NetTest.NetType.PROTO) {
             this.log(`${service.serviceName} 使用Proto方式`);
             service.messageHeader = ProtoMessageHeader;
             service.heartbeat = HeartbeatProto;
-            service.maxEnterBackgroundTime = Config.MAX_INBACKGROUND_TIME;
+            service.maxEnterBackgroundTime = td.Config.MAX_INBACKGROUND_TIME;
         } else if (type == NetTest.NetType.BINARY) {
             this.log(`${service.serviceName} 使用Binary方式`);
             service.messageHeader = BinaryStreamMessageHeader;
             service.heartbeat = HeartbeatBinary;
-            service.maxEnterBackgroundTime = Config.MAX_INBACKGROUND_TIME;
+            service.maxEnterBackgroundTime = td.Config.MAX_INBACKGROUND_TIME;
         } else {
             cc.error(`未知网络类型`);
         }

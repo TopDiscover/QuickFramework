@@ -1,9 +1,4 @@
-import { EventApi } from "../event/EventApi";
-import { ENABLE_CHANGE_LANGUAGE, USING_LAN_KEY } from "./Defines";
 const LANG_KEY: string = "using_language";
-
-const COMMON_LANGUAGE_NAME = "COMMON_LANGUAGE_NAME";
-td.COMMON_LANGUAGE_NAME = COMMON_LANGUAGE_NAME;
 export class Language {
 
     private static _instance: Language = null;
@@ -30,7 +25,7 @@ export class Language {
         if (index != -1) {
             this.delegates.splice(index, 1);
             let data: any = this._data;
-            if (delegate.name != COMMON_LANGUAGE_NAME && data[delegate.name]) {
+            if (delegate.name != td.Macro.COMMON_LANGUAGE_NAME && data[delegate.name]) {
                 data[delegate.name] = {};
             }
         }
@@ -49,13 +44,13 @@ export class Language {
             //当前有语言包数据 相同语言包，不再进行设置
             return;
         }
-        if ( ENABLE_CHANGE_LANGUAGE ){
+        if ( td.Macro.ENABLE_CHANGE_LANGUAGE ){
             //先更新所有数据
             this.delegates.forEach((delegate, index, source) => {
                 this._data = delegate.data(language);
             });
             //通知更新
-            dispatch(EventApi.CHANGE_LANGUAGE, language);
+            dispatch(td.Event.CHANGE_LANGUAGE, language);
         }else{
             this.delegates.forEach((delegate, index, source) => {
                 this._data = delegate.data(this.getLanguage());
@@ -74,7 +69,7 @@ export class Language {
                 cc.error("key error");
                 break;
             }
-            if (keyString.indexOf(USING_LAN_KEY) > -1) {
+            if (keyString.indexOf(td.Macro.USING_LAN_KEY) > -1) {
 
                 let keys = keyString.split(".");
                 if (keys.length < 2) {
@@ -122,4 +117,3 @@ export class Language {
         return Manager.localStorage.getItem(LANG_KEY, cc.sys.LANGUAGE_CHINESE);
     }
 }
-td.Language = Language;

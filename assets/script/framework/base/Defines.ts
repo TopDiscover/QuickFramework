@@ -1,5 +1,5 @@
 
-import { UIClass, UIView } from "../ui/UIView";
+import { UIView } from "../ui/UIView";
 import { Service } from "./Service";
 
 /**
@@ -11,7 +11,6 @@ export enum ResourceCacheStatus {
     /**@description 等待释放 */
     WAITTING_FOR_RELEASE,
 }
-td.ResourceCacheStatus = ResourceCacheStatus;
 
 /**@description 资源类型 */
 export enum ResourceType {
@@ -20,7 +19,6 @@ export enum ResourceType {
     /**@description 远程资源 */
     Remote,
 }
-td.ResourceType = ResourceType;
 
 /**@description 资源信息 */
 export class ResourceInfo {
@@ -33,7 +31,6 @@ export class ResourceInfo {
     /**@description 默认为本地资源 */
     resourceType: ResourceType = ResourceType.Local;
 }
-td.ResourceInfo = ResourceInfo;
 
 export class ResourceCacheData {
     /**@description 是否已经加载完成 */
@@ -79,7 +76,6 @@ export class ResourceCacheData {
         return this.isLoaded && this.data && !cc.isValid(this.data);
     }
 }
-td.ResourceCacheData = ResourceCacheData;
 
 export interface ResourceData {
     /**@description resources 目录url 与 type 必须成对出现*/
@@ -92,7 +88,7 @@ export interface ResourceData {
      * 在网络消息来的时间，用预置体加载界面还是需要一定的时间，
      * 从而会造成消息处理不是顺序执行 
      * */
-    preloadView?: UIClass<UIView>,
+    preloadView?: td.UIClass<UIView>,
     bundle?: BUNDLE_TYPE,
     /**@description 如果是加载的目录，请用dir字段 */
     dir?:string,
@@ -111,18 +107,6 @@ export enum ViewStatus {
     /**@description 无状态 */
     WAITTING_NONE,
 }
-
-export const BUNDLE_RESOURCES = 'resources';
-
-export const BUNDLE_REMOTE = "__Remote__Caches__";
-
-/**@description 是否允许游戏启动后切换语言 */
-export const ENABLE_CHANGE_LANGUAGE = true;
-/**@description 语言包路径使用前缀 */
-export const USING_LAN_KEY = "i18n.";
-
-/**@description 网络数据全以大端方式进行处理 */
-export const USING_LITTLE_ENDIAN = false;
 
 export interface ServiceEvent{
     service: Service;

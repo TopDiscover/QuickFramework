@@ -1,5 +1,5 @@
 import { UIView } from "../ui/UIView";
-import { ResourceInfo, ResourceType, BUNDLE_RESOURCES, BUNDLE_REMOTE, ResourceCacheData } from "../base/Defines";
+import { ResourceInfo, ResourceType, ResourceCacheData } from "../base/Defines";
 
 /**@description 添加加载本地的资源 */
 export function addExtraLoadResource(view: UIView, info: ResourceInfo) {
@@ -31,7 +31,7 @@ export function addRemoteLoadResource(view: UIView, info: ResourceInfo) {
 export function getBundle( config : { bundle? : BUNDLE_TYPE , view? : UIView}){
     let bundle : BUNDLE_TYPE = config.bundle;
     if ( config.bundle == undefined || config.bundle == null ){
-        bundle = BUNDLE_RESOURCES;
+        bundle = td.Macro.BUNDLE_RESOURCES;
         if( config.view ){
             bundle = config.view.bundle;
         }
@@ -340,7 +340,7 @@ export function setSkeletonSkeletonData(
     info.retain = retain;
     info.bundle = getBundle(config);
     if (resourceType == ResourceType.Remote) {
-        info.bundle = BUNDLE_REMOTE;
+        info.bundle = td.Macro.BUNDLE_REMOTE;
         addRemoteLoadResource(config.view, info);
     } else {
         addExtraLoadResource(config.view, info);

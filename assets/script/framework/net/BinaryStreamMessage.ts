@@ -3,7 +3,6 @@
  */
 
 import { Message, Utf8ArrayToStr, MessageHeader } from "./Message";
-import { USING_LITTLE_ENDIAN } from "../base/Defines";
 
 type BinaryStreamConstructor = typeof BinaryStream;
 type NumberStreamValueConstructor = typeof NumberStreamValue;
@@ -70,7 +69,7 @@ class StreamValue<T> implements IStreamValue {
     }
     /**@description 网络数据全以大端方式进行处理 */
     get littleEndian() {
-        return USING_LITTLE_ENDIAN;
+        return td.Macro.USING_LITTLE_ENDIAN;
     }
 }
 
@@ -412,7 +411,7 @@ export class BinaryStream extends Message {
 
     private serializeArray(value: Array<any>, memberName : string , valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
         //先写入数组的大小
-        this._dataView.setUint32(this._byteOffset, value.length, USING_LITTLE_ENDIAN);
+        this._dataView.setUint32(this._byteOffset, value.length, td.Macro.USING_LITTLE_ENDIAN);
         this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
         for( let i = 0; i< value.length ; i++ ){
             this.serializeMember(value[i],`${memberName}[${i}]` , arrTypeOrMapKeyType, null, null);
@@ -421,7 +420,7 @@ export class BinaryStream extends Message {
 
     private serializeMap(value: Map<any, any>, memberName : string , valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
         //先写入字典的大小
-        this._dataView.setUint32(this._byteOffset, value.size, USING_LITTLE_ENDIAN);
+        this._dataView.setUint32(this._byteOffset, value.size, td.Macro.USING_LITTLE_ENDIAN);
         this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
         value.forEach((dataValue, dataKey) => {
             //写入key
@@ -430,7 +429,7 @@ export class BinaryStream extends Message {
                 keyValue.data = dataKey;
                 this._byteOffset += keyValue.write(this._dataView, this._byteOffset);
             } else {
-                this._dataView.setUint32(this._byteOffset, dataKey, USING_LITTLE_ENDIAN)
+                this._dataView.setUint32(this._byteOffset, dataKey, td.Macro.USING_LITTLE_ENDIAN)
                 this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
             }
             //写值
@@ -515,7 +514,7 @@ export class BinaryStream extends Message {
         //重新解析，初始化时可能已经赋值，需要先清空对象
         this[memberName] = [];
         //先读数组大小
-        let size = this._dataView.getUint32(this._byteOffset, USING_LITTLE_ENDIAN);
+        let size = this._dataView.getUint32(this._byteOffset, td.Macro.USING_LITTLE_ENDIAN);
         this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
         for (let i = 0; i < size; i++) {
             let type = new arrTypeOrMapKeyType();
@@ -532,7 +531,7 @@ export class BinaryStream extends Message {
 
         this[memberName] = new Map;
         //先读入数组大小
-        let size = this._dataView.getUint32(this._byteOffset, USING_LITTLE_ENDIAN);
+        let size = this._dataView.getUint32(this._byteOffset, td.Macro.USING_LITTLE_ENDIAN);
         this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
         for (let i = 0; i < size; i++) {
             let key = null;
@@ -542,7 +541,7 @@ export class BinaryStream extends Message {
                 this._byteOffset += keyValue.read(this._dataView, this._byteOffset)
                 key = keyValue.data;
             } else {
-                key = this._dataView.getUint32(this._byteOffset, USING_LITTLE_ENDIAN)
+                key = this._dataView.getUint32(this._byteOffset, td.Macro.USING_LITTLE_ENDIAN)
                 this._byteOffset += Uint32Array.BYTES_PER_ELEMENT;
             }
             //写值

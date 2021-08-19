@@ -1,5 +1,3 @@
-import { CustomNetEventType } from "../event/EventApi";
-
 /**
  * @description websocket封装
  */
@@ -257,7 +255,7 @@ export default class WebSocketClinet {
      */
     public close( isEnd : boolean){
         if ( this._ws ){
-            this._closeEvent = {type : CustomNetEventType.CLOSE , isEnd : isEnd};
+            this._closeEvent = {type : td.Event.Net.ON_CUSTOM_CLOSE, isEnd : isEnd};
             this._ws.close();
         }
         //清空发送

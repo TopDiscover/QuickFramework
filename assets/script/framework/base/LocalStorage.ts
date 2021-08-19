@@ -86,4 +86,3 @@ export class LocalStorage {
         cc.sys.localStorage.removeItem(key);
     }
 }
-td.LocalStorage = LocalStorage;

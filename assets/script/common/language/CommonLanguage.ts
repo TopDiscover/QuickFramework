@@ -6,7 +6,7 @@ import { LanguageEN } from "./LanguageEN";
 export let i18n = LanguageZH;
 
 export class CommonLanguage implements LanguageDataSourceDelegate{
-    name = td.COMMON_LANGUAGE_NAME;
+    name = td.Macro.COMMON_LANGUAGE_NAME;
     data( language : string ): LanguageData {
         if( i18n.language == language ){
             return i18n;

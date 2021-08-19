@@ -131,4 +131,3 @@ export class NodePoolManager {
     }
 }
 td.NodePool = NodePool;
-td.NodePoolManager = td.NodePoolManager;

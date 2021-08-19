@@ -281,7 +281,6 @@ class RemoteCaches {
         }
     }
 }
-td.RemoteCaches = RemoteCaches;
 
 export class CacheManager {
     private logTag = `[CacheManager]: `;
@@ -532,4 +531,3 @@ export class CacheManager {
         this.remoteCaches.showCaches();
     }
 }
-td.CacheManager = CacheManager;

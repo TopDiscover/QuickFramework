@@ -2,7 +2,6 @@ import { LogicEventData, LogicType } from "../event/LogicEvent";
 import EventComponent from "../../framework/base/EventComponent";
 import { ResourceData, ResourceCacheData } from "../../framework/base/Defines";
 import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
-import { Config } from "../config/Config";
 
 /**
  * @description 逻辑控制器
@@ -46,11 +45,7 @@ export class Logic extends EventComponent {
     }
 
     public onLoad() {
-        if ( !!this.bundle ){
-            Config.assetBundle[`${this.bundle}`] = this.bundle;
-        }else{
-            cc.error(`请子类重写protected get bundle,返回游戏的包名,即 asset bundle name`);
-        }
+        this.bundle;
         super.onLoad();
     }
 

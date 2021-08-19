@@ -1,4 +1,3 @@
-import { Config } from "../config/Config";
 import { Reconnect } from "../net/Reconnect";
 /**
  * @description 主控制器 
@@ -48,7 +47,7 @@ export default class MainController extends cc.Component {
             showRes.zIndex = 9999;
             showComp.zIndex = 9999;
             let isShow = false;
-            if ( Config.isShowDebugButton ){
+            if ( td.Config.isShowDebugButton ){
                 isShow = true;
                 showUI.on(cc.Node.EventType.TOUCH_END,()=>{
                     Manager.uiManager.printViews();
