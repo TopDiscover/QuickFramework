@@ -1,4 +1,4 @@
-CocosCreator 快速开发轻量级棋牌框架
+CocosCreator 快速开发轻量级游戏框架
 ========
 
 项目说明
