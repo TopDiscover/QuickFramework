@@ -57,5 +57,5 @@ sprite.loadRemoteImage({url :"http://tools.itharbors.com/res/logo.png", view : t
 
 注意事项
 -------
-跑热更新示例时，需要修改[TEST_HOT_UPDATE_URL_ROOT](https://gitee.com/top-discover/QuickFramework/blob/2.4.3/assets/script/common/config/Config.ts#L21)为自己的服务器测试地址.
+跑热更新示例时，需要修改[TEST_HOT_UPDATE_URL_ROOT](https://gitee.com/top-discover/QuickFramework/blob/2.4.3/assets/script/common/config/Config.ts#L25)为自己的服务器测试地址.
 ![欢迎大家进群讨论](https://images.gitee.com/uploads/images/2021/0704/233403_8c07fe63_393413.jpeg "qrcode_1625412690446.jpg")
