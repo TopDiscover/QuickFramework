@@ -15,28 +15,28 @@ import { NodePoolManager } from "./base/NodePoolManager";
 
 
 /**@description 框架层使用的各管理器单例的管理 */
-export class Framewok{
-    
+export class Framewok {
+
     /**@description 常驻资源指定的模拟view */
     get retainMemory() { return this.uiManager.retainMemory; }
 
     /**@description 语言包 */
-    get language( ){
+    get language() {
         return getSingleton(Language);
     }
-    
+
     /**@description 事件派发器 */
-    get eventDispatcher(){
+    get eventDispatcher() {
         return getSingleton(EventDispatcher);
     }
 
     /**@description 界面管理器 */
-    get uiManager(){
+    get uiManager() {
         return getSingleton(UIManager);
     }
 
     /**@description 本地仓库 */
-    get localStorage(){
+    get localStorage() {
         return getSingleton(LocalStorage);
     }
 
@@ -46,31 +46,32 @@ export class Framewok{
     }
 
     /**@description 资源缓存管理器 */
-    get cacheManager(){
+    get cacheManager() {
         return getSingleton(CacheManager);
     }
 
     /**@description 屏幕适配 */
-    get resolutionHelper(){
+    get resolutionHelper() {
         return getSingleton(ResolutionHelper);
     }
 
     /**@description 对象池管理器 */
-    get nodePoolManager(){
+    get nodePoolManager() {
         return getSingleton(NodePoolManager);
     }
 
     /**@description 小提示 */
-    get tips() : Tips{
-        return null;
+    get tips(): Tips {
+        return <any>null;
     }
+
     /**@description 界面加载时的全屏Loading,显示加载进度 */
-    get uiLoading():UILoading{
-        return null;
+    get uiLoading(): UILoading {
+        return <any>null;
     }
 
     /**@description websocket wss 证书url地址 */
-    get wssCacertUrl(){
+    get wssCacertUrl() {
         return "";
     }
 

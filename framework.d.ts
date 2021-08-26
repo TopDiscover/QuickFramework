@@ -256,59 +256,57 @@ declare type BUNDLE_TYPE = string | cc.AssetManager.Bundle;
 declare function require(any);
 
 /**
-		 * @description 发事件 参考framework/extentions/extentions dispatch 方法
-		 * @param name 
-		 * @param data 
-		 */
-declare function dispatch(name: string, data?: any);
+ * @description 发事件 参考framework/extentions/extentions dispatch 方法
+ * @param name 
+ * @param data 
+ */
+declare function dispatch(name: string, data?: any): void;
 
 declare interface Date {
-	/**
-	 * @description 格式当前时间 
-	 * @example 
-	 * let now = new Date();
-	 * let str = now.format("yyyy:MM:dd hh:mm:ss"); //2019:11:07 10:19:51
-	 * str = now.format("yyyy/MM/dd");//2019/11/07
-	 * str = now.format("hh:mm:ss");//10:19:51
-	 * */
-	format(format: string): string;
+    /**
+     * @description 格式当前时间 
+     * @example 
+     * let now = new Date();
+     * let str = now.format("yyyy:MM:dd hh:mm:ss"); //2019:11:07 10:19:51
+     * str = now.format("yyyy/MM/dd");//2019/11/07
+     * str = now.format("hh:mm:ss");//10:19:51
+     * */
+    format(format: string): string;
 }
 
 declare interface DateConstructor {
-	/**
-	 * @description 返回当前时间的秒数
-	 * @example 
-	 * Date.timeNow()
-	 *  */
-	timeNow(): number;
-	/**
-	 * @description 返回当前时间的毫秒数 
-	 * @example 
-	 * Date.timeNowMillisecons()
-	 * */
-	timeNowMillisecons(): number;
+    /**
+     * @description 返回当前时间的秒数
+     * @example 
+     * Date.timeNow()
+     *  */
+    timeNow(): number;
+    /**
+     * @description 返回当前时间的毫秒数 
+     * @example 
+     * Date.timeNowMillisecons()
+     * */
+    timeNowMillisecons(): number;
 }
 
 declare interface StringConstructor {
-	/**
-	 * @description 格式化字符串
-	 * @example
-	 * String.format("{0}-->{1}-->{2}","one","two","three") | String.format("{0}-->{1}-->{2}",["one","two","three"])
-	 * => "one-->two-->three"
-	 * */
-	format(...args): string;
+    /**
+     * @description 格式化字符串
+     * @example
+     * String.format("{0}-->{1}-->{2}","one","two","three") | String.format("{0}-->{1}-->{2}",["one","two","three"])
+     * => "one-->two-->three"
+     * */
+    format(...args: any[]): string;
 }
 
 declare function md5(data: any): any;
 
 
 declare interface LanguageData {
-	language: string;
+    language: string;
 }
 
-
 declare type WebSocketType = "ws" | "wss";
-
 /**
  * @description 数据代理
  * 如果是公共总合，name使用 td.COMMON_LANGUAGE_NAME
@@ -324,79 +322,79 @@ declare interface Tips {
 	 * @description tips提示
 	 * @param msg 提示内容
 	 */
-	show(msg: string);
+	show(msg: string):void;
 	/**@description 预加载预置体 */
-	preloadPrefab();
-	finishShowItem(node: cc.Node);
+	preloadPrefab():void;
+	finishShowItem(node: cc.Node):void;
 }
 
 /**@description 界面加载动画，web端在下载界面时，如果超过了一定时间，需要弹出动画，告诉用户当前加载界面的进度 */
 declare interface UILoading {
-	/**
-	 * @description 显示全屏幕加载动画
-	 * @param delay 延迟显示时间 当为null时，不会显示loading进度，但会显示阻隔层 >0时为延迟显示的时间
-	 */
-	show(delay: number, name: string);
-	/**
-	 * @description 更新进度，0-100
-	 * @param progress 0-100
-	 */
-	public updateProgress(progress: number);
-	public hide();
-	/**@description 预加载预置体 */
-	public preloadPrefab();
+    /**
+     * @description 显示全屏幕加载动画
+     * @param delay 延迟显示时间 当为null时，不会显示loading进度，但会显示阻隔层 >0时为延迟显示的时间
+     */
+    show(delay: number, name: string): void;
+    /**
+     * @description 更新进度，0-100
+     * @param progress 0-100
+     */
+    updateProgress(progress: number): void;
+    hide(): void;
+    /**@description 预加载预置体 */
+    preloadPrefab(): void;
 }
 
 declare interface IFullScreenAdapt {
-	/**@description 全屏幕适配 调用 */
-	onFullScreenAdapt(): void;
+    /**@description 全屏幕适配 调用 */
+    onFullScreenAdapt(): void;
 }
 
 /**@description 提示弹出框配置 */
 declare interface AlertConfig {
-	/**@description 用来标识弹出框，后面可指定tag进行关闭所有相同tag的弹出框 */
-	tag?: string | number,
-	/**@description 提示内容 richText只能二先1 */
-	text?: string,
-	/**@description 标题,默认为 : 温馨提示 */
-	title?: string,
-	/**@description 确定按钮文字 默认为 : 确定*/
-	confirmString?: string,
-	/**@description 取消按钮文字 默认为 : 取消*/
-	cancelString?: string,
-	/**@description 确定按钮回调 有回调则显示按钮，无回调则不显示*/
-	confirmCb?: (isOK: boolean) => void,
-	/**@description 取消按钮回调 有回调则显示按钮，无回调则不显示*/
-	cancelCb?: (isOK: boolean) => void,
-	/**@description 富文件显示内容 跟text只能二选1 */
-	richText?: string,
-	/**@description true 回调后在关闭弹出 false 关闭弹出框在回调 默认为 : false */
-	immediatelyCallback?: boolean,
-	/**@description 是否允许该tag的弹出框重复弹出，默认为true 会弹出同类型的多个 */
-	isRepeat?: boolean,
-	/**@description 用户自定义数据 */
-	userData?: any,
+    /**@description 用来标识弹出框，后面可指定tag进行关闭所有相同tag的弹出框 */
+    tag?: string | number,
+    /**@description 提示内容 richText只能二先1 */
+    text?: string,
+    /**@description 标题,默认为 : 温馨提示 */
+    title?: string,
+    /**@description 确定按钮文字 默认为 : 确定*/
+    confirmString?: string,
+    /**@description 取消按钮文字 默认为 : 取消*/
+    cancelString?: string,
+    /**@description 确定按钮回调 有回调则显示按钮，无回调则不显示*/
+    confirmCb?: (isOK: boolean) => void,
+    /**@description 取消按钮回调 有回调则显示按钮，无回调则不显示*/
+    cancelCb?: (isOK: boolean) => void,
+    /**@description 富文件显示内容 跟text只能二选1 */
+    richText?: string,
+    /**@description true 回调后在关闭弹出 false 关闭弹出框在回调 默认为 : false */
+    immediatelyCallback?: boolean,
+    /**@description 是否允许该tag的弹出框重复弹出，默认为true 会弹出同类型的多个 */
+    isRepeat?: boolean,
+    /**@description 用户自定义数据 */
+    userData?: any,
 }
 
 /**
  * @description 处理游戏事件接口声明
  *      cc.game.EVENT_ENGINE_INITED
-		cc.game.EVENT_GAME_INITED
-		cc.game.EVENT_HIDE
-		cc.game.EVENT_RESTART
-		cc.game.EVENT_SHOW
+        cc.game.EVENT_GAME_INITED
+        cc.game.EVENT_HIDE
+        cc.game.EVENT_RESTART
+        cc.game.EVENT_SHOW
  */
 
 declare interface GameEventInterface {
 
-	/**@description 进入后台 cc.game.EVENT_HIDE*/
-	onEnterBackground();
+    /**@description 进入后台 cc.game.EVENT_HIDE*/
+    onEnterBackground(): void;
 
-	/**
-	 * @description 进入前台 cc.game.EVENT_SHOW
-	 * @param inBackgroundTime 在后台运行的总时间，单位秒
-	 */
-	onEnterForgeground(inBackgroundTime: number);
+    /**
+     * @description 进入前台 cc.game.EVENT_SHOW
+     * @param inBackgroundTime 在后台运行的总时间，单位秒
+     */
+    onEnterForgeground(inBackgroundTime: number): void;
 }
 
 declare interface Singleton<T> {
@@ -1168,20 +1166,21 @@ declare namespace td {
 		wssCacertUrl: string;
 		/**@description 提示框 */
 		readonly alert: Alert;
-		/**@description 加载动画 */
-		readonly loading: Loading;
+		/**@description 公共loading */
+        readonly loading: Loading;
 		/**@description 逻辑控制器管理器 */
 		readonly logicManager: LogicManager;
 		/**@description 游戏数据 自行设置 */
 		gameData: GameData;
 		/**@description 游戏网络控制器 自行设置 */
 		gameController: any;
-		/**@description 当前游戏视图 自行设置 */
+		/**@description 当前游戏GameView, GameView进入onLoad赋值 */
 		gameView: GameView;
-		/**@description 全局音效播放组件 */
+		/**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
 		readonly globalAudio: GlobalAudio;
 		/**@description bundle管理器 */
 		readonly bundleManager: BundleManager;
+		/**@description 网络Service管理器 */
 		readonly serviceManager: ServiceManager;
 		/**@description 大厅网络管理器 */
 		readonly hallNetManager: NetManager;

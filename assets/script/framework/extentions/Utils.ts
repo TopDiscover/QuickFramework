@@ -385,6 +385,8 @@ export function createNodeWithPrefab(config: { bundle?:BUNDLE_TYPE , url: string
         if (data && isValidComponent(config.view) && config.completeCallback) {
             let node = cc.instantiate(data);
             config.completeCallback(node);
+        } else if( isValidComponent(config.view) && config.completeCallback){
+            config.completeCallback(null);
         }
     });
 }
