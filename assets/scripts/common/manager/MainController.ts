@@ -1,5 +1,4 @@
 import { Asset, Component, find, Game, game, SystemEvent, systemEvent, SystemEventType, _decorator } from "cc";
-import { Config } from "../config/Config";
 import { Reconnect } from "../net/Reconnect";
 
 /**
@@ -49,7 +48,7 @@ export default class MainController extends Component {
             let showComp = find("showComponent", show);
             if (showUI && showNode && showRes && showComp) {
                 let isShow = false;
-                if (Config.isShowDebugButton) {
+                if (td.Config.isShowDebugButton) {
                     isShow = true;
                     showUI.on(SystemEventType.TOUCH_END, () => {
                         Manager.uiManager.printViews();

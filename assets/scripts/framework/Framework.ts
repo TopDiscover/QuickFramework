@@ -1,4 +1,7 @@
-import { NodePoolManager } from "./base/NodePoolManager";
+import { extentionsInit } from "./extentions/Extentions";
+extentionsInit();
+import { configurationInit } from "./base/Configuration";
+configurationInit();
 import { Language } from "./base/Language";
 import { EventDispatcher } from "./event/EventDispatcher";
 import { UIManager } from "./base/UIManager";
@@ -6,7 +9,10 @@ import { LocalStorage } from "./base/LocalStorage";
 import { _AssetManager } from "./assetManager/AssetManager";
 import { CacheManager } from "./assetManager/CacheManager";
 import { ResolutionHelper } from "./adaptor/ResolutionHelper";
-import { BUNDLE_RESOURCES, USING_LAN_KEY } from "./base/Global";
+import { NodePoolManager } from "./base/NodePoolManager";
+
+
+
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
@@ -55,12 +61,12 @@ export class Framewok {
     }
 
     /**@description 小提示 */
-    get tips():Tips {
+    get tips(): Tips {
         return <any>null;
     }
 
     /**@description 界面加载时的全屏Loading,显示加载进度 */
-    get uiLoading():UILoading {
+    get uiLoading(): UILoading {
         return <any>null;
     }
 
@@ -86,18 +92,18 @@ export class Framewok {
      * Manager.makeLanguage("title","tankBattle"); //=> i18n.tankBattle.title 指向游戏特定的语言包
      * Manager.makeLanguage("title"); //=> i18n.title 指向的大厅的公共语言包
      */
-     makeLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE = BUNDLE_RESOURCES): (string | number)[] | string {
+    makeLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE = td.Macro.BUNDLE_RESOURCES): (string | number)[] | string {
         if (typeof param == "string") {
             if (bundle) {
-                return `${USING_LAN_KEY}${bundle}.${param}`;
+                return `${td.Macro.USING_LAN_KEY}${bundle}.${param}`;
             }
-            return `${USING_LAN_KEY}${param}`;
+            return `${td.Macro.USING_LAN_KEY}${param}`;
         }
         if (typeof param[0] == "string" && param instanceof Array) {
             if (bundle) {
-                param[0] = `${USING_LAN_KEY}${bundle}.${param[0]}`;
+                param[0] = `${td.Macro.USING_LAN_KEY}${bundle}.${param[0]}`;
             } else {
-                param[0] = `${USING_LAN_KEY}${param[0]}`;
+                param[0] = `${td.Macro.USING_LAN_KEY}${param[0]}`;
             }
         }
         return param;
@@ -110,17 +116,17 @@ export class Framewok {
         let key = "";
         if (typeof param == "string") {
             if (bundle) {
-                key = `${USING_LAN_KEY}${bundle}.${param}`;
+                key = `${td.Macro.USING_LAN_KEY}${bundle}.${param}`;
             } else {
-                key = `${USING_LAN_KEY}${param}`;
+                key = `${td.Macro.USING_LAN_KEY}${param}`;
             }
             return this.language.get([key]);
         }
         if (typeof param[0] == "string" && param instanceof Array) {
             if (bundle) {
-                param[0] = `${USING_LAN_KEY}${bundle}.${param[0]}`;
+                param[0] = `${td.Macro.USING_LAN_KEY}${bundle}.${param[0]}`;
             } else {
-                param[0] = `${USING_LAN_KEY}${param[0]}`;
+                param[0] = `${td.Macro.USING_LAN_KEY}${param[0]}`;
             }
             return this.language.get(param);
         }

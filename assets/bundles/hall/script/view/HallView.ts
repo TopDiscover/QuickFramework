@@ -8,8 +8,6 @@ import { GameService } from "../../../../scripts/common/net/GameService";
 import { ChatService } from "../../../../scripts/common/net/ChatService";
 import SettingView from "../../../../scripts/common/component/SettingView";
 import { EventTouch, _decorator,Node, PageView, instantiate, find, Label, ProgressBar, sys, PhysicsSystem2D } from "cc";
-import { ViewZOrder } from "../../../../scripts/common/config/ViewZOrder";
-import { BUNDLE_RESOURCES } from "../../../../scripts/framework/base/Global";
 
 
 const { ccclass, property } = _decorator;
@@ -104,7 +102,7 @@ export default class HallView extends UIView {
         let bottom_op = find("bottom_op", this.node) as Node;
         let setting = find("setting", bottom_op) as Node;
         setting.on(Node.EventType.TOUCH_END, () => {
-            Manager.uiManager.open({type:SettingView,bundle:BUNDLE_RESOURCES,zIndex:ViewZOrder.UI,name:"设置界面"});
+            Manager.uiManager.open({type:SettingView,bundle:td.Macro.BUNDLE_RESOURCES,zIndex:td.ViewZOrder.UI,name:"设置界面"});
         });
 
         let change = find("mial",bottom_op) as Node;

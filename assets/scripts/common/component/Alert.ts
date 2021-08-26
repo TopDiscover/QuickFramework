@@ -1,35 +1,5 @@
-import { Config } from "../config/Config";
 import { Component,find,instantiate,isValid,Label,Node, Prefab, RichText, SystemEventType, tween, Vec3 } from "cc";
-import { ViewZOrder } from "../config/ViewZOrder";
 import { i18n } from "../language/CommonLanguage";
-import { BUNDLE_RESOURCES, EventApi } from "../../framework/base/Global";
-
-
-/**@description 提示弹出框配置 */
-interface AlertConfig {
-    /**@description 用来标识弹出框，后面可指定tag进行关闭所有相同tag的弹出框 */
-    tag?: string | number,
-    /**@description 提示内容 richText只能二先1 */
-    text?: string,
-    /**@description 标题,默认为 : 温馨提示 */
-    title?: string,
-    /**@description 确定按钮文字 默认为 : 确定*/
-    confirmString?: string,
-    /**@description 取消按钮文字 默认为 : 取消*/
-    cancelString?: string,
-    /**@description 确定按钮回调 有回调则显示按钮，无回调则不显示*/
-    confirmCb?: (isOK: boolean) => void,
-    /**@description 取消按钮回调 有回调则显示按钮，无回调则不显示*/
-    cancelCb?: (isOK: boolean) => void,
-    /**@description 富文件显示内容 跟text只能二选1 */
-    richText?: string,
-    /**@description true 回调后在关闭弹出 false 关闭弹出框在回调 默认为 : false */
-    immediatelyCallback?: boolean,
-    /**@description 是否允许该tag的弹出框重复弹出，默认为true 会弹出同类型的多个 */
-    isRepeat?: boolean,
-    /**@description 用户自定义数据 */
-    userData?: any,
-}
 
 class AlertDialog extends Component {
 
@@ -220,7 +190,7 @@ export default class Alert {
     private prefab: Prefab = null!;
 
     constructor() {
-        Manager.eventDispatcher.addEventListener(EventApi.AdaptScreenEvent, this.onAdaptScreen, this);
+        Manager.eventDispatcher.addEventListener(td.Event.ADAPT_SCREEN, this.onAdaptScreen, this);
     }
 
     private _isLoadingPrefab = false;
@@ -368,7 +338,7 @@ export default class Alert {
             if (!this.curPanel) {
                 this.curPanel = instantiate(this.prefab);
                 let dialog = this.curPanel.addComponent(AlertDialog);
-                Manager.uiManager.addChild(this.curPanel,ViewZOrder.Alert);
+                Manager.uiManager.addChild(this.curPanel,td.ViewZOrder.Alert);
                 dialog.show(config);
             }
         }
@@ -391,15 +361,15 @@ export default class Alert {
             else {
                 this._isLoadingPrefab = true;
                 Manager.assetManager.load(
-                    BUNDLE_RESOURCES,
-                    Config.CommonPrefabs.alert,
+                    td.Macro.BUNDLE_RESOURCES,
+                    td.Config.CommonPrefabs.alert,
                     Prefab,
                     (finish, total, item) => { },
                     (data) => {
                         this._isLoadingPrefab = false;
                         if (data && data.data && data.data instanceof Prefab) {
                             this.prefab = data.data;
-                            Manager.assetManager.addPersistAsset(Config.CommonPrefabs.alert, data.data, BUNDLE_RESOURCES);
+                            Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.alert, data.data, td.Macro.BUNDLE_RESOURCES);
                             if (this.finishLoadCb) {
                                 this.finishLoadCb(true);
                                 this.finishLoadCb = null;

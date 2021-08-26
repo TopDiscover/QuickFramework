@@ -1,7 +1,4 @@
-import { Config} from "../config/Config";
 import { Component ,find,instantiate,Label,log,Node, Prefab, Tween, tween, UIOpacity, UITransform, Vec2, Vec3} from "cc";
-import { ViewZOrder } from "../config/ViewZOrder";
-import { BUNDLE_RESOURCES } from "../../framework/base/Global";
 /**
  * @description 提示
  */
@@ -115,13 +112,13 @@ class ToastItem extends Component {
                 return;
             }else{
                 Manager.assetManager.load( 
-                    BUNDLE_RESOURCES, 
-                    Config.CommonPrefabs.tips,
+                    td.Macro.BUNDLE_RESOURCES, 
+                    td.Config.CommonPrefabs.tips,
                     Prefab,
                     (finish, total, item)=>{},
                     (data)=>{
                     if ( data && data.data && data.data instanceof Prefab ){
-                        Manager.assetManager.addPersistAsset(Config.CommonPrefabs.tips,data.data,BUNDLE_RESOURCES);
+                        Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.tips,data.data,td.Macro.BUNDLE_RESOURCES);
                         this._prefab = data.data;
                         resolve(true);
                     }else{
@@ -143,7 +140,7 @@ class ToastItem extends Component {
                 itemComp.fadeIn();
                 node.userData = this._id++;
                 node.name = `Tips${node.userData}`;
-                Manager.uiManager.addChild(node,ViewZOrder.Tips);
+                Manager.uiManager.addChild(node,td.ViewZOrder.Tips);
 
                 //整体上移
                 let length = this._queue.length;

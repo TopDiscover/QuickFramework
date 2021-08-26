@@ -1,10 +1,8 @@
 import { LogicEventData, LogicType } from "../event/LogicEvent";
 import EventComponent from "../../framework/base/EventComponent";
-import { ResourceData } from "../../framework/base/Defines";
+import { ResourceCacheData, ResourceData } from "../../framework/base/Defines";
 import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
 import { Node } from "cc";
-import { ResourceCacheData } from "../../framework/base/Global";
-
 
 /**@description 当前入子游戏时，在Logic.onLoad时初始设置 */
 let assetBundle = {};

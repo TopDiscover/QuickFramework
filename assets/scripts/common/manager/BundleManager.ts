@@ -1,10 +1,8 @@
 import { HotUpdate, AssetManagerCode, AssetManagerState, BundleConfig, DownLoadInfo } from "../base/HotUpdate";
 import { CommonEvent } from "../event/CommonEvent";
-import { Config} from "../config/Config";
 import DownloadLoading from "../component/DownloadLoading";
 import { game } from "cc";
 import { DEBUG } from "cc/env";
-import { ViewZOrder } from "../config/ViewZOrder";
 import { i18n } from "../language/CommonLanguage";
 
 /**
@@ -33,7 +31,7 @@ export class BundleManager {
    public removeLoadedGamesBundle() {
       let i = this.loadedBundle.length;
       while (i--) {
-         if( this.loadedBundle[i] != Config.BUNDLE_HALL ){
+         if( this.loadedBundle[i] != td.Config.BUNDLE_HALL ){
             Manager.assetManager.removeBundle(this.loadedBundle[i]);
             this.loadedBundle.splice(i,1);
          }
@@ -83,7 +81,7 @@ export class BundleManager {
                   text:String.format(i18n.newVersionForBundle,versionInfo.name),
                   confirmCb:(isOK)=>{
                      if( isOK ){
-                        Manager.uiManager.open({type:DownloadLoading,zIndex:ViewZOrder.Loading,args:[state,versionInfo.name]});
+                        Manager.uiManager.open({type:DownloadLoading,zIndex:td.ViewZOrder.Loading,args:[state,versionInfo.name]});
                      }else{
                         //不更新
                         //直接关闭掉游戏
@@ -103,7 +101,7 @@ export class BundleManager {
                   text:String.format(i18n.newVersionForBundle,versionInfo.name),
                   confirmCb:(isOK)=>{
                      if( isOK ){
-                        Manager.uiManager.open({type:DownloadLoading,zIndex:ViewZOrder.Loading,args:[state,versionInfo.name]});
+                        Manager.uiManager.open({type:DownloadLoading,zIndex:td.ViewZOrder.Loading,args:[state,versionInfo.name]});
                      }else{
                         game.end();
                      }

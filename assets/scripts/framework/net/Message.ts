@@ -1,5 +1,3 @@
-import { USING_LITTLE_ENDIAN } from "../base/Global";
-
 /**@description utf-8 Uint8Array转字符串 */
 export function Utf8ArrayToStr(array: any) {
 
@@ -189,11 +187,11 @@ export class MessageHeader implements IMessage {
 
         let buffer = new ArrayBuffer(this._dataSize + this.headerSize);
         let dataView = new DataView(buffer);
-        dataView.setUint32(offset,this.mainCmd,USING_LITTLE_ENDIAN);
+        dataView.setUint32(offset,this.mainCmd,td.Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
-        dataView.setUint32(offset,this.subCmd,USING_LITTLE_ENDIAN);
+        dataView.setUint32(offset,this.subCmd,td.Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
-        dataView.setUint32(offset,this._dataSize,USING_LITTLE_ENDIAN);
+        dataView.setUint32(offset,this._dataSize,td.Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
         if( msg.buffer ){
             //感觉这里的复制数据有点low啊
@@ -216,11 +214,11 @@ export class MessageHeader implements IMessage {
         let dataView = new DataView(data.buffer);
         //取包头
         let offset = 0;
-        this.mainCmd = dataView.getUint32(offset, USING_LITTLE_ENDIAN);
+        this.mainCmd = dataView.getUint32(offset, td.Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
-        this.subCmd = dataView.getUint32(offset, USING_LITTLE_ENDIAN);
+        this.subCmd = dataView.getUint32(offset, td.Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
-        this._dataSize = dataView.getUint32(offset, USING_LITTLE_ENDIAN);
+        this._dataSize = dataView.getUint32(offset, td.Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
         let buffer = dataView.buffer.slice(offset, dataView.buffer.byteLength)
         this.buffer = new Uint8Array(buffer);

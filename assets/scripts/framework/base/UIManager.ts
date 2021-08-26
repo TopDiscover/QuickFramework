@@ -1,7 +1,7 @@
-import UIView, {UIClass } from "../ui/UIView";
+import UIView from "../ui/UIView";
+import { ResourceInfo, ResourceCacheData, ViewStatus } from "./Defines";
 import { isValid, js, Node, Prefab, Widget, instantiate, director, Component } from "cc";
 import { DEBUG } from "cc/env";
-import { BUNDLE_RESOURCES, ResourceInfo, ViewStatus } from "./Global";
 
 /**@description 动态加载垃圾数据名 */
 const DYNAMIC_LOAD_GARBAGE = "DYNAMIC_LOAD_GARBAGE";
@@ -147,7 +147,7 @@ export class UIManager {
     /**@description 视图 */
     private _viewDatas: Map<string, ViewData> = new Map<string, ViewData>();
     private getViewData(className: string): ViewData;
-    private getViewData<T extends UIView>(uiClass: UIClass<T>): ViewData;
+    private getViewData<T extends UIView>(uiClass: td.UIClass<T>): ViewData;
     private getViewData(data: any): ViewData | undefined {
         let className = this.getClassName(data);
         if (!className) return undefined;
@@ -156,7 +156,7 @@ export class UIManager {
     }
 
     private getClassName(className: string): string;
-    private getClassName<T extends UIView>(uiClass: UIClass<T>): string;
+    private getClassName<T extends UIView>(uiClass: td.UIClass<T>): string;
     private getClassName(data: any): string | undefined {
         if (!data) return undefined;
         let className = undefined;
@@ -174,7 +174,7 @@ export class UIManager {
     /**@description 驻留内存资源 */
     public retainMemory = new ViewDynamicLoadData(DYNAMIC_LOAD_RETAIN_MEMORY);
 
-    public preload<T extends UIView>(uiClass: UIClass<T>, bundle: BUNDLE_TYPE) {
+    public preload<T extends UIView>(uiClass: td.UIClass<T>, bundle: BUNDLE_TYPE) {
         return this._open(uiClass, bundle, 0, true, undefined, undefined);
     }
 
@@ -200,12 +200,12 @@ export class UIManager {
      * @param zIndex 节点层级 
      * @param args 传入参数列表
      */
-    public open<T extends UIView>(config: { type: UIClass<T>, bundle?: BUNDLE_TYPE, zIndex?: number, args?: any[], delay?: number, name?: string }): Promise<T> {
+    public open<T extends UIView>(config: { type: td.UIClass<T>, bundle?: BUNDLE_TYPE, zIndex?: number, args?: any[], delay?: number, name?: string }): Promise<T> {
         return this._open(config.type, config.bundle as BUNDLE_TYPE, config.zIndex ? config.zIndex : 0, false, config.args, config.delay, config.name);
     }
 
     private _open<T extends UIView>(
-        uiClass: UIClass<T>,
+        uiClass: td.UIClass<T>,
         bundle: BUNDLE_TYPE,
         zOrder: number = 0,
         isPreload: boolean,
@@ -304,7 +304,7 @@ export class UIManager {
 
     private _addComponent<T extends UIView>(
         uiNode: Node,
-        uiClass: UIClass<T>,
+        uiClass: td.UIClass<T>,
         viewData: ViewData,
         className: string,
         zOrder: number,
@@ -360,7 +360,7 @@ export class UIManager {
 
     private createNode<T extends UIView>(
         className: string,
-        uiClass: UIClass<T>,
+        uiClass: td.UIClass<T>,
         reslove: any,
         data: Prefab,
         args: any[] | undefined,
@@ -407,7 +407,7 @@ export class UIManager {
     private loadPrefab(bundle: BUNDLE_TYPE | undefined, url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
         return new Promise<Prefab>((resolove, reject) => {
             if (bundle == undefined || bundle == "" || bundle == null) {
-                bundle = BUNDLE_RESOURCES;
+                bundle = td.Macro.BUNDLE_RESOURCES;
             }
             Manager.assetManager.load(bundle, url, Prefab, progressCallback, (data) => {
                 if (data && data.data && data.data instanceof Prefab) {
@@ -462,7 +462,7 @@ export class UIManager {
         }
     }
 
-    public close<T extends UIView>(uiClass: UIClass<T>): void;
+    public close<T extends UIView>(uiClass: td.UIClass<T>): void;
     public close(className: string): void;
     public close(data: any): void {
         //当前所有界面都已经加载完成
@@ -482,7 +482,7 @@ export class UIManager {
     }
 
     /**@description 关闭除传入参数以外的所有其它界面,不传入，关闭所有界面 */
-    public closeExcept(views: (UIClass<UIView> | string | UIView)[]) {
+    public closeExcept(views: (td.UIClass<UIView> | string | UIView)[]) {
         let self = this;
         if (views == undefined || views == null || views.length == 0) {
             //关闭所有界面
@@ -511,7 +511,7 @@ export class UIManager {
     }
 
     public hide(className: string): void;
-    public hide<T extends UIView>(uiClass: UIClass<T>): void;
+    public hide<T extends UIView>(uiClass: td.UIClass<T>): void;
     public hide(data: any): void {
         let viewData = this.getViewData(data);
         if (viewData) {
@@ -530,7 +530,7 @@ export class UIManager {
     }
 
     public getView(className: string): Promise<any>;
-    public getView<T extends UIView>(uiClass: UIClass<T>): Promise<T>;
+    public getView<T extends UIView>(uiClass: td.UIClass<T>): Promise<T>;
     public getView(data: any): any {
         return new Promise<any>((resolove, reject) => {
             if (data == undefined || data == null) {
@@ -578,7 +578,7 @@ export class UIManager {
     }
 
     public isShow(className: string): boolean;
-    public isShow<T extends UIView>(uiClass: UIClass<T>): boolean;
+    public isShow<T extends UIView>(uiClass: td.UIClass<T>): boolean;
     public isShow(data: any) {
         let viewData = this.getViewData(data);
         if (!viewData) {

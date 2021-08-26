@@ -9,9 +9,7 @@
  import { HotUpdate, AssetManagerCode, AssetManagerState } from "../common/base/HotUpdate";
  import DownloadLoading from "../common/component/DownloadLoading";
 import { game, log } from "cc";
-import { ViewZOrder } from "../common/config/ViewZOrder";
 import { i18n } from "../common/language/CommonLanguage";
-import { BUNDLE_RESOURCES } from "../framework/base/Global";
  
  class LoginLogic extends Logic {
  
@@ -23,7 +21,7 @@ import { BUNDLE_RESOURCES } from "../framework/base/Global";
      }
  
      get bundle() {
-         return BUNDLE_RESOURCES;
+         return td.Macro.BUNDLE_RESOURCES;
      }
  
      onLoad() {
@@ -42,7 +40,7 @@ import { BUNDLE_RESOURCES } from "../framework/base/Global";
                  Manager.alert.show({
                      text: i18n.newVersion, confirmCb: (isOK) => {
                          if (isOK) {
-                             Manager.uiManager.open({ type: DownloadLoading, zIndex: ViewZOrder.UI, args: [state,i18n.halltext] });
+                             Manager.uiManager.open({ type: DownloadLoading, zIndex: td.ViewZOrder.UI, args: [state,i18n.halltext] });
                          } else {
                              //退出游戏
                              game.end();
@@ -71,7 +69,7 @@ import { BUNDLE_RESOURCES } from "../framework/base/Global";
                  log(`检测更新当前状态 code : ${code} state : ${state}`);
              }
          });
-         Manager.uiManager.open({ type: LoginView, zIndex: ViewZOrder.zero, bundle: this.bundle });
+         Manager.uiManager.open({ type: LoginView, zIndex: td.ViewZOrder.zero, bundle: this.bundle });
      }
  
      public onEnterComplete(data: LogicEventData) {

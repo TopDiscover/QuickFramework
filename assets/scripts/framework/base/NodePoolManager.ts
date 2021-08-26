@@ -1,6 +1,5 @@
 import { instantiate, isValid, Node } from "cc";
 import { EDITOR } from "cc/env";
-import { toNamespace } from "./Global";
 
 class NodePool {
     name: string = "unknown";

@@ -1,8 +1,21 @@
+/**@description 调试 */
+declare function log(...args: any[]): void;
+declare function error(...args: any[]): void;
+declare function warn(...args: any[]): void;
 /**
-         * @description 发事件 参考framework/extentions/extentions dispatch 方法
-         * @param name 
-         * @param data 
-         */
+ * @description 界面当前value的值信息
+ * @param value 值 
+ * @param name 名字
+ * @param level 打印对象深度，不传入，如果有对象嵌套对象，默认只打印10层
+ */
+declare function dump(value: any, name?: string, level?: number): void;
+
+declare type BUNDLE_TYPE = string | import("cc").AssetManager.Bundle;
+/**
+ * @description 发事件 参考framework/extentions/extentions dispatch 方法
+ * @param name 
+ * @param data 
+ */
 declare function dispatch(name: string, data?: any): void;
 
 declare interface Date {
@@ -44,44 +57,19 @@ declare interface StringConstructor {
 
 declare function md5(data: any): any;
 
-/**@description 调试 */
-declare function log(...args: any[]): void;
-declare function error(...args: any[]): void;
-declare function warn(...args: any[]): void;
-/**
- * @description 界面当前value的值信息
- * @param value 值 
- * @param name 名字
- * @param level 打印对象深度，不传入，如果有对象嵌套对象，默认只打印10层
- */
-declare function dump(value: any, name?: string, level?: number): void;
-
-declare type BUNDLE_TYPE = string | import("cc").AssetManager.Bundle;
-
-declare type WebSocketType = "ws" | "wss";
-
-declare interface Singleton<T> {
-    new(): T;
-    /**
-     *@description 单例统一实现 
-     */
-    Instance(): T;
-}
-
-/**@description 获取根据类型获取单列 */
-declare function getSingleton<T>(SingletonClass: Singleton<T>): T;
 
 declare interface LanguageData {
     language: string;
 }
 
+declare type WebSocketType = "ws" | "wss";
 /**
  * @description 数据代理
- * 如果是公共总合，name使用 COMMON_LANGUAGE_NAME
+ * 如果是公共总合，name使用 td.COMMON_LANGUAGE_NAME
  */
 declare interface LanguageDataSourceDelegate {
-    name: string;
-    data(language: string): LanguageData;
+	name: string;
+	data(language: string): LanguageData;
 }
 
 /**@description 提示代理 */
@@ -165,53 +153,184 @@ declare interface GameEventInterface {
     onEnterForgeground(inBackgroundTime: number): void;
 }
 
+declare interface Singleton<T> {
+	new(): T;
+	/**
+	 *@description 单例统一实现 
+	 */
+	Instance(): T;
+}
+
+/**@description 获取根据类型获取单列 */
+declare function getSingleton<T>(SingletonClass: Singleton<T>): T;
+/**@description 创建命名空间并返回 默认为td */
+declare function createNamespace(namespace?: string): any;
+/**@description 设置值到该命名空间下，默认为td */
+declare function toNamespace(key: string, value: any, namespace?: string): void;
+
+
 declare namespace td {
-    export class EventComponent extends import("cc").Component {
-        /**
-          * @description 注册网络事件 ，在onLoad中注册，在onDestroy自动移除
-          * @param manCmd 
-          * @param subCmd 
-          * @param func 处理函数
-          * @param handleType 消息解析类型
-          * @param isQueue 是否加入队列
-          */
-        registerEvent(manCmd: number, subCmd: number, func: (data: any) => void, handleType?: any, isQueue?: boolean): void;
-        /**
-         * 注册事件 ，在onLoad中注册，在onDestroy自动移除
-         * @param eventName 
-         * @param func 
-         */
-        registerEvent(eventName: string, func: (data: any) => void): void;
-        /**
-          * @description 注册网络事件 ，在onLoad中注册，在onDestroy自动移除
-          * @param manCmd 
-          * @param subCmd 
-          * @param func 处理函数
-          * @param handleType 消息解析类型 如果不注册类型，返回的是服务器未进行解析的源数据，需要自己进行解包处理
-          * @param isQueue 是否加入队列
-          */
-        addEvent(manCmd: number, subCmd: number, func: (data: any) => void, handleType?: any, isQueue?: boolean): void;
-        /**
-         * 注册事件 ，在onLoad中注册，在onDestroy自动移除
-         * @param eventName 
-         * @param func 
-         */
-        addEvent(eventName: string, func: (data: any) => void): void;
-        /**
-          * @description 删除注册网络事件
-          * @param manCmd 主cmd
-          * @param subCmd 子cmd
-          */
-        removeEvent(manCmd: number, subCmd: number): void;
-        /**
-         * @description 删除普通事件
-         * @param eventName 事件名
-         */
-        removeEvent(eventName: string): void;
-        // protected bindingEvents(): void;
-        onLoad(): void;
-        onDestroy(): void;
-    }
+	/**@description 全局配置命名空间 可使用toNamespace进行对数据的合并*/
+	namespace Config {
+		/**@description 是否显示调试按钮 */
+		export const isShowDebugButton : boolean;
+
+		/**@description 公共Prefabs预置路径 */
+		export const CommonPrefabs : {
+			tips: string,
+			uiLoading: string,
+			loading: string,
+			alert: string,
+		}
+
+		/**@description 公共音效路径 */
+		export const audioPath : {
+			dialog: string,
+			button: string,
+		}
+
+		/**@description 是否跳过热更新检测 */
+		export const isSkipCheckUpdate :boolean;
+
+		/**@description 测试热更新服务器地址 */
+		export const TEST_HOT_UPDATE_URL_ROOT :string;//"http://192.168.0.104:9945/hotupdate";
+
+		/**@description Loading动画显示超时回调默认超时时间 默认30 */
+		export const LOADING_TIME_OUT : number;
+
+		/**@description Loading提示中切换显示内容的时间间隔 默认3 */
+		export const LOADING_CONTENT_CHANGE_INTERVAL : number;
+
+		/**@description 加载界面超时时间,如果在LOAD_VIEW_TIME_OUT秒未加载出，提示玩家加载界面超时,默认20 */
+		export const LOAD_VIEW_TIME_OUT : number;
+
+		/**@description UILoading显示默认时间，即在打开界面时，如果界面在LOAD_VIEW_DELAY之内未显示，就会弹出一的加载界面的进度 
+		 * 在打开界面时，也可直接指定delay的值
+		 * @example  
+		 * Manager.uiManager.open({ type : LoginLayer, zIndex: ViewZOrder.zero, delay : 0.2});
+		 */
+		export const LOAD_VIEW_DELAY :number;
+
+		/**@description 大厅bundle名 */
+		export const BUNDLE_HALL : string;
+
+		/**@description 重连的超时时间 */
+		export const RECONNECT_TIME_OUT : number;
+
+		/**@description 进入后台最大时间（单位秒）大于这个时间时就会进入重连*/
+		export const MAX_INBACKGROUND_TIME : number;
+		/**@description 进入后台最小时间（单位秒）大于这个时间时就会进入重连*/
+		export const MIN_INBACKGROUND_TIME : number;
+
+		/**@description 网络重连弹出框tag */
+		export const RECONNECT_ALERT_TAG : number;
+	}
+
+	export namespace Macro{
+		/**@description 公共语言包数据名 */
+		export const COMMON_LANGUAGE_NAME: string;
+		/**@description 网络数据全以大端方式进行处理 */
+		export const USING_LITTLE_ENDIAN : boolean;
+		/**@description 主包bundle名 */
+		export const BUNDLE_RESOURCES : string;
+		/**@description 远程资源包bundle名 */
+		export const BUNDLE_REMOTE : string;
+		/**@description 是否允许游戏启动后切换语言 */
+		export const ENABLE_CHANGE_LANGUAGE : boolean;
+		/**@description 语言包路径使用前缀 */
+		export const USING_LAN_KEY : string;
+	}
+
+	/**
+ 	 * @description 界面层级定义
+ 	 */
+	export namespace ViewZOrder {
+
+		/**@description 最底层 */
+		export const zero = 0;
+
+		/**@description 小喇叭显示层 */
+		export const Horn = 10;
+
+		/**@description ui层 */
+		export const UI = 100;
+
+		/**@description 提示 */
+		export const Tips = 300;
+
+		/**@description 提示弹出框 */
+		export const Alert = 299;
+
+		/**@description Loading层 */
+		export const Loading = 600;
+
+		/**@description 界面加载动画层，暂时放到最高层，加载动画时，界面未打开完成时，不让玩家点击其它地方 */
+		export const UILoading = 700;
+	}
+
+	namespace Event {
+		export enum Net{
+			/**@description 网络打开 */
+			ON_OPEN = "NetEvent_ON_OPEN",
+			/**@description 网络关闭 */
+			ON_CLOSE = "NetEvent_ON_CLOSE",
+			/**@description 网络错误 */
+			ON_ERROR = "NetEvent_ON_ERROR",
+			/**@description 应用层主动调用网络层close */
+			ON_CUSTOM_CLOSE = "NetEvent_ON_CUSTOM_CLOSE",
+		}
+		/**@description 屏幕适配 */
+		export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
+		/**@description 语言变更 */
+		export const CHANGE_LANGUAGE = "Event_CHANGE_LANGUAGE";
+	}
+
+	export class EventComponent extends cc.Component {
+		/**
+		  * @description 注册网络事件 ，在onLoad中注册，在onDestroy自动移除
+		  * @param manCmd 
+		  * @param subCmd 
+		  * @param func 处理函数
+		  * @param handleType 消息解析类型
+		  * @param isQueue 是否加入队列
+		  */
+		registerEvent(manCmd: number, subCmd: number, func: (data: any) => void, handleType?: any, isQueue?: boolean): void;
+		/**
+		 * 注册事件 ，在onLoad中注册，在onDestroy自动移除
+		 * @param eventName 
+		 * @param func 
+		 */
+		registerEvent(eventName: string, func: (data: any) => void): void;
+		/**
+		  * @description 注册网络事件 ，在onLoad中注册，在onDestroy自动移除
+		  * @param manCmd 
+		  * @param subCmd 
+		  * @param func 处理函数
+		  * @param handleType 消息解析类型 如果不注册类型，返回的是服务器未进行解析的源数据，需要自己进行解包处理
+		  * @param isQueue 是否加入队列
+		  */
+		addEvent(manCmd: number, subCmd: number, func: (data: any) => void, handleType?: any, isQueue?: boolean): void;
+		/**
+		 * 注册事件 ，在onLoad中注册，在onDestroy自动移除
+		 * @param eventName 
+		 * @param func 
+		 */
+		addEvent(eventName: string, func: (data: any) => void): void;
+		/**
+		  * @description 删除注册网络事件
+		  * @param manCmd 主cmd
+		  * @param subCmd 子cmd
+		  */
+		removeEvent(manCmd: number, subCmd: number): void;
+		/**
+		 * @description 删除普通事件
+		 * @param eventName 事件名
+		 */
+		removeEvent(eventName: string): void;
+		// protected bindingEvents(): void;
+		onLoad(): void;
+		onDestroy(): void;
+	}
 
     export class AudioComponent extends EventComponent {
         /**@description 音频控件资源拥有者，该对象由UIManager打开的界面 */
@@ -805,34 +924,28 @@ declare namespace td {
         readonly uiLoading: UILoading;
         /**@description websocket wss 证书url地址 */
         wssCacertUrl: string;
-        /**@description 全局常驻网络组件管理器,注册到该管理器的网络组件会跟游戏的生命周期一致 */
-        readonly netManager: NetManager;
-        /**@description 大厅的网络控制器组件管理器，注册到该管理器的网络组件，除登录界面外，都会被移除掉*/
-        readonly hallNetManager: NetManager;
-        /**@description 网络Service管理器 */
-        readonly serviceManager: ServiceManager;
+	    /**@description 提示框 */
+        readonly alert: Alert;
+	    /**@description 公共loading */
+        readonly loading: Loading;
         /**@description 逻辑控制器管理器 */
         readonly logicManager: LogicManager;
-        /**@description bundle管理器 */
-        readonly bundleManager: BundleManager;
-        /**@description 弹出提示框,带一到两个按钮 */
-        readonly alert: Alert;
-        /**@description 公共loading */
-        readonly loading: Loading;
-        /**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
-        readonly globalAudio: GlobalAudio;
+        /**@description 游戏数据 自行设置 */
+        gameData: GameData|null;
+        /**@description 游戏网络控制器 自行设置 */
+        gameController: any;
         /**@description 当前游戏GameView, GameView进入onLoad赋值 */
         gameView: GameView|null;
-        /**@description 游戏数据 */
-        gameData: GameData|null;
-        /**
-         * @description 游戏控制器，在自己的模块内写函数有类型化读取,此值在Logic.addNetComponent赋值
-         * @example 
-         * export function netController() : TankBattleNetController{
-         * return Manager.gameController;
-         * }
-         */
-        gameController: any;
+        /**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
+        readonly globalAudio: GlobalAudio;
+        /**@description bundle管理器 */
+        readonly bundleManager: BundleManager;
+        /**@description 网络Service管理器 */
+        readonly serviceManager: ServiceManager;
+        /**@description 大厅的网络控制器组件管理器，注册到该管理器的网络组件，除登录界面外，都会被移除掉*/
+        readonly hallNetManager: NetManager;
+        /**@description 全局常驻网络组件管理器,注册到该管理器的网络组件会跟游戏的生命周期一致 */
+        readonly netManager: NetManager;
         /**
         * @description 把语言包转换成i18n.xxx形式
         * @param param 语言包配置

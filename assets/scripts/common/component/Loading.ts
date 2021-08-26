@@ -1,7 +1,4 @@
-import { Config } from "../config/Config";
 import { find ,instantiate,Label,Node, Prefab, tween, Vec3} from "cc";
-import { ViewZOrder } from "../config/ViewZOrder";
-import { BUNDLE_RESOURCES, EventApi } from "../../framework/base/Global";
 /**
  * @description 加载动画
  */
@@ -12,7 +9,7 @@ export default class Loading {
     /**@description 当前loading节点 */
     private _node: Node = null!;
     constructor() {
-        Manager.eventDispatcher.addEventListener(EventApi.AdaptScreenEvent, this.onAdaptScreen, this);
+        Manager.eventDispatcher.addEventListener(td.Event.ADAPT_SCREEN, this.onAdaptScreen, this);
     }
     private onAdaptScreen() {
         Manager.resolutionHelper.fullScreenAdapt(this._node);
@@ -50,7 +47,7 @@ export default class Loading {
      * @param timeOutCb 超时回调
      * @param timeout 显示超时时间
      */
-    public show( content : string | string[] , timeOutCb?:()=>void,timeout = Config.LOADING_TIME_OUT ) {
+    public show( content : string | string[] , timeOutCb?:()=>void,timeout = td.Config.LOADING_TIME_OUT ) {
         this._timeOutCb = timeOutCb;
         if( Array.isArray(content) ){
             this._content = content;
@@ -67,7 +64,7 @@ export default class Loading {
         let finish = await this.loadPrefab();
         if (finish) {
             this._node.removeFromParent();
-            Manager.uiManager.addChild(this._node,ViewZOrder.Loading);
+            Manager.uiManager.addChild(this._node,td.ViewZOrder.Loading);
             this._node.position = Vec3.ZERO;
             this._text = find("content/text",this._node)?.getComponent(Label) as Label;
             this._showContentIndex = 0;
@@ -93,7 +90,7 @@ export default class Loading {
             .call(()=>{
                 this._text.string = this._content[this._showContentIndex];
             })
-            .delay(Config.LOADING_CONTENT_CHANGE_INTERVAL)
+            .delay(td.Config.LOADING_CONTENT_CHANGE_INTERVAL)
             .call(()=>{
                 this._showContentIndex ++;
                 if( this._showContentIndex >= this._content.length ){
@@ -145,14 +142,14 @@ export default class Loading {
             }
             this._isLoadingPrefab = true;
             Manager.assetManager.load(
-                BUNDLE_RESOURCES, 
-                Config.CommonPrefabs.loading,
+                td.Macro.BUNDLE_RESOURCES, 
+                td.Config.CommonPrefabs.loading,
                 Prefab,
                 (finish, total, item)=>{},
                 (data) => {
                 this._isLoadingPrefab = false;
                 if (data && data.data && data.data instanceof Prefab) {
-                    Manager.assetManager.addPersistAsset(Config.CommonPrefabs.loading,data.data,BUNDLE_RESOURCES)
+                    Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.loading,data.data,td.Macro.BUNDLE_RESOURCES)
                     this._node = instantiate(data.data);
                     resolove(true);
                 }

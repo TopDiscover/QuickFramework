@@ -1,4 +1,5 @@
 import WebEditBoxImpl from "./WebEditBoxImpl";
+import { ResourceType } from "../base/Defines";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
@@ -7,7 +8,6 @@ import {
 import { isValid, SpriteFrame, sp, Font, ParticleSystem2D, ParticleAsset, sys, EditBox, Sprite,Node, Button, Label, randomRange, Asset, AssetManager} from "cc";
 import { DEBUG, EDITOR, PREVIEW } from "cc/env";
 import UIView from "../ui/UIView";
-import { BUNDLE_REMOTE, ENABLE_CHANGE_LANGUAGE, EventApi, ResourceType, USING_LAN_KEY } from "../base/Global";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
 if (typeof Reflect == "object") {
@@ -75,7 +75,7 @@ prototype.loadRemoteImage = function (config: any) {
     let defaultBundle = getBundle({ bundle: config.defaultBundle, view: config.view })
     Manager.assetManager.remote.loadImage(config.url, config.isNeedCache).then((data) => {
         if (data) {
-            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback, BUNDLE_REMOTE, ResourceType.Remote, isRetain);
+            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback, td.Macro.BUNDLE_REMOTE, ResourceType.Remote, isRetain);
         } else {
             if (config.defaultSpriteFrame) {
                 if (typeof config.defaultSpriteFrame == "string") {
@@ -241,16 +241,16 @@ Reflect.defineProperty(Label.prototype, "language", {
                 self.string = "";
             }
         }
-        if (ENABLE_CHANGE_LANGUAGE) {
+        if (td.Macro.ENABLE_CHANGE_LANGUAGE) {
             updateLanguage(v, (isUsing: boolean) => {
                 if (isUsing) {
                     if (!!!self._isUsinglanguage) {
                         self._isUsinglanguage = true;
-                        Manager.eventDispatcher.addEventListener(EventApi.CHANGE_LANGUAGE, self._onChangeLanguage, self);
+                        Manager.eventDispatcher.addEventListener(td.Event.CHANGE_LANGUAGE, self._onChangeLanguage, self);
                     }
                 } else {
                     if (self._language) {
-                        Manager.eventDispatcher.removeEventListener(EventApi.CHANGE_LANGUAGE, self);
+                        Manager.eventDispatcher.removeEventListener(td.Event.CHANGE_LANGUAGE, self);
                     }
                 }
             })
@@ -261,7 +261,7 @@ Reflect.defineProperty(Label.prototype, "language", {
 });
 
 prototype = Label.prototype;
-if (!EDITOR && ENABLE_CHANGE_LANGUAGE) {
+if (!EDITOR && td.Macro.ENABLE_CHANGE_LANGUAGE) {
     prototype._onChangeLanguage = function () {
         this.language = this.language;
     }
@@ -269,14 +269,14 @@ if (!EDITOR && ENABLE_CHANGE_LANGUAGE) {
     let __label_onDestroy__ = prototype.onDestroy;
     prototype.onDestroy = function () {
         if (this._isUsinglanguage) {
-            Manager.eventDispatcher.removeEventListener(EventApi.CHANGE_LANGUAGE, this);
+            Manager.eventDispatcher.removeEventListener(td.Event.CHANGE_LANGUAGE, this);
         }
         __label_onDestroy__ && __label_onDestroy__.call(this);
     }
 
     let __label_onLoad__ = prototype.onLoad;
     prototype.onLoad = function () {
-        if (this.string.indexOf(USING_LAN_KEY) > -1) {
+        if (this.string.indexOf(td.Macro.USING_LAN_KEY) > -1) {
             this.language = [this.string];
         }
         __label_onLoad__ && __label_onLoad__.call(this);

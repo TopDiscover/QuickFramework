@@ -1,4 +1,4 @@
-import UIView, { UIClass } from "../../framework/ui/UIView";
+import UIView from "../../framework/ui/UIView";
 
 /**
  * @description 逻辑模块类型
@@ -23,7 +23,7 @@ export interface LogicEventData {
     type: LogicType;
 
     /**@description 需要排除的界面，除这些界面之外的其它界面将会关闭 */
-    views: (UIClass<UIView> | string | UIView)[];
+    views: (td.UIClass<UIView> | string | UIView)[];
 
     /**@description 其它用户数据 */
     data?: any;

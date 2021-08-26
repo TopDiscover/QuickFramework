@@ -1,8 +1,6 @@
 import { Asset} from "cc";
 import { DEBUG } from "cc/env";
-import { ResourceData } from "../base/Defines";
-import { ResourceCacheData, ResourceInfo } from "../base/Global";
-
+import { ResourceCacheData, ResourceData, ResourceInfo } from "../base/Defines";
 export enum ResourceLoaderError {
     /**@description 加载中 */
     LOADING,

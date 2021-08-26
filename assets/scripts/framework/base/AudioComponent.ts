@@ -2,7 +2,7 @@ import UIView from "../ui/UIView";
 import EventComponent from "./EventComponent";
 import { AudioClip, AudioSource, _decorator } from "cc";
 import { DEBUG } from "cc/env";
-import { BUNDLE_RESOURCES, ResourceInfo } from "./Global";
+import { ResourceInfo } from "./Defines";
 
 /**
  * @description 声音组件
@@ -11,7 +11,7 @@ const { ccclass, property, menu } = _decorator;
 
 export class AudioInfo {
     url: string = "";
-    bundle: BUNDLE_TYPE = BUNDLE_RESOURCES;
+    bundle: BUNDLE_TYPE = td.Macro.BUNDLE_RESOURCES;
     source: AudioSource | null = null;
     owner: UIView | null = null;
     isPause = false;

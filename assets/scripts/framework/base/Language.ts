@@ -1,5 +1,4 @@
 import { sys } from "cc";
-import { COMMON_LANGUAGE_NAME, ENABLE_CHANGE_LANGUAGE, EventApi, USING_LAN_KEY } from "./Global";
 const LANG_KEY: string = "using_language";
 
 export class Language {
@@ -28,7 +27,7 @@ export class Language {
         if (index != -1) {
             this.delegates.splice(index, 1);
             let data: any = this._data;
-            if (delegate.name != COMMON_LANGUAGE_NAME && data[delegate.name]) {
+            if (delegate.name != td.Macro.COMMON_LANGUAGE_NAME && data[delegate.name]) {
                 data[delegate.name] = {};
             }
         }
@@ -47,13 +46,13 @@ export class Language {
             //当前有语言包数据 相同语言包，不再进行设置
             return;
         }
-        if (ENABLE_CHANGE_LANGUAGE) {
+        if (td.Macro.ENABLE_CHANGE_LANGUAGE) {
             //先更新所有数据
             this.delegates.forEach((delegate, index, source) => {
                 this._data = delegate.data(language);
             });
             //通知更新
-            dispatch(EventApi.CHANGE_LANGUAGE, language);
+            dispatch(td.Event.CHANGE_LANGUAGE, language);
         } else {
             this.delegates.forEach((delegate, index, source) => {
                 this._data = delegate.data(this.getLanguage());
@@ -72,7 +71,7 @@ export class Language {
                 error("key error");
                 break;
             }
-            if (keyString.indexOf(USING_LAN_KEY) > -1) {
+            if (keyString.indexOf(td.Macro.USING_LAN_KEY) > -1) {
 
                 let keys = keyString.split(".");
                 if (keys.length < 2) {

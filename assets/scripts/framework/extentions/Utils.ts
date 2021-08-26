@@ -1,6 +1,6 @@
 import UIView from "../ui/UIView";
 import { Button, Component, Font, isValid, Label, ParticleAsset, ParticleSystem2D, Sprite, SpriteFrame, sp, Node, Prefab, instantiate, Asset, AssetManager } from "cc";
-import { BUNDLE_REMOTE, BUNDLE_RESOURCES, ResourceInfo, ResourceType } from "../base/Global";
+import { ResourceInfo , ResourceType , ResourceCacheData} from "../base/Defines";
 
 /**@description 添加加载本地的资源 */
 export function addExtraLoadResource(view: td.UIView, info: td.ResourceInfo) {
@@ -16,7 +16,7 @@ export function addExtraLoadResource(view: td.UIView, info: td.ResourceInfo) {
 }
 
 /**@description 添加加载远程的资源 */
-export function addRemoteLoadResource(view: UIView, info: ResourceInfo) {
+export function addRemoteLoadResource(view: UIView, info: td.ResourceInfo) {
     let uiManager = Manager.uiManager;
     if (view == <any>(uiManager.retainMemory)) {
         uiManager.retainMemory.addRemote(info);
@@ -32,7 +32,7 @@ export function addRemoteLoadResource(view: UIView, info: ResourceInfo) {
 export function getBundle(config: { bundle?: BUNDLE_TYPE, view?: UIView }):BUNDLE_TYPE {
     let bundle = config.bundle;
     if (config.bundle == undefined || config.bundle == null) {
-        bundle = BUNDLE_RESOURCES;
+        bundle = td.Macro.BUNDLE_RESOURCES;
         if (config.view) {
             bundle = config.view.bundle;
         }
@@ -341,7 +341,7 @@ export function setSkeletonSkeletonData(
     info.retain = retain;
     info.bundle = getBundle(config);
     if (resourceType == ResourceType.Remote) {
-        info.bundle = BUNDLE_REMOTE;
+        info.bundle = td.Macro.BUNDLE_REMOTE;
         addRemoteLoadResource(config.view, info);
     } else {
         addExtraLoadResource(config.view, info);
@@ -398,7 +398,7 @@ export function _loadDirRes(config: {
     type: typeof Asset,
     view: any,
     onProgress?: (finish: number, total: number, item: AssetManager.RequestItem) => void,
-    onComplete: (data: td.ResourceCacheData) => void
+    onComplete: (data: ResourceCacheData) => void
 }) {
     let bundle = getBundle(config);
     let cache = Manager.cacheManager.get(bundle, config.url);

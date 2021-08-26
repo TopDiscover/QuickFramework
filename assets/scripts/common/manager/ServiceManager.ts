@@ -3,7 +3,6 @@
  */
 
 import { DEBUG } from "cc/env";
- import { Config } from "../config/Config";
  import { LogicEvent } from "../event/LogicEvent";
  import { ChatService } from "../net/ChatService";
  import { CommonService } from "../net/CommonService";
@@ -81,17 +80,17 @@ import { DEBUG } from "cc/env";
                  if (view) return;
                  service.reconnect.hide();
                  log(`${service.serviceName} 断开`)
-                 let current = Manager.alert.currentShow(Config.RECONNECT_ALERT_TAG);
+                 let current = Manager.alert.currentShow(td.Config.RECONNECT_ALERT_TAG);
                  if( current ){
                      let showService : CommonService = current.userData;
                      if( service.priority > showService.priority ){
                          //如果尝试连接的优先级更高，显示优先级更高的连接
                          log(`显示更新优先级重连弹出框 : ${service.serviceName}`);
-                         Manager.alert.close(Config.RECONNECT_ALERT_TAG);
+                         Manager.alert.close(td.Config.RECONNECT_ALERT_TAG);
                      }
                  }
                  Manager.alert.show({
-                     tag: Config.RECONNECT_ALERT_TAG,
+                     tag: td.Config.RECONNECT_ALERT_TAG,
                      isRepeat: false,
                      userData:service,
                      text: Manager.getLanguage(["warningReconnect", service.serviceName]),
@@ -110,7 +109,7 @@ import { DEBUG } from "cc/env";
                  });
              });
          } else {
-             if( Manager.alert.isCurrentShow(Config.RECONNECT_ALERT_TAG)){
+             if( Manager.alert.isCurrentShow(td.Config.RECONNECT_ALERT_TAG)){
                  if( DEBUG ) warn(`有一个重连提示框显示，等待玩家操作`);
                  return;
              }

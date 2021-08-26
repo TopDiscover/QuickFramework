@@ -2,12 +2,11 @@
 
 import { LanguageZH } from "./LanguageZH";
 import { LanguageEN } from "./LanguageEN";
-import { COMMON_LANGUAGE_NAME } from "../../framework/base/Global";
 
 export let i18n = LanguageZH;
 
 export class CommonLanguage implements LanguageDataSourceDelegate{
-    name = COMMON_LANGUAGE_NAME;
+    name = td.Macro.COMMON_LANGUAGE_NAME;
     data( language : string ): LanguageData {
         if( i18n.language == language ){
             return i18n;

@@ -1,8 +1,6 @@
 import { js, _decorator } from "cc";
 import { ServiceEvent } from "../../framework/base/Defines";
-import { CustomNetEventType } from "../../framework/base/Global";
 import Controller from "../../framework/controller/Controller";
-import { Config } from "../config/Config";
 import { LogicEvent, LogicEventData, LogicType } from "../event/LogicEvent";
 import { CommonService } from "./CommonService";
 
@@ -61,7 +59,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
             this._isDoConnect = false;
             //启用连接超时处理
             this.unschedule(this.connectTimeOut);
-            this.scheduleOnce(this.connectTimeOut, Config.RECONNECT_TIME_OUT);
+            this.scheduleOnce(this.connectTimeOut, td.Config.RECONNECT_TIME_OUT);
         }
     }
 
@@ -98,7 +96,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
         this.service && this.service.reconnect.hideNode();
         log(`${this.logName} ${this.service.serviceName} 断开`)
         Manager.alert.show({
-            tag: Config.RECONNECT_ALERT_TAG,
+            tag: td.Config.RECONNECT_ALERT_TAG,
             isRepeat:false,
             text: Manager.getLanguage(["warningReconnect", this.service.serviceName]),
             confirmCb: (isOK) => {
@@ -124,7 +122,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
             //根据自己的业务，请示登录，拉游戏数据等操作
             this.service.reconnect.hide();
             this._connectCount = 0;
-            Manager.alert.close(Config.RECONNECT_ALERT_TAG);
+            Manager.alert.close(td.Config.RECONNECT_ALERT_TAG);
             Manager.serviceManager.onReconnectSuccess(this.service);
             log(`${this.logName} ${this.service.serviceName}服务器重连成功`);
         }
@@ -145,7 +143,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
     protected onNetClose(event: ServiceEvent) {
         let result = super.onNetClose(event);
         if (result) {
-            if (event.event.type == CustomNetEventType.CLOSE) {
+            if (event.event.type == td.Event.Net.ON_CUSTOM_CLOSE) {
                 log(`${this.logName} 应用层主动关闭socket`);
                 return false;
             }

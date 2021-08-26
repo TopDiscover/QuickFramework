@@ -1,6 +1,6 @@
 import { Asset, assetManager, AssetManager, JsonAsset, TextAsset, Texture2D, sp, SpriteFrame, ImageAsset } from "cc";
 import { DEBUG } from "cc/env";
-import { BUNDLE_REMOTE, ResourceCacheData, ResourceCacheStatus, ResourceInfo, ResourceType } from "../base/Global";
+import { ResourceCacheData, ResourceCacheStatus, ResourceInfo, ResourceType } from "../base/Defines";
 
 class RemoteLoader {
 
@@ -58,7 +58,7 @@ class RemoteLoader {
                     cache = new ResourceCacheData();
                     cache.info.resourceType = ResourceType.Remote;
                     cache.info.type = sp.SkeletonData;
-                    cache.info.bundle = BUNDLE_REMOTE;
+                    cache.info.bundle = td.Macro.BUNDLE_REMOTE;
                     Manager.cacheManager.remoteCaches.set(url, cache);
                     me._loadRemoteRes(spinePng, Asset, isNeedCache).then((image: ImageAsset) => {
                         if (image) {

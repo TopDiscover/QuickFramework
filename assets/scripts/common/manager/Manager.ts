@@ -1,12 +1,11 @@
 /**@description 管理器 */
-//日志
-import { Log, LogLevel } from "../../framework/log/Log";
-Log.logLevel = LogLevel.ERROR | LogLevel.LOG | LogLevel.WARN | LogLevel.DUMP;
 import { Framewok } from "../../framework/Framework";
+import { commonConfigInit } from "../config/Config";
+commonConfigInit();
+import { Log, LogLevel } from "../../framework/log/Log";
 import { NetManager } from "./NetManager";
 import { LogicManager } from "./LogicManager";
 import GlobalAudio from "../component/GlobalAudio";
-import { extentionsInit } from "../../framework/extentions/Extentions";
 import { CocosExtentionInit } from "../../framework/extentions/CocosExtention";
 import GameView from "../base/GameView";
 import { GameData } from "../base/GameData";
@@ -53,11 +52,6 @@ class _Manager extends Framewok {
         return getSingleton(BundleManager);
     }
 
-    /**@description 弹出提示框,带一到两个按钮 */
-    get alert() {
-        return getSingleton(Alert);
-    }
-
     /**@description 小提示 */
     get tips():Tips {
         return getSingleton(Tips);
@@ -66,6 +60,11 @@ class _Manager extends Framewok {
     /**@description 界面加载时的全屏Loading,显示加载进度 */
     get uiLoading():UILoading {
         return getSingleton(UILoading);
+    }
+
+    /**@description 弹出提示框,带一到两个按钮 */
+    get alert() {
+        return getSingleton(Alert);
     }
 
     /**@description 公共loading */
@@ -111,8 +110,6 @@ class _Manager extends Framewok {
 
         //适配
         this.resolutionHelper.initBrowserAdaptor();
-        //扩展
-        extentionsInit();
         //引擎扩展初始化
         CocosExtentionInit();
         //语言包初始化
@@ -122,6 +119,7 @@ class _Manager extends Framewok {
 }
 
 export function applicationInit() {
+    Log.logLevel = LogLevel.ERROR | LogLevel.LOG | LogLevel.WARN | LogLevel.DUMP;
     const Manager = new _Manager();
     (<any>window)["Manager"] = Manager;
     Manager.init();

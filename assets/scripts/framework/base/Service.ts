@@ -2,7 +2,6 @@ import { ServerConnector } from "../net/ServerConnector";
 import { makeKey } from "../decorator/Decorators";
 import { Message, MessageHeader, IMessage } from "../net/Message";
 import { DEBUG } from "cc/env";
-import { EventApi } from "./Global";
 
 /**
  * @description 与服务器之间消息收发基类,注册消息并转发
@@ -66,15 +65,15 @@ export class Service extends ServerConnector {
     }
     protected onOpen() {
         super.onOpen();
-        dispatch(EventApi.NetEvent.ON_OPEN, { service: this, event: null });
+        dispatch(td.Event.Net.ON_OPEN, { service: this, event: null });
     }
     protected onClose(ev: Event) {
         super.onClose(ev);
-        dispatch(EventApi.NetEvent.ON_CLOSE, { service: this, event: ev });
+        dispatch(td.Event.Net.ON_CLOSE, { service: this, event: ev });
     }
     protected onError(ev: Event) {
         super.onError(ev);
-        dispatch(EventApi.NetEvent.ON_ERROR, { service: this, event: ev });
+        dispatch(td.Event.Net.ON_ERROR, { service: this, event: ev });
     }
     protected onMessage(data: Uint8Array) {
 

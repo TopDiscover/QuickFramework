@@ -1,8 +1,7 @@
 import UIView from "../ui/UIView";
 import { DEBUG } from "cc/env";
 import { Asset, assetManager, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D, ImageAsset } from "cc";
-import { ResourceCacheData, ResourceInfo } from "../base/Global";
-
+import { ResourceCacheData, ResourceInfo } from "../base/Defines";
 class ResourceCache {
     print() {
         let content: any[] = [];

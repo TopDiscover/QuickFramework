@@ -5,7 +5,6 @@ import { Message } from "../net/Message";
 import { ServiceEvent } from "../base/Defines";
 import { _decorator } from "cc";
 import { DEBUG } from "cc/env";
-import { EventApi } from "../base/Global";
 
 /**
  * @description 控制器基类 , 对service 的自动注入
@@ -28,9 +27,9 @@ export default class Controller<ServiceType> extends EventComponent {
 
     protected bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(EventApi.NetEvent.ON_OPEN, this.onNetOpen);
-        this.registerEvent(EventApi.NetEvent.ON_CLOSE, this.onNetClose);
-        this.registerEvent(EventApi.NetEvent.ON_ERROR, this.onNetError);
+        this.registerEvent(td.Event.Net.ON_OPEN, this.onNetOpen);
+        this.registerEvent(td.Event.Net.ON_CLOSE, this.onNetClose);
+        this.registerEvent(td.Event.Net.ON_ERROR, this.onNetError);
     }
 
     protected onNetOpen(event: ServiceEvent) {
