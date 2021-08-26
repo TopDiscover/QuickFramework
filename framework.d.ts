@@ -285,7 +285,7 @@ declare namespace td {
 		export const CHANGE_LANGUAGE = "Event_CHANGE_LANGUAGE";
 	}
 
-	export class EventComponent extends cc.Component {
+	export class EventComponent extends import("cc").Component {
 		/**
 		  * @description 注册网络事件 ，在onLoad中注册，在onDestroy自动移除
 		  * @param manCmd 

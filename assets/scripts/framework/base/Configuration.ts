@@ -2,7 +2,8 @@
 export function configurationInit() {
     
 }
-
+/**@description 设置值到该命名空间下，默认为td */
+declare function toNamespace(key: string, value: any, namespace?: string): void;
 namespace Config {
     /**@description 是否显示调试按钮 */
     export const isShowDebugButton = true;
