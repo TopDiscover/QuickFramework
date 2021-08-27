@@ -1,30 +1,13 @@
 /**
  * @description http网络请求
  */
-
-export enum HttpErrorType {
-    UrlError,//错误的Url地方
-    TimeOut,//超时
-    RequestError,//请求错误
-}
-
-export interface HttpError {
-    type: HttpErrorType,
-    reason: any
-}
-
-export enum HttpRequestType {
-    POST = "POST",
-    GET = "GET",
-}
-
 class HttpPackageData {
     data: any = null;
     url: string = null;
     /**@description 超时设置 默认为10s*/
     timeout: number = 10000;
     /**@description 请求类型 默认为GET请求*/
-    type: HttpRequestType = HttpRequestType.GET;
+    type: td.Http.RequestType = td.Http.RequestType.GET;
     requestHeader: { name: string, value: string }[] | { name: string, value: string } = null;
     /**@description 发送接口时，默认为false 仅浏览器端生效
      * 自动附加当前时间的参数字段
@@ -85,7 +68,7 @@ export class HttpPackage {
      * @param cb 
      * @param errorcb 
      */
-    public send(cb?: (data: any) => void, errorcb?: (errorData: HttpError) => void) {
+    public send(cb?: (data: any) => void, errorcb?: (errorData: td.Http.Error) => void) {
         HttpClient.request(this, cb, errorcb);
     }
 }
@@ -139,14 +122,14 @@ class HttpClient {
         return  result;
     }
 
-    static request(httpPackage: HttpPackage, cb?: (data: any) => void, errorcb?: (errorData: HttpError) => void) {
+    static request(httpPackage: HttpPackage, cb?: (data: any) => void, errorcb?: (errorData: td.Http.Error) => void) {
 
         let url = httpPackage.data.url;
         if (!url) {
             if ( CC_DEBUG ){
                 cc.error(`reuqest url error`);
             }
-            if (errorcb) errorcb({ type: HttpErrorType.UrlError, reason: "错误的Url地址" });
+            if (errorcb) errorcb({ type: td.Http.ErrorType.UrlError, reason: "错误的Url地址" });
             return;
         }
 
@@ -163,7 +146,7 @@ class HttpClient {
                 } else {
                     let reason = `请求错误,错误状态:${xhr.status}`;
                     cc.error(`request error status : ${xhr.status} url : ${url} `);
-                    if (errorcb) errorcb({ type: HttpErrorType.RequestError, reason: reason });
+                    if (errorcb) errorcb({ type: td.Http.ErrorType.RequestError, reason: reason });
                 }
             }
             else {
@@ -177,12 +160,12 @@ class HttpClient {
         xhr.ontimeout = () => {
             xhr.abort();//网络超时，断开连接
             if ( CC_DEBUG) cc.warn(`request timeout : ${url}`);
-            if (errorcb) errorcb({ type: HttpErrorType.TimeOut, reason: "连接超时" });
+            if (errorcb) errorcb({ type: td.Http.ErrorType.TimeOut, reason: "连接超时" });
         };
 
         xhr.onerror = () => {
             cc.error(`request error : ${url} `);
-            if (errorcb) errorcb({ type: HttpErrorType.RequestError, reason: "请求错误" });
+            if (errorcb) errorcb({ type: td.Http.ErrorType.RequestError, reason: "请求错误" });
         };
 
         if ( CC_DEBUG ) cc.log(`[send http request] url : ${url} request type : ${httpPackage.data.type} , responseType : ${xhr.responseType}`);
@@ -204,8 +187,8 @@ class HttpClient {
             if ( CC_DEBUG) cc.log(`[send http request] corss prox url : ${url} request type : ${httpPackage.data.type} , responseType : ${xhr.responseType}`);
         }
 
-        if (httpPackage.data.type === HttpRequestType.POST) {
-            xhr.open(HttpRequestType.POST, url);
+        if (httpPackage.data.type === td.Http.RequestType.POST) {
+            xhr.open(td.Http.RequestType.POST, url);
             if (httpPackage.data.requestHeader) {
                 if( httpPackage.data.requestHeader instanceof Array ){
                     httpPackage.data.requestHeader.forEach((header)=>{
@@ -222,7 +205,7 @@ class HttpClient {
             xhr.send( httpPackage.data.data );
         }
         else {
-            xhr.open(HttpRequestType.GET, url, true);
+            xhr.open(td.Http.RequestType.GET, url, true);
             if( httpPackage.data.requestHeader ){
                 if( httpPackage.data.requestHeader instanceof Array ){
                     httpPackage.data.requestHeader.forEach((header)=>{

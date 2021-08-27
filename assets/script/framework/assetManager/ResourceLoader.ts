@@ -1,5 +1,3 @@
-import { ResourceData, ResourceCacheData, ResourceInfo } from "../base/Defines";
-
 export enum ResourceLoaderError {
     /**@description 加载中 */
     LOADING,
@@ -15,12 +13,12 @@ export enum ResourceLoaderError {
 export default class ResourceLoader {
 
     /** @description 加载资源数据 */
-    private _resources: Map<string,ResourceData> = new Map<string,ResourceData>();
+    private _resources: Map<string,td.Resource.Data> = new Map<string,td.Resource.Data>();
     /**@description 当前已经加载的资源数量 */
     private _loadedCount: number = 0;
 
     /**@description 加载完成后的数据，为了方便释放时精准释放，没加载成功的资源，不在做释放的判断 */
-    private _loadedResource: Map<string,ResourceInfo>  = new Map<string,ResourceInfo>();
+    private _loadedResource: Map<string,td.Resource.Info>  = new Map<string,td.Resource.Info>();
 
     /**@description 当前是否正在加载资源 */
     private _isLoading: boolean = false;
@@ -44,8 +42,8 @@ export default class ResourceLoader {
     }
 
     /**@description 加载进度 */
-    public _onLoadProgress: (loadedCount: number, toatl: number, data: ResourceCacheData) => void;
-    public set onLoadProgress(value: (loadedCount: number, toatl: number, data: ResourceCacheData) => void) {
+    public _onLoadProgress: (loadedCount: number, toatl: number, data: td.Resource.CacheData) => void;
+    public set onLoadProgress(value: (loadedCount: number, toatl: number, data: td.Resource.CacheData) => void) {
         this._onLoadProgress = value;
     }
     public get onLoadProgress() {
@@ -56,11 +54,11 @@ export default class ResourceLoader {
     /**
      * @description 实现类必须给个需要加载资源
      */
-    private _getLoadResource: () => ResourceData[] = null;
-    public set getLoadResources(func: () => ResourceData[]) {
+    private _getLoadResource: () => td.Resource.Data[] = null;
+    public set getLoadResources(func: () => td.Resource.Data[]) {
         this._getLoadResource = func;
     }
-    public get getLoadResources(): () => ResourceData[] {
+    public get getLoadResources(): () => td.Resource.Data[] {
         return this._getLoadResource;
     }
 
@@ -114,10 +112,10 @@ export default class ResourceLoader {
         });
 
         this._loadedCount = 0;
-        this._resources.forEach((value: ResourceData,key,source) => {
+        this._resources.forEach((value,key,source) => {
             if ( value.preloadView ){
                 Manager.uiManager.preload(value.preloadView,value.bundle).then((view)=>{
-                    let cache = new ResourceCacheData();
+                    let cache = new td.Resource.CacheData();
                     cache.isLoaded = true;
                     cache.data = <any>view;
                     cache.info.url = value.preloadView.getPrefabUrl();
@@ -148,7 +146,7 @@ export default class ResourceLoader {
             return;
         }
         if (this._resources.size > 0) {
-            this._resources.forEach((value: ResourceData) => {
+            this._resources.forEach((value) => {
                 if ( value.url ){
                     if( this._loadedResource.has(value.url)){
                         let data = this._loadedResource.get(value.url);
@@ -174,7 +172,7 @@ export default class ResourceLoader {
         this._resources.clear();
     }
 
-    private _onLoadResourceComplete(data: ResourceCacheData) {
+    private _onLoadResourceComplete(data: td.Resource.CacheData) {
         this._loadedCount++;
 
         if (this._onLoadProgress) {
@@ -187,7 +185,7 @@ export default class ResourceLoader {
 
         if (data && ( Array.isArray(data.data) || data.data instanceof cc.Asset ) ) {
             //排除掉界面管理器
-            let info = new ResourceInfo;
+            let info = new td.Resource.Info;
             info.url = data.info.url;
             info.type = data.info.type;
             info.data = data.data;

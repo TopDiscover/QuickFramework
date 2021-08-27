@@ -1,4 +1,3 @@
-import { ResourceCacheData } from "../../framework/base/Defines";
 import { i18n } from "../language/CommonLanguage";
 
 class AlertDialog extends cc.Component {
@@ -365,7 +364,7 @@ export default class Alert {
                     td.Config.CommonPrefabs.alert,
                     cc.Prefab,
                     (finish: number, total: number, item: cc.AssetManager.RequestItem) => { },
-                    (data: ResourceCacheData) => {
+                    (data) => {
                         this._isLoadingPrefab = false;
                         if (data && data.data && data.data instanceof cc.Prefab) {
                             this.prefab = data.data;

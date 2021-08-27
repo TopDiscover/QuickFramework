@@ -1,5 +1,4 @@
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
-import { ResourceCacheData } from "../../../../script/framework/base/Defines";
 import { UIView } from "../../../../script/framework/ui/UIView";
 
 const {ccclass, property} = cc._decorator;
@@ -74,7 +73,7 @@ export default class ShaderView extends UIView {
                    url : "material/sprite_gray",
                    view:this,
                    type : cc.Material,
-                   onComplete : (data : ResourceCacheData)=>{
+                   onComplete : (data)=>{
                        sp.setMaterial(0,(<cc.Material>data.data));
                    }
                })
@@ -103,7 +102,7 @@ export default class ShaderView extends UIView {
                     url:"material/sprite_circle",
                     view:this,
                     type:cc.Material,
-                    onComplete:(data:ResourceCacheData)=>{
+                    onComplete:(data)=>{
                         sp.setMaterial(0,(<cc.Material>data.data));
                     }
                 });

@@ -64,7 +64,7 @@ declare module cc {
 		url: string,
 		type: typeof cc.Asset,
 		onProgress?: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
-		onComplete: (data: any) => void,
+		onComplete: (data: td.Resource.CacheData) => void,
 		view: any,
 	});
 
@@ -263,47 +263,47 @@ declare function require(any);
 declare function dispatch(name: string, data?: any): void;
 
 declare interface Date {
-    /**
-     * @description 格式当前时间 
-     * @example 
-     * let now = new Date();
-     * let str = now.format("yyyy:MM:dd hh:mm:ss"); //2019:11:07 10:19:51
-     * str = now.format("yyyy/MM/dd");//2019/11/07
-     * str = now.format("hh:mm:ss");//10:19:51
-     * */
-    format(format: string): string;
+	/**
+	 * @description 格式当前时间 
+	 * @example 
+	 * let now = new Date();
+	 * let str = now.format("yyyy:MM:dd hh:mm:ss"); //2019:11:07 10:19:51
+	 * str = now.format("yyyy/MM/dd");//2019/11/07
+	 * str = now.format("hh:mm:ss");//10:19:51
+	 * */
+	format(format: string): string;
 }
 
 declare interface DateConstructor {
-    /**
-     * @description 返回当前时间的秒数
-     * @example 
-     * Date.timeNow()
-     *  */
-    timeNow(): number;
-    /**
-     * @description 返回当前时间的毫秒数 
-     * @example 
-     * Date.timeNowMillisecons()
-     * */
-    timeNowMillisecons(): number;
+	/**
+	 * @description 返回当前时间的秒数
+	 * @example 
+	 * Date.timeNow()
+	 *  */
+	timeNow(): number;
+	/**
+	 * @description 返回当前时间的毫秒数 
+	 * @example 
+	 * Date.timeNowMillisecons()
+	 * */
+	timeNowMillisecons(): number;
 }
 
 declare interface StringConstructor {
-    /**
-     * @description 格式化字符串
-     * @example
-     * String.format("{0}-->{1}-->{2}","one","two","three") | String.format("{0}-->{1}-->{2}",["one","two","three"])
-     * => "one-->two-->three"
-     * */
-    format(...args: any[]): string;
+	/**
+	 * @description 格式化字符串
+	 * @example
+	 * String.format("{0}-->{1}-->{2}","one","two","three") | String.format("{0}-->{1}-->{2}",["one","two","three"])
+	 * => "one-->two-->three"
+	 * */
+	format(...args: any[]): string;
 }
 
 declare function md5(data: any): any;
 
 
 declare interface LanguageData {
-    language: string;
+	language: string;
 }
 
 declare type WebSocketType = "ws" | "wss";
@@ -322,79 +322,79 @@ declare interface Tips {
 	 * @description tips提示
 	 * @param msg 提示内容
 	 */
-	show(msg: string):void;
+	show(msg: string): void;
 	/**@description 预加载预置体 */
-	preloadPrefab():void;
-	finishShowItem(node: cc.Node):void;
+	preloadPrefab(): void;
+	finishShowItem(node: cc.Node): void;
 }
 
 /**@description 界面加载动画，web端在下载界面时，如果超过了一定时间，需要弹出动画，告诉用户当前加载界面的进度 */
 declare interface UILoading {
-    /**
-     * @description 显示全屏幕加载动画
-     * @param delay 延迟显示时间 当为null时，不会显示loading进度，但会显示阻隔层 >0时为延迟显示的时间
-     */
-    show(delay: number, name: string): void;
-    /**
-     * @description 更新进度，0-100
-     * @param progress 0-100
-     */
-    updateProgress(progress: number): void;
-    hide(): void;
-    /**@description 预加载预置体 */
-    preloadPrefab(): void;
+	/**
+	 * @description 显示全屏幕加载动画
+	 * @param delay 延迟显示时间 当为null时，不会显示loading进度，但会显示阻隔层 >0时为延迟显示的时间
+	 */
+	show(delay: number, name: string): void;
+	/**
+	 * @description 更新进度，0-100
+	 * @param progress 0-100
+	 */
+	updateProgress(progress: number): void;
+	hide(): void;
+	/**@description 预加载预置体 */
+	preloadPrefab(): void;
 }
 
 declare interface IFullScreenAdapt {
-    /**@description 全屏幕适配 调用 */
-    onFullScreenAdapt(): void;
+	/**@description 全屏幕适配 调用 */
+	onFullScreenAdapt(): void;
 }
 
 /**@description 提示弹出框配置 */
 declare interface AlertConfig {
-    /**@description 用来标识弹出框，后面可指定tag进行关闭所有相同tag的弹出框 */
-    tag?: string | number,
-    /**@description 提示内容 richText只能二先1 */
-    text?: string,
-    /**@description 标题,默认为 : 温馨提示 */
-    title?: string,
-    /**@description 确定按钮文字 默认为 : 确定*/
-    confirmString?: string,
-    /**@description 取消按钮文字 默认为 : 取消*/
-    cancelString?: string,
-    /**@description 确定按钮回调 有回调则显示按钮，无回调则不显示*/
-    confirmCb?: (isOK: boolean) => void,
-    /**@description 取消按钮回调 有回调则显示按钮，无回调则不显示*/
-    cancelCb?: (isOK: boolean) => void,
-    /**@description 富文件显示内容 跟text只能二选1 */
-    richText?: string,
-    /**@description true 回调后在关闭弹出 false 关闭弹出框在回调 默认为 : false */
-    immediatelyCallback?: boolean,
-    /**@description 是否允许该tag的弹出框重复弹出，默认为true 会弹出同类型的多个 */
-    isRepeat?: boolean,
-    /**@description 用户自定义数据 */
-    userData?: any,
+	/**@description 用来标识弹出框，后面可指定tag进行关闭所有相同tag的弹出框 */
+	tag?: string | number,
+	/**@description 提示内容 richText只能二先1 */
+	text?: string,
+	/**@description 标题,默认为 : 温馨提示 */
+	title?: string,
+	/**@description 确定按钮文字 默认为 : 确定*/
+	confirmString?: string,
+	/**@description 取消按钮文字 默认为 : 取消*/
+	cancelString?: string,
+	/**@description 确定按钮回调 有回调则显示按钮，无回调则不显示*/
+	confirmCb?: (isOK: boolean) => void,
+	/**@description 取消按钮回调 有回调则显示按钮，无回调则不显示*/
+	cancelCb?: (isOK: boolean) => void,
+	/**@description 富文件显示内容 跟text只能二选1 */
+	richText?: string,
+	/**@description true 回调后在关闭弹出 false 关闭弹出框在回调 默认为 : false */
+	immediatelyCallback?: boolean,
+	/**@description 是否允许该tag的弹出框重复弹出，默认为true 会弹出同类型的多个 */
+	isRepeat?: boolean,
+	/**@description 用户自定义数据 */
+	userData?: any,
 }
 
 /**
  * @description 处理游戏事件接口声明
  *      cc.game.EVENT_ENGINE_INITED
-        cc.game.EVENT_GAME_INITED
-        cc.game.EVENT_HIDE
-        cc.game.EVENT_RESTART
-        cc.game.EVENT_SHOW
+		cc.game.EVENT_GAME_INITED
+		cc.game.EVENT_HIDE
+		cc.game.EVENT_RESTART
+		cc.game.EVENT_SHOW
  */
 
 declare interface GameEventInterface {
 
-    /**@description 进入后台 cc.game.EVENT_HIDE*/
-    onEnterBackground(): void;
+	/**@description 进入后台 cc.game.EVENT_HIDE*/
+	onEnterBackground(): void;
 
-    /**
-     * @description 进入前台 cc.game.EVENT_SHOW
-     * @param inBackgroundTime 在后台运行的总时间，单位秒
-     */
-    onEnterForgeground(inBackgroundTime: number): void;
+	/**
+	 * @description 进入前台 cc.game.EVENT_SHOW
+	 * @param inBackgroundTime 在后台运行的总时间，单位秒
+	 */
+	onEnterForgeground(inBackgroundTime: number): void;
 }
 
 declare interface Singleton<T> {
@@ -414,6 +414,132 @@ declare function toNamespace(key: string, value: any, namespace?: string): void;
 
 
 declare namespace td {
+
+	/**@description Http相关枚举定义 */
+	export namespace Http {
+		/**@description http错误类型 */
+		export enum ErrorType {
+			/**@description 错误的Url地地址*/
+			UrlError,
+			/**@description 请求超时 */
+			TimeOut,
+			/**@description 请求错误 */
+			RequestError,
+		}
+
+		/**@description http 请求类型 */
+		export enum RequestType {
+			POST = "POST",
+			GET = "GET",
+		}
+
+		/**@description http 错误 */
+		export interface Error {
+			type: ErrorType,
+			reason: any,
+		}
+	}
+
+	/**@description 日志输出相关 */
+	namespace Log {
+		/**@description 日志等级 */
+		export enum Level {
+			LOG = 0X00000001,
+			DUMP = 0X00000010,
+			WARN = 0X00000100,
+			ERROR = 0X00001000,
+			ALL = LOG | DUMP | WARN | ERROR,
+		}
+	}
+
+	/**@description 资源相关 */
+	namespace Resource {
+		/**@description 资源缓存类型 */
+		export enum CacheStatus {
+			/**@description 无状态 */
+			NONE,
+			/**@description 等待释放 */
+			WAITTING_FOR_RELEASE,
+		}
+		/**@description 资源类型 */
+		export enum Type {
+			/**@description 本地 */
+			Local,
+			/**@description 远程资源 */
+			Remote,
+		}
+		/**@description 资源信息 */
+		export class Info {
+			url: string = "";
+			type: typeof cc.Asset = null;
+			data: cc.Asset | cc.Asset[] = null;
+			/**@description 是否常驻内存，远程加载资源有效 */
+			retain: boolean = false;
+			bundle: BUNDLE_TYPE = null;
+			/**@description 默认为本地资源 */
+			resourceType: td.Resource.Type = td.Resource.Type.Local;
+		}
+		export class CacheData {
+			/**@description 是否已经加载完成 */
+			isLoaded: boolean = false;
+			/**@description 加载完成数据 
+			 * cc.Prefab 
+			 * cc.SpriteAtlas 
+			 * cc.SpriteFrame 
+			 * cc.AudioClip 
+			 * cc.Font 
+			 * sp.SkeletonData 
+			 * cc.ParticleAsset 
+			 * cc.Texture2D
+			 * cc.JsonAsset
+			 * */
+			data: cc.Asset | cc.Asset[] = null;
+
+			info: Info = new Info();
+
+			status: CacheStatus = CacheStatus.NONE;
+
+			/**@description 在加载过程中有地方获取,加载完成后再回调 */
+			getCb: ((data: any) => void)[] = [];
+
+			/**@description 完成回调，在资源正在加载过程中，又有其它地方调用加载同一个资源，此时需要等待资源加载完成，统一回调 */
+			finishCb: ((data: any) => void)[] = [];
+
+			doGet(data): void;
+
+			doFinish(data): void;
+
+			get isInvalid(): boolean;
+		}
+
+		export interface Data {
+			/**@description resources 目录url 与 type 必须成对出现*/
+			url?: string,
+			/**@description 资源类型 与 url 必须成对出现 目前支持预加载的资源有cc.Prefab | cc.SpriteFrame | sp.SkeletonData*/
+			type?: typeof cc.Asset,
+			/**
+			 * @description 预加载界面，不需要对url type赋值 
+			 * 如GameView游戏界面，需要提前直接加载好界面，而不是只加载预置体，
+			 * 在网络消息来的时间，用预置体加载界面还是需要一定的时间，
+			 * 从而会造成消息处理不是顺序执行 
+			 * */
+			preloadView?: UIClass<UIView>,
+			bundle?: BUNDLE_TYPE,
+			/**@description 如果是加载的目录，请用dir字段 */
+			dir?: string,
+		}
+	}
+
+	/**@description 界面视图状态 */
+	enum ViewStatus {
+		/**@description 等待关闭 */
+		WAITTING_CLOSE,
+		/**@description 等待隐藏 */
+		WATITING_HIDE,
+		/**@description 无状态 */
+		WAITTING_NONE,
+	}
+
 	/**@description 全局配置命名空间 可使用toNamespace进行对数据的合并*/
 	declare namespace Config {
 		/**@description 是否显示调试按钮 */
@@ -470,7 +596,7 @@ declare namespace td {
 		export const RECONNECT_ALERT_TAG = 100;
 	}
 
-	export namespace Macro{
+	export namespace Macro {
 		/**@description 公共语言包数据名 */
 		export const COMMON_LANGUAGE_NAME: string = "COMMON_LANGUAGE_NAME";
 		/**@description 网络数据全以大端方式进行处理 */
@@ -486,8 +612,8 @@ declare namespace td {
 	}
 
 	/**
- 	 * @description 界面层级定义
- 	 */
+	   * @description 界面层级定义
+	   */
 	export namespace ViewZOrder {
 
 		/**@description 最底层 */
@@ -513,7 +639,7 @@ declare namespace td {
 	}
 
 	namespace Event {
-		export enum Net{
+		export enum Net {
 			/**@description 网络打开 */
 			ON_OPEN = "NetEvent_ON_OPEN",
 			/**@description 网络关闭 */
@@ -694,9 +820,9 @@ declare namespace td {
 		name: string;
 		constructor(name: string = null);
 		/**@description 添加动态加载的本地资源 */
-		addLocal(info: ResourceInfo, className: string = null): void;
+		addLocal(info: Resource.Info, className: string = null): void;
 		/**@description 添加动态加载的远程资源 */
-		addRemote(info: ResourceInfo, className: string = null): void;
+		addRemote(info: Resource.Info, className: string = null): void;
 		/**@description 清除远程加载资源 */
 		clear(): void;
 	};
@@ -742,9 +868,9 @@ declare namespace td {
 		getCanvas(): cc.Node;
 		addChild(node: cc.Node, zOrder: number, adpater: IFullScreenAdapt = null): void;
 		/**@description 添加动态加载的本地资源 */
-		addLocal(info: ResourceInfo, className: string): void;
+		addLocal(info: Resource.Info, className: string): void;
 		/**@description 添加动态加载的远程资源 */
-		addRemote(info: ResourceInfo, className: string): void;
+		addRemote(info: Resource.Info, className: string): void;
 		close<T extends UIView>(uiClass: UIClass<T>): void;
 		close(className: string): void;
 		/**@description 关闭除传入参数以外的所有其它界面,不传入，关闭所有界面 */
@@ -791,23 +917,23 @@ declare namespace td {
 			path: string,
 			type: typeof cc.Asset,
 			onProgress: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
-			onComplete: (data: ResourceCacheData) => void): void;
+			onComplete: (data: Resource.CacheData) => void): void;
 		loadDir(
 			bundle: BUNDLE_TYPE,
 			path: string,
 			type: typeof cc.Asset,
 			onProgress: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
-			onComplete: (data: ResourceCacheData) => void): void;
+			onComplete: (data: Resource.CacheData) => void): void;
 		/**
 		 * @description 释放资源
 		 * @param info 资源信息
 		 */
-		releaseAsset(info: ResourceInfo): void;
+		releaseAsset(info: Resource.Info): void;
 		/**
 		 * @description 资源引用计数加1
 		 * @param info 资源信息
 		 */
-		retainAsset(info: ResourceInfo): void;
+		retainAsset(info: Resource.Info): void;
 		/**
 		 * @description 添加常驻资源
 		 * @param url 
@@ -816,79 +942,19 @@ declare namespace td {
 		 */
 		addPersistAsset(url: string, data: cc.Asset, bundle: BUNDLE_TYPE): void;
 	}
-	/**
-	   * @description 资源加载缓存数据 
-	   */
-	export enum ResourceCacheStatus {
-		/**@description 无状态 */
-		NONE = 0,
-		/**@description 等待释放 */
-		WAITTING_FOR_RELEASE = 1,
-	}
 
-	/**@description 资源类型 */
-	export enum ResourceType {
-		/**@description 本地 */
-		Local = 0,
-		/**@description 远程资源 */
-		Remote = 1,
-	}
-
-	/**@description 资源信息 */
-	export class ResourceInfo {
-		url: string = "";
-		type: typeof cc.Asset = null;
-		data: cc.Asset | cc.Asset[] = null;
-		/**@description 是否常驻内存，远程加载资源有效 */
-		retain: boolean = false;
-		bundle: BUNDLE_TYPE = null;
-		/**@description 默认为本地资源 */
-		resourceType: ResourceType = ResourceType.Local;
-	}
-	export class ResourceCacheData {
-		/**@description 是否已经加载完成 */
-		isLoaded: boolean = false;
-		/**@description 加载完成数据 
-		 * cc.Prefab 
-		 * cc.SpriteAtlas 
-		 * cc.SpriteFrame 
-		 * cc.AudioClip 
-		 * cc.Font 
-		 * sp.SkeletonData 
-		 * cc.ParticleAsset 
-		 * cc.Texture2D
-		 * cc.JsonAsset
-		 * */
-		data: cc.Asset | cc.Asset[] = null;
-
-		info: ResourceInfo = new ResourceInfo();
-
-		status = ResourceCacheStatus.NONE;
-
-		/**@description 在加载过程中有地方获取,加载完成后再回调 */
-		getCb: ((data: any) => void)[] = [];
-
-		/**@description 完成回调，在资源正在加载过程中，又有其它地方调用加载同一个资源，此时需要等待资源加载完成，统一回调 */
-		finishCb: ((data: any) => void)[] = [];
-
-		public doGet(data): void;
-
-		public doFinish(data): void;
-
-		public get isInvalid(): boolean;
-	}
 	export class RemoteCaches {
 		/**
 		 * @description 获取远程缓存数据
 		 * @param type 远程奖状类型
 		 * @param url 远程地址
 		 */
-		public get(url: string): ResourceCacheData;
-		public getSpriteFrame(url: string): ResourceCacheData;
+		public get(url: string): Resource.CacheData;
+		public getSpriteFrame(url: string): Resource.CacheData;
 		public setSpriteFrame(url: string, data: any): cc.SpriteFrame;
-		set(url: string, data: ResourceCacheData): void;
-		retainAsset(info: ResourceInfo): void;
-		releaseAsset(info: ResourceInfo): void;
+		set(url: string, data: Resource.CacheData): void;
+		retainAsset(info: Resource.Info): void;
+		releaseAsset(info: Resource.Info): void;
 		remove(url: string): void;
 		showCaches(): void;
 	}
@@ -896,15 +962,15 @@ declare namespace td {
 		/**@description 远程资源缓存管理器 */
 		public get remoteCaches(): RemoteCaches;
 		getBundleName(bundle: BUNDLE_TYPE): string;
-		get(bundle: BUNDLE_TYPE, path: string, isCheck: boolean = true): ResourceCacheData;
-		set(bundle: BUNDLE_TYPE, path: string, data: ResourceCacheData): void;
+		get(bundle: BUNDLE_TYPE, path: string, isCheck: boolean = true): Resource.CacheData;
+		set(bundle: BUNDLE_TYPE, path: string, data: Resource.CacheData): void;
 		/**
 		 * @description 
 		 * @param bundle bundle
 		 * @param path path
 		 */
 		remove(bundle: BUNDLE_TYPE, path: string): boolean;
-		removeWithInfo(info: ResourceInfo): boolean;
+		removeWithInfo(info: Resource.Info): boolean;
 		removeBundle(bundle: BUNDLE_TYPE): void;
 		/**
 		  * @description 如果资源正在加载中，会等待资源加载完成后返回，否则直接返回null
@@ -920,7 +986,7 @@ declare namespace td {
 		  * @param bundle 
 		  */
 		getCacheByAsync<T extends cc.Asset>(url: string, type: { prototype: T }, bundle: BUNDLE_TYPE): Promise<T>;
-		getSpriteFrameByAsync(urls: string[], key: string, view: UIView, addExtraLoadResource: (view: UIView, info: ResourceInfo) => void, bundle: BUNDLE_TYPE): Promise<{
+		getSpriteFrameByAsync(urls: string[], key: string, view: UIView, addExtraLoadResource: (view: UIView, info: Resource.Info) => void, bundle: BUNDLE_TYPE): Promise<{
 			url: string;
 			spriteFrame: cc.SpriteFrame;
 			isTryReload?: boolean;
@@ -1167,7 +1233,7 @@ declare namespace td {
 		/**@description 提示框 */
 		readonly alert: Alert;
 		/**@description 公共loading */
-        readonly loading: Loading;
+		readonly loading: Loading;
 		/**@description 逻辑控制器管理器 */
 		readonly logicManager: LogicManager;
 		/**@description 游戏数据 自行设置 */

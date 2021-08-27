@@ -1,4 +1,3 @@
-import { ResourceCacheData } from "../../framework/base/Defines";
 /**
  * @description 提示
  */
@@ -74,7 +73,7 @@ class ToastItem extends cc.Component {
                     td.Config.CommonPrefabs.tips,
                     cc.Prefab,
                     (finish: number, total: number, item: cc.AssetManager.RequestItem)=>{},
-                    (data : ResourceCacheData)=>{
+                    (data)=>{
                     if ( data && data.data && data.data instanceof cc.Prefab ){
                         Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.tips,data.data,td.Macro.BUNDLE_RESOURCES);
                         this._prefab = data.data;

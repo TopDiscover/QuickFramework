@@ -1,8 +1,7 @@
 import { UIView } from "../ui/UIView";
-import { ResourceInfo, ResourceType, ResourceCacheData } from "../base/Defines";
 
 /**@description 添加加载本地的资源 */
-export function addExtraLoadResource(view: UIView, info: ResourceInfo) {
+export function addExtraLoadResource(view: UIView, info: td.Resource.Info) {
     let uiManager = Manager.uiManager;
     if (view == <any>(uiManager.retainMemory)) {
         uiManager.retainMemory.addLocal(info);
@@ -15,7 +14,7 @@ export function addExtraLoadResource(view: UIView, info: ResourceInfo) {
 }
 
 /**@description 添加加载远程的资源 */
-export function addRemoteLoadResource(view: UIView, info: ResourceInfo) {
+export function addRemoteLoadResource(view: UIView, info: td.Resource.Info) {
     let uiManager = Manager.uiManager;
     if (view == <any>(uiManager.retainMemory)) {
         uiManager.retainMemory.addRemote(info);
@@ -64,19 +63,19 @@ export function setSpriteSpriteFrame(
     spriteFrame: cc.SpriteFrame,
     completeCallback: (data: cc.SpriteFrame) => void,
     bundle:BUNDLE_TYPE,
-    resourceType: ResourceType = ResourceType.Local,
+    resourceType: td.Resource.Type = td.Resource.Type.Local,
     retain: boolean = false,
     isAtlas: boolean = false) {
 
     if (!isAtlas) {
         //纹理只需要把纹理单独添加引用，不需要把spirteFrame也添加引用
-        let info = new ResourceInfo;
+        let info = new td.Resource.Info;
         info.url = url;
         info.type = cc.SpriteFrame;
         info.data = spriteFrame;
         info.retain = retain;
         info.bundle = bundle;
-        if (resourceType == ResourceType.Remote) {
+        if (resourceType == td.Resource.Type.Remote) {
             addRemoteLoadResource(view, info);
         } else {
             addExtraLoadResource(view, info);
@@ -130,7 +129,7 @@ function _setSpriteFrame(
     bundle:BUNDLE_TYPE) {
 
     if (!isAtlas) {
-        let info = new ResourceInfo;
+        let info = new td.Resource.Info;
         info.url = url;
         info.type = cc.SpriteFrame;
         info.data = spriteFrame;
@@ -251,7 +250,7 @@ export function setParticleSystemFile(
     config: { url: string, view: any, completeCallback?: (file: cc.ParticleAsset) => void , bundle?:BUNDLE_TYPE},
     data: cc.ParticleAsset
 ) {
-    let info = new ResourceInfo;
+    let info = new td.Resource.Info;
     info.url = config.url;
     info.type = cc.ParticleAsset;
     info.data = data;
@@ -286,7 +285,7 @@ export function setLabelFont(
     component: cc.Label,
     config: { font: string, view: any, completeCallback?: (font: cc.Font) => void , bundle?:BUNDLE_TYPE },
     data: cc.Font) {
-    let info = new ResourceInfo;
+    let info = new td.Resource.Info;
     info.url = config.font;
     info.type = cc.Font;
     info.data = data;
@@ -322,10 +321,10 @@ export function setSkeletonSkeletonData(
     config: { url: string, view: any, completeCallback: (data: sp.SkeletonData) => void , bundle?:BUNDLE_TYPE} |
     { view: any, path: string, name: string, completeCallback: (data: sp.SkeletonData) => void, bundle?:BUNDLE_TYPE , isNeedCache?: boolean, retain?: boolean },
     data: sp.SkeletonData,
-    resourceType: ResourceType = ResourceType.Local) {
+    resourceType: td.Resource.Type = td.Resource.Type.Local) {
     let url = "";
     let retain = false;
-    if (resourceType == ResourceType.Remote) {
+    if (resourceType == td.Resource.Type.Remote) {
         let realConfig: { view: any, path: string, name: string, completeCallback: (data: sp.SkeletonData) => void, isNeedCache?: boolean, retain?: boolean } = <any>config;
         url = `${realConfig.path}/${realConfig.name}`;
         retain = realConfig.retain ? true : false;
@@ -333,13 +332,13 @@ export function setSkeletonSkeletonData(
         let realConfig: { url: string, view: any, completeCallback: (data: sp.SkeletonData) => void } = <any>config;
         url = realConfig.url;
     }
-    let info = new ResourceInfo;
+    let info = new td.Resource.Info;
     info.url = url;
     info.type = sp.SkeletonData;
     info.data = data;
     info.retain = retain;
     info.bundle = getBundle(config);
-    if (resourceType == ResourceType.Remote) {
+    if (resourceType == td.Resource.Type.Remote) {
         info.bundle = td.Macro.BUNDLE_REMOTE;
         addRemoteLoadResource(config.view, info);
     } else {
@@ -375,7 +374,7 @@ export function createNodeWithPrefab(config: { bundle?:BUNDLE_TYPE , url: string
     let cache = Manager.cacheManager.get(bundle,url);
     Manager.cacheManager.getCacheByAsync(url, cc.Prefab,bundle).then((data) => {
         if (!cache) {
-            let info = new ResourceInfo;
+            let info = new td.Resource.Info;
             info.url = config.url;
             info.type = cc.Prefab;
             info.data = data;
@@ -397,7 +396,7 @@ export function _loadDirRes( config:{
     type : typeof cc.Asset, 
     view : any, 
     onProgress?:(finish:number,total:number,item:cc.AssetManager.RequestItem) => void , 
-    onComplete:(data:ResourceCacheData)=>void}){
+    onComplete:(data:td.Resource.CacheData)=>void}){
         let bundle = getBundle(config);
         let cache = Manager.cacheManager.get(bundle,config.url);
         //这里要做一个防止重复加载操作，以免对加载完成后的引用计数多加次数
@@ -405,7 +404,7 @@ export function _loadDirRes( config:{
             
             if( !cache ){
                 //如果已经有了，可能是从logic中加载过来的，不在进行引用计数操作
-                let info = new ResourceInfo;
+                let info = new td.Resource.Info;
                 info.url = config.url;
                 info.type = config.type;
                 info.data = data.data;
@@ -436,7 +435,7 @@ export function _loadRes(config:{
         config.onProgress,
         (data)=>{
             if( !cache ){
-                let info = new ResourceInfo;
+                let info = new td.Resource.Info;
                 info.url = config.url;
                 info.type = config.type;
                 info.data = data.data;

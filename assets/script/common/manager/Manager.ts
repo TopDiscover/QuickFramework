@@ -2,7 +2,7 @@
 import { Framewok } from "../../framework/Framework";
 import { commonConfigInit } from "../config/Config";
 commonConfigInit();
-import { Log, LogLevel } from "../../framework/log/Log";
+import { Log } from "../../framework/log/Log";
 import { NetManager } from "./NetManager";
 import { LogicManager } from "./LogicManager";
 import GlobalAudio from "../component/GlobalAudio";
@@ -121,7 +121,7 @@ class _Manager extends Framewok {
 
 export function applicationInit() {
     //日志
-    Log.logLevel = LogLevel.ERROR | LogLevel.LOG | LogLevel.WARN | LogLevel.DUMP;
+    Log.logLevel = td.Log.Level.ERROR | td.Log.Level.LOG | td.Log.Level.WARN | td.Log.Level.DUMP;
     let mgr = new _Manager();
     window["Manager"] = mgr;
     mgr.init();

@@ -1,6 +1,5 @@
 import { Logic } from "../../../script/common/base/Logic";
 import { LogicType, LogicEvent, LogicEventData } from "../../../script/common/event/LogicEvent";
-import { ResourceData } from "../../../script/framework/base/Defines";
 import { LobbyService } from "../../../script/common/net/LobbyService";
 import { ResourceLoaderError } from "../../../script/framework/assetManager/ResourceLoader";
 import TankBattleGameView from "./view/TankBattleGameView";
@@ -90,7 +89,7 @@ class TankBattleLogic extends Logic {
         }
     }
 
-    protected getLoadResources(): ResourceData[]{
+    protected getLoadResources(): td.Resource.Data[]{
         return [{ preloadView: TankBattleGameView , bundle : this.bundle}];
     }
 }

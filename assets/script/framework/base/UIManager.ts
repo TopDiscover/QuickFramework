@@ -1,13 +1,12 @@
 import { UIView } from "../ui/UIView";
-import { ResourceInfo, ResourceCacheData, ViewStatus } from "./Defines";
 
 /**@description 动态加载垃圾数据名 */
 const DYNAMIC_LOAD_GARBAGE = "DYNAMIC_LOAD_GARBAGE";
 /**@description 动画加载全局数据名 */
 const DYNAMIC_LOAD_RETAIN_MEMORY = "DYNAMIC_LOAD_RETAIN_MEMORY";
 class ViewDynamicLoadData {
-    private local = new Map<string, ResourceInfo>();
-    private remote = new Map<string, ResourceInfo>();
+    private local = new Map<string, td.Resource.Info>();
+    private remote = new Map<string, td.Resource.Info>();
     public name: string;
 
     constructor(name: string = null) {
@@ -15,7 +14,7 @@ class ViewDynamicLoadData {
     }
 
     /**@description 添加动态加载的本地资源 */
-    public addLocal(info: ResourceInfo, className: string = null) {
+    public addLocal(info: td.Resource.Info, className: string = null) {
         if (info && info.url) {
             if (this.name == DYNAMIC_LOAD_GARBAGE) {
                 cc.error(`找不到资源持有者: ${info.url}`);
@@ -29,7 +28,7 @@ class ViewDynamicLoadData {
     }
 
     /**@description 添加动态加载的远程资源 */
-    public addRemote(info: ResourceInfo, className: string = null) {
+    public addRemote(info: td.Resource.Info, className: string = null) {
         if (info && info.data && !this.remote.has(info.url)) {
             if (this.name == DYNAMIC_LOAD_GARBAGE) {
                 cc.error(`找不到资源持有者 : ${info.url}`);
@@ -91,7 +90,7 @@ class ViewData {
     /**@description 界面是否已经加载 */
     isLoaded: boolean = false;
     /**@description 界面当前等待操作状态 */
-    status: ViewStatus = ViewStatus.WAITTING_NONE;
+    status: td.ViewStatus = td.ViewStatus.WAITTING_NONE;
     /**@description 实际显示界面 */
     view: UIView = null;
     /**@description 等待加载完成回调 */
@@ -101,7 +100,7 @@ class ViewData {
     /**是否预加载,不显示出来，但会加到当前场景上 */
     isPreload: boolean = false;
     /**@description 资源信息 */
-    info: ResourceInfo = null;
+    info: td.Resource.Info = null;
 
     /**@description 界面动态加载的数据 */
     loadData: ViewDynamicLoadData = new ViewDynamicLoadData();
@@ -222,7 +221,7 @@ export class UIManager {
                 viewData.isPreload = isPreload;
                 //已经加载
                 if (viewData.isLoaded) {
-                    viewData.status = ViewStatus.WAITTING_NONE;
+                    viewData.status = td.ViewStatus.WAITTING_NONE;
                     if (!isPreload) {
                         if (viewData.view && cc.isValid(viewData.node)) {
                             viewData.node.zIndex = zOrder;
@@ -236,7 +235,7 @@ export class UIManager {
                     return;
                 }
                 else {
-                    viewData.status = ViewStatus.WAITTING_NONE;
+                    viewData.status = td.ViewStatus.WAITTING_NONE;
                     if ( !isPreload ){
                         Manager.uiLoading.show(delay,name);
                     }
@@ -265,7 +264,7 @@ export class UIManager {
                 }
                 this.loadPrefab(bundle,prefabUrl, progressCallback)
                     .then((prefab) => {
-                        viewData.info = new ResourceInfo;
+                        viewData.info = new td.Resource.Info;
                         viewData.info.url = prefabUrl;
                         viewData.info.type = cc.Prefab;
                         viewData.info.data = prefab;
@@ -344,7 +343,7 @@ export class UIManager {
     private createNode<T extends UIView>(className: string, uiClass: td.UIClass<T>, reslove, data: cc.Prefab, args: any[], zOrder: number,bundle:BUNDLE_TYPE) {
         let viewData = this._viewDatas.get(className);
         viewData.isLoaded = true;
-        if (viewData.status == ViewStatus.WAITTING_CLOSE) {
+        if (viewData.status == td.ViewStatus.WAITTING_CLOSE) {
             //加载过程中有人关闭了界面
             reslove(null);
             if (CC_DEBUG) cc.warn(`${this._logTag}${className}正等待关闭`);
@@ -361,7 +360,7 @@ export class UIManager {
             return;
         }
 
-        if (viewData.status == ViewStatus.WATITING_HIDE) {
+        if (viewData.status == td.ViewStatus.WATITING_HIDE) {
             //加载过程中有人隐藏了界面
             view.hide();
             if (CC_DEBUG) cc.warn(`${this._logTag}加载过程隐藏了界面${className}`);
@@ -384,7 +383,7 @@ export class UIManager {
             if ( bundle == undefined || bundle == "" || bundle == null ){
                 bundle = td.Macro.BUNDLE_RESOURCES;
             }
-            Manager.assetManager.load(bundle,url,cc.Prefab,progressCallback,(data: ResourceCacheData) => {
+            Manager.assetManager.load(bundle,url,cc.Prefab,progressCallback,(data) => {
                 if (data && data.data && data.data instanceof cc.Prefab) {
                     resolove(data.data);
                 }
@@ -418,7 +417,7 @@ export class UIManager {
     }
 
     /**@description 添加动态加载的本地资源 */
-    public addLocal(info: ResourceInfo, className: string) {
+    public addLocal(info: td.Resource.Info, className: string) {
         if (info) {
             let viewData = this.getViewData(className);
             if (viewData) {
@@ -428,7 +427,7 @@ export class UIManager {
     }
 
     /**@description 添加动态加载的远程资源 */
-    public addRemote(info: ResourceInfo, className: string) {
+    public addRemote(info: td.Resource.Info, className: string) {
         if (info) {
             let viewData = this.getViewData(className);
             if (viewData) {
@@ -443,7 +442,7 @@ export class UIManager {
         //当前所有界面都已经加载完成
         let viewData = this.getViewData(data);
         if (viewData) {
-            viewData.status = ViewStatus.WAITTING_CLOSE;
+            viewData.status = td.ViewStatus.WAITTING_CLOSE;
             if (viewData.view && cc.isValid(viewData.node)) {
                 viewData.node.removeFromParent(true);
                 viewData.node.destroy();
@@ -499,7 +498,7 @@ export class UIManager {
             }
             else {
                 //没有加载写成，正常加载中
-                viewData.status = ViewStatus.WATITING_HIDE;
+                viewData.status = td.ViewStatus.WATITING_HIDE;
             }
         }
     }
@@ -559,7 +558,7 @@ export class UIManager {
         if (!viewData) {
             return false;
         }
-        if (viewData.isLoaded && viewData.status == ViewStatus.WAITTING_NONE) {
+        if (viewData.isLoaded && viewData.status == td.ViewStatus.WAITTING_NONE) {
             if (viewData.view) return viewData.view.node.active;
         }
         return false;

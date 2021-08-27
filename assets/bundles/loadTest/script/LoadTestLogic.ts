@@ -1,7 +1,6 @@
 import { Logic } from "../../../script/common/base/Logic";
 import { LogicType, LogicEvent, LogicEventData } from "../../../script/common/event/LogicEvent";
 import { ResourceLoaderError } from "../../../script/framework/assetManager/ResourceLoader";
-import { ResourceData } from "../../../script/framework/base/Defines";
 import LoadTestView from "./view/LoadTestView";
 
 class LoadTestLogic extends Logic {
@@ -57,7 +56,7 @@ class LoadTestLogic extends Logic {
         Manager.uiManager.open({ type: LoadTestView ,bundle:this.bundle});
     }
 
-    protected getLoadResources():ResourceData[]{
+    protected getLoadResources():td.Resource.Data[]{
         // return [];
         return [{ dir: "texture/sheep" , bundle : this.bundle,type : cc.SpriteFrame}];
     }

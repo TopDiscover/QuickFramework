@@ -1,6 +1,5 @@
 import { LogicEventData, LogicType } from "../event/LogicEvent";
 import EventComponent from "../../framework/base/EventComponent";
-import { ResourceData, ResourceCacheData } from "../../framework/base/Defines";
 import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
 
 /**
@@ -55,7 +54,7 @@ export class Logic extends EventComponent {
     }
 
     /**@description 获取需要加载的资源 */
-    protected getLoadResources(): ResourceData[] {
+    protected getLoadResources(): td.Resource.Data[] {
         return [];
     }
 
@@ -64,7 +63,7 @@ export class Logic extends EventComponent {
     }
 
     /**@description 资源加载中 */
-    protected onLoadResourceProgress( loadedCount : number , total : number , data : ResourceCacheData ){
+    protected onLoadResourceProgress( loadedCount : number , total : number , data : td.Resource.CacheData ){
     }
 
 

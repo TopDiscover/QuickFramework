@@ -2,7 +2,7 @@ import NetHelper from "../../../../script/framework/controller/NetHelper";
 import { LobbyService } from "../../../../script/common/net/LobbyService";
 import { TestProtoMessage } from "../protocol/TestProtoMessage";
 import { TestBinaryMessage } from "../protocol/TestBinaryMessage";
-import { HttpPackage, HttpRequestType } from "../../../../script/framework/net/HttpClient";
+import { HttpPackage } from "../../../../script/framework/net/HttpClient";
 import { TestJsonMessage } from "../protocol/TestJsonMessage";
 
 class _HallNetHelper extends NetHelper<LobbyService>{
@@ -34,7 +34,7 @@ class _HallNetHelper extends NetHelper<LobbyService>{
 
         let httpPackage = new HttpPackage();
         httpPackage.data.url = "https://httpbin.org/post";
-        httpPackage.data.type = HttpRequestType.POST;
+        httpPackage.data.type = td.Http.RequestType.POST;
         //"text/plain;charset=UTF-8""Accept-Encoding","gzip,deflate"
         //httpPackage.data.requestHeader = [{name : "Content-Type" , value : "text/plain"},{name:"Accept-Encoding",value:"gzip,deflate"}]
         httpPackage.data.requestHeader = { name: "Content-Type", value: "text/plain" }

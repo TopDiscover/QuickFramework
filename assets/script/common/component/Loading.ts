@@ -1,4 +1,3 @@
-import { ResourceCacheData } from "../../framework/base/Defines";
 /**
  * @description 加载动画
  */
@@ -146,7 +145,7 @@ export default class Loading {
                 td.Config.CommonPrefabs.loading,
                 cc.Prefab,
                 (finish: number, total: number, item: cc.AssetManager.RequestItem)=>{},
-                (data: ResourceCacheData) => {
+                (data) => {
                 this._isLoadingPrefab = false;
                 if (data && data.data && data.data instanceof cc.Prefab) {
                     Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.loading,data.data,td.Macro.BUNDLE_RESOURCES)

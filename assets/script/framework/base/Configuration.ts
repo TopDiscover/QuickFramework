@@ -1,6 +1,14 @@
-
+/**
+ * 该文件只定义框架内使用的相关配置，不要在内部引入其它模块，
+ */
+import { enumsInit } from "./Enums";
+enumsInit();
+import { typesInit } from "./Types";
+typesInit();
 export function configurationInit() {
-    
+    if (!CC_EDITOR) {
+        cc.log("框架配置初始化");
+    }
 }
 
 namespace Config {
@@ -9,16 +17,16 @@ namespace Config {
 
     /**@description 公共Prefabs预置路径 */
     export const CommonPrefabs = {
-        tips : "common/prefabs/Tips",
-        uiLoading : "common/prefabs/UILoading",
-        loading : "common/prefabs/Loading",
-        alert : "common/prefabs/Alert",
+        tips: "common/prefabs/Tips",
+        uiLoading: "common/prefabs/UILoading",
+        loading: "common/prefabs/Loading",
+        alert: "common/prefabs/Alert",
     }
 
     /**@description 公共音效路径 */
     export const audioPath = {
-        dialog : "common/audio/dlg_open",
-        button : "common/audio/btn_click",
+        dialog: "common/audio/dlg_open",
+        button: "common/audio/btn_click",
     }
 
     /**@description 是否跳过热更新检测 */
@@ -57,7 +65,7 @@ namespace Config {
     /**@description 网络重连弹出框tag */
     export const RECONNECT_ALERT_TAG = 100;
 }
-toNamespace("Config",Config);
+toNamespace("Config", Config);
 
 /**
  * @description 界面层级定义
@@ -88,10 +96,10 @@ namespace ViewZOrder {
     export const UILoading = 700;
 }
 
-toNamespace("ViewZOrder",ViewZOrder);
+toNamespace("ViewZOrder", ViewZOrder);
 
 namespace Event {
-    export enum Net{
+    export enum Net {
         /**@description 网络打开 */
         ON_OPEN = "NetEvent_ON_OPEN",
         /**@description 网络关闭 */
@@ -106,9 +114,9 @@ namespace Event {
     /**@description 语言变更 */
     export const CHANGE_LANGUAGE = "Event_CHANGE_LANGUAGE";
 }
-toNamespace("Event",Event);
+toNamespace("Event", Event);
 
-namespace Macro{
+namespace Macro {
     /**@description 公共语言包数据名 */
     export const COMMON_LANGUAGE_NAME: string = "COMMON_LANGUAGE_NAME";
     /**@description 网络数据全以大端方式进行处理 */
@@ -122,4 +130,4 @@ namespace Macro{
     /**@description 语言包路径使用前缀 */
     export const USING_LAN_KEY = "i18n.";
 }
-toNamespace("Macro",Macro);
+toNamespace("Macro", Macro);

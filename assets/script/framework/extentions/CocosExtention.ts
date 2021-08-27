@@ -1,5 +1,4 @@
 import WebEditBoxImpl from "./WebEditBoxImpl";
-import { ResourceType } from "../base/Defines";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
@@ -54,7 +53,7 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
     let defaultBundle = getBundle({bundle:config.defaultBundle,view:config.view})
     Manager.assetManager.remote.loadImage(config.url, config.isNeedCache).then((data) => {
         if (data) {
-            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback,td.Macro.BUNDLE_REMOTE, ResourceType.Remote, isRetain);
+            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback,td.Macro.BUNDLE_REMOTE, td.Resource.Type.Remote, isRetain);
         } else {
             if (config.defaultSpriteFrame) {
                 if (typeof config.defaultSpriteFrame == "string") {
@@ -98,7 +97,7 @@ cc.Sprite.prototype.loadImage = function (config) {
             if ( data && data.isTryReload ){
                //来到这里面程序已经崩溃了，无意义在处理了
             }else{
-                setSpriteSpriteFrame(view, data.url, me, data.spriteFrame, completeCallback,bundle,ResourceType.Local,false,true);
+                setSpriteSpriteFrame(view, data.url, me, data.spriteFrame, completeCallback,bundle,td.Resource.Type.Local,false,true);
             }
         });
     }
@@ -174,7 +173,7 @@ sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
         config.isNeedCache = true;
     }
     Manager.assetManager.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then((data) => {
-        setSkeletonSkeletonData(me, config, data, ResourceType.Remote);
+        setSkeletonSkeletonData(me, config, data, td.Resource.Type.Remote);
     });
 }
 

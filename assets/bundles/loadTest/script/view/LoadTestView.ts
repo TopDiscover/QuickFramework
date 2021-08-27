@@ -1,6 +1,5 @@
 
 import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
-import { ResourceCacheData } from "../../../../script/framework/base/Defines";
 import { ButtonSpriteMemberName } from "../../../../script/framework/extentions/Utils";
 import { UIView } from "../../../../script/framework/ui/UIView";
 import { HallData } from "../../../hall/script/data/HallData";
@@ -197,7 +196,7 @@ export default class LoadTestView extends UIView {
             url:"texture/sheep",
             type:cc.SpriteFrame,
             view : this,
-            onComplete:(data:ResourceCacheData)=>{
+            onComplete:(data)=>{
                 if( data.data ){
                     let arr : cc.SpriteFrame[] = (<cc.SpriteFrame[]>data.data);
                     let clip = cc.AnimationClip.createWithSpriteFrames(arr,arr.length);

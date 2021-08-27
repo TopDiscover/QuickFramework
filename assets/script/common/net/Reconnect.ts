@@ -1,8 +1,6 @@
 /**
  * @description 断线重连
  */
-
-import { ResourceCacheData } from "../../framework/base/Defines";
 import { i18n } from "../language/CommonLanguage";
 import { CommonService } from "./CommonService";
 import ReconnectComponent from "./ReconnectComponent";
@@ -32,7 +30,7 @@ export class Reconnect {
                 td.Config.CommonPrefabs.loading,
                 cc.Prefab,
                 (finish: number, total: number, item: cc.AssetManager.RequestItem) => { },
-                (data: ResourceCacheData) => {
+                (data) => {
                     this.isLoadingPrefab = false;
                     if (data && data.data && data.data instanceof cc.Prefab) {
                         Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.loading, data.data, td.Macro.BUNDLE_RESOURCES)

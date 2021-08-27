@@ -2,16 +2,8 @@
  * @description 日志封装
  */
 
-export enum LogLevel {
-    LOG = 0X00000001,
-    DUMP = 0X00000010,
-    WARN = 0X00000100,
-    ERROR = 0X00001000,
-    ALL = LOG | DUMP | WARN | ERROR ,
-}
-
 class _Log {
-    private _level: number = LogLevel.ALL;
+    private _level: number = td.Log.Level.ALL;
     private _forceNativeLog: boolean = false;
     public get logLevel(): number {
         return this._level;
@@ -57,7 +49,7 @@ class _Log {
             cc.warn = this.warn.bind(this);
             cc.error = this.error.bind(this);
 
-            if ( (this.logLevel & LogLevel.LOG) && this.isDebug ){
+            if ( (this.logLevel & td.Log.Level.LOG) && this.isDebug ){
                 window["cc"].time = console.time;
                 window["cc"].timeEnd = console.timeEnd;
             }else{
@@ -68,7 +60,7 @@ class _Log {
         else {
             console.log(`--------using default log--------`);
 
-            if (this.logLevel & LogLevel.DUMP) {
+            if (this.logLevel & td.Log.Level.DUMP) {
                 let backupcc = window["cc"];
                 if (!backupcc.dump) {
                     window["cc"].dump = this.dump.bind(this);
@@ -77,13 +69,13 @@ class _Log {
                 cc.dump = this.doNothing.bind(this);
             }
 
-            if (this.logLevel & LogLevel.WARN) {
+            if (this.logLevel & td.Log.Level.WARN) {
 
             } else {
                 cc.warn = this.doNothing.bind(this);
             }
 
-            if ( (this.logLevel & LogLevel.LOG) && this.isDebug ){
+            if ( (this.logLevel & td.Log.Level.LOG) && this.isDebug ){
                 window["cc"].time = console.time;
                 window["cc"].timeEnd = console.timeEnd;
             }else{
@@ -111,7 +103,7 @@ class _Log {
     }
 
     public log() {
-        if (this.logLevel & LogLevel.LOG) {
+        if (this.logLevel & td.Log.Level.LOG) {
             if (!this.isDebug) return;
             let backupLog = console.log || cc.log || window["log"];
             backupLog.call(_Log, `${this.getDateString()} INFO : ` + cc.js.formatStr.apply(cc, arguments), this.stack());
@@ -119,7 +111,7 @@ class _Log {
     }
 
     public dump() {
-        if (this.logLevel & LogLevel.DUMP) {
+        if (this.logLevel & td.Log.Level.DUMP) {
             if (!this.isDebug) return;
             let ret = this._dump(arguments[0], arguments[1], arguments[2], arguments[4]);
             let backupLog = console.info || cc.log || window["info"];
@@ -128,7 +120,7 @@ class _Log {
     }
 
     public warn() {
-        if (this.logLevel & LogLevel.WARN) {
+        if (this.logLevel & td.Log.Level.WARN) {
             if (!this.isDebug) return;
             let backupLog = console.warn || cc.warn || window["warn"];
             backupLog.call(_Log, `${this.getDateString()} WARN : ` + cc.js.formatStr.apply(cc, arguments), this.stack());
@@ -136,7 +128,7 @@ class _Log {
     }
 
     public error() {
-        if (this.logLevel & LogLevel.ERROR) {
+        if (this.logLevel & td.Log.Level.ERROR) {
             if (!this.isDebug) return;
             if ( cc.sys.isNative ){
                 try {
