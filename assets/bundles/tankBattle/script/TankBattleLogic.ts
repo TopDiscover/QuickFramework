@@ -1,7 +1,6 @@
 import { Logic } from "../../../script/common/base/Logic";
 import { LogicType, LogicEvent, LogicEventData } from "../../../script/common/event/LogicEvent";
 import { LobbyService } from "../../../script/common/net/LobbyService";
-import { ResourceLoaderError } from "../../../script/framework/assetManager/ResourceLoader";
 import TankBattleGameView from "./view/TankBattleGameView";
 import { TankBettle } from "./data/TankBattleGameData";
 import TankBattleNetController from "./controller/TankBattleNetController";
@@ -48,8 +47,8 @@ class TankBattleLogic extends Logic {
         //打开自己的子游戏房间列表
     }
 
-    protected onLoadResourceComplete( err : ResourceLoaderError ){
-        if ( err == ResourceLoaderError.LOADING ){
+    protected onLoadResourceComplete( err : td.Resource.LoaderError ){
+        if ( err == td.Resource.LoaderError.LOADING ){
             return;
         }
         cc.log(`${this.bundle}资源加载完成!!!`);

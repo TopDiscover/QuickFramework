@@ -1,6 +1,6 @@
 import { LogicEventData, LogicType } from "../event/LogicEvent";
 import EventComponent from "../../framework/base/EventComponent";
-import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
+import ResourceLoader from "../../framework/assetManager/ResourceLoader";
 
 /**
  * @description 逻辑控制器
@@ -59,7 +59,7 @@ export class Logic extends EventComponent {
     }
 
     /**@description 资源加载完成 */
-    protected onLoadResourceComplete( err : ResourceLoaderError ) {
+    protected onLoadResourceComplete( err : td.Resource.LoaderError ) {
     }
 
     /**@description 资源加载中 */

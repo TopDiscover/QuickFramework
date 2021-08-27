@@ -454,6 +454,15 @@ declare namespace td {
 
 	/**@description 资源相关 */
 	namespace Resource {
+		/**@description 资源加载器错误 */
+		export enum LoaderError {
+			/**@description 加载中 */
+			LOADING,
+			/** @description 未找到或设置加载资源*/
+			NO_FOUND_LOAD_RESOURCE,
+			/**@description 完美加载 */
+			SUCCESS,
+		}
 		/**@description 资源缓存类型 */
 		export enum CacheStatus {
 			/**@description 无状态 */
@@ -538,6 +547,21 @@ declare namespace td {
 		WATITING_HIDE,
 		/**@description 无状态 */
 		WAITTING_NONE,
+	}
+
+	/**@description 网络相关 */
+	namespace Net {
+		/** @description 处理函数声明 handleType 为你之前注册的handleType类型的数据 返回值number 为处理函数需要的时间 */
+		export type HandleFunc = (handleTypeData: any) => number;
+		export interface ListenerData {
+			mainCmd: number, // main cmd
+			subCmd: number, //sub cmd
+			func: HandleFunc, //处理函数
+			type: typeof Message, //解包类型
+			isQueue: boolean,//是否进入消息队列，如果不是，收到网络消息返回，会立即回调处理函数
+			data?: any, //解包后的数据
+			target?: any, //处理者
+		}
 	}
 
 	/**@description 全局配置命名空间 可使用toNamespace进行对数据的合并*/
@@ -738,7 +762,7 @@ declare namespace td {
 		/**指向当前View打开时的bundle */
 		bundle: BUNDLE_TYPE;
 		/**@description 类名，请不要设置，由管理器进行设置 */
-		className:string;
+		className: string;
 		close(): void;
 		/**@description args为open代入的参数 */
 		show(args: any[]): void;

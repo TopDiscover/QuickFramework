@@ -1,6 +1,5 @@
 import { Logic } from "../../../script/common/base/Logic";
 import { LogicType, LogicEvent, LogicEventData } from "../../../script/common/event/LogicEvent";
-import { ResourceLoaderError } from "../../../script/framework/assetManager/ResourceLoader";
 import LoadTestView from "./view/LoadTestView";
 
 class LoadTestLogic extends Logic {
@@ -47,8 +46,8 @@ class LoadTestLogic extends Logic {
         }
     }
 
-    protected onLoadResourceComplete( err : ResourceLoaderError ){
-        if ( err == ResourceLoaderError.LOADING ){
+    protected onLoadResourceComplete( err : td.Resource.LoaderError ){
+        if ( err == td.Resource.LoaderError.LOADING ){
             return;
         }
         cc.log(`${this.bundle}资源加载完成!!!`);

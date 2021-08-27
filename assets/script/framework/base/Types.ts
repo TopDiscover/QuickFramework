@@ -9,6 +9,16 @@ export function typesInit() {
 
 /**@description 资源相关 */
 namespace Resource {
+    /**@description 资源加载器错误 */
+    export enum LoaderError {
+        /**@description 加载中 */
+        LOADING,
+        /** @description 未找到或设置加载资源*/
+        NO_FOUND_LOAD_RESOURCE,
+        /**@description 完美加载 */
+        SUCCESS,
+    }
+
     /**@description 资源缓存类型 */
     export enum CacheStatus {
         /**@description 无状态 */

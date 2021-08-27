@@ -1,12 +1,3 @@
-export enum ResourceLoaderError {
-    /**@description 加载中 */
-    LOADING,
-    /** @description 未找到或设置加载资源*/
-    NO_FOUND_LOAD_RESOURCE,
-    /**@description 完美加载 */
-    SUCCESS,
-}
-
 /**
  * @description 资源加载器
  */
@@ -33,8 +24,8 @@ export default class ResourceLoader {
     }
 
     /**@description 加载完成回调 */
-    private _onLoadComplete: (error: ResourceLoaderError) => void = null;
-    public set onLoadComplete(cb: (error: ResourceLoaderError) => void) {
+    private _onLoadComplete: (error: td.Resource.LoaderError) => void = null;
+    public set onLoadComplete(cb: (error: td.Resource.LoaderError) => void) {
         this._onLoadComplete = cb;
     }
     public get onLoadComplete() {
@@ -69,32 +60,32 @@ export default class ResourceLoader {
 
         if (!this.getLoadResources) {
             if (CC_DEBUG) cc.error("未指定 getLoadResources 函数");
-            this.onLoadComplete && this.onLoadComplete(ResourceLoaderError.NO_FOUND_LOAD_RESOURCE);
+            this.onLoadComplete && this.onLoadComplete(td.Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
             return;
         }
 
         let res = this.getLoadResources();
         if (!res) {
             if (CC_DEBUG) cc.error(`未指定加载资源`);
-            this.onLoadComplete && this.onLoadComplete(ResourceLoaderError.NO_FOUND_LOAD_RESOURCE);
+            this.onLoadComplete && this.onLoadComplete(td.Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
             return;
         }
         if (res.length <= 0) {
             if (CC_DEBUG) cc.warn(`加载的资源为空`);
-            this.onLoadComplete && this.onLoadComplete(ResourceLoaderError.NO_FOUND_LOAD_RESOURCE);
+            this.onLoadComplete && this.onLoadComplete(td.Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
             return;
         }
 
         //如果正在加载中，防止重复调用
         if (this._isLoading) {
             if (CC_DEBUG) cc.warn(`资源加载中，未完成加载`);
-            this.onLoadComplete && this.onLoadComplete(ResourceLoaderError.LOADING);
+            this.onLoadComplete && this.onLoadComplete(td.Resource.LoaderError.LOADING);
             return;
         }
 
         if ( this._resources.size > 0 && this.isLoadComplete() ){
             if ( CC_DEBUG ) cc.warn(`资源已经加载完成，使用已经加载完成的资源`);
-            this.onLoadComplete && this.onLoadComplete(ResourceLoaderError.SUCCESS);
+            this.onLoadComplete && this.onLoadComplete(td.Resource.LoaderError.SUCCESS);
             this.onLoadResourceComplete();
             return;
         }
@@ -205,7 +196,7 @@ export default class ResourceLoader {
             //加载完成
             this._isLoading = false;
 
-            this.onLoadComplete && this.onLoadComplete(ResourceLoaderError.SUCCESS);
+            this.onLoadComplete && this.onLoadComplete(td.Resource.LoaderError.SUCCESS);
             this.onLoadResourceComplete();
         }
     }
