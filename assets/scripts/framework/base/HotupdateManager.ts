@@ -17,9 +17,9 @@ const HALL_ASSETS_MANAGER_NAME = "HALL";
 /**
  * @description 热更新组件
  */
-const { ccclass, property } = cc._decorator;
-@ccclass
-class _HotUpdate {
+export class HotupdateManager {
+    private static _instance: HotupdateManager = null;
+    public static Instance() { return this._instance || (this._instance = new HotupdateManager()); }
     private manifestRoot: string = `manifest/`;
     /**@description 本地存储热更新文件的路径 */
     private storagePath = "";
@@ -94,7 +94,7 @@ class _HotUpdate {
     }
 
     /**@description 释放资源管理器，默认为hall 大厅资源管理器 */
-    destroyAssetsManager(name: string = HALL_ASSETS_MANAGER_NAME) {
+    private destroyAssetsManager(name: string = HALL_ASSETS_MANAGER_NAME) {
         if (this.assetsManagers[name]) {
             cc.log("destroyAssetsManager : " + name);
             this.currentAssetsManager = null;
@@ -103,7 +103,7 @@ class _HotUpdate {
     }
 
     /**@description 获取资源管理器，默认为hall 大厅的资源管理器 */
-    public getAssetsManager(name: string = HALL_ASSETS_MANAGER_NAME) {
+    private getAssetsManager(name: string = HALL_ASSETS_MANAGER_NAME) {
         if (this.assetsManagers[name]) {
             return this.assetsManagers[name];
         } else {
@@ -150,7 +150,7 @@ class _HotUpdate {
     }
 
     /**@description 是否是预览或浏览器 */
-    public get isBrowser( ){
+    private get isBrowser( ){
         return cc.sys.platform == cc.sys.WECHAT_GAME || CC_PREVIEW || cc.sys.isBrowser;
     }
 
@@ -217,7 +217,7 @@ class _HotUpdate {
      * @param gameName 子游戏名
      * @returns manifest url
      */
-    public getGameManifest(gameName): string {
+    private getGameManifest(gameName): string {
         return `${this.manifestRoot}${gameName}_project.manifest`;
     }
 
@@ -302,11 +302,7 @@ class _HotUpdate {
         }
     }
 
-    /**
-     * @description 热更新
-     * @param manifestUrl manifest地址
-     * @param gameName 
-     */
+    /**@description 执行热更新*/
     hotUpdate() {
         if (!this.currentAssetsManager) {
             cc.error(`热更新管理器未初始化`);
@@ -454,5 +450,3 @@ class _HotUpdate {
         return 0;
     }
 }
-
-export let HotUpdate = new _HotUpdate();

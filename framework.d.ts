@@ -460,10 +460,10 @@ declare namespace td {
 		}
 		/**@description 下载事件 */
 		export enum Event {
-			 /**@description 热更新事件*/
-			 HOTUPDATE_DOWNLOAD = "HOTUPDATE_DOWNLOAD",
-			 /**@description 下载进度 */
-			 DOWNLOAD_PROGRESS = "DOWNLOAD_PROGRESS",
+			/**@description 热更新事件*/
+			HOTUPDATE_DOWNLOAD = "HOTUPDATE_DOWNLOAD",
+			/**@description 下载进度 */
+			DOWNLOAD_PROGRESS = "DOWNLOAD_PROGRESS",
 		}
 		export enum Code {
 			/**@description 找不到本地mainfest文件*/
@@ -551,7 +551,7 @@ declare namespace td {
 				bundle: string,
 				index: number,
 				event?: string,
-				isNeedPrompt?: boolean );
+				isNeedPrompt?: boolean);
 		}
 	}
 
@@ -1414,6 +1414,29 @@ declare namespace td {
 		removeNetControllers(): void;
 	}
 
+	export class HotupdateManager {
+		/**@description 通用的热更新地址，当在子游戏或大厅未指定热更新地址时，都统一使用服务器传回来的默认全局更新地址 */
+		get commonHotUpdateUrl(): string;
+		/**@description 检测更新回调 */
+		checkCallback: (code: HotUpdate.Code, state: HotUpdate.State) => void = null;
+		/**@description bundle版本信息 */
+		bundlesConfig: { [key: string]: HotUpdate.BundleConfig }
+		/**@description 获取Bundle名 */
+		getBundleName(gameName: string): HotUpdate.BundleConfig;
+		/**@description 重新下载 下载失败的资源 */
+		downloadFailedAssets(): void;
+		/**@description 检查大厅是否需要更新 */
+		checkHallUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void): void;
+		/**
+		* @description 检测子游戏更新
+		* @param gameName 子游戏名
+		* @param callback 检测完成回调
+		*/
+		checkGameUpdate(gameName: string, callback: (code: HotUpdate.Code, state: HotUpdate.State) => void): void;
+		/**@description 执行热更新*/
+		hotUpdate():void;
+	}
+
 	export class FramewokManager {
 		/**@description 常驻资源指定的模拟view */
 		readonly retainMemory: ViewDynamicLoadData;
@@ -1461,6 +1484,8 @@ declare namespace td {
 		readonly hallNetManager: NetManager;
 		/**@description 全局网络管理器 */
 		readonly netManager: NetManager;
+		/**@description 热更新管理器 */
+		readonly hotupdate: HotupdateManager;
 		/**
 		  * @description 把语言包转换成i18n.xxx形式
 		  * @param param 语言包配置

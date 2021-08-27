@@ -1,5 +1,4 @@
 import { UIView } from "../../framework/ui/UIView";
-import { HotUpdate } from "../base/HotUpdate";
 import { i18n } from "../language/CommonLanguage";
 
 /**@description 下载界面 */
@@ -47,9 +46,9 @@ export default class DownloadLoading extends UIView {
 
     private doUpdate() {
         if( this.state == td.HotUpdate.State.TRY_DOWNLOAD_FAILED_ASSETS ){
-            HotUpdate.downloadFailedAssets();
+            Manager.hotupdate.downloadFailedAssets();
         }else{
-            HotUpdate.hotUpdate();
+            Manager.hotupdate.hotUpdate();
         }
     }
 

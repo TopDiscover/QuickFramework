@@ -10,12 +10,16 @@ import { AssetManager } from "./assetManager/AssetManager";
 import { CacheManager } from "./assetManager/CacheManager";
 import { ResolutionHelper } from "./adaptor/ResolutionHelper";
 import { NodePoolManager } from "./base/NodePoolManager";
+import { HotupdateManager } from "./base/HotupdateManager";
 
 
 
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
+
+    /**@description 热更新管理器 */
+    get hotupdate() { return getSingleton(HotupdateManager) }
 
     /**@description 常驻资源指定的模拟view */
     get retainMemory() { return this.uiManager.retainMemory; }
@@ -41,7 +45,7 @@ export class Framewok {
     }
 
     /**@description 资源管理器 */
-    get assetManager(){
+    get assetManager() {
         return getSingleton(AssetManager);
     }
 
@@ -92,7 +96,7 @@ export class Framewok {
      * Manager.makeLanguage("title","tankBattle"); //=> i18n.tankBattle.title 指向游戏特定的语言包
      * Manager.makeLanguage("title"); //=> i18n.title 指向的大厅的公共语言包
      */
-     makeLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE = td.Macro.BUNDLE_RESOURCES): (string | number)[] | string {
+    makeLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE = td.Macro.BUNDLE_RESOURCES): (string | number)[] | string {
         if (typeof param == "string") {
             if (bundle) {
                 return `${td.Macro.USING_LAN_KEY}${bundle}.${param}`;

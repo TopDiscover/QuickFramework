@@ -1,4 +1,3 @@
-import { HotUpdate } from "../base/HotUpdate";
 import DownloadLoading from "../component/DownloadLoading";
 import { i18n } from "../language/CommonLanguage";
 
@@ -48,11 +47,11 @@ export class BundleManager {
       this.curBundle = config;
       this.isLoading = true;
 
-      if (!HotUpdate.bundlesConfig[this.curBundle.bundle]) {
-         HotUpdate.bundlesConfig[this.curBundle.bundle] = config;
+      if (!Manager.hotupdate.bundlesConfig[this.curBundle.bundle]) {
+         Manager.hotupdate.bundlesConfig[this.curBundle.bundle] = config;
       }
 
-      let versionInfo = HotUpdate.bundlesConfig[this.curBundle.bundle];
+      let versionInfo = Manager.hotupdate.bundlesConfig[this.curBundle.bundle];
       this.checkUpdate(versionInfo);
    }
 
@@ -68,7 +67,7 @@ export class BundleManager {
       let self = this;
       cc.log(`检测更新信息:${versionInfo.name}(${versionInfo.bundle})`);
       Manager.eventDispatcher.removeEventListener(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD,this);
-      HotUpdate.checkGameUpdate(this.curBundle.bundle, (code, state) => {
+      Manager.hotupdate.checkGameUpdate(this.curBundle.bundle, (code, state) => {
          if (code == td.HotUpdate.Code.NEW_VERSION_FOUND) {
             //有新版本
             Manager.eventDispatcher.addEventListener(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD,this.onDownload,this);
@@ -87,7 +86,7 @@ export class BundleManager {
                   }
                });
             }else{
-               HotUpdate.hotUpdate();
+               Manager.hotupdate.hotUpdate();
             }
          } else if (state == td.HotUpdate.State.TRY_DOWNLOAD_FAILED_ASSETS) {
             //尝试重新下载之前下载失败的文件
@@ -105,7 +104,7 @@ export class BundleManager {
                   }
                });
             }else{
-               HotUpdate.downloadFailedAssets();
+               Manager.hotupdate.downloadFailedAssets();
             }
          } else if (code == td.HotUpdate.Code.ALREADY_UP_TO_DATE) {
             //已经是最新版本
@@ -138,7 +137,7 @@ export class BundleManager {
       cc.log(`updateGame : ${this.curBundle.bundle}`);
       let me = this;
       //加载子包
-      let versionInfo = HotUpdate.bundlesConfig[this.curBundle.bundle];
+      let versionInfo = Manager.hotupdate.bundlesConfig[this.curBundle.bundle];
       Manager.assetManager.loadBundle(versionInfo.bundle, (err: Error, bundle: cc.AssetManager.Bundle) => {
          me.isLoading = false;
          if (err) {
@@ -179,7 +178,7 @@ export class BundleManager {
     ERROR_DECOMPRESS,
        */
 
-      let config = HotUpdate.getBundleName(this.curBundle.bundle);
+      let config = Manager.hotupdate.getBundleName(this.curBundle.bundle);
 
       if (info.code == td.HotUpdate.Code.UPDATE_PROGRESSION) {
          newPercent = info.percent == Number.NaN ? 0 : info.percent;
