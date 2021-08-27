@@ -5,7 +5,6 @@
 
 import { Logic } from "../framework/base/Logic";
 import LoginView from "./view/LoginView";
-import DownloadLoading from "../common/component/DownloadLoading";
 import { i18n } from "../common/language/CommonLanguage";
 
 class LoginLogic extends Logic {
@@ -36,12 +35,13 @@ class LoginLogic extends Logic {
                 Manager.loading.hide();
                 Manager.alert.show({
                     text: i18n.newVersion, confirmCb: (isOK) => {
-                        if (isOK) {
-                            Manager.uiManager.open({ type: DownloadLoading, zIndex: td.ViewZOrder.UI, args: [state,i18n.hallText] });
-                        } else {
-                            //退出游戏
-                            cc.game.end();
-                        }
+                        let data : td.HotUpdate.MessageData = {
+                            isOk : isOK,
+                            state : state,
+                            name : i18n.hallText,
+                            bundle : td.Config.BUNDLE_HALL
+                        };
+                        dispatch(td.HotUpdate.Event.DOWNLOAD_MESSAGE,data);
                     }
                 });
             } else if (code == td.HotUpdate.Code.ALREADY_UP_TO_DATE) {

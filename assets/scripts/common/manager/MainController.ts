@@ -1,3 +1,5 @@
+import EventComponent from "../../framework/base/EventComponent";
+import DownloadLoading from "../component/DownloadLoading";
 import { Reconnect } from "../net/Reconnect";
 /**
  * @description 主控制器 
@@ -7,7 +9,7 @@ const {ccclass, property,menu} = cc._decorator;
 
 @ccclass
 @menu("manager/MainController")
-export default class MainController extends cc.Component {
+export default class MainController extends EventComponent {
     
     /**@description 进入后台的时间 */
     private _enterBackgroundTime = 0;
@@ -15,8 +17,21 @@ export default class MainController extends cc.Component {
     @property(cc.Asset)
     wssCacert : cc.Asset = null;
 
-    onLoad () {
+    bindingEvents(){
+        super.bindingEvents();
+        this.registerEvent(td.HotUpdate.Event.DOWNLOAD_MESSAGE,this.onHotupdateMessage);
+    }
 
+    private onHotupdateMessage( data : td.HotUpdate.MessageData ){
+        if ( data.isOk ){
+            Manager.uiManager.open({type : DownloadLoading,zIndex:td.ViewZOrder.Loading,args:[data.state,data.name,data.bundle]});
+        }else{
+            cc.game.end();
+        }
+    }
+
+    onLoad () {
+        super.onLoad();
         if( this.wssCacert ){
             Manager.wssCacertUrl = this.wssCacert.nativeUrl;
         }
@@ -80,7 +95,6 @@ export default class MainController extends cc.Component {
     }
 
     update(){
-
         //Service 网络调试
         Manager.serviceManager.update();
 
@@ -106,6 +120,7 @@ export default class MainController extends cc.Component {
 
         //逻辑管理器
         Manager.logicManager.onDestroy(this.node);
+        super.onDestroy();
     }
 
     private onEnterBackground(){

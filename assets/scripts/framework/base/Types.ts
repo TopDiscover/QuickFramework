@@ -101,6 +101,8 @@ namespace HotUpdate {
         HOTUPDATE_DOWNLOAD = "HOTUPDATE_DOWNLOAD",
         /**@description 下载进度 */
         DOWNLOAD_PROGRESS = "DOWNLOAD_PROGRESS",
+        /**@description 提示下载弹出框事件 */
+        DOWNLOAD_MESSAGE = "DOWNLOAD_MESSAGE",
     }
 
     export enum Code {

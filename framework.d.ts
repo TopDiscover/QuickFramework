@@ -458,12 +458,25 @@ declare namespace td {
 			/**@description 是否需要重启 */
 			needRestart: boolean
 		}
+		/**@description 提示下载弹出框事件数据 */
+		interface MessageData{
+			state : State;
+			/**@description 下载的bundle */
+			bundle : string;
+			/**@description 下载的bundle名，如大厅 */
+			name : string;
+			/**@description 是否点击了确定按钮 true为下载 */
+			isOk : boolean;
+		}
+
 		/**@description 下载事件 */
 		export enum Event {
 			/**@description 热更新事件*/
 			HOTUPDATE_DOWNLOAD = "HOTUPDATE_DOWNLOAD",
 			/**@description 下载进度 */
 			DOWNLOAD_PROGRESS = "DOWNLOAD_PROGRESS",
+			/**@description 提示下载弹出框事件 */
+			DOWNLOAD_MESSAGE = "DOWNLOAD_MESSAGE",
 		}
 		export enum Code {
 			/**@description 找不到本地mainfest文件*/

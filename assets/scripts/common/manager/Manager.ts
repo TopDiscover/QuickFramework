@@ -4,7 +4,7 @@ import { commonConfigInit } from "../config/Config";
 commonConfigInit();
 import { Log } from "../../framework/log/Log";
 import { NetManager } from "./NetManager";
-import { LogicManager } from "./LogicManager";
+import { LogicManager } from "../../framework/base/LogicManager";
 import GlobalAudio from "../component/GlobalAudio";
 import { CocosExtentionInit } from "../../framework/extentions/CocosExtention";
 import GameView from "../../framework/base/GameView";

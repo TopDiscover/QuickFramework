@@ -1,4 +1,3 @@
-import DownloadLoading from "../component/DownloadLoading";
 import { i18n } from "../language/CommonLanguage";
 
 /**
@@ -76,13 +75,13 @@ export class BundleManager {
                Manager.alert.show({
                   text:String.format(i18n.newVersionForBundle,versionInfo.name),
                   confirmCb:(isOK)=>{
-                     if( isOK ){
-                        Manager.uiManager.open({type:DownloadLoading,zIndex:td.ViewZOrder.Loading,args:[state,versionInfo.name]});
-                     }else{
-                        //不更新
-                        //直接关闭掉游戏
-                        cc.game.end();
+                     let data : td.HotUpdate.MessageData = {
+                        isOk : isOK,
+                        state : state,
+                        name : versionInfo.name,
+                        bundle : versionInfo.bundle,
                      }
+                     dispatch(td.HotUpdate.Event.DOWNLOAD_MESSAGE,data);
                   }
                });
             }else{
@@ -96,11 +95,13 @@ export class BundleManager {
                Manager.alert.show({
                   text:String.format(i18n.newVersionForBundle,versionInfo.name),
                   confirmCb:(isOK)=>{
-                     if( isOK ){
-                        Manager.uiManager.open({type:DownloadLoading,zIndex:td.ViewZOrder.Loading,args:[state,versionInfo.name]});
-                     }else{
-                        cc.game.end();
+                     let data : td.HotUpdate.MessageData = {
+                        isOk : isOK,
+                        state : state,
+                        name : versionInfo.name,
+                        bundle : versionInfo.bundle,
                      }
+                     dispatch(td.HotUpdate.Event.DOWNLOAD_MESSAGE,data);
                   }
                });
             }else{
