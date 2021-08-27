@@ -9,7 +9,7 @@ import GlobalAudio from "../component/GlobalAudio";
 import { CocosExtentionInit } from "../../framework/extentions/CocosExtention";
 import GameView from "../../framework/base/GameView";
 import { GameData } from "../../framework/base/GameData";
-import { BundleManager } from "./BundleManager";
+import { BundleManager } from "../../framework/base/BundleManager";
 import Tips from "../component/Tips";
 import UILoading from "../component/UILoading";
 import Alert from "../component/Alert";

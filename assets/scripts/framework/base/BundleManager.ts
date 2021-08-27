@@ -1,4 +1,4 @@
-import { i18n } from "../language/CommonLanguage";
+import { i18n } from "../../common/language/CommonLanguage";
 
 /**
  * @description bundle管理器
