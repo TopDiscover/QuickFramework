@@ -1,4 +1,4 @@
-import { GameData } from "../../../../script/common/base/GameData";
+import { GameData } from "../../../../script/framework/base/GameData";
 import EliminateGameModel from "../model/EliminateGameModel";
 import { CELL_PREFAB_URL, CELL_TYPE } from "./EliminateDefines";
 

@@ -415,7 +415,7 @@ declare function toNamespace(key: string, value: any, namespace?: string): void;
  * @description 专用进入完成Logic事件LogicEvent.ENTER_COMPLETE
  * @param data 数据
  */
-declare function dispatchEnterComplete(data: LogicEventData): void;
+declare function dispatchEnterComplete(data: td.Logic.EventData): void;
 
 declare namespace td {
 

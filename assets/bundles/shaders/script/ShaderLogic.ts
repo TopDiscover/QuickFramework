@@ -1,4 +1,4 @@
-import { Logic } from "../../../script/common/base/Logic";
+import { Logic } from "../../../script/framework/base/Logic";
 import ShaderView from "./view/ShaderView";
 
 class ShaderLogic extends Logic {

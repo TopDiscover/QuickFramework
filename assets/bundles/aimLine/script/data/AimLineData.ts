@@ -1,4 +1,4 @@
-import { GameData } from "../../../../script/common/base/GameData";
+import { GameData } from "../../../../script/framework/base/GameData";
 
 class _AimLineData extends GameData {
     private static _instance: _AimLineData = null;

@@ -1,4 +1,4 @@
-import GameView from "../../../../script/common/base/GameView";
+import GameView from "../../../../script/framework/base/GameView";
 import { EliminateData } from "../data/EliminateData";
 import { EliminateEffect } from "../data/EliminateDefines";
 import EliminateEffectsView from "./EliminateEffectsView";

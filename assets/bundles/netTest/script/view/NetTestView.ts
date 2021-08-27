@@ -1,4 +1,4 @@
-import GameView from "../../../../script/common/base/GameView";
+import GameView from "../../../../script/framework/base/GameView";
 import { CommonEvent } from "../../../../script/common/event/CommonEvent";
 import { ChatService } from "../../../../script/common/net/ChatService";
 import { CommonService } from "../../../../script/common/net/CommonService";

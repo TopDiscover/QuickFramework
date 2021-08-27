@@ -1,4 +1,4 @@
-import { Logic } from "../../../script/common/base/Logic";
+import { Logic } from "../../../script/framework/base/Logic";
 import NetTestView from "./view/NetTestView";
 
 class NetTestLogic extends Logic {

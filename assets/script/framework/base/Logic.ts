@@ -1,5 +1,5 @@
-import EventComponent from "../../framework/base/EventComponent";
-import ResourceLoader from "../../framework/assetManager/ResourceLoader";
+import EventComponent from "./EventComponent";
+import ResourceLoader from "../assetManager/ResourceLoader";
 
 /**
  * @description 逻辑控制器

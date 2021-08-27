@@ -1,5 +1,5 @@
 
-import { GameData } from "../../../../script/common/base/GameData";
+import { GameData } from "../../../../script/framework/base/GameData";
 /**@description 大厅数据 */
 class _HallData extends GameData {
     private static _instance: _HallData = null;

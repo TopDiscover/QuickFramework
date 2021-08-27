@@ -1,4 +1,4 @@
-import { Logic } from "../base/Logic";
+import { Logic } from "../../framework/base/Logic";
 
 /**
  * @description 逻辑控制器管理器 

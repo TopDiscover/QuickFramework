@@ -3,7 +3,7 @@
  * @description 登录流程 , 不用导出
  */
 
-import { Logic } from "../common/base/Logic";
+import { Logic } from "../framework/base/Logic";
 import LoginView from "./view/LoginView";
 import { HotUpdate, AssetManagerCode, AssetManagerState } from "../common/base/HotUpdate";
 import DownloadLoading from "../common/component/DownloadLoading";
