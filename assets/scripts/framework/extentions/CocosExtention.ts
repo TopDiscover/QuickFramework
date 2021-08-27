@@ -292,8 +292,8 @@ export function CocosExtentionInit() {
             if (CC_DEBUG) cc.log(`浏览器`);
             (<any>cc.EditBox)._ImplClass = WebEditBoxImpl;
         }
+        cc.log("Cocos引擎扩展初始化");
     }
-    //cc.log("CocosExtentionInit");
 }
 
 Reflect.defineProperty(cc.Label.prototype, "language", {

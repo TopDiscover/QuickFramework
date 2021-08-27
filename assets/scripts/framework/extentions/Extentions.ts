@@ -102,6 +102,9 @@ window.getSingleton = getSingleton;
 createNamespace();
 export function extentionsInit(){
     createNamespace();
+    if ( !CC_EDITOR ){
+        cc.log("全局扩展初始化");
+    }
 }
 
 

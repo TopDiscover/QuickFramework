@@ -11,6 +11,12 @@ import { CacheManager } from "./assetManager/CacheManager";
 import { ResolutionHelper } from "./adaptor/ResolutionHelper";
 import { NodePoolManager } from "./base/NodePoolManager";
 import { HotupdateManager } from "./base/HotupdateManager";
+import { NetManager } from "./base/NetManager";
+import { LogicManager } from "./base/LogicManager";
+import { BundleManager } from "./base/BundleManager";
+import GameView from "./base/GameView";
+import { GameData } from "./base/GameData";
+import { CocosExtentionInit } from "./extentions/CocosExtention";
 
 
 
@@ -18,6 +24,34 @@ import { HotupdateManager } from "./base/HotupdateManager";
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
 
+    /**@description bundle管理器 */
+    get bundleManager() {
+        return getSingleton(BundleManager);
+    }
+
+    /**@description 逻辑控制器管理器 */
+    get logicManager() {
+        return getSingleton(LogicManager);
+    }
+    
+    private _hallNetManager: NetManager = null;
+    /**@description 大厅的网络控制器组件管理器，注册到该管理器的网络组件，除登录界面外，都会被移除掉*/
+    get hallNetManager() {
+        if (!this._hallNetManager) {
+            this._hallNetManager = new NetManager("hallNetManager");
+        }
+        return this._hallNetManager;
+    }
+
+    private _netManager: NetManager = null;
+    /**@description 全局常驻网络组件管理器,注册到该管理器的网络组件会跟游戏的生命周期一致 */
+    get netManager() {
+        if (!this._netManager) {
+            this._netManager = new NetManager("netManager");
+        }
+        return this._netManager;
+    }
+    
     /**@description 热更新管理器 */
     get hotupdate() { return getSingleton(HotupdateManager) }
 
@@ -79,6 +113,21 @@ export class Framewok {
         return "";
     }
 
+    /**@description 当前游戏GameView, GameView进入onLoad赋值 */
+    gameView: GameView = null;
+
+    /**@description 游戏数据 */
+    gameData: GameData = null;
+
+    /**@description 游戏控制器，在自己的模块内写函数有类型化读取,此值在Logic.addNetComponent赋值
+     * @example 
+     * export function netController() : TankBattleNetController{
+     * return Manager.gameController;
+     * }
+     * 
+     */
+    gameController: any = null;
+
     /**
      * @description 把语言包转换成i18n.xxx形式
      * @param param 语言包配置
@@ -137,5 +186,12 @@ export class Framewok {
         }
         cc.error(`传入参数有误`);
         return "";
+    }
+
+    init(){
+        //适配
+        this.resolutionHelper.initBrowserAdaptor();
+        //引擎扩展初始化
+        CocosExtentionInit();
     }
 }
