@@ -1,5 +1,4 @@
 import { Logic } from "../../../script/common/base/Logic";
-import { LogicType, LogicEvent, LogicEventData } from "../../../script/common/event/LogicEvent";
 import { LobbyService } from "../../../script/common/net/LobbyService";
 import TankBattleGameView from "./view/TankBattleGameView";
 import { TankBettle } from "./data/TankBattleGameData";
@@ -12,7 +11,7 @@ import { TankBattleLanguage } from "./data/TankBattleLanguage";
  */
 class TankBattleLogic extends Logic {
 
-    logicType: LogicType = LogicType.GAME;
+    logicType: td.Logic.Type = td.Logic.Type.GAME;
 
     language = new TankBattleLanguage;
     onLoad() {
@@ -21,15 +20,15 @@ class TankBattleLogic extends Logic {
 
     protected bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(LogicEvent.ENTER_GAME, this.onEnterGame);
-        this.registerEvent(LogicEvent.ENTER_ROOM_LIST,this.onEnterRoomList);
+        this.registerEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
+        this.registerEvent(td.Logic.Event.ENTER_ROOM_LIST,this.onEnterRoomList);
     }
 
     protected get bundle() {
         return TankBettle.gameData.bundle;
     }
 
-    public onEnterComplete( data : LogicEventData ){
+    public onEnterComplete( data : td.Logic.EventData ){
         super.onEnterComplete(data);
         if( data.type == this.logicType ){
 

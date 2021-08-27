@@ -1,5 +1,4 @@
 import SettingView from "../../../../script/common/component/SettingView";
-import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
 import { UIView } from "../../../../script/framework/ui/UIView";
 
 
@@ -18,7 +17,7 @@ export default class GameOneView extends UIView {
         super.onLoad();
         let goback = cc.find("goBack",this.node);
         goback.on(cc.Node.EventType.TOUCH_END,()=>{
-            dispatch(LogicEvent.ENTER_HALL);
+            dispatch(td.Logic.Event.ENTER_HALL);
         });
         goback.zIndex = 10;
 
@@ -26,7 +25,7 @@ export default class GameOneView extends UIView {
 
         cc.find("setting",this.node).on(cc.Node.EventType.TOUCH_END,this.onSetting,this);
 
-        dispatchEnterComplete({type:LogicType.GAME,views:[this]});
+        dispatchEnterComplete({type:td.Logic.Type.GAME,views:[this]});
     }
 
     private onSetting(){

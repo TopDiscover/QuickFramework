@@ -1,6 +1,5 @@
 import { UIView } from "../../../../script/framework/ui/UIView";
 import { BundleConfig } from "../../../../script/common/base/HotUpdate";
-import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../script/common/event/LogicEvent";
 import { CommonEvent } from "../../../../script/common/event/CommonEvent";
 import { HallData } from "../data/HallData";
 import { LobbyService } from "../../../../script/common/net/LobbyService";
@@ -105,7 +104,7 @@ export default class HallView extends UIView {
 
         // this.audioHelper.playMusic("audio/background",this.bundle)
 
-        dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
+        dispatchEnterComplete({ type: td.Logic.Type.HALL, views: [this] });
     }
 
     bindingEvents() {

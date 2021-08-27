@@ -1,4 +1,3 @@
-import { LogicEventData, LogicType } from "../event/LogicEvent";
 import EventComponent from "../../framework/base/EventComponent";
 import ResourceLoader from "../../framework/assetManager/ResourceLoader";
 
@@ -11,7 +10,7 @@ export class Logic extends EventComponent {
     protected logTag = `[Logic]`;
     protected _loader: ResourceLoader = null;
 
-    protected logicType : LogicType = LogicType.UNKNOWN;
+    protected logicType : td.Logic.Type = td.Logic.Type.UNKNOWN;
     protected language : LanguageDataSourceDelegate = null;
 
     constructor() {
@@ -32,12 +31,12 @@ export class Logic extends EventComponent {
     }
 
     /**@description 进入各模块完成回调 */
-    public onEnterComplete(data: LogicEventData){
+    public onEnterComplete(data: td.Logic.EventData){
 
     }
 
     public init( data : cc.Node ){
-        if ( this.logicType == LogicType.UNKNOWN ){
+        if ( this.logicType == td.Logic.Type.UNKNOWN ){
             cc.error(`未对正确的对logicType赋值`);
         }
         this.node = data;

@@ -1,5 +1,4 @@
 import { UIView } from "../../framework/ui/UIView";
-import { LogicEvent } from "../event/LogicEvent";
 import { i18n } from "../language/CommonLanguage";
 
 const { ccclass, property } = cc._decorator;
@@ -63,7 +62,7 @@ export default class SettingView extends UIView {
             text: i18n.quitGame,
             confirmCb: (isOk) => {
                 if (isOk) {
-                    dispatch(LogicEvent.ENTER_LOGIN);
+                    dispatch(td.Logic.Event.ENTER_LOGIN);
                 }
             },
         });

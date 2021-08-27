@@ -1,4 +1,3 @@
-import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
 import { UIView } from "../../../../script/framework/ui/UIView";
 
 const {ccclass, property} = cc._decorator;
@@ -17,7 +16,7 @@ export default class NodePoolView extends UIView {
         super.onLoad();
 
         cc.find("goback", this.node).on(cc.Node.EventType.TOUCH_END, () => {
-            dispatch(LogicEvent.ENTER_HALL);
+            dispatch(td.Logic.Event.ENTER_HALL);
         });
 
         this.star = cc.find("star",this.node);
@@ -34,7 +33,7 @@ export default class NodePoolView extends UIView {
         getNode.on(cc.Node.EventType.TOUCH_END,this.onGet,this);
         putNode.on(cc.Node.EventType.TOUCH_END,this.onPut,this);
 
-        dispatchEnterComplete({ type: LogicType.GAME, views: [this] });
+        dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this] });
     }
 
     private onCreate( ){

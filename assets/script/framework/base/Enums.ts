@@ -50,4 +50,44 @@ enum ViewStatus {
     /**@description 无状态 */
     WAITTING_NONE,
 }
-toNamespace("ViewStatus",ViewStatus)
+toNamespace("ViewStatus", ViewStatus)
+
+/**@description 逻辑模块 */
+namespace Logic {
+    /**@description 逻辑事件类型 */
+    export enum Type {
+        /**@description 未知 */
+        UNKNOWN = "UNKNOWN",
+        /**@description 大厅 */
+        HALL = "HALL",
+        /**@description 游戏场景 */
+        GAME = "GAME",
+        /**@description 登录场景 */
+        LOGIN = "LOGIN",
+        /**@description 房间列表 */
+        ROOM_LIST = "ROOM_LIST",
+    }
+    /**@description 逻辑事件定义 */
+    export enum Event {
+        /**@description 进行指定场景完成 */
+        ENTER_COMPLETE = "ENTER_COMPLETE",
+
+        /**@description 进入大厅*/
+        ENTER_HALL = "ENTER_HALL",
+
+        /**@description 进入游戏 */
+        ENTER_GAME = "ENTER_GAME",
+
+        /**@description 返回登录界面 */
+        ENTER_LOGIN = "ENTER_LOGIN",
+
+        /**@description 进入房间列表 */
+        ENTER_ROOM_LIST = "ENTER_ROOM_LIST"
+    };
+}
+
+window.dispatchEnterComplete = function(data:td.Logic.EventData){
+    dispatch(Logic.Event.ENTER_COMPLETE, data);
+}
+
+toNamespace("Logic", Logic);

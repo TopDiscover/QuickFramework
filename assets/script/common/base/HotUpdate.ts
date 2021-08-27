@@ -1,5 +1,4 @@
 import { CommonEvent } from "../event/CommonEvent";
-import { LogicType, LogicEvent } from "../event/LogicEvent";
 
 interface Manifest {
     /**@description 大厅版本 */
@@ -114,7 +113,7 @@ export class BundleConfig {
     name: string = "";
     index = 0;
     /**@description 加载bundle完成后，发出的bundle事件 */
-    event : string = LogicEvent.ENTER_GAME;
+    event : string = td.Logic.Event.ENTER_GAME;
     /**@description 是否需要提示弹出框提示升级 */
     isNeedPrompt : boolean = false;
     /**

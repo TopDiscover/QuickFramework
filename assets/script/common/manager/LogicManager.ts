@@ -1,5 +1,4 @@
 import { Logic } from "../base/Logic";
-import { LogicEvent, LogicEventData, LogicType } from "../event/LogicEvent";
 
 /**
  * @description 逻辑控制器管理器 
@@ -37,7 +36,7 @@ export class LogicManager{
 
     public onLoad( node : cc.Node ){
         this.node = node;
-        Manager.eventDispatcher.addEventListener(LogicEvent.ENTER_COMPLETE,this.onEnterComplete,this);
+        Manager.eventDispatcher.addEventListener(td.Logic.Event.ENTER_COMPLETE,this.onEnterComplete,this);
         if ( this._logics.length == 0 ){
             for ( let i = 0 ; i < this._logicTypes.length ; i++ ){
                 let type = this._logicTypes[i];
@@ -55,16 +54,16 @@ export class LogicManager{
     }
 
     public onDestroy( node : cc.Node ){
-        Manager.eventDispatcher.removeEventListener(LogicEvent.ENTER_COMPLETE,this);
+        Manager.eventDispatcher.removeEventListener(td.Logic.Event.ENTER_COMPLETE,this);
         this._logics.forEach((data : Logic)=>{
             data.onDestroy();
         });
     }
 
-    protected onEnterComplete(data: LogicEventData) {
+    protected onEnterComplete(data: td.Logic.EventData) {
 
         //房间列表会直接加在大厅上，不对界面进行关闭操作
-        if ( data.type != LogicType.ROOM_LIST ){
+        if ( data.type != td.Logic.Type.ROOM_LIST ){
             if (data && data.views && data.views.length > 0) {
                 //关闭掉除排除项之外的所有界面
                 Manager.uiManager.closeExcept(data.views);
@@ -75,10 +74,10 @@ export class LogicManager{
                     logic.onEnterComplete(data);
                 }
             }
-            if( data.type == LogicType.HALL){
+            if( data.type == td.Logic.Type.HALL){
                 //删除加载的子游戏bundle
                 Manager.bundleManager.removeLoadedGamesBundle();
-            }else if( data.type == LogicType.LOGIN ){
+            }else if( data.type == td.Logic.Type.LOGIN ){
                 //返回到登录界面，删除所有加载的bundles，包括大厅hall
                 Manager.bundleManager.removeLoadedBundle();
             }

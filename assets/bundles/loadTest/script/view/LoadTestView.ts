@@ -1,5 +1,4 @@
 
-import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
 import { ButtonSpriteMemberName } from "../../../../script/framework/extentions/Utils";
 import { UIView } from "../../../../script/framework/ui/UIView";
 import { HallData } from "../../../hall/script/data/HallData";
@@ -38,11 +37,11 @@ export default class LoadTestView extends UIView {
 
         cc.find("loadDir",op).on(cc.Node.EventType.TOUCH_END,this.onLoadDir,this);
 
-        dispatchEnterComplete({ type: LogicType.GAME, views: [this] });
+        dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this] });
     }
 
     private onGoback(){
-        dispatch(LogicEvent.ENTER_HALL);
+        dispatch(td.Logic.Event.ENTER_HALL);
     }
 
     private onLoadFont( ){

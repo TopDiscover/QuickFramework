@@ -1,4 +1,3 @@
-import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
 import { UIView } from "../../../../script/framework/ui/UIView";
 
 const {ccclass, property} = cc._decorator;
@@ -16,7 +15,7 @@ export default class ShaderView extends UIView {
         super.onLoad();
 
         cc.find("goback",this.node).on(cc.Node.EventType.TOUCH_END,()=>{
-            dispatch(LogicEvent.ENTER_HALL);
+            dispatch(td.Logic.Event.ENTER_HALL);
         },this);
 
         this.prefabs = cc.find("prefabs",this.node);
@@ -38,7 +37,7 @@ export default class ShaderView extends UIView {
             circle.on(cc.Node.EventType.TOUCH_END,this.onCircleSprite,this);
         }
 
-        dispatchEnterComplete({type:LogicType.GAME,views:[this]});
+        dispatchEnterComplete({type:td.Logic.Type.GAME,views:[this]});
     }
 
     private onLoading(){

@@ -1,6 +1,5 @@
 import { ServiceEvent } from "../../framework/base/Defines";
 import Controller from "../../framework/controller/Controller";
-import { LogicEvent, LogicEventData, LogicType } from "../event/LogicEvent";
 import { CommonService } from "./CommonService";
 
 /**
@@ -26,11 +25,11 @@ export default class ReconnectComponent extends Controller<CommonService> {
 
     protected bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(LogicEvent.ENTER_COMPLETE, this.enterComplete);
+        this.registerEvent(td.Logic.Event.ENTER_COMPLETE, this.enterComplete);
     }
 
-    private enterComplete(data: LogicEventData) {
-        if (data.type == LogicType.LOGIN) {
+    private enterComplete(data: td.Logic.EventData) {
+        if (data.type == td.Logic.Type.LOGIN) {
             this.service && this.service.reconnect.hide();
         }
     }
@@ -105,12 +104,12 @@ export default class ReconnectComponent extends Controller<CommonService> {
                     this.connect();
                 } else {
                     cc.log(`${this.logName} 玩家网络不好，不重连，退回到登录界面`);
-                    dispatch(LogicEvent.ENTER_LOGIN, true);
+                    dispatch(td.Logic.Event.ENTER_LOGIN, true);
                 }
             },
             cancelCb: () => {
                 cc.log(`${this.logName} 玩家网络不好，不重连，退回到登录界面`);
-                dispatch(LogicEvent.ENTER_LOGIN, true);
+                dispatch(td.Logic.Event.ENTER_LOGIN, true);
             }
         });
     }

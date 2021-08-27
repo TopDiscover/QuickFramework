@@ -4,7 +4,6 @@
  */
 
 import { Logic } from "../common/base/Logic";
-import { LogicType, LogicEvent, LogicEventData } from "../common/event/LogicEvent";
 import LoginView from "./view/LoginView";
 import { HotUpdate, AssetManagerCode, AssetManagerState } from "../common/base/HotUpdate";
 import DownloadLoading from "../common/component/DownloadLoading";
@@ -12,11 +11,11 @@ import { i18n } from "../common/language/CommonLanguage";
 
 class LoginLogic extends Logic {
 
-    logicType: LogicType = LogicType.LOGIN;
+    logicType: td.Logic.Type = td.Logic.Type.LOGIN;
 
     protected bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(LogicEvent.ENTER_LOGIN, this.onEnterLogin);
+        this.registerEvent(td.Logic.Event.ENTER_LOGIN, this.onEnterLogin);
     }
 
     get bundle() {
@@ -71,7 +70,7 @@ class LoginLogic extends Logic {
         Manager.uiManager.open({ type: LoginView, zIndex: td.ViewZOrder.zero, bundle: this.bundle });
     }
 
-    public onEnterComplete(data: LogicEventData) {
+    public onEnterComplete(data: td.Logic.EventData) {
         super.onEnterComplete(data);
         if( data.type == this.logicType ){
             //进入到登录，关闭掉所有网络连接，请求登录成功后才连接网络

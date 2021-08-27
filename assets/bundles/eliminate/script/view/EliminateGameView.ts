@@ -1,5 +1,4 @@
 import GameView from "../../../../script/common/base/GameView";
-import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
 import { EliminateData } from "../data/EliminateData";
 import { EliminateEffect } from "../data/EliminateDefines";
 import EliminateEffectsView from "./EliminateEffectsView";
@@ -42,11 +41,11 @@ export default class EliminateGameView extends GameView {
         this.audioHelper.playMusic("audios/gamescenebgm",this.bundle);
 
         //通知进入bundle完成
-        dispatchEnterComplete({ type: LogicType.GAME, views: [this] });
+        dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this] });
     }
 
     private onGoBack() {
-        dispatch(LogicEvent.ENTER_HALL);
+        dispatch(td.Logic.Event.ENTER_HALL);
     }
 
     playClick() {

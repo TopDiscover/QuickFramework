@@ -1,10 +1,9 @@
 import { Logic } from "../../../script/common/base/Logic";
-import { LogicType, LogicEvent, LogicEventData } from "../../../script/common/event/LogicEvent";
 import LoadTestView from "./view/LoadTestView";
 
 class LoadTestLogic extends Logic {
 
-    logicType: LogicType = LogicType.GAME;
+    logicType: td.Logic.Type = td.Logic.Type.GAME;
 
     onLoad() {
         super.onLoad();
@@ -12,7 +11,7 @@ class LoadTestLogic extends Logic {
 
     protected bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(LogicEvent.ENTER_GAME, this.onEnterGame);
+        this.registerEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
     }
 
     protected get bundle() {
@@ -32,7 +31,7 @@ class LoadTestLogic extends Logic {
     }
 
     /**@description 进入的模块只要不是自己的模块，需要把自己加载的资源卸载 */
-    onEnterComplete(data: LogicEventData) {
+    onEnterComplete(data: td.Logic.EventData) {
         super.onEnterComplete(data);
         //关闭房间列表
         if ( data.type == this.logicType ){

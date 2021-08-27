@@ -1,10 +1,9 @@
 import { Logic } from "../../../script/common/base/Logic";
-import { LogicType, LogicEvent } from "../../../script/common/event/LogicEvent";
 import GameOneView from "./view/GameOneView";
 
 class GameOneLogic extends Logic {
 
-    logicType: LogicType = LogicType.GAME;
+    logicType: td.Logic.Type = td.Logic.Type.GAME;
 
     onLoad() {
         super.onLoad();
@@ -12,7 +11,7 @@ class GameOneLogic extends Logic {
 
     protected bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(LogicEvent.ENTER_GAME, this.onEnterGame);
+        this.registerEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
     }
 
     protected get bundle() {

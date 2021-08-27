@@ -1,6 +1,5 @@
 import GameView from "../../../../script/common/base/GameView";
 import { CommonEvent } from "../../../../script/common/event/CommonEvent";
-import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../script/common/event/LogicEvent";
 import { ChatService } from "../../../../script/common/net/ChatService";
 import { CommonService } from "../../../../script/common/net/CommonService";
 import { GameService } from "../../../../script/common/net/GameService";
@@ -88,7 +87,7 @@ export default class NetTestView extends GameView {
         super.onLoad();
 
         cc.find("goback", this.node).on(cc.Node.EventType.TOUCH_END, () => {
-            dispatch(LogicEvent.ENTER_HALL);
+            dispatch(td.Logic.Event.ENTER_HALL);
         });
 
         this.netToggleContainer = cc.find("netType", this.node).getComponent(cc.ToggleContainer);
@@ -127,7 +126,7 @@ export default class NetTestView extends GameView {
 
         this.init();
 
-        dispatchEnterComplete({ type: LogicType.GAME, views: [this] });
+        dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this] });
     }
 
     private init() {

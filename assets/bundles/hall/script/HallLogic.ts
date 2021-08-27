@@ -1,5 +1,4 @@
 import { Logic } from "../../../script/common/base/Logic";
-import { LogicType, LogicEvent, LogicEventData } from "../../../script/common/event/LogicEvent";
 import HallView from "./view/HallView";
 import { HallData } from "./data/HallData";
 import { HallLanguage } from "./data/HallLanguage";
@@ -8,7 +7,7 @@ import { HallLanguage } from "./data/HallLanguage";
 
 class HallLogic extends Logic {
 
-    logicType: LogicType = LogicType.HALL;
+    logicType: td.Logic.Type = td.Logic.Type.HALL;
 
     language = new HallLanguage;
 
@@ -18,8 +17,8 @@ class HallLogic extends Logic {
 
     bindingEvents(){
         super.bindingEvents();
-        this.registerEvent(LogicEvent.ENTER_HALL,this.onEnterHall); 
-        this.registerEvent(LogicEvent.ENTER_COMPLETE,this.onEnterComplete);
+        this.registerEvent(td.Logic.Event.ENTER_HALL,this.onEnterHall); 
+        this.registerEvent(td.Logic.Event.ENTER_COMPLETE,this.onEnterComplete);
     }
 
     private onEnterHall(){
@@ -29,9 +28,9 @@ class HallLogic extends Logic {
         Manager.uiManager.open({ type: HallView , bundle:this.bundle});
     }
 
-    public onEnterComplete(data: LogicEventData){
+    public onEnterComplete(data: td.Logic.EventData){
         super.onEnterComplete(data);
-        if( data.type == LogicType.LOGIN){
+        if( data.type == td.Logic.Type.LOGIN){
             //进入登录界面，移除大厅的网络组件
             Manager.hallNetManager.removeNetControllers();
         }

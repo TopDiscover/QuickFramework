@@ -1,5 +1,4 @@
 import { UIView } from "../../../../script/framework/ui/UIView";
-import { LogicEvent, dispatchEnterComplete, LogicType } from "../../../../script/common/event/LogicEvent";
 
 /**
  * @description 瞄准线视图
@@ -43,7 +42,7 @@ export default class AimLineView extends UIView {
 
         
         //通知进入bundle完成
-        dispatchEnterComplete({type :LogicType.GAME,views:[this]});
+        dispatchEnterComplete({type :td.Logic.Type.GAME,views:[this]});
     }
 
     onFullScreenAdapt(){
@@ -108,7 +107,7 @@ export default class AimLineView extends UIView {
     }
 
     private onGoBack( ){
-        dispatch(LogicEvent.ENTER_HALL);
+        dispatch(td.Logic.Event.ENTER_HALL);
     }
 
     /**
