@@ -1,5 +1,4 @@
 
-import { ButtonSpriteMemberName } from "../../../../scripts/framework/extentions/Utils";
 import { UIView } from "../../../../scripts/framework/ui/UIView";
 import { HallData } from "../../../hall/script/data/HallData";
 
@@ -109,7 +108,7 @@ export default class LoadTestView extends UIView {
             view: this,
             bundle : HallData.bundle,
             completeCallback:(type,spriteFrame)=>{
-                if( type == ButtonSpriteMemberName.Norml ){
+                if( type == td.ButtonSpriteType.Norml ){
                     button.setContentSize(spriteFrame.getOriginalSize());
                     btn.target.setContentSize(spriteFrame.getOriginalSize());
                 }

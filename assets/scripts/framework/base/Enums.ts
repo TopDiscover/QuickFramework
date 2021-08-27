@@ -92,3 +92,10 @@ window.dispatchEnterComplete = function(data:td.Logic.EventData){
 
 toNamespace("Logic", Logic);
 
+enum ButtonSpriteType {
+    Norml = "normalSprite",
+    Pressed = "pressedSprite",
+    Hover = "hoverSprite",
+    Disable = "disabledSprite",
+}
+toNamespace("ButtonSpriteType",ButtonSpriteType)

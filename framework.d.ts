@@ -419,6 +419,14 @@ declare function dispatchEnterComplete(data: td.Logic.EventData): void;
 
 declare namespace td {
 
+	/**@description 替换按钮纹理类型 */
+	enum ButtonSpriteType {
+		Norml = "normalSprite",
+		Pressed = "pressedSprite",
+		Hover = "hoverSprite",
+		Disable = "disabledSprite",
+	}
+
 	/**@description 热更新相关 */
 	namespace HotUpdate {
 		interface Manifest {

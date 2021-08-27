@@ -99,13 +99,6 @@ export function setSpriteSpriteFrame(
     }
 }
 
-export enum ButtonSpriteMemberName {
-    Norml = "normalSprite",
-    Pressed = "pressedSprite",
-    Hover = "hoverSprite",
-    Disable = "disabledSprite",
-}
-
 /**
  * @description 设置按钮精灵帧
  * @param view 持有视图
@@ -166,7 +159,7 @@ function _setSpriteFrame(
  */
 function _setButtonSpriteFrame(
     button: cc.Button,
-    memberName: ButtonSpriteMemberName,
+    memberName: td.ButtonSpriteType,
     view: td.UIView,
     url: string,
     spriteFrame: cc.SpriteFrame,
@@ -192,7 +185,7 @@ function _setButtonSpriteFrame(
  */
 function _setButtonWithType(
     button: cc.Button,
-    memberName: ButtonSpriteMemberName,
+    memberName: td.ButtonSpriteType,
     view: td.UIView,
     url: string | { urls: string[], key: string },
     completeCallback?: (type: string, spriteFrame: cc.SpriteFrame) => void,
@@ -231,10 +224,10 @@ export function setButtonSpriteFrame(button: cc.Button, config: {
     bundle?:BUNDLE_TYPE
 }) {
     let bundle = getBundle(config);
-    _setButtonWithType(button, ButtonSpriteMemberName.Norml, config.view, config.normalSprite, config.completeCallback,bundle);
-    _setButtonWithType(button, ButtonSpriteMemberName.Pressed, config.view, config.pressedSprite, config.completeCallback,bundle);
-    _setButtonWithType(button, ButtonSpriteMemberName.Hover, config.view, config.hoverSprite, config.completeCallback,bundle);
-    _setButtonWithType(button, ButtonSpriteMemberName.Disable, config.view, config.disabledSprite, config.completeCallback,bundle);
+    _setButtonWithType(button, td.ButtonSpriteType.Norml, config.view, config.normalSprite, config.completeCallback,bundle);
+    _setButtonWithType(button, td.ButtonSpriteType.Pressed, config.view, config.pressedSprite, config.completeCallback,bundle);
+    _setButtonWithType(button, td.ButtonSpriteType.Hover, config.view, config.hoverSprite, config.completeCallback,bundle);
+    _setButtonWithType(button, td.ButtonSpriteType.Disable, config.view, config.disabledSprite, config.completeCallback,bundle);
 }
 
 /**
