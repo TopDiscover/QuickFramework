@@ -1,12 +1,10 @@
-import { UIView } from "../ui/UIView";
-
 /**@description 添加加载本地的资源 */
-export function addExtraLoadResource(view: UIView, info: td.Resource.Info) {
+export function addExtraLoadResource(view: td.UIView, info: td.Resource.Info) {
     let uiManager = Manager.uiManager;
     if (view == <any>(uiManager.retainMemory)) {
         uiManager.retainMemory.addLocal(info);
     }
-    else if (view && view instanceof UIView) {
+    else if (view && view instanceof td.UIView) {
         uiManager.addLocal(info, view.className);
     } else {
         uiManager.garbage.addLocal(info);
@@ -14,12 +12,12 @@ export function addExtraLoadResource(view: UIView, info: td.Resource.Info) {
 }
 
 /**@description 添加加载远程的资源 */
-export function addRemoteLoadResource(view: UIView, info: td.Resource.Info) {
+export function addRemoteLoadResource(view: td.UIView, info: td.Resource.Info) {
     let uiManager = Manager.uiManager;
     if (view == <any>(uiManager.retainMemory)) {
         uiManager.retainMemory.addRemote(info);
     }
-    else if (view && view instanceof UIView) {
+    else if (view && view instanceof td.UIView) {
         uiManager.addRemote(info, view.className);
     } else {
         uiManager.garbage.addRemote(info);
@@ -27,7 +25,7 @@ export function addRemoteLoadResource(view: UIView, info: td.Resource.Info) {
 }
 
 /**@description 获取Bundle,如果没有传入，会默认指定当前View打开时的bundle,否则批定resources */
-export function getBundle( config : { bundle? : BUNDLE_TYPE , view? : UIView}){
+export function getBundle( config : { bundle? : BUNDLE_TYPE , view? : td.UIView}){
     let bundle : BUNDLE_TYPE = config.bundle;
     if ( config.bundle == undefined || config.bundle == null ){
         bundle = td.Macro.BUNDLE_RESOURCES;
@@ -57,7 +55,7 @@ function isValidComponent(component: cc.Component): boolean {
  * @param {*} isAtlas 是否是大纹理图集加载 默认为false
  */
 export function setSpriteSpriteFrame(
-    view: UIView,
+    view: td.UIView,
     url: string,
     sprite: cc.Sprite,
     spriteFrame: cc.SpriteFrame,
@@ -119,7 +117,7 @@ export enum ButtonSpriteMemberName {
  * @param isAtlas 是否是从大纹理图集中加载的
  */
 function _setSpriteFrame(
-    view: UIView,
+    view: td.UIView,
     url: string,
     button: cc.Button,
     spriteFrame: cc.SpriteFrame,
@@ -169,7 +167,7 @@ function _setSpriteFrame(
 function _setButtonSpriteFrame(
     button: cc.Button,
     memberName: ButtonSpriteMemberName,
-    view: UIView,
+    view: td.UIView,
     url: string,
     spriteFrame: cc.SpriteFrame,
     completeCallback: (type: string, data: cc.SpriteFrame) => void,
@@ -195,7 +193,7 @@ function _setButtonSpriteFrame(
 function _setButtonWithType(
     button: cc.Button,
     memberName: ButtonSpriteMemberName,
-    view: UIView,
+    view: td.UIView,
     url: string | { urls: string[], key: string },
     completeCallback?: (type: string, spriteFrame: cc.SpriteFrame) => void,
     bundle ?: BUNDLE_TYPE
