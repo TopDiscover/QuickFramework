@@ -1,2 +1,2 @@
-import { applicationInit } from "./script/common/manager/Manager";
+import { applicationInit } from "./scripts/common/manager/Manager";
 applicationInit();

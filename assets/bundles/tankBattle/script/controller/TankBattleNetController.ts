@@ -3,10 +3,10 @@
  * 
  */
 
-import { injectService } from "../../../../script/framework/decorator/Decorators";
-import { LobbyService } from "../../../../script/common/net/LobbyService";
-import Controller from "../../../../script/framework/controller/Controller";
-import { MainCmd } from "../../../../script/common/protocol/CmdDefines";
+import { injectService } from "../../../../scripts/framework/decorator/Decorators";
+import { LobbyService } from "../../../../scripts/common/net/LobbyService";
+import Controller from "../../../../scripts/framework/controller/Controller";
+import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { SUB_CMD_GAME, TankBattleConfig } from "../protocol/TankBattleProtocal";
 import { TankBettle } from "../data/TankBattleGameData";
 import TankBattleChangeStageView from "../view/TankBattleChangeStageView";

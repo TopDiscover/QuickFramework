@@ -1,6 +1,6 @@
 
-import { ButtonSpriteMemberName } from "../../../../script/framework/extentions/Utils";
-import { UIView } from "../../../../script/framework/ui/UIView";
+import { ButtonSpriteMemberName } from "../../../../scripts/framework/extentions/Utils";
+import { UIView } from "../../../../scripts/framework/ui/UIView";
 import { HallData } from "../../../hall/script/data/HallData";
 
 const {ccclass, property} = cc._decorator;

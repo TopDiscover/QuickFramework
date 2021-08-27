@@ -1,4 +1,4 @@
-import { Logic } from "../../../script/framework/base/Logic";
+import { Logic } from "../../../scripts/framework/base/Logic";
 import NodePoolView from "./view/NodePoolView";
 
 class NodePoolTestLogic extends Logic {

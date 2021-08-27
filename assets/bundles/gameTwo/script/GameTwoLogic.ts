@@ -1,4 +1,4 @@
-import { Logic } from "../../../script/framework/base/Logic";
+import { Logic } from "../../../scripts/framework/base/Logic";
 import GameTwoView from "./GameTwoView";
 
 class GameTwoLogic extends Logic {

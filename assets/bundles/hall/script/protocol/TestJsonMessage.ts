@@ -1,5 +1,5 @@
-import { MainCmd } from "../../../../script/common/protocol/CmdDefines";
-import { JsonMessage, serialize } from "../../../../script/framework/net/JsonMessage";
+import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
+import { JsonMessage, serialize } from "../../../../scripts/framework/net/JsonMessage";
 import { SUB_CMD_LOBBY } from "./LobbyCmd";
 
 export class TestData extends JsonMessage{

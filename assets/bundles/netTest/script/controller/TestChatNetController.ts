@@ -2,12 +2,12 @@
  * @description 聊天测试
  */
 
-import { injectService } from "../../../../script/framework/decorator/Decorators";
-import Controller from "../../../../script/framework/controller/Controller";
-import { ChatService } from "../../../../script/common/net/ChatService";
-import { CommonEvent } from "../../../../script/common/event/CommonEvent";
-import { ServiceEvent } from "../../../../script/framework/base/Defines";
-import { MainCmd } from "../../../../script/common/protocol/CmdDefines";
+import { injectService } from "../../../../scripts/framework/decorator/Decorators";
+import Controller from "../../../../scripts/framework/controller/Controller";
+import { ChatService } from "../../../../scripts/common/net/ChatService";
+import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
+import { ServiceEvent } from "../../../../scripts/framework/base/Defines";
+import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { SUB_CMD_LOBBY } from "../../../hall/script/protocol/LobbyCmd";
 import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessage";
 import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";

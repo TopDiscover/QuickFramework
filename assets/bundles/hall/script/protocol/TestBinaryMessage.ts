@@ -1,5 +1,5 @@
-import { BinaryStreamMessage, serialize, Int8Value, Int16Value, Int32Value, Float32Value, Float64Value, Uint8Value, Uint16Value, Uint32Value, StringValue, BinaryStream } from "../../../../script/framework/net/BinaryStreamMessage"
-import { MainCmd } from "../../../../script/common/protocol/CmdDefines";
+import { BinaryStreamMessage, serialize, Int8Value, Int16Value, Int32Value, Float32Value, Float64Value, Uint8Value, Uint16Value, Uint32Value, StringValue, BinaryStream } from "../../../../scripts/framework/net/BinaryStreamMessage"
+import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { SUB_CMD_LOBBY } from "./LobbyCmd";
 
 class TestData extends BinaryStream{

@@ -1,6 +1,6 @@
 
-import { MainCmd } from "../../../../script/common/protocol/CmdDefines";
-import { ProtoMessage } from "../../../../script/framework/net/ProtoMessage";
+import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
+import { ProtoMessage } from "../../../../scripts/framework/net/ProtoMessage";
 
 export enum AwesomeEnum{
     ONE = 1,

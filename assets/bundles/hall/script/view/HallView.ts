@@ -1,11 +1,11 @@
-import { UIView } from "../../../../script/framework/ui/UIView";
-import { BundleConfig } from "../../../../script/common/base/HotUpdate";
-import { CommonEvent } from "../../../../script/common/event/CommonEvent";
+import { UIView } from "../../../../scripts/framework/ui/UIView";
+import { BundleConfig } from "../../../../scripts/common/base/HotUpdate";
+import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { HallData } from "../data/HallData";
-import { LobbyService } from "../../../../script/common/net/LobbyService";
-import { GameService } from "../../../../script/common/net/GameService";
-import { ChatService } from "../../../../script/common/net/ChatService";
-import SettingView from "../../../../script/common/component/SettingView";
+import { LobbyService } from "../../../../scripts/common/net/LobbyService";
+import { GameService } from "../../../../scripts/common/net/GameService";
+import { ChatService } from "../../../../scripts/common/net/ChatService";
+import SettingView from "../../../../scripts/common/component/SettingView";
 
 
 const { ccclass, property } = cc._decorator;

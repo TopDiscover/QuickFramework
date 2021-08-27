@@ -1,5 +1,5 @@
 /**@description 语言包具体的代码实现 */
-import { i18n } from "../../../../script/common/language/CommonLanguage";
+import { i18n } from "../../../../scripts/common/language/CommonLanguage";
 import { HallData } from "./HallData";
 import { HALL_EN } from "./HallLanguageEN";
 import { HALL_ZH } from "./HallLanguageZH";

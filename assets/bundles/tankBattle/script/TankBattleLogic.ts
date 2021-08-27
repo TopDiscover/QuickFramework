@@ -1,5 +1,5 @@
-import { Logic } from "../../../script/framework/base/Logic";
-import { LobbyService } from "../../../script/common/net/LobbyService";
+import { Logic } from "../../../scripts/framework/base/Logic";
+import { LobbyService } from "../../../scripts/common/net/LobbyService";
 import TankBattleGameView from "./view/TankBattleGameView";
 import { TankBettle } from "./data/TankBattleGameData";
 import TankBattleNetController from "./controller/TankBattleNetController";

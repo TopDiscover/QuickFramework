@@ -1,5 +1,5 @@
-import NetHelper from "../../../../script/framework/controller/NetHelper";
-import { ChatService } from "../../../../script/common/net/ChatService";
+import NetHelper from "../../../../scripts/framework/controller/NetHelper";
+import { ChatService } from "../../../../scripts/common/net/ChatService";
 import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessage";
 import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
 import { TestProtoMessage } from "../../../hall/script/protocol/TestProtoMessage";
