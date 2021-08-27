@@ -5,7 +5,7 @@
 
 import { Logic } from "../framework/base/Logic";
 import LoginView from "./view/LoginView";
-import { HotUpdate, AssetManagerCode, AssetManagerState } from "../common/base/HotUpdate";
+import { HotUpdate } from "../common/base/HotUpdate";
 import DownloadLoading from "../common/component/DownloadLoading";
 import { i18n } from "../common/language/CommonLanguage";
 
@@ -31,7 +31,7 @@ class LoginLogic extends Logic {
         cc.log(`--------------onEnterLogin--------------`);
         Manager.loading.show(i18n.checkingUpdate);
         HotUpdate.checkHallUpdate((code, state) => {
-            if (code == AssetManagerCode.NEW_VERSION_FOUND || state == AssetManagerState.TRY_DOWNLOAD_FAILED_ASSETS) {
+            if (code == td.HotUpdate.Code.NEW_VERSION_FOUND || state == td.HotUpdate.State.TRY_DOWNLOAD_FAILED_ASSETS) {
                 //有新版本
                 cc.log(`提示更新`);
                 Manager.loading.hide();
@@ -45,22 +45,22 @@ class LoginLogic extends Logic {
                         }
                     }
                 });
-            } else if (code == AssetManagerCode.ALREADY_UP_TO_DATE) {
+            } else if (code == td.HotUpdate.Code.ALREADY_UP_TO_DATE) {
                 //已经是最新版本
                 cc.log(`已经是最新版本`);
                 Manager.loading.hide();
-            } else if (code == AssetManagerCode.ERROR_DOWNLOAD_MANIFEST ||
-                code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||
-                code == AssetManagerCode.ERROR_PARSE_MANIFEST) {
+            } else if (code == td.HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST ||
+                code == td.HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
+                code == td.HotUpdate.Code.ERROR_PARSE_MANIFEST) {
                 Manager.loading.hide();
                 let content = i18n.downloadFailManifest;
-                if (code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST) {
+                if (code == td.HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST) {
                     content = i18n.noFindManifest;
-                } else if (code == AssetManagerCode.ERROR_PARSE_MANIFEST) {
+                } else if (code == td.HotUpdate.Code.ERROR_PARSE_MANIFEST) {
                     content = i18n.manifestError;
                 }
                 Manager.tips.show(content);
-            } else if (code == AssetManagerCode.CHECKING) {
+            } else if (code == td.HotUpdate.Code.CHECKING) {
                 //当前正在检测更新
                 cc.log(`正在检测更新!!`);
             } else {

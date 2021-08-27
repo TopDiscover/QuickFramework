@@ -1,21 +1,3 @@
-import { CommonEvent } from "../event/CommonEvent";
-
-interface Manifest {
-    /**@description 大厅版本 */
-    version?: string,
-    /**@description 子游戏版本 大厅的manifest不包含该字段 */
-    subVersion?: string,
-    /**@description 资源服务器地址 */
-    packageUrl?: string,
-    /**@description 远程project.manifest地址 */
-    remoteManifestUrl?: string,
-    /**@description 远程version.manifest地址 */
-    remoteVersionUrl?: string,
-    /**@description 包含资源 */
-    assets?: any,
-    searchPaths?: any
-}
-
 class AssetsManager {
 
     constructor(name: string) {
@@ -29,116 +11,6 @@ class AssetsManager {
     /**@description 当前资源管理器的实体 jsb.AssetsManager */
     manager: jsb.AssetsManager = null;
 }
-
-export interface DownLoadInfo{
-    downloadedBytes: number,
-    totalBytes: number,
-    downloadedFiles: number,
-    totalFiles: number,
-    percent: number,
-    percentByFile: number,
-    code: AssetManagerCode,
-    state: AssetManagerState,
-    needRestart: boolean
-}
-
-export enum AssetManagerCode {
-    /**@description 找不到本地mainfest文件*/
-    ERROR_NO_LOCAL_MANIFEST,
-    /**@description 下载manifest文件错误 */
-    ERROR_DOWNLOAD_MANIFEST,
-    /**@description 解析manifest文件错误 */
-    ERROR_PARSE_MANIFEST,
-    /**@description 找到新版本 */
-    NEW_VERSION_FOUND,
-    /**@description 当前已经是最新版本 */
-    ALREADY_UP_TO_DATE,
-    /**@description 更新下载进度中 */
-    UPDATE_PROGRESSION,
-    /**@description 资源更新中 */
-    ASSET_UPDATED,
-    /**@description 更新错误 */
-    ERROR_UPDATING,
-    /**@description 更新完成 */
-    UPDATE_FINISHED,
-    /**@description 更新失败 */
-    UPDATE_FAILED,
-    /**@description 解压资源失败 */
-    ERROR_DECOMPRESS,
-
-    //以下是js中扩展的字段，上面是引擎中已经有的字段
-    /**@description 正检测更新中 */
-    CHECKING,
-}
-
-export enum AssetManagerState {
-    /**@description 未初始化 */
-    UNINITED,
-    /**@description 找到manifest文件 */
-    UNCHECKED,
-    /**@description 准备下载版本文件 */
-    PREDOWNLOAD_VERSION,
-    /**@description 下载版本文件中 */
-    DOWNLOADING_VERSION,
-    /**@description 版本文件下载完成 */
-    VERSION_LOADED,
-    /**@description 准备加载project.manifest文件 */
-    PREDOWNLOAD_MANIFEST,
-    /**@description 下载project.manifest文件中 */
-    DOWNLOADING_MANIFEST,
-    /**@description 下载project.manifest文件完成 */
-    MANIFEST_LOADED,
-    /**@description 需要下载更新 */
-    NEED_UPDATE,
-    /**@description 准备更新 */
-    READY_TO_UPDATE,
-    /**@description 更新中 */
-    UPDATING,
-    /**@description 解压中 */
-    UNZIPPING,
-    /**@description 已经是最新版本 */
-    UP_TO_DATE,
-    /**@description 更新失败 */
-    FAIL_TO_UPDATE,
-
-    /**自定定义扩展 */
-    /**@description 尝试重新下载失败文件 */
-    TRY_DOWNLOAD_FAILED_ASSETS,
-}
-
-export class BundleConfig {
-    /**@description Bundle名 如:hall*/
-    bundle: string = "";
-    /**@description Bundle名 如:大厅  */
-    name: string = "";
-    index = 0;
-    /**@description 加载bundle完成后，发出的bundle事件 */
-    event : string = td.Logic.Event.ENTER_GAME;
-    /**@description 是否需要提示弹出框提示升级 */
-    isNeedPrompt : boolean = false;
-    /**
-     * 
-     * @param name bundle名 如：大厅
-     * @param bundle Bundle名 如:hall
-     * @param index 游戏index,可根据自己需要决定需不需要
-     * @param event 加载bundle完成后，派发事件
-     * @param isNeedPrompt 是否需要弹出提示升级的弹出框
-     */
-    constructor( 
-        name : string , 
-        bundle : string , 
-        index : number,
-        event ?: string,
-        isNeedPrompt : boolean = false){
-        this.name = name;
-        this.bundle = bundle;
-        this.index = index;
-        this.isNeedPrompt = isNeedPrompt;
-        if( event ){
-            this.event = event;
-        }
-    }
- }
 
 const HALL_ASSETS_MANAGER_NAME = "HALL";
 
@@ -164,8 +36,8 @@ class _HotUpdate {
         }
     }
 
-    private _projectManifest: Manifest = null;
-    private get projectManifest(): Manifest {
+    private _projectManifest: td.HotUpdate.Manifest = null;
+    private get projectManifest(): td.HotUpdate.Manifest {
         if (CC_JSB && !this._projectManifest) {
             let content = jsb.fileUtils.getStringFromFile(this.hallProjectMainfest);
             try {
@@ -183,10 +55,10 @@ class _HotUpdate {
         return `${this.manifestRoot}project.manifest`;
     }
     /**@description 检测更新回调 */
-    public checkCallback: (code: AssetManagerCode, state: AssetManagerState) => void = null;
+    public checkCallback: (code: td.HotUpdate.Code, state: td.HotUpdate.State) => void = null;
 
     /**@description bundle版本信息 */
-    public bundlesConfig: { [key: string]: BundleConfig } = {};
+    public bundlesConfig: { [key: string]: td.HotUpdate.BundleConfig } = {};
 
     /**@description 资源管理器 */
     private assetsManagers: { [key: string]: AssetsManager } = {};
@@ -267,10 +139,10 @@ class _HotUpdate {
     /**@description 判断是否需要重新尝试下载之前下载失败的文件 */
     private isTryDownloadFailedAssets( ) {
         if (this.currentAssetsManager &&(
-            this.currentAssetsManager.manager.getState() == AssetManagerState.FAIL_TO_UPDATE ||
-            this.currentAssetsManager.code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||
-            this.currentAssetsManager.code == AssetManagerCode.ERROR_DOWNLOAD_MANIFEST ||
-            this.currentAssetsManager.code == AssetManagerCode.ERROR_PARSE_MANIFEST)
+            this.currentAssetsManager.manager.getState() == td.HotUpdate.State.FAIL_TO_UPDATE ||
+            this.currentAssetsManager.code == td.HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
+            this.currentAssetsManager.code == td.HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST ||
+            this.currentAssetsManager.code == td.HotUpdate.Code.ERROR_PARSE_MANIFEST)
             ) {
             return true;
         }
@@ -282,40 +154,40 @@ class _HotUpdate {
         return cc.sys.platform == cc.sys.WECHAT_GAME || CC_PREVIEW || cc.sys.isBrowser;
     }
 
-    private isNeedUpdate( callback: (code: AssetManagerCode, state: AssetManagerState) => void ){
+    private isNeedUpdate( callback: (code: td.HotUpdate.Code, state: td.HotUpdate.State) => void ){
         if( this.isBrowser ){
             //预览及浏览器下，不需要有更新的操作
             this.updating = false;
-            callback(AssetManagerCode.ALREADY_UP_TO_DATE, AssetManagerState.UP_TO_DATE);
+            callback(td.HotUpdate.Code.ALREADY_UP_TO_DATE, td.HotUpdate.State.UP_TO_DATE);
             return false;
         }else{
             if( td.Config.isSkipCheckUpdate ){
                 cc.log("跳过热更新，直接使用本地资源代码");
                 this.updating = false;
-                callback(AssetManagerCode.ALREADY_UP_TO_DATE, AssetManagerState.UP_TO_DATE);
+                callback(td.HotUpdate.Code.ALREADY_UP_TO_DATE, td.HotUpdate.State.UP_TO_DATE);
             }
             return !td.Config.isSkipCheckUpdate;
         }
     }
 
     /**@description 检测更新 */
-    private checkUpdate(callback: (code: AssetManagerCode, state: AssetManagerState) => void) {
+    private checkUpdate(callback: (code: td.HotUpdate.Code, state: td.HotUpdate.State) => void) {
         if( this.isNeedUpdate(callback) ){
             cc.log(`--checkUpdate--`);
             if (this.updating) {
                 cc.log(`Checking or updating...`);
-                callback(AssetManagerCode.CHECKING, AssetManagerState.PREDOWNLOAD_VERSION);
+                callback(td.HotUpdate.Code.CHECKING, td.HotUpdate.State.PREDOWNLOAD_VERSION);
                 return;
             }
             if (!this.currentAssetsManager.manager.getLocalManifest() || !this.currentAssetsManager.manager.getLocalManifest().isLoaded()) {
                 cc.log(`Failed to load local manifest ....`);
-                callback(AssetManagerCode.ERROR_DOWNLOAD_MANIFEST, AssetManagerState.FAIL_TO_UPDATE);
+                callback(td.HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST, td.HotUpdate.State.FAIL_TO_UPDATE);
                 return;
             }
             if (this.isTryDownloadFailedAssets()) {
                 //已经更新失败，尝试获取更新下载失败的
                 cc.log(`之前下载资源未完全下载完成，请尝试重新下载`);
-                callback(AssetManagerCode.UPDATE_FAILED, AssetManagerState.TRY_DOWNLOAD_FAILED_ASSETS);
+                callback(td.HotUpdate.Code.UPDATE_FAILED, td.HotUpdate.State.TRY_DOWNLOAD_FAILED_ASSETS);
             } else {
                 this.updating = true;
                 this.checkCallback = callback;
@@ -332,7 +204,7 @@ class _HotUpdate {
     }
 
     /**@description 检查大厅是否需要更新 */
-    checkHallUpdate(callback: (code: AssetManagerCode, state: AssetManagerState) => void) {
+    checkHallUpdate(callback: (code: td.HotUpdate.Code, state: td.HotUpdate.State) => void) {
         if( this.isNeedUpdate(callback) ){
             this.currentAssetsManager = this.getAssetsManager();
             this.currentAssetsManager.manager.loadLocalManifest(this.hallProjectMainfest);
@@ -354,7 +226,7 @@ class _HotUpdate {
      * @param gameName 子游戏名
      * @param callback 检测完成回调
      */
-    checkGameUpdate(gameName: string, callback: (code: AssetManagerCode, state: AssetManagerState) => void) {
+    checkGameUpdate(gameName: string, callback: (code: td.HotUpdate.Code, state: td.HotUpdate.State) => void) {
         if( this.isNeedUpdate(callback) ){
             this.currentAssetsManager = this.getAssetsManager(gameName);
             let manifestUrl = this.getGameManifest(gameName);
@@ -371,7 +243,7 @@ class _HotUpdate {
                 //不存在版本控制文件 ，生成一个初始版本
                 if (this.updating) {
                     cc.log(`Checking or updating...`);
-                    callback(AssetManagerCode.CHECKING, AssetManagerState.PREDOWNLOAD_VERSION);
+                    callback(td.HotUpdate.Code.CHECKING, td.HotUpdate.State.PREDOWNLOAD_VERSION);
                     return;
                 }
 
@@ -403,17 +275,17 @@ class _HotUpdate {
         this.currentAssetsManager.code = event.getEventCode();
         cc.log(`checkCb event code : ${event.getEventCode()} state : ${this.currentAssetsManager.manager.getState()}`);
         switch (event.getEventCode()) {
-            case AssetManagerCode.ERROR_NO_LOCAL_MANIFEST:
+            case td.HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST:
                 cc.log(`No local manifest file found, hot update skipped.`);
                 break;
-            case AssetManagerCode.ERROR_DOWNLOAD_MANIFEST:
-            case AssetManagerCode.ERROR_PARSE_MANIFEST:
+            case td.HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST:
+            case td.HotUpdate.Code.ERROR_PARSE_MANIFEST:
                 cc.log(`Fail to download manifest file, hot update skipped.`);
                 break;
-            case AssetManagerCode.ALREADY_UP_TO_DATE:
+            case td.HotUpdate.Code.ALREADY_UP_TO_DATE:
                 cc.log(`Already up to date with the latest remote version.`);
                 break;
-            case AssetManagerCode.NEW_VERSION_FOUND:
+            case td.HotUpdate.Code.NEW_VERSION_FOUND:
                 cc.log(`New version found, please try to update.`);
                 break;
             default:
@@ -424,7 +296,7 @@ class _HotUpdate {
         this.updating = false;
 
         //如果正在下载更新文件，先下载更新文件比较完成后，再回调
-        if (this.checkCallback && this.currentAssetsManager.manager.getState() != AssetManagerState.DOWNLOADING_VERSION) {
+        if (this.checkCallback && this.currentAssetsManager.manager.getState() != td.HotUpdate.State.DOWNLOADING_VERSION) {
             this.checkCallback(event.getEventCode(), this.currentAssetsManager.manager.getState());
             this.checkCallback = null;
         }
@@ -456,11 +328,11 @@ class _HotUpdate {
         //存储当前的状态，当下载版本文件失败时，state的状态与下载非版本文件是一样的状态
         this.currentAssetsManager.code = event.getEventCode();
         switch (event.getEventCode()) {
-            case AssetManagerCode.ERROR_NO_LOCAL_MANIFEST:
+            case td.HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST:
                 cc.log(`No local manifest file found, hot update skipped.`);
                 failed = true;
                 break;
-            case AssetManagerCode.UPDATE_PROGRESSION:
+            case td.HotUpdate.Code.UPDATE_PROGRESSION:
                 cc.log(`${event.getDownloadedBytes()} / ${event.getTotalBytes()}`);
                 cc.log(`${event.getDownloadedFiles()} / ${event.getTotalFiles()}`);
                 cc.log(`percent : ${event.getPercent()}`);
@@ -470,27 +342,27 @@ class _HotUpdate {
                     cc.log(`Updated file: ${msg}`);
                 }
                 break;
-            case AssetManagerCode.ERROR_DOWNLOAD_MANIFEST:
-            case AssetManagerCode.ERROR_PARSE_MANIFEST:
+            case td.HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST:
+            case td.HotUpdate.Code.ERROR_PARSE_MANIFEST:
                 cc.log(`Fail to download manifest file, hot update skipped.`);
                 failed = true;
                 break;
-            case AssetManagerCode.ALREADY_UP_TO_DATE:
+            case td.HotUpdate.Code.ALREADY_UP_TO_DATE:
                 cc.log(`Already up to date with the latest remote version.`);
                 failed = true;
                 break;
-            case AssetManagerCode.UPDATE_FINISHED:
+            case td.HotUpdate.Code.UPDATE_FINISHED:
                 cc.log(`Update finished. ${event.getMessage()}`);
                 isUpdateFinished = true;
                 break;
-            case AssetManagerCode.UPDATE_FAILED:
+            case td.HotUpdate.Code.UPDATE_FAILED:
                 cc.log(`Update failed. ${event.getMessage()}`);
                 this.updating = false;
                 break;
-            case AssetManagerCode.ERROR_UPDATING:
+            case td.HotUpdate.Code.ERROR_UPDATING:
                 cc.log(`Asset update error: ${event.getAssetId()} , ${event.getMessage()}`);
                 break;
-            case AssetManagerCode.ERROR_DECOMPRESS:
+            case td.HotUpdate.Code.ERROR_DECOMPRESS:
                 cc.log(`${event.getMessage()}`);
                 break;
             default:
@@ -544,7 +416,7 @@ class _HotUpdate {
             }
         }
 
-        let info : DownLoadInfo = { 
+        let info : td.HotUpdate.DownLoadInfo = { 
             downloadedBytes : event.getDownloadedBytes(),
             totalBytes : event.getTotalBytes(),
             downloadedFiles : event.getDownloadedFiles(),
@@ -556,7 +428,7 @@ class _HotUpdate {
             needRestart : isUpdateFinished,
         };
 
-        dispatch(CommonEvent.HOTUPDATE_DOWNLOAD,info)
+        dispatch(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD,info)
 
         cc.log(`update cb  failed : ${failed}  , need restart : ${isUpdateFinished} , updating : ${this.updating}`);
     }

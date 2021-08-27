@@ -1,5 +1,4 @@
-import { HotUpdate, AssetManagerCode, AssetManagerState, BundleConfig, DownLoadInfo } from "../base/HotUpdate";
-import { CommonEvent } from "../event/CommonEvent";
+import { HotUpdate } from "../base/HotUpdate";
 import DownloadLoading from "../component/DownloadLoading";
 import { i18n } from "../language/CommonLanguage";
 
@@ -10,7 +9,7 @@ import { i18n } from "../language/CommonLanguage";
 export class BundleManager {
    private static _instance: BundleManager = null;
    public static Instance() { return this._instance || (this._instance = new BundleManager()); }
-   private curBundle: BundleConfig = null;
+   private curBundle: td.HotUpdate.BundleConfig = null;
    private isLoading = false;
 
 
@@ -40,7 +39,7 @@ export class BundleManager {
     * 外部接口 进入Bundle
     * @param config 配置
     */
-   public enterBundle(config: BundleConfig) {
+   public enterBundle(config: td.HotUpdate.BundleConfig) {
       if (this.isLoading) {
          Manager.tips.show(i18n.updating);
          cc.log("正在更新游戏，请稍等");
@@ -65,14 +64,14 @@ export class BundleManager {
    }
 
    /**@description 检测子游戏更新 */
-   private checkUpdate(versionInfo: BundleConfig) {
+   private checkUpdate(versionInfo: td.HotUpdate.BundleConfig) {
       let self = this;
       cc.log(`检测更新信息:${versionInfo.name}(${versionInfo.bundle})`);
-      Manager.eventDispatcher.removeEventListener(CommonEvent.HOTUPDATE_DOWNLOAD,this);
+      Manager.eventDispatcher.removeEventListener(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD,this);
       HotUpdate.checkGameUpdate(this.curBundle.bundle, (code, state) => {
-         if (code == AssetManagerCode.NEW_VERSION_FOUND) {
+         if (code == td.HotUpdate.Code.NEW_VERSION_FOUND) {
             //有新版本
-            Manager.eventDispatcher.addEventListener(CommonEvent.HOTUPDATE_DOWNLOAD,this.onDownload,this);
+            Manager.eventDispatcher.addEventListener(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD,this.onDownload,this);
             cc.log(`检测到${versionInfo.name}(${versionInfo.bundle})有新的版本`);
             if( versionInfo.isNeedPrompt ){
                Manager.alert.show({
@@ -90,9 +89,9 @@ export class BundleManager {
             }else{
                HotUpdate.hotUpdate();
             }
-         } else if (state == AssetManagerState.TRY_DOWNLOAD_FAILED_ASSETS) {
+         } else if (state == td.HotUpdate.State.TRY_DOWNLOAD_FAILED_ASSETS) {
             //尝试重新下载之前下载失败的文件
-            Manager.eventDispatcher.addEventListener(CommonEvent.HOTUPDATE_DOWNLOAD,this.onDownload,this);
+            Manager.eventDispatcher.addEventListener(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD,this.onDownload,this);
             cc.log(`正在尝试重新下载之前下载失败的资源`);
             if( versionInfo.isNeedPrompt ){
                Manager.alert.show({
@@ -108,23 +107,23 @@ export class BundleManager {
             }else{
                HotUpdate.downloadFailedAssets();
             }
-         } else if (code == AssetManagerCode.ALREADY_UP_TO_DATE) {
+         } else if (code == td.HotUpdate.Code.ALREADY_UP_TO_DATE) {
             //已经是最新版本
             //以最新的bundle为准
             self.loadBundle();
-         } else if (code == AssetManagerCode.ERROR_DOWNLOAD_MANIFEST ||
-            code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||
-            code == AssetManagerCode.ERROR_PARSE_MANIFEST) {
+         } else if (code == td.HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST ||
+            code == td.HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
+            code == td.HotUpdate.Code.ERROR_PARSE_MANIFEST) {
             //下载manifest文件失败
             this.isLoading = false;
             let content = i18n.downloadFailManifest;
-            if (code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST) {
+            if (code == td.HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST) {
                content = i18n.noFindManifest;
-            } else if (code == AssetManagerCode.ERROR_PARSE_MANIFEST) {
+            } else if (code == td.HotUpdate.Code.ERROR_PARSE_MANIFEST) {
                content = i18n.manifestError;
             }
             Manager.tips.show(content);
-         } else if (code == AssetManagerCode.CHECKING) {
+         } else if (code == td.HotUpdate.Code.CHECKING) {
             //当前正在检测更新
             cc.log(`正在检测更新!!`);
          } else {
@@ -152,7 +151,7 @@ export class BundleManager {
          }
       });
    }
-   private onDownload( info : DownLoadInfo ) {
+   private onDownload( info : td.HotUpdate.DownLoadInfo ) {
       if (CC_DEBUG) cc.log(JSON.stringify(info));
       let newPercent = 0;
       /**
@@ -182,27 +181,27 @@ export class BundleManager {
 
       let config = HotUpdate.getBundleName(this.curBundle.bundle);
 
-      if (info.code == AssetManagerCode.UPDATE_PROGRESSION) {
+      if (info.code == td.HotUpdate.Code.UPDATE_PROGRESSION) {
          newPercent = info.percent == Number.NaN ? 0 : info.percent;
-         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
-      } else if (info.code == AssetManagerCode.ALREADY_UP_TO_DATE) {
+         dispatch(td.HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
+      } else if (info.code == td.HotUpdate.Code.ALREADY_UP_TO_DATE) {
          newPercent = 1;
-         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
-      } else if (info.code == AssetManagerCode.UPDATE_FINISHED) {
+         dispatch(td.HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
+      } else if (info.code == td.HotUpdate.Code.UPDATE_FINISHED) {
          newPercent = 1.1;
          cc.log(`更新${config.name}成功`);
          cc.log(`正在加载${config.name}`);
          this.loadBundle();
-         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
-      } else if (info.code == AssetManagerCode.UPDATE_FAILED ||
-         info.code == AssetManagerCode.ERROR_NO_LOCAL_MANIFEST ||
-         info.code == AssetManagerCode.ERROR_DOWNLOAD_MANIFEST ||
-         info.code == AssetManagerCode.ERROR_PARSE_MANIFEST ||
-         info.code == AssetManagerCode.ERROR_DECOMPRESS) {
+         dispatch(td.HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
+      } else if (info.code == td.HotUpdate.Code.UPDATE_FAILED ||
+         info.code == td.HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
+         info.code == td.HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST ||
+         info.code == td.HotUpdate.Code.ERROR_PARSE_MANIFEST ||
+         info.code == td.HotUpdate.Code.ERROR_DECOMPRESS) {
          newPercent = -1;
          this.isLoading = false;
          cc.error(`更新${config.name}失败`);
-         dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
+         dispatch(td.HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
       }
    }
 }

@@ -1,6 +1,4 @@
 import { UIView } from "../../../../scripts/framework/ui/UIView";
-import { BundleConfig } from "../../../../scripts/common/base/HotUpdate";
-import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { HallData } from "../data/HallData";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import { GameService } from "../../../../scripts/common/net/GameService";
@@ -26,19 +24,19 @@ export default class HallView extends UIView {
     private readonly PAGE_COUNT = 6;
     private testProgress = 0;
 
-    private _bundles: BundleConfig[] = [];
+    private _bundles: td.HotUpdate.BundleConfig[] = [];
     private get bundles() {
         if (this._bundles.length <= 0) {
             this._bundles = [
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.0", HallData.bundle), "gameOne", 1),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.1", HallData.bundle), "gameTwo", 2),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.2", HallData.bundle), "tankBattle", 3),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.3", HallData.bundle), "loadTest", 4),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.4", HallData.bundle), "netTest", 5),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.5", HallData.bundle), "aimLine", 6),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.6", HallData.bundle), "nodePoolTest", 7),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.7", HallData.bundle), "shaders", 8),
-                new BundleConfig(Manager.getLanguage("hall_view_game_name.8", HallData.bundle), "eliminate", 9),
+                new td.HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.0", HallData.bundle), "gameOne", 1),
+                new td.HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.1", HallData.bundle), "gameTwo", 2),
+                new td.HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.2", HallData.bundle), "tankBattle", 3),
+                new td.HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.3", HallData.bundle), "loadTest", 4),
+                new td.HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.4", HallData.bundle), "netTest", 5),
+                new td.HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.5", HallData.bundle), "aimLine", 6),
+                new td.HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.6", HallData.bundle), "nodePoolTest", 7),
+                new td.HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.7", HallData.bundle), "shaders", 8),
+                new td.HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.8", HallData.bundle), "eliminate", 9),
             ];
         }
         return this._bundles;
@@ -109,10 +107,10 @@ export default class HallView extends UIView {
 
     bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(CommonEvent.DOWNLOAD_PROGRESS, this.onDownloadProgess);
+        this.registerEvent(td.HotUpdate.Event.DOWNLOAD_PROGRESS, this.onDownloadProgess);
     }
 
-    private getGameItem(config: BundleConfig) {
+    private getGameItem(config: td.HotUpdate.BundleConfig) {
         let pages = this.pageView.getPages();
         for (let i = 0; i < pages.length; i++) {
             let page = pages[i];
@@ -124,7 +122,7 @@ export default class HallView extends UIView {
         return null;
     }
 
-    private onDownloadProgess(data: { progress: number, config: BundleConfig }) {
+    private onDownloadProgess(data: { progress: number, config: td.HotUpdate.BundleConfig }) {
 
         let node = this.getGameItem(data.config);
         if (node) {
