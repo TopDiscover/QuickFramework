@@ -1,5 +1,3 @@
-import { i18n } from "../../common/language/CommonLanguage";
-
 /**
  * @description bundle管理器
  */
@@ -26,9 +24,9 @@ export class BundleManager {
    public removeLoadedGamesBundle() {
       let i = this.loadedBundle.length;
       while (i--) {
-         if( this.loadedBundle[i] != td.Config.BUNDLE_HALL ){
+         if (this.loadedBundle[i] != td.Config.BUNDLE_HALL) {
             Manager.assetManager.removeBundle(this.loadedBundle[i]);
-            this.loadedBundle.splice(i,1);
+            this.loadedBundle.splice(i, 1);
          }
       }
    }
@@ -39,7 +37,7 @@ export class BundleManager {
     */
    public enterBundle(config: td.HotUpdate.BundleConfig) {
       if (this.isLoading) {
-         Manager.tips.show(i18n.updating);
+         Manager.tips.show(Manager.getLanguage("updating"));
          cc.log("正在更新游戏，请稍等");
          return;
       }
@@ -65,46 +63,48 @@ export class BundleManager {
    private checkUpdate(versionInfo: td.HotUpdate.BundleConfig) {
       let self = this;
       cc.log(`检测更新信息:${versionInfo.name}(${versionInfo.bundle})`);
-      Manager.eventDispatcher.removeEventListener(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD,this);
+      Manager.eventDispatcher.removeEventListener(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD, this);
       Manager.hotupdate.checkGameUpdate(this.curBundle.bundle, (code, state) => {
          if (code == td.HotUpdate.Code.NEW_VERSION_FOUND) {
             //有新版本
-            Manager.eventDispatcher.addEventListener(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD,this.onDownload,this);
+            Manager.eventDispatcher.addEventListener(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload, this);
             cc.log(`检测到${versionInfo.name}(${versionInfo.bundle})有新的版本`);
-            if( versionInfo.isNeedPrompt ){
+            if (versionInfo.isNeedPrompt) {
+               let content = Manager.getLanguage(["newVersionForBundle", versionInfo.name]);
                Manager.alert.show({
-                  text:String.format(i18n.newVersionForBundle,versionInfo.name),
-                  confirmCb:(isOK)=>{
-                     let data : td.HotUpdate.MessageData = {
-                        isOk : isOK,
-                        state : state,
-                        name : versionInfo.name,
-                        bundle : versionInfo.bundle,
+                  text: content,
+                  confirmCb: (isOK) => {
+                     let data: td.HotUpdate.MessageData = {
+                        isOk: isOK,
+                        state: state,
+                        name: versionInfo.name,
+                        bundle: versionInfo.bundle,
                      }
-                     dispatch(td.HotUpdate.Event.DOWNLOAD_MESSAGE,data);
+                     dispatch(td.HotUpdate.Event.DOWNLOAD_MESSAGE, data);
                   }
                });
-            }else{
+            } else {
                Manager.hotupdate.hotUpdate();
             }
          } else if (state == td.HotUpdate.State.TRY_DOWNLOAD_FAILED_ASSETS) {
             //尝试重新下载之前下载失败的文件
-            Manager.eventDispatcher.addEventListener(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD,this.onDownload,this);
+            Manager.eventDispatcher.addEventListener(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload, this);
             cc.log(`正在尝试重新下载之前下载失败的资源`);
-            if( versionInfo.isNeedPrompt ){
+            if (versionInfo.isNeedPrompt) {
+               let content = Manager.getLanguage(["newVersionForBundle", versionInfo.name]);
                Manager.alert.show({
-                  text:String.format(i18n.newVersionForBundle,versionInfo.name),
-                  confirmCb:(isOK)=>{
-                     let data : td.HotUpdate.MessageData = {
-                        isOk : isOK,
-                        state : state,
-                        name : versionInfo.name,
-                        bundle : versionInfo.bundle,
+                  text: content,
+                  confirmCb: (isOK) => {
+                     let data: td.HotUpdate.MessageData = {
+                        isOk: isOK,
+                        state: state,
+                        name: versionInfo.name,
+                        bundle: versionInfo.bundle,
                      }
-                     dispatch(td.HotUpdate.Event.DOWNLOAD_MESSAGE,data);
+                     dispatch(td.HotUpdate.Event.DOWNLOAD_MESSAGE, data);
                   }
                });
-            }else{
+            } else {
                Manager.hotupdate.downloadFailedAssets();
             }
          } else if (code == td.HotUpdate.Code.ALREADY_UP_TO_DATE) {
@@ -116,11 +116,11 @@ export class BundleManager {
             code == td.HotUpdate.Code.ERROR_PARSE_MANIFEST) {
             //下载manifest文件失败
             this.isLoading = false;
-            let content = i18n.downloadFailManifest;
+            let content = Manager.getLanguage("downloadFailManifest");
             if (code == td.HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST) {
-               content = i18n.noFindManifest;
+               content = Manager.getLanguage("noFindManifest");
             } else if (code == td.HotUpdate.Code.ERROR_PARSE_MANIFEST) {
-               content = i18n.manifestError;
+               content = Manager.getLanguage("manifestError");
             }
             Manager.tips.show(content);
          } else if (code == td.HotUpdate.Code.CHECKING) {
@@ -143,7 +143,8 @@ export class BundleManager {
          me.isLoading = false;
          if (err) {
             cc.error(`load bundle : ${versionInfo.bundle} fail !!!`);
-            Manager.tips.show(String.format(i18n.updateFaild, versionInfo.name));
+            let content = Manager.getLanguage(["updateFaild",versionInfo.name]);
+            Manager.tips.show(content);
          } else {
             cc.log(`load bundle : ${versionInfo.bundle} success !!!`);
             this.loadedBundle.push(versionInfo.bundle);
@@ -151,7 +152,7 @@ export class BundleManager {
          }
       });
    }
-   private onDownload( info : td.HotUpdate.DownLoadInfo ) {
+   private onDownload(info: td.HotUpdate.DownLoadInfo) {
       if (CC_DEBUG) cc.log(JSON.stringify(info));
       let newPercent = 0;
       /**
