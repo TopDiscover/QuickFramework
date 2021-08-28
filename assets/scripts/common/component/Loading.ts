@@ -31,7 +31,7 @@ export default class Loading {
     private _showContentIndex = 0;
 
     /**@description 超时回调定时器id */
-    private _timerId:number = -1;
+    private _timerId:any = -1;
 
     /**@description 显示的提示 */
     private _text : cc.Label = null;

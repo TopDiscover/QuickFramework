@@ -24,6 +24,7 @@
     "gulp-htmlmin": "^5.0.1",
     "gulp-imagemin": "^7.1.0",
     "gulp-javascript-obfuscator": "^1.1.6",
+    "nodejs-websocket": "^1.7.2",
     "vinyl-sourcemaps-apply": "^0.2.1"
   }
 }

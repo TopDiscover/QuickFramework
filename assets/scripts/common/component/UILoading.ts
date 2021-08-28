@@ -37,7 +37,7 @@ export default class UILoading {
         this._uiName = name;
         this._show();
     }
-    private _timerId = -1;
+    private _timerId : any = -1;
 
     /**
      * @description 显示动画
