@@ -1,8 +1,7 @@
 
 import EventComponent from "../base/EventComponent";
-import { Service } from "../base/Service";
+import { Service, ServiceEvent } from "../base/Service";
 import { Message } from "../net/Message";
-import { ServiceEvent } from "../base/Defines";
 
 /**
  * @description 控制器基类 , 对service 的自动注入

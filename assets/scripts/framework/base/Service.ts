@@ -5,7 +5,10 @@ import { Message, MessageHeader, IMessage } from "../net/Message";
 /**
  * @description 与服务器之间消息收发基类,注册消息并转发
  */
-
+export interface ServiceEvent{
+    service: Service;
+    event : Event;
+}
 export class Service extends ServerConnector {
     private _messageHeader : typeof MessageHeader = MessageHeader;
     /**@description 数据流消息包头定义类型 */

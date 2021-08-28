@@ -1,4 +1,4 @@
-import { ServiceEvent } from "../../framework/base/Defines";
+import { ServiceEvent } from "../../framework/base/Service";
 import Controller from "../../framework/controller/Controller";
 import { CommonService } from "./CommonService";
 
