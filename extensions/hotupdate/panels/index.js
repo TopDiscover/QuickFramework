@@ -12,6 +12,7 @@ const elements = {
     buildDir: "#buildDir",//构建目录
     manifestDir: "#manifestDir",//Manifest输出目录
     delBunles: "#delBunles",//删除bundle
+    insertHotupdate: "#insertHotupdate",//插入热更新代码
     createManifest: "#createManifest",//生成Manifest
     remoteUrl: "#remoteUrl",//主包远程服务器地址
     remoteDir: "#remoteDir",//主包本地测试服务器目录
@@ -271,18 +272,36 @@ exports.methods = {
         this.$.refreshMainVersion.addEventListener("confirm", this.onRefreshMainVersion.bind(this));
         //refresh${gameInfo.dir}Version 子包地址刷新
         keys.forEach((key) => {
-            this.$[`is${key}includeApp`].addEventListener("confirm",this.onIncludeAppChange.bind(this,this.$[`is${key}includeApp`],key));
+            this.$[`is${key}includeApp`].addEventListener("confirm", this.onIncludeAppChange.bind(this, this.$[`is${key}includeApp`], key));
             this.$[`refresh${key}Version`].addEventListener("confirm", this.onRefreshBundleLocalServerVersion.bind(this, key))
         });
         //删除不包含在包内的bundles
         this.$.delBunles.addEventListener("confirm", this.onDelBundles.bind(this));
+        //插入热更新代码
+        this.$.insertHotupdate.addEventListener("confirm", this.onInsertHotupdate.bind(this));
+    },
+    //插入热更新代码
+    onInsertHotupdate() {
+        let codePath = path.join(__dirname, "../code/hotupdate.js");
+        let code = fs.readFileSync(codePath, "utf8");
+        // console.log(code);
+        let sourcePath = userCache.buildDir + "/main.js";
+        let sourceCode = fs.readFileSync(sourcePath,"utf8");
+        let templateReplace = function templateReplace() {
+            // console.log(arguments);
+            return arguments[1] + code + arguments[3];
+        }
+        //添加子游戏测试环境版本号
+        sourceCode = sourceCode.replace(/(\);)([\s\w\S]*)(const[ ]*importMapJson)/g,templateReplace);
+        console.log(`向${sourcePath}中插入热更新代码`);
+        fs.writeFileSync(sourcePath,sourceCode,{"encoding" : "utf8"});
     },
     //初始化
     init() {
         this.initDatas();
         this.bindingEvents();
     },
-    onIncludeAppChange(element,key){
+    onIncludeAppChange(element, key) {
         // console.log("element",element);
         // console.log("key",key);
         // console.log("value",element.value);
@@ -291,7 +310,7 @@ exports.methods = {
     },
     /**@description 删除不包含在包内的bundles */
     async onDelBundles() {
-        if( this.isDoCreate()) return;
+        if (this.isDoCreate()) return;
         const config = {
             title: '警告',
             detail: '',
@@ -335,7 +354,7 @@ exports.methods = {
      * @description 刷新测试环境主包信息
      */
     onRefreshMainVersion() {
-        if( this.isDoCreate()) return;
+        if (this.isDoCreate()) return;
         if (userCache.remoteDir.length > 0) {
             let versionManifestPath = path.join(userCache.remoteDir, "manifest/version.manifest");
             fs.readFile(versionManifestPath, "utf-8", (err, data) => {
@@ -357,7 +376,7 @@ exports.methods = {
      * @param {*} key 
      */
     onRefreshBundleLocalServerVersion(key) {
-        if( this.isDoCreate()) return;
+        if (this.isDoCreate()) return;
         if (userCache.remoteDir.length > 0) {
             let versionManifestPath = path.join(userCache.remoteDir, `manifest/${key}_version.manifest`);
             fs.readFile(versionManifestPath, "utf-8", (err, data) => {
@@ -378,7 +397,7 @@ exports.methods = {
      * @description 部署
      */
     onDeployToRemote() {
-        if( this.isDoCreate() ) return;
+        if (this.isDoCreate()) return;
         if (userCache.remoteDir.length <= 0) {
             this.addLog("[部署]请先选择本地服务器目录");
             return;
@@ -395,17 +414,17 @@ exports.methods = {
         let includes = this.getMainBundleIncludes();
 
         let temps = [];
-        for( let i = 0 ; i < includes.length ; i++ ){
+        for (let i = 0; i < includes.length; i++) {
             //只保留根目录
             let dir = includes[i];
             let index = dir.search(/\\|\//);
-            if( index == -1){
-                if( temps.indexOf(dir) == -1){
+            if (index == -1) {
+                if (temps.indexOf(dir) == -1) {
                     temps.push(dir);
                 }
-            }else{
-                dir = dir.substr(0,index);
-                if( temps.indexOf(dir) == -1){
+            } else {
+                dir = dir.substr(0, index);
+                if (temps.indexOf(dir) == -1) {
                     temps.push(dir);
                 }
             }
@@ -596,7 +615,7 @@ exports.methods = {
     },
     delDir(sourceDir, isRemoveSourceDir = false) {
         let delFile = function (dir) {
-            if( !fs.existsSync(dir) ) return;
+            if (!fs.existsSync(dir)) return;
             let readDir = fs.readdirSync(dir);
             for (let i in readDir) {
                 let fullPath = path.join(dir, readDir[i]);
@@ -604,7 +623,7 @@ exports.methods = {
             }
         };
         let delDir = function (dir) {
-            if( !fs.existsSync(dir)) return;
+            if (!fs.existsSync(dir)) return;
             let readDir = fs.readdirSync(dir);
             if (readDir.length > 0) {
                 for (let i in readDir) {
@@ -874,9 +893,9 @@ exports.ready = async function () {
 };
 // 尝试关闭面板的时候触发
 exports.beforeClose = async function () {
-    
+
 };
 // 当面板实际关闭后触发
 exports.close = async function () {
-    
+
 };
