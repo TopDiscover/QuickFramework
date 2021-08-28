@@ -1068,7 +1068,7 @@ class _Helper {
   }
 
   get style() {
-    let content = fs.readFileSync(path.join(Editor.Project.path, "/packages/hot-update-tools/dist/panel/index.html"), "utf-8");
+    let content = fs.readFileSync(path.join(Editor.Project.path, "/packages/hot-update-tools/dist/panel/index.css"), "utf-8");
     return content;
   }
 

@@ -1,8 +1,8 @@
 {
     "name": "hot-update-tools",
-    "version": "0.0.8",
+    "version": "1.0.0",
     "description": "hotUpdateTools",
-    "author": "xu_yanfeng",
+    "author": "zheng_fasheng",
     "main": "dist/main.js",
     "main-menu": {
         "项目工具/热更新工具": {
