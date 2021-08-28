@@ -460,21 +460,21 @@ declare namespace td {
 			/**@description 下载当前文件的进度 */
 			percentByFile: number,
 			/**@description 下载Code */
-			code: AssetManagerCode,
+			code: Code,
 			/**@description 下载State */
-			state: AssetManagerState,
+			state: State,
 			/**@description 是否需要重启 */
 			needRestart: boolean
 		}
 		/**@description 提示下载弹出框事件数据 */
-		interface MessageData{
-			state : State;
+		interface MessageData {
+			state: State;
 			/**@description 下载的bundle */
-			bundle : string;
+			bundle: string;
 			/**@description 下载的bundle名，如大厅 */
-			name : string;
+			name: string;
 			/**@description 是否点击了确定按钮 true为下载 */
-			isOk : boolean;
+			isOk: boolean;
 		}
 
 		/**@description 下载事件 */
@@ -607,7 +607,7 @@ declare namespace td {
 
 			/**@description 进入房间列表 */
 			ENTER_ROOM_LIST = "ENTER_ROOM_LIST"
-		};
+		}
 		/**@description 逻辑派发数据接口 */
 		export interface EventData {
 			type: Type;
@@ -690,7 +690,7 @@ declare namespace td {
 			retain: boolean = false;
 			bundle: BUNDLE_TYPE = null;
 			/**@description 默认为本地资源 */
-			resourceType: td.Resource.Type = td.Resource.Type.Local;
+			resourceType: Resource.Type = td.Resource.Type.Local;
 		}
 		export class CacheData {
 			/**@description 是否已经加载完成 */
@@ -755,6 +755,18 @@ declare namespace td {
 
 	/**@description 网络相关 */
 	namespace Net {
+		export class Message {
+			/**@description 消息主cmd码 */
+			mainCmd: number;
+			/**@description 消息子cmd码 */
+			subCmd: number;
+			/**@description 发送或接收的消息流 */
+			buffer: Uint8Array;
+			/**@description 打包数据 */
+			encode(): boolean;
+			/**@description 解析数据 */
+			decode(data: Uint8Array): boolean;
+		}
 		/** @description 处理函数声明 handleType 为你之前注册的handleType类型的数据 返回值number 为处理函数需要的时间 */
 		export type HandleFunc = (handleTypeData: any) => number;
 		export interface ListenerData {
@@ -769,74 +781,74 @@ declare namespace td {
 	}
 
 	/**@description 全局配置命名空间 可使用toNamespace进行对数据的合并*/
-	declare namespace Config {
+	namespace Config {
 		/**@description 是否显示调试按钮 */
-		export const isShowDebugButton = true;
+		export const isShowDebugButton: boolean;
 
 		/**@description 公共Prefabs预置路径 */
-		export const CommonPrefabs = {
-			tips: "common/prefabs/Tips",
-			uiLoading: "common/prefabs/UILoading",
-			loading: "common/prefabs/Loading",
-			alert: "common/prefabs/Alert",
+		export const CommonPrefabs: {
+			tips: string,
+			uiLoading: string,
+			loading: string,
+			alert: string,
 		}
 
 		/**@description 公共音效路径 */
-		export const audioPath = {
-			dialog: "common/audio/dlg_open",
-			button: "common/audio/btn_click",
+		export const audioPath: {
+			dialog: string,
+			button: string,
 		}
 
 		/**@description 是否跳过热更新检测 */
-		export const isSkipCheckUpdate = true;
+		export const isSkipCheckUpdate: boolean;
 
 		/**@description 测试热更新服务器地址 */
-		export const TEST_HOT_UPDATE_URL_ROOT = "";//"http://192.168.0.104:9945/hotupdate";
+		export const TEST_HOT_UPDATE_URL_ROOT: string;//"http://192.168.0.104:9945/hotupdate";
 
-		/**@description Loading动画显示超时回调默认超时时间 */
-		export const LOADING_TIME_OUT = 30;
+		/**@description Loading动画显示超时回调默认超时时间 默认30 */
+		export const LOADING_TIME_OUT: number;
 
-		/**@description Loading提示中切换显示内容的时间间隔 */
-		export const LOADING_CONTENT_CHANGE_INTERVAL = 3;
+		/**@description Loading提示中切换显示内容的时间间隔 默认3 */
+		export const LOADING_CONTENT_CHANGE_INTERVAL: number;
 
-		/**@description 加载界面超时时间,如果在LOAD_VIEW_TIME_OUT秒未加载出，提示玩家加载界面超时 */
-		export const LOAD_VIEW_TIME_OUT = 20;
+		/**@description 加载界面超时时间,如果在LOAD_VIEW_TIME_OUT秒未加载出，提示玩家加载界面超时,默认20 */
+		export const LOAD_VIEW_TIME_OUT: number;
 
 		/**@description UILoading显示默认时间，即在打开界面时，如果界面在LOAD_VIEW_DELAY之内未显示，就会弹出一的加载界面的进度 
 		 * 在打开界面时，也可直接指定delay的值
 		 * @example  
 		 * Manager.uiManager.open({ type : LoginLayer, zIndex: ViewZOrder.zero, delay : 0.2});
 		 */
-		export const LOAD_VIEW_DELAY = 0.1;
+		export const LOAD_VIEW_DELAY: number;
 
 		/**@description 大厅bundle名 */
-		export const BUNDLE_HALL = "hall";
+		export const BUNDLE_HALL: string;
 
 		/**@description 重连的超时时间 */
-		export const RECONNECT_TIME_OUT = 30;
+		export const RECONNECT_TIME_OUT: number;
 
 		/**@description 进入后台最大时间（单位秒）大于这个时间时就会进入重连*/
-		export const MAX_INBACKGROUND_TIME = 60;
+		export const MAX_INBACKGROUND_TIME: number;
 		/**@description 进入后台最小时间（单位秒）大于这个时间时就会进入重连*/
-		export const MIN_INBACKGROUND_TIME = 5;
+		export const MIN_INBACKGROUND_TIME: number;
 
 		/**@description 网络重连弹出框tag */
-		export const RECONNECT_ALERT_TAG = 100;
+		export const RECONNECT_ALERT_TAG: number;
 	}
 
 	export namespace Macro {
 		/**@description 公共语言包数据名 */
-		export const COMMON_LANGUAGE_NAME: string = "COMMON_LANGUAGE_NAME";
+		export const COMMON_LANGUAGE_NAME: string;
 		/**@description 网络数据全以大端方式进行处理 */
-		export const USING_LITTLE_ENDIAN = false;
+		export const USING_LITTLE_ENDIAN: boolean;
 		/**@description 主包bundle名 */
-		export const BUNDLE_RESOURCES = 'resources';
+		export const BUNDLE_RESOURCES: string;
 		/**@description 远程资源包bundle名 */
-		export const BUNDLE_REMOTE = "__Remote__Caches__";
+		export const BUNDLE_REMOTE: string;
 		/**@description 是否允许游戏启动后切换语言 */
-		export const ENABLE_CHANGE_LANGUAGE = true;
+		export const ENABLE_CHANGE_LANGUAGE: boolean;
 		/**@description 语言包路径使用前缀 */
-		export const USING_LAN_KEY = "i18n.";
+		export const USING_LAN_KEY: string;
 	}
 
 	/**
@@ -1012,17 +1024,17 @@ declare namespace td {
 
 	export class Language {
 		/**@description 添加数据代理 */
-		public addSourceDelegate(delegate: LanguageDataSourceDelegate);
+		addSourceDelegate(delegate: LanguageDataSourceDelegate): void;
 		/**@description 删除数据代理 */
-		public removeSourceDelegate(delegate: LanguageDataSourceDelegate);
+		removeSourceDelegate(delegate: LanguageDataSourceDelegate): void;
 		/**
 		   * @description 改变语言包
 		   * @param language 语言包类型
 		   */
-		public change(language: string);
-		public get(args: (string | number)[]);
+		change(language: string): void;
+		get(args: (string | number)[]): any;
 		/**@description 获取语言包名 */
-		public getLanguage();
+		getLanguage(): string;
 	}
 	export class EventDispatcher {
 		/**
@@ -1031,31 +1043,31 @@ declare namespace td {
 		   * @param callback 事件回调
 		   * @param target target
 		   */
-		public addEventListener(type: string, callback: ((data: any) => void) | string, target: any);
+		addEventListener(type: string, callback: ((data: any) => void) | string, target: any): void;
 		/**
 		   * @description 移除事件
 		   * @param type 事件类型
 		   * @param target 
 		   */
-		public removeEventListener(type: string, target: any);
+		removeEventListener(type: string, target: any): void;
 		/**
 		   * @description 派发事件
 		   * @param type 事件类型
 		   * @param data 事件数据
 		   */
-		public dispatchEvent(type: string, data?: any);
+		dispatchEvent(type: string, data?: any): void;
 	}
 
 	export class ViewDynamicLoadData {
 		name: string;
-		constructor(name: string = null);
+		constructor(name?: string);
 		/**@description 添加动态加载的本地资源 */
-		addLocal(info: Resource.Info, className: string = null): void;
+		addLocal(info: Resource.Info, className?: string): void;
 		/**@description 添加动态加载的远程资源 */
-		addRemote(info: Resource.Info, className: string = null): void;
+		addRemote(info: Resource.Info, className?: string): void;
 		/**@description 清除远程加载资源 */
 		clear(): void;
-	};
+	}
 
 	export interface UIClass<T extends UIView> {
 		new(): T;
@@ -1455,7 +1467,7 @@ declare namespace td {
 		*/
 		checkGameUpdate(gameName: string, callback: (code: HotUpdate.Code, state: HotUpdate.State) => void): void;
 		/**@description 执行热更新*/
-		hotUpdate():void;
+		hotUpdate(): void;
 	}
 
 	export class FramewokManager {
