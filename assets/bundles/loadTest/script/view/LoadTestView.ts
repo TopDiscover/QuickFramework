@@ -26,8 +26,8 @@ export default class LoadTestView extends UIView {
 
         cc.find("loadNetImg",op).on(cc.Node.EventType.TOUCH_END,this.onLoadNetImg,this);
 
-        this.loadButton = cc.find("loadButton",op);
-        this.loadButton.on(cc.Node.EventType.TOUCH_END,this.onLoadButton,this);
+        this.loadButton = cc.find("loadButton",this.node);
+        cc.find("loadButton",op).on(cc.Node.EventType.TOUCH_END,this.onLoadButton,this);
 
         cc.find("loadParticle",op).on(cc.Node.EventType.TOUCH_END,this.onLoadParticle,this);
 
@@ -99,6 +99,7 @@ export default class LoadTestView extends UIView {
         let button = cc.instantiate(this.loadButton);
         this.content.addChild(button);
         button.name = name;
+        button.active = true;
         button.position = cc.v3(0,0,0);
         let btn = button.getComponent(cc.Button);
         btn.loadButton({
