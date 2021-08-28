@@ -128,18 +128,35 @@ export default class HallView extends UIView {
         this.registerEvent(td.HotUpdate.Event.DOWNLOAD_PROGRESS, this.onDownloadProgess);
     }
 
+    private getGameItem(config: td.HotUpdate.BundleConfig) {
+        let pages = this.pageView.getPages();
+        for (let i = 0; i < pages.length; i++) {
+            let page = pages[i];
+            let item = find(`game_${config.index}`, page);
+            if (item) {
+                return item;
+            }
+        }
+        return null;
+    }
+
     private onDownloadProgess(data: { progress: number, config: td.HotUpdate.BundleConfig }) {
 
-        let progressBar = find(`games/game_${data.config.index}/Background/progressBar`, this.node)?.getComponent(ProgressBar) as ProgressBar;
-        let progressLabel = find(`games/game_${data.config.index}/Background/progressBar/progress`, this.node)?.getComponent(Label) as Label;
-        if (data.progress == -1) {
-            progressBar.node.active = false;
-        } else if (data.progress < 1) {
-            progressBar.node.active = true;
-            progressBar.progress = data.progress;
-            progressLabel.string = "" + Math.floor(data.progress * 100) + "%";
-        } else {
-            progressBar.node.active = false;
+        let node = this.getGameItem(data.config);
+        if (node) {
+            let progressBar = find(`Background/progressBar`, node)?.getComponent(ProgressBar);
+            let progressLabel = find(`Background/progressBar/progress`, node)?.getComponent(Label);
+            if ( progressBar && progressLabel ){
+                if (data.progress == -1) {
+                    progressBar.node.active = false;
+                } else if (data.progress < 1) {
+                    progressBar.node.active = true;
+                    progressBar.progress = data.progress;
+                    progressLabel.string = "" + Math.floor(data.progress * 100) + "%";
+                } else {
+                    progressBar.node.active = false;
+                }
+            }
         }
     }
 }
