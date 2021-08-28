@@ -11,11 +11,22 @@ class RemoteLoader {
                 resolve(null);
                 return;
             }
-            let spCache = Manager.cacheManager.remoteCaches.getSpriteFrame(url);
-            if (spCache && spCache.data) {
-                if (CC_DEBUG) cc.log(this._logTag, `从缓存精灵帧中获取:${url}`);
-                resolve(<cc.SpriteFrame>(spCache.data));
-                return;
+            if ( isNeedCache ){
+                //如果存在缓存 ，直接取出
+                let spCache = Manager.cacheManager.remoteCaches.getSpriteFrame(url);
+                if (spCache && spCache.data) {
+                    if (CC_DEBUG) cc.log(this._logTag, `从缓存精灵帧中获取:${url}`);
+                    resolve(<cc.SpriteFrame>(spCache.data));
+                    return;
+                }else{
+                    //错误处理
+                    if (CC_DEBUG) cc.log(this._logTag,`错误资源，删除缓存信息，重新加载:${url}`);
+                    Manager.cacheManager.remoteCaches.remove(url);
+                }
+            }else{
+                //不需要缓存，先删除之前的,再重新加载
+                if (CC_DEBUG) cc.log(this._logTag,`不需要缓存信息，删除缓存，重新加载${url}`);
+                Manager.cacheManager.remoteCaches.remove(url);
             }
 
             me._loadRemoteRes(url,cc.Texture2D , isNeedCache).then((data: any) => {
