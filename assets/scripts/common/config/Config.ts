@@ -5,7 +5,7 @@ namespace Config {
     export const isShowDebugButton = true;
 
     /**@description 公共Prefabs预置路径 */
-    export let CommonPrefabs = {
+    export const CommonPrefabs = {
         tips : "common/prefabs/Tips",
         uiLoading : "common/prefabs/UILoading",
         loading : "common/prefabs/Loading",
@@ -41,6 +41,7 @@ namespace Config {
     /**@description 进入后台最小时间（单位秒）大于这个时间时就会进入重连*/
     export const MIN_INBACKGROUND_TIME = 5;
 }
+
 /**@description 更新框架内全局配置数据 */
 toNamespace("Config",Config);
 
