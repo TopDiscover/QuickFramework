@@ -1,5 +1,5 @@
 
-import { _decorator,Node, find,Animation, Label, Sprite, instantiate, Button, Vec2, Vec3, UITransform, ParticleSystem, ParticleSystem2D, sp, SpriteFrame, AnimationClip, Layers, Widget } from "cc";
+import { _decorator,Node, find,Animation, Label, Sprite, instantiate, Button, Vec2, Vec3, UITransform, ParticleSystem, ParticleSystem2D, sp, SpriteFrame, AnimationClip, Layers, Widget, size } from "cc";
 import { loadDirRes } from "../../../../scripts/framework/extentions/CocosExtention";
 import UIView from "../../../../scripts/framework/ui/UIView";
 import { HallData } from "../../../hall/script/data/HallData";
@@ -28,8 +28,8 @@ export default class LoadTestView extends UIView {
 
         find("loadNetImg",op)?.on(Node.EventType.TOUCH_END,this.onLoadNetImg,this);
 
-        this.loadButton = find("loadButton",op) as Node;
-        this.loadButton.on(Node.EventType.TOUCH_END,this.onLoadButton,this);
+        this.loadButton = find("loadButton",this.node) as Node;
+        find("loadButton",op)?.on(Node.EventType.TOUCH_END,this.onLoadButton,this);
 
         find("loadParticle",op)?.on(Node.EventType.TOUCH_END,this.onLoadParticle,this);
 
@@ -111,7 +111,9 @@ export default class LoadTestView extends UIView {
         this.content.addChild(button);
         button.name = name;
         button.setPosition(new Vec3());
+        button.getComponent(UITransform)?.setContentSize(size(200,60));
         let btn = button.getComponent(Button) as Button;
+        button.active = true;
         btn.loadButton({
             normalSprite : "texture/btn_b/spriteFrame",
             pressedSprite: "texture/btn_y/spriteFrame",
@@ -122,8 +124,12 @@ export default class LoadTestView extends UIView {
                 if( type == td.ButtonSpriteType.Norml && spriteFrame ){
                     let buttonTrans = button.getComponent(UITransform) as UITransform;
                     let targetTrans = btn.target.getComponent(UITransform) as UITransform;
+                    log(spriteFrame.originalSize);
+                    buttonTrans.contentSize = spriteFrame.originalSize;
                     buttonTrans.setContentSize(spriteFrame.originalSize);
+                    targetTrans.contentSize = spriteFrame.originalSize;
                     targetTrans.setContentSize(spriteFrame.originalSize);
+                    log(button.getComponent(UITransform))
                 }
             },
         })
