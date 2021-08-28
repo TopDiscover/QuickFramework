@@ -1,5 +1,4 @@
 import UIView from "../../../../scripts/framework/ui/UIView";
-import { LogicEvent } from "../../../../scripts/common/event/LogicEvent";
 import { TankBettle } from "../data/TankBattleGameData";
 import { _decorator,Node, find, Label, Vec3, EventKeyboard, macro } from "cc";
 
@@ -46,7 +45,7 @@ export default class TankBattleStartView extends UIView{
 
     onKeyBack(ev: EventKeyboard) {
         super.onKeyBack(ev);
-        dispatch(LogicEvent.ENTER_HALL);
+        dispatch(td.Logic.Event.ENTER_HALL);
     }
 
     onKeyUp(ev: EventKeyboard) {

@@ -5,19 +5,11 @@
 import { js, sys } from "cc";
 import { DEBUG } from "cc/env";
 
-export enum LogLevel {
-    LOG = 0X00000001,
-    DUMP = 0X00000010,
-    WARN = 0X00000100,
-    ERROR = 0X00001000,
-    ALL = LOG | DUMP | WARN | ERROR,
-}
-
 let _window: any = window;
 let _cc = _window["cc"];
 class _Log {
     /**@description 当前日志等级 */
-    private _level: number = LogLevel.ALL;
+    private _level: number = td.Log.Level.ALL;
     /**@description 是否强制开户日志,如在非debug模式下，需要显示日志 */
     private _forceShowLog: boolean = false;
     /**@description 使用系统默认日志，还是自定义日志 */
@@ -89,7 +81,7 @@ class _Log {
     }
 
     private log() {
-        if (this.canDo(LogLevel.LOG)) {
+        if (this.canDo(td.Log.Level.LOG)) {
             if (this.isUsingCustom) {
                 this.do(console.log || _cc.log, "INFO", arguments);
             } else {
@@ -99,14 +91,14 @@ class _Log {
     }
 
     private dump() {
-        if (this.canDo(LogLevel.DUMP)) {
+        if (this.canDo(td.Log.Level.DUMP)) {
             let ret = this._dump(arguments[0], arguments[1], arguments[2], arguments[4]);
             this.do(console.info || _cc.log, "DUMP", [ret]);
         }
     }
 
     private warn() {
-        if (this.canDo(LogLevel.WARN)) {
+        if (this.canDo(td.Log.Level.WARN)) {
             if (this.isUsingCustom) {
                 this.do(console.warn || _cc.warn, "WARN", arguments);
             } else {
@@ -116,7 +108,7 @@ class _Log {
     }
 
     private error() {
-        if (this.canDo(LogLevel.ERROR)) {
+        if (this.canDo(td.Log.Level.ERROR)) {
             if (sys.isNative) {
                 try {
                     if (this.isUsingCustom) {

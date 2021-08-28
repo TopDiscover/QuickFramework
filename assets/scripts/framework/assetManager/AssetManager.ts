@@ -1,6 +1,5 @@
 import { Asset, assetManager, AssetManager, JsonAsset, TextAsset, Texture2D, sp, SpriteFrame, ImageAsset } from "cc";
 import { DEBUG } from "cc/env";
-import { ResourceCacheData, ResourceCacheStatus, ResourceInfo, ResourceType } from "../base/Defines";
 
 class RemoteLoader {
 
@@ -55,8 +54,8 @@ class RemoteLoader {
                         cache.finishCb.push(resolve);
                     }
                 } else {
-                    cache = new ResourceCacheData();
-                    cache.info.resourceType = ResourceType.Remote;
+                    cache = new td.Resource.CacheData();
+                    cache.info.resourceType = td.Resource.Type.Remote;
                     cache.info.type = sp.SkeletonData;
                     cache.info.bundle = td.Macro.BUNDLE_REMOTE;
                     Manager.cacheManager.remoteCaches.set(url, cache);
@@ -75,7 +74,7 @@ class RemoteLoader {
                                             asset.textures = [texture];
                                             let pngName = name + ".png"
                                             asset.textureNames = [pngName];
-                                            cache = cache as ResourceCacheData;
+                                            cache = cache as td.Resource.CacheData;
                                             cache.info.url = url;
                                             asset.name = url;
                                             cache.data = asset;
@@ -84,21 +83,21 @@ class RemoteLoader {
                                             cache.doFinish(cache.data);
                                         } else {
                                             resolve(null);
-                                            cache = cache as ResourceCacheData;
+                                            cache = cache as td.Resource.CacheData;
                                             cache.doFinish(null);
                                             Manager.cacheManager.remoteCaches.remove(url);
                                         }
                                     });
                                 } else {
                                     resolve(null);
-                                    cache = cache as ResourceCacheData;
+                                    cache = cache as td.Resource.CacheData;
                                     cache.doFinish(null);
                                     Manager.cacheManager.remoteCaches.remove(url);
                                 }
                             });
                         } else {
                             resolve(null);
-                            cache = cache as ResourceCacheData;
+                            cache = cache as td.Resource.CacheData;
                             cache.doFinish(null);
                             Manager.cacheManager.remoteCaches.remove(url);
                         }
@@ -124,8 +123,8 @@ class RemoteLoader {
                 }
             } else {
                 //没有缓存存在,生成加载缓存
-                cache = new ResourceCacheData();
-                cache.info.resourceType = ResourceType.Remote;
+                cache = new td.Resource.CacheData();
+                cache.info.resourceType = td.Resource.Type.Remote;
                 cache.info.type = type;
                 Manager.cacheManager.remoteCaches.set(url, cache);
                 assetManager.loadRemote(url,{cacheAsset : isNeedCache } ,  (error, data) => {
@@ -209,7 +208,7 @@ export class _AssetManager {
         path: string,
         type: typeof Asset,
         onProgress: (finish: number, total: number, item: AssetManager.RequestItem) => void,
-        onComplete: (data: ResourceCacheData) => void): void {
+        onComplete: (data: td.Resource.CacheData) => void): void {
         if (DEBUG) {
             log(`load bundle : ${bundle} path : ${path}`)
         }
@@ -218,22 +217,22 @@ export class _AssetManager {
             //存在缓存信息
             if (cache.isLoaded) {
                 //已经加载完成
-                if (DEBUG && cache.status == ResourceCacheStatus.WAITTING_FOR_RELEASE) {
+                if (DEBUG && cache.status == td.Resource.CacheStatus.WAITTING_FOR_RELEASE) {
                     warn(this.logTag, `资源:${path} 等待释放，但资源已经加载完成，此时有人又重新加载，不进行释放处理`);
                 }
                 //加载完成
                 onComplete(cache);
             } else {
-                if (DEBUG && cache.status == ResourceCacheStatus.WAITTING_FOR_RELEASE) {
+                if (DEBUG && cache.status == td.Resource.CacheStatus.WAITTING_FOR_RELEASE) {
                     warn(this.logTag, `资源:${path}等待释放，但资源处理加载过程中，此时有人又重新加载，不进行释放处理`);
                 }
                 cache.finishCb.push(onComplete);
             }
             //重新复位资源状态
-            cache.status = ResourceCacheStatus.NONE;
+            cache.status = td.Resource.CacheStatus.NONE;
         } else {
             //无缓存信息
-            cache = new ResourceCacheData();
+            cache = new td.Resource.CacheData();
             cache.info.url = path;
             cache.info.type = type;
             cache.info.bundle = bundle;
@@ -259,7 +258,7 @@ export class _AssetManager {
         }
     }
 
-    private _onLoadComplete(cache: ResourceCacheData, completeCallback: (data: ResourceCacheData) => void, err: Error | null, data: Asset | Asset[] | null) {
+    private _onLoadComplete(cache: td.Resource.CacheData, completeCallback: (data: td.Resource.CacheData) => void, err: Error | null, data: Asset | Asset[] | null) {
         cache.isLoaded = true;
         //添加引用关系
         let tempCache = cache;
@@ -281,11 +280,11 @@ export class _AssetManager {
         cache.doFinish(tempCache);
         cache.doGet(tempCache.data);
 
-        if (cache.status == ResourceCacheStatus.WAITTING_FOR_RELEASE) {
+        if (cache.status == td.Resource.CacheStatus.WAITTING_FOR_RELEASE) {
             if (DEBUG) warn(this.logTag, `资源:${cache.info.url}加载完成，但缓存状态为等待销毁，销毁资源`);
             if (cache.data) {
-                cache.status = ResourceCacheStatus.NONE;
-                let info = new ResourceInfo;
+                cache.status = td.Resource.CacheStatus.NONE;
+                let info = new td.Resource.Info;
                 info.url = cache.info.url;
                 info.type = cache.info.type;
                 info.data = cache.data;
@@ -302,7 +301,7 @@ export class _AssetManager {
         path: string,
         type: typeof Asset,
         onProgress: (finish: number, total: number, item: AssetManager.RequestItem) => void,
-        onComplete: (data: ResourceCacheData) => void): void {
+        onComplete: (data: td.Resource.CacheData) => void): void {
         if (DEBUG) {
             log(`load bundle : ${bundle} path : ${path}`)
         }
@@ -311,22 +310,22 @@ export class _AssetManager {
             //存在缓存信息
             if (cache.isLoaded) {
                 //已经加载完成
-                if (DEBUG && cache.status == ResourceCacheStatus.WAITTING_FOR_RELEASE) {
+                if (DEBUG && cache.status == td.Resource.CacheStatus.WAITTING_FOR_RELEASE) {
                     warn(this.logTag, `资源:${path} 等待释放，但资源已经加载完成，此时有人又重新加载，不进行释放处理`);
                 }
                 //加载完成
                 onComplete(cache);
             } else {
-                if (DEBUG && cache.status == ResourceCacheStatus.WAITTING_FOR_RELEASE) {
+                if (DEBUG && cache.status == td.Resource.CacheStatus.WAITTING_FOR_RELEASE) {
                     warn(this.logTag, `资源:${path}等待释放，但资源处理加载过程中，此时有人又重新加载，不进行释放处理`);
                 }
                 cache.finishCb.push(onComplete);
             }
             //重新复位资源状态
-            cache.status = ResourceCacheStatus.NONE;
+            cache.status = td.Resource.CacheStatus.NONE;
         } else {
             //无缓存信息
-            cache = new ResourceCacheData();
+            cache = new td.Resource.CacheData();
             cache.info.url = path;
             cache.info.type = type;
             cache.info.bundle = bundle;
@@ -347,7 +346,7 @@ export class _AssetManager {
         }
     }
 
-    public releaseAsset(info: ResourceInfo) {
+    public releaseAsset(info: td.Resource.Info) {
         if (info && info.bundle) {
             let cache = Manager.cacheManager.get(info.bundle, info.url, false);
             if (!cache) {
@@ -395,14 +394,14 @@ export class _AssetManager {
                     }
                 }
             } else {
-                cache.status = ResourceCacheStatus.WAITTING_FOR_RELEASE;
+                cache.status = td.Resource.CacheStatus.WAITTING_FOR_RELEASE;
                 if (DEBUG) warn(`${cache.info.url} 正在加载，等待加载完成后进行释放`);
             }
 
         }
     }
 
-    public retainAsset(info: ResourceInfo) {
+    public retainAsset(info: td.Resource.Info) {
         if (info) {
             let cache = Manager.cacheManager.get(info.bundle, info.url)
             if (cache) {
@@ -435,7 +434,7 @@ export class _AssetManager {
      * @param prefab 
      */
     public addPersistAsset(url: string, data: Asset, bundle: BUNDLE_TYPE) {
-        let info = new ResourceInfo;
+        let info = new td.Resource.Info;
         info.url = url;
         info.data = data;
         info.bundle = bundle;

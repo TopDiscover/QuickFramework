@@ -1,5 +1,4 @@
-import { LogicEvent, dispatchEnterComplete, LogicType } from "../../../../scripts/common/event/LogicEvent";
-import GameView from "../../../../scripts/common/base/GameView";
+import GameView from "../../../../scripts/framework/base/GameView";
 import { Graphics, _decorator ,Node, find, EventTouch, Vec2, UITransform, Vec3, PhysicsSystem2D, physics, EPhysics2DDrawFlags, ERaycast2DType, view} from "cc";
 
 /**
@@ -45,7 +44,7 @@ export default class AimLineView extends GameView {
 
 
         //通知进入bundle完成
-        dispatchEnterComplete({type :LogicType.GAME,views:[this]});
+        dispatchEnterComplete({type :td.Logic.Type.GAME,views:[this]});
     }
 
     private onTouchStart( ev : EventTouch ){
@@ -73,7 +72,7 @@ export default class AimLineView extends GameView {
     }
 
     private onGoBack( ){
-        dispatch(LogicEvent.ENTER_HALL);
+        dispatch(td.Logic.Event.ENTER_HALL);
     }
 
     /**

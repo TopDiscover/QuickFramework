@@ -1,15 +1,12 @@
 import { Prefab } from "cc";
-import { Logic } from "../../../scripts/common/base/Logic";
-import { LogicType, LogicEvent, LogicEventData } from "../../../scripts/common/event/LogicEvent";
-import { ResourceLoaderError } from "../../../scripts/framework/assetManager/ResourceLoader";
-import { ResourceData } from "../../../scripts/framework/base/Defines";
+import { Logic } from "../../../scripts/framework/base/Logic";
 import { EliminateData } from "./data/EliminateData";
 import { CELL_PREFAB_URL, EFFECTS_CONFIG } from "./data/EliminateDefines";
 import EliminateGameView from "./view/EliminateGameView";
 
 class EliminateLogic extends Logic {
 
-    logicType: LogicType = LogicType.GAME;
+    logicType: td.Logic.Type = td.Logic.Type.GAME;
 
     onLoad() {
         super.onLoad();
@@ -17,14 +14,14 @@ class EliminateLogic extends Logic {
 
     protected bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(LogicEvent.ENTER_GAME, this.onEnterGame);
+        this.registerEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
     }
 
     protected get bundle() {
         return EliminateData.bundle;
     }
 
-    public onEnterComplete(data: LogicEventData) {
+    public onEnterComplete(data: td.Logic.EventData) {
         super.onEnterComplete(data);
         if (data.type == this.logicType) {
 
@@ -42,8 +39,8 @@ class EliminateLogic extends Logic {
         }
     }
 
-    protected onLoadResourceComplete(err: ResourceLoaderError) {
-        if (err == ResourceLoaderError.LOADING) {
+    protected onLoadResourceComplete(err: td.Resource.LoaderError) {
+        if (err == td.Resource.LoaderError.LOADING) {
             return;
         }
         log(`${this.bundle} 资源加载完成`);
@@ -52,9 +49,9 @@ class EliminateLogic extends Logic {
         Manager.uiManager.open({ type: EliminateGameView, bundle: this.bundle });
     }
 
-    protected getLoadResources(): ResourceData[] {
+    protected getLoadResources(): td.Resource.Data[] {
 
-        let res: ResourceData[] = [];
+        let res: td.Resource.Data[] = [];
         for (let i = 0; i < CELL_PREFAB_URL.length; i++) {
             let prefabUrl = CELL_PREFAB_URL[i];
             if (prefabUrl) {

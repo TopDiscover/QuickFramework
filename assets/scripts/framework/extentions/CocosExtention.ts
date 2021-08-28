@@ -1,5 +1,4 @@
 import WebEditBoxImpl from "./WebEditBoxImpl";
-import { ResourceType } from "../base/Defines";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
@@ -7,7 +6,6 @@ import {
 } from "./Utils";
 import { isValid, SpriteFrame, sp, Font, ParticleSystem2D, ParticleAsset, sys, EditBox, Sprite,Node, Button, Label, randomRange, Asset, AssetManager} from "cc";
 import { DEBUG, EDITOR, PREVIEW } from "cc/env";
-import UIView from "../ui/UIView";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
 if (typeof Reflect == "object") {
@@ -75,7 +73,7 @@ prototype.loadRemoteImage = function (config: any) {
     let defaultBundle = getBundle({ bundle: config.defaultBundle, view: config.view })
     Manager.assetManager.remote.loadImage(config.url, config.isNeedCache).then((data) => {
         if (data) {
-            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback, td.Macro.BUNDLE_REMOTE, ResourceType.Remote, isRetain);
+            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback, td.Macro.BUNDLE_REMOTE, td.Resource.Type.Remote, isRetain);
         } else {
             if (config.defaultSpriteFrame) {
                 if (typeof config.defaultSpriteFrame == "string") {
@@ -119,7 +117,7 @@ prototype.loadImage = function (config: any) {
             if (data && data.isTryReload) {
                 //来到这里面程序已经崩溃了，无意义在处理了
             } else {
-                setSpriteSpriteFrame(view, data.url, me, data.spriteFrame as SpriteFrame, completeCallback, bundle, ResourceType.Local, false, true);
+                setSpriteSpriteFrame(view, data.url, me, data.spriteFrame as SpriteFrame, completeCallback, bundle, td.Resource.Type.Local, false, true);
             }
         });
     }
@@ -152,7 +150,7 @@ prototype.loadRemoteSkeleton = function (config: any) {
         config.isNeedCache = true;
     }
     Manager.assetManager.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then((data) => {
-        setSkeletonSkeletonData(me, config, data as sp.SkeletonData, ResourceType.Remote);
+        setSkeletonSkeletonData(me, config, data as sp.SkeletonData, td.Resource.Type.Remote);
     });
 }
 
@@ -338,7 +336,7 @@ _cc.createPrefab = function (config: any) {
 	 */
 export function createPrefab(config: { 
     url: string, 
-    view: UIView, 
+    view: td.UIView, 
     completeCallback: (node: Node) => void ,
     bundle?:BUNDLE_TYPE}):void{
     _cc.createPrefab(config);
@@ -373,7 +371,7 @@ export function loadDirRes( config:{
     type : typeof Asset, 
     view : any, 
     onProgress?:(finish:number,total:number,item:AssetManager.RequestItem) => void , 
-    onComplete:(data:td.ResourceCacheData)=>void
+    onComplete:(data:td.Resource.CacheData)=>void
     }):void{
     _cc.loadDirRes(config);  
 }
@@ -432,6 +430,6 @@ export function CocosExtentionInit() {
         if (Manager.resolutionHelper.isBrowser) {
             (<any>EditBox)._EditBoxImpl = WebEditBoxImpl;
         }
+        log("Cocos扩展初始化");
     }
-    //cc.log("CocosExtentionInit");
 }

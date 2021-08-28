@@ -1,6 +1,6 @@
 import UIView from "../../../../scripts/framework/ui/UIView";
 import { TankBettle } from "../data/TankBattleGameData";
-import { _decorator,Node, find, Label ,Animation, AnimationState, tween, AnimationClip} from "cc";
+import { _decorator,Node, find, Label ,Animation, AnimationState, tween} from "cc";
 
 
 const {ccclass, property} = _decorator;

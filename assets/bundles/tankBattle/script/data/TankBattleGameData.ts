@@ -1,6 +1,6 @@
 /**@@description 坦克大战游戏数据 */
 
-import { GameData } from "../../../../scripts/common/base/GameData";
+import { GameData } from "../../../../scripts/framework/base/GameData";
 import { MapLevel } from "./TankBattleLevel";
 import TankBattleMap from "../model/TankBattleMap";
 import TankBattleGameView from "../view/TankBattleGameView";

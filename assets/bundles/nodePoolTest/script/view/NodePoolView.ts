@@ -1,6 +1,5 @@
 import { _decorator ,Node, find, instantiate, Vec3, randomRangeInt, UITransform} from "cc";
-import GameView from "../../../../scripts/common/base/GameView";
-import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../scripts/common/event/LogicEvent";
+import GameView from "../../../../scripts/framework/base/GameView";
 
 const {ccclass, property} = _decorator;
 
@@ -18,7 +17,7 @@ export default class NodePoolView extends GameView {
         super.onLoad();
 
         find("goback", this.node)?.on(Node.EventType.TOUCH_END, () => {
-            dispatch(LogicEvent.ENTER_HALL);
+            dispatch(td.Logic.Event.ENTER_HALL);
         });
 
         this.star = find("star",this.node) as Node;
@@ -35,7 +34,7 @@ export default class NodePoolView extends GameView {
         getNode?.on(Node.EventType.TOUCH_END,this.onGet,this);
         putNode?.on(Node.EventType.TOUCH_END,this.onPut,this);
 
-        dispatchEnterComplete({ type: LogicType.GAME, views: [this] });
+        dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this] });
     }
 
     private onCreate( ){

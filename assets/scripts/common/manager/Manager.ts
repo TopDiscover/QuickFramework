@@ -2,14 +2,8 @@
 import { Framewok } from "../../framework/Framework";
 import { commonConfigInit } from "../config/Config";
 commonConfigInit();
-import { Log, LogLevel } from "../../framework/log/Log";
-import { NetManager } from "./NetManager";
-import { LogicManager } from "./LogicManager";
+import { Log } from "../../framework/log/Log";
 import GlobalAudio from "../component/GlobalAudio";
-import { CocosExtentionInit } from "../../framework/extentions/CocosExtention";
-import GameView from "../base/GameView";
-import { GameData } from "../base/GameData";
-import { BundleManager } from "./BundleManager";
 import Tips from "../component/Tips";
 import UILoading from "../component/UILoading";
 import Alert from "../component/Alert";
@@ -17,43 +11,18 @@ import Loading from "../component/Loading";
 import { ServiceManager } from "./ServiceManager";
 import { CommonLanguage } from "../language/CommonLanguage";
 
+
+
 /**@description 游戏所有运行单例的管理 */
 class _Manager extends Framewok {
-    private _netManager: NetManager = null!;
-    /**@description 全局常驻网络组件管理器,注册到该管理器的网络组件会跟游戏的生命周期一致 */
-    get netManager() {
-        if (!this._netManager) {
-            this._netManager = new NetManager("netManager");
-        }
-        return this._netManager;
-    }
-
-    private _hallNetManager: NetManager = null!;
-    /**@description 大厅的网络控制器组件管理器，注册到该管理器的网络组件，除登录界面外，都会被移除掉*/
-    get hallNetManager() {
-        if (!this._hallNetManager) {
-            this._hallNetManager = new NetManager("hallNetManager");
-        }
-        return this._hallNetManager;
-    }
 
     /**@description 网络Service管理器 */
     get serviceManager() {
         return getSingleton(ServiceManager);
     }
 
-    /**@description 逻辑控制器管理器 */
-    get logicManager() {
-        return getSingleton(LogicManager);
-    }
-
-    /**@description bundle管理器 */
-    get bundleManager() {
-        return getSingleton(BundleManager);
-    }
-
     /**@description 小提示 */
-    get tips():Tips {
+    get tips() {
         return getSingleton(Tips);
     }
 
@@ -91,27 +60,8 @@ class _Manager extends Framewok {
         return this._globalAudio;
     }
 
-    /**@description 当前游戏GameView, GameView进入onLoad赋值 */
-    gameView: GameView | null = null;
-
-    /**@description 游戏数据 */
-    gameData: GameData | null = null;
-
-    /**@description 游戏控制器，在自己的模块内写函数有类型化读取,此值在Logic.addNetComponent赋值
-     * @example 
-     * export function netController() : TankBattleNetController{
-     * return Manager.gameController;
-     * }
-     * 
-     */
-    gameController: any = null;
-
     init() {
-
-        //适配
-        this.resolutionHelper.initBrowserAdaptor();
-        //引擎扩展初始化
-        CocosExtentionInit();
+        super.init();
         //语言包初始化
         //cc.log("language init");
         this.language.addSourceDelegate(new CommonLanguage);
@@ -119,8 +69,9 @@ class _Manager extends Framewok {
 }
 
 export function applicationInit() {
-    Log.logLevel = LogLevel.ERROR | LogLevel.LOG | LogLevel.WARN | LogLevel.DUMP;
-    const Manager = new _Manager();
-    (<any>window)["Manager"] = Manager;
-    Manager.init();
+    //日志
+    Log.logLevel = td.Log.Level.ERROR | td.Log.Level.LOG | td.Log.Level.WARN | td.Log.Level.DUMP;
+    let mgr = new _Manager();
+    (<any>window)["Manager"] = mgr;
+    mgr.init();
 }

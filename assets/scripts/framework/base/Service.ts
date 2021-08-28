@@ -6,18 +6,9 @@ import { DEBUG } from "cc/env";
 /**
  * @description 与服务器之间消息收发基类,注册消息并转发
  */
-
-/** @description 处理函数声明 handleType 为你之前注册的handleType类型的数据 返回值number 为处理函数需要的时间 */
-export type MessageHandleFunc = (handleTypeData: any) => number;
-
-export interface ProtoListenerData {
-    mainCmd: number, // main cmd
-    subCmd: number, //sub cmd
-    func: MessageHandleFunc, //处理函数
-    type: typeof Message, //解包类型
-    isQueue: boolean,//是否进入消息队列，如果不是，收到网络消息返回，会立即回调处理函数
-    data?: any, //解包后的数据
-    target?: any, //处理者
+export interface ServiceEvent{
+    service: Service;
+    event : Event;
 }
 
 export class Service extends ServerConnector {
@@ -134,10 +125,10 @@ export class Service extends ServerConnector {
     }
 
     /** 监听集合*/
-    private _listeners: { [key: string]: ProtoListenerData[] } = {};
+    private _listeners: { [key: string]: td.Net.ListenerData[] } = {};
 
     /** 消息处理队列 */
-    private _masseageQueue: Array<ProtoListenerData[]> = new Array<ProtoListenerData[]>();
+    private _masseageQueue: Array<td.Net.ListenerData[]> = new Array<td.Net.ListenerData[]>();
 
     /** 是否正在处理消息 ，消息队列处理消息有时间，如执行一个消息需要多少秒后才执行一下个*/
     private _isDoingMessage: boolean = false;
@@ -171,7 +162,7 @@ export class Service extends ServerConnector {
         mainCmd: number,
         subCmd: number,
         handleType: any,
-        handleFunc: MessageHandleFunc,
+        handleFunc: td.Net.HandleFunc,
         isQueue: boolean,
         target: any) {
         let key = makeKey(mainCmd, subCmd);
@@ -304,7 +295,7 @@ export class Service extends ServerConnector {
      * @param input 
      * @param data 
      */
-    private copyListenerData(input: ProtoListenerData, data: any): ProtoListenerData {
+    private copyListenerData(input: td.Net.ListenerData, data: any): td.Net.ListenerData {
         return {
             mainCmd: input.mainCmd,
             subCmd: input.subCmd,

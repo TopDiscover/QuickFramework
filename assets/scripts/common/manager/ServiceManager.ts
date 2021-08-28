@@ -3,7 +3,6 @@
  */
 
 import { DEBUG } from "cc/env";
- import { LogicEvent } from "../event/LogicEvent";
  import { ChatService } from "../net/ChatService";
  import { CommonService } from "../net/CommonService";
  import { GameService } from "../net/GameService";
@@ -99,12 +98,12 @@ import { DEBUG } from "cc/env";
                              service.reconnect.show();
                          } else {
                              log(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
-                             dispatch(LogicEvent.ENTER_LOGIN, true);
+                             dispatch(td.Logic.Event.ENTER_LOGIN, true);
                          }
                      },
                      cancelCb: () => {
                          log(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
-                         dispatch(LogicEvent.ENTER_LOGIN, true);
+                         dispatch(td.Logic.Event.ENTER_LOGIN, true);
                      }
                  });
              });

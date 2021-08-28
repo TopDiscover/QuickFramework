@@ -1,11 +1,10 @@
-import { Logic } from "../../../scripts/common/base/Logic";
-import { LogicType, LogicEvent } from "../../../scripts/common/event/LogicEvent";
+import { Logic } from "../../../scripts/framework/base/Logic";
 import { AimLineData } from "./data/AimLineData";
 import AimLineView from "./view/AimLineView";
 
 class AimLineLogic extends Logic {
 
-    logicType: LogicType = LogicType.GAME;
+    logicType: td.Logic.Type = td.Logic.Type.GAME;
 
     onLoad() {
         super.onLoad();
@@ -13,7 +12,7 @@ class AimLineLogic extends Logic {
 
     protected bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(LogicEvent.ENTER_GAME, this.onEnterGame);
+        this.registerEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
     }
 
     protected get bundle() {

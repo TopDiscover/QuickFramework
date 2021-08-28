@@ -5,6 +5,7 @@
  */
 
 import { EDITOR } from "cc/env";
+import { log } from "cc"
 
 window.md5 = function md5(data) {
     return (<any>this).CryptoJS.MD5(data);
@@ -104,4 +105,7 @@ window.getSingleton = getSingleton;
 createNamespace();
 export function extentionsInit() {
     createNamespace();
+    if ( !EDITOR ){
+        log("全局扩展初始化");
+    }
 }

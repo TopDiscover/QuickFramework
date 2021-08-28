@@ -1,8 +1,7 @@
 
 import EventComponent from "../base/EventComponent";
-import { Service } from "../base/Service";
+import { Service, ServiceEvent } from "../base/Service";
 import { Message } from "../net/Message";
-import { ServiceEvent } from "../base/Defines";
 import { _decorator } from "cc";
 import { DEBUG } from "cc/env";
 

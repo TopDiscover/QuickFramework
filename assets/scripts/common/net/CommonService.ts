@@ -12,9 +12,12 @@ export class CommonService extends Service implements GameEventInterface {
 
     protected static _instance: CommonService = null!;
     public static get instance() { return this._instance || (this._instance = new CommonService()); }
-    protected ip = ""
-    protected port: number = null!;
-    protected protocol: WebSocketType = "wss"
+    // protected ip = ""
+    // protected port: number = null;
+    // protected protocol: WebSocketType = "wss"
+    protected ip = "localhost";
+    protected port = 3000;
+    protected protocol: WebSocketType = "ws"
     
     private _maxEnterBackgroundTime: number = td.Config.MAX_INBACKGROUND_TIME;
     private _backgroundTimeOutId = -1;

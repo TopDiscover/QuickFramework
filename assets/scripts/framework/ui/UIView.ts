@@ -233,3 +233,4 @@ export default class UIView extends EventComponent implements IFullScreenAdapt {
 
     }
 }
+toNamespace("UIView",UIView)

@@ -1,7 +1,6 @@
 import { ScrollView, Toggle, ToggleContainer, _decorator, Node, find, instantiate, Label, EventTouch, widgetManager } from "cc";
-import GameView from "../../../../scripts/common/base/GameView";
+import GameView from "../../../../scripts/framework/base/GameView";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
-import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../scripts/common/event/LogicEvent";
 import { ChatService } from "../../../../scripts/common/net/ChatService";
 import { CommonService } from "../../../../scripts/common/net/CommonService";
 import { GameService } from "../../../../scripts/common/net/GameService";
@@ -109,7 +108,7 @@ export default class NetTestView extends GameView {
 
         //返回
         find("goback", this.node)?.on(Node.EventType.TOUCH_END, () => {
-            dispatch(LogicEvent.ENTER_HALL);
+            dispatch(td.Logic.Event.ENTER_HALL);
         });
 
         //重连
@@ -141,7 +140,7 @@ export default class NetTestView extends GameView {
 
         this.init();
 
-        dispatchEnterComplete({ type: LogicType.GAME, views: [this] });
+        dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this] });
     }
 
     private init() {

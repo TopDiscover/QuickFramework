@@ -4,6 +4,7 @@
   "uuid": "1d7956ee-c217-452d-8e65-33eede5cffec",
   "version": "3.1.0",
   "devDependencies": {
-    "@types/node": "^15.12.4"
+    "@types/node": "^15.12.4",
+    "nodejs-websocket": "^1.7.2"
   }
 }

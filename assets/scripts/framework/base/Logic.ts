@@ -1,7 +1,5 @@
-import { LogicEventData, LogicType } from "../event/LogicEvent";
-import EventComponent from "../../framework/base/EventComponent";
-import { ResourceCacheData, ResourceData } from "../../framework/base/Defines";
-import ResourceLoader, { ResourceLoaderError } from "../../framework/assetManager/ResourceLoader";
+import EventComponent from "./EventComponent";
+import ResourceLoader from "../assetManager/ResourceLoader";
 import { Node } from "cc";
 
 /**@description 当前入子游戏时，在Logic.onLoad时初始设置 */
@@ -16,7 +14,7 @@ export class Logic extends EventComponent {
     protected logTag = `[Logic]`;
     protected _loader: ResourceLoader = null!;
 
-    protected logicType : LogicType = LogicType.UNKNOWN;
+    protected logicType : td.Logic.Type = td.Logic.Type.UNKNOWN;
     protected language : LanguageDataSourceDelegate =null!;
 
     constructor() {
@@ -37,12 +35,12 @@ export class Logic extends EventComponent {
     }
 
     /**@description 进入各模块完成回调 */
-    public onEnterComplete(data: LogicEventData){
+    public onEnterComplete(data: td.Logic.EventData){
 
     }
 
     public init( data : Node ){
-        if ( this.logicType == LogicType.UNKNOWN ){
+        if ( this.logicType == td.Logic.Type.UNKNOWN ){
             error(`未对正确的对logicType赋值`);
         }
         this.node = data;
@@ -63,16 +61,16 @@ export class Logic extends EventComponent {
     }
 
     /**@description 获取需要加载的资源 */
-    protected getLoadResources(): ResourceData[] {
+    protected getLoadResources(): td.Resource.Data[] {
         return [];
     }
 
     /**@description 资源加载完成 */
-    protected onLoadResourceComplete( err : ResourceLoaderError ) {
+    protected onLoadResourceComplete( err : td.Resource.LoaderError ) {
     }
 
     /**@description 资源加载中 */
-    protected onLoadResourceProgress( loadedCount : number , total : number , data : ResourceCacheData ){
+    protected onLoadResourceProgress( loadedCount : number , total : number , data : td.Resource.CacheData ){
     }
 
 

@@ -1,6 +1,5 @@
 import { _decorator,find ,Node} from "cc";
-import GameView from "../../../../scripts/common/base/GameView";
-import { dispatchEnterComplete, LogicEvent, LogicType } from "../../../../scripts/common/event/LogicEvent";
+import GameView from "../../../../scripts/framework/base/GameView";
 import { EliminateData } from "../data/EliminateData";
 import { EliminateEffect } from "../data/EliminateDefines";
 import EliminateEffectsView from "./EliminateEffectsView";
@@ -43,11 +42,11 @@ export default class EliminateGameView extends GameView {
         this.audioHelper.playMusic("audios/gamescenebgm",this.bundle);
 
         //通知进入bundle完成
-        dispatchEnterComplete({ type: LogicType.GAME, views: [this] });
+        dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this] });
     }
 
     private onGoBack() {
-        dispatch(LogicEvent.ENTER_HALL);
+        dispatch(td.Logic.Event.ENTER_HALL);
     }
 
     playClick() {

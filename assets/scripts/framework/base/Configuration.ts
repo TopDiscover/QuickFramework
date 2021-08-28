@@ -1,9 +1,18 @@
-
+/**
+ * 该文件只定义框架内使用的相关配置，不要在内部引入其它模块，
+ */
+import { EDITOR } from "cc/env";
+import { log } from "cc"
+import { enumsInit } from "./Enums";
+enumsInit();
+import { typesInit } from "./Types";
+typesInit();
 export function configurationInit() {
-    
+    if (!EDITOR) {
+        log("框架配置初始化");
+    }
 }
-/**@description 设置值到该命名空间下，默认为td */
-declare function toNamespace(key: string, value: any, namespace?: string): void;
+
 namespace Config {
     /**@description 是否显示调试按钮 */
     export const isShowDebugButton = true;

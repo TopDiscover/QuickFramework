@@ -6,13 +6,13 @@
  import Controller from "../../../../scripts/framework/controller/Controller";
  import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
  import { GameService } from "../../../../scripts/common/net/GameService";
- import { ServiceEvent } from "../../../../scripts/framework/base/Defines";
  import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
  import { SUB_CMD_LOBBY } from "../../../hall/script/protocol/LobbyCmd";
  import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessage";
  import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
  import { TestProtoMessage } from "../../../hall/script/protocol/TestProtoMessage";
 import { _decorator } from "cc";
+import { ServiceEvent } from "../../../../scripts/framework/base/Service";
  const { ccclass, property } = _decorator;
  
  @ccclass

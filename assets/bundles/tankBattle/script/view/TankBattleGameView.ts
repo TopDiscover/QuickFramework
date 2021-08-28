@@ -1,8 +1,7 @@
-import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../scripts/common/event/LogicEvent";
 import TankBattleStartView from "./TankBattleStartView";
 import TankBattleMap from "../model/TankBattleMap";
 import { TankBettle } from "../data/TankBattleGameData";
-import GameView from "../../../../scripts/common/base/GameView";
+import GameView from "../../../../scripts/framework/base/GameView";
 import { _decorator,Node, Label, director, PhysicsSystem2D, find, systemEvent, SystemEvent, EventKeyboard, macro, instantiate } from "cc";
 
 
@@ -49,7 +48,7 @@ export default class TankBattleGameView extends GameView{
 
         this.init()
 
-        dispatchEnterComplete({ type: LogicType.GAME, views: [this, TankBattleStartView] });
+        dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this, TankBattleStartView] });
     }
 
     onDestroy(){

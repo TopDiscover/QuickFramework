@@ -1,6 +1,4 @@
 import UIView from "../../../../scripts/framework/ui/UIView";
-import { BundleConfig } from "../../../../scripts/common/base/HotUpdate";
-import { dispatchEnterComplete, LogicType, LogicEvent } from "../../../../scripts/common/event/LogicEvent";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { HallData } from "../data/HallData";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
@@ -51,12 +49,12 @@ export default class HallView extends UIView {
         "nodePoolTest",
         "eliminate",
     ];
-    private _bundles: BundleConfig[] = [];
+    private _bundles: td.HotUpdate.BundleConfig[] = [];
     private get bundles() {
         if (this._bundles.length <= 0) {
             let names : string[] = Manager.getLanguage("hall_view_game_name",HallData.bundle);
             for( let i = 0 ; i < this._bundleNames.length ;i++ ){
-                this._bundles.push(new BundleConfig(names[i],this._bundleNames[i],i+1));
+                this._bundles.push(new td.HotUpdate.BundleConfig(names[i],this._bundleNames[i],i+1));
             }
         }
         return this._bundles;
@@ -122,15 +120,15 @@ export default class HallView extends UIView {
 
         this.audioHelper.playMusic("audio/background",this.bundle)
         
-        dispatchEnterComplete({ type: LogicType.HALL, views: [this] });
+        dispatchEnterComplete({ type: td.Logic.Type.HALL, views: [this] });
     }
 
     bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(CommonEvent.DOWNLOAD_PROGRESS, this.onDownloadProgess);
+        this.registerEvent(td.HotUpdate.Event.DOWNLOAD_PROGRESS, this.onDownloadProgess);
     }
 
-    private onDownloadProgess(data: { progress: number, config: BundleConfig }) {
+    private onDownloadProgess(data: { progress: number, config: td.HotUpdate.BundleConfig }) {
 
         let progressBar = find(`games/game_${data.config.index}/Background/progressBar`, this.node)?.getComponent(ProgressBar) as ProgressBar;
         let progressLabel = find(`games/game_${data.config.index}/Background/progressBar/progress`, this.node)?.getComponent(Label) as Label;

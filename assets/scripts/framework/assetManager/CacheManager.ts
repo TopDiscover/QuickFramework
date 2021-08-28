@@ -1,7 +1,6 @@
 import UIView from "../ui/UIView";
 import { DEBUG } from "cc/env";
 import { Asset, assetManager, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D, ImageAsset } from "cc";
-import { ResourceCacheData, ResourceInfo } from "../base/Defines";
 class ResourceCache {
     print() {
         let content: any[] = [];
@@ -33,7 +32,7 @@ class ResourceCache {
         }
     }
 
-    private _caches = new Map<string, ResourceCacheData>();
+    private _caches = new Map<string, td.Resource.CacheData>();
     private name = "unknown";
     constructor(name: string) {
         this.name = name;
@@ -53,7 +52,7 @@ class ResourceCache {
         return null;
     }
 
-    public set(path: string, data: ResourceCacheData) {
+    public set(path: string, data: td.Resource.CacheData) {
         this._caches.set(path, data);
     }
 
@@ -96,8 +95,8 @@ class CacheInfo {
 }
 
 class RemoteCaches {
-    private _caches = new Map<string, ResourceCacheData>();
-    private _spriteFrameCaches = new Map<string, ResourceCacheData>();
+    private _caches = new Map<string, td.Resource.CacheData>();
+    private _spriteFrameCaches = new Map<string, td.Resource.CacheData>();
     private _resMap = new Map<string, CacheInfo>();
     /**
      * @description 获取远程缓存数据
@@ -131,7 +130,7 @@ class RemoteCaches {
             if (spriteFrame) {
                 return <SpriteFrame>(spriteFrame.data);
             }
-            let cache = new ResourceCacheData();
+            let cache = new td.Resource.CacheData();
             let sp = new SpriteFrame();
             let texture = new Texture2D();
             texture.image = data
@@ -145,12 +144,12 @@ class RemoteCaches {
         return null;
     }
 
-    public set(url: string, data: ResourceCacheData) {
+    public set(url: string, data: td.Resource.CacheData) {
         data.info.url = url;
         this._caches.set(url, data);
     }
 
-    private _getCacheInfo(info: ResourceInfo, isNoFoundCreate: boolean = true) {
+    private _getCacheInfo(info: td.Resource.Info, isNoFoundCreate: boolean = true) {
         if (info && info.url && info.url.length > 0) {
             if (!this._resMap.has(info.url)) {
                 if (isNoFoundCreate) {
@@ -167,7 +166,7 @@ class RemoteCaches {
         return null;
     }
 
-    public retainAsset(info: ResourceInfo) {
+    public retainAsset(info: td.Resource.Info) {
         if (info && info.data) {
             let cache = this._getCacheInfo(info);
             if (cache) {
@@ -188,7 +187,7 @@ class RemoteCaches {
         }
     }
 
-    public releaseAsset(info: ResourceInfo) {
+    public releaseAsset(info: td.Resource.Info) {
         if (info && info.data) {
             let cache = this._getCacheInfo(info, false);
             if (cache) {
@@ -210,7 +209,7 @@ class RemoteCaches {
         //先删除精灵帧
         if (this._spriteFrameCaches.has(url)) {
             //先释放引用计数
-            (<Asset>(this._spriteFrameCaches.get(url) as ResourceCacheData).data).decRef();
+            (<Asset>(this._spriteFrameCaches.get(url) as td.Resource.CacheData).data).decRef();
             this._spriteFrameCaches.delete(url);
             if (DEBUG) log(`remove remote sprite frames resource url : ${url}`);
         }
@@ -315,7 +314,7 @@ export class CacheManager {
         return null;
     }
 
-    public set(bundle: BUNDLE_TYPE, path: string, data: ResourceCacheData) {
+    public set(bundle: BUNDLE_TYPE, path: string, data: td.Resource.CacheData) {
         let bundleName = this.getBundleName(bundle);
         if (bundleName) {
             if (!this._bundles.has(bundleName)) {
@@ -341,7 +340,7 @@ export class CacheManager {
         return false;
     }
 
-    public removeWithInfo(info: ResourceInfo) {
+    public removeWithInfo(info: td.Resource.Info) {
         if (info) {
             if (info.data) {
                 if (Array.isArray(info.data)) {
@@ -487,13 +486,13 @@ export class CacheManager {
         });
     }
 
-    public getSpriteFrameByAsync(urls: string[], key: string, view: UIView, addExtraLoadResource: (view: UIView, info: ResourceInfo) => void, bundle: BUNDLE_TYPE) {
+    public getSpriteFrameByAsync(urls: string[], key: string, view: UIView, addExtraLoadResource: (view: UIView, info: td.Resource.Info) => void, bundle: BUNDLE_TYPE) {
         let me = this;
         return new Promise<{ url: string, spriteFrame: SpriteFrame | null, isTryReload?: boolean }>((resolve) => {
             let nIndex = 0;
             let getFun = (url: string) => {
                 me.getCacheByAsync(url, SpriteAtlas, bundle).then((atlas) => {
-                    let info = new ResourceInfo;
+                    let info = new td.Resource.Info;
                     info.url = url;
                     info.type = SpriteAtlas;
                     info.data = atlas;

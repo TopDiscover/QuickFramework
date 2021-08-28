@@ -1,13 +1,10 @@
 import { SpriteFrame } from "cc";
-import { Logic } from "../../../scripts/common/base/Logic";
-import { LogicType, LogicEvent, LogicEventData } from "../../../scripts/common/event/LogicEvent";
-import { ResourceLoaderError } from "../../../scripts/framework/assetManager/ResourceLoader";
-import { ResourceData } from "../../../scripts/framework/base/Defines";
+import { Logic } from "../../../scripts/framework/base/Logic";
 import LoadTestView from "./view/LoadTestView";
 
 class LoadTestLogic extends Logic {
 
-    logicType: LogicType = LogicType.GAME;
+    logicType: td.Logic.Type = td.Logic.Type.GAME;
 
     onLoad() {
         super.onLoad();
@@ -15,7 +12,7 @@ class LoadTestLogic extends Logic {
 
     protected bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(LogicEvent.ENTER_GAME, this.onEnterGame);
+        this.registerEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
     }
 
     protected get bundle() {
@@ -35,7 +32,7 @@ class LoadTestLogic extends Logic {
     }
 
     /**@description 进入的模块只要不是自己的模块，需要把自己加载的资源卸载 */
-    onEnterComplete(data: LogicEventData) {
+    onEnterComplete(data: td.Logic.EventData) {
         super.onEnterComplete(data);
         //关闭房间列表
         if ( data.type == this.logicType ){
@@ -49,8 +46,8 @@ class LoadTestLogic extends Logic {
         }
     }
 
-    protected onLoadResourceComplete( err : ResourceLoaderError ){
-        if ( err == ResourceLoaderError.LOADING ){
+    protected onLoadResourceComplete( err : td.Resource.LoaderError ){
+        if ( err == td.Resource.LoaderError.LOADING ){
             return;
         }
         log(`${this.bundle}资源加载完成!!!`);
@@ -58,7 +55,7 @@ class LoadTestLogic extends Logic {
         Manager.uiManager.open({ type: LoadTestView ,bundle:this.bundle});
     }
 
-    protected getLoadResources():ResourceData[]{
+    protected getLoadResources():td.Resource.Data[]{
         // return [];
         return [{ dir: "texture/sheep" , bundle : this.bundle,type : SpriteFrame}];
     }
