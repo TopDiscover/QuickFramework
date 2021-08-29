@@ -187,7 +187,7 @@ export default class Alert {
     private prefab: cc.Prefab = null;
 
     constructor() {
-        Manager.eventDispatcher.addEventListener(td.Event.ADAPT_SCREEN, this.onAdaptScreen, this);
+        Manager.eventDispatcher.addEventListener(td.Adaptor.ADAPT_SCREEN, this.onAdaptScreen, this);
     }
 
     private _isLoadingPrefab = false;

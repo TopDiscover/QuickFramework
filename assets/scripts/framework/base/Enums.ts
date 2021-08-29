@@ -114,4 +114,18 @@ namespace Net{
         ON_CUSTOM_CLOSE = "NetEvent_ON_CUSTOM_CLOSE",
     }
 }
-toNamespace("Net",Net);
+toNamespace("Net", Net);
+
+/**@description 语言包 */
+namespace Language {
+    /**@description 语言变更 */
+    export const CHANGE_LANGUAGE = "Event_CHANGE_LANGUAGE";
+}
+toNamespace("Language", Language);
+
+/**@description 适配器相关 */
+namespace Adaptor {
+    /**@description 屏幕适配 */
+    export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
+}
+toNamespace("Adaptor",Adaptor);

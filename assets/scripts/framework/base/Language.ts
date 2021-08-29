@@ -51,7 +51,7 @@ export class Language {
                 this._data = delegate.data(language);
             });
             //通知更新
-            dispatch(td.Event.CHANGE_LANGUAGE, language);
+            dispatch(td.Language.CHANGE_LANGUAGE, language);
         } else {
             this.delegates.forEach((delegate, index, source) => {
                 this._data = delegate.data(this.getLanguage());

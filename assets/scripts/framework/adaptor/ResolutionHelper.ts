@@ -113,7 +113,7 @@ export class ResolutionHelper {
             me.canvas.designResolution = me.designResolution;
         }
         if (me.isNeedAdapt) {
-            dispatch(td.Event.ADAPT_SCREEN);
+            dispatch(td.Adaptor.ADAPT_SCREEN);
             Manager.uiManager.fullScreenAdapt();
         }
     }

@@ -8,7 +8,7 @@ export default class UILoading {
     /**@description 当前loading节点 */
     private _node: cc.Node = null;
     constructor() {
-        Manager.eventDispatcher.addEventListener( td.Event.ADAPT_SCREEN, this.onAdaptScreen, this);
+        Manager.eventDispatcher.addEventListener( td.Adaptor.ADAPT_SCREEN, this.onAdaptScreen, this);
     }
     private onAdaptScreen() {
         Manager.resolutionHelper.fullScreenAdapt(this._node);
