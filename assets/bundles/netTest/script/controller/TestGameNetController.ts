@@ -2,7 +2,7 @@
  * @description 游戏测试
  */
 
-import { injectService } from "../../../../scripts/framework/decorator/Decorators";
+import { setService } from "../../../../scripts/framework/decorator/Decorators";
 import Controller from "../../../../scripts/framework/componects/Controller";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { GameService } from "../../../../scripts/common/net/GameService";
@@ -11,11 +11,11 @@ import { SUB_CMD_LOBBY } from "../../../hall/script/protocol/LobbyCmd";
 import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessage";
 import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
 import { TestProtoMessage } from "../../../hall/script/protocol/TestProtoMessage";
-import { ServiceEvent } from "../../../../scripts/framework/support/net/service/Service";
+import { ServiceEvent } from "../../../hall/script/controller/HallNetController";
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-@injectService(GameService.instance)
+@setService(GameService.instance)
 export default class TestGameNetController extends Controller<GameService> {
 
     protected bindingEvents() {

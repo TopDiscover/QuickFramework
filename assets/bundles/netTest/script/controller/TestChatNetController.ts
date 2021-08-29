@@ -2,7 +2,7 @@
  * @description 聊天测试
  */
 
-import { injectService } from "../../../../scripts/framework/decorator/Decorators";
+import { setService } from "../../../../scripts/framework/decorator/Decorators";
 import Controller from "../../../../scripts/framework/componects/Controller";
 import { ChatService } from "../../../../scripts/common/net/ChatService";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
@@ -11,16 +11,15 @@ import { SUB_CMD_LOBBY } from "../../../hall/script/protocol/LobbyCmd";
 import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessage";
 import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
 import { TestProtoMessage } from "../../../hall/script/protocol/TestProtoMessage";
-import { ServiceEvent } from "../../../../scripts/framework/support/net/service/Service";
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-@injectService(ChatService.instance)
+@setService(ChatService.instance)
 export default class TestChatNetController extends Controller<ChatService> {
 
     protected bindingEvents() {
         super.bindingEvents()
-        this.registerEvent(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_JSON_MSG, this.onTestJsonMessage, TestJsonMessage,true);
+        this.registerEvent(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_JSON_MSG, this.onTestJsonMessage, TestJsonMessage, true);
         this.registerEvent(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_PROTO_MSG, this.onTestProtoMessage, TestProtoMessage);
         this.registerEvent(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_BINARY_MSG, this.onTestBinaryMessage, TestBinaryMessage);
     }
