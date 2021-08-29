@@ -48,7 +48,6 @@ export function setServiceByClassName(name: string) {
 }
 export function setService(service: Service) {
     return function (target: any) {
-        debugger
         let __load = target.prototype.onLoad
         target.prototype.onLoad = function () {
             if (CC_DEBUG) {
@@ -73,5 +72,13 @@ export function setServiceCodec(header: typeof Codec) {
 
             __load && __load.call(this)
         }
+    }
+}
+
+export function setClassName() {
+    return function (target) {
+        let frameInfo = cc['_RF'].peek()
+        let script = frameInfo.script;
+        cc.js.setClassName(script, target)
     }
 }

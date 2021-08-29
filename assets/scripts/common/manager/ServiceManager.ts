@@ -3,11 +3,6 @@
  */
 
 import { ICommonService } from "../../framework/support/net/socket/ICommonService";
-// import { ChatService } from "../net/ChatService";
-// import { CommonService } from "../net/CommonService";
-// import { GameService } from "../net/GameService";
-// import { LobbyService } from "../net/LobbyService";
-
 export class ServiceManager implements GameEventInterface {
 
     private static _instance: ServiceManager = null;
