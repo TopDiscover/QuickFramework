@@ -1,5 +1,5 @@
 
-import EventComponent from "../componects/EventComponent";
+import EventComponent from "./EventComponent";
 import { Service, ServiceEvent } from "../support/net/service/Service";
 import { Message } from "../support/net/message/Message";
 

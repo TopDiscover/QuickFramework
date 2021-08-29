@@ -4,7 +4,7 @@
 
 import { injectService } from "../../../../scripts/framework/decorator/Decorators";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
-import Controller from "../../../../scripts/framework/controller/Controller";
+import Controller from "../../../../scripts/framework/componects/Controller";
 import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { TestProtoMessage } from "../protocol/TestProtoMessage";
 import { TestBinaryMessage } from "../protocol/TestBinaryMessage";

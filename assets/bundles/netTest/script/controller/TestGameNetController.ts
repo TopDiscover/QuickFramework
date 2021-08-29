@@ -3,7 +3,7 @@
  */
 
 import { injectService } from "../../../../scripts/framework/decorator/Decorators";
-import Controller from "../../../../scripts/framework/controller/Controller";
+import Controller from "../../../../scripts/framework/componects/Controller";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { GameService } from "../../../../scripts/common/net/GameService";
 import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";

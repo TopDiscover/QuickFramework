@@ -5,7 +5,7 @@
 
 import { injectService } from "../../../../scripts/framework/decorator/Decorators";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
-import Controller from "../../../../scripts/framework/controller/Controller";
+import Controller from "../../../../scripts/framework/componects/Controller";
 import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { SUB_CMD_GAME, TankBattleConfig } from "../protocol/TankBattleProtocal";
 import { TankBettle } from "../data/TankBattleGameData";

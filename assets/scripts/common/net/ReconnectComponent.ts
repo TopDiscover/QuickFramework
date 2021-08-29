@@ -1,5 +1,5 @@
 import { ServiceEvent } from "../../framework/support/net/service/Service";
-import Controller from "../../framework/controller/Controller";
+import Controller from "../../framework/componects/Controller";
 import { CommonService } from "./CommonService";
 
 /**
