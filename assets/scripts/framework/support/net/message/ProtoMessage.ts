@@ -26,7 +26,7 @@ export abstract class ProtoMessage<T> extends Message {
     }
 
     /**@description 打包数据 */
-    Encode(): boolean {
+    encode(): boolean {
         this.buffer = this.type.encode(this.data).finish();
         if (this.buffer) {
             return true;
@@ -34,7 +34,7 @@ export abstract class ProtoMessage<T> extends Message {
         return false;
     }
     /**@description 解析数据 */
-    Decode(data: Uint8Array): boolean {
+    decode(data: Uint8Array): boolean {
         if (data) {
             this.buffer = data;
             this.data = this.type.decode(this.buffer);

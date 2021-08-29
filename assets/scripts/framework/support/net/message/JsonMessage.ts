@@ -39,7 +39,7 @@ export abstract class JsonMessage extends Message {
     private _data = null;
     get Data() { return this._data }
 
-    Encode(): boolean {
+    encode(): boolean {
         this._data = this.serialize();
         let result = JSON.stringify(this._data);
         this._data = Buffer.from(result);
@@ -125,7 +125,7 @@ export abstract class JsonMessage extends Message {
         return result;
     }
 
-    Decode(data: Uint8Array): boolean {
+    decode(data: Uint8Array): boolean {
         if (data) {
             this._data = data;
             let result = Utf8ArrayToString(data);

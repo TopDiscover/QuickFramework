@@ -265,7 +265,7 @@ export abstract class BinaryStream extends Message {
     buffer: Uint8Array;
     get Data(): any { return this.buffer }
     /**@description 将当前数据转成buffer */
-    Encode(): boolean {
+    encode(): boolean {
         let size = this.size()
         let buffer = new ArrayBuffer(size)
         this._dataView = new DataView(buffer)
@@ -439,7 +439,7 @@ export abstract class BinaryStream extends Message {
     }
 
     /**@description 从二进制数据中取数据 */
-    Decode(data: Uint8Array): boolean {
+    decode(data: Uint8Array): boolean {
         this.buffer = data;
         this._dataView = new DataView(data.buffer);
         this._byteOffset = 0;
