@@ -302,24 +302,11 @@ declare interface StringConstructor {
 declare function md5(data: any): any;
 
 /**@description utf-8 Uint8Array转字符串 */
-declare function Utf8ArrayToString(data:Uint8Array):string;
+declare function Utf8ArrayToString(data: Uint8Array): string;
 /**@description utf-8 字符串转Uint8Array */
-declare function StringToUtf8Array(data:string):Uint8Array;
-
-
-declare interface LanguageData {
-	language: string;
-}
+declare function StringToUtf8Array(data: string): Uint8Array;
 
 declare type WebSocketType = "ws" | "wss";
-/**
- * @description 数据代理
- * 如果是公共总合，name使用 td.COMMON_LANGUAGE_NAME
- */
-declare interface LanguageDataSourceDelegate {
-	name: string;
-	data(language: string): LanguageData;
-}
 
 /**@description 提示代理 */
 declare interface Tips {
@@ -423,6 +410,37 @@ declare function toNamespace(key: string, value: any, namespace?: string): void;
 declare function dispatchEnterComplete(data: td.Logic.EventData): void;
 
 declare namespace td {
+
+	/**@description 语言包相关 */
+	namespace Language {
+		interface Data {
+			language: string;
+		}
+		/** 
+		 * @description 数据代理
+		 * 如果是公共总合，name使用 td.COMMON_LANGUAGE_NAME
+		 **/
+		declare interface DataSourceDelegate {
+			name: string;
+			data(language: string): Data;
+		}
+
+		/**@description 语言包具体实现 */
+		export class Impl {
+			/**@description 添加数据代理 */
+			addSourceDelegate(delegate: DataSourceDelegate): void;
+			/**@description 删除数据代理 */
+			removeSourceDelegate(delegate: DataSourceDelegate): void;
+			/**
+			 * @description 改变语言包
+			 * @param language 语言包类型
+			 **/
+			change(language: string): void;
+			get(args: (string | number)[]): any;
+			/**@description 获取语言包名 */
+			getLanguage(): string;
+		}
+	}
 
 	/**@description 替换按钮纹理类型 */
 	enum ButtonSpriteType {
@@ -1027,20 +1045,6 @@ declare namespace td {
 		onEnterBackground(): void;
 	}
 
-	export class Language {
-		/**@description 添加数据代理 */
-		addSourceDelegate(delegate: LanguageDataSourceDelegate): void;
-		/**@description 删除数据代理 */
-		removeSourceDelegate(delegate: LanguageDataSourceDelegate): void;
-		/**
-		   * @description 改变语言包
-		   * @param language 语言包类型
-		   */
-		change(language: string): void;
-		get(args: (string | number)[]): any;
-		/**@description 获取语言包名 */
-		getLanguage(): string;
-	}
 	export class EventDispatcher {
 		/**
 		   * @description 添加事件
@@ -1479,7 +1483,7 @@ declare namespace td {
 		/**@description 常驻资源指定的模拟view */
 		readonly retainMemory: ViewDynamicLoadData;
 		/**@description 语言包 */
-		readonly language: Language;
+		readonly language: Language.Impl;
 		/**@description 事件派发器 */
 		readonly eventDispatcher: EventDispatcher;
 		/**@description 界面管理器 */

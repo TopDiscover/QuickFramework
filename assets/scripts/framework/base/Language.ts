@@ -4,10 +4,10 @@ export class Language {
     private static _instance: Language = null;
     public static Instance() { return this._instance || (this._instance = new Language()); }
 
-    private _data: LanguageData = { language: "unknown" };
-    private delegates: LanguageDataSourceDelegate[] = [];
+    private _data: td.Language.Data = { language: "unknown" };
+    private delegates: td.Language.DataSourceDelegate[] = [];
 
-    public addSourceDelegate(delegate: LanguageDataSourceDelegate) {
+    public addSourceDelegate(delegate: td.Language.DataSourceDelegate) {
         if (this.delegates.indexOf(delegate) == -1) {
             this.delegates.push(delegate);
             this.updateSource(this.getLanguage());
@@ -20,7 +20,7 @@ export class Language {
         });
     }
 
-    public removeSourceDelegate(delegate: LanguageDataSourceDelegate) {
+    public removeSourceDelegate(delegate: td.Language.DataSourceDelegate) {
         let index = this.delegates.indexOf(delegate);
         if (index != -1) {
             this.delegates.splice(index, 1);
