@@ -670,9 +670,22 @@ declare namespace td {
         export const UILoading = 700;
     }
 
+    /**@description 适配相关 */
     namespace Adaptor {
         /**@description 屏幕适配 */
         export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
+        export class Impl {
+            isShowKeyboard: boolean;
+            /**@description 全屏适配 */
+            public fullScreenAdapt(node: import("cc").Node, adapter?: IFullScreenAdapt): void;
+            /**@description 是否需要做适配操作，当分辨率发生变化，只要ScreenAdaptType 不是None的情况 */
+            public get isNeedAdapt(): boolean;
+            public onLoad(node: import("cc").Node): void;
+            public onDestroy(): void;
+            /**@description 浏览器适配初始化 */
+            public initBrowserAdaptor(): void;
+            get isBrowser(): boolean;
+        }
     }
 
     export class EventComponent extends import("cc").Component {
@@ -998,18 +1011,6 @@ declare namespace td {
         /**@description 打印当前缓存资源 */
         printCaches(): void;
     }
-    export class ResolutionHelper {
-        isShowKeyboard: boolean;
-        /**@description 全屏适配 */
-        public fullScreenAdapt(node: import("cc").Node, adapter?: IFullScreenAdapt): void;
-        /**@description 是否需要做适配操作，当分辨率发生变化，只要ScreenAdaptType 不是None的情况 */
-        public get isNeedAdapt(): boolean;
-        public onLoad(node: import("cc").Node): void;
-        public onDestroy(): void;
-        /**@description 浏览器适配初始化 */
-        public initBrowserAdaptor(): void;
-        get isBrowser(): boolean;
-    }
     export class NodePool {
         constructor(name: string);
         name: string;
@@ -1255,8 +1256,8 @@ declare namespace td {
         readonly assetManager: AssetManager;
         /**@description 资源缓存管理器 */
         readonly cacheManager: CacheManager;
-        /**@description 屏幕适配 */
-        readonly resolutionHelper: ResolutionHelper;
+        /**@description 适配相关 */
+        readonly adaptor: Adaptor.Impl;
         /**@description 对象池管理器 */
         readonly nodePoolManager: NodePoolManager;
         /**@description 小提示 */

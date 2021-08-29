@@ -427,7 +427,7 @@ export function updateZIndex( node : Node ){
 export function CocosExtentionInit() {
     if (!EDITOR) {
         //对引擎输入框进行修改 
-        if (Manager.resolutionHelper.isBrowser) {
+        if (Manager.adaptor.isBrowser) {
             (<any>EditBox)._EditBoxImpl = WebEditBoxImpl;
         }
         log("Cocos扩展初始化");

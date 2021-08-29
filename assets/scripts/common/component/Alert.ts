@@ -200,7 +200,7 @@ export default class Alert {
     }
 
     private onAdaptScreen() {
-        Manager.resolutionHelper.fullScreenAdapt(this.curPanel);
+        Manager.adaptor.fullScreenAdapt(this.curPanel);
     }
 
     private getConfig( config : AlertConfig ){
