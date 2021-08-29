@@ -37,13 +37,13 @@ export default class TestChatNetController extends Controller<ChatService> {
         dispatch(CommonEvent.TEST_BINARY_MSG, data.hello)
     }
 
-    protected onNetOpen(event: ServiceEvent) {
+    protected onNetOpen(event: td.Net.ServiceEvent) {
         let result = super.onNetOpen(event);
         if (result) dispatch(CommonEvent.CHAT_SERVICE_CONNECTED, this.service);
         return result;
     }
 
-    protected onNetClose(event: ServiceEvent) {
+    protected onNetClose(event: td.Net.ServiceEvent) {
         let result = super.onNetClose(event);
         if (result) dispatch(CommonEvent.CHAT_SERVICE_CLOSE, this.service);
         return result;

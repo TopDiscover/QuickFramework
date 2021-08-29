@@ -28,16 +28,16 @@ export abstract class Service extends ServerConnector {
 
     protected onOpen() {
         super.onOpen();
-        dispatch(td.Net.Event.ON_OPEN, { service: this, event: null });
+        dispatch(td.Net.NetEvent.ON_OPEN, { service: this, event: null });
     }
 
     protected onClose(ev: Event) {
         super.onClose(ev);
-        dispatch(td.Net.Event.ON_CLOSE, { service: this, event: ev });
+        dispatch(td.Net.NetEvent.ON_CLOSE, { service: this, event: ev });
     }
     protected onError(ev: Event) {
         super.onError(ev);
-        dispatch(td.Net.Event.ON_ERROR, { service: this, event: ev });
+        dispatch(td.Net.NetEvent.ON_ERROR, { service: this, event: ev });
     }
 
     protected onMessage(data: Uint8Array) {
