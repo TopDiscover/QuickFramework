@@ -1,5 +1,3 @@
-import { extentionsInit } from "./extentions/Extentions";
-extentionsInit();
 import { configurationInit } from "./base/Configuration";
 configurationInit();
 import { Language } from "./base/Language";
@@ -17,9 +15,6 @@ import { BundleManager } from "./base/BundleManager";
 import GameView from "./base/GameView";
 import { GameData } from "./base/GameData";
 import { CocosExtentionInit } from "./extentions/CocosExtention";
-
-
-
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {

@@ -94,7 +94,7 @@ export class ServerConnector {
         this._curRecvHartTimeOutCount = 0;
     }
 
-    private _sendHartId: number = -1; //发送心跳包的间隔id
+    private _sendHartId: any = -1; //发送心跳包的间隔id
     private _curRecvHartTimeOutCount: number = 0;//当前接收心跳超时的次数
 
     private _enabled = true;

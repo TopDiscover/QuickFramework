@@ -301,6 +301,11 @@ declare interface StringConstructor {
 
 declare function md5(data: any): any;
 
+/**@description utf-8 Uint8Array转字符串 */
+declare function Utf8ArrayToString(data:Uint8Array):string;
+/**@description utf-8 字符串转Uint8Array */
+declare function StringToUtf8Array(data:string):Uint8Array;
+
 
 declare interface LanguageData {
 	language: string;

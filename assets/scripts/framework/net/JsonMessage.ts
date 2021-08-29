@@ -1,5 +1,5 @@
 
-import { Message, Utf8ArrayToStr, MessageHeader } from "./Message";
+import { Message, MessageHeader } from "./Message";
 
 type JsonMessageConstructor = typeof JsonMessage;
 
@@ -30,7 +30,7 @@ export function serialize(key: string, type, arrTypeOrMapKeyType?, mapValueType?
         target['__serialize__'][key] = [memberName, type, arrTypeOrMapKeyType, mapValueType];
     }
 }
-const Buffer = require('buffer').Buffer;
+
 /**
  * @description JSON的序列化与序列化
  */
@@ -41,7 +41,7 @@ export class JsonMessage extends Message {
     encode() : boolean {
         this.data = this.serialize();
         let result = JSON.stringify(this.data);
-        this.buffer = new Buffer(result);
+        this.buffer = StringToUtf8Array(result);
         return true;
     }
 
@@ -121,7 +121,7 @@ export class JsonMessage extends Message {
     decode(data: Uint8Array): boolean {
         if (data) {
             this.buffer = data;
-            let result = Utf8ArrayToStr(data);
+            let result = Utf8ArrayToString(data);
             if (result.length > 0) {
                 try {
                     this.data = JSON.parse(result);
