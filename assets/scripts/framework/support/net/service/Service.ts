@@ -108,9 +108,9 @@ export abstract class Service extends ServerConnector {
                 let header = new this._Process.Codec
                 header.pack(msg)
                 if (this.isHeartBeat(msg)) {
-                    if (CC_DEBUG) cc.log(`send request cmd : ${msg.getMsgID} `);
+                    if (CC_DEBUG) cc.log(`send request cmd : ${msg.getMsgID()} `);
                 } else {
-                    cc.log(`send request main cmd : ${msg.getMsgID} `);
+                    cc.log(`send request main cmd : ${msg.getMsgID()} `);
                 }
                 this.sendBuffer(header.getData());
             } else {
