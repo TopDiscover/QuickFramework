@@ -36,7 +36,7 @@ export default class MainController extends EventComponent {
             Manager.wssCacertUrl = this.wssCacert.nativeUrl;
         }
 
-        Manager.resolutionHelper.onLoad(this.node);
+        Manager.adaptor.onLoad(this.node);
 
         //全局网络管理器onLoad
         Manager.netManager.onLoad(this.node);
@@ -104,7 +104,7 @@ export default class MainController extends EventComponent {
 
     onDestroy(){
         
-        Manager.resolutionHelper.onDestroy();
+        Manager.adaptor.onDestroy();
 
         //网络管理器onDestroy
         Manager.netManager.onDestroy(this.node);

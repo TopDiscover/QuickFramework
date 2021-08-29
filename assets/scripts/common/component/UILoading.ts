@@ -11,7 +11,7 @@ export default class UILoading {
         Manager.eventDispatcher.addEventListener( td.Adaptor.ADAPT_SCREEN, this.onAdaptScreen, this);
     }
     private onAdaptScreen() {
-        Manager.resolutionHelper.fullScreenAdapt(this._node);
+        Manager.adaptor.fullScreenAdapt(this._node);
     }
     private _isWaitingHide = false;
     private delay : number = null;

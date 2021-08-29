@@ -12,13 +12,13 @@ enum ScreenAdaptType {
 }
 
 function instance(){
-    return getSingleton(ResolutionHelper);
+    return getSingleton(Adaptor);
 }
 
-export class ResolutionHelper {
-    private _logTag = "[ResolutionHelper]";
-    private static _instance: ResolutionHelper = null;
-    public static Instance() { return this._instance || (this._instance = new ResolutionHelper()); }
+export class Adaptor {
+    private _logTag = "[Adaptor]";
+    private static _instance: Adaptor = null;
+    public static Instance() { return this._instance || (this._instance = new Adaptor()); }
     private canvas: cc.Canvas = null;
     /**@description 是否需要进行全屏幕适配 */
     private screenAdaptType: ScreenAdaptType = ScreenAdaptType.None;

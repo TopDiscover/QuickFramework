@@ -11,7 +11,7 @@ export default class Loading {
         Manager.eventDispatcher.addEventListener(td.Adaptor.ADAPT_SCREEN, this.onAdaptScreen, this);
     }
     private onAdaptScreen() {
-        Manager.resolutionHelper.fullScreenAdapt(this._node);
+        Manager.adaptor.fullScreenAdapt(this._node);
     }
     /**@description 是否等待关闭 */
     private _isWaitingHide = false;

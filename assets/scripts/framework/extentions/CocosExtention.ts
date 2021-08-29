@@ -288,7 +288,7 @@ export function CocosExtentionInit() {
     if (!CC_EDITOR) {
 
         //对引擎输入框进行修改 ,原始引擎版本2.1.2
-        if ( Manager.resolutionHelper.isBrowser && !CC_PREVIEW && cc.sys.os != cc.sys.OS_WINDOWS) {
+        if ( Manager.adaptor.isBrowser && !CC_PREVIEW && cc.sys.os != cc.sys.OS_WINDOWS) {
             if (CC_DEBUG) cc.log(`浏览器`);
             (<any>cc.EditBox)._ImplClass = WebEditBoxImpl;
         }

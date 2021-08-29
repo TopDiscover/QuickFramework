@@ -61,7 +61,7 @@ export class Reconnect {
     }
 
     private onAdaptScreen() {
-        Manager.resolutionHelper.fullScreenAdapt(this.node);
+        Manager.adaptor.fullScreenAdapt(this.node);
     }
 
     public async show(content: string = i18n.reconnect) {

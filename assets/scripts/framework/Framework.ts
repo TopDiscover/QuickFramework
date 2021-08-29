@@ -6,7 +6,7 @@ import { UIManager } from "./base/UIManager";
 import { LocalStorage } from "./base/LocalStorage";
 import { AssetManager } from "./assetManager/AssetManager";
 import { CacheManager } from "./assetManager/CacheManager";
-import { ResolutionHelper } from "./adaptor/ResolutionHelper";
+import { Adaptor } from "./adaptor/Adaptor";
 import { NodePoolManager } from "./base/NodePoolManager";
 import { HotupdateManager } from "./base/HotupdateManager";
 import { NetManager } from "./base/NetManager";
@@ -84,8 +84,8 @@ export class Framewok {
     }
 
     /**@description 屏幕适配 */
-    get resolutionHelper() {
-        return getSingleton(ResolutionHelper);
+    get adaptor() {
+        return getSingleton(Adaptor);
     }
 
     /**@description 对象池管理器 */
@@ -185,7 +185,7 @@ export class Framewok {
 
     init(){
         //适配
-        this.resolutionHelper.initBrowserAdaptor();
+        this.adaptor.initBrowserAdaptor();
         //引擎扩展初始化
         CocosExtentionInit();
     }

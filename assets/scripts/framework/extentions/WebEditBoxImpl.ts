@@ -201,7 +201,7 @@ export default class WebEditBoxImpl {
 
     beginEditing() {
         this._isFocus = true;
-        Manager.resolutionHelper.isShowKeyboard = true;
+        Manager.adaptor.isShowKeyboard = true;
         this._showDom();
         this._registerEventListeners();
         this._elem.focus();
@@ -359,7 +359,7 @@ export default class WebEditBoxImpl {
         cbs.onBlur = function () {
             impl._hideDom();
             impl._isFocus = false;
-            Manager.resolutionHelper.isShowKeyboard = false;
+            Manager.adaptor.isShowKeyboard = false;
             //删除注册事件
             impl._removeEventListeners();
             impl._delegate.editBoxEditingDidEnded();

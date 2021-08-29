@@ -413,7 +413,7 @@ export class UIManager {
         if( !node ) return;
         this.getCanvas().addChild(node);
         node.zIndex = zOrder;
-        Manager.resolutionHelper.fullScreenAdapt(node,adpater);
+        Manager.adaptor.fullScreenAdapt(node,adpater);
     }
 
     /**@description 添加动态加载的本地资源 */
@@ -567,7 +567,7 @@ export class UIManager {
     public fullScreenAdapt() {
         this._viewDatas.forEach((data) => {
             if (data.isLoaded && data.view) {
-                Manager.resolutionHelper.fullScreenAdapt(data.view.node,data.view);
+                Manager.adaptor.fullScreenAdapt(data.view.node,data.view);
             }
         });
     }
