@@ -10,7 +10,7 @@ export class ServerConnector {
     /**
      * @description websocket实例由外部设置方可使用
      */
-    private _wsClient: WebSocketClinet = null;
+    private _wsClient: WebSocketClinet = null!;
 
     constructor() {
         this._wsClient = new WebSocketClinet();
@@ -115,7 +115,7 @@ export class ServerConnector {
      * @param port 
      * @param protocol 协议类型 ws / wss 
      */
-    public connect(ip: string, port: number | string = null, protocol: WebSocketType = "wss") {
+    public connect(ip: string, port: number | string | null = null, protocol: td.Net.Type = "wss") {
         if (!this.enabled) {
             if (CC_DEBUG) cc.warn(`请求先启用`)
             return;

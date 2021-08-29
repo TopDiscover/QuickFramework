@@ -99,3 +99,19 @@ enum ButtonSpriteType {
     Disable = "disabledSprite",
 }
 toNamespace("ButtonSpriteType",ButtonSpriteType)
+
+/**@description 网络相关 */
+namespace Net{
+    /**@description 网络事件 */
+    export enum Event {
+        /**@description 网络打开 */
+        ON_OPEN = "NetEvent_ON_OPEN",
+        /**@description 网络关闭 */
+        ON_CLOSE = "NetEvent_ON_CLOSE",
+        /**@description 网络错误 */
+        ON_ERROR = "NetEvent_ON_ERROR",
+        /**@description 应用层主动调用网络层close */
+        ON_CUSTOM_CLOSE = "NetEvent_ON_CUSTOM_CLOSE",
+    }
+}
+toNamespace("Net",Net);

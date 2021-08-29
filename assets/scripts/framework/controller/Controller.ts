@@ -24,9 +24,9 @@ export default class Controller<ServiceType> extends EventComponent {
 
     protected bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(td.Event.Net.ON_OPEN, this.onNetOpen);
-        this.registerEvent(td.Event.Net.ON_CLOSE, this.onNetClose);
-        this.registerEvent(td.Event.Net.ON_ERROR, this.onNetError);
+        this.registerEvent(td.Net.Event.ON_OPEN, this.onNetOpen);
+        this.registerEvent(td.Net.Event.ON_CLOSE, this.onNetClose);
+        this.registerEvent(td.Net.Event.ON_ERROR, this.onNetError);
     }
 
     protected onNetOpen(event: ServiceEvent) {

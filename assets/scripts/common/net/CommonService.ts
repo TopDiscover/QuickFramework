@@ -10,14 +10,14 @@ import { Reconnect } from "./Reconnect";
 
 export class CommonService extends Service implements GameEventInterface {
 
-    protected static _instance: CommonService = null;
+    protected static _instance: CommonService = null!;
     public static get instance() { return this._instance || (this._instance = new CommonService()); }
     // protected ip = ""
     // protected port: number = null;
     // protected protocol: WebSocketType = "wss"
     protected ip = "localhost";
     protected port = 3000;
-    protected protocol: WebSocketType = "ws"
+    protected protocol: td.Net.Type = "ws"
     
     private _maxEnterBackgroundTime: number = td.Config.MAX_INBACKGROUND_TIME;
     private _backgroundTimeOutId : any = -1;
@@ -41,7 +41,7 @@ export class CommonService extends Service implements GameEventInterface {
     }
 
     /**@description 网络重连 */
-    public reconnect: Reconnect = null;
+    public reconnect: Reconnect = null!;
     constructor() {
         super();
         this.reconnect = new Reconnect(this);
@@ -127,7 +127,7 @@ export class CommonService extends Service implements GameEventInterface {
 
     protected onClose(ev:Event){
         super.onClose(ev)
-        if( ev.type == td.Event.Net.ON_CUSTOM_CLOSE){
+        if( ev.type == td.Net.Event.ON_CUSTOM_CLOSE){
             cc.log(`${this.serviceName} 应用层主动关闭Socket`);
             return;
         }

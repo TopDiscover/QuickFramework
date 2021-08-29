@@ -6,70 +6,70 @@ export default class WebSocketClinet {
 
     private _tag: string = "[WebSocketClinet]";
     private _ip: string = "";
-    private _port: string = null;
-    private _protocol : WebSocketType = "wss";
-    private _dataArr = [];
+    private _port: string | null = null;
+    private _protocol: td.Net.Type = "wss";
+    private _dataArr: any[] = [];
     /**@description 是否处于等待连接状态 */
     private _isWaitingConnect = false;
 
     /** 连接超时时间 默认为10*/
     private _conTimeOut: number = 10;
-    public set connectTimeOut( value : number ){
+    public set connectTimeOut(value: number) {
         this._conTimeOut = value;
     }
-    public get connectTimeOut( ) : number{
+    public get connectTimeOut(): number {
         return this._conTimeOut;
     }
     /** 发送超时设置 默认为10*/
     private _sendTimeOut: number = 10;
-    public set sendTimeOut( value : number ){
+    public set sendTimeOut(value: number) {
         this._sendTimeOut = value;
     }
-    public get sendTimeOut( ) : number{
+    public get sendTimeOut(): number {
         return this._sendTimeOut;
     }
 
-    private _ws: WebSocket = null;
+    private _ws: WebSocket | null = null;
 
-    private _onOpen : ( )=>void = null;
-    public set onOpen( value : ()=> void){
+    private _onOpen: () => void = null!;
+    public set onOpen(value: () => void) {
         this._onOpen = value;
     }
     /**@description 网络连接成功 */
-    public get onOpen( ){
+    public get onOpen() {
         return this._onOpen;
     }
 
-    private _onClose : (ev )=>void = null;
-    public set onClose( value : (ev )=>void ){
+    private _onClose: (ev: any) => void = null!;
+    public set onClose(value: (ev: any) => void) {
         this._onClose = value;
     }
     /**@description 网络关闭 */
-    public get onClose( ){
+    public get onClose() {
         return this._onClose;
     }
 
-    private _onMessage : (data : Uint8Array)=> void = null;
-    public set onMessage( value : (data : Uint8Array)=>void){
+    private _onMessage: (data: Uint8Array) => void = null!;
+    public set onMessage(value: (data: Uint8Array) => void) {
         this._onMessage = value;
     }
     /**@description 接收网络数据 */
-    public get onMessage(){
+    public get onMessage() {
         return this._onMessage;
     }
 
-    private _onError : ( ev : Event )=>void = null;
-    public set onError( value : (ev : Event)=>void ){
+    private _onError: (ev: Event) => void = null!;
+    public set onError(value: (ev: Event) => void) {
         this._onError = value;
     }
     /**@description 网络连接错误 */
-    public get onError(){
+    public get onError() {
         return this._onError;
     }
 
-    private _closeEvent = null;
+    private _closeEvent: any = null;
 
-    private init(ip: string, port: string , protocol : WebSocketType ) {
+    private init(ip: string, port: string | null, protocol: td.Net.Type) {
         this._ip = ip;
         this._port = port;
         this._protocol = protocol;
@@ -80,9 +80,9 @@ export default class WebSocketClinet {
     }
 
 
-    private connectWebSocket( ip : string , port: string , protocol : WebSocketType ){
-        this.init(ip, port,protocol);
-        if (!this._ip ) return;
+    private connectWebSocket(ip: string, port: string | null, protocol: td.Net.Type) {
+        this.init(ip, port, protocol);
+        if (!this._ip) return;
         let fullUrl = `${protocol}://${this._ip}`;
         if(this._port){
             fullUrl = fullUrl +`:${this._port}`;
@@ -98,22 +98,22 @@ export default class WebSocketClinet {
         }else{
             this._ws = new WebSocket(fullUrl);
         }
-        //cc.log(this._tag,`new websocket readyState : ${this._ws.readyState}`);
-        this._ws.binaryType = "arraybuffer";
+        if (this._ws) {
+            //cc.log(this._tag,`new websocket readyState : ${this._ws.readyState}`);
+            this._ws.binaryType = "arraybuffer";
 
-        //打开socket
-        this._ws.onopen = this.__onConected.bind(this);
+            //打开socket
+            this._ws.onopen = this.__onConected.bind(this);
 
-        //收消息
-        this._ws.onmessage = this.__onMessage.bind(this);
+            //收消息
+            this._ws.onmessage = this.__onMessage.bind(this);
 
-        //socket关闭
-        this._ws.onclose = this.__onClose.bind(this);
+            //socket关闭
+            this._ws.onclose = this.__onClose.bind(this);
 
-        //错误处理
-        this._ws.onerror = this.__onError.bind(this);
-
-        this._ws.readyState
+            //错误处理
+            this._ws.onerror = this.__onError.bind(this);
+        }
     }
 
     /**
@@ -121,7 +121,7 @@ export default class WebSocketClinet {
      * @param ip ip
      * @param port 端口
      */
-    public initWebSocket(ip: string, port: string, protocol : WebSocketType ) {
+    public initWebSocket(ip: string, port: string | null, protocol: td.Net.Type) {
         if ( ip == undefined || ip == null || ip.length < 0 ){
             if ( CC_DEBUG ) cc.error(this._tag,`init websocket error ip : ${ip} port : ${port}`);
             return;
@@ -253,9 +253,9 @@ export default class WebSocketClinet {
      * @param isEnd 只有在程序的关闭销毁时调用，
      * 在MainController.onDestroy中使用
      */
-    public close( isEnd : boolean){
-        if ( this._ws ){
-            this._closeEvent = {type : td.Event.Net.ON_CUSTOM_CLOSE, isEnd : isEnd};
+    public close(isEnd: boolean) {
+        if (this._ws) {
+            this._closeEvent = { type: td.Net.Event.ON_CUSTOM_CLOSE, isEnd: isEnd };
             this._ws.close();
         }
         //清空发送

@@ -306,8 +306,6 @@ declare function Utf8ArrayToString(data: Uint8Array): string;
 /**@description utf-8 字符串转Uint8Array */
 declare function StringToUtf8Array(data: string): Uint8Array;
 
-declare type WebSocketType = "ws" | "wss";
-
 /**@description 提示代理 */
 declare interface Tips {
 	/**
@@ -800,6 +798,18 @@ declare namespace td {
 			isQueue: boolean,//是否进入消息队列，如果不是，收到网络消息返回，会立即回调处理函数
 			data?: any, //解包后的数据
 			target?: any, //处理者
+        }
+        type Type = "ws" | "wss";
+        /**@description 网络事件 */
+        export enum Event {
+            /**@description 网络打开 */
+            ON_OPEN = "NetEvent_ON_OPEN",
+            /**@description 网络关闭 */
+            ON_CLOSE = "NetEvent_ON_CLOSE",
+            /**@description 网络错误 */
+            ON_ERROR = "NetEvent_ON_ERROR",
+            /**@description 应用层主动调用网络层close */
+            ON_CUSTOM_CLOSE = "NetEvent_ON_CUSTOM_CLOSE",
 		}
 	}
 
@@ -902,16 +912,6 @@ declare namespace td {
 	}
 
 	namespace Event {
-		export enum Net {
-			/**@description 网络打开 */
-			ON_OPEN = "NetEvent_ON_OPEN",
-			/**@description 网络关闭 */
-			ON_CLOSE = "NetEvent_ON_CLOSE",
-			/**@description 网络错误 */
-			ON_ERROR = "NetEvent_ON_ERROR",
-			/**@description 应用层主动调用网络层close */
-			ON_CUSTOM_CLOSE = "NetEvent_ON_CUSTOM_CLOSE",
-		}
 		/**@description 屏幕适配 */
 		export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
 		/**@description 语言变更 */
