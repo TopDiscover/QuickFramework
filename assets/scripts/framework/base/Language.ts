@@ -1,7 +1,8 @@
 const LANG_KEY: string = "using_language";
+
 export class Language {
 
-    private static _instance: Language = null;
+    private static _instance: Language = null!;
     public static Instance() { return this._instance || (this._instance = new Language()); }
 
     private _data: td.Language.Data = { language: "unknown" };
@@ -51,7 +52,7 @@ export class Language {
             });
             //通知更新
             dispatch(td.Event.CHANGE_LANGUAGE, language);
-        }else{
+        } else {
             this.delegates.forEach((delegate, index, source) => {
                 this._data = delegate.data(this.getLanguage());
             });

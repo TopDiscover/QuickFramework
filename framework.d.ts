@@ -420,7 +420,7 @@ declare namespace td {
 		 * @description 数据代理
 		 * 如果是公共总合，name使用 td.COMMON_LANGUAGE_NAME
 		 **/
-		declare interface DataSourceDelegate {
+		interface DataSourceDelegate {
 			name: string;
 			data(language: string): Data;
 		}

@@ -8,7 +8,7 @@ import ResourceLoader from "../assetManager/ResourceLoader";
 export class Logic extends EventComponent {
 
     protected logTag = `[Logic]`;
-    protected _loader: ResourceLoader = null;
+    protected _loader: ResourceLoader = null!;
 
     protected logicType : td.Logic.Type = td.Logic.Type.UNKNOWN;
     protected language : td.Language.DataSourceDelegate = null;
