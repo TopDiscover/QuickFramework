@@ -1,5 +1,4 @@
-import { Utf8ArrayToStr } from "../../../plugin/StringUtils";
-import { Codec, Message } from "./Message";
+import { Message } from "./Message";
 import { Buffer } from "../../../plugin/Buffer"
 
 
@@ -129,7 +128,7 @@ export abstract class JsonMessage extends Message {
     Decode(data: Uint8Array): boolean {
         if (data) {
             this._data = data;
-            let result = Utf8ArrayToStr(data);
+            let result = Utf8ArrayToString(data);
             if (result.length > 0) {
                 try {
                     this._data = JSON.parse(result);
