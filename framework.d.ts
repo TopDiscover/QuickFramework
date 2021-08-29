@@ -62,20 +62,7 @@ declare function Utf8ArrayToString(data:Uint8Array):string;
 /**@description utf-8 字符串转Uint8Array */
 declare function StringToUtf8Array(data:string):Uint8Array;
 
-
-declare interface LanguageData {
-    language: string;
-}
-
 declare type WebSocketType = "ws" | "wss";
-/**
- * @description 数据代理
- * 如果是公共总合，name使用 td.COMMON_LANGUAGE_NAME
- */
-declare interface LanguageDataSourceDelegate {
-    name: string;
-    data(language: string): LanguageData;
-}
 
 /**@description 提示代理 */
 declare interface Tips {
@@ -180,13 +167,44 @@ declare function dispatchEnterComplete(data: td.Logic.EventData): void;
 
 declare namespace td {
 
-    /**@description 替换按钮纹理类型 */
-    enum ButtonSpriteType {
-        Norml = "normalSprite",
-        Pressed = "pressedSprite",
-        Hover = "hoverSprite",
-        Disable = "disabledSprite",
-    }
+	/**@description 语言包相关 */
+	namespace Language {
+		interface Data {
+			language: string;
+		}
+		/** 
+		 * @description 数据代理
+		 * 如果是公共总合，name使用 td.COMMON_LANGUAGE_NAME
+		 **/
+		interface DataSourceDelegate {
+			name: string;
+			data(language: string): Data;
+		}
+
+		/**@description 语言包具体实现 */
+		export class Impl {
+			/**@description 添加数据代理 */
+			addSourceDelegate(delegate: DataSourceDelegate): void;
+			/**@description 删除数据代理 */
+			removeSourceDelegate(delegate: DataSourceDelegate): void;
+			/**
+			 * @description 改变语言包
+			 * @param language 语言包类型
+			 **/
+			change(language: string): void;
+			get(args: (string | number)[]): any;
+			/**@description 获取语言包名 */
+			getLanguage(): string;
+		}
+	}
+
+	/**@description 替换按钮纹理类型 */
+	enum ButtonSpriteType {
+		Norml = "normalSprite",
+		Pressed = "pressedSprite",
+		Hover = "hoverSprite",
+		Disable = "disabledSprite",
+	}
 
     /**@description 热更新相关 */
     namespace HotUpdate {
@@ -778,41 +796,27 @@ declare namespace td {
         onEnterBackground(): void;
     }
 
-    export class Language {
-        /**@description 添加数据代理 */
-        addSourceDelegate(delegate: LanguageDataSourceDelegate): void;
-        /**@description 删除数据代理 */
-        removeSourceDelegate(delegate: LanguageDataSourceDelegate): void;
-        /**
-           * @description 改变语言包
-           * @param language 语言包类型
-           */
-        change(language: string): void;
-        get(args: (string | number)[]): any;
-        /**@description 获取语言包名 */
-        getLanguage(): string;
-    }
-    export class EventDispatcher {
-        /**
-           * @description 添加事件
-           * @param type 事件类型
-           * @param callback 事件回调
-           * @param target target
-           */
-        addEventListener(type: string, callback: ((data: any) => void) | string, target: any): void;
-        /**
-           * @description 移除事件
-           * @param type 事件类型
-           * @param target 
-           */
-        removeEventListener(type: string, target: any): void;
-        /**
-           * @description 派发事件
-           * @param type 事件类型
-           * @param data 事件数据
-           */
-        dispatchEvent(type: string, data?: any): void;
-    }
+	export class EventDispatcher {
+		/**
+		   * @description 添加事件
+		   * @param type 事件类型
+		   * @param callback 事件回调
+		   * @param target target
+		   */
+		addEventListener(type: string, callback: ((data: any) => void) | string, target: any): void;
+		/**
+		   * @description 移除事件
+		   * @param type 事件类型
+		   * @param target 
+		   */
+		removeEventListener(type: string, target: any): void;
+		/**
+		   * @description 派发事件
+		   * @param type 事件类型
+		   * @param data 事件数据
+		   */
+		dispatchEvent(type: string, data?: any): void;
+	}
 
     export class ViewDynamicLoadData {
         name: string;
@@ -1239,7 +1243,7 @@ declare namespace td {
         /**@description 常驻资源指定的模拟view */
         readonly retainMemory: ViewDynamicLoadData;
         /**@description 语言包 */
-        readonly language: Language;
+		readonly language: Language.Impl;
         /**@description 事件派发器 */
         readonly eventDispatcher: EventDispatcher;
         /**@description 界面管理器 */

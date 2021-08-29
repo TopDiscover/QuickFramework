@@ -6,9 +6,9 @@ import { TANK_LAN_EN } from "./TankBattleLanguageEN";
 import { TANK_LAN_ZH } from "./TankBattleLanguageZH";
 
 
-export class TankBattleLanguage implements LanguageDataSourceDelegate{
+export class TankBattleLanguage implements td.Language.DataSourceDelegate{
     name = TankBettle.gameData.bundle;
-    data( language : string ): LanguageData {
+    data( language : string ): td.Language.Data {
 
         let data : any = i18n;
         if( data[`${this.name}`] && data[`${this.name}`].language == language ){
