@@ -37,7 +37,7 @@ export function serialize(key: string, type, arrTypeOrMapKeyType?, mapValueType?
  */
 export abstract class JsonMessage extends Message {
     private _data = null;
-    get Data() { return this._data }
+    getData() { return this._data }
 
     encode(): boolean {
         this._data = this.serialize();

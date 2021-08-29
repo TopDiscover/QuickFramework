@@ -1,8 +1,8 @@
 
 export abstract class IMessage {
     //等待发送数据
-    abstract get Data(): any
-    abstract get MsgID(): string
+    abstract getData(): any
+    abstract getMsgID(): string
 }
 
 export abstract class Codec extends IMessage {

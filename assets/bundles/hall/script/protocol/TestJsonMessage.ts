@@ -3,7 +3,7 @@ import { JsonMessage, serialize } from "../../../../scripts/framework/support/ne
 import { SUB_CMD_LOBBY } from "./LobbyCmd";
 
 export class TestData extends JsonMessage {
-    get MsgID(): string { return null }
+    getMsgID(): string { return null }
 
     @serialize("test", String)
     test: string = "这是一个中文的字符串测试";
@@ -11,7 +11,7 @@ export class TestData extends JsonMessage {
 }
 
 export class TestJsonMessage extends JsonMessage {
-    get MsgID(): string {
+    getMsgID(): string {
         return String(this.mainCmd) + String(this.subCmd)
     }
     mainCmd = MainCmd.CMD_LOBBY;

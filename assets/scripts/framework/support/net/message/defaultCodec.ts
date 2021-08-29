@@ -21,7 +21,7 @@ export class DefaultCodec extends Codec {
      */
 
 
-    get Data(): any { return this.buffer }
+    getData(): any { return this.buffer }
 
     pack(data: MessageStruct): boolean {
         this.mainCmd = data.mainCmd;
@@ -71,7 +71,7 @@ export class DefaultCodec extends Codec {
     }
 
 
-    get MsgID(): string {
+    getMsgID(): string {
         return String(this.mainCmd) + String(this.subCmd)
     }
 

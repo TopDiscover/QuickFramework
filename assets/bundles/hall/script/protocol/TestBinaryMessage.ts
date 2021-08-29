@@ -3,7 +3,7 @@ import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { SUB_CMD_LOBBY } from "./LobbyCmd";
 
 class TestData extends BinaryStream {
-    get MsgID(): string { return null }
+    getMsgID(): string { return null }
 
     @serialize("value32", Float32Value)
     float32: number = 32;
@@ -13,7 +13,7 @@ class TestData extends BinaryStream {
 }
 
 export class TestBinaryMessage extends BinaryStream {
-    get MsgID(): string {
+    getMsgID(): string {
         return String(this.mainCmd) + String(this.subCmd)
     }
     mainCmd = MainCmd.CMD_LOBBY;
