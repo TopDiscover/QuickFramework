@@ -11,7 +11,6 @@ import { SUB_CMD_LOBBY } from "../../../hall/script/protocol/LobbyCmd";
 import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessage";
 import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
 import { TestProtoMessage } from "../../../hall/script/protocol/TestProtoMessage";
-import { ServiceEvent } from "../../../hall/script/controller/HallNetController";
 const { ccclass, property } = cc._decorator;
 
 @ccclass
