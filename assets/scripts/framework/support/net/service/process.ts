@@ -204,7 +204,7 @@ export class Process {
         if (o.type) {
             obj = new o.type();
             //解包
-            obj.Decode(header.Data);
+            obj.decode(header.Data);
         } else {
             //把数据放到里面，让后面使用都自己解析
             obj = header.Data;

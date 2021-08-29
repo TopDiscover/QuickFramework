@@ -44,7 +44,7 @@ export abstract class Service extends ServerConnector {
 
         //先对包信进行解析
         let header = new this._Process.Codec;
-        if (!header.UnPack(data)) {
+        if (!header.unPack(data)) {
             cc.error(`decode header error`);
             return;
         }
@@ -104,9 +104,9 @@ export abstract class Service extends ServerConnector {
 
     public send(msg: Message) {
         if (this._Process.Codec) {
-            if (msg.Encode()) {
+            if (msg.encode()) {
                 let header = new this._Process.Codec
-                header.Pack(msg)
+                header.pack(msg)
                 if (this.isHeartBeat(msg)) {
                     if (CC_DEBUG) cc.log(`send request cmd : ${msg.MsgID} `);
                 } else {

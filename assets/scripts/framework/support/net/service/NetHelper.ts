@@ -7,11 +7,11 @@ import { Service } from "./Service";
  */
 export default class NetHelper<ServiceType> {
     private _service: Service = null;
-    public get service() : ServiceType{
+    public get service(): ServiceType {
         return <any>(this._service);
     };
 
-    constructor( service : Service ){
+    constructor(service: Service) {
         this._service = service;
     }
 }

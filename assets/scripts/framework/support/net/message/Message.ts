@@ -7,15 +7,15 @@ abstract class IMessage {
 
 export abstract class Codec extends IMessage {
     //编码数据
-    abstract Pack(data: any): boolean
+    abstract pack(data: any): boolean
     //解码数据
-    abstract UnPack(data: any): boolean
+    abstract unPack(data: any): boolean
 }
 
 
 export abstract class Message extends IMessage {
     //编码数据
-    abstract Encode(): boolean
+    abstract encode(): boolean
     //解码数据
-    abstract Decode(data: any): boolean
+    abstract decode(data: any): boolean
 }

@@ -23,7 +23,7 @@ export class DefaultCodec extends Codec {
 
     get Data(): any { return this.buffer }
 
-    Pack(data: MessageStruct): boolean {
+    pack(data: MessageStruct): boolean {
         this.mainCmd = data.mainCmd;
         this.subCmd = data.subCmd;
         this._dataSize = 0;
@@ -55,7 +55,7 @@ export class DefaultCodec extends Codec {
         this.buffer = result;
         return true;
     }
-    UnPack(data: any): boolean {
+    unPack(data: any): boolean {
         let dataView = new DataView(data.buffer);
         //取包头
         let offset = 0;
