@@ -379,21 +379,6 @@ declare function toNamespace(key: string, value: any, namespace?: string): void;
  */
 declare function dispatchEnterComplete(data: td.Logic.EventData): void;
 
-declare namespace Socket {
-	interface IMessage {
-		readonly Data: any
-	}
-
-	interface ProtoListenerData {
-		eventName: string
-		func: MessageHandleFunc,
-		type: typeof Message
-		isQueue: boolean,
-		data?: any
-		target?: any
-	}
-}
-
 declare namespace td {
 
 	/**@description 语言包相关 */
@@ -409,23 +394,6 @@ declare namespace td {
 			name: string;
 			data(language: string): Data;
 		}
-
-		/**@description 语言包具体实现 */
-		export class Impl {
-			/**@description 添加数据代理 */
-			addSourceDelegate(delegate: DataSourceDelegate): void;
-			/**@description 删除数据代理 */
-			removeSourceDelegate(delegate: DataSourceDelegate): void;
-			/**
-			 * @description 改变语言包
-			 * @param language 语言包类型
-			 **/
-			change(language: string): void;
-			get(args: (string | number)[]): any;
-			/**@description 获取语言包名 */
-			getLanguage(): string;
-		}
-
 		/**@description 语言变更 */
 		export const CHANGE_LANGUAGE = "Event_CHANGE_LANGUAGE";
 	}
@@ -769,10 +737,9 @@ declare namespace td {
 		/** @description 处理函数声明 handleType 为你之前注册的handleType类型的数据 返回值number 为处理函数需要的时间 */
 		export type HandleFunc = (handleTypeData: any) => number;
 		export interface ListenerData {
-			mainCmd: number, // main cmd
-			subCmd: number, //sub cmd
+			eventName: string,
 			func: HandleFunc, //处理函数
-			type: typeof import("./assets/scripts/framework/support/net/message/Message").Message, //解包类型
+			type: new() => import("./assets/scripts/framework/support/net/message/Message").Message, //解包类型
 			isQueue: boolean,//是否进入消息队列，如果不是，收到网络消息返回，会立即回调处理函数
 			data?: any, //解包后的数据
 			target?: any, //处理者
@@ -897,156 +864,6 @@ declare namespace td {
 	namespace Adaptor {
 		/**@description 屏幕适配 */
 		export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
-		export class Impl {
-			isShowKeyboard: boolean;
-			/**@description 全屏适配 */
-			public fullScreenAdapt(node: cc.Node, adapter?: IFullScreenAdapt): void;
-			/**@description 是否需要做适配操作，当分辨率发生变化，只要ScreenAdaptType 不是None的情况 */
-			public get isNeedAdapt(): boolean;
-			public onLoad(node: cc.Node): void;
-			public onDestroy(): void;
-			/**@description 浏览器适配初始化 */
-			public initBrowserAdaptor(): void;
-			get isBrowser(): boolean;
-		}
-	}
-
-	export class EventComponent extends cc.Component {
-		/**
-		  * @description 注册网络事件 ，在onLoad中注册，在onDestroy自动移除
-		  * @param manCmd 
-		  * @param subCmd 
-		  * @param func 处理函数
-		  * @param handleType 消息解析类型
-		  * @param isQueue 是否加入队列
-		  */
-		registerEvent(manCmd: number, subCmd: number, func: (data: any) => void, handleType?: any, isQueue?: boolean): void;
-		/**
-		 * 注册事件 ，在onLoad中注册，在onDestroy自动移除
-		 * @param eventName 
-		 * @param func 
-		 */
-		registerEvent(eventName: string, func: (data: any) => void): void;
-		/**
-		  * @description 注册网络事件 ，在onLoad中注册，在onDestroy自动移除
-		  * @param manCmd 
-		  * @param subCmd 
-		  * @param func 处理函数
-		  * @param handleType 消息解析类型 如果不注册类型，返回的是服务器未进行解析的源数据，需要自己进行解包处理
-		  * @param isQueue 是否加入队列
-		  */
-		addEvent(manCmd: number, subCmd: number, func: (data: any) => void, handleType?: any, isQueue?: boolean): void;
-		/**
-		 * 注册事件 ，在onLoad中注册，在onDestroy自动移除
-		 * @param eventName 
-		 * @param func 
-		 */
-		addEvent(eventName: string, func: (data: any) => void): void;
-		/**
-		  * @description 删除注册网络事件
-		  * @param manCmd 主cmd
-		  * @param subCmd 子cmd
-		  */
-		removeEvent(manCmd: number, subCmd: number): void;
-		/**
-		 * @description 删除普通事件
-		 * @param eventName 事件名
-		 */
-		removeEvent(eventName: string): void;
-		// protected bindingEvents(): void;
-		onLoad(): void;
-		onDestroy(): void;
-	}
-
-	export class AudioComponent extends EventComponent {
-		/**@description 音频控件资源拥有者，该对象由UIManager打开的界面 */
-		owner: UIView
-		/**@description 背景音乐音量 */
-		musicVolume: number;
-		/**@description 音效音量 */
-		effectVolume: number;
-		/**@description 音效开关 */
-		isEffectOn: boolean;
-		/**@description 背景音乐开关 */
-		isMusicOn: boolean;
-		/**@description 当前播放的背景音乐 */
-		curMusicUrl: string;
-		curBundle: BUNDLE_TYPE;
-		/**@description 存储 */
-		save(): void;
-		/**@description 停止 */
-		stopEffect(effectId: number = null): void;
-		stopAllEffects(): void;
-		stopMusic(): void;
-		playMusic(url: string, bundle: BUNDLE_TYPE, loop: boolean = true): Promise<{
-			url: string;
-			isSuccess: boolean;
-		}>;
-		playEffect(url: string, bundle: BUNDLE_TYPE, loop: boolean = false): Promise<number>;
-		onEnterBackground(): void;
-		onEnterForgeground(inBackgroundTime: number): void;
-	}
-
-	export class UIView extends EventComponent implements IFullScreenAdapt {
-		static getPrefabUrl(): string;
-		/**@description 当前传入参数，即通过UI管理器打开时的传入参数 */
-		get args(): any[];
-		/**指向当前View打开时的bundle */
-		bundle: BUNDLE_TYPE;
-		/**@description 类名，请不要设置，由管理器进行设置 */
-		className: string;
-		close(): void;
-		/**@description args为open代入的参数 */
-		show(args: any[]): void;
-		hide(): void;
-		/**@description 动画显示界面 
-		  *@param isOverrideShow 是否是重写show调用的,如果是重写show调用了,必将此参数设置为true,否则会产生死循环递归调用 
-		  *@param completeCallback 完成回调
-		  *@example 
-		  *  示例： 通常在init/onLoad函数中调用 showWithAction,
-		  *  但如果需要界面通过hide隐藏，而不是关闭界面时，下一次显示时
-		  *  管理器直接调用了show,没有执行界面的打开动画，如果还需要界面打开动画
-		  *  需要按如下方式重写show方法
-		  *  show( args : any[] ){
-		  *      super.show(args);
-		  *      this.showWithAction(true);
-		  *      //to do => 
-		  *  }
-		  */
-		showWithAction(isOverrideShow = false, completeCallback?: () => void): void;
-		/**@description 动画隐藏界面 
-		  *@param isOverrideHide 是否是重写hide调用的,如果是重写hide调用了,必将此参数设置为true,否则会产生死循环递归调用 
-		  *@param completeCallback 完成回调
-		  */
-		hideWithAction(completeCallback?: () => void): void;
-		/**@description 动画关闭界面 
-		  *@param completeCallback 完成回调
-		  */
-		closeWithAction(completeCallback?: () => void): void;
-		/**
-		  * @description 启用物理返回键按钮
-		  * @param isEnabled true 启用，
-		  * @example 重写onKeyBack方法
-		  */
-		setEnabledKeyBack(isEnabled: boolean): void;
-		isEnabledKeyBack(): boolean;
-		onKeyUp(ev: cc.Event.EventKeyboard): void;
-		onKeyBack(ev: cc.Event.EventKeyboard): void;
-		audioHelper: AudioComponent;
-		enableFrontAndBackgroundSwitch: boolean;
-		onEnterForgeground(inBackgroundTime: number): void;
-		onEnterBackground(): void;
-	}
-
-	export class ViewDynamicLoadData {
-		name: string;
-		constructor(name?: string);
-		/**@description 添加动态加载的本地资源 */
-		addLocal(info: Resource.Info, className?: string): void;
-		/**@description 添加动态加载的远程资源 */
-		addRemote(info: Resource.Info, className?: string): void;
-		/**@description 清除远程加载资源 */
-		clear(): void;
 	}
 
 	export interface UIClass<T extends import("./assets/scripts/framework/support/ui/UIView").UIView> {
@@ -1070,6 +887,7 @@ declare namespace td {
 		readonly localStorage: import("./assets/scripts/framework/support/storage/LocalStorage").LocalStorage;
 		/**@description 资源管理器 */
 		readonly assetManager: import("./assets/scripts/framework/support/assetManager/AssetManager").AssetManager;
+		/**@description 资源缓存管理器 */
 		readonly cacheManager: import("./assets/scripts/framework/support/assetManager/CacheManager").CacheManager;
 		/**@description 适配相关 */
 		readonly adaptor: import("./assets/scripts/framework/support/adaptor/Adaptor").Adaptor;

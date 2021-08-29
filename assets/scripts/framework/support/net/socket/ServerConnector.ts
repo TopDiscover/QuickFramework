@@ -1,3 +1,4 @@
+import { Message } from "../message/Message";
 import WebSocketClinet from "./WebSocketClient";
 
 /**
@@ -49,7 +50,7 @@ export class ServerConnector {
     /**
      * @description 是否为心跳消息
      */
-    protected isHeartBeat(data: Socket.IMessage): boolean {
+    protected isHeartBeat(data: Message): boolean {
         return false;
     }
 

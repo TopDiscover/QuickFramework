@@ -120,7 +120,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
             this.service.reconnect.hide();
             this._connectCount = 0;
             Manager.alert.close(td.Config.RECONNECT_ALERT_TAG);
-            Manager.serviceManager.onReconnectSuccess(this.service);
+            Manager.serviceManager.onReconnectSuccess(this.service as any);
             cc.log(`${this.logName} ${this.service.serviceName}服务器重连成功`);
         }
         return result;

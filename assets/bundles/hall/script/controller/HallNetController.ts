@@ -1,10 +1,6 @@
 /**
  * @description 大厅网络逻辑流程控制器  
  */
-export interface ServiceEvent {
-    service: Service;
-    event: Event;
-}
 import { setService } from "../../../../scripts/framework/decorator/Decorators";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import Controller from "../../../../scripts/framework/componects/Controller";
@@ -14,7 +10,6 @@ import { TestBinaryMessage } from "../protocol/TestBinaryMessage";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { SUB_CMD_LOBBY } from "../protocol/LobbyCmd";
 import { TestJsonMessage } from "../protocol/TestJsonMessage";
-import { Service } from "../../../../scripts/framework/support/net/service/Service";
 const { ccclass, property } = cc._decorator;
 
 @ccclass

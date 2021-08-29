@@ -1,6 +1,6 @@
 import { Reconnect } from "../../../../common/net/Reconnect";
+import { Message } from "../message/Message";
 import { Service } from "../service/Service";
-// import { Config } from "../../../defines/Configuration"
 
 export abstract class ICommonService extends Service implements GameEventInterface {
     /**@description 网络重连 */
@@ -43,7 +43,7 @@ export abstract class ICommonService extends Service implements GameEventInterfa
     /**
      * @description 是否为心跳消息
      */
-    protected abstract isHeartBeat(data: Socket.IMessage): boolean
+    protected abstract isHeartBeat(data: Message): boolean
 
     protected onError(ev: Event): void {
         super.onError(ev)
