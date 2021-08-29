@@ -1,6 +1,6 @@
 
-import { Service } from "../../framework/base/Service";
-import { IMessage } from "../../framework/net/Message";
+import { Service } from "../../framework/support/net/service/Service";
+import { IMessage } from "../../framework/support/net/message/Message";
 import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdDefines";
 import { Reconnect } from "./Reconnect";
 

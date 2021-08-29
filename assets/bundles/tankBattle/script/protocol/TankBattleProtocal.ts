@@ -1,5 +1,5 @@
 import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
-import { serialize, JsonMessage } from "../../../../scripts/framework/net/JsonMessage";
+import { serialize, JsonMessage } from "../../../../scripts/framework/support/net/message/JsonMessage";
 
 /**
  * @description 网络协议接口定义及实现处理

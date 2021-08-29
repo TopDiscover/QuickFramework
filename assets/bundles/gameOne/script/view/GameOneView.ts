@@ -1,5 +1,5 @@
 import SettingView from "../../../../scripts/common/component/SettingView";
-import { UIView } from "../../../../scripts/framework/ui/UIView";
+import { UIView } from "../../../../scripts/framework/support/ui/UIView";
 
 
 const {ccclass, property} = cc._decorator;

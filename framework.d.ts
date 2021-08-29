@@ -1059,28 +1059,6 @@ declare namespace td {
 		onEnterBackground(): void;
 	}
 
-	export class EventDispatcher {
-		/**
-		   * @description 添加事件
-		   * @param type 事件类型
-		   * @param callback 事件回调
-		   * @param target target
-		   */
-		addEventListener(type: string, callback: ((data: any) => void) | string, target: any): void;
-		/**
-		   * @description 移除事件
-		   * @param type 事件类型
-		   * @param target 
-		   */
-		removeEventListener(type: string, target: any): void;
-		/**
-		   * @description 派发事件
-		   * @param type 事件类型
-		   * @param data 事件数据
-		   */
-		dispatchEvent(type: string, data?: any): void;
-	}
-
 	export class ViewDynamicLoadData {
 		name: string;
 		constructor(name?: string);
@@ -1100,112 +1078,11 @@ declare namespace td {
 		getPrefabUrl(): string;
 	}
 
-	export class UIManager {
-		/**@description 无主资源 */
-		garbage: ViewDynamicLoadData;
-		/**@description 驻留内存资源 */
-		retainMemory: ViewDynamicLoadData;
-
-		preload<T extends UIView>(uiClass: UIClass<T>, bundle: BUNDLE_TYPE): Promise<T>
-		/**
-		 * @description open<T extends UIView>(config: { type: UIClass<T>, zIndex?: number, args?: any[] , delay?: number}) : Promise<T>
-		 * @param config 配置信息 
-		 * @param config.type UIView
-		 * @param config.zIndex 节点层级，默认为0
-		 * @param config.args 传入的参数列表
-		 * @param config.delay 
-		 * delay > 0 时间未加载界面完成显示加载动画，
-		 * delay = 0 则不显示加载动画，但仍然会显示UILoading,在加载界面时阻挡玩家的触摸事件
-		 * delay 其它情况以UILoading的默认显示时间为准
-		 * @param config.name 界面名字，如 商城 首充
-		 * @example 示例
-		 * Manager.uiManager.open({type:GameLayer});
-		 * Manager.uiManager.open({type:GameLayer,delay:ViewDelay.delay});
-		 * Manager.uiManager.open({type:GameLayer,delay:ViewDelay.delay,zIndex:ViewZOrder.zero});
-		 * Manager.uiManager.open({type:GameLayer,delay:ViewDelay.delay,zIndex:ViewZOrder.zero,args:["aa","bb"]});
-		 * 
-		 * @description 弃用接口 open<T extends UIView>(uiClass: UIClass<T>, zIndex?: number, ...args: any[]): Promise<T>
-		 * @param uiClass UIView
-		 * @param zIndex 节点层级 
-		 * @param args 传入参数列表
-		 */
-		open<T extends UIView>(config: { type: UIClass<T>, bundle?: BUNDLE_TYPE, zIndex?: number, args?: any[], delay?: number, name?: string }): Promise<T>;
-		getCanvas(): cc.Node;
-		addChild(node: cc.Node, zOrder: number, adpater: IFullScreenAdapt = null): void;
-		/**@description 添加动态加载的本地资源 */
-		addLocal(info: Resource.Info, className: string): void;
-		/**@description 添加动态加载的远程资源 */
-		addRemote(info: Resource.Info, className: string): void;
-		close<T extends UIView>(uiClass: UIClass<T>): void;
-		close(className: string): void;
-		/**@description 关闭除传入参数以外的所有其它界面,不传入，关闭所有界面 */
-		closeExcept(views: (UIClass<UIView> | string | UIView)[]): void;
-		hide(className: string): void;
-		hide<T extends UIView>(uiClass: UIClass<T>): void;
-		getView(className: string): Promise<any>;
-		getView<T extends UIView>(uiClass: UIClass<T>): Promise<T>;
-		checkView(url: string, className: string);
-		isShow(className: string): boolean;
-		isShow<T extends UIView>(uiClass: UIClass<T>): boolean;
-		fullScreenAdapt(): void;
-		/*获取当前canvas的组件 */
-		getCanvasComponent(): cc.Component;
-		addComponent<T extends cc.Component>(type: { new(): T }): T;
-		addComponent(className: string): any;
-		removeComponent(component: string | cc.Component): void;
-		printViews(): void;
-		printCanvasChildren(): void;
-		printComponent(): void;
-	}
-	export class LocalStorage {
-		key: string;
-		getItem(key: string, defaultValue?: any): any;
-		setItem(key: string, value: string | number | boolean | object): void;
-		removeItem(key: string): void;
-	}
-
 	export class RemoteLoader {
 		loadImage(url: string, isNeedCache: boolean): Promise<cc.SpriteFrame>;
 		loadSkeleton(path: string, name: string, isNeedCache: boolean): Promise<sp.SkeletonData>;
 		/**@description 由主游戏控制器驱动，在下载远程资源时，设置一个上限下载任务数据，以免同一时间任务数量过大 */
 		update(): void;
-	}
-	export class AssetManager {
-		get remote(): RemoteLoader;
-		getBundle(bundle: BUNDLE_TYPE): cc.AssetManager.Bundle;
-		/**@description 加载bundle */
-		loadBundle(nameOrUrl: string, onComplete: (err: Error, bundle: cc.AssetManager.Bundle) => void): void;
-		/**@description 移除bundle */
-		removeBundle(bundle: BUNDLE_TYPE): void;
-		load(
-			bundle: BUNDLE_TYPE,
-			path: string,
-			type: typeof cc.Asset,
-			onProgress: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
-			onComplete: (data: Resource.CacheData) => void): void;
-		loadDir(
-			bundle: BUNDLE_TYPE,
-			path: string,
-			type: typeof cc.Asset,
-			onProgress: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
-			onComplete: (data: Resource.CacheData) => void): void;
-		/**
-		 * @description 释放资源
-		 * @param info 资源信息
-		 */
-		releaseAsset(info: Resource.Info): void;
-		/**
-		 * @description 资源引用计数加1
-		 * @param info 资源信息
-		 */
-		retainAsset(info: Resource.Info): void;
-		/**
-		 * @description 添加常驻资源
-		 * @param url 
-		 * @param data 
-		 * @param bundle 
-		 */
-		addPersistAsset(url: string, data: cc.Asset, bundle: BUNDLE_TYPE): void;
 	}
 
 	export class RemoteCaches {
@@ -1487,13 +1364,13 @@ declare namespace td {
 		/**@description 语言包 */
 		readonly language: Language.Impl;
 		/**@description 事件派发器 */
-		readonly eventDispatcher: EventDispatcher;
+		readonly eventDispatcher: import("./assets/scripts/framework/support/event/EventDispatcher").EventDispatcher;
 		/**@description 界面管理器 */
-		readonly uiManager: UIManager;
+		readonly uiManager: import("./assets/scripts/framework/support/ui/UIManager").UIManager;
 		/**@description 本地仓库 */
-		readonly localStorage: LocalStorage;
+		readonly localStorage: import("./assets/scripts/framework/support/storage/LocalStorage").LocalStorage;
 		/**@description 资源管理器 */
-		readonly assetManager: AssetManager;
+		readonly assetManager: import("./assets/scripts/framework/support/assetManager/AssetManager").AssetManager;
 		/**@description 资源缓存管理器 */
 		readonly cacheManager: CacheManager;
         /**@description 适配相关 */

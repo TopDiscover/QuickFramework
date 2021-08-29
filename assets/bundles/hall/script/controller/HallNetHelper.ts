@@ -1,8 +1,8 @@
-import NetHelper from "../../../../scripts/framework/controller/NetHelper";
+import NetHelper from "../../../../scripts/framework/support/net/service/NetHelper";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import { TestProtoMessage } from "../protocol/TestProtoMessage";
 import { TestBinaryMessage } from "../protocol/TestBinaryMessage";
-import { HttpPackage } from "../../../../scripts/framework/net/HttpClient";
+import { HttpPackage } from "../../../../scripts/framework/support/net/http/HttpClient";
 import { TestJsonMessage } from "../protocol/TestJsonMessage";
 
 class _HallNetHelper extends NetHelper<LobbyService>{

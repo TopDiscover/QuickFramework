@@ -2,7 +2,7 @@
 import { Framewok } from "../../framework/Framework";
 import { commonConfigInit } from "../config/Config";
 commonConfigInit();
-import { Log } from "../../framework/log/Log";
+import { Log } from "../../framework/support/log/Log";
 import GlobalAudio from "../component/GlobalAudio";
 import Tips from "../component/Tips";
 import UILoading from "../component/UILoading";

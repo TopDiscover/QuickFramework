@@ -1,4 +1,4 @@
-import GameView from "../../../../scripts/framework/base/GameView";
+import GameView from "../../../../scripts/framework/support/ui/GameView";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { ChatService } from "../../../../scripts/common/net/ChatService";
 import { CommonService } from "../../../../scripts/common/net/CommonService";
@@ -7,9 +7,9 @@ import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import { HeartbeatBinary } from "../../../../scripts/common/protocol/HeartbetBinary";
 import { HeartbeatJson } from "../../../../scripts/common/protocol/HeartbetJson";
 import { HeartbeatProto } from "../../../../scripts/common/protocol/HeartbetProto";
-import { BinaryStreamMessageHeader } from "../../../../scripts/framework/net/BinaryStreamMessage";
-import { JsonMessageHeader } from "../../../../scripts/framework/net/JsonMessage";
-import { ProtoMessageHeader } from "../../../../scripts/framework/net/ProtoMessage";
+import { BinaryStreamMessageHeader } from "../../../../scripts/framework/support/net/message/BinaryStreamMessage";
+import { JsonMessageHeader } from "../../../../scripts/framework/support/net/message/JsonMessage";
+import { ProtoMessageHeader } from "../../../../scripts/framework/support/net/message/ProtoMessage";
 import { HallNetHelper } from "../../../hall/script/controller/HallNetHelper";
 import { INetHelper } from "../controller/INetHelper";
 import { TestChatNetHelper } from "../controller/TestChatNetHelper";

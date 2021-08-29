@@ -2,7 +2,7 @@
 /**
  * @description 各种装饰器定义
  */
-import { Service } from "../base/Service";
+import { Service } from "../support/net/service/Service";
 
 export function injectService(service: Service) {
     return function (target: any) {

@@ -1,4 +1,4 @@
-import { UIView } from "../../../../scripts/framework/ui/UIView";
+import { UIView } from "../../../../scripts/framework/support/ui/UIView";
 import { HallData } from "../data/HallData";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import { GameService } from "../../../../scripts/common/net/GameService";

@@ -11,7 +11,7 @@ import { TestBinaryMessage } from "../protocol/TestBinaryMessage";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { SUB_CMD_LOBBY } from "../protocol/LobbyCmd";
 import { TestJsonMessage } from "../protocol/TestJsonMessage";
-import { ServiceEvent } from "../../../../scripts/framework/base/Service";
+import { ServiceEvent } from "../../../../scripts/framework/support/net/service/Service";
 const { ccclass, property } = cc._decorator;
 
 @ccclass

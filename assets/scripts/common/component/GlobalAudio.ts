@@ -1,4 +1,4 @@
-import AudioComponent from "../../framework/base/AudioComponent";
+import AudioComponent from "../../framework/componects/AudioComponent";
 
 /**
  * @description 全局音频播放组棒

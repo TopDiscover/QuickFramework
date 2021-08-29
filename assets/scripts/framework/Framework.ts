@@ -1,20 +1,20 @@
-import { configurationInit } from "./base/Configuration";
+import { configurationInit } from "./defines/Configuration";
 configurationInit();
-import { Language } from "./base/Language";
-import { EventDispatcher } from "./event/EventDispatcher";
-import { UIManager } from "./base/UIManager";
-import { LocalStorage } from "./base/LocalStorage";
-import { AssetManager } from "./assetManager/AssetManager";
-import { CacheManager } from "./assetManager/CacheManager";
-import { Adaptor } from "./adaptor/Adaptor";
-import { NodePoolManager } from "./base/NodePoolManager";
-import { HotupdateManager } from "./base/HotupdateManager";
-import { NetManager } from "./base/NetManager";
-import { LogicManager } from "./base/LogicManager";
-import { BundleManager } from "./base/BundleManager";
-import GameView from "./base/GameView";
-import { GameData } from "./base/GameData";
-import { CocosExtentionInit } from "./extentions/CocosExtention";
+import { Language } from "./support/language/Language";
+import { EventDispatcher } from "./support/event/EventDispatcher";
+import { UIManager } from "./support/ui/UIManager";
+import { LocalStorage } from "./support/storage/LocalStorage";
+import { AssetManager } from "./support/assetManager/AssetManager";
+import { CacheManager } from "./support/assetManager/CacheManager";
+import { Adaptor } from "./support/adaptor/Adaptor";
+import { NodePoolManager } from "./support/nodePool/NodePoolManager";
+import { HotupdateManager } from "./support/hotupdate/HotupdateManager";
+import { NetManager } from "./support/net/service/NetManager";
+import { LogicManager } from "./support/logic/LogicManager";
+import { BundleManager } from "./support/assetManager/BundleManager";
+import GameView from "./support/ui/GameView";
+import { GameData } from "./data/GameData";
+import { CocosExtentionInit } from "./plugin/CocosExtention";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {

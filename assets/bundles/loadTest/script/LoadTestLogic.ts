@@ -1,4 +1,4 @@
-import { Logic } from "../../../scripts/framework/base/Logic";
+import { Logic } from "../../../scripts/framework/support/logic/Logic";
 import LoadTestView from "./view/LoadTestView";
 
 class LoadTestLogic extends Logic {
