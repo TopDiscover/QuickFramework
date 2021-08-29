@@ -4,10 +4,10 @@ import { commonConfigInit } from "../config/Config";
 commonConfigInit();
 import { Log } from "../../framework/support/log/Log";
 import GlobalAudio from "../component/GlobalAudio";
-import Tips from "../component/Tips";
-import UILoading from "../component/UILoading";
-import Alert from "../component/Alert";
-import Loading from "../component/Loading";
+import {Tips} from "../component/Tips";
+import {UILoading} from "../component/UILoading";
+import {Alert} from "../component/Alert";
+import {Loading} from "../component/Loading";
 import { ServiceManager } from "./ServiceManager";
 import { CommonLanguage } from "../language/CommonLanguage";
 

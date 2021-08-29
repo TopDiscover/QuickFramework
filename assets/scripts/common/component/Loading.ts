@@ -2,7 +2,7 @@
  * @description 加载动画
  */
 
-export default class Loading {
+export class Loading {
     private static _instance: Loading = null;
     public static Instance() { return this._instance || (this._instance = new Loading()); }
     /**@description 当前loading节点 */

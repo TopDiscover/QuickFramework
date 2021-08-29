@@ -6,6 +6,7 @@ export function enumsInit() {
         cc.log("框架枚举初始化");
     }
 }
+
 /**@description Http相关枚举定义 */
 namespace Http {
     /**@description http错误类型 */

@@ -1,5 +1,5 @@
 
-class NodePool {
+export class NodePool {
     name: string = "unknown";
     private pool: Array<cc.Node> = [];
     /**@description 用来克隆的节点 */
@@ -130,4 +130,3 @@ export class NodePoolManager {
         }
     }
 }
-td.NodePool = NodePool;
