@@ -1,7 +1,7 @@
 
 import EventComponent from "./EventComponent";
-import { Service, ServiceEvent } from "../support/net/service/Service";
 import { Message } from "../support/net/message/Message";
+import { Service } from "../support/net/service/Service";
 
 /**
  * @description 控制器基类 , 对service 的自动注入
@@ -24,12 +24,12 @@ export default class Controller<ServiceType> extends EventComponent {
 
     protected bindingEvents() {
         super.bindingEvents();
-        this.registerEvent(td.Net.Event.ON_OPEN, this.onNetOpen);
-        this.registerEvent(td.Net.Event.ON_CLOSE, this.onNetClose);
-        this.registerEvent(td.Net.Event.ON_ERROR, this.onNetError);
+        this.registerEvent(td.Net.NetEvent.ON_OPEN, this.onNetOpen);
+        this.registerEvent(td.Net.NetEvent.ON_CLOSE, this.onNetClose);
+        this.registerEvent(td.Net.NetEvent.ON_ERROR, this.onNetError);
     }
 
-    protected onNetOpen(event: ServiceEvent) {
+    protected onNetOpen(event: td.Net.ServiceEvent) {
         if( this.service as any == event.service ){
             if (CC_DEBUG) cc.log(`${event.service.serviceName}网络 onNetOpen`);
             return true;
@@ -37,14 +37,14 @@ export default class Controller<ServiceType> extends EventComponent {
         return false;
     }
 
-    protected onNetClose(event: ServiceEvent) {
+    protected onNetClose(event: td.Net.ServiceEvent) {
         if( this.service as any == event.service){
             if (CC_DEBUG) cc.log(`${event.service.serviceName}网络 onNetClose`);
             return true;
         }
         return false;
     }
-    protected onNetError(event: ServiceEvent) {
+    protected onNetError(event: td.Net.ServiceEvent) {
         if( this.service as any == event.service ){
             if (CC_DEBUG) cc.log(`${event.service.serviceName}网络 onNetError`);
             return true;

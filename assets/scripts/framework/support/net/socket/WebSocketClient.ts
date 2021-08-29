@@ -255,7 +255,7 @@ export default class WebSocketClinet {
      */
     public close(isEnd: boolean) {
         if (this._ws) {
-            this._closeEvent = { type: td.Net.Event.ON_CUSTOM_CLOSE, isEnd: isEnd };
+            this._closeEvent = { type: td.Net.NetEvent.ON_CUSTOM_CLOSE, isEnd: isEnd };
             this._ws.close();
         }
         //清空发送

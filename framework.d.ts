@@ -747,7 +747,7 @@ declare namespace td {
 		}
 		type Type = "ws" | "wss";
 		/**@description 网络事件 */
-		export enum Event {
+		export enum NetEvent {
 			/**@description 网络打开 */
 			ON_OPEN = "NetEvent_ON_OPEN",
 			/**@description 网络关闭 */
@@ -756,6 +756,10 @@ declare namespace td {
 			ON_ERROR = "NetEvent_ON_ERROR",
 			/**@description 应用层主动调用网络层close */
 			ON_CUSTOM_CLOSE = "NetEvent_ON_CUSTOM_CLOSE",
+		}
+		export interface ServiceEvent{
+			service: import("./assets/scripts/framework/support/net/service/Service").Service;
+			event : Event;
 		}
 	}
 

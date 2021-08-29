@@ -11,7 +11,6 @@ import { SUB_CMD_LOBBY } from "../../../hall/script/protocol/LobbyCmd";
 import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessage";
 import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
 import { TestProtoMessage } from "../../../hall/script/protocol/TestProtoMessage";
-import { ServiceEvent } from "../../../../scripts/framework/support/net/service/Service";
 const { ccclass, property } = cc._decorator;
 
 @ccclass
@@ -37,13 +36,13 @@ export default class TestChatNetController extends Controller<ChatService> {
         dispatch(CommonEvent.TEST_BINARY_MSG, data.hello)
     }
 
-    protected onNetOpen(event: ServiceEvent) {
+    protected onNetOpen(event: td.Net.ServiceEvent) {
         let result = super.onNetOpen(event);
         if (result) dispatch(CommonEvent.CHAT_SERVICE_CONNECTED, this.service);
         return result;
     }
 
-    protected onNetClose(event: ServiceEvent) {
+    protected onNetClose(event: td.Net.ServiceEvent) {
         let result = super.onNetClose(event);
         if (result) dispatch(CommonEvent.CHAT_SERVICE_CLOSE, this.service);
         return result;

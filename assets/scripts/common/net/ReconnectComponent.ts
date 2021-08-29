@@ -1,4 +1,3 @@
-import { ServiceEvent } from "../../framework/support/net/service/Service";
 import Controller from "../../framework/componects/Controller";
 import { CommonService } from "./CommonService";
 
@@ -114,7 +113,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
         });
     }
 
-    protected onNetOpen(event: ServiceEvent) {
+    protected onNetOpen(event: td.Net.ServiceEvent) {
         let result = super.onNetOpen(event);
         if (result) {
             //根据自己的业务，请示登录，拉游戏数据等操作
@@ -127,7 +126,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
         return result;
     }
 
-    protected onNetError(event: ServiceEvent) {
+    protected onNetError(event: td.Net.ServiceEvent) {
         let result = super.onNetError(event);
         if (result) {
             Manager.loading.hide();
@@ -138,10 +137,10 @@ export default class ReconnectComponent extends Controller<CommonService> {
         return result;
     }
 
-    protected onNetClose(event: ServiceEvent) {
+    protected onNetClose(event: td.Net.ServiceEvent) {
         let result = super.onNetClose(event);
         if (result) {
-            if (event.event.type == td.Net.Event.ON_CUSTOM_CLOSE) {
+            if (event.event.type == td.Net.NetEvent.ON_CUSTOM_CLOSE) {
                 cc.log(`${this.logName} 应用层主动关闭socket`);
                 return false;
             }

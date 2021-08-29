@@ -104,7 +104,7 @@ toNamespace("ButtonSpriteType",ButtonSpriteType)
 /**@description 网络相关 */
 namespace Net{
     /**@description 网络事件 */
-    export enum Event {
+    export enum NetEvent {
         /**@description 网络打开 */
         ON_OPEN = "NetEvent_ON_OPEN",
         /**@description 网络关闭 */

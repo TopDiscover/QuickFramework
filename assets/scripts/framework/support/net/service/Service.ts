@@ -5,10 +5,6 @@ import { Message, MessageHeader, IMessage } from "../message/Message";
 /**
  * @description 与服务器之间消息收发基类,注册消息并转发
  */
-export interface ServiceEvent{
-    service: Service;
-    event : Event;
-}
 export class Service extends ServerConnector {
     private _messageHeader : typeof MessageHeader = MessageHeader;
     /**@description 数据流消息包头定义类型 */
@@ -54,15 +50,15 @@ export class Service extends ServerConnector {
     }
     protected onOpen() {
         super.onOpen();
-        dispatch(td.Net.Event.ON_OPEN, { service: this, event: null });
+        dispatch(td.Net.NetEvent.ON_OPEN, { service: this, event: null });
     }
     protected onClose(ev: Event) {
         super.onClose(ev);
-        dispatch(td.Net.Event.ON_CLOSE, { service: this, event: ev });
+        dispatch(td.Net.NetEvent.ON_CLOSE, { service: this, event: ev });
     }
     protected onError(ev: Event) {
         super.onError(ev);
-        dispatch(td.Net.Event.ON_ERROR, { service: this, event: ev });
+        dispatch(td.Net.NetEvent.ON_ERROR, { service: this, event: ev });
     }
     protected onMessage(data: Uint8Array) {
 
