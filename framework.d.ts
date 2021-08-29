@@ -407,6 +407,21 @@ declare function toNamespace(key: string, value: any, namespace?: string): void;
  */
 declare function dispatchEnterComplete(data: td.Logic.EventData): void;
 
+declare namespace Socket {
+	interface IMessage {
+		readonly Data: any
+	}
+
+	interface ProtoListenerData {
+		eventName: string
+		func: MessageHandleFunc,
+		type: typeof Message
+		isQueue: boolean,
+		data?: any
+		target?: any
+	}
+}
+
 declare namespace td {
 
 	/**@description 语言包相关 */
@@ -439,8 +454,8 @@ declare namespace td {
 			getLanguage(): string;
 		}
 
-        /**@description 语言变更 */
-        export const CHANGE_LANGUAGE = "Event_CHANGE_LANGUAGE";
+		/**@description 语言变更 */
+		export const CHANGE_LANGUAGE = "Event_CHANGE_LANGUAGE";
 	}
 
 	/**@description 替换按钮纹理类型 */
@@ -801,18 +816,18 @@ declare namespace td {
 			isQueue: boolean,//是否进入消息队列，如果不是，收到网络消息返回，会立即回调处理函数
 			data?: any, //解包后的数据
 			target?: any, //处理者
-        }
-        type Type = "ws" | "wss";
-        /**@description 网络事件 */
-        export enum Event {
-            /**@description 网络打开 */
-            ON_OPEN = "NetEvent_ON_OPEN",
-            /**@description 网络关闭 */
-            ON_CLOSE = "NetEvent_ON_CLOSE",
-            /**@description 网络错误 */
-            ON_ERROR = "NetEvent_ON_ERROR",
-            /**@description 应用层主动调用网络层close */
-            ON_CUSTOM_CLOSE = "NetEvent_ON_CUSTOM_CLOSE",
+		}
+		type Type = "ws" | "wss";
+		/**@description 网络事件 */
+		export enum Event {
+			/**@description 网络打开 */
+			ON_OPEN = "NetEvent_ON_OPEN",
+			/**@description 网络关闭 */
+			ON_CLOSE = "NetEvent_ON_CLOSE",
+			/**@description 网络错误 */
+			ON_ERROR = "NetEvent_ON_ERROR",
+			/**@description 应用层主动调用网络层close */
+			ON_CUSTOM_CLOSE = "NetEvent_ON_CUSTOM_CLOSE",
 		}
 	}
 
@@ -915,9 +930,9 @@ declare namespace td {
 	}
 
 	/**@description 适配相关 */
-    namespace Adaptor {
-        /**@description 屏幕适配 */
-        export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
+	namespace Adaptor {
+		/**@description 屏幕适配 */
+		export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
 		export class Impl {
 			isShowKeyboard: boolean;
 			/**@description 全屏适配 */
@@ -930,7 +945,7 @@ declare namespace td {
 			public initBrowserAdaptor(): void;
 			get isBrowser(): boolean;
 		}
-    }
+	}
 
 	export class EventComponent extends cc.Component {
 		/**
@@ -1373,7 +1388,7 @@ declare namespace td {
 		readonly assetManager: import("./assets/scripts/framework/support/assetManager/AssetManager").AssetManager;
 		/**@description 资源缓存管理器 */
 		readonly cacheManager: CacheManager;
-        /**@description 适配相关 */
+		/**@description 适配相关 */
 		readonly adaptor: Adaptor.Impl;
 		/**@description 对象池管理器 */
 		readonly nodePoolManager: NodePoolManager;

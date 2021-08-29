@@ -1,17 +1,21 @@
-import { BinaryStreamMessage, serialize, Int8Value, Int16Value, Int32Value, Float32Value, Float64Value, Uint8Value, Uint16Value, Uint32Value, StringValue, BinaryStream } from "../../../../scripts/framework/support/net/message/BinaryStreamMessage"
+import { serialize, Int8Value, Int16Value, Int32Value, Float32Value, Float64Value, Uint8Value, Uint16Value, Uint32Value, StringValue, BinaryStream } from "../../../../scripts/framework/support/net/message/BinaryStreamMessage"
 import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { SUB_CMD_LOBBY } from "./LobbyCmd";
 
-class TestData extends BinaryStream{
+class TestData extends BinaryStream {
+    get MsgID(): string { return null }
 
-    @serialize("value32",Float32Value)
-    float32 : number = 32;
+    @serialize("value32", Float32Value)
+    float32: number = 32;
 
-    @serialize("value64",Float64Value)
+    @serialize("value64", Float64Value)
     float64: number = 64;
 }
 
-export class TestBinaryMessage extends BinaryStreamMessage {
+export class TestBinaryMessage extends BinaryStream {
+    get MsgID(): string {
+        return String(this.mainCmd) + String(this.subCmd)
+    }
     mainCmd = MainCmd.CMD_LOBBY;
     subCmd = SUB_CMD_LOBBY.TEST_BINARY_MSG;
     // @serialize("value32",Float32Value)
@@ -47,13 +51,13 @@ export class TestBinaryMessage extends BinaryStreamMessage {
     // @serialize("testMap",Map,String,Int32Value)
     // testMap:Map<string,number> = new Map();
 
-    @serialize("user",TestData)
-    user : TestData = new TestData();
+    @serialize("user", TestData)
+    user: TestData = new TestData();
 
-    @serialize("hello",StringValue)
-    hello : string = "您好，我是Binary消息！"
+    @serialize("hello", StringValue)
+    hello: string = "您好，我是Binary消息！"
 
-    constructor(){
+    constructor() {
         super();
         // this.testMap.set("keyy_1",1);
         // this.testMap.set("keyy_2",2);

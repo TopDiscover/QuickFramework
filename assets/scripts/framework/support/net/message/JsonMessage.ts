@@ -1,9 +1,11 @@
+import { Utf8ArrayToStr } from "../../../plugin/StringUtils";
+import { Codec, Message } from "./Message";
+import { Buffer } from "../../../plugin/Buffer"
 
-import { Message, MessageHeader } from "./Message";
 
 type JsonMessageConstructor = typeof JsonMessage;
 
-export function serialize(key: string, type: JsonMessageConstructor | NumberConstructor | StringConstructor);
+export function serialize(key: string, type: JsonMessageConstructor | NumberConstructor | StringConstructor | Object);
 export function serialize(key: string, type: ArrayConstructor, arrayType: JsonMessageConstructor | NumberConstructor | StringConstructor);
 export function serialize(key: string, type: MapConstructor, mapKeyType: NumberConstructor | StringConstructor, mapValueType: JsonMessageConstructor | NumberConstructor | StringConstructor);
 export function serialize(key: string, type, arrTypeOrMapKeyType?, mapValueType?) {
@@ -34,19 +36,19 @@ export function serialize(key: string, type, arrTypeOrMapKeyType?, mapValueType?
 /**
  * @description JSON的序列化与序列化
  */
-export class JsonMessage extends Message {
+export abstract class JsonMessage extends Message {
+    private _data = null;
+    get Data() { return this._data }
 
-    private data = null;
-
-    encode() : boolean {
-        this.data = this.serialize();
-        let result = JSON.stringify(this.data);
-        this.buffer = StringToUtf8Array(result);
+    Encode(): boolean {
+        this._data = this.serialize();
+        let result = JSON.stringify(this._data);
+        this._data = Buffer.from(result);
         return true;
     }
 
     /**@description 序列化 */
-    private serialize(): any {
+    protected serialize(): any {
         let result = {};
         let __serialize__ = Reflect.getPrototypeOf(this)['__serialize__'];
         if (!__serialize__) return result;
@@ -78,14 +80,20 @@ export class JsonMessage extends Message {
             return this.serializeMap(value);
         } else if (value instanceof JsonMessage) {
             return value.serialize();
+        } else if (value instanceof Object) {
+            return this.serializeObject(value);
         } else {
             cc.warn("Invalid serialize value : " + value);
             return null;
         }
     }
+    private serializeObject(value: Object) { return value }
 
     private serializeNumber(value: Number) {
-        return (value === undefined || value === null) ? '0' : value.toString();
+        if (value === undefined || value === null) { value = 0 }
+        else if (typeof value == "string") { value = Number(value) }
+        if (Number.isNaN(value)) { value = 0 }
+        return value;
     }
 
     private serializeString(value: String) {
@@ -118,18 +126,18 @@ export class JsonMessage extends Message {
         return result;
     }
 
-    decode(data: Uint8Array): boolean {
+    Decode(data: Uint8Array): boolean {
         if (data) {
-            this.buffer = data;
-            let result = Utf8ArrayToString(data);
+            this._data = data;
+            let result = Utf8ArrayToStr(data);
             if (result.length > 0) {
                 try {
-                    this.data = JSON.parse(result);
+                    this._data = JSON.parse(result);
                 } catch (error) {
                     return false;
                 }
             }
-            return this.deserialize(this.data);
+            return this.deserialize(this._data);
         }
         return false;
     }
@@ -179,7 +187,7 @@ export class JsonMessage extends Message {
                 switch (memberType) {
                     case Number: this[memberName] = this.deserializeNumber(memberName, value); break;
                     case String: this[memberName] = this.deserializeString(memberName, value); break;
-                    case Array: this[memberName] = [];break;
+                    case Array: this[memberName] = []; break;
                     case Map: this[memberName] = new Map; break;
                     default: {
                         this[memberName] = new memberType;
@@ -286,8 +294,4 @@ export class JsonMessage extends Message {
             this[memberName].set(elementKey, elementValue);
         });
     }
-}
-
-export class JsonMessageHeader extends MessageHeader{
-    
 }

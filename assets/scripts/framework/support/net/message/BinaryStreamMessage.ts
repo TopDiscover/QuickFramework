@@ -2,7 +2,9 @@
  * @description 二进制数据流解析
  */
 
-import { Message, MessageHeader } from "./Message";
+import { Utf8ArrayToStr } from "../../../plugin/StringUtils";
+import { Message } from "./Message";
+
 
 type BinaryStreamConstructor = typeof BinaryStream;
 type NumberStreamValueConstructor = typeof NumberStreamValue;
@@ -108,14 +110,14 @@ export class StringValue extends StringStreamValue {
             readLen += Uint8Array.BYTES_PER_ELEMENT;
         }
 
-        this.data = Utf8ArrayToString(arr);
+        this.data = Utf8ArrayToStr(arr);
         return readLen;
     }
 
     write(dataView: DataView, offset: number) {
         //先写入字符串长度
         let writeLen = 0;
-        let buffer: Uint8Array =  StringToUtf8Array(this.data);
+        let buffer: Uint8Array = StringToUtf8Array(this.data);
         let byteLenght = buffer.length;
         //可变长字符串
         dataView.setUint32(offset, byteLenght, this.littleEndian);
@@ -256,14 +258,15 @@ export class Uint32Value extends NumberStreamValue {
     }
 }
 
-export class BinaryStream extends Message {
+export abstract class BinaryStream extends Message {
 
     protected _dataView: DataView = null!;
     /**@description 读取数据的偏移量 */
     protected _byteOffset = 0;
-
+    buffer: Uint8Array;
+    get Data(): any { return this.buffer }
     /**@description 将当前数据转成buffer */
-    encode(): boolean {
+    Encode(): boolean {
         let size = this.size()
         let buffer = new ArrayBuffer(size)
         this._dataView = new DataView(buffer)
@@ -271,7 +274,7 @@ export class BinaryStream extends Message {
         this.serialize();
         this.buffer = new Uint8Array(this._dataView.buffer);
         let success = this._byteOffset == this._dataView.byteLength;
-        if( !success ){
+        if (!success) {
             cc.error(`encode 当前读取大小为 : ${this._byteOffset} 数据大小为 : ${this._dataView.byteLength}`);
         }
         return success;
@@ -437,15 +440,16 @@ export class BinaryStream extends Message {
     }
 
     /**@description 从二进制数据中取数据 */
-    decode(data: Uint8Array): boolean {
+    Decode(data: Uint8Array): boolean {
         this.buffer = data;
         this._dataView = new DataView(data.buffer);
         this._byteOffset = 0;
         this.deserialize();
         let success = this._dataView.byteLength == this._byteOffset;
-        if( !success ){
+        if (!success) {
             cc.error(`decode 当前读取大小为 : ${this._byteOffset} 数据大小为 : ${this._dataView.byteLength}`);
         }
+
         return success;
     }
 
@@ -493,7 +497,7 @@ export class BinaryStream extends Message {
             }
         } catch (error) {
             cc.warn(error.message);
-            cc.error(`deserializeMember ${memberName} error!!!`);
+            error(`deserializeMember ${memberName} error!!!`);
         }
     }
 
@@ -554,12 +558,5 @@ export class BinaryStream extends Message {
             (<any>this)[memberName].set(key, data);
         }
     }
-}
-
-export class BinaryStreamMessage extends BinaryStream {
-
-}
-
-export class BinaryStreamMessageHeader extends MessageHeader {
 
 }
