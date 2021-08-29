@@ -142,7 +142,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
     protected onNetClose(event: ServiceEvent) {
         let result = super.onNetClose(event);
         if (result) {
-            if (event.event.type == td.Event.Net.ON_CUSTOM_CLOSE) {
+            if (event.event.type == td.Net.Event.ON_CUSTOM_CLOSE) {
                 log(`${this.logName} 应用层主动关闭socket`);
                 return false;
             }

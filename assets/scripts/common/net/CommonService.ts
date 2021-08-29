@@ -17,7 +17,7 @@ export class CommonService extends Service implements GameEventInterface {
     // protected protocol: WebSocketType = "wss"
     protected ip = "localhost";
     protected port = 3000;
-    protected protocol: WebSocketType = "ws"
+    protected protocol: td.Net.Type = "ws"
     
     private _maxEnterBackgroundTime: number = td.Config.MAX_INBACKGROUND_TIME;
     private _backgroundTimeOutId = -1;
@@ -127,7 +127,7 @@ export class CommonService extends Service implements GameEventInterface {
 
     protected onClose(ev:Event){
         super.onClose(ev)
-        if( ev.type == td.Event.Net.ON_CUSTOM_CLOSE){
+        if( ev.type == td.Net.Event.ON_CUSTOM_CLOSE){
             log(`${this.serviceName} 应用层主动关闭Socket`);
             return;
         }
