@@ -88,7 +88,7 @@ namespace Logic {
     };
 }
 
-window.dispatchEnterComplete = function(data:td.Logic.EventData){
+window.dispatchEnterComplete = function (data: td.Logic.EventData) {
     dispatch(Logic.Event.ENTER_COMPLETE, data);
 }
 
@@ -100,10 +100,10 @@ enum ButtonSpriteType {
     Hover = "hoverSprite",
     Disable = "disabledSprite",
 }
-toNamespace("ButtonSpriteType",ButtonSpriteType)
+toNamespace("ButtonSpriteType", ButtonSpriteType)
 
 /**@description 网络相关 */
-namespace Net{
+namespace Net {
     /**@description 网络事件 */
     export enum Event {
         /**@description 网络打开 */
@@ -116,4 +116,18 @@ namespace Net{
         ON_CUSTOM_CLOSE = "NetEvent_ON_CUSTOM_CLOSE",
     }
 }
-toNamespace("Net",Net);
+toNamespace("Net", Net);
+
+/**@description 语言包 */
+namespace Language {
+    /**@description 语言变更 */
+    export const CHANGE_LANGUAGE = "Event_CHANGE_LANGUAGE";
+}
+toNamespace("Language", Language);
+
+/**@description 适配器相关 */
+namespace Adaptor {
+    /**@description 屏幕适配 */
+    export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
+}
+toNamespace("Adaptor",Adaptor);

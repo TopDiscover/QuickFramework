@@ -194,6 +194,9 @@ declare namespace td {
 			/**@description 获取语言包名 */
 			getLanguage(): string;
 		}
+
+        /**@description 语言变更 */
+        export const CHANGE_LANGUAGE = "Event_CHANGE_LANGUAGE";
 	}
 
 	/**@description 替换按钮纹理类型 */
@@ -667,11 +670,9 @@ declare namespace td {
         export const UILoading = 700;
     }
 
-    namespace Event {
+    namespace Adaptor {
         /**@description 屏幕适配 */
         export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
-        /**@description 语言变更 */
-        export const CHANGE_LANGUAGE = "Event_CHANGE_LANGUAGE";
     }
 
     export class EventComponent extends import("cc").Component {

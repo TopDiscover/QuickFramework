@@ -60,7 +60,7 @@ import { i18n } from "../language/CommonLanguage";
      }
      constructor(service: CommonService) {
          this.service = service;
-         Manager.eventDispatcher.addEventListener(td.Event.ADAPT_SCREEN, this.onAdaptScreen, this)
+         Manager.eventDispatcher.addEventListener(td.Adaptor.ADAPT_SCREEN, this.onAdaptScreen, this)
      }
  
      private onAdaptScreen() {

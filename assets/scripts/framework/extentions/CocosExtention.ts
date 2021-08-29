@@ -244,11 +244,11 @@ Reflect.defineProperty(Label.prototype, "language", {
                 if (isUsing) {
                     if (!!!self._isUsinglanguage) {
                         self._isUsinglanguage = true;
-                        Manager.eventDispatcher.addEventListener(td.Event.CHANGE_LANGUAGE, self._onChangeLanguage, self);
+                        Manager.eventDispatcher.addEventListener(td.Language.CHANGE_LANGUAGE, self._onChangeLanguage, self);
                     }
                 } else {
                     if (self._language) {
-                        Manager.eventDispatcher.removeEventListener(td.Event.CHANGE_LANGUAGE, self);
+                        Manager.eventDispatcher.removeEventListener(td.Language.CHANGE_LANGUAGE, self);
                     }
                 }
             })
@@ -267,7 +267,7 @@ if (!EDITOR && td.Macro.ENABLE_CHANGE_LANGUAGE) {
     let __label_onDestroy__ = prototype.onDestroy;
     prototype.onDestroy = function () {
         if (this._isUsinglanguage) {
-            Manager.eventDispatcher.removeEventListener(td.Event.CHANGE_LANGUAGE, this);
+            Manager.eventDispatcher.removeEventListener(td.Language.CHANGE_LANGUAGE, this);
         }
         __label_onDestroy__ && __label_onDestroy__.call(this);
     }

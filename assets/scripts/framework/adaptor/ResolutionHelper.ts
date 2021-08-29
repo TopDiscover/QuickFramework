@@ -106,7 +106,7 @@ export class ResolutionHelper {
             view.setDesignResolutionSize(me.designResolution.width, me.designResolution.height, policy);
         }
         if (me.isNeedAdapt) {
-            dispatch(td.Event.ADAPT_SCREEN);
+            dispatch(td.Adaptor.ADAPT_SCREEN);
             Manager.uiManager.fullScreenAdapt();
         }
     }
