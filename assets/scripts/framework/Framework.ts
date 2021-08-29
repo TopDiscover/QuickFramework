@@ -1,5 +1,3 @@
-import { extentionsInit } from "./extentions/Extentions";
-extentionsInit();
 import { configurationInit } from "./base/Configuration";
 configurationInit();
 import { Language } from "./base/Language";

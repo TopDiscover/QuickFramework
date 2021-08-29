@@ -2,7 +2,7 @@
  * @description 二进制数据流解析
  */
 
-import { Message, Utf8ArrayToStr, MessageHeader, StringToUtf8Array } from "./Message";
+import { Message, MessageHeader } from "./Message";
 
 type BinaryStreamConstructor = typeof BinaryStream;
 type NumberStreamValueConstructor = typeof NumberStreamValue;
@@ -108,7 +108,7 @@ export class StringValue extends StringStreamValue {
             readLen += Uint8Array.BYTES_PER_ELEMENT;
         }
 
-        this.data = Utf8ArrayToStr(arr);
+        this.data = Utf8ArrayToString(arr);
         return readLen;
     }
 
