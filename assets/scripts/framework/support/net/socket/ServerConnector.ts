@@ -115,7 +115,7 @@ export class ServerConnector {
      * @param port 
      * @param protocol 协议类型 ws / wss 
      */
-    public connect(ip: string, port: number | string | null = null, protocol: td.Net.Type = "wss") {
+    public connect_server(ip: string, port: number | string | null = null, protocol: td.Net.Type = "wss") {
         if (!this.enabled) {
             if (CC_DEBUG) cc.warn(`请求先启用`)
             return;

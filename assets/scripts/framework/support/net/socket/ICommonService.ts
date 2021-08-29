@@ -6,8 +6,8 @@ export abstract class ICommonService extends Service implements GameEventInterfa
     /**@description 网络重连 */
     public reconnect: Reconnect = null!;
 
-    private _maxEnterBackgroundTime: number = td.Config.MAX_INBACKGROUND_TIME;
-    private _backgroundTimeOutId: number = -1;
+    protected _maxEnterBackgroundTime: number = td.Config.MAX_INBACKGROUND_TIME;
+    protected _backgroundTimeOutId: number = -1;
     /**@description 进入后台的最大允许时间，超过了最大值，则进入网络重连 */
     public get maxEnterBackgroundTime() {
         return this._maxEnterBackgroundTime;

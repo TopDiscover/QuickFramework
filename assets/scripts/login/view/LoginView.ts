@@ -19,14 +19,14 @@ export default class LoginView extends UIView {
         this._login = cc.find("login", this.node);
         this._login.on(cc.Node.EventType.TOUCH_END, () => {
             // console.log()
-            console.log(cc.js.getClassName(this))
+            // console.log(cc.js.getClassName(this))
 
-            //@ts-ignore
-            console.log(cc.js.getClassName(NetManager))
-            console.log(cc.js.getClassName(new NetManager("123")))
+            // //@ts-ignore
+            // console.log(cc.js.getClassName(NetManager))
+            // console.log(cc.js.getClassName(new NetManager("123")))
 
-            console.log(this.getClassName(AssetManager))
-            // Manager.bundleManager.enterBundle(new td.HotUpdate.BundleConfig("大厅", td.Config.BUNDLE_HALL, 0, td.Logic.Event.ENTER_HALL, true));
+            // console.log(this.getClassName(AssetManager))
+            Manager.bundleManager.enterBundle(new td.HotUpdate.BundleConfig("大厅", td.Config.BUNDLE_HALL, 0, td.Logic.Event.ENTER_HALL, true));
         });
 
         // let version = cc.find("version", this.node).getComponent(cc.Label).string = "版本3";
