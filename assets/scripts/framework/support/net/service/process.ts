@@ -72,10 +72,10 @@ export class Process {
     }
 
     public onMessage(code: Codec) {
-        cc.log(`recv data main cmd : ${code.getMsgID}`);
-        let key = code.getMsgID()
+        cc.log(`recv data main cmd : ${code.getMsgID()}`);
+        let key = code.getMsgID();
         if (!this._listeners[key]) {
-            cc.warn(`no find listener data main cmd : ${code.getMsgID}`);
+            cc.warn(`no find listener data main cmd : ${code.getMsgID()}`);
             return;
         }
         if (this._listeners[key].length <= 0) {
@@ -204,7 +204,7 @@ export class Process {
         if (o.type) {
             obj = new o.type();
             //解包
-            obj.decode(header.getData);
+            obj.decode(header.getData());
         } else {
             //把数据放到里面，让后面使用都自己解析
             obj = header.getData();

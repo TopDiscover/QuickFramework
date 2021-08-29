@@ -1,7 +1,5 @@
 import { UIView } from "../../framework/support/ui/UIView";
 import DownloadLoading from "../../common/component/DownloadLoading";
-import { NetManager } from "../../framework/support/net/service/NetManager";
-import { AssetManager } from "../../framework/support/assetManager/AssetManager";
 
 const { ccclass, property } = cc._decorator;
 
