@@ -4,7 +4,7 @@ import { UIView } from "./UIView";
 const DYNAMIC_LOAD_GARBAGE = "DYNAMIC_LOAD_GARBAGE";
 /**@description 动画加载全局数据名 */
 const DYNAMIC_LOAD_RETAIN_MEMORY = "DYNAMIC_LOAD_RETAIN_MEMORY";
-class ViewDynamicLoadData {
+export class ViewDynamicLoadData {
     private local = new Map<string, td.Resource.Info>();
     private remote = new Map<string, td.Resource.Info>();
     public name: string;

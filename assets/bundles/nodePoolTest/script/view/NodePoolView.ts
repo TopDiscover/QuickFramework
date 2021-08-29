@@ -1,3 +1,4 @@
+import { NodePool } from "../../../../scripts/framework/support/nodePool/NodePoolManager";
 import { UIView } from "../../../../scripts/framework/support/ui/UIView";
 
 const {ccclass, property} = cc._decorator;
@@ -9,7 +10,7 @@ export default class NodePoolView extends UIView {
         return "prefabs/NodePoolView";
     }
 
-    private pool : td.NodePool = null;
+    private pool : NodePool = null;
     private star : cc.Node = null;
 
     onLoad() {

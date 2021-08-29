@@ -94,13 +94,13 @@ export class Framewok {
     }
 
     /**@description 小提示 */
-    get tips(): Tips {
-        return <any>null;
+    get tips() {
+        return null;
     }
 
     /**@description 界面加载时的全屏Loading,显示加载进度 */
-    get uiLoading(): UILoading {
-        return <any>null;
+    get uiLoading() {
+        return null;
     }
 
     /**@description websocket wss 证书url地址 */
