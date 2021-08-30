@@ -341,10 +341,10 @@ declare interface AlertConfig {
 /**
  * @description 处理游戏事件接口声明
  *      cc.game.EVENT_ENGINE_INITED
-		cc.game.EVENT_GAME_INITED
-		cc.game.EVENT_HIDE
-		cc.game.EVENT_RESTART
-		cc.game.EVENT_SHOW
+        cc.game.EVENT_GAME_INITED
+        cc.game.EVENT_HIDE
+        cc.game.EVENT_RESTART
+        cc.game.EVENT_SHOW
  */
 
 declare interface GameEventInterface {
