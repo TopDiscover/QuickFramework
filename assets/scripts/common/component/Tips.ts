@@ -44,7 +44,7 @@ class ToastItem extends cc.Component {
     }
  }
 
- export class Tips {
+ export default class Tips {
 
     private static _instance: Tips = null;
     public static Instance() { return this._instance || (this._instance = new Tips()); }

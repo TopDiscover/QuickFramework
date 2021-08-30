@@ -1,6 +1,6 @@
 /**@description 游戏层公共基类 */
 
-import { UIView } from "./UIView";
+import UIView from "./UIView";
 
 /**
  * @description 游戏视图基类,处理了前后台切换对网络进行后台最大允许时间做统一处理,

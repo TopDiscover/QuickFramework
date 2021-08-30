@@ -1,4 +1,4 @@
-import { UIView } from "../core/ui/UIView";
+import UIView from "../core/ui/UIView";
 
 /**@description 添加加载本地的资源 */
 export function addExtraLoadResource(view: UIView, info: td.Resource.Info) {

@@ -1,4 +1,4 @@
-import { UIView } from "./UIView";
+import UIView from "./UIView";
 
 const {ccclass, property} = cc._decorator;
 

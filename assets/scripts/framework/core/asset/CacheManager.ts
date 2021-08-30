@@ -1,4 +1,4 @@
-import { UIView } from "../ui/UIView";
+import UIView from "../ui/UIView";
 
 class ResourceCache {
     print() {

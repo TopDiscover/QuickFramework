@@ -1,4 +1,4 @@
-import { UIView } from "./UIView";
+import UIView from "./UIView";
 
 /**@description 动态加载垃圾数据名 */
 const DYNAMIC_LOAD_GARBAGE = "DYNAMIC_LOAD_GARBAGE";

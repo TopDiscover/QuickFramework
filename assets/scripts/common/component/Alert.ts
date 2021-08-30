@@ -176,7 +176,7 @@ class AlertDialog extends cc.Component {
     }
 }
 
-export class Alert {
+export default class Alert {
 
     private static _instance: Alert = null;
     public static Instance() { return this._instance || (this._instance = new Alert()); }
