@@ -1,4 +1,4 @@
-import { BinaryStreamMessage, serialize, Int8Value, Int16Value, Int32Value, Float32Value, Float64Value, Uint8Value, Uint16Value, Uint32Value, StringValue, BinaryStream } from "../../../../scripts/framework/support/net/message/BinaryStreamMessage"
+import { BinaryStreamMessage, serialize, Int8Value, Int16Value, Int32Value, Float32Value, Float64Value, Uint8Value, Uint16Value, Uint32Value, StringValue, BinaryStream } from "../../../../scripts/framework/core/net/message/BinaryStreamMessage"
 import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { SUB_CMD_LOBBY } from "./LobbyCmd";
 

@@ -29,7 +29,7 @@ declare module cc {
 	 *     }
 	 * }});
 	 **/
-	export function createPrefab(config: { url: string, view: import("./assets/scripts/framework/support/ui/UIView").UIView, completeCallback: (node: cc.Node) => void, bundle?: BUNDLE_TYPE });
+	export function createPrefab(config: { url: string, view: import("./assets/scripts/framework/core/ui/UIView").UIView, completeCallback: (node: cc.Node) => void, bundle?: BUNDLE_TYPE });
 
 	/**
 	 * @description 扩展一个在界面中加载指定目录的接口
@@ -45,7 +45,7 @@ declare module cc {
 		bundle?: BUNDLE_TYPE,
 		url: string,
 		type: typeof cc.Asset,
-		view: import("./assets/scripts/framework/support/ui/UIView").UIView,
+		view: import("./assets/scripts/framework/core/ui/UIView").UIView,
 		onProgress?: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
 		onComplete: (data: td.Resource.CacheData) => void
 	});
@@ -66,7 +66,7 @@ declare module cc {
 		type: typeof cc.Asset,
 		onProgress?: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
 		onComplete: (data: td.Resource.CacheData) => void,
-		view: import("./assets/scripts/framework/support/ui/UIView").UIView,
+		view: import("./assets/scripts/framework/core/ui/UIView").UIView,
 	});
 
 	export interface Sprite {
@@ -96,7 +96,7 @@ declare module cc {
 		 */
 		loadRemoteImage(config: {
 			url: string,
-			view: import("./assets/scripts/framework/support/ui/UIView").UIView,
+			view: import("./assets/scripts/framework/core/ui/UIView").UIView,
 			completeCallback?: (data: cc.SpriteFrame) => void,
 			defaultSpriteFrame?: string,
 			defaultBundle?: BUNDLE_TYPE,
@@ -118,7 +118,7 @@ declare module cc {
 		 */
 		loadImage(config: {
 			url: string | { urls: string[], key: string },
-			view: import("./assets/scripts/framework/support/ui/UIView").UIView,
+			view: import("./assets/scripts/framework/core/ui/UIView").UIView,
 			completeCallback?: (data: SpriteFrame) => void,
 			bundle?: BUNDLE_TYPE
 		});
@@ -144,7 +144,7 @@ declare module cc {
 		 */
 		loadButton(config: {
 			normalSprite?: string | { urls: string[], key: string },
-			view: import("./assets/scripts/framework/support/ui/UIView").UIView,//UIView的子类
+			view: import("./assets/scripts/framework/core/ui/UIView").UIView,//UIView的子类
 			pressedSprite?: string | { urls: string[], key: string },
 			hoverSprite?: string | { urls: string[], key: string },
 			disabledSprite?: string | { urls: string[], key: string },
@@ -161,7 +161,7 @@ declare module cc {
 		  * let content = cc.find("content",this.node); 
 		  * content.getComponent(cc.Label).loadFont({font:"font/DFYUANW7-GB2312",view:this});
 		  */
-		loadFont(config: { font: string, view: import("./assets/scripts/framework/support/ui/UIView").UIView, completeCallback?: (font: Font) => void, bundle?: BUNDLE_TYPE });
+		loadFont(config: { font: string, view: import("./assets/scripts/framework/core/ui/UIView").UIView, completeCallback?: (font: Font) => void, bundle?: BUNDLE_TYPE });
 
 		/**@description 强制label在当前帧进行绘制 */
 		forceDoLayout();
@@ -201,7 +201,7 @@ declare module cc {
 		 * par.loadFile({url:GAME_RES( "res/action/DDZ_win_lizi" ),view:null});
 		 * this.node.addChild(node);
 		 */
-		loadFile(config: { url: string, view: import("./assets/scripts/framework/support/ui/UIView").UIView, completeCallback?: (file: ParticleAsset) => void, bundle?: BUNDLE_TYPE });
+		loadFile(config: { url: string, view: import("./assets/scripts/framework/core/ui/UIView").UIView, completeCallback?: (file: ParticleAsset) => void, bundle?: BUNDLE_TYPE });
 
 	}
 }
@@ -228,7 +228,7 @@ declare namespace sp {
 		 * }});
 		 */
 		loadRemoteSkeleton(config: {
-			view: import("./assets/scripts/framework/support/ui/UIView").UIView,
+			view: import("./assets/scripts/framework/core/ui/UIView").UIView,
 			path: string,
 			name: string,
 			completeCallback: (data: sp.SkeletonData) => void,
@@ -248,7 +248,7 @@ declare namespace sp {
 		 *	}
 		 * }});
 		 */
-		loadSkeleton(config: { url: string, view: import("./assets/scripts/framework/support/ui/UIView").UIView, completeCallback: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE });
+		loadSkeleton(config: { url: string, view: import("./assets/scripts/framework/core/ui/UIView").UIView, completeCallback: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE });
 	}
 }
 
@@ -591,7 +591,7 @@ declare namespace td {
 		export interface EventData {
 			type: Type;
 			/**@description 需要排除的界面，除这些界面之外的其它界面将会关闭 */
-			views: (UIClass<import("./assets/scripts/framework/support/ui/UIView").UIView> | string | import("./assets/scripts/framework/support/ui/UIView").UIView)[];
+			views: (UIClass<import("./assets/scripts/framework/core/ui/UIView").UIView> | string | import("./assets/scripts/framework/core/ui/UIView").UIView)[];
 
 			/**@description 其它用户数据 */
 			data?: any;
@@ -715,7 +715,7 @@ declare namespace td {
 			 * 在网络消息来的时间，用预置体加载界面还是需要一定的时间，
 			 * 从而会造成消息处理不是顺序执行 
 			 * */
-			preloadView?: UIClass<import("./assets/scripts/framework/support/ui/UIView").UIView>,
+			preloadView?: UIClass<import("./assets/scripts/framework/core/ui/UIView").UIView>,
 			bundle?: BUNDLE_TYPE,
 			/**@description 如果是加载的目录，请用dir字段 */
 			dir?: string,
@@ -740,7 +740,7 @@ declare namespace td {
 			mainCmd: number, // main cmd
 			subCmd: number, //sub cmd
 			func: HandleFunc, //处理函数
-			type: typeof import("./assets/scripts/framework/support/net/message/Message").Message, //解包类型
+			type: typeof import("./assets/scripts/framework/core/net/message/Message").Message, //解包类型
 			isQueue: boolean,//是否进入消息队列，如果不是，收到网络消息返回，会立即回调处理函数
 			data?: any, //解包后的数据
 			target?: any, //处理者
@@ -758,7 +758,7 @@ declare namespace td {
 			ON_CUSTOM_CLOSE = "NetEvent_ON_CUSTOM_CLOSE",
 		}
 		export interface ServiceEvent{
-			service: import("./assets/scripts/framework/support/net/service/Service").Service;
+			service: import("./assets/scripts/framework/core/net/service/Service").Service;
 			event : Event;
 		}
 	}
@@ -867,7 +867,7 @@ declare namespace td {
 		export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
 	}
 
-	export interface UIClass<T extends import("./assets/scripts/framework/support/ui/UIView").UIView> {
+	export interface UIClass<T extends import("./assets/scripts/framework/core/ui/UIView").UIView> {
 		new(): T;
 		/**
 		 *@description 视图prefab 地址 resources目录下如z_panels/WeiZoneLayer 
@@ -877,23 +877,23 @@ declare namespace td {
 
 	export class FramewokManager {
 		/**@description 常驻资源指定的模拟view */
-		readonly retainMemory: import("./assets/scripts/framework/support/ui/UIManager").ViewDynamicLoadData;
+		readonly retainMemory: import("./assets/scripts/framework/core/ui/UIManager").ViewDynamicLoadData;
 		/**@description 语言包 */
-		readonly language: import("./assets/scripts/framework/support/language/Language").Language;
+		readonly language: import("./assets/scripts/framework/core/language/Language").Language;
 		/**@description 事件派发器 */
-		readonly eventDispatcher: import("./assets/scripts/framework/support/event/EventDispatcher").EventDispatcher;
+		readonly eventDispatcher: import("./assets/scripts/framework/core/event/EventDispatcher").EventDispatcher;
 		/**@description 界面管理器 */
-		readonly uiManager: import("./assets/scripts/framework/support/ui/UIManager").UIManager;
+		readonly uiManager: import("./assets/scripts/framework/core/ui/UIManager").UIManager;
 		/**@description 本地仓库 */
-		readonly localStorage: import("./assets/scripts/framework/support/storage/LocalStorage").LocalStorage;
+		readonly localStorage: import("./assets/scripts/framework/core/storage/LocalStorage").LocalStorage;
 		/**@description 资源管理器 */
-		readonly assetManager: import("./assets/scripts/framework/support/assetManager/AssetManager").AssetManager;
+		readonly assetManager: import("./assets/scripts/framework/core/asset/AssetManager").AssetManager;
 		/**@description 资源缓存管理器 */
-		readonly cacheManager: import("./assets/scripts/framework/support/assetManager/CacheManager").CacheManager;
+		readonly cacheManager: import("./assets/scripts/framework/core/asset/CacheManager").CacheManager;
 		/**@description 适配相关 */
-		readonly adaptor: import("./assets/scripts/framework/support/adaptor/Adaptor").Adaptor;
+		readonly adaptor: import("./assets/scripts/framework/core/adaptor/Adaptor").Adaptor;
 		/**@description 对象池管理器 */
-		readonly nodePoolManager: import("./assets/scripts/framework/support/nodePool/NodePoolManager").NodePoolManager;
+		readonly nodePoolManager: import("./assets/scripts/framework/core/nodePool/NodePoolManager").NodePoolManager;
 		/**@description 小提示 */
 		readonly tips: import("./assets/scripts/common/component/Tips").Tips;
 		/**@description 界面加载时的全屏Loading,显示加载进度 */
@@ -905,25 +905,25 @@ declare namespace td {
 		/**@description 公共loading */
 		readonly loading: import("./assets/scripts/common/component/Loading").Loading;
 		/**@description 逻辑控制器管理器 */
-		readonly logicManager: import("./assets/scripts/framework/support/logic/LogicManager").LogicManager;
+		readonly logicManager: import("./assets/scripts/framework/core/logic/LogicManager").LogicManager;
 		/**@description 游戏数据 自行设置 */
 		gameData: import("./assets/scripts/framework/data/GameData").GameData;
 		/**@description 游戏网络控制器 自行设置 */
 		gameController: any;
 		/**@description 当前游戏GameView, GameView进入onLoad赋值 */
-		gameView: import("./assets/scripts/framework/support/ui/GameView").default;
+		gameView: import("./assets/scripts/framework/core/ui/GameView").default;
 		/**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
 		readonly globalAudio: import("./assets/scripts/common/component/GlobalAudio");
 		/**@description bundle管理器 */
-		readonly bundleManager: import("./assets/scripts/framework/support/assetManager/BundleManager").BundleManager;
+		readonly bundleManager: import("./assets/scripts/framework/core/asset/BundleManager").BundleManager;
 		/**@description 网络Service管理器 */
 		readonly serviceManager: import("./assets/scripts/common/manager/ServiceManager").ServiceManager;
 		/**@description 大厅网络管理器 */
-		readonly hallNetManager: import("./assets/scripts/framework/support/net/service/NetManager").NetManager;
+		readonly hallNetManager: import("./assets/scripts/framework/core/net/service/NetManager").NetManager;
 		/**@description 全局网络管理器 */
-		readonly netManager: import("./assets/scripts/framework/support/net/service/NetManager").NetManager;
+		readonly netManager: import("./assets/scripts/framework/core/net/service/NetManager").NetManager;
 		/**@description 热更新管理器 */
-		readonly hotupdate: import("./assets/scripts/framework/support/hotupdate/HotupdateManager").HotupdateManager;
+		readonly hotupdate: import("./assets/scripts/framework/core/hotupdate/HotupdateManager").HotupdateManager;
 		/**
 		  * @description 把语言包转换成i18n.xxx形式
 		  * @param param 语言包配置

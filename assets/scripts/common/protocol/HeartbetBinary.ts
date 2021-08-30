@@ -1,4 +1,4 @@
-import { BinaryStreamMessage } from "../../framework/support/net/message/BinaryStreamMessage";
+import { BinaryStreamMessage } from "../../framework/core/net/message/BinaryStreamMessage";
 import { MainCmd, SUB_CMD_SYS } from "./CmdDefines";
 
 /**@description 二进制心跳包 */

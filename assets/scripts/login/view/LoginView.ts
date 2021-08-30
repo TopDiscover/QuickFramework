@@ -1,4 +1,4 @@
-import { UIView } from "../../framework/support/ui/UIView";
+import { UIView } from "../../framework/core/ui/UIView";
 import DownloadLoading from "../../common/component/DownloadLoading";
 
 const {ccclass, property} = cc._decorator;

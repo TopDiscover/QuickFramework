@@ -1,4 +1,4 @@
-import { Logic } from "../../../scripts/framework/support/logic/Logic";
+import { Logic } from "../../../scripts/framework/core/logic/Logic";
 import { AimLineData } from "./data/AimLineData";
 import AimLineView from "./view/AimLineView";
 

@@ -1,4 +1,4 @@
-import { Logic } from "../../../scripts/framework/support/logic/Logic";
+import { Logic } from "../../../scripts/framework/core/logic/Logic";
 import { EliminateData } from "./data/EliminateData";
 import { CELL_PREFAB_URL, EFFECTS_CONFIG } from "./data/EliminateDefines";
 import EliminateGameView from "./view/EliminateGameView";
