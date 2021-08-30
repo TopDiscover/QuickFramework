@@ -9,9 +9,9 @@ class GameTwoLogic extends Logic {
         super.onLoad();
     }
 
-    protected bindingEvents() {
-        super.bindingEvents();
-        this.registerEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
+    protected addEvents() {
+        super.addEvents();
+        this.addUIEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
     }
 
     protected get bundle() {
@@ -20,7 +20,7 @@ class GameTwoLogic extends Logic {
 
     private onEnterGame(data) {
         if (data == this.bundle) {
-            Manager.uiManager.open({ type: GameTwoView ,bundle:this.bundle});
+            Manager.uiManager.open({ type: GameTwoView, bundle: this.bundle });
         }
     }
 }

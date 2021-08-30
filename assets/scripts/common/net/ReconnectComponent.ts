@@ -22,9 +22,9 @@ export default class ReconnectComponent extends Controller<CommonService> {
         return `[${cc.js.getClassName(this.service)}].${this.logTag}`
     }
 
-    protected bindingEvents() {
-        super.bindingEvents();
-        this.registerEvent(td.Logic.Event.ENTER_COMPLETE, this.enterComplete);
+    protected addEvents() {
+        super.addEvents();
+        this.addUIEvent(td.Logic.Event.ENTER_COMPLETE, this.enterComplete);
     }
 
     private enterComplete(data: td.Logic.EventData) {
@@ -94,7 +94,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
         cc.log(`${this.logName} ${this.service.serviceName} 断开`)
         Manager.alert.show({
             tag: td.Config.RECONNECT_ALERT_TAG,
-            isRepeat:false,
+            isRepeat: false,
             text: Manager.getLanguage(["warningReconnect", this.service.serviceName]),
             confirmCb: (isOK) => {
                 if (isOK) {

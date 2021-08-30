@@ -11,26 +11,27 @@ class HallLogic extends Logic {
 
     language = new HallLanguage;
 
-    get bundle(){
+    get bundle() {
         return HallData.bundle;
     }
 
-    bindingEvents(){
-        super.bindingEvents();
-        this.registerEvent(td.Logic.Event.ENTER_HALL,this.onEnterHall); 
-        this.registerEvent(td.Logic.Event.ENTER_COMPLETE,this.onEnterComplete);
+    addEvents() {
+        super.addEvents();
+        this.addUIEvent(td.Logic.Event.ENTER_HALL, this.onEnterHall);
+        this.addUIEvent(td.Logic.Event.ENTER_COMPLETE, this.onEnterComplete);
     }
 
-    private onEnterHall(){
+    private onEnterHall() {
+        console.log("login hall")
         Manager.language.addSourceDelegate(this.language);
         //添加大厅网络组件
         Manager.hallNetManager.addNetControllers();
-        Manager.uiManager.open({ type: HallView , bundle:this.bundle});
+        Manager.uiManager.open({ type: HallView, bundle: this.bundle });
     }
 
-    public onEnterComplete(data: td.Logic.EventData){
+    public onEnterComplete(data: td.Logic.EventData) {
         super.onEnterComplete(data);
-        if( data.type == td.Logic.Type.LOGIN){
+        if (data.type == td.Logic.Type.LOGIN) {
             //进入登录界面，移除大厅的网络组件
             Manager.hallNetManager.removeNetControllers();
         }

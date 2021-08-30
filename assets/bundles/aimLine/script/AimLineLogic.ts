@@ -10,13 +10,13 @@ class AimLineLogic extends Logic {
         super.onLoad();
     }
 
-    protected bindingEvents() {
-        super.bindingEvents();
-        this.registerEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
+    protected addEvents() {
+        super.addEvents();
+        this.addUIEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
     }
 
     protected get bundle() {
-       return AimLineData.bundle;
+        return AimLineData.bundle;
     }
 
     private onEnterGame(data) {

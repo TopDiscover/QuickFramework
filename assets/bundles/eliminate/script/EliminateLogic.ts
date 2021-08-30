@@ -11,9 +11,9 @@ class EliminateLogic extends Logic {
         super.onLoad();
     }
 
-    protected bindingEvents() {
-        super.bindingEvents();
-        this.registerEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
+    protected addEvents() {
+        super.addEvents();
+        this.addUIEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
     }
 
     protected get bundle() {
@@ -57,8 +57,8 @@ class EliminateLogic extends Logic {
             }
         }
 
-        res.push({url:EFFECTS_CONFIG.crush.url,type:cc.Prefab,bundle:this.bundle});
-        res.push({url:EFFECTS_CONFIG.colBomb.url,type:cc.Prefab,bundle:this.bundle});
+        res.push({ url: EFFECTS_CONFIG.crush.url, type: cc.Prefab, bundle: this.bundle });
+        res.push({ url: EFFECTS_CONFIG.colBomb.url, type: cc.Prefab, bundle: this.bundle });
         return res;
     }
 }

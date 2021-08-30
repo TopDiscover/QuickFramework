@@ -7,8 +7,8 @@ import GameView from "../../../../scripts/framework/core/ui/GameView";
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class TankBattleGameView extends GameView{
-    get data(){
+export default class TankBattleGameView extends GameView {
+    get data() {
         return TankBettle.gameData;
     }
 
@@ -30,9 +30,9 @@ export default class TankBattleGameView extends GameView{
     private _playerOneTankLive: cc.Label = null;
     private _playerTwoTankLive: cc.Label = null;
 
-    protected bindingEvents() {
-        super.bindingEvents()
-        this.registerEvent(TankBettle.EVENT.SHOW_MAP_LEVEL, this.onShowMapLevel)
+    protected addEvents() {
+        super.addEvents()
+        this.addUIEvent(TankBettle.EVENT.SHOW_MAP_LEVEL, this.onShowMapLevel)
     }
 
     onLoad() {
@@ -49,7 +49,7 @@ export default class TankBattleGameView extends GameView{
         dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this, TankBattleStartView] });
     }
 
-    onDestroy(){
+    onDestroy() {
         this.data.gameMap = null;
         this.data.gamePrefabs = null;
         super.onDestroy();
@@ -84,7 +84,7 @@ export default class TankBattleGameView extends GameView{
     }
 
     onKeyUp(ev: cc.Event.EventKeyboard) {
-        if( this.data.gameMap){
+        if (this.data.gameMap) {
             this.data.gameMap.onKeyUp(ev);
         }
         if (ev.keyCode == cc.macro.KEY.n) {
@@ -95,7 +95,7 @@ export default class TankBattleGameView extends GameView{
             //手动下一关，恢复下生命
             this.data.isSingle = this.data.isSingle;
             this.data.prevLevel();
-        } else if( ev.keyCode == cc.macro.KEY.escape ){
+        } else if (ev.keyCode == cc.macro.KEY.escape) {
             ev.stopPropagation();
             this.data.gameMap.clear();
             this.data.enterStart();
@@ -110,7 +110,7 @@ export default class TankBattleGameView extends GameView{
 
     protected onShowMapLevel(data: any) {
         this.data.showMap(data);
-        this.audioHelper.playMusic(TankBettle.AUDIO_PATH.START,this.bundle,false);
+        this.audioHelper.playMusic(TankBettle.AUDIO_PATH.START, this.bundle, false);
     }
 
     public showGameInfo() {
@@ -119,14 +119,14 @@ export default class TankBattleGameView extends GameView{
         //玩家的生命
         this._playerOneLive.string = (this.data.playerOneLive < 0 ? 0 : this.data.playerOneLive).toString();
         this._playerTwoLive.string = (this.data.playerTwoLive < 0 ? 0 : this.data.playerTwoLive).toString();
-        if( this.data.gameMap.playerOne && this.data.gameMap.playerOne.config.live > 0 ){
+        if (this.data.gameMap.playerOne && this.data.gameMap.playerOne.config.live > 0) {
             this._playerOneTankLive.string = `-${this.data.gameMap.playerOne.config.live}`
-        }else{
+        } else {
             this._playerOneTankLive.string = "";
         }
-        if( this.data.gameMap.playerTwo && this.data.gameMap.playerTwo.config.live > 0 ){
+        if (this.data.gameMap.playerTwo && this.data.gameMap.playerTwo.config.live > 0) {
             this._playerTwoTankLive.string = `-${this.data.gameMap.playerTwo.config.live}`
-        }else{
+        } else {
             this._playerTwoTankLive.string = "";
         }
 

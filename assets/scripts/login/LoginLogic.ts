@@ -11,9 +11,9 @@ class LoginLogic extends Logic {
 
     logicType: td.Logic.Type = td.Logic.Type.LOGIN;
 
-    protected bindingEvents() {
-        super.bindingEvents();
-        this.registerEvent(td.Logic.Event.ENTER_LOGIN, this.onEnterLogin);
+    protected addEvents() {
+        super.addEvents();
+        this.addUIEvent(td.Logic.Event.ENTER_LOGIN, this.onEnterLogin);
     }
 
     get bundle() {
@@ -35,13 +35,13 @@ class LoginLogic extends Logic {
                 Manager.loading.hide();
                 Manager.alert.show({
                     text: i18n.newVersion, confirmCb: (isOK) => {
-                        let data : td.HotUpdate.MessageData = {
-                            isOk : isOK,
-                            state : state,
-                            name : i18n.hallText,
-                            bundle : td.Config.BUNDLE_HALL
+                        let data: td.HotUpdate.MessageData = {
+                            isOk: isOK,
+                            state: state,
+                            name: i18n.hallText,
+                            bundle: td.Config.BUNDLE_HALL
                         };
-                        dispatch(td.HotUpdate.Event.DOWNLOAD_MESSAGE,data);
+                        dispatch(td.HotUpdate.Event.DOWNLOAD_MESSAGE, data);
                     }
                 });
             } else if (code == td.HotUpdate.Code.ALREADY_UP_TO_DATE) {
@@ -71,7 +71,7 @@ class LoginLogic extends Logic {
 
     public onEnterComplete(data: td.Logic.EventData) {
         super.onEnterComplete(data);
-        if( data.type == this.logicType ){
+        if (data.type == this.logicType) {
             //进入到登录，关闭掉所有网络连接，请求登录成功后才连接网络
             Manager.serviceManager.close();
         }

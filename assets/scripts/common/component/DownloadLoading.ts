@@ -7,75 +7,75 @@ const { ccclass, property } = cc._decorator;
 @ccclass
 export default class DownloadLoading extends UIView {
 
-    public static getPrefabUrl(){
+    public static getPrefabUrl() {
         return "common/prefabs/DownloadLoading";
     }
-    
+
     /**@description 下载过程中提示语 */
-    private get tips(){
+    private get tips() {
         return i18n.updatingtips;
     }
 
     /**@description 下载进度 */
-    private progress : cc.ProgressBar = null;
+    private progress: cc.ProgressBar = null;
 
     /**@description 下载过程中显示文字的节点 */
-    private tipsLabel : cc.Label = null;
+    private tipsLabel: cc.Label = null;
 
     private tipsIndex = 0;
 
     /**@description 下载的状态 */
-    private state : td.HotUpdate.State = null;
+    private state: td.HotUpdate.State = null;
 
     private updateName = "";
 
-    bindingEvents(){
-        super.bindingEvents();
-        this.registerEvent(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD,this.onDownload);
+    addEvents() {
+        super.addEvents();
+        this.addUIEvent(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload);
     }
 
-    onLoad(){
+    onLoad() {
         super.onLoad();
         this.state = this.args[0];
         this.updateName = this.args[1];
-        this.tipsLabel = cc.find("tips",this.node).getComponent(cc.Label);
-        this.progress = cc.find("progressBar",this.node).getComponent(cc.ProgressBar);
+        this.tipsLabel = cc.find("tips", this.node).getComponent(cc.Label);
+        this.progress = cc.find("progressBar", this.node).getComponent(cc.ProgressBar);
         this.startTips();
-        this.scheduleOnce(this.doUpdate,1.5);
+        this.scheduleOnce(this.doUpdate, 1.5);
     }
 
     private doUpdate() {
-        if( this.state == td.HotUpdate.State.TRY_DOWNLOAD_FAILED_ASSETS ){
+        if (this.state == td.HotUpdate.State.TRY_DOWNLOAD_FAILED_ASSETS) {
             Manager.hotupdate.downloadFailedAssets();
-        }else{
+        } else {
             Manager.hotupdate.hotUpdate();
         }
     }
 
     private startTips() {
-       cc.tween(this.tipsLabel.node)
-       .call(()=>{
-           this.tipsLabel.string = this.tips[this.tipsIndex];
-       })
-       .delay(2)
-       .call(()=>{
-           this.tipsIndex++;
-           if( this.tipsIndex >= this.tips.length ){
-               this.tipsIndex = 0;
-           }
-           this.startTips();
-       })
-       .start();
+        cc.tween(this.tipsLabel.node)
+            .call(() => {
+                this.tipsLabel.string = this.tips[this.tipsIndex];
+            })
+            .delay(2)
+            .call(() => {
+                this.tipsIndex++;
+                if (this.tipsIndex >= this.tips.length) {
+                    this.tipsIndex = 0;
+                }
+                this.startTips();
+            })
+            .start();
     }
 
-    private onDownload( info : td.HotUpdate.DownLoadInfo ) {
+    private onDownload(info: td.HotUpdate.DownLoadInfo) {
         if (CC_DEBUG) cc.log(JSON.stringify(info));
         if (info.code == td.HotUpdate.Code.UPDATE_PROGRESSION) {
             this.progress.progress = info.percent == Number.NaN ? 0 : info.percent;
         } else if (info.code == td.HotUpdate.Code.ALREADY_UP_TO_DATE) {
             this.progress.progress = 1;
         } else if (info.code == td.HotUpdate.Code.UPDATE_FINISHED) {
-            Manager.tips.show(String.format(i18n.alreadyRemoteVersion,this.updateName));
+            Manager.tips.show(String.format(i18n.alreadyRemoteVersion, this.updateName));
             this.close();
         } else if (info.code == td.HotUpdate.Code.UPDATE_FAILED ||
             info.code == td.HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
@@ -83,7 +83,7 @@ export default class DownloadLoading extends UIView {
             info.code == td.HotUpdate.Code.ERROR_PARSE_MANIFEST ||
             info.code == td.HotUpdate.Code.ERROR_UPDATING ||
             info.code == td.HotUpdate.Code.ERROR_DECOMPRESS) {
-            Manager.tips.show(String.format(i18n.updateFaild,this.updateName));
+            Manager.tips.show(String.format(i18n.updateFaild, this.updateName));
             this.close();
         }
     }

@@ -18,21 +18,21 @@ class TankBattleLogic extends Logic {
         super.onLoad();
     }
 
-    protected bindingEvents() {
-        super.bindingEvents();
-        this.registerEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
-        this.registerEvent(td.Logic.Event.ENTER_ROOM_LIST,this.onEnterRoomList);
+    protected addEvents() {
+        super.addEvents();
+        this.addUIEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
+        this.addUIEvent(td.Logic.Event.ENTER_ROOM_LIST, this.onEnterRoomList);
     }
 
     protected get bundle() {
         return TankBettle.gameData.bundle;
     }
 
-    public onEnterComplete( data : td.Logic.EventData ){
+    public onEnterComplete(data: td.Logic.EventData) {
         super.onEnterComplete(data);
-        if( data.type == this.logicType ){
+        if (data.type == this.logicType) {
 
-        }else{
+        } else {
             //删除子包的语言包
             Manager.language.removeSourceDelegate(this.language);
             //移除网络组件
@@ -42,22 +42,22 @@ class TankBattleLogic extends Logic {
         }
     }
 
-    private onEnterRoomList(data){
+    private onEnterRoomList(data) {
         //打开自己的子游戏房间列表
     }
 
-    protected onLoadResourceComplete( err : td.Resource.LoaderError ){
-        if ( err == td.Resource.LoaderError.LOADING ){
+    protected onLoadResourceComplete(err: td.Resource.LoaderError) {
+        if (err == td.Resource.LoaderError.LOADING) {
             return;
         }
         cc.log(`${this.bundle}资源加载完成!!!`);
         super.onLoadResourceComplete(err);
         //加载完成，恢复网络
         LobbyService.instance.resumeMessageQueue();
-        Manager.uiManager.open({ type: TankBattleGameView ,bundle:this.bundle});
+        Manager.uiManager.open({ type: TankBattleGameView, bundle: this.bundle });
     }
 
-    protected getNetControllerType(){
+    protected getNetControllerType() {
         return TankBattleNetController
     }
 
@@ -78,7 +78,7 @@ class TankBattleLogic extends Logic {
             LobbyService.instance.pauseMessageQueue();
             //加载资源
             this._loader.loadResources();
-        }else{
+        } else {
 
             //移除网络组件
             this.removeNetComponent();
@@ -87,8 +87,8 @@ class TankBattleLogic extends Logic {
         }
     }
 
-    protected getLoadResources(): td.Resource.Data[]{
-        return [{ preloadView: TankBattleGameView , bundle : this.bundle}];
+    protected getLoadResources(): td.Resource.Data[] {
+        return [{ preloadView: TankBattleGameView, bundle: this.bundle }];
     }
 }
 

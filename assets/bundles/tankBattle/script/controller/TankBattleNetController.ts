@@ -10,6 +10,7 @@ import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { SUB_CMD_GAME, TankBattleConfig } from "../protocol/TankBattleProtocal";
 import { TankBettle } from "../data/TankBattleGameData";
 import TankBattleChangeStageView from "../view/TankBattleChangeStageView";
+import { GetCmdKey } from "../../../hall/script/controller/GetCmdKey";
 
 const { ccclass, property } = cc._decorator;
 
@@ -17,10 +18,10 @@ const { ccclass, property } = cc._decorator;
 @setService(LobbyService.instance)
 export default class TankBattleNetController extends Controller<LobbyService> {
 
-    protected bindingEvents() {
-        super.bindingEvents()
+    protected addEvents() {
+        super.addEvents()
         cc.log("TankBattleNetController=>bindingEvents")
-        this.registerEvent(MainCmd.CMD_GAME, SUB_CMD_GAME.CMD_GAME_CONFIG, this.onGameSaveConfig, TankBattleConfig);
+        this.addNetEvent(GetCmdKey(MainCmd.CMD_GAME, SUB_CMD_GAME.CMD_GAME_CONFIG), this.onGameSaveConfig, TankBattleConfig);
     }
 
     protected get bundle(): string {

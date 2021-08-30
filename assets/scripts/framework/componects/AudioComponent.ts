@@ -23,11 +23,11 @@ class AudioData {
     public curMusicUrl = "";
     public curEffectId = -1;
     /**@description 当前背景音乐的Bundle */
-    public curBundle : BUNDLE_TYPE = null;
+    public curBundle: BUNDLE_TYPE = null;
     /**@description 当前背景音乐是否循环播放 */
-    public curLoop : boolean = true;
+    public curLoop: boolean = true;
     /**@description 当前背景音乐是否正在播放 */
-    public isPlaying : boolean = false;
+    public isPlaying: boolean = false;
 
     private readonly _storeMusicKey: string = "default_save_music";
     private readonly _storeEffectKey: string = "default_save_effect";
@@ -65,21 +65,21 @@ const PLAY_MUSIC = "AudioComponent_PLAY_MUSIC";
 export default class AudioComponent extends EventComponent {
 
 
-    protected bindingEvents(){
-        super.bindingEvents();
-        this.registerEvent(PLAY_MUSIC,this.onPlayMusic);
+    protected addEvents() {
+        super.addEvents();
+        this.addUIEvent(PLAY_MUSIC, this.onPlayMusic);
     }
 
-    private onPlayMusic( data ){
-        if( this.curPlayMusicUrl == this.curMusicUrl && !this.isPlaying && this.curMusicUrl && this.curBundle ){
-            this.playMusic(this.curMusicUrl,this.curBundle,this.curLoop);
+    private onPlayMusic(data) {
+        if (this.curPlayMusicUrl == this.curMusicUrl && !this.isPlaying && this.curMusicUrl && this.curBundle) {
+            this.playMusic(this.curMusicUrl, this.curBundle, this.curLoop);
         }
     }
 
     protected audioData = AudioData.instance;
 
     /**@description 音频控件资源拥有者，该对象由UIManager打开的界面 */
-    public owner : UIView = null;
+    public owner: UIView = null;
 
     /**@description 背景音乐音量 */
     public get musicVolume() { return this.audioData.musicVolume; }
@@ -121,7 +121,7 @@ export default class AudioComponent extends EventComponent {
                 return;
             }
             //有多个AudioComponent ,通知所有的组件
-            dispatch(PLAY_MUSIC,this);
+            dispatch(PLAY_MUSIC, this);
         } else {
             this.stopMusic();
         }
@@ -129,14 +129,14 @@ export default class AudioComponent extends EventComponent {
     /**@description 当前播放的背景音乐 */
     public get curMusicUrl() { return this.audioData.curMusicUrl; }
     public set curMusicUrl(value) { this.audioData.curMusicUrl = value };
-    public get curBundle(){ return this.audioData.curBundle;}
-    public set curBundle(value){ this.audioData.curBundle = value;}
-    protected get curLoop(){ return this.audioData.curLoop;}
-    protected set curLoop(value) { this.audioData.curLoop = value};
-    protected get isPlaying(){ return this.audioData.isPlaying;}
-    protected set isPlaying(value){ this.audioData.isPlaying = value};
+    public get curBundle() { return this.audioData.curBundle; }
+    public set curBundle(value) { this.audioData.curBundle = value; }
+    protected get curLoop() { return this.audioData.curLoop; }
+    protected set curLoop(value) { this.audioData.curLoop = value };
+    protected get isPlaying() { return this.audioData.isPlaying; }
+    protected set isPlaying(value) { this.audioData.isPlaying = value };
     /**@description 指向当前组件的播放音乐 */
-    protected curPlayMusicUrl : string = null;
+    protected curPlayMusicUrl: string = null;
 
     /**@description 存储 */
     public save() {
@@ -166,12 +166,12 @@ export default class AudioComponent extends EventComponent {
         this.isPlaying = false;
     }
 
-    public playMusic(url: string, bundle : BUNDLE_TYPE , loop: boolean = true) {
+    public playMusic(url: string, bundle: BUNDLE_TYPE, loop: boolean = true) {
         return new Promise<{ url: string, isSuccess: boolean }>((resolve) => {
-            if ( CC_DEBUG ){
-                if ( !this.owner ){
+            if (CC_DEBUG) {
+                if (!this.owner) {
                     cc.error(`必须要指定资源的管理都才能播放`);
-                    resolve({url:url,isSuccess:false});
+                    resolve({ url: url, isSuccess: false });
                     return;
                 }
             }
@@ -180,16 +180,16 @@ export default class AudioComponent extends EventComponent {
             this.curBundle = bundle;
             this.curLoop = loop;
             if (this.audioData.isMusicOn) {
-                Manager.cacheManager.getCacheByAsync(url,cc.AudioClip,bundle).then((data) => {
+                Manager.cacheManager.getCacheByAsync(url, cc.AudioClip, bundle).then((data) => {
                     if (data) {
                         let info = new td.Resource.Info;
                         info.url = url;
                         info.type = cc.AudioClip;
                         info.data = data;
                         info.bundle = bundle;
-                        if ( this.owner ){ 
-                            Manager.uiManager.addLocal(info,this.owner.className);
-                        }else{
+                        if (this.owner) {
+                            Manager.uiManager.addLocal(info, this.owner.className);
+                        } else {
                             Manager.uiManager.garbage.addLocal(info);
                         }
                         //停掉当前播放音乐
@@ -207,26 +207,26 @@ export default class AudioComponent extends EventComponent {
 
     }
 
-    public playEffect(url: string, bundle:BUNDLE_TYPE ,loop: boolean = false) {
+    public playEffect(url: string, bundle: BUNDLE_TYPE, loop: boolean = false) {
         return new Promise<number>((resolve) => {
-            if ( CC_DEBUG ){
-                if ( !this.owner ){
+            if (CC_DEBUG) {
+                if (!this.owner) {
                     cc.error(`必须要指定资源的管理都才能播放`);
                     resolve(-1);
                     return;
                 }
             }
             if (this.audioData.isEffectOn) {
-                Manager.cacheManager.getCacheByAsync(url,cc.AudioClip,bundle).then((data) => {
+                Manager.cacheManager.getCacheByAsync(url, cc.AudioClip, bundle).then((data) => {
                     if (data) {
                         let info = new td.Resource.Info;
                         info.url = url;
                         info.type = cc.AudioClip;
                         info.data = data;
                         info.bundle = bundle;
-                        if ( this.owner ) {
-                            Manager.uiManager.addLocal(info,this.owner.className);
-                        }else{
+                        if (this.owner) {
+                            Manager.uiManager.addLocal(info, this.owner.className);
+                        } else {
                             Manager.uiManager.garbage.addLocal(info);
                         }
                         this.audioData.curEffectId = cc.audioEngine.playEffect(data, loop);

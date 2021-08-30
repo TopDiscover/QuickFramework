@@ -87,9 +87,9 @@ export default class HallView extends UIView {
         let mail = cc.find("mial", bottom_op);
         mail.on(cc.Node.EventType.TOUCH_END, () => {
             let lan = Manager.language.getLanguage();
-            if( lan == cc.sys.LANGUAGE_CHINESE){
+            if (lan == cc.sys.LANGUAGE_CHINESE) {
                 lan = cc.sys.LANGUAGE_ENGLISH
-            }else if( lan == cc.sys.LANGUAGE_ENGLISH ) {
+            } else if (lan == cc.sys.LANGUAGE_ENGLISH) {
                 lan = cc.sys.LANGUAGE_CHINESE;
             }
             Manager.language.change(lan);
@@ -105,9 +105,9 @@ export default class HallView extends UIView {
         dispatchEnterComplete({ type: td.Logic.Type.HALL, views: [this] });
     }
 
-    bindingEvents() {
-        super.bindingEvents();
-        this.registerEvent(td.HotUpdate.Event.DOWNLOAD_PROGRESS, this.onDownloadProgess);
+    addEvents() {
+        super.addEvents();
+        this.addUIEvent(td.HotUpdate.Event.DOWNLOAD_PROGRESS, this.onDownloadProgess);
     }
 
     private getGameItem(config: td.HotUpdate.BundleConfig) {

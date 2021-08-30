@@ -5,7 +5,7 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class TankBattleStartView extends UIView {
-    get data(){
+    get data() {
         return TankBettle.gameData;
     }
 
@@ -20,9 +20,9 @@ export default class TankBattleStartView extends UIView {
     /**@description 多人 */
     private doublePalyers: cc.Node = null;
 
-    protected bindingEvents(){
-        super.bindingEvents();
-        this.registerEvent(TankBettle.EVENT.SHOW_MAP_LEVEL,this.onChangeStageFinished)
+    protected addEvents() {
+        super.addEvents();
+        this.addUIEvent(TankBettle.EVENT.SHOW_MAP_LEVEL, this.onChangeStageFinished)
     }
 
     onLoad() {
@@ -48,25 +48,25 @@ export default class TankBattleStartView extends UIView {
 
     onKeyUp(ev: cc.Event.EventKeyboard) {
         super.onKeyUp(ev);
-        if( this.data.gameStatus != TankBettle.GAME_STATUS.SELECTED ){
+        if (this.data.gameStatus != TankBettle.GAME_STATUS.SELECTED) {
             return;
         }
-        if (ev.keyCode == cc.macro.KEY.down || ev.keyCode == cc.macro.KEY.up ) {
+        if (ev.keyCode == cc.macro.KEY.down || ev.keyCode == cc.macro.KEY.up) {
             let isSingle = false;
             if (this.selectTank.y == this.singlePlayer.y) {
                 this.selectTank.y = this.doublePalyers.y;
-            }else{
+            } else {
                 this.selectTank.y = this.singlePlayer.y;
                 isSingle = true;
             }
             this.data.isSingle = isSingle;
-        }else if( ev.keyCode == cc.macro.KEY.space || ev.keyCode == cc.macro.KEY.enter ){
+        } else if (ev.keyCode == cc.macro.KEY.space || ev.keyCode == cc.macro.KEY.enter) {
             this.data.isSingle = this.data.isSingle;
             this.data.enterGame();
         }
     }
 
-    protected onChangeStageFinished(){
+    protected onChangeStageFinished() {
         this.close();
     }
 }
