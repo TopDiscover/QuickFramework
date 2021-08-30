@@ -1,5 +1,5 @@
 import EventComponent from "./EventComponent";
-import { UIView } from "../support/ui/UIView";
+import { UIView } from "../core/ui/UIView";
 
 /**
  * @description 声音组件

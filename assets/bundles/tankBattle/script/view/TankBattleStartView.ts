@@ -1,4 +1,4 @@
-import { UIView } from "../../../../scripts/framework/support/ui/UIView";
+import { UIView } from "../../../../scripts/framework/core/ui/UIView";
 import { TankBettle } from "../data/TankBattleGameData";
 
 const { ccclass, property } = cc._decorator;

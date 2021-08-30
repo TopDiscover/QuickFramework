@@ -3,7 +3,7 @@
  * @description 登录流程 , 不用导出
  */
 
-import { Logic } from "../framework/support/logic/Logic";
+import { Logic } from "../framework/core/logic/Logic";
 import LoginView from "./view/LoginView";
 import { i18n } from "../common/language/CommonLanguage";
 

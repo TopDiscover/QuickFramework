@@ -1,15 +1,14 @@
 
-import { Service } from "../../framework/support/net/service/Service";
-import { IMessage, Message } from "../../framework/support/net/message/Message";
+import { Service } from "../../framework/core/net/service/Service";
+import { IMessage } from "../../framework/core/net/message/Message";
 import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdDefines";
 import { Reconnect } from "./Reconnect";
-import { ICommonService } from "../../framework/support/net/socket/ICommonService";
 
 /**
  * @description service公共基类
  */
 
-export class CommonService extends ICommonService implements GameEventInterface {
+export class CommonService extends Service implements GameEventInterface {
 
     protected static _instance: CommonService = null!;
     public static get instance() { return this._instance || (this._instance = new CommonService()); }
@@ -19,9 +18,9 @@ export class CommonService extends ICommonService implements GameEventInterface 
     protected ip = "localhost";
     protected port = 3000;
     protected protocol: td.Net.Type = "ws"
-
-    protected _maxEnterBackgroundTime: number = td.Config.MAX_INBACKGROUND_TIME;
-    protected _backgroundTimeOutId: any = -1;
+    
+    private _maxEnterBackgroundTime: number = td.Config.MAX_INBACKGROUND_TIME;
+    private _backgroundTimeOutId : any = -1;
     /**@description 进入后台的最大允许时间，超过了最大值，则进入网络重连 */
     public get maxEnterBackgroundTime() {
         return this._maxEnterBackgroundTime;
@@ -38,7 +37,7 @@ export class CommonService extends ICommonService implements GameEventInterface 
     * @description 连接网络
     */
     public connect() {
-        super.connect_server(this.ip, this.port, this.protocol);
+        super.connect(this.ip, this.port, this.protocol);
     }
 
     /**@description 网络重连 */
@@ -77,19 +76,19 @@ export class CommonService extends ICommonService implements GameEventInterface 
         super.onHeartbeatTimeOut();
         cc.warn(`${this.serviceName} 心跳超时，您已经断开网络`);
         this.close();
-        Manager.serviceManager.tryReconnect(this, true);
+        Manager.serviceManager.tryReconnect(this,true);
     }
     /**
      * @description 是否为心跳消息
      */
-    protected isHeartBeat(data: Message): boolean {
+    protected isHeartBeat(data: IMessage): boolean {
         //示例
-        return data.getMsgID() == "11"//String(MainCmd.CMD_SYS) + String(SUB_CMD_SYS.CMD_SYS_HEART)
+        return data.mainCmd == MainCmd.CMD_SYS && data.subCmd == SUB_CMD_SYS.CMD_SYS_HEART;
     }
 
     onEnterBackground() {
         let me = this;
-        Manager.uiManager.getView("LoginView").then(view => {
+        Manager.uiManager.getView("LoginView").then(view=>{
             me._backgroundTimeOutId = setTimeout(() => {
                 //进入后台超时，主动关闭网络
                 cc.log(`进入后台时间过长，主动关闭网络，等玩家切回前台重新连接网络`);
@@ -118,22 +117,22 @@ export class CommonService extends ICommonService implements GameEventInterface 
         }
     }
 
-    protected onError(ev: Event) {
+    protected onError(ev:Event){
         super.onError(ev)
-        Manager.uiManager.getView("LoginView").then(view => {
-            if (view) return;
+        Manager.uiManager.getView("LoginView").then(view=>{
+            if( view ) return;
             Manager.serviceManager.tryReconnect(this);
         });
     }
 
-    protected onClose(ev: Event) {
+    protected onClose(ev:Event){
         super.onClose(ev)
-        if (ev.type == td.Net.NetEvent.ON_CUSTOM_CLOSE) {
+        if( ev.type == td.Net.NetEvent.ON_CUSTOM_CLOSE){
             cc.log(`${this.serviceName} 应用层主动关闭Socket`);
             return;
         }
-        Manager.uiManager.getView("LoginView").then(view => {
-            if (view) return;
+        Manager.uiManager.getView("LoginView").then(view=>{
+            if( view ) return;
             Manager.serviceManager.tryReconnect(this);
         });
     }

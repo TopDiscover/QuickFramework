@@ -1,4 +1,4 @@
-import GameView from "../../../../scripts/framework/support/ui/GameView";
+import GameView from "../../../../scripts/framework/core/ui/GameView";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { ChatService } from "../../../../scripts/common/net/ChatService";
 import { CommonService } from "../../../../scripts/common/net/CommonService";
@@ -7,7 +7,9 @@ import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import { HeartbeatBinary } from "../../../../scripts/common/protocol/HeartbetBinary";
 import { HeartbeatJson } from "../../../../scripts/common/protocol/HeartbetJson";
 import { HeartbeatProto } from "../../../../scripts/common/protocol/HeartbetProto";
-
+import { BinaryStreamMessageHeader } from "../../../../scripts/framework/core/net/message/BinaryStreamMessage";
+import { JsonMessageHeader } from "../../../../scripts/framework/core/net/message/JsonMessage";
+import { ProtoMessageHeader } from "../../../../scripts/framework/core/net/message/ProtoMessage";
 import { HallNetHelper } from "../../../hall/script/controller/HallNetHelper";
 import { INetHelper } from "../controller/INetHelper";
 import { TestChatNetHelper } from "../controller/TestChatNetHelper";
@@ -165,17 +167,17 @@ export default class NetTestView extends GameView {
     private _changeNetType(type: NetTest.NetType, service: CommonService) {
         if (type == NetTest.NetType.JSON) {
             this.log(`${service.serviceName} 使用Json方式`);
-            // service.Codec = JsonMessageHeader;
+            service.messageHeader = JsonMessageHeader;
             service.heartbeat = HeartbeatJson;
             service.maxEnterBackgroundTime = td.Config.MIN_INBACKGROUND_TIME;
         } else if (type == NetTest.NetType.PROTO) {
             this.log(`${service.serviceName} 使用Proto方式`);
-            // service.Codec = ProtoMessageHeader;
+            service.messageHeader = ProtoMessageHeader;
             service.heartbeat = HeartbeatProto;
             service.maxEnterBackgroundTime = td.Config.MAX_INBACKGROUND_TIME;
         } else if (type == NetTest.NetType.BINARY) {
             this.log(`${service.serviceName} 使用Binary方式`);
-            // service.Codec = BinaryStreamMessageHeader;
+            service.messageHeader = BinaryStreamMessageHeader;
             service.heartbeat = HeartbeatBinary;
             service.maxEnterBackgroundTime = td.Config.MAX_INBACKGROUND_TIME;
         } else {
@@ -192,19 +194,19 @@ export default class NetTestView extends GameView {
 
     private enabledReconnect(service: CommonService, enabled: boolean) {
         service.reconnect.enabled = enabled;
-        if (enabled) {
+        if( enabled ){
             this.log(`${service.serviceName} 启用重连组件`);
-        } else {
+        }else{
             this.log(`${service.serviceName} 禁用重连组件`);
         }
     }
     private onReconnectToggle(toggle: cc.Toggle) {
         if (toggle.node.userData == NetTest.ServiceType.Lobby) {
-            this.enabledReconnect(LobbyService.instance, toggle.isChecked);
+            this.enabledReconnect(LobbyService.instance,toggle.isChecked);
         } else if (toggle.node.userData == NetTest.ServiceType.Game) {
-            this.enabledReconnect(GameService.instance, toggle.isChecked);
+            this.enabledReconnect(GameService.instance,toggle.isChecked);
         } else if (toggle.node.userData == NetTest.ServiceType.Chat) {
-            this.enabledReconnect(ChatService.instance, toggle.isChecked);
+            this.enabledReconnect(ChatService.instance,toggle.isChecked);
         }
     }
 

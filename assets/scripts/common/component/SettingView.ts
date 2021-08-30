@@ -1,4 +1,4 @@
-import { UIView } from "../../framework/support/ui/UIView";
+import { UIView } from "../../framework/core/ui/UIView";
 import { i18n } from "../language/CommonLanguage";
 
 const { ccclass, property } = cc._decorator;

@@ -1,7 +1,7 @@
 import TankBattleStartView from "./TankBattleStartView";
 import TankBattleMap from "../model/TankBattleMap";
 import { TankBettle } from "../data/TankBattleGameData";
-import GameView from "../../../../scripts/framework/support/ui/GameView";
+import GameView from "../../../../scripts/framework/core/ui/GameView";
 
 
 const { ccclass, property } = cc._decorator;

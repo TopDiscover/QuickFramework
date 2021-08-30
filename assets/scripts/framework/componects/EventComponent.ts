@@ -1,4 +1,4 @@
-import { Service } from "../support/net/service/Service";
+import { Service } from "../core/net/service/Service";
 
 /**
  * @description 事件处理组件

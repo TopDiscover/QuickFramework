@@ -1,4 +1,4 @@
-import NetHelper from "../../../../scripts/framework/support/net/service/NetHelper";
+import NetHelper from "../../../../scripts/framework/core/net/service/NetHelper";
 import { ChatService } from "../../../../scripts/common/net/ChatService";
 import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessage";
 import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
