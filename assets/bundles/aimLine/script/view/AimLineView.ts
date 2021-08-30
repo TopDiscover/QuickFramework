@@ -1,4 +1,4 @@
-import GameView from "../../../../scripts/framework/base/GameView";
+import GameView from "../../../../scripts/framework/core/ui/GameView";
 import { Graphics, _decorator ,Node, find, EventTouch, Vec2, UITransform, Vec3, PhysicsSystem2D, physics, EPhysics2DDrawFlags, ERaycast2DType, view} from "cc";
 
 /**

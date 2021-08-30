@@ -1,11 +1,11 @@
 /**@@description 坦克大战游戏数据 */
 
-import { GameData } from "../../../../scripts/framework/base/GameData";
+import { GameData } from "../../../../scripts/framework/data/GameData";
 import { MapLevel } from "./TankBattleLevel";
 import TankBattleMap from "../model/TankBattleMap";
 import TankBattleGameView from "../view/TankBattleGameView";
 import { Node, Rect, UITransform, Vec2, Vec3 } from "cc"
-import UIView from "../../../../scripts/framework/ui/UIView";
+import UIView from "../../../../scripts/framework/core/ui/UIView";
 
 export namespace TankBettle {
     export enum Direction {

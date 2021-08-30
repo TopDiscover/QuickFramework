@@ -1,5 +1,5 @@
 import { Prefab } from "cc";
-import { Logic } from "../../../scripts/framework/base/Logic";
+import { Logic } from "../../../scripts/framework/core/logic/Logic";
 import { EliminateData } from "./data/EliminateData";
 import { CELL_PREFAB_URL, EFFECTS_CONFIG } from "./data/EliminateDefines";
 import EliminateGameView from "./view/EliminateGameView";
@@ -32,7 +32,7 @@ class EliminateLogic extends Logic {
 
     private onEnterGame(data:string) {
         if (data == this.bundle) {
-            Manager.loading.show(Manager.getLanguage("loading_game_resources"));
+            Manager.loading.show(Manager.getLanguage("loading_game_resources")as string);
             this._loader.loadResources();
         } else {
             this._loader.unLoadResources();

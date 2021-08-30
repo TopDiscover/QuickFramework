@@ -1,5 +1,6 @@
 import { _decorator ,Node, find, instantiate, Vec3, randomRangeInt, UITransform} from "cc";
-import GameView from "../../../../scripts/framework/base/GameView";
+import { NodePool } from "../../../../scripts/framework/core/nodePool/NodePoolManager";
+import GameView from "../../../../scripts/framework/core/ui/GameView";
 
 const {ccclass, property} = _decorator;
 
@@ -10,7 +11,7 @@ export default class NodePoolView extends GameView {
         return "prefabs/NodePoolView";
     }
 
-    private pool : td.NodePool|null = null;
+    private pool : NodePool|null = null;
     private star : Node = null!;
 
     onLoad() {

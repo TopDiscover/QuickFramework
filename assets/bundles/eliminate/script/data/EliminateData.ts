@@ -1,4 +1,4 @@
-import { GameData } from "../../../../scripts/framework/base/GameData";
+import { GameData } from "../../../../scripts/framework/data/GameData";
 import EliminateGameModel from "../model/EliminateGameModel";
 
 class _EliminateData extends GameData {

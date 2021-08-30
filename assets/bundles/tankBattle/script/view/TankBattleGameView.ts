@@ -1,7 +1,7 @@
 import TankBattleStartView from "./TankBattleStartView";
 import TankBattleMap from "../model/TankBattleMap";
 import { TankBettle } from "../data/TankBattleGameData";
-import GameView from "../../../../scripts/framework/base/GameView";
+import GameView from "../../../../scripts/framework/core/ui/GameView";
 import { _decorator,Node, Label, director, PhysicsSystem2D, find, systemEvent, SystemEvent, EventKeyboard, macro, instantiate } from "cc";
 
 

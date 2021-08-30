@@ -1,4 +1,4 @@
-import { Logic } from "../../../scripts/framework/base/Logic";
+import { Logic } from "../../../scripts/framework/core/logic/Logic";
 import HallView from "./view/HallView";
 import { HallData } from "./data/HallData";
 import { HallLanguage } from "./data/HallLanguage";

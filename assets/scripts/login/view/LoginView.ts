@@ -1,4 +1,4 @@
-import UIView from "../../framework/ui/UIView";
+import UIView from "../../framework/core/ui/UIView";
 import DownloadLoading from "../../common/component/DownloadLoading";
 import { _decorator,Node, find, SystemEventType } from "cc";
 

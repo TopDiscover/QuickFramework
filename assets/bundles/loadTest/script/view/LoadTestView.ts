@@ -1,7 +1,7 @@
 
 import { _decorator,Node, find,Animation, Label, Sprite, instantiate, Button, Vec2, Vec3, UITransform, ParticleSystem, ParticleSystem2D, sp, SpriteFrame, AnimationClip, Layers, Widget, size } from "cc";
-import { loadDirRes } from "../../../../scripts/framework/extentions/CocosExtention";
-import UIView from "../../../../scripts/framework/ui/UIView";
+import { loadDirRes } from "../../../../scripts/framework/plugin/CocosExtention";
+import UIView from "../../../../scripts/framework/core/ui/UIView";
 import { HallData } from "../../../hall/script/data/HallData";
 
 const {ccclass, property} = _decorator;

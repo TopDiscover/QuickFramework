@@ -1,6 +1,6 @@
 
-import { Service } from "../../framework/base/Service";
-import { IMessage } from "../../framework/net/Message";
+import { Service } from "../../framework/core/net/service/Service";
+import { IMessage } from "../../framework/core/net/message/Message";
 import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdDefines";
 import { Reconnect } from "./Reconnect";
 
@@ -127,7 +127,7 @@ export class CommonService extends Service implements GameEventInterface {
 
     protected onClose(ev:Event){
         super.onClose(ev)
-        if( ev.type == td.Net.Event.ON_CUSTOM_CLOSE){
+        if( ev.type == td.Net.NetEvent.ON_CUSTOM_CLOSE){
             log(`${this.serviceName} 应用层主动关闭Socket`);
             return;
         }

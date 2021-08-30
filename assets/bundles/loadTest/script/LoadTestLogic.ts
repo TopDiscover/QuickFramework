@@ -1,5 +1,5 @@
 import { SpriteFrame } from "cc";
-import { Logic } from "../../../scripts/framework/base/Logic";
+import { Logic } from "../../../scripts/framework/core/logic/Logic";
 import LoadTestView from "./view/LoadTestView";
 
 class LoadTestLogic extends Logic {

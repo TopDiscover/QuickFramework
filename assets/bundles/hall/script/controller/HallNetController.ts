@@ -4,7 +4,7 @@
 
 import { injectService } from "../../../../scripts/framework/decorator/Decorators";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
-import Controller from "../../../../scripts/framework/controller/Controller";
+import Controller from "../../../../scripts/framework/componects/Controller";
 import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { TestProtoMessage } from "../protocol/TestProtoMessage";
 import { TestBinaryMessage } from "../protocol/TestBinaryMessage";
@@ -12,7 +12,6 @@ import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { SUB_CMD_LOBBY } from "../protocol/LobbyCmd";
 import { TestJsonMessage } from "../protocol/TestJsonMessage";
 import { _decorator } from "cc";
-import { ServiceEvent } from "../../../../scripts/framework/base/Service";
 const { ccclass, property } = _decorator;
 
 @ccclass
@@ -38,13 +37,13 @@ export default class HallNetController extends Controller<LobbyService> {
         dispatch(CommonEvent.TEST_BINARY_MSG, data.hello)
     }
 
-    protected onNetOpen(event: ServiceEvent) {
+    protected onNetOpen(event: td.Net.ServiceEvent) {
         let result = super.onNetOpen(event);
         if (result) dispatch(CommonEvent.LOBBY_SERVICE_CONNECTED, this.service);
         return result;
     }
 
-    protected onNetClose(event: ServiceEvent) {
+    protected onNetClose(event: td.Net.ServiceEvent) {
         let result = super.onNetClose(event);
         if (result) dispatch(CommonEvent.LOBBY_SERVICE_CLOSE, this.service);
         return result;

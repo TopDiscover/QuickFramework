@@ -1,5 +1,5 @@
 import { _decorator,find ,Node} from "cc";
-import GameView from "../../../../scripts/framework/base/GameView";
+import GameView from "../../../../scripts/framework/core/ui/GameView";
 import { EliminateData } from "../data/EliminateData";
 import { EliminateEffect } from "../data/EliminateDefines";
 import EliminateEffectsView from "./EliminateEffectsView";

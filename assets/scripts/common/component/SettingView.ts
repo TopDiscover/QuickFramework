@@ -1,5 +1,5 @@
 import { find, Slider, Toggle, _decorator,Node, SystemEventType, ProgressBar } from "cc";
-import UIView from "../../framework/ui/UIView";
+import UIView from "../../framework/core/ui/UIView";
 import { i18n } from "../language/CommonLanguage";
 
 const { ccclass, property } = _decorator;

@@ -1,4 +1,4 @@
-import { Logic } from "../../../scripts/framework/base/Logic";
+import { Logic } from "../../../scripts/framework/core/logic/Logic";
 import { LobbyService } from "../../../scripts/common/net/LobbyService";
 import TankBattleGameView from "./view/TankBattleGameView";
 import { TankBettle } from "./data/TankBattleGameData";

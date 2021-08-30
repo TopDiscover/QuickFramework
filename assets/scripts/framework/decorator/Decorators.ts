@@ -4,7 +4,7 @@
  */
 import { js, log } from "cc";
 import { DEBUG } from "cc/env";
-import { Service } from "../base/Service";
+import { Service } from "../core/net/service/Service";
 
 export function injectService(service: Service) {
     return function (target: any) {

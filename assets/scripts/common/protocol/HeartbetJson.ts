@@ -1,4 +1,4 @@
-import { JsonMessage } from "../../framework/net/JsonMessage";
+import { JsonMessage } from "../../framework/core/net/message/JsonMessage";
 import { MainCmd, SUB_CMD_SYS } from "./CmdDefines";
 
 /**@description json心跳包 */

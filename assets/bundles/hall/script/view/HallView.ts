@@ -1,4 +1,4 @@
-import UIView from "../../../../scripts/framework/ui/UIView";
+import UIView from "../../../../scripts/framework/core/ui/UIView";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { HallData } from "../data/HallData";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
@@ -52,7 +52,7 @@ export default class HallView extends UIView {
     private _bundles: td.HotUpdate.BundleConfig[] = [];
     private get bundles() {
         if (this._bundles.length <= 0) {
-            let names : string[] = Manager.getLanguage("hall_view_game_name",HallData.bundle);
+            let names : string[] = Manager.getLanguage("hall_view_game_name",HallData.bundle) as string[];
             for( let i = 0 ; i < this._bundleNames.length ;i++ ){
                 this._bundles.push(new td.HotUpdate.BundleConfig(names[i],this._bundleNames[i],i+1));
             }

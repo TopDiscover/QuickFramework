@@ -1,4 +1,4 @@
-import UIView from "../../framework/ui/UIView";
+import UIView from "../../framework/core/ui/UIView";
 import { find, Label, ProgressBar, tween, _decorator } from "cc";
 import { DEBUG } from "cc/env";
 import { i18n } from "../language/CommonLanguage";

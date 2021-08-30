@@ -1,4 +1,4 @@
-import UIView from "../../../../scripts/framework/ui/UIView";
+import UIView from "../../../../scripts/framework/core/ui/UIView";
 import { TankBettle } from "../data/TankBattleGameData";
 import { _decorator,Node, find, Label, tween, Vec3, UITransform } from "cc";
 

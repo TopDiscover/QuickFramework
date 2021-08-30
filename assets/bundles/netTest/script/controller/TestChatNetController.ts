@@ -3,7 +3,7 @@
  */
 
  import { injectService } from "../../../../scripts/framework/decorator/Decorators";
- import Controller from "../../../../scripts/framework/controller/Controller";
+ import Controller from "../../../../scripts/framework/componects/Controller";
  import { ChatService } from "../../../../scripts/common/net/ChatService";
  import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
  import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
@@ -12,7 +12,6 @@
  import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
  import { TestProtoMessage } from "../../../hall/script/protocol/TestProtoMessage";
 import { _decorator } from "cc";
-import { ServiceEvent } from "../../../../scripts/framework/base/Service";
  const { ccclass, property } = _decorator;
  
  @ccclass
@@ -38,13 +37,13 @@ import { ServiceEvent } from "../../../../scripts/framework/base/Service";
          dispatch(CommonEvent.TEST_BINARY_MSG, data.hello)
      }
  
-     protected onNetOpen(event: ServiceEvent) {
+     protected onNetOpen(event: td.Net.ServiceEvent) {
          let result = super.onNetOpen(event);
          if (result) dispatch(CommonEvent.CHAT_SERVICE_CONNECTED, this.service);
          return result;
      }
  
-     protected onNetClose(event: ServiceEvent) {
+     protected onNetClose(event: td.Net.ServiceEvent) {
          let result = super.onNetClose(event);
          if (result) dispatch(CommonEvent.CHAT_SERVICE_CLOSE, this.service);
          return result;

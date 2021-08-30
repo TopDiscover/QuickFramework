@@ -1,20 +1,20 @@
-import { configurationInit } from "./base/Configuration";
+import { configurationInit } from "./defines/Configuration";
 configurationInit();
-import { Language } from "./base/Language";
-import { EventDispatcher } from "./event/EventDispatcher";
-import { UIManager } from "./base/UIManager";
-import { LocalStorage } from "./base/LocalStorage";
-import { _AssetManager } from "./assetManager/AssetManager";
-import { CacheManager } from "./assetManager/CacheManager";
-import { Adaptor } from "./adaptor/Adaptor";
-import { NodePoolManager } from "./base/NodePoolManager";
-import { HotupdateManager } from "./base/HotupdateManager";
-import { NetManager } from "./base/NetManager";
-import { LogicManager } from "./base/LogicManager";
-import { BundleManager } from "./base/BundleManager";
-import GameView from "./base/GameView";
-import { GameData } from "./base/GameData";
-import { CocosExtentionInit } from "./extentions/CocosExtention";
+import { Language } from "./core/language/Language";
+import { EventDispatcher } from "./core/event/EventDispatcher";
+import { UIManager } from "./core/ui/UIManager";
+import { LocalStorage } from "./core/storage/LocalStorage";
+import { _AssetManager } from "./core/asset/AssetManager";
+import { CacheManager } from "./core/asset/CacheManager";
+import { Adaptor } from "./core/adaptor/Adaptor";
+import { NodePoolManager } from "./core/nodePool/NodePoolManager";
+import { HotupdateManager } from "./core/hotupdate/HotupdateManager";
+import { NetManager } from "./core/net/service/NetManager";
+import { LogicManager } from "./core/logic/LogicManager";
+import { BundleManager } from "./core/asset/BundleManager";
+import GameView from "./core/ui/GameView";
+import { GameData } from "./data/GameData";
+import { CocosExtentionInit } from "./plugin/CocosExtention";
 
 
 
@@ -97,13 +97,13 @@ export class Framewok {
     }
 
     /**@description 小提示 */
-    get tips(): Tips {
-        return <any>null;
+    get tips() : any{
+        return null;
     }
 
     /**@description 界面加载时的全屏Loading,显示加载进度 */
-    get uiLoading(): UILoading {
-        return <any>null;
+    get uiLoading():any {
+        return null;
     }
 
     /**@description websocket wss 证书url地址 */

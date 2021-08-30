@@ -1,5 +1,5 @@
 import { AudioClip, AudioSource, _decorator } from "cc";
-import AudioComponent, { AudioInfo } from "../../framework/base/AudioComponent";
+import AudioComponent, { AudioInfo } from "../../framework/componects/AudioComponent";
 
 /**
  * @description 全局音频播放组棒

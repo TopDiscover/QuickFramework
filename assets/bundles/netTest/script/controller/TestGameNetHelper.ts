@@ -1,4 +1,4 @@
-import NetHelper from "../../../../scripts/framework/controller/NetHelper";
+import NetHelper from "../../../../scripts/framework/core/net/service/NetHelper";
 import { GameService } from "../../../../scripts/common/net/GameService";
 import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessage";
 import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
