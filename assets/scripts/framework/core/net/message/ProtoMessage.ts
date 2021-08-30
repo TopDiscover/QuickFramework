@@ -4,8 +4,6 @@ import { Codec, Message } from "./Message";
  * @description protobuf解析基类
  */
 export abstract class ProtoMessage<T> extends Message {
-    getData(): any { return this.data }
-
     /**@description 发送或接收的消息流 */
     buffer: Uint8Array = null;
 

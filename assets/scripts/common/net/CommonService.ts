@@ -2,6 +2,7 @@
 import { Message } from "../../framework/core/net/message/Message";
 import { Reconnect } from "./Reconnect";
 import { ICommonService } from "../../framework/core/net/socket/ICommonService";
+import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdDefines";
 
 /**
  * @description service公共基类
@@ -82,7 +83,7 @@ export class CommonService extends ICommonService implements GameEventInterface 
      */
     protected isHeartBeat(data: Message): boolean {
         //示例
-        return data.getMsgID() == "11"//String(MainCmd.CMD_SYS) + String(SUB_CMD_SYS.CMD_SYS_HEART)
+        return data.cmd == String(MainCmd.CMD_SYS) + String(SUB_CMD_SYS.CMD_SYS_HEART)
     }
 
     onEnterBackground() {

@@ -1,10 +1,8 @@
 import { Message } from "./Message";
-import { Buffer } from "../../../plugin/Buffer"
-
 
 type JsonMessageConstructor = typeof JsonMessage;
 
-export function serialize(key: string, type: JsonMessageConstructor | NumberConstructor | StringConstructor | Object);
+export function serialize(key: string, type: JsonMessageConstructor | NumberConstructor | StringConstructor);
 export function serialize(key: string, type: ArrayConstructor, arrayType: JsonMessageConstructor | NumberConstructor | StringConstructor);
 export function serialize(key: string, type: MapConstructor, mapKeyType: NumberConstructor | StringConstructor, mapValueType: JsonMessageConstructor | NumberConstructor | StringConstructor);
 export function serialize(key: string, type, arrTypeOrMapKeyType?, mapValueType?) {
@@ -36,13 +34,13 @@ export function serialize(key: string, type, arrTypeOrMapKeyType?, mapValueType?
  * @description JSON的序列化与序列化
  */
 export abstract class JsonMessage extends Message {
-    private _data = null;
-    getData() { return this._data }
+    private data = null;
 
-    encode(): boolean {
-        this._data = this.serialize();
-        let result = JSON.stringify(this._data);
-        this._data = Buffer.from(result);
+    buffer: Uint8Array;
+    encode() : boolean {
+        this.data = this.serialize();
+        let result = JSON.stringify(this.data);
+        this.buffer = StringToUtf8Array(result);
         return true;
     }
 
@@ -79,18 +77,15 @@ export abstract class JsonMessage extends Message {
             return this.serializeMap(value);
         } else if (value instanceof JsonMessage) {
             return value.serialize();
-        } else if (value instanceof Object) {
-            return this.serializeObject(value);
         } else {
             cc.warn("Invalid serialize value : " + value);
             return null;
         }
     }
-    private serializeObject(value: Object) { return value }
 
     private serializeNumber(value: Number) {
         if (value === undefined || value === null) { value = 0 }
-        else if (typeof value == "string") { value = Number(value) }
+        if ( typeof value == "string" ){ value = Number(value);}
         if (Number.isNaN(value)) { value = 0 }
         return value;
     }
@@ -127,16 +122,16 @@ export abstract class JsonMessage extends Message {
 
     decode(data: Uint8Array): boolean {
         if (data) {
-            this._data = data;
+            this.buffer = data;
             let result = Utf8ArrayToString(data);
             if (result.length > 0) {
                 try {
-                    this._data = JSON.parse(result);
+                    this.data = JSON.parse(result);
                 } catch (error) {
                     return false;
                 }
             }
-            return this.deserialize(this._data);
+            return this.deserialize(this.data);
         }
         return false;
     }
@@ -186,7 +181,7 @@ export abstract class JsonMessage extends Message {
                 switch (memberType) {
                     case Number: this[memberName] = this.deserializeNumber(memberName, value); break;
                     case String: this[memberName] = this.deserializeString(memberName, value); break;
-                    case Array: this[memberName] = []; break;
+                    case Array: this[memberName] = [];break;
                     case Map: this[memberName] = new Map; break;
                     default: {
                         this[memberName] = new memberType;

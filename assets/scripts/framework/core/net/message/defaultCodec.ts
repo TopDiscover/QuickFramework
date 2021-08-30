@@ -15,13 +15,6 @@ export class DefaultCodec extends Codec {
     /**@description 数据大小 */
     private _dataSize: number = 0;
     headerSize: number = 3 * Uint32Array.BYTES_PER_ELEMENT;
-    /**
-     * @description 通过当前数据包体，拼接数据包头，mainCmd subCmd 还在Message中
-     * @param msg 数据体对象
-     */
-
-
-    getData(): any { return this.buffer }
 
     pack(data: MessageStruct): boolean {
         this.mainCmd = data.mainCmd;
@@ -71,8 +64,6 @@ export class DefaultCodec extends Codec {
     }
 
 
-    getMsgID(): string {
-        return String(this.mainCmd) + String(this.subCmd)
-    }
+    get cmd(){return String(this.mainCmd) + String(this.subCmd);} 
 
 }

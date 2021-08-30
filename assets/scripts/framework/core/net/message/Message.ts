@@ -1,8 +1,9 @@
 
 export abstract class IMessage {
-    //等待发送数据
-    abstract getData(): any
-    abstract getMsgID(): string
+    /**@description 发送或接收的字节数据流 */
+    abstract buffer: Uint8Array;
+    /**@description 消息命令码 */
+    abstract get cmd(): string
 }
 
 export abstract class Codec extends IMessage {

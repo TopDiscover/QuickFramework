@@ -3,6 +3,9 @@ import { JsonMessage, serialize } from "../../../../scripts/framework/core/net/m
 import { SUB_CMD_LOBBY } from "./LobbyCmd";
 
 export class TestData extends JsonMessage {
+    get cmd(): string {
+        return "";
+    }
     getMsgID(): string { return null }
 
     @serialize("test", String)
@@ -11,9 +14,7 @@ export class TestData extends JsonMessage {
 }
 
 export class TestJsonMessage extends JsonMessage {
-    getMsgID(): string {
-        return String(this.mainCmd) + String(this.subCmd)
-    }
+    get cmd(){return String(this.mainCmd) + String(this.subCmd)}
     mainCmd = MainCmd.CMD_LOBBY;
     subCmd = SUB_CMD_LOBBY.TEST_JSON_MSG;
     @serialize("count", Number)

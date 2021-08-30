@@ -29,7 +29,7 @@ export class TestProtoData extends protobuf.Message {
 }
 
 export class TestProtoMessage extends ProtoMessage<TestProtoData>{
-    getMsgID(): string { return String(this.mainCmd) + String(this.subCmd) }
+    get cmd(){ return String(this.mainCmd) + String(this.subCmd) }
 
     mainCmd = MainCmd.CMD_LOBBY;
     subCmd = SUB_CMD_LOBBY.TEST_PROTO_MSG;

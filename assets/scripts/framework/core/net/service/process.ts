@@ -72,10 +72,10 @@ export class Process {
     }
 
     public onMessage(code: Codec) {
-        cc.log(`recv data main cmd : ${code.getMsgID()}`);
-        let key = code.getMsgID();
+        cc.log(`recv data main cmd : ${code.cmd}`);
+        let key = code.cmd;
         if (!this._listeners[key]) {
-            cc.warn(`no find listener data main cmd : ${code.getMsgID()}`);
+            cc.warn(`no find listener data main cmd : ${code.cmd}`);
             return;
         }
         if (this._listeners[key].length <= 0) {
@@ -115,7 +115,7 @@ export class Process {
                 return;
             }
             this._listeners[key].push({
-                eventName: eventName,
+                cmd: eventName,
                 func: handleFunc,
                 type: handleType,
                 isQueue: isQueue,
@@ -125,7 +125,7 @@ export class Process {
         else {
             this._listeners[key] = [];
             this._listeners[key].push({
-                eventName: eventName,
+                cmd: eventName,
                 func: handleFunc,
                 type: handleType,
                 isQueue: isQueue,
@@ -141,7 +141,7 @@ export class Process {
                 let datas = self._listeners[value];
                 let i = datas.length;
                 while (i--) {
-                    if (datas[i].target == target && datas[i].eventName == eventName) {
+                    if (datas[i].target == target && datas[i].cmd == eventName) {
                         datas.splice(i, 1);
                     }
                 }
@@ -156,7 +156,7 @@ export class Process {
                 let datas = this._masseageQueue[i];
                 let j = datas.length;
                 while (j--) {
-                    if (datas[j].target == target && datas[i].eventName == eventName) {
+                    if (datas[j].target == target && datas[i].cmd == eventName) {
                         datas.splice(j, 1);
                     }
                 }
@@ -204,10 +204,10 @@ export class Process {
         if (o.type) {
             obj = new o.type();
             //解包
-            obj.decode(header.getData());
+            obj.decode(header.buffer);
         } else {
-            //把数据放到里面，让后面使用都自己解析
-            obj = header.getData();
+            //把数据放到里面，让后面使用都自己解析,数据未解析，此消息推后解析
+            obj = header.buffer as any;
         }
         return obj
     }
@@ -254,7 +254,7 @@ export class Process {
             isQueue: input.isQueue,
             data: data,
             target: input.target,
-            eventName: input.eventName
+            cmd: input.cmd
         };
     }
 }

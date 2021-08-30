@@ -108,11 +108,11 @@ export abstract class Service extends ServerConnector {
                 let header = new this._Process.Codec
                 header.pack(msg)
                 if (this.isHeartBeat(msg)) {
-                    if (CC_DEBUG) cc.log(`send request cmd : ${msg.getMsgID()} `);
+                    if (CC_DEBUG) cc.log(`send request cmd : ${msg.cmd} `);
                 } else {
-                    cc.log(`send request main cmd : ${msg.getMsgID()} `);
+                    cc.log(`send request main cmd : ${msg.cmd} `);
                 }
-                this.sendBuffer(header.getData());
+                this.sendBuffer(header.buffer);
             } else {
                 cc.error(`encode error`);
             }

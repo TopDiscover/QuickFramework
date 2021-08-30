@@ -737,10 +737,9 @@ declare namespace td {
 		/** @description 处理函数声明 handleType 为你之前注册的handleType类型的数据 返回值number 为处理函数需要的时间 */
 		export type HandleFunc = (handleTypeData: any) => number;
 		export interface ListenerData {
-			mainCmd: number, // main cmd
-			subCmd: number, //sub cmd
+			cmd : string,//事件名，如果是主命令跟子命令，按自己的需要返回固定组合如，mainCmd 1 subCmd 2 eventName = "1_2" | "12" 单个消夏码直接返回 "1"
 			func: HandleFunc, //处理函数
-			type: typeof import("./assets/scripts/framework/core/net/message/Message").Message, //解包类型
+			type: new() => import("./assets/scripts/framework/core/net/message/Message").Message, //解包类型
 			isQueue: boolean,//是否进入消息队列，如果不是，收到网络消息返回，会立即回调处理函数
 			data?: any, //解包后的数据
 			target?: any, //处理者

@@ -3,9 +3,7 @@ import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { SUB_CMD_LOBBY } from "./LobbyCmd";
 
 class BinaryStreamMessage extends BinaryStream{
-    mainCmd = MainCmd.CMD_LOBBY;
-    subCmd = SUB_CMD_LOBBY.TEST_BINARY_MSG;
-    getMsgID() { return String(this.mainCmd) + String(this.subCmd)};
+    get cmd() { return "";};
 }
 
 class TestData extends BinaryStreamMessage{
@@ -18,6 +16,7 @@ class TestData extends BinaryStreamMessage{
 }
 
 export class TestBinaryMessage extends BinaryStreamMessage {
+    get cmd(){ return String(this.mainCmd) + String(this.subCmd);}
     mainCmd = MainCmd.CMD_LOBBY;
     subCmd = SUB_CMD_LOBBY.TEST_BINARY_MSG;
     // @serialize("value32",Float32Value)
