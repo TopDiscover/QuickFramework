@@ -1,4 +1,4 @@
-import { UIView } from "../../../../scripts/framework/core/ui/UIView";
+import UIView from "../../../../scripts/framework/core/ui/UIView";
 
 /**
  * @description 瞄准线视图

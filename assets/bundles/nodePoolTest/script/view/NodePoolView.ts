@@ -1,5 +1,5 @@
 import { NodePool } from "../../../../scripts/framework/core/nodePool/NodePoolManager";
-import { UIView } from "../../../../scripts/framework/core/ui/UIView";
+import UIView from "../../../../scripts/framework/core/ui/UIView";
 
 const {ccclass, property} = cc._decorator;
 

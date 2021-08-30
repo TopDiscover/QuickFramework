@@ -7,7 +7,7 @@ import AudioComponent from "../../componects/AudioComponent";
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export class UIView extends EventComponent implements IFullScreenAdapt {
+export default class UIView extends EventComponent implements IFullScreenAdapt {
     onFullScreenAdapt() {
         
     }
@@ -228,5 +228,3 @@ export class UIView extends EventComponent implements IFullScreenAdapt {
 
     }
 }
-
-toNamespace("UIView",UIView);

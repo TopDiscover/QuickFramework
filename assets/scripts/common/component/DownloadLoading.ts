@@ -1,4 +1,4 @@
-import { UIView } from "../../framework/core/ui/UIView";
+import UIView from "../../framework/core/ui/UIView";
 import { i18n } from "../language/CommonLanguage";
 
 /**@description 下载界面 */

@@ -29,7 +29,7 @@ declare module cc {
 	 *     }
 	 * }});
 	 **/
-	export function createPrefab(config: { url: string, view: import("./assets/scripts/framework/core/ui/UIView").UIView, completeCallback: (node: cc.Node) => void, bundle?: BUNDLE_TYPE });
+	export function createPrefab(config: { url: string, view: import("./assets/scripts/framework/core/ui/UIView").default, completeCallback: (node: cc.Node) => void, bundle?: BUNDLE_TYPE });
 
 	/**
 	 * @description 扩展一个在界面中加载指定目录的接口
@@ -45,7 +45,7 @@ declare module cc {
 		bundle?: BUNDLE_TYPE,
 		url: string,
 		type: typeof cc.Asset,
-		view: import("./assets/scripts/framework/core/ui/UIView").UIView,
+		view: import("./assets/scripts/framework/core/ui/UIView").default,
 		onProgress?: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
 		onComplete: (data: td.Resource.CacheData) => void
 	});
@@ -66,7 +66,7 @@ declare module cc {
 		type: typeof cc.Asset,
 		onProgress?: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
 		onComplete: (data: td.Resource.CacheData) => void,
-		view: import("./assets/scripts/framework/core/ui/UIView").UIView,
+		view: import("./assets/scripts/framework/core/ui/UIView").default,
 	});
 
 	export interface Sprite {
@@ -96,7 +96,7 @@ declare module cc {
 		 */
 		loadRemoteImage(config: {
 			url: string,
-			view: import("./assets/scripts/framework/core/ui/UIView").UIView,
+			view: import("./assets/scripts/framework/core/ui/UIView").default,
 			completeCallback?: (data: cc.SpriteFrame) => void,
 			defaultSpriteFrame?: string,
 			defaultBundle?: BUNDLE_TYPE,
@@ -118,7 +118,7 @@ declare module cc {
 		 */
 		loadImage(config: {
 			url: string | { urls: string[], key: string },
-			view: import("./assets/scripts/framework/core/ui/UIView").UIView,
+			view: import("./assets/scripts/framework/core/ui/UIView").default,
 			completeCallback?: (data: SpriteFrame) => void,
 			bundle?: BUNDLE_TYPE
 		});
@@ -144,7 +144,7 @@ declare module cc {
 		 */
 		loadButton(config: {
 			normalSprite?: string | { urls: string[], key: string },
-			view: import("./assets/scripts/framework/core/ui/UIView").UIView,//UIView的子类
+			view: import("./assets/scripts/framework/core/ui/UIView").default,//UIView的子类
 			pressedSprite?: string | { urls: string[], key: string },
 			hoverSprite?: string | { urls: string[], key: string },
 			disabledSprite?: string | { urls: string[], key: string },
@@ -161,7 +161,7 @@ declare module cc {
 		  * let content = cc.find("content",this.node); 
 		  * content.getComponent(cc.Label).loadFont({font:"font/DFYUANW7-GB2312",view:this});
 		  */
-		loadFont(config: { font: string, view: import("./assets/scripts/framework/core/ui/UIView").UIView, completeCallback?: (font: Font) => void, bundle?: BUNDLE_TYPE });
+		loadFont(config: { font: string, view: import("./assets/scripts/framework/core/ui/UIView").default, completeCallback?: (font: Font) => void, bundle?: BUNDLE_TYPE });
 
 		/**@description 强制label在当前帧进行绘制 */
 		forceDoLayout();
@@ -201,7 +201,7 @@ declare module cc {
 		 * par.loadFile({url:GAME_RES( "res/action/DDZ_win_lizi" ),view:null});
 		 * this.node.addChild(node);
 		 */
-		loadFile(config: { url: string, view: import("./assets/scripts/framework/core/ui/UIView").UIView, completeCallback?: (file: ParticleAsset) => void, bundle?: BUNDLE_TYPE });
+		loadFile(config: { url: string, view: import("./assets/scripts/framework/core/ui/UIView").default, completeCallback?: (file: ParticleAsset) => void, bundle?: BUNDLE_TYPE });
 
 	}
 }
@@ -228,7 +228,7 @@ declare namespace sp {
 		 * }});
 		 */
 		loadRemoteSkeleton(config: {
-			view: import("./assets/scripts/framework/core/ui/UIView").UIView,
+			view: import("./assets/scripts/framework/core/ui/UIView").default,
 			path: string,
 			name: string,
 			completeCallback: (data: sp.SkeletonData) => void,
@@ -248,7 +248,7 @@ declare namespace sp {
 		 *	}
 		 * }});
 		 */
-		loadSkeleton(config: { url: string, view: import("./assets/scripts/framework/core/ui/UIView").UIView, completeCallback: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE });
+		loadSkeleton(config: { url: string, view: import("./assets/scripts/framework/core/ui/UIView").default, completeCallback: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE });
 	}
 }
 
@@ -341,10 +341,10 @@ declare interface AlertConfig {
 /**
  * @description 处理游戏事件接口声明
  *      cc.game.EVENT_ENGINE_INITED
-		cc.game.EVENT_GAME_INITED
-		cc.game.EVENT_HIDE
-		cc.game.EVENT_RESTART
-		cc.game.EVENT_SHOW
+        cc.game.EVENT_GAME_INITED
+        cc.game.EVENT_HIDE
+        cc.game.EVENT_RESTART
+        cc.game.EVENT_SHOW
  */
 
 declare interface GameEventInterface {
@@ -591,7 +591,7 @@ declare namespace td {
 		export interface EventData {
 			type: Type;
 			/**@description 需要排除的界面，除这些界面之外的其它界面将会关闭 */
-			views: (UIClass<import("./assets/scripts/framework/core/ui/UIView").UIView> | string | import("./assets/scripts/framework/core/ui/UIView").UIView)[];
+			views: (UIClass<import("./assets/scripts/framework/core/ui/UIView").default> | string | import("./assets/scripts/framework/core/ui/UIView").default)[];
 
 			/**@description 其它用户数据 */
 			data?: any;
@@ -715,7 +715,7 @@ declare namespace td {
 			 * 在网络消息来的时间，用预置体加载界面还是需要一定的时间，
 			 * 从而会造成消息处理不是顺序执行 
 			 * */
-			preloadView?: UIClass<import("./assets/scripts/framework/core/ui/UIView").UIView>,
+			preloadView?: UIClass<import("./assets/scripts/framework/core/ui/UIView").default>,
 			bundle?: BUNDLE_TYPE,
 			/**@description 如果是加载的目录，请用dir字段 */
 			dir?: string,
@@ -867,7 +867,7 @@ declare namespace td {
 		export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
 	}
 
-	export interface UIClass<T extends import("./assets/scripts/framework/core/ui/UIView").UIView> {
+	export interface UIClass<T extends import("./assets/scripts/framework/core/ui/UIView").default> {
 		new(): T;
 		/**
 		 *@description 视图prefab 地址 resources目录下如z_panels/WeiZoneLayer 
@@ -895,15 +895,15 @@ declare namespace td {
 		/**@description 对象池管理器 */
 		readonly nodePoolManager: import("./assets/scripts/framework/core/nodePool/NodePoolManager").NodePoolManager;
 		/**@description 小提示 */
-		readonly tips: import("./assets/scripts/common/component/Tips").Tips;
+		readonly tips: import("./assets/scripts/common/component/Tips").default;
 		/**@description 界面加载时的全屏Loading,显示加载进度 */
-		readonly uiLoading: import("./assets/scripts/common/component/UILoading").UILoading;
+		readonly uiLoading: import("./assets/scripts/common/component/UILoading").default;
 		/**@description websocket wss 证书url地址 */
 		wssCacertUrl: string;
 		/**@description 提示框 */
-		readonly alert: import("./assets/scripts/common/component/Alert").Alert;
+		readonly alert: import("./assets/scripts/common/component/Alert").default;
 		/**@description 公共loading */
-		readonly loading: import("./assets/scripts/common/component/Loading").Loading;
+		readonly loading: import("./assets/scripts/common/component/Loading").default;
 		/**@description 逻辑控制器管理器 */
 		readonly logicManager: import("./assets/scripts/framework/core/logic/LogicManager").LogicManager;
 		/**@description 游戏数据 自行设置 */
@@ -913,7 +913,7 @@ declare namespace td {
 		/**@description 当前游戏GameView, GameView进入onLoad赋值 */
 		gameView: import("./assets/scripts/framework/core/ui/GameView").default;
 		/**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
-		readonly globalAudio: import("./assets/scripts/common/component/GlobalAudio");
+		readonly globalAudio: import("./assets/scripts/common/component/GlobalAudio").default;
 		/**@description bundle管理器 */
 		readonly bundleManager: import("./assets/scripts/framework/core/asset/BundleManager").BundleManager;
 		/**@description 网络Service管理器 */
