@@ -340,13 +340,12 @@ declare interface AlertConfig {
 
 /**
  * @description 处理游戏事件接口声明
- *      cc.game.EVENT_ENGINE_INITED
-		cc.game.EVENT_GAME_INITED
-		cc.game.EVENT_HIDE
-		cc.game.EVENT_RESTART
-		cc.game.EVENT_SHOW
- */
-
+ * cc.game.EVENT_ENGINE_INITED
+ * cc.game.EVENT_GAME_INITED
+ * cc.game.EVENT_HIDE
+ * cc.game.EVENT_RESTART
+ * cc.game.EVENT_SHOW
+ **/
 declare interface GameEventInterface {
 
 	/**@description 进入后台 cc.game.EVENT_HIDE*/
@@ -382,16 +381,16 @@ declare type Message = import("./assets/scripts/framework/core/net/message/Messa
 declare type Service = import("./assets/scripts/framework/core/net/service/Service").Service;
 /**@description 语言包相关 */
 declare namespace Language {
-    export interface Data {
-        language: string;
-    }
-    /** 
-     * @description 数据代理
-     * 如果是公共总合，name使用 td.COMMON_LANGUAGE_NAME
-     **/
-    export interface DataSourceDelegate {
-        name: string;
-        data(language: string): Data;
+	export interface Data {
+		language: string;
+	}
+	/** 
+	 * @description 数据代理
+	 * 如果是公共总合，name使用 td.COMMON_LANGUAGE_NAME
+	 **/
+	export interface DataSourceDelegate {
+		name: string;
+		data(language: string): Data;
 	}
 }
 
@@ -399,7 +398,7 @@ declare class ManagerImpl {
 	/**@description 常驻资源指定的模拟view */
 	readonly retainMemory: import("./assets/scripts/framework/core/ui/UIManager").ViewDynamicLoadData;
 	/**@description 语言包 */
-	readonly language: import("./assets/scripts/framework/core/language/LanguageImpl").LanguageImpl;
+	readonly language: import("./assets/scripts/framework/core/language/Language").Language;
 	/**@description 事件派发器 */
 	readonly eventDispatcher: import("./assets/scripts/framework/core/event/EventDispatcher").EventDispatcher;
 	/**@description 界面管理器 */
@@ -411,7 +410,7 @@ declare class ManagerImpl {
 	/**@description 资源缓存管理器 */
 	readonly cacheManager: import("./assets/scripts/framework/core/asset/CacheManager").CacheManager;
 	/**@description 适配相关 */
-	readonly adaptor: import("./assets/scripts/framework/core/adaptor/AdaptorImpl").AdaptorImpl;
+	readonly adaptor: import("./assets/scripts/framework/core/adaptor/Adaptor").Adaptor;
 	/**@description 对象池管理器 */
 	readonly nodePoolManager: import("./assets/scripts/framework/core/nodePool/NodePoolManager").NodePoolManager;
 	/**@description 小提示 */
@@ -461,23 +460,23 @@ declare class ManagerImpl {
 	  * Manager.makeLanguage("title","tankBattle"); //=> i18n.tankBattle.title 指向游戏特定的语言包
 	  * Manager.makeLanguage("title"); //=> i18n.title 指向的大厅的公共语言包
 	  */
-	makeLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE = BUNDLE_RESOURCES): (string | number)[] | string;
+	makeLanguage(param: string | (string | number)[], bundle?: BUNDLE_TYPE): (string | number)[] | string;
 	/**
 	  * @description 获取语言包 
 	  */
 	getLanguage(param: string | (string | number)[], bundle?: BUNDLE_TYPE): string;
 
-	onLoad(node : cc.Node):void;
+	onLoad(node: cc.Node): void;
 
-    update(node : cc.Node):void;
+	update(node: cc.Node): void;
 
-    onDestroy(node:cc.Node):void;
+	onDestroy(node: cc.Node): void;
 
 	onEnterBackground(): void;
 
 	onEnterForgeground(): void;
 
-	onHotupdateMessage(data: import("./assets/scripts/framework/core/hotupdate/Hotupdate").HotUpdate.MessageData);
+	onHotupdateMessage(data: import("./assets/scripts/framework/core/hotupdate/Hotupdate").HotUpdate.MessageData):void;
 }
 
 declare let Manager: ManagerImpl;
