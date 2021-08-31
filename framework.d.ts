@@ -466,6 +466,18 @@ declare class ManagerImpl {
 	  * @description 获取语言包 
 	  */
 	getLanguage(param: string | (string | number)[], bundle?: BUNDLE_TYPE): string;
+
+	onLoad(node : cc.Node):void;
+
+    update(node : cc.Node):void;
+
+    onDestroy(node:cc.Node):void;
+
+	onEnterBackground(): void;
+
+	onEnterForgeground(): void;
+
+	onHotupdateMessage(data: import("./assets/scripts/framework/core/hotupdate/Hotupdate").HotUpdate.MessageData);
 }
 
 declare let Manager: ManagerImpl;
