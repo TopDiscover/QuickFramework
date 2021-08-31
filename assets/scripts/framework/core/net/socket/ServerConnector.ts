@@ -1,11 +1,12 @@
-import { IMessage, Message } from "../message/Message";
+import { IMessage } from "../message/Message";
+import { Net } from "../Net";
 import WebSocketClinet from "./WebSocketClient";
 
 /**
  * @description 服务器连接器
  */
 
-export class ServerConnector {
+export abstract class ServerConnector {
 
     /**
      * @description websocket实例由外部设置方可使用
@@ -43,9 +44,7 @@ export class ServerConnector {
     /**
      * @description 心跳超时
      */
-    protected onHeartbeatTimeOut() {
-        //do noting
-    }
+    protected abstract onHeartbeatTimeOut():void;
 
     /**
      * @description 是否为心跳消息
@@ -115,7 +114,7 @@ export class ServerConnector {
      * @param port 
      * @param protocol 协议类型 ws / wss 
      */
-    public connect_server(ip: string, port: number | string | null = null, protocol: td.Net.Type = "wss") {
+    public connect_server(ip: string, port: number | string | null = null, protocol: Net.Type = "wss") {
         if (!this.enabled) {
             if (CC_DEBUG) cc.warn(`请求先启用`)
             return;

@@ -2,14 +2,16 @@
  * @description 网络Service服务管理
  */
 
-import { ICommonService } from "../../framework/support/net/socket/ICommonService";
+import { Logic } from "../../framework/core/logic/Logic";
+import { Config } from "../config/Config";
+import { CommonService } from "../net/CommonService";
 export class ServiceManager implements GameEventInterface {
 
     private static _instance: ServiceManager = null;
     public static Instance() { return this._instance || (this._instance = new ServiceManager()); }
 
-    private services: ICommonService[] = [];
-    private services_names: { [keyof: string]: ICommonService } = {}
+    private services: CommonService[] = [];
+    private services_names: { [keyof: string]: CommonService } = {}
 
     /**
      * @description 如果自己项目有多个网络Service，
@@ -29,11 +31,11 @@ export class ServiceManager implements GameEventInterface {
         //  ChatService.instance.priority = 1;
     }
 
-    public getServiceByNmame(name: string): ICommonService | null {
+    public getServiceByNmame(name: string): CommonService | null {
         return this.services_names[name]
     }
 
-    private addService(service: ICommonService, priority: number) {
+    private addService(service: CommonService, priority: number) {
         let className = cc.js.getClassName(service)
         this.services_names[className] = service
         this.services.push(service)
@@ -75,7 +77,7 @@ export class ServiceManager implements GameEventInterface {
     }
 
     /**@description 尝试重连 */
-    tryReconnect(service: ICommonService, isShowTips: boolean = false) {
+    tryReconnect(service: CommonService, isShowTips: boolean = false) {
         if (!service) {
             cc.error(`service is null`);
             return;
@@ -90,17 +92,17 @@ export class ServiceManager implements GameEventInterface {
                 if (view) return;
                 service.reconnect.hide();
                 cc.log(`${service.serviceName} 断开`)
-                let current = Manager.alert.currentShow(td.Config.RECONNECT_ALERT_TAG);
+                let current = Manager.alert.currentShow(Config.RECONNECT_ALERT_TAG);
                 if (current) {
-                    let showService: ICommonService = current.userData;
+                    let showService: CommonService = current.userData;
                     if (service.priority > showService.priority) {
                         //如果尝试连接的优先级更高，显示优先级更高的连接
                         cc.log(`显示更新优先级重连弹出框 : ${service.serviceName}`);
-                        Manager.alert.close(td.Config.RECONNECT_ALERT_TAG);
+                        Manager.alert.close(Config.RECONNECT_ALERT_TAG);
                     }
                 }
                 Manager.alert.show({
-                    tag: td.Config.RECONNECT_ALERT_TAG,
+                    tag: Config.RECONNECT_ALERT_TAG,
                     isRepeat: false,
                     userData: service,
                     text: Manager.getLanguage(["warningReconnect", service.serviceName]),
@@ -109,22 +111,22 @@ export class ServiceManager implements GameEventInterface {
                             service.reconnect.show();
                         } else {
                             cc.log(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
-                            dispatch(td.Logic.Event.ENTER_LOGIN, true);
+                            dispatch(Logic.Event.ENTER_LOGIN, true);
                         }
                     },
                     cancelCb: () => {
                         cc.log(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
-                        dispatch(td.Logic.Event.ENTER_LOGIN, true);
+                        dispatch(Logic.Event.ENTER_LOGIN, true);
                     }
                 });
             });
         } else {
-            if (Manager.alert.isCurrentShow(td.Config.RECONNECT_ALERT_TAG)) {
+            if (Manager.alert.isCurrentShow(Config.RECONNECT_ALERT_TAG)) {
                 if (CC_DEBUG) cc.warn(`有一个重连提示框显示，等待玩家操作`);
                 return;
             }
-            let prev: ICommonService = null!;
-            let cur: ICommonService = null!;
+            let prev: CommonService = null!;
+            let cur: CommonService = null!;
             if (this.services.length == 1) { cur = this.services[0] }
             else {
                 for (let i = 1; i < this.services.length; i++) {
@@ -153,7 +155,7 @@ export class ServiceManager implements GameEventInterface {
     }
 
     /**@description 重连成功 */
-    onReconnectSuccess(service: ICommonService) {
+    onReconnectSuccess(service: CommonService) {
         for (let i = 0; i < this.services.length; i++) {
             //优先级高的重连成功后，连接优先级低的
             if (!this.services[i].enabled || !this.services[i].reconnect.enabled) {

@@ -1,15 +1,17 @@
+import { Resource } from "./Resource";
+
 /**
  * @description 资源加载器
  */
 export default class ResourceLoader {
 
     /** @description 加载资源数据 */
-    private _resources: Map<string,td.Resource.Data> = new Map<string,td.Resource.Data>();
+    private _resources: Map<string,Resource.Data> = new Map<string,Resource.Data>();
     /**@description 当前已经加载的资源数量 */
     private _loadedCount: number = 0;
 
     /**@description 加载完成后的数据，为了方便释放时精准释放，没加载成功的资源，不在做释放的判断 */
-    private _loadedResource: Map<string,td.Resource.Info>  = new Map<string,td.Resource.Info>();
+    private _loadedResource: Map<string,Resource.Info>  = new Map<string,Resource.Info>();
 
     /**@description 当前是否正在加载资源 */
     private _isLoading: boolean = false;
@@ -24,8 +26,8 @@ export default class ResourceLoader {
     }
 
     /**@description 加载完成回调 */
-    private _onLoadComplete: (error: td.Resource.LoaderError) => void = null;
-    public set onLoadComplete(cb: (error: td.Resource.LoaderError) => void) {
+    private _onLoadComplete: (error: Resource.LoaderError) => void = null;
+    public set onLoadComplete(cb: (error: Resource.LoaderError) => void) {
         this._onLoadComplete = cb;
     }
     public get onLoadComplete() {
@@ -33,8 +35,8 @@ export default class ResourceLoader {
     }
 
     /**@description 加载进度 */
-    public _onLoadProgress: (loadedCount: number, toatl: number, data: td.Resource.CacheData) => void;
-    public set onLoadProgress(value: (loadedCount: number, toatl: number, data: td.Resource.CacheData) => void) {
+    public _onLoadProgress: (loadedCount: number, toatl: number, data: Resource.CacheData) => void;
+    public set onLoadProgress(value: (loadedCount: number, toatl: number, data: Resource.CacheData) => void) {
         this._onLoadProgress = value;
     }
     public get onLoadProgress() {
@@ -45,11 +47,11 @@ export default class ResourceLoader {
     /**
      * @description 实现类必须给个需要加载资源
      */
-    private _getLoadResource: () => td.Resource.Data[] = null;
-    public set getLoadResources(func: () => td.Resource.Data[]) {
+    private _getLoadResource: () => Resource.Data[] = null;
+    public set getLoadResources(func: () => Resource.Data[]) {
         this._getLoadResource = func;
     }
-    public get getLoadResources(): () => td.Resource.Data[] {
+    public get getLoadResources(): () => Resource.Data[] {
         return this._getLoadResource;
     }
 
@@ -60,32 +62,32 @@ export default class ResourceLoader {
 
         if (!this.getLoadResources) {
             if (CC_DEBUG) cc.error("未指定 getLoadResources 函数");
-            this.onLoadComplete && this.onLoadComplete(td.Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
+            this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
             return;
         }
 
         let res = this.getLoadResources();
         if (!res) {
             if (CC_DEBUG) cc.error(`未指定加载资源`);
-            this.onLoadComplete && this.onLoadComplete(td.Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
+            this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
             return;
         }
         if (res.length <= 0) {
             if (CC_DEBUG) cc.warn(`加载的资源为空`);
-            this.onLoadComplete && this.onLoadComplete(td.Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
+            this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
             return;
         }
 
         //如果正在加载中，防止重复调用
         if (this._isLoading) {
             if (CC_DEBUG) cc.warn(`资源加载中，未完成加载`);
-            this.onLoadComplete && this.onLoadComplete(td.Resource.LoaderError.LOADING);
+            this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.LOADING);
             return;
         }
 
         if ( this._resources.size > 0 && this.isLoadComplete() ){
             if ( CC_DEBUG ) cc.warn(`资源已经加载完成，使用已经加载完成的资源`);
-            this.onLoadComplete && this.onLoadComplete(td.Resource.LoaderError.SUCCESS);
+            this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.SUCCESS);
             this.onLoadResourceComplete();
             return;
         }
@@ -106,7 +108,7 @@ export default class ResourceLoader {
         this._resources.forEach((value,key,source) => {
             if ( value.preloadView ){
                 Manager.uiManager.preload(value.preloadView,value.bundle).then((view)=>{
-                    let cache = new td.Resource.CacheData();
+                    let cache = new Resource.CacheData();
                     cache.isLoaded = true;
                     cache.data = <any>view;
                     cache.info.url = value.preloadView.getPrefabUrl();
@@ -163,7 +165,7 @@ export default class ResourceLoader {
         this._resources.clear();
     }
 
-    private _onLoadResourceComplete(data: td.Resource.CacheData) {
+    private _onLoadResourceComplete(data: Resource.CacheData) {
         this._loadedCount++;
 
         if (this._onLoadProgress) {
@@ -176,7 +178,7 @@ export default class ResourceLoader {
 
         if (data && ( Array.isArray(data.data) || data.data instanceof cc.Asset ) ) {
             //排除掉界面管理器
-            let info = new td.Resource.Info;
+            let info = new Resource.Info;
             info.url = data.info.url;
             info.type = data.info.type;
             info.data = data.data;
@@ -196,7 +198,7 @@ export default class ResourceLoader {
             //加载完成
             this._isLoading = false;
 
-            this.onLoadComplete && this.onLoadComplete(td.Resource.LoaderError.SUCCESS);
+            this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.SUCCESS);
             this.onLoadResourceComplete();
         }
     }

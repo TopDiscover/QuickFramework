@@ -1,17 +1,19 @@
-import { Logic } from "../../../scripts/framework/core/logic/Logic";
+import { LogicImpl } from "../../../scripts/framework/core/logic/LogicImpl";
 import { LobbyService } from "../../../scripts/common/net/LobbyService";
 import TankBattleGameView from "./view/TankBattleGameView";
 import { TankBettle } from "./data/TankBattleGameData";
 import TankBattleNetController from "./controller/TankBattleNetController";
 import { TankBattleLanguage } from "./data/TankBattleLanguage";
+import { Resource } from "../../../scripts/framework/core/asset/Resource";
+import { Logic } from "../../../scripts/framework/core/logic/Logic";
 /**
  * @description 坦克大战Logic 
  * 1，处理LogicEvent的事件
  * 2，
  */
-class TankBattleLogic extends Logic {
+class TankBattleLogic extends LogicImpl {
 
-    logicType: td.Logic.Type = td.Logic.Type.GAME;
+    logicType: Logic.Type = Logic.Type.GAME;
 
     language = new TankBattleLanguage;
     onLoad() {
@@ -20,15 +22,15 @@ class TankBattleLogic extends Logic {
 
     protected addEvents() {
         super.addEvents();
-        this.addUIEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
-        this.addUIEvent(td.Logic.Event.ENTER_ROOM_LIST, this.onEnterRoomList);
+        this.addUIEvent(Logic.Event.ENTER_GAME, this.onEnterGame);
+        this.addUIEvent(Logic.Event.ENTER_ROOM_LIST, this.onEnterRoomList);
     }
 
     protected get bundle() {
         return TankBettle.gameData.bundle;
     }
 
-    public onEnterComplete(data: td.Logic.EventData) {
+    public onEnterComplete(data: Logic.EventData) {
         super.onEnterComplete(data);
         if (data.type == this.logicType) {
 
@@ -46,8 +48,8 @@ class TankBattleLogic extends Logic {
         //打开自己的子游戏房间列表
     }
 
-    protected onLoadResourceComplete(err: td.Resource.LoaderError) {
-        if (err == td.Resource.LoaderError.LOADING) {
+    protected onLoadResourceComplete(err: Resource.LoaderError) {
+        if (err == Resource.LoaderError.LOADING) {
             return;
         }
         cc.log(`${this.bundle}资源加载完成!!!`);
@@ -87,7 +89,7 @@ class TankBattleLogic extends Logic {
         }
     }
 
-    protected getLoadResources(): td.Resource.Data[] {
+    protected getLoadResources(): Resource.Data[] {
         return [{ preloadView: TankBattleGameView, bundle: this.bundle }];
     }
 }

@@ -1,9 +1,10 @@
 import { Logic } from "../../../scripts/framework/core/logic/Logic";
+import { LogicImpl } from "../../../scripts/framework/core/logic/LogicImpl";
 import NetTestView from "./view/NetTestView";
 
-class NetTestLogic extends Logic {
+class NetTestLogic extends LogicImpl {
 
-    logicType: td.Logic.Type = td.Logic.Type.GAME;
+    logicType: Logic.Type = Logic.Type.GAME;
 
     onLoad() {
         super.onLoad();
@@ -11,7 +12,7 @@ class NetTestLogic extends Logic {
 
     protected addEvents() {
         super.addEvents();
-        this.addUIEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
+        this.addUIEvent(Logic.Event.ENTER_GAME, this.onEnterGame);
     }
 
     protected get bundle() {

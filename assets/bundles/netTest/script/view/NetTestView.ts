@@ -12,6 +12,8 @@ import { INetHelper } from "../controller/INetHelper";
 import { TestChatNetHelper } from "../controller/TestChatNetHelper";
 import { TestGameNetHelper } from "../controller/TestGameNetHelper";
 import { NetTest } from "../data/NetTestData";
+import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
+import { Config } from "../../../../scripts/common/config/Config";
 
 
 const { ccclass, property } = cc._decorator;
@@ -84,7 +86,7 @@ export default class NetTestView extends GameView {
         super.onLoad();
 
         cc.find("goback", this.node).on(cc.Node.EventType.TOUCH_END, () => {
-            dispatch(td.Logic.Event.ENTER_HALL);
+            dispatch(Logic.Event.ENTER_HALL);
         });
 
         this.netToggleContainer = cc.find("netType", this.node).getComponent(cc.ToggleContainer);
@@ -123,7 +125,7 @@ export default class NetTestView extends GameView {
 
         this.init();
 
-        dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this] });
+        dispatchEnterComplete({ type: Logic.Type.GAME, views: [this] });
     }
 
     private init() {
@@ -166,17 +168,17 @@ export default class NetTestView extends GameView {
             this.log(`${service.serviceName} 使用Json方式`);
             // service.messageHeader = JsonMessageHeader;
             service.heartbeat = HeartbeatJson;
-            service.maxEnterBackgroundTime = td.Config.MIN_INBACKGROUND_TIME;
+            service.maxEnterBackgroundTime = Config.MIN_INBACKGROUND_TIME;
         } else if (type == NetTest.NetType.PROTO) {
             this.log(`${service.serviceName} 使用Proto方式`);
             // service.messageHeader = ProtoMessageHeader;
             service.heartbeat = HeartbeatProto;
-            service.maxEnterBackgroundTime = td.Config.MAX_INBACKGROUND_TIME;
+            service.maxEnterBackgroundTime = Config.MAX_INBACKGROUND_TIME;
         } else if (type == NetTest.NetType.BINARY) {
             this.log(`${service.serviceName} 使用Binary方式`);
             // service.messageHeader = BinaryStreamMessageHeader;
             service.heartbeat = HeartbeatBinary;
-            service.maxEnterBackgroundTime = td.Config.MAX_INBACKGROUND_TIME;
+            service.maxEnterBackgroundTime = Config.MAX_INBACKGROUND_TIME;
         } else {
             cc.error(`未知网络类型`);
         }

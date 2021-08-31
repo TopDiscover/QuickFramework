@@ -1,4 +1,5 @@
 import { Codec, Message } from "../message/Message";
+import { Net } from "../Net";
 import { ServerConnector } from "../socket/ServerConnector";
 import { Process } from "./process";
 
@@ -28,16 +29,16 @@ export abstract class Service extends ServerConnector {
 
     protected onOpen() {
         super.onOpen();
-        dispatch(td.Net.NetEvent.ON_OPEN, { service: this, event: null });
+        dispatch(Net.NetEvent.ON_OPEN, { service: this, event: null });
     }
 
     protected onClose(ev: Event) {
         super.onClose(ev);
-        dispatch(td.Net.NetEvent.ON_CLOSE, { service: this, event: ev });
+        dispatch(Net.NetEvent.ON_CLOSE, { service: this, event: ev });
     }
     protected onError(ev: Event) {
         super.onError(ev);
-        dispatch(td.Net.NetEvent.ON_ERROR, { service: this, event: ev });
+        dispatch(Net.NetEvent.ON_ERROR, { service: this, event: ev });
     }
 
     protected onMessage(data: Uint8Array) {
@@ -62,8 +63,8 @@ export abstract class Service extends ServerConnector {
   * @param handleFunc 处理回调
   * @param isQueue 是否进入消息队列
   */
-    public addListener(eventName: string, handleType: any, handleFunc: Function, isQueue: boolean, target: any) {
-        this._Process.addListener(eventName, handleType, handleFunc as any, isQueue, target)
+    public addListener(cmd: string, handleType: any, handleFunc: Function, isQueue: boolean, target: any) {
+        this._Process.addListener(cmd, handleType, handleFunc as any, isQueue, target)
     }
 
     public removeListeners(target: any, eventName?: string) {

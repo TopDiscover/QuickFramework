@@ -1,3 +1,5 @@
+import { Macro } from "../../defines/Macros";
+
 const LANG_KEY: string = "using_language";
 
 export class Language {
@@ -5,10 +7,10 @@ export class Language {
     private static _instance: Language = null!;
     public static Instance() { return this._instance || (this._instance = new Language()); }
 
-    private _data: td.Language.Data = { language: "unknown" };
-    private delegates: td.Language.DataSourceDelegate[] = [];
+    private _data: Language.Data = { language: "unknown" };
+    private delegates: Language.DataSourceDelegate[] = [];
 
-    public addSourceDelegate(delegate: td.Language.DataSourceDelegate) {
+    public addSourceDelegate(delegate: Language.DataSourceDelegate) {
         if (this.delegates.indexOf(delegate) == -1) {
             this.delegates.push(delegate);
             this.updateSource(this.getLanguage());
@@ -21,12 +23,12 @@ export class Language {
         });
     }
 
-    public removeSourceDelegate(delegate: td.Language.DataSourceDelegate) {
+    public removeSourceDelegate(delegate: Language.DataSourceDelegate) {
         let index = this.delegates.indexOf(delegate);
         if (index != -1) {
             this.delegates.splice(index, 1);
             let data: any = this._data;
-            if (delegate.name != td.Macro.COMMON_LANGUAGE_NAME && data[delegate.name]) {
+            if (delegate.name != Macro.COMMON_LANGUAGE_NAME && data[delegate.name]) {
                 data[delegate.name] = {};
             }
         }
@@ -45,13 +47,13 @@ export class Language {
             //当前有语言包数据 相同语言包，不再进行设置
             return;
         }
-        if ( td.Macro.ENABLE_CHANGE_LANGUAGE ){
+        if ( Macro.ENABLE_CHANGE_LANGUAGE ){
             //先更新所有数据
             this.delegates.forEach((delegate, index, source) => {
                 this._data = delegate.data(language);
             });
             //通知更新
-            dispatch(td.Language.CHANGE_LANGUAGE, language);
+            dispatch(Macro.CHANGE_LANGUAGE, language);
         } else {
             this.delegates.forEach((delegate, index, source) => {
                 this._data = delegate.data(this.getLanguage());
@@ -70,7 +72,7 @@ export class Language {
                 cc.error("key error");
                 break;
             }
-            if (keyString.indexOf(td.Macro.USING_LAN_KEY) > -1) {
+            if (keyString.indexOf(Macro.USING_LAN_KEY) > -1) {
 
                 let keys = keyString.split(".");
                 if (keys.length < 2) {

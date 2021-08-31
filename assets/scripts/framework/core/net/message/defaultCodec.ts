@@ -1,3 +1,4 @@
+import { Macro } from "../../../defines/Macros";
 import { Codec } from "./Message";
 
 interface MessageStruct {
@@ -30,11 +31,11 @@ export class DefaultCodec extends Codec {
 
         let buffer = new ArrayBuffer(this._dataSize + this.headerSize);
         let dataView = new DataView(buffer);
-        dataView.setUint32(offset, this.mainCmd, td.Macro.USING_LITTLE_ENDIAN);
+        dataView.setUint32(offset, this.mainCmd, Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
-        dataView.setUint32(offset, this.subCmd, td.Macro.USING_LITTLE_ENDIAN);
+        dataView.setUint32(offset, this.subCmd, Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
-        dataView.setUint32(offset, this._dataSize, td.Macro.USING_LITTLE_ENDIAN);
+        dataView.setUint32(offset, this._dataSize, Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
         if (data.buffer) {
             //感觉这里的复制数据有点low啊
@@ -52,11 +53,11 @@ export class DefaultCodec extends Codec {
         let dataView = new DataView(data.buffer);
         //取包头
         let offset = 0;
-        this.mainCmd = dataView.getUint32(offset, td.Macro.USING_LITTLE_ENDIAN);
+        this.mainCmd = dataView.getUint32(offset, Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
-        this.subCmd = dataView.getUint32(offset, td.Macro.USING_LITTLE_ENDIAN);
+        this.subCmd = dataView.getUint32(offset, Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
-        this._dataSize = dataView.getUint32(offset, td.Macro.USING_LITTLE_ENDIAN);
+        this._dataSize = dataView.getUint32(offset, Macro.USING_LITTLE_ENDIAN);
         offset += Uint32Array.BYTES_PER_ELEMENT;
         let buffer = dataView.buffer.slice(offset, dataView.buffer.byteLength)
         this.buffer = new Uint8Array(buffer);

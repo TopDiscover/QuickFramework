@@ -4,7 +4,6 @@
  */
 
 import { Codec } from "../core/net/message/Message"
-import { Service } from "../core/net/service/Service"
 
 export function setServiceByClassName(name: string) {
     // if(CC_DEBUG)    

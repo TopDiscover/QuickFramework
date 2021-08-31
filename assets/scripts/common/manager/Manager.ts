@@ -1,6 +1,6 @@
 /**@description 管理器 */
 import { Framewok } from "../../framework/Framework";
-import { commonConfigInit } from "../config/Config";
+import { commonConfigInit, Config } from "../config/Config";
 commonConfigInit();
 import { Log } from "../../framework/core/log/Log";
 import GlobalAudio from "../component/GlobalAudio";
@@ -10,6 +10,7 @@ import Alert from "../component/Alert";
 import Loading from "../component/Loading";
 import { ServiceManager } from "./ServiceManager";
 import { CommonLanguage } from "../language/CommonLanguage";
+import { LogLevel } from "../../framework/defines/Enums";
 
 
 
@@ -62,6 +63,9 @@ class _Manager extends Framewok {
 
     init() {
         super.init();
+        this.hotupdate.commonHotUpdateUrl = Config.TEST_HOT_UPDATE_URL_ROOT;
+        this.hotupdate.isSkipCheckUpdate = Config.isSkipCheckUpdate;
+        this.bundleManager.bundleHall = Config.BUNDLE_HALL;
         //语言包初始化
         //cc.log("language init");
         this.language.addSourceDelegate(new CommonLanguage);
@@ -70,7 +74,7 @@ class _Manager extends Framewok {
 
 export function applicationInit() {
     //日志
-    Log.logLevel = td.Log.Level.ERROR | td.Log.Level.LOG | td.Log.Level.WARN | td.Log.Level.DUMP;
+    Log.logLevel = LogLevel.ERROR | LogLevel.LOG | LogLevel.WARN | LogLevel.DUMP;
     let mgr = new _Manager();
     window["Manager"] = mgr;
     mgr.init();

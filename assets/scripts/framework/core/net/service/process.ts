@@ -1,5 +1,6 @@
 import { DefaultCodec } from "../message/defaultCodec";
 import { Codec, Message } from "../message/Message";
+import { Net } from "../Net";
 
 export type MessageHandleFunc = (handleTypeData: any) => number;
 
@@ -7,9 +8,9 @@ export class Process {
     public Codec: new () => Codec = DefaultCodec;
 
     /** 监听集合*/
-    protected _listeners: { [key: string]: td.Net.ListenerData[] } = {};
+    protected _listeners: { [key: string]: Net.ListenerData[] } = {};
     /** 消息处理队列 */
-    protected _masseageQueue: Array<td.Net.ListenerData[]> = new Array<td.Net.ListenerData[]>();
+    protected _masseageQueue: Array<Net.ListenerData[]> = new Array<Net.ListenerData[]>();
 
 
     /** 是否正在处理消息 ，消息队列处理消息有时间，如执行一个消息需要多少秒后才执行一下个*/
@@ -100,8 +101,8 @@ export class Process {
         this._isDoingMessage = false;
     }
 
-    public addListener(eventName: string, handleType: any, handleFunc: MessageHandleFunc, isQueue: boolean, target: any) {
-        let key = eventName;
+    public addListener(cmd: string, handleType: any, handleFunc: MessageHandleFunc, isQueue: boolean, target: any) {
+        let key = cmd;
 
         if (this._listeners[key]) {
             let hasSame = false;
@@ -115,7 +116,7 @@ export class Process {
                 return;
             }
             this._listeners[key].push({
-                cmd: eventName,
+                cmd: cmd,
                 func: handleFunc,
                 type: handleType,
                 isQueue: isQueue,
@@ -125,7 +126,7 @@ export class Process {
         else {
             this._listeners[key] = [];
             this._listeners[key].push({
-                cmd: eventName,
+                cmd: cmd,
                 func: handleFunc,
                 type: handleType,
                 isQueue: isQueue,
@@ -199,7 +200,7 @@ export class Process {
         }
     }
 
-    protected decode(o: td.Net.ListenerData, header: Codec): Message | null {
+    protected decode(o: Net.ListenerData, header: Codec): Message | null {
         let obj: Message = null!;
         if (o.type) {
             obj = new o.type();
@@ -247,7 +248,7 @@ export class Process {
      * @param input 
      * @param data 
      */
-    private copyListenerData(input: td.Net.ListenerData, data: any): td.Net.ListenerData {
+    private copyListenerData(input: Net.ListenerData, data: any): Net.ListenerData {
         return {
             type: input.type,
             func: input.func,

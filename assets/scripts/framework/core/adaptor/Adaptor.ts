@@ -1,3 +1,5 @@
+import { Macro } from "../../defines/Macros";
+
 type DeviceDirection = "" | "Landscape" | "Portrait";
 
 enum ScreenAdaptType {
@@ -113,7 +115,7 @@ export class Adaptor {
             me.canvas.designResolution = me.designResolution;
         }
         if (me.isNeedAdapt) {
-            dispatch(td.Adaptor.ADAPT_SCREEN);
+            dispatch(Macro.ADAPT_SCREEN);
             Manager.uiManager.fullScreenAdapt();
         }
     }

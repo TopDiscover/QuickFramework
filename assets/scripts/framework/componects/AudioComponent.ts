@@ -1,5 +1,6 @@
 import EventComponent from "./EventComponent";
 import UIView from "../core/ui/UIView";
+import { Resource } from "../core/asset/Resource";
 
 /**
  * @description 声音组件
@@ -182,7 +183,7 @@ export default class AudioComponent extends EventComponent {
             if (this.audioData.isMusicOn) {
                 Manager.cacheManager.getCacheByAsync(url, cc.AudioClip, bundle).then((data) => {
                     if (data) {
-                        let info = new td.Resource.Info;
+                        let info = new Resource.Info;
                         info.url = url;
                         info.type = cc.AudioClip;
                         info.data = data;
@@ -219,7 +220,7 @@ export default class AudioComponent extends EventComponent {
             if (this.audioData.isEffectOn) {
                 Manager.cacheManager.getCacheByAsync(url, cc.AudioClip, bundle).then((data) => {
                     if (data) {
-                        let info = new td.Resource.Info;
+                        let info = new Resource.Info;
                         info.url = url;
                         info.type = cc.AudioClip;
                         info.data = data;

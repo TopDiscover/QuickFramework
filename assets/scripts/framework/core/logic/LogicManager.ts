@@ -1,4 +1,5 @@
 import { Logic } from "./Logic";
+import { LogicImpl } from "./LogicImpl";
 
 /**
  * @description 逻辑控制器管理器 
@@ -12,7 +13,7 @@ export class LogicManager{
     private static _instance: LogicManager = null;
     public static Instance() { return this._instance || (this._instance = new LogicManager()); }
 
-    private _logics : Logic[] = [];
+    private _logics : LogicImpl[] = [];
     private _logicTypes = [];
     private node : cc.Node = null;
 
@@ -25,7 +26,7 @@ export class LogicManager{
         }
         if ( this.node ){
             //已经进入过onLoad,这里需要单独的进行初始化
-            let logic : Logic = new logicType;
+            let logic : LogicImpl = new logicType;
             logic.init(this.node);
             this._logics.push(logic);
             logic.onLoad();
@@ -36,34 +37,34 @@ export class LogicManager{
 
     public onLoad( node : cc.Node ){
         this.node = node;
-        Manager.eventDispatcher.addEventListener(td.Logic.Event.ENTER_COMPLETE,this.onEnterComplete,this);
+        Manager.eventDispatcher.addEventListener(Logic.Event.ENTER_COMPLETE,this.onEnterComplete,this);
         if ( this._logics.length == 0 ){
             for ( let i = 0 ; i < this._logicTypes.length ; i++ ){
                 let type = this._logicTypes[i];
                 cc.log(this._logTag,`添加Logic : ${cc.js.getClassName(type)}`);
-                let logic : Logic = new type;
+                let logic : LogicImpl = new type;
                 logic.init(node);
                 this._logics.push( logic );
             }
         }
 
-        this._logics.forEach((data : Logic)=>{
+        this._logics.forEach((data : LogicImpl)=>{
             data.onLoad();
         });
         
     }
 
     public onDestroy( node : cc.Node ){
-        Manager.eventDispatcher.removeEventListener(td.Logic.Event.ENTER_COMPLETE,this);
-        this._logics.forEach((data : Logic)=>{
+        Manager.eventDispatcher.removeEventListener(Logic.Event.ENTER_COMPLETE,this);
+        this._logics.forEach((data : LogicImpl)=>{
             data.onDestroy();
         });
     }
 
-    protected onEnterComplete(data: td.Logic.EventData) {
+    protected onEnterComplete(data: Logic.EventData) {
 
         //房间列表会直接加在大厅上，不对界面进行关闭操作
-        if ( data.type != td.Logic.Type.ROOM_LIST ){
+        if ( data.type != Logic.Type.ROOM_LIST ){
             if (data && data.views && data.views.length > 0) {
                 //关闭掉除排除项之外的所有界面
                 Manager.uiManager.closeExcept(data.views);
@@ -74,10 +75,10 @@ export class LogicManager{
                     logic.onEnterComplete(data);
                 }
             }
-            if( data.type == td.Logic.Type.HALL){
+            if( data.type == Logic.Type.HALL){
                 //删除加载的子游戏bundle
                 Manager.bundleManager.removeLoadedGamesBundle();
-            }else if( data.type == td.Logic.Type.LOGIN ){
+            }else if( data.type == Logic.Type.LOGIN ){
                 //返回到登录界面，删除所有加载的bundles，包括大厅hall
                 Manager.bundleManager.removeLoadedBundle();
             }

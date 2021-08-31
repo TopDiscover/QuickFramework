@@ -1,3 +1,4 @@
+import { HotUpdate } from "../../framework/core/hotupdate/Hotupdate";
 import UIView from "../../framework/core/ui/UIView";
 import { i18n } from "../language/CommonLanguage";
 
@@ -25,13 +26,13 @@ export default class DownloadLoading extends UIView {
     private tipsIndex = 0;
 
     /**@description 下载的状态 */
-    private state: td.HotUpdate.State = null;
+    private state: HotUpdate.State = null;
 
     private updateName = "";
 
     addEvents() {
         super.addEvents();
-        this.addUIEvent(td.HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload);
+        this.addUIEvent(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload);
     }
 
     onLoad() {
@@ -45,7 +46,7 @@ export default class DownloadLoading extends UIView {
     }
 
     private doUpdate() {
-        if (this.state == td.HotUpdate.State.TRY_DOWNLOAD_FAILED_ASSETS) {
+        if (this.state == HotUpdate.State.TRY_DOWNLOAD_FAILED_ASSETS) {
             Manager.hotupdate.downloadFailedAssets();
         } else {
             Manager.hotupdate.hotUpdate();
@@ -68,21 +69,21 @@ export default class DownloadLoading extends UIView {
             .start();
     }
 
-    private onDownload(info: td.HotUpdate.DownLoadInfo) {
+    private onDownload(info: HotUpdate.DownLoadInfo) {
         if (CC_DEBUG) cc.log(JSON.stringify(info));
-        if (info.code == td.HotUpdate.Code.UPDATE_PROGRESSION) {
+        if (info.code == HotUpdate.Code.UPDATE_PROGRESSION) {
             this.progress.progress = info.percent == Number.NaN ? 0 : info.percent;
-        } else if (info.code == td.HotUpdate.Code.ALREADY_UP_TO_DATE) {
+        } else if (info.code == HotUpdate.Code.ALREADY_UP_TO_DATE) {
             this.progress.progress = 1;
-        } else if (info.code == td.HotUpdate.Code.UPDATE_FINISHED) {
+        } else if (info.code == HotUpdate.Code.UPDATE_FINISHED) {
             Manager.tips.show(String.format(i18n.alreadyRemoteVersion, this.updateName));
             this.close();
-        } else if (info.code == td.HotUpdate.Code.UPDATE_FAILED ||
-            info.code == td.HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
-            info.code == td.HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST ||
-            info.code == td.HotUpdate.Code.ERROR_PARSE_MANIFEST ||
-            info.code == td.HotUpdate.Code.ERROR_UPDATING ||
-            info.code == td.HotUpdate.Code.ERROR_DECOMPRESS) {
+        } else if (info.code == HotUpdate.Code.UPDATE_FAILED ||
+            info.code == HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
+            info.code == HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST ||
+            info.code == HotUpdate.Code.ERROR_PARSE_MANIFEST ||
+            info.code == HotUpdate.Code.ERROR_UPDATING ||
+            info.code == HotUpdate.Code.ERROR_DECOMPRESS) {
             Manager.tips.show(String.format(i18n.updateFaild, this.updateName));
             this.close();
         }

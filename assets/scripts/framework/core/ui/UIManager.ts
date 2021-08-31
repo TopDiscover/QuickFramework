@@ -1,3 +1,6 @@
+import { ViewStatus } from "../../defines/Enums";
+import { Macro } from "../../defines/Macros";
+import { Resource } from "../asset/Resource";
 import UIView from "./UIView";
 
 /**@description 动态加载垃圾数据名 */
@@ -5,8 +8,8 @@ const DYNAMIC_LOAD_GARBAGE = "DYNAMIC_LOAD_GARBAGE";
 /**@description 动画加载全局数据名 */
 const DYNAMIC_LOAD_RETAIN_MEMORY = "DYNAMIC_LOAD_RETAIN_MEMORY";
 export class ViewDynamicLoadData {
-    private local = new Map<string, td.Resource.Info>();
-    private remote = new Map<string, td.Resource.Info>();
+    private local = new Map<string, Resource.Info>();
+    private remote = new Map<string, Resource.Info>();
     public name: string;
 
     constructor(name: string = null) {
@@ -14,7 +17,7 @@ export class ViewDynamicLoadData {
     }
 
     /**@description 添加动态加载的本地资源 */
-    public addLocal(info: td.Resource.Info, className: string = null) {
+    public addLocal(info: Resource.Info, className: string = null) {
         if (info && info.url) {
             if (this.name == DYNAMIC_LOAD_GARBAGE) {
                 cc.error(`找不到资源持有者: ${info.url}`);
@@ -28,7 +31,7 @@ export class ViewDynamicLoadData {
     }
 
     /**@description 添加动态加载的远程资源 */
-    public addRemote(info: td.Resource.Info, className: string = null) {
+    public addRemote(info: Resource.Info, className: string = null) {
         if (info && info.data && !this.remote.has(info.url)) {
             if (this.name == DYNAMIC_LOAD_GARBAGE) {
                 cc.error(`找不到资源持有者 : ${info.url}`);
@@ -90,7 +93,7 @@ class ViewData {
     /**@description 界面是否已经加载 */
     isLoaded: boolean = false;
     /**@description 界面当前等待操作状态 */
-    status: td.ViewStatus = td.ViewStatus.WAITTING_NONE;
+    status: ViewStatus = ViewStatus.WAITTING_NONE;
     /**@description 实际显示界面 */
     view: UIView = null;
     /**@description 等待加载完成回调 */
@@ -100,7 +103,7 @@ class ViewData {
     /**是否预加载,不显示出来，但会加到当前场景上 */
     isPreload: boolean = false;
     /**@description 资源信息 */
-    info: td.Resource.Info = null;
+    info: Resource.Info = null;
 
     /**@description 界面动态加载的数据 */
     loadData: ViewDynamicLoadData = new ViewDynamicLoadData();
@@ -144,7 +147,7 @@ export class UIManager {
     /**@description 视图 */
     private _viewDatas: Map<string, ViewData> = new Map<string, ViewData>();
     private getViewData(className: string): ViewData;
-    private getViewData<T extends UIView>(uiClass: td.UIClass<T>): ViewData;
+    private getViewData<T extends UIView>(uiClass: UIClass<T>): ViewData;
     private getViewData(data: any): ViewData {
         let className = this.getClassName(data);
         if (!className) return null;
@@ -153,7 +156,7 @@ export class UIManager {
     }
 
     private getClassName(className: string): string;
-    private getClassName<T extends UIView>(uiClass: td.UIClass<T>): string;
+    private getClassName<T extends UIView>(uiClass: UIClass<T>): string;
     private getClassName(data: any): string {
         if (!data) return null;
         let className = null;
@@ -171,7 +174,7 @@ export class UIManager {
     /**@description 驻留内存资源 */
     public retainMemory = new ViewDynamicLoadData(DYNAMIC_LOAD_RETAIN_MEMORY);
 
-    public preload<T extends UIView>(uiClass: td.UIClass<T>,bundle:BUNDLE_TYPE) {
+    public preload<T extends UIView>(uiClass: UIClass<T>,bundle:BUNDLE_TYPE) {
         return this._open(uiClass,bundle, 0, true, null,null);
     }
 
@@ -197,11 +200,11 @@ export class UIManager {
      * @param zIndex 节点层级 
      * @param args 传入参数列表
      */
-    public open<T extends UIView>(config: { type: td.UIClass<T>, bundle?:BUNDLE_TYPE , zIndex?: number, args?: any[] , delay?: number,name?:string}) : Promise<T>{
+    public open<T extends UIView>(config: { type: UIClass<T>, bundle?:BUNDLE_TYPE , zIndex?: number, args?: any[] , delay?: number,name?:string}) : Promise<T>{
         return this._open(config.type,config.bundle, config.zIndex ? config.zIndex : 0, false, config.args,config.delay,config.name);
     }
 
-    private _open<T extends UIView>(uiClass: td.UIClass<T>, bundle:BUNDLE_TYPE, zOrder: number = 0, isPreload: boolean, args: any[],delay : number,name?:string) {
+    private _open<T extends UIView>(uiClass: UIClass<T>, bundle:BUNDLE_TYPE, zOrder: number = 0, isPreload: boolean, args: any[],delay : number,name?:string) {
         return new Promise<T>((reslove, reject) => {
             if (!uiClass) {
                 if (CC_DEBUG) cc.log(`${this._logTag}open ui class error`);
@@ -221,7 +224,7 @@ export class UIManager {
                 viewData.isPreload = isPreload;
                 //已经加载
                 if (viewData.isLoaded) {
-                    viewData.status = td.ViewStatus.WAITTING_NONE;
+                    viewData.status = ViewStatus.WAITTING_NONE;
                     if (!isPreload) {
                         if (viewData.view && cc.isValid(viewData.node)) {
                             viewData.node.zIndex = zOrder;
@@ -235,7 +238,7 @@ export class UIManager {
                     return;
                 }
                 else {
-                    viewData.status = td.ViewStatus.WAITTING_NONE;
+                    viewData.status = ViewStatus.WAITTING_NONE;
                     if ( !isPreload ){
                         Manager.uiLoading.show(delay,name);
                     }
@@ -264,7 +267,7 @@ export class UIManager {
                 }
                 this.loadPrefab(bundle,prefabUrl, progressCallback)
                     .then((prefab) => {
-                        viewData.info = new td.Resource.Info;
+                        viewData.info = new Resource.Info;
                         viewData.info.url = prefabUrl;
                         viewData.info.type = cc.Prefab;
                         viewData.info.data = prefab;
@@ -292,7 +295,7 @@ export class UIManager {
         });
     }
 
-    private _addComponent<T extends UIView>(uiNode: cc.Node, uiClass: td.UIClass<T>, viewData: ViewData, className: string, zOrder: number, args: any[],bundle:BUNDLE_TYPE): UIView {
+    private _addComponent<T extends UIView>(uiNode: cc.Node, uiClass: UIClass<T>, viewData: ViewData, className: string, zOrder: number, args: any[],bundle:BUNDLE_TYPE): UIView {
         if (uiNode) {
             //挂载脚本
             let view = uiNode.getComponent(uiClass) as UIView;
@@ -340,10 +343,10 @@ export class UIManager {
         }
     }
 
-    private createNode<T extends UIView>(className: string, uiClass: td.UIClass<T>, reslove, data: cc.Prefab, args: any[], zOrder: number,bundle:BUNDLE_TYPE) {
+    private createNode<T extends UIView>(className: string, uiClass: UIClass<T>, reslove, data: cc.Prefab, args: any[], zOrder: number,bundle:BUNDLE_TYPE) {
         let viewData = this._viewDatas.get(className);
         viewData.isLoaded = true;
-        if (viewData.status == td.ViewStatus.WAITTING_CLOSE) {
+        if (viewData.status == ViewStatus.WAITTING_CLOSE) {
             //加载过程中有人关闭了界面
             reslove(null);
             if (CC_DEBUG) cc.warn(`${this._logTag}${className}正等待关闭`);
@@ -360,7 +363,7 @@ export class UIManager {
             return;
         }
 
-        if (viewData.status == td.ViewStatus.WATITING_HIDE) {
+        if (viewData.status == ViewStatus.WATITING_HIDE) {
             //加载过程中有人隐藏了界面
             view.hide();
             if (CC_DEBUG) cc.warn(`${this._logTag}加载过程隐藏了界面${className}`);
@@ -381,7 +384,7 @@ export class UIManager {
     private loadPrefab( bundle: BUNDLE_TYPE, url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
         return new Promise<cc.Prefab>((resolove, reject) => {
             if ( bundle == undefined || bundle == "" || bundle == null ){
-                bundle = td.Macro.BUNDLE_RESOURCES;
+                bundle = Macro.BUNDLE_RESOURCES;
             }
             Manager.assetManager.load(bundle,url,cc.Prefab,progressCallback,(data) => {
                 if (data && data.data && data.data instanceof cc.Prefab) {
@@ -417,7 +420,7 @@ export class UIManager {
     }
 
     /**@description 添加动态加载的本地资源 */
-    public addLocal(info: td.Resource.Info, className: string) {
+    public addLocal(info: Resource.Info, className: string) {
         if (info) {
             let viewData = this.getViewData(className);
             if (viewData) {
@@ -427,7 +430,7 @@ export class UIManager {
     }
 
     /**@description 添加动态加载的远程资源 */
-    public addRemote(info: td.Resource.Info, className: string) {
+    public addRemote(info: Resource.Info, className: string) {
         if (info) {
             let viewData = this.getViewData(className);
             if (viewData) {
@@ -436,13 +439,13 @@ export class UIManager {
         }
     }
 
-    public close<T extends UIView>(uiClass: td.UIClass<T>);
+    public close<T extends UIView>(uiClass: UIClass<T>);
     public close(className: string);
     public close(data: any) {
         //当前所有界面都已经加载完成
         let viewData = this.getViewData(data);
         if (viewData) {
-            viewData.status = td.ViewStatus.WAITTING_CLOSE;
+            viewData.status = ViewStatus.WAITTING_CLOSE;
             if (viewData.view && cc.isValid(viewData.node)) {
                 viewData.node.removeFromParent(true);
                 viewData.node.destroy();
@@ -456,7 +459,7 @@ export class UIManager {
     }
 
     /**@description 关闭除传入参数以外的所有其它界面,不传入，关闭所有界面 */
-    public closeExcept(views: (td.UIClass<UIView> | string | UIView)[]) {
+    public closeExcept(views: (UIClass<UIView> | string | UIView)[]) {
         let self = this;
         if (views == undefined || views == null || views.length == 0) {
             //关闭所有界面
@@ -485,7 +488,7 @@ export class UIManager {
     }
 
     public hide(className: string);
-    public hide<T extends UIView>(uiClass: td.UIClass<T>);
+    public hide<T extends UIView>(uiClass: UIClass<T>);
     public hide(data: any) {
         let viewData = this.getViewData(data);
         if (viewData) {
@@ -498,13 +501,13 @@ export class UIManager {
             }
             else {
                 //没有加载写成，正常加载中
-                viewData.status = td.ViewStatus.WATITING_HIDE;
+                viewData.status = ViewStatus.WATITING_HIDE;
             }
         }
     }
 
     public getView(className: string): Promise<any>;
-    public getView<T extends UIView>(uiClass: td.UIClass<T>): Promise<T>;
+    public getView<T extends UIView>(uiClass: UIClass<T>): Promise<T>;
     public getView(data: any): any {
         return new Promise<any>((resolove, reject) => {
             if (data == undefined || data == null) {
@@ -552,13 +555,13 @@ export class UIManager {
     }
 
     public isShow(className: string): boolean;
-    public isShow<T extends UIView>(uiClass: td.UIClass<T>): boolean;
+    public isShow<T extends UIView>(uiClass: UIClass<T>): boolean;
     public isShow(data: any) {
         let viewData = this.getViewData(data);
         if (!viewData) {
             return false;
         }
-        if (viewData.isLoaded && viewData.status == td.ViewStatus.WAITTING_NONE) {
+        if (viewData.isLoaded && viewData.status == ViewStatus.WAITTING_NONE) {
             if (viewData.view) return viewData.view.node.active;
         }
         return false;

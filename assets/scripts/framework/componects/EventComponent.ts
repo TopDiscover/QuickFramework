@@ -1,5 +1,3 @@
-import { Service } from "../core/net/service/Service";
-
 /**
  * @description 事件处理组件
  */
@@ -25,11 +23,11 @@ export default class EventComponent extends cc.Component {
     protected logTag = `[EventComponent]`;
 
     private _events: EventArgs[] = [];
-    addNetEvent(name: string, func: fn, handlerType?: any, isQueue: boolean = false) {
+    addNetEvent(cmd: string, func: fn, handlerType?: any, isQueue: boolean = false) {
         //普通消息
         if (this._service) {
             this._service.addListener(
-                name,
+                cmd,
                 handlerType,
                 func as any,
                 isQueue,

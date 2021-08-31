@@ -2,6 +2,9 @@
  * @description 提示
  */
 
+import { Macro } from "../../framework/defines/Macros";
+import { Config, ViewZOrder } from "../config/Config";
+
 class ToastItem extends cc.Component {
     private _content : cc.Node = null;
     init( content : string , time : number ){
@@ -69,13 +72,13 @@ class ToastItem extends cc.Component {
                 return;
             }else{
                 Manager.assetManager.load( 
-                    td.Macro.BUNDLE_RESOURCES, 
-                    td.Config.CommonPrefabs.tips,
+                    Macro.BUNDLE_RESOURCES, 
+                    Config.CommonPrefabs.tips,
                     cc.Prefab,
                     (finish: number, total: number, item: cc.AssetManager.RequestItem)=>{},
                     (data)=>{
                     if ( data && data.data && data.data instanceof cc.Prefab ){
-                        Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.tips,data.data,td.Macro.BUNDLE_RESOURCES);
+                        Manager.assetManager.addPersistAsset(Config.CommonPrefabs.tips,data.data,Macro.BUNDLE_RESOURCES);
                         this._prefab = data.data;
                         resolve(true);
                     }else{
@@ -96,7 +99,7 @@ class ToastItem extends cc.Component {
                 itemComp.fadeIn();
                 node.userData = this._id++;
                 node.name = `Tips${node.userData}`;
-                Manager.uiManager.addChild(node,td.ViewZOrder.Tips)
+                Manager.uiManager.addChild(node,ViewZOrder.Tips)
                 //整体上移
                 let length = this._queue.length;
                 for ( let i = 0 ; i < length ; i++ ){

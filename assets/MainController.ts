@@ -1,6 +1,8 @@
 import EventComponent from "./scripts/framework/componects/EventComponent";
 import DownloadLoading from "./scripts/common/component/DownloadLoading";
 import { Reconnect } from "./scripts/common/net/Reconnect";
+import { HotUpdate } from "./scripts/framework/core/hotupdate/Hotupdate";
+import { Config, ViewZOrder } from "./scripts/common/config/Config";
 /**
  * @description 主控制器 
  */
@@ -19,12 +21,12 @@ export default class MainController extends EventComponent {
 
     addEvents() {
         super.addEvents();
-        this.addUIEvent(td.HotUpdate.Event.DOWNLOAD_MESSAGE, this.onHotupdateMessage);
+        this.addUIEvent(HotUpdate.Event.DOWNLOAD_MESSAGE, this.onHotupdateMessage);
     }
 
-    private onHotupdateMessage(data: td.HotUpdate.MessageData) {
+    private onHotupdateMessage(data: HotUpdate.MessageData) {
         if (data.isOk) {
-            Manager.uiManager.open({ type: DownloadLoading, zIndex: td.ViewZOrder.Loading, args: [data.state, data.name, data.bundle] });
+            Manager.uiManager.open({ type: DownloadLoading, zIndex: ViewZOrder.Loading, args: [data.state, data.name, data.bundle] });
         } else {
             cc.game.end();
         }
@@ -62,7 +64,7 @@ export default class MainController extends EventComponent {
             showRes.zIndex = 9999;
             showComp.zIndex = 9999;
             let isShow = false;
-            if (td.Config.isShowDebugButton) {
+            if (Config.isShowDebugButton) {
                 isShow = true;
                 showUI.on(cc.Node.EventType.TOUCH_END, () => {
                     Manager.uiManager.printViews();

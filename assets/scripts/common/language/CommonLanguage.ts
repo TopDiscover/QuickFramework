@@ -2,12 +2,13 @@
 
 import { LanguageZH } from "./LanguageZH";
 import { LanguageEN } from "./LanguageEN";
+import { Macro } from "../../framework/defines/Macros";
 
 export let i18n = LanguageZH;
 
-export class CommonLanguage implements td.Language.DataSourceDelegate{
-    name = td.Macro.COMMON_LANGUAGE_NAME;
-    data( language : string ): td.Language.Data {
+export class CommonLanguage implements Language.DataSourceDelegate{
+    name = Macro.COMMON_LANGUAGE_NAME;
+    data( language : string ): Language.Data {
         if( i18n.language == language ){
             return i18n;
         }

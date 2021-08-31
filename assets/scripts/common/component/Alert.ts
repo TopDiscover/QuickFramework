@@ -1,3 +1,5 @@
+import { Macro } from "../../framework/defines/Macros";
+import { Config, ViewZOrder } from "../config/Config";
 import { i18n } from "../language/CommonLanguage";
 
 class AlertDialog extends cc.Component {
@@ -187,7 +189,7 @@ export default class Alert {
     private prefab: cc.Prefab = null;
 
     constructor() {
-        Manager.eventDispatcher.addEventListener(td.Adaptor.ADAPT_SCREEN, this.onAdaptScreen, this);
+        Manager.eventDispatcher.addEventListener(Macro.ADAPT_SCREEN, this.onAdaptScreen, this);
     }
 
     private _isLoadingPrefab = false;
@@ -337,7 +339,7 @@ export default class Alert {
             if (!this.curPanel) {
                 this.curPanel = cc.instantiate(this.prefab);
                 let dialog = this.curPanel.addComponent(AlertDialog);
-                Manager.uiManager.addChild(this.curPanel,td.ViewZOrder.Alert)
+                Manager.uiManager.addChild(this.curPanel,ViewZOrder.Alert)
                 dialog.show(config);
             }
         }
@@ -360,15 +362,15 @@ export default class Alert {
             else {
                 this._isLoadingPrefab = true;
                 Manager.assetManager.load(
-                    td.Macro.BUNDLE_RESOURCES,
-                    td.Config.CommonPrefabs.alert,
+                    Macro.BUNDLE_RESOURCES,
+                    Config.CommonPrefabs.alert,
                     cc.Prefab,
                     (finish: number, total: number, item: cc.AssetManager.RequestItem) => { },
                     (data) => {
                         this._isLoadingPrefab = false;
                         if (data && data.data && data.data instanceof cc.Prefab) {
                             this.prefab = data.data;
-                            Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.alert, data.data, td.Macro.BUNDLE_RESOURCES);
+                            Manager.assetManager.addPersistAsset(Config.CommonPrefabs.alert, data.data, Macro.BUNDLE_RESOURCES);
                             if (this.finishLoadCb) {
                                 this.finishLoadCb(true);
                                 this.finishLoadCb = null;

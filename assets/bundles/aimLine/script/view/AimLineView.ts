@@ -1,3 +1,4 @@
+import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
 import UIView from "../../../../scripts/framework/core/ui/UIView";
 
 /**
@@ -42,7 +43,7 @@ export default class AimLineView extends UIView {
 
         
         //通知进入bundle完成
-        dispatchEnterComplete({type :td.Logic.Type.GAME,views:[this]});
+        dispatchEnterComplete({type :Logic.Type.GAME,views:[this]});
     }
 
     onFullScreenAdapt(){
@@ -107,7 +108,7 @@ export default class AimLineView extends UIView {
     }
 
     private onGoBack( ){
-        dispatch(td.Logic.Event.ENTER_HALL);
+        dispatch(Logic.Event.ENTER_HALL);
     }
 
     /**

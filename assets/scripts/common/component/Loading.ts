@@ -2,13 +2,17 @@
  * @description 加载动画
  */
 
+import { Macro } from "../../framework/defines/Macros";
+import { Config, ViewZOrder } from "../config/Config";
+
+
 export default class Loading {
     private static _instance: Loading = null;
     public static Instance() { return this._instance || (this._instance = new Loading()); }
     /**@description 当前loading节点 */
     private _node: cc.Node = null;
     constructor() {
-        Manager.eventDispatcher.addEventListener(td.Adaptor.ADAPT_SCREEN, this.onAdaptScreen, this);
+        Manager.eventDispatcher.addEventListener(Macro.ADAPT_SCREEN, this.onAdaptScreen, this);
     }
     private onAdaptScreen() {
         Manager.adaptor.fullScreenAdapt(this._node);
@@ -46,7 +50,7 @@ export default class Loading {
      * @param timeOutCb 超时回调
      * @param timeout 显示超时时间
      */
-    public show( content : string | string[] , timeOutCb?:()=>void,timeout = td.Config.LOADING_TIME_OUT ) {
+    public show( content : string | string[] , timeOutCb?:()=>void,timeout = Config.LOADING_TIME_OUT ) {
         this._timeOutCb = timeOutCb;
         if( Array.isArray(content) ){
             this._content = content;
@@ -63,7 +67,7 @@ export default class Loading {
         let finish = await this.loadPrefab();
         if (finish) {
             this._node.removeFromParent();
-            Manager.uiManager.addChild(this._node,td.ViewZOrder.Loading);
+            Manager.uiManager.addChild(this._node,ViewZOrder.Loading);
             this._node.position = cc.Vec3.ZERO;
             this._text = cc.find("content/text",this._node).getComponent(cc.Label);
             this._showContentIndex = 0;
@@ -89,7 +93,7 @@ export default class Loading {
             .call(()=>{
                 this._text.string = this._content[this._showContentIndex];
             })
-            .delay(td.Config.LOADING_CONTENT_CHANGE_INTERVAL)
+            .delay(Config.LOADING_CONTENT_CHANGE_INTERVAL)
             .call(()=>{
                 this._showContentIndex ++;
                 if( this._showContentIndex >= this._content.length ){
@@ -141,14 +145,14 @@ export default class Loading {
             }
             this._isLoadingPrefab = true;
             Manager.assetManager.load(
-                td.Macro.BUNDLE_RESOURCES, 
-                td.Config.CommonPrefabs.loading,
+                Macro.BUNDLE_RESOURCES, 
+                Config.CommonPrefabs.loading,
                 cc.Prefab,
                 (finish: number, total: number, item: cc.AssetManager.RequestItem)=>{},
                 (data) => {
                 this._isLoadingPrefab = false;
                 if (data && data.data && data.data instanceof cc.Prefab) {
-                    Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.loading,data.data,td.Macro.BUNDLE_RESOURCES)
+                    Manager.assetManager.addPersistAsset(Config.CommonPrefabs.loading,data.data,Macro.BUNDLE_RESOURCES)
                     this._node = cc.instantiate(data.data);
                     resolove(true);
                 }

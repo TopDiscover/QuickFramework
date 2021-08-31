@@ -12,6 +12,7 @@ import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessa
 import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
 import { TestProtoMessage } from "../../../hall/script/protocol/TestProtoMessage";
 import { GetCmdKey } from "../../../hall/script/controller/GetCmdKey";
+import { Net } from "../../../../scripts/framework/core/net/Net";
 const { ccclass, property } = cc._decorator;
 
 @ccclass
@@ -37,13 +38,13 @@ export default class TestChatNetController extends Controller<ChatService> {
         dispatch(CommonEvent.TEST_BINARY_MSG, data.hello)
     }
 
-    protected onNetOpen(event: td.Net.ServiceEvent) {
+    protected onNetOpen(event: Net.ServiceEvent) {
         let result = super.onNetOpen(event);
         if (result) dispatch(CommonEvent.CHAT_SERVICE_CONNECTED, this.service);
         return result;
     }
 
-    protected onNetClose(event: td.Net.ServiceEvent) {
+    protected onNetClose(event: Net.ServiceEvent) {
         let result = super.onNetClose(event);
         if (result) dispatch(CommonEvent.CHAT_SERVICE_CLOSE, this.service);
         return result;

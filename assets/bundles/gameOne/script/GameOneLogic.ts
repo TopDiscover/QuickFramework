@@ -1,9 +1,10 @@
 import { Logic } from "../../../scripts/framework/core/logic/Logic";
+import { LogicImpl } from "../../../scripts/framework/core/logic/LogicImpl";
 import GameOneView from "./view/GameOneView";
 
-class GameOneLogic extends Logic {
+class GameOneLogic extends LogicImpl {
 
-    logicType: td.Logic.Type = td.Logic.Type.GAME;
+    logicType: Logic.Type = Logic.Type.GAME;
 
     onLoad() {
         super.onLoad();
@@ -11,7 +12,7 @@ class GameOneLogic extends Logic {
 
     protected addEvents() {
         super.addEvents();
-        this.addUIEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
+        this.addUIEvent(Logic.Event.ENTER_GAME, this.onEnterGame);
     }
 
     protected get bundle() {

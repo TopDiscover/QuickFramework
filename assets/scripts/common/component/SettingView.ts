@@ -1,3 +1,4 @@
+import { Logic } from "../../framework/core/logic/Logic";
 import UIView from "../../framework/core/ui/UIView";
 import { i18n } from "../language/CommonLanguage";
 
@@ -62,7 +63,7 @@ export default class SettingView extends UIView {
             text: i18n.quitGame,
             confirmCb: (isOk) => {
                 if (isOk) {
-                    dispatch(td.Logic.Event.ENTER_LOGIN);
+                    dispatch(Logic.Event.ENTER_LOGIN);
                 }
             },
         });

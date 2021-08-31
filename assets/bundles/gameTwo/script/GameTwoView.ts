@@ -1,3 +1,4 @@
+import { dispatchEnterComplete, Logic } from "../../../scripts/framework/core/logic/Logic";
 import UIView from "../../../scripts/framework/core/ui/UIView";
 
 const {ccclass, property} = cc._decorator;
@@ -13,9 +14,9 @@ export default class GameTwoView extends UIView {
         super.onLoad();
 
         cc.find("goBack",this.node).on(cc.Node.EventType.TOUCH_END,()=>{
-            dispatch(td.Logic.Event.ENTER_HALL);
+            dispatch(Logic.Event.ENTER_HALL);
         });
 
-        dispatchEnterComplete({type:td.Logic.Type.GAME,views:[this]});
+        dispatchEnterComplete({type:Logic.Type.GAME,views:[this]});
     }
 }

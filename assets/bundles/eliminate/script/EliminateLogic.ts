@@ -1,11 +1,13 @@
+import { Resource } from "../../../scripts/framework/core/asset/Resource";
 import { Logic } from "../../../scripts/framework/core/logic/Logic";
+import { LogicImpl } from "../../../scripts/framework/core/logic/LogicImpl";
 import { EliminateData } from "./data/EliminateData";
 import { CELL_PREFAB_URL, EFFECTS_CONFIG } from "./data/EliminateDefines";
 import EliminateGameView from "./view/EliminateGameView";
 
-class EliminateLogic extends Logic {
+class EliminateLogic extends LogicImpl {
 
-    logicType: td.Logic.Type = td.Logic.Type.GAME;
+    logicType: Logic.Type = Logic.Type.GAME;
 
     onLoad() {
         super.onLoad();
@@ -13,14 +15,14 @@ class EliminateLogic extends Logic {
 
     protected addEvents() {
         super.addEvents();
-        this.addUIEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
+        this.addUIEvent(Logic.Event.ENTER_GAME, this.onEnterGame);
     }
 
     protected get bundle() {
         return EliminateData.bundle;
     }
 
-    public onEnterComplete(data: td.Logic.EventData) {
+    public onEnterComplete(data: Logic.EventData) {
         super.onEnterComplete(data);
         if (data.type == this.logicType) {
 
@@ -38,8 +40,8 @@ class EliminateLogic extends Logic {
         }
     }
 
-    protected onLoadResourceComplete(err: td.Resource.LoaderError) {
-        if (err == td.Resource.LoaderError.LOADING) {
+    protected onLoadResourceComplete(err: Resource.LoaderError) {
+        if (err == Resource.LoaderError.LOADING) {
             return;
         }
         cc.log(`${this.bundle} 资源加载完成`);
@@ -48,9 +50,9 @@ class EliminateLogic extends Logic {
         Manager.uiManager.open({ type: EliminateGameView, bundle: this.bundle });
     }
 
-    protected getLoadResources(): td.Resource.Data[] {
+    protected getLoadResources(): Resource.Data[] {
 
-        let res: td.Resource.Data[] = [];
+        let res: Resource.Data[] = [];
         for (let i = 0; i < CELL_PREFAB_URL.length; i++) {
             if (CELL_PREFAB_URL[i]) {
                 res.push({ url: CELL_PREFAB_URL[i], type: cc.Prefab, bundle: this.bundle })

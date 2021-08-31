@@ -2,7 +2,7 @@ import TankBattleStartView from "./TankBattleStartView";
 import TankBattleMap from "../model/TankBattleMap";
 import { TankBettle } from "../data/TankBattleGameData";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
-
+import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
 
 const { ccclass, property } = cc._decorator;
 
@@ -46,7 +46,7 @@ export default class TankBattleGameView extends GameView {
 
         this.init()
 
-        dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this, TankBattleStartView] });
+        dispatchEnterComplete({ type: Logic.Type.GAME, views: [this, TankBattleStartView] });
     }
 
     onDestroy() {

@@ -1,5 +1,3 @@
-import { Service } from "./Service";
-
 /**@description NetHelper 
  * 子类需要继承并实现constructor,传入实例化的service，
  * 在该模块的其它地方，可直接调用

@@ -1,8 +1,9 @@
 
-import { Message } from "../../framework/core/net/message/Message";
 import { Reconnect } from "./Reconnect";
 import { ICommonService } from "../../framework/core/net/socket/ICommonService";
 import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdDefines";
+import { Net } from "../../framework/core/net/Net";
+import { Config } from "../config/Config";
 
 /**
  * @description service公共基类
@@ -17,17 +18,17 @@ export class CommonService extends ICommonService implements GameEventInterface 
     // protected protocol: WebSocketType = "wss"
     protected ip = "localhost";
     protected port = 3000;
-    protected protocol: td.Net.Type = "ws"
+    protected protocol: Net.Type = "ws"
 
-    protected _maxEnterBackgroundTime: number = td.Config.MAX_INBACKGROUND_TIME;
+    protected _maxEnterBackgroundTime: number = Config.MAX_INBACKGROUND_TIME;
     protected _backgroundTimeOutId: any = -1;
     /**@description 进入后台的最大允许时间，超过了最大值，则进入网络重连 */
     public get maxEnterBackgroundTime() {
         return this._maxEnterBackgroundTime;
     }
     public set maxEnterBackgroundTime(value: number) {
-        if (value < td.Config.MIN_INBACKGROUND_TIME || value > td.Config.MAX_INBACKGROUND_TIME) {
-            value = td.Config.MIN_INBACKGROUND_TIME;
+        if (value < Config.MIN_INBACKGROUND_TIME || value > Config.MAX_INBACKGROUND_TIME) {
+            value = Config.MIN_INBACKGROUND_TIME;
         }
         cc.log(this.serviceName, `maxEnterBackgroundTime ${value}`);
         this._maxEnterBackgroundTime = value;
@@ -73,7 +74,6 @@ export class CommonService extends ICommonService implements GameEventInterface 
      * @description 心跳超时
      */
     protected onHeartbeatTimeOut() {
-        super.onHeartbeatTimeOut();
         cc.warn(`${this.serviceName} 心跳超时，您已经断开网络`);
         this.close();
         Manager.serviceManager.tryReconnect(this, true);
@@ -127,7 +127,7 @@ export class CommonService extends ICommonService implements GameEventInterface 
 
     protected onClose(ev: Event) {
         super.onClose(ev)
-        if (ev.type == td.Net.NetEvent.ON_CUSTOM_CLOSE) {
+        if (ev.type == Net.NetEvent.ON_CUSTOM_CLOSE) {
             cc.log(`${this.serviceName} 应用层主动关闭Socket`);
             return;
         }
