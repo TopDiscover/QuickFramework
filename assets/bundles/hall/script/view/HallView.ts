@@ -1,11 +1,14 @@
 import UIView from "../../../../scripts/framework/core/ui/UIView";
-import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { HallData } from "../data/HallData";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import { GameService } from "../../../../scripts/common/net/GameService";
 import { ChatService } from "../../../../scripts/common/net/ChatService";
 import SettingView from "../../../../scripts/common/component/SettingView";
 import { EventTouch, _decorator,Node, PageView, instantiate, find, Label, ProgressBar, sys, PhysicsSystem2D } from "cc";
+import { HotUpdate } from "../../../../scripts/framework/core/hotupdate/Hotupdate";
+import { ViewZOrder } from "../../../../scripts/common/config/Config";
+import { Macro } from "../../../../scripts/framework/defines/Macros";
+import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
 
 
 const { ccclass, property } = _decorator;
@@ -49,12 +52,12 @@ export default class HallView extends UIView {
         "nodePoolTest",
         "eliminate",
     ];
-    private _bundles: td.HotUpdate.BundleConfig[] = [];
+    private _bundles: HotUpdate.BundleConfig[] = [];
     private get bundles() {
         if (this._bundles.length <= 0) {
-            let names : string[] = Manager.getLanguage("hall_view_game_name",HallData.bundle) as string[];
+            let names : string[] = Manager.getLanguage("hall_view_game_name",HallData.bundle);
             for( let i = 0 ; i < this._bundleNames.length ;i++ ){
-                this._bundles.push(new td.HotUpdate.BundleConfig(names[i],this._bundleNames[i],i+1));
+                this._bundles.push(new HotUpdate.BundleConfig(names[i],this._bundleNames[i],i+1));
             }
         }
         return this._bundles;
@@ -100,7 +103,7 @@ export default class HallView extends UIView {
         let bottom_op = find("bottom_op", this.node) as Node;
         let setting = find("setting", bottom_op) as Node;
         setting.on(Node.EventType.TOUCH_END, () => {
-            Manager.uiManager.open({type:SettingView,bundle:td.Macro.BUNDLE_RESOURCES,zIndex:td.ViewZOrder.UI,name:"设置界面"});
+            Manager.uiManager.open({type:SettingView,bundle:Macro.BUNDLE_RESOURCES,zIndex:ViewZOrder.UI,name:"设置界面"});
         });
 
         let change = find("mial",bottom_op) as Node;
@@ -120,15 +123,15 @@ export default class HallView extends UIView {
 
         this.audioHelper.playMusic("audio/background",this.bundle)
         
-        dispatchEnterComplete({ type: td.Logic.Type.HALL, views: [this] });
+        dispatchEnterComplete({ type: Logic.Type.HALL, views: [this] });
     }
 
-    bindingEvents() {
-        super.bindingEvents();
-        this.registerEvent(td.HotUpdate.Event.DOWNLOAD_PROGRESS, this.onDownloadProgess);
+    addEvents() {
+        super.addEvents();
+        this.addUIEvent(HotUpdate.Event.DOWNLOAD_PROGRESS, this.onDownloadProgess);
     }
 
-    private getGameItem(config: td.HotUpdate.BundleConfig) {
+    private getGameItem(config: HotUpdate.BundleConfig) {
         let pages = this.pageView.getPages();
         for (let i = 0; i < pages.length; i++) {
             let page = pages[i];
@@ -140,7 +143,7 @@ export default class HallView extends UIView {
         return null;
     }
 
-    private onDownloadProgess(data: { progress: number, config: td.HotUpdate.BundleConfig }) {
+    private onDownloadProgess(data: { progress: number, config: HotUpdate.BundleConfig }) {
 
         let node = this.getGameItem(data.config);
         if (node) {

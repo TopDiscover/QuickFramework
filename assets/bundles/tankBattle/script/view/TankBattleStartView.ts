@@ -1,6 +1,7 @@
 import UIView from "../../../../scripts/framework/core/ui/UIView";
 import { TankBettle } from "../data/TankBattleGameData";
 import { _decorator,Node, find, Label, Vec3, EventKeyboard, macro } from "cc";
+import { Logic } from "../../../../scripts/framework/core/logic/Logic";
 
 const { ccclass, property } = _decorator;
 
@@ -22,9 +23,9 @@ export default class TankBattleStartView extends UIView{
         return TankBettle.gameData;
     }
 
-    protected bindingEvents(){
-        super.bindingEvents();
-        this.registerEvent(TankBettle.EVENT.SHOW_MAP_LEVEL,this.onChangeStageFinished)
+    addEvents(){
+        super.addEvents();
+        this.addUIEvent(TankBettle.EVENT.SHOW_MAP_LEVEL,this.onChangeStageFinished)
     }
 
     onLoad() {
@@ -45,7 +46,7 @@ export default class TankBattleStartView extends UIView{
 
     onKeyBack(ev: EventKeyboard) {
         super.onKeyBack(ev);
-        dispatch(td.Logic.Event.ENTER_HALL);
+        dispatch(Logic.Event.ENTER_HALL);
     }
 
     onKeyUp(ev: EventKeyboard) {

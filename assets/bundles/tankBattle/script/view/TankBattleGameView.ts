@@ -3,6 +3,7 @@ import TankBattleMap from "../model/TankBattleMap";
 import { TankBettle } from "../data/TankBattleGameData";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
 import { _decorator,Node, Label, director, PhysicsSystem2D, find, systemEvent, SystemEvent, EventKeyboard, macro, instantiate } from "cc";
+import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
 
 
 const { ccclass, property } = _decorator;
@@ -32,9 +33,9 @@ export default class TankBattleGameView extends GameView{
     private _playerOneTankLive: Label = null!;
     private _playerTwoTankLive: Label = null!;
 
-    protected bindingEvents() {
-        super.bindingEvents()
-        this.registerEvent(TankBettle.EVENT.SHOW_MAP_LEVEL, this.onShowMapLevel)
+    addEvents() {
+        super.addEvents()
+        this.addUIEvent(TankBettle.EVENT.SHOW_MAP_LEVEL, this.onShowMapLevel)
     }
 
     onLoad() {
@@ -48,7 +49,7 @@ export default class TankBattleGameView extends GameView{
 
         this.init()
 
-        dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this, TankBattleStartView] });
+        dispatchEnterComplete({ type: Logic.Type.GAME, views: [this, TankBattleStartView] });
     }
 
     onDestroy(){

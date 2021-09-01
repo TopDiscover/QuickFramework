@@ -8,14 +8,13 @@ import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import { HeartbeatBinary } from "../../../../scripts/common/protocol/HeartbetBinary";
 import { HeartbeatJson } from "../../../../scripts/common/protocol/HeartbetJson";
 import { HeartbeatProto } from "../../../../scripts/common/protocol/HeartbetProto";
-import { BinaryStreamMessageHeader } from "../../../../scripts/framework/core/net/message/BinaryStreamMessage";
-import { JsonMessageHeader } from "../../../../scripts/framework/core/net/message/JsonMessage";
-import { ProtoMessageHeader } from "../../../../scripts/framework/core/net/message/ProtoMessage";
 import { HallNetHelper } from "../../../hall/script/controller/HallNetHelper";
 import { INetHelper } from "../controller/INetHelper";
 import { TestChatNetHelper } from "../controller/TestChatNetHelper";
 import { TestGameNetHelper } from "../controller/TestGameNetHelper";
 import { NetTest } from "../data/NetTestData";
+import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
+import { Config } from "../../../../scripts/common/config/Config";
 
 
 const { ccclass, property } = _decorator;
@@ -38,20 +37,20 @@ export default class NetTestView extends GameView {
 
     private netType: NetTest.NetType = NetTest.NetType.JSON;
 
-    protected bindingEvents() {
-        super.bindingEvents();
-        this.registerEvent(CommonEvent.LOBBY_SERVICE_CONNECTED, this.onNetConnected);
-        this.registerEvent(CommonEvent.LOBBY_SERVICE_CLOSE, this.onNetClose);
+    addEvents() {
+        super.addEvents();
+        this.addUIEvent(CommonEvent.LOBBY_SERVICE_CONNECTED, this.onNetConnected);
+        this.addUIEvent(CommonEvent.LOBBY_SERVICE_CLOSE, this.onNetClose);
 
-        this.registerEvent(CommonEvent.GAME_SERVICE_CONNECTED, this.onNetConnected);
-        this.registerEvent(CommonEvent.GAME_SERVICE_CLOSE, this.onNetClose);
+        this.addUIEvent(CommonEvent.GAME_SERVICE_CONNECTED, this.onNetConnected);
+        this.addUIEvent(CommonEvent.GAME_SERVICE_CLOSE, this.onNetClose);
 
-        this.registerEvent(CommonEvent.CHAT_SERVICE_CONNECTED, this.onNetConnected);
-        this.registerEvent(CommonEvent.CHAT_SERVICE_CLOSE, this.onNetClose);
+        this.addUIEvent(CommonEvent.CHAT_SERVICE_CONNECTED, this.onNetConnected);
+        this.addUIEvent(CommonEvent.CHAT_SERVICE_CLOSE, this.onNetClose);
 
-        this.registerEvent(CommonEvent.TEST_BINARY_MSG, this.onMessage);
-        this.registerEvent(CommonEvent.TEST_JSON_MSG, this.onMessage);
-        this.registerEvent(CommonEvent.TEST_PROTO_MSG, this.onMessage);
+        this.addUIEvent(CommonEvent.TEST_BINARY_MSG, this.onMessage);
+        this.addUIEvent(CommonEvent.TEST_JSON_MSG, this.onMessage);
+        this.addUIEvent(CommonEvent.TEST_PROTO_MSG, this.onMessage);
     }
     private onMessage(hello: string) {
         this.log(`收到：${hello}`);
@@ -108,7 +107,7 @@ export default class NetTestView extends GameView {
 
         //返回
         find("goback", this.node)?.on(Node.EventType.TOUCH_END, () => {
-            dispatch(td.Logic.Event.ENTER_HALL);
+            dispatch(Logic.Event.ENTER_HALL);
         });
 
         //重连
@@ -140,7 +139,7 @@ export default class NetTestView extends GameView {
 
         this.init();
 
-        dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this] });
+        dispatchEnterComplete({ type: Logic.Type.GAME, views: [this] });
     }
 
     private init() {
@@ -191,19 +190,16 @@ export default class NetTestView extends GameView {
     private _changeNetType(type: NetTest.NetType, service: CommonService) {
         if (type == NetTest.NetType.JSON) {
             this.log(`${service.serviceName} 使用Json方式`);
-            service.messageHeader = JsonMessageHeader;
             service.heartbeat = HeartbeatJson;
-            service.maxEnterBackgroundTime = td.Config.MIN_INBACKGROUND_TIME;
+            service.maxEnterBackgroundTime = Config.MIN_INBACKGROUND_TIME;
         } else if (type == NetTest.NetType.PROTO) {
             this.log(`${service.serviceName} 使用Proto方式`);
-            service.messageHeader = ProtoMessageHeader;
             service.heartbeat = HeartbeatProto;
-            service.maxEnterBackgroundTime = td.Config.MAX_INBACKGROUND_TIME;
+            service.maxEnterBackgroundTime = Config.MAX_INBACKGROUND_TIME;
         } else if (type == NetTest.NetType.BINARY) {
             this.log(`${service.serviceName} 使用Binary方式`);
-            service.messageHeader = BinaryStreamMessageHeader;
             service.heartbeat = HeartbeatBinary;
-            service.maxEnterBackgroundTime = td.Config.MAX_INBACKGROUND_TIME;
+            service.maxEnterBackgroundTime = Config.MAX_INBACKGROUND_TIME;
         } else {
             error(`未知网络类型`);
         }

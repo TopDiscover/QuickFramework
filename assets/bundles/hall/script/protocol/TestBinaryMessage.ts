@@ -1,8 +1,12 @@
-import { BinaryStreamMessage, serialize, Int8Value, Int16Value, Int32Value, Float32Value, Float64Value, Uint8Value, Uint16Value, Uint32Value, StringValue, BinaryStream } from "../../../../scripts/framework/core/net/message/BinaryStreamMessage"
+import { serialize, Int8Value, Int16Value, Int32Value, Float32Value, Float64Value, Uint8Value, Uint16Value, Uint32Value, StringValue, BinaryStream } from "../../../../scripts/framework/core/net/message/BinaryStreamMessage"
 import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { SUB_CMD_LOBBY } from "./LobbyCmd";
 
-class TestData extends BinaryStream{
+class BinaryStreamMessage extends BinaryStream{
+    get cmd() { return "";};
+}
+
+class TestData extends BinaryStreamMessage{
 
     @serialize("value32",Float32Value)
     float32 : number = 32;
@@ -12,6 +16,7 @@ class TestData extends BinaryStream{
 }
 
 export class TestBinaryMessage extends BinaryStreamMessage {
+    get cmd(){ return String(this.mainCmd) + String(this.subCmd);}
     mainCmd = MainCmd.CMD_LOBBY;
     subCmd = SUB_CMD_LOBBY.TEST_BINARY_MSG;
     // @serialize("value32",Float32Value)

@@ -3,6 +3,8 @@ import { _decorator,Node, find,Animation, Label, Sprite, instantiate, Button, Ve
 import { loadDirRes } from "../../../../scripts/framework/plugin/CocosExtention";
 import UIView from "../../../../scripts/framework/core/ui/UIView";
 import { HallData } from "../../../hall/script/data/HallData";
+import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
+import { ButtonSpriteType } from "../../../../scripts/framework/defines/Enums";
 
 const {ccclass, property} = _decorator;
 
@@ -38,11 +40,11 @@ export default class LoadTestView extends UIView {
 
         find("loadDir",op)?.on(Node.EventType.TOUCH_END,this.onLoadDir,this);
 
-        dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this] });
+        dispatchEnterComplete({ type: Logic.Type.GAME, views: [this] });
     }
 
     private onGoback(){
-        dispatch(td.Logic.Event.ENTER_HALL);
+        dispatch(Logic.Event.ENTER_HALL);
     }
 
     private onLoadFont( ){
@@ -121,7 +123,7 @@ export default class LoadTestView extends UIView {
             view: this,
             bundle : HallData.bundle,
             completeCallback:(type,spriteFrame)=>{
-                if( type == td.ButtonSpriteType.Norml && spriteFrame ){
+                if( type == ButtonSpriteType.Norml && spriteFrame ){
                     let buttonTrans = button.getComponent(UITransform) as UITransform;
                     let targetTrans = btn.target.getComponent(UITransform) as UITransform;
                     log(spriteFrame.originalSize);

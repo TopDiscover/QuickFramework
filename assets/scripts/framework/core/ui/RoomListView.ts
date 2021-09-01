@@ -13,6 +13,6 @@ export default class RoomListView extends UIView {
         //通用公共网络重连组件添加
 
         //进入场景完成，即onLoad最后一行  必须发进入完成事件
-        // dispatchEnterComplete( {type : td.Logic.Type.GAME,views:[this],data : GameName.likuiby });
+        // dispatchEnterComplete( {type : Logic.Type.GAME,views:[this],data : GameName.likuiby });
     }
 }

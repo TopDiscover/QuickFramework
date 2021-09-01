@@ -1,18 +1,20 @@
 import { SpriteFrame } from "cc";
+import { Resource } from "../../../scripts/framework/core/asset/Resource";
 import { Logic } from "../../../scripts/framework/core/logic/Logic";
+import { LogicImpl } from "../../../scripts/framework/core/logic/LogicImpl";
 import LoadTestView from "./view/LoadTestView";
 
-class LoadTestLogic extends Logic {
+class LoadTestLogic extends LogicImpl {
 
-    logicType: td.Logic.Type = td.Logic.Type.GAME;
+    logicType: Logic.Type = Logic.Type.GAME;
 
     onLoad() {
         super.onLoad();
     }
 
-    protected bindingEvents() {
-        super.bindingEvents();
-        this.registerEvent(td.Logic.Event.ENTER_GAME, this.onEnterGame);
+    protected addEvents() {
+        super.addEvents();
+        this.addUIEvent(Logic.Event.ENTER_GAME, this.onEnterGame);
     }
 
     protected get bundle() {
@@ -24,21 +26,21 @@ class LoadTestLogic extends Logic {
             //游戏数据初始化
             //加载资源
             this._loader.loadResources();
-        }else{
-           
+        } else {
+
             //卸载资源
             this._loader.unLoadResources();
         }
     }
 
     /**@description 进入的模块只要不是自己的模块，需要把自己加载的资源卸载 */
-    onEnterComplete(data: td.Logic.EventData) {
+    onEnterComplete(data: Logic.EventData) {
         super.onEnterComplete(data);
         //关闭房间列表
-        if ( data.type == this.logicType ){
-            
+        if (data.type == this.logicType) {
+
         }
-        else{
+        else {
             //移除网络组件 
             //this.removeNetComponent();
             //卸载资源
@@ -46,16 +48,16 @@ class LoadTestLogic extends Logic {
         }
     }
 
-    protected onLoadResourceComplete( err : td.Resource.LoaderError ){
-        if ( err == td.Resource.LoaderError.LOADING ){
+    protected onLoadResourceComplete(err: Resource.LoaderError) {
+        if (err == Resource.LoaderError.LOADING) {
             return;
         }
         log(`${this.bundle}资源加载完成!!!`);
         super.onLoadResourceComplete(err);
-        Manager.uiManager.open({ type: LoadTestView ,bundle:this.bundle});
+        Manager.uiManager.open({ type: LoadTestView, bundle: this.bundle });
     }
 
-    protected getLoadResources():td.Resource.Data[]{
+    protected getLoadResources(): Resource.Data[] {
         // return [];
         return [{ dir: "texture/sheep" , bundle : this.bundle,type : SpriteFrame}];
     }

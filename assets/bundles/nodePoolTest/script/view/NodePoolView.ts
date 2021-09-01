@@ -1,4 +1,5 @@
 import { _decorator ,Node, find, instantiate, Vec3, randomRangeInt, UITransform} from "cc";
+import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
 import { NodePool } from "../../../../scripts/framework/core/nodePool/NodePoolManager";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
 
@@ -18,7 +19,7 @@ export default class NodePoolView extends GameView {
         super.onLoad();
 
         find("goback", this.node)?.on(Node.EventType.TOUCH_END, () => {
-            dispatch(td.Logic.Event.ENTER_HALL);
+            dispatch(Logic.Event.ENTER_HALL);
         });
 
         this.star = find("star",this.node) as Node;
@@ -35,7 +36,7 @@ export default class NodePoolView extends GameView {
         getNode?.on(Node.EventType.TOUCH_END,this.onGet,this);
         putNode?.on(Node.EventType.TOUCH_END,this.onPut,this);
 
-        dispatchEnterComplete({ type: td.Logic.Type.GAME, views: [this] });
+        dispatchEnterComplete({ type: Logic.Type.GAME, views: [this] });
     }
 
     private onCreate( ){

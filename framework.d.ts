@@ -219,7 +219,7 @@ declare class ManagerImpl {
 	/**
 	  * @description 获取语言包 
 	  */
-	getLanguage(param: string | (string | number)[], bundle?: BUNDLE_TYPE): string;
+	getLanguage(param: string | (string | number)[], bundle?: BUNDLE_TYPE): any;
 
 	onLoad(node: import("cc").Node): void;
 

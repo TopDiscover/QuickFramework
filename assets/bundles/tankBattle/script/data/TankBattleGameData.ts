@@ -6,6 +6,7 @@ import TankBattleMap from "../model/TankBattleMap";
 import TankBattleGameView from "../view/TankBattleGameView";
 import { Node, Rect, UITransform, Vec2, Vec3 } from "cc"
 import UIView from "../../../../scripts/framework/core/ui/UIView";
+import { ViewZOrder } from "../../../../scripts/common/config/Config";
 
 export namespace TankBettle {
     export enum Direction {
@@ -312,13 +313,13 @@ export namespace TankBettle {
         /**@description 进入游戏 */
         enterGame() {
             this.gameStatus = GAME_STATUS.INIT;
-            Manager.uiManager.open({ bundle: this.bundle, type: this.TankBattleChangeStageView, zIndex: td.ViewZOrder.UI, args: [this.currentLevel] })
+            Manager.uiManager.open({ bundle: this.bundle, type: this.TankBattleChangeStageView, zIndex: ViewZOrder.UI, args: [this.currentLevel] })
         }
 
         /**@description 进入选人界面 */
         enterStart() {
             this.gameStatus = GAME_STATUS.SELECTED;
-            Manager.uiManager.open({ type: this.TankBattleStartView, bundle: this.bundle, zIndex: td.ViewZOrder.UI });
+            Manager.uiManager.open({ type: this.TankBattleStartView, bundle: this.bundle, zIndex: ViewZOrder.UI });
         }
 
         /**@description 下一关 */
@@ -377,7 +378,7 @@ export namespace TankBettle {
                 return;
             }
             this.gameStatus = GAME_STATUS.OVER;
-            Manager.uiManager.open({ type: this.TankBattleGameOver, bundle: this.bundle, zIndex: td.ViewZOrder.UI });
+            Manager.uiManager.open({ type: this.TankBattleGameOver, bundle: this.bundle, zIndex: ViewZOrder.UI });
             this.gameMap?.gameOver();
         }
 

@@ -5,9 +5,9 @@ import { HALL_EN } from "./HallLanguageEN";
 import { HALL_ZH } from "./HallLanguageZH";
 
 
-export class HallLanguage implements td.Language.DataSourceDelegate{
+export class HallLanguage implements Language.DataSourceDelegate{
     name = HallData.bundle;
-    data( language : string ): td.Language.Data {
+    data( language : string ): Language.Data {
         let data : any = i18n;
         if( data[`${this.name}`] && data[`${this.name}`].language == language ){
             return i18n;
