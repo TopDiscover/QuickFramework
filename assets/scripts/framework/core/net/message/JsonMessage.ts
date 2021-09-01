@@ -1,5 +1,4 @@
-
-import { Message, MessageHeader } from "./Message";
+import { Message } from "./Message";
 
 type JsonMessageConstructor = typeof JsonMessage;
 
@@ -33,20 +32,20 @@ export function serialize(key: string, type: any, arrTypeOrMapKeyType?: any, map
 /**
  * @description JSON的序列化与序列化
  */
-export class JsonMessage extends Message {
-
+export abstract class JsonMessage extends Message {
     private data = null;
 
-    encode(): boolean {
+    buffer: Uint8Array = null!;
+    encode() : boolean {
         this.data = this.serialize();
         let result = JSON.stringify(this.data);
-        this.buffer =  StringToUtf8Array(result);
+        this.buffer = StringToUtf8Array(result);
         return true;
     }
 
     /**@description 序列化 */
-    private serialize(): any {
-        let result: any = {};
+    protected serialize(): any {
+        let result:any = {};
         let __serialize__ = (<any>Reflect.getPrototypeOf(this))['__serialize__'];
         if (!__serialize__) return result;
         let serializeKeyList = Object.keys(__serialize__);
@@ -84,7 +83,10 @@ export class JsonMessage extends Message {
     }
 
     private serializeNumber(value: Number) {
-        return (value === undefined || value === null) ? '0' : value.toString();
+        if (value === undefined || value === null) { value = 0 }
+        if ( typeof value == "string" ){ value = Number(value);}
+        if (Number.isNaN(value)) { value = 0 }
+        return value;
     }
 
     private serializeString(value: String) {
@@ -285,8 +287,4 @@ export class JsonMessage extends Message {
             (<any>this)[memberName].set(elementKey, elementValue);
         });
     }
-}
-
-export class JsonMessageHeader extends MessageHeader {
-
 }

@@ -1,12 +1,13 @@
 import WebSocketClinet from "./WebSocketClient";
 import { IMessage } from "../message/Message";
 import { DEBUG } from "cc/env";
+import { Net } from "../Net";
 
 /**
  * @description 服务器连接器
  */
 
-export class ServerConnector {
+export abstract class ServerConnector {
 
     /**
      * @description websocket实例由外部设置方可使用
@@ -44,9 +45,7 @@ export class ServerConnector {
     /**
      * @description 心跳超时
      */
-    protected onHeartbeatTimeOut() {
-        //do noting
-    }
+    protected abstract onHeartbeatTimeOut():void;
 
     /**
      * @description 是否为心跳消息
@@ -95,7 +94,7 @@ export class ServerConnector {
         this._curRecvHartTimeOutCount = 0;
     }
 
-    private _sendHartId: number = -1; //发送心跳包的间隔id
+    private _sendHartId: any = -1; //发送心跳包的间隔id
     private _curRecvHartTimeOutCount: number = 0;//当前接收心跳超时的次数
 
     private _enabled = true;
@@ -116,7 +115,7 @@ export class ServerConnector {
      * @param port 
      * @param protocol 协议类型 ws / wss 
      */
-    public connect(ip: string, port: number | string | null = null, protocol: td.Net.Type = "wss") {
+    public connect_server(ip: string, port: number | string | null = null, protocol: Net.Type = "wss") {
         if (!this.enabled) {
             if (DEBUG) warn(`请求先启用`)
             return;

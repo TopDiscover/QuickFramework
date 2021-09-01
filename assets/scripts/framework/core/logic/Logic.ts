@@ -1,106 +1,46 @@
-import EventComponent from "../../componects/EventComponent";
-import ResourceLoader from "../asset/ResourceLoader";
-import { Node } from "cc";
-
-/**@description 当前入子游戏时，在Logic.onLoad时初始设置 */
-let assetBundle = {};
-
-/**
- * @description 逻辑控制器
-*/
-
-export class Logic extends EventComponent {
-
-    protected logTag = `[Logic]`;
-    protected _loader: ResourceLoader = null!;
-
-    protected logicType : td.Logic.Type = td.Logic.Type.UNKNOWN;
-    protected language : td.Language.DataSourceDelegate = null!;
-
-    constructor() {
-        super();
-
-        this._loader = new ResourceLoader();
-
-        //绑定加载器获取资源的回调
-        this._loader.getLoadResources = this.getLoadResources.bind(this);
-        //绑定加载器加载资源完成回调
-        this._loader.onLoadComplete = this.onLoadResourceComplete.bind(this);
-        this._loader.onLoadProgress = this.onLoadResourceProgress.bind(this);
+/**@description 逻辑模块 */
+export namespace Logic {
+    /**@description 逻辑事件类型 */
+    export enum Type {
+        /**@description 未知 */
+        UNKNOWN = "UNKNOWN",
+        /**@description 大厅 */
+        HALL = "HALL",
+        /**@description 游戏场景 */
+        GAME = "GAME",
+        /**@description 登录场景 */
+        LOGIN = "LOGIN",
+        /**@description 房间列表 */
+        ROOM_LIST = "ROOM_LIST",
     }
+    /**@description 逻辑事件定义 */
+    export enum Event {
+        /**@description 进行指定场景完成 */
+        ENTER_COMPLETE = "ENTER_COMPLETE",
 
-    protected get bundle( ) : string{
-        error(`请子类重写protected get bundle,返回游戏的包名,即 asset bundle name`);
-        return "";
+        /**@description 进入大厅*/
+        ENTER_HALL = "ENTER_HALL",
+
+        /**@description 进入游戏 */
+        ENTER_GAME = "ENTER_GAME",
+
+        /**@description 返回登录界面 */
+        ENTER_LOGIN = "ENTER_LOGIN",
+
+        /**@description 进入房间列表 */
+        ENTER_ROOM_LIST = "ENTER_ROOM_LIST"
+    };
+    /**@description 逻辑派发数据接口 */
+    export interface EventData {
+        type: Type;
+        /**@description 需要排除的界面，除这些界面之外的其它界面将会关闭 */
+        views: (UIClass<UIView> | UIView)[];
+
+        /**@description 其它用户数据 */
+        data?: any;
     }
+}
 
-    /**@description 进入各模块完成回调 */
-    public onEnterComplete(data: td.Logic.EventData){
-
-    }
-
-    public init( data : Node ){
-        if ( this.logicType == td.Logic.Type.UNKNOWN ){
-            error(`未对正确的对logicType赋值`);
-        }
-        this.node = data;
-    }
-
-    public onLoad() {
-        if ( !!this.bundle ){
-            (assetBundle as any)[`${this.bundle}`] = this.bundle;
-        }else{
-            error(`请子类重写protected get bundle,返回游戏的包名,即 asset bundle name`);
-        }
-        super.onLoad();
-    }
-
-    public onDestroy() {
-        super.onDestroy();
-        this.node = <any>null;
-    }
-
-    /**@description 获取需要加载的资源 */
-    protected getLoadResources(): td.Resource.Data[] {
-        return [];
-    }
-
-    /**@description 资源加载完成 */
-    protected onLoadResourceComplete( err : td.Resource.LoaderError ) {
-    }
-
-    /**@description 资源加载中 */
-    protected onLoadResourceProgress( loadedCount : number , total : number , data : td.Resource.CacheData ){
-    }
-
-
-    /**@description 返回当前网络控制器类型Controller子类 */
-    protected getNetControllerType() : any {
-        return null;
-    }
-
-    //移除网络组件
-    protected removeNetComponent(){
-        let type = this.getNetControllerType()
-        if( type ){
-            if( this.node.getComponent(type)){
-                this.node.removeComponent(type)
-                Manager.gameController = null;
-            } 
-        }
-    }
-
-    //添加网络组件
-    protected addNetComponent(){
-        let type = this.getNetControllerType()
-        if( type ){
-            let controller = this.node.getComponent(type);
-            if ( !controller ){
-                controller = this.node.addComponent(type);
-            }
-            Manager.gameController = controller;
-            return controller;
-        }
-        return null;
-    }
+export function dispatchEnterComplete(data: Logic.EventData) {
+    dispatch(Logic.Event.ENTER_COMPLETE, data);
 }

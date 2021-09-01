@@ -2,6 +2,8 @@ import UIView from "../core/ui/UIView";
 import EventComponent from "./EventComponent";
 import { AudioClip, AudioSource, _decorator } from "cc";
 import { DEBUG } from "cc/env";
+import { Resource } from "../core/asset/Resource";
+import { Macro } from "../defines/Macros";
 /**
  * @description 声音组件
  */
@@ -9,7 +11,7 @@ const { ccclass, property, menu } = _decorator;
 
 export class AudioInfo {
     url: string = "";
-    bundle: BUNDLE_TYPE = td.Macro.BUNDLE_RESOURCES;
+    bundle: BUNDLE_TYPE = Macro.BUNDLE_RESOURCES;
     source: AudioSource | null = null;
     owner: UIView | null = null;
     isPause = false;
@@ -271,7 +273,7 @@ export default class AudioComponent extends EventComponent {
             this.audioData.curMusic = audioInfo;
             Manager.cacheManager.getCacheByAsync(url, AudioClip, bundle).then((data) => {
                 if (data) {
-                    let info = new td.Resource.Info;
+                    let info = new Resource.Info;
                     info.url = url;
                     info.type = AudioClip;
                     info.data = data;
@@ -321,7 +323,7 @@ export default class AudioComponent extends EventComponent {
             }
             Manager.cacheManager.getCacheByAsync(url, AudioClip, bundle).then((data) => {
                 if (data) {
-                    let info = new td.Resource.Info;
+                    let info = new Resource.Info;
                     info.url = url;
                     info.type = AudioClip;
                     info.data = data;

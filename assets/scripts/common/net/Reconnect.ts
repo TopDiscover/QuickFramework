@@ -4,6 +4,8 @@
 
  import { Prefab, Node, instantiate, Vec3, find, Label } from "cc";
 import { DEBUG } from "cc/env";
+import { Macro } from "../../framework/defines/Macros";
+import { Config, ViewZOrder } from "../config/Config";
 import { i18n } from "../language/CommonLanguage";
  import { CommonService } from "./CommonService";
  import ReconnectComponent from "./ReconnectComponent";
@@ -29,14 +31,14 @@ import { i18n } from "../language/CommonLanguage";
              }
              this.isLoadingPrefab = true;
              Manager.assetManager.load(
-                 td.Macro.BUNDLE_RESOURCES,
-                 td.Config.CommonPrefabs.loading,
+                 Macro.BUNDLE_RESOURCES,
+                 Config.CommonPrefabs.loading,
                  Prefab,
                  (finish, total, item) => { },
                  (data) => {
                      this.isLoadingPrefab = false;
                      if (data && data.data && data.data instanceof Prefab) {
-                         Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.loading, data.data, td.Macro.BUNDLE_RESOURCES)
+                         Manager.assetManager.addPersistAsset(Config.CommonPrefabs.loading, data.data, Macro.BUNDLE_RESOURCES)
                          this.prefab = data.data;
                          resolove(true);
                      }
@@ -60,7 +62,7 @@ import { i18n } from "../language/CommonLanguage";
      }
      constructor(service: CommonService) {
          this.service = service;
-         Manager.eventDispatcher.addEventListener(td.Adaptor.ADAPT_SCREEN, this.onAdaptScreen, this)
+         Manager.eventDispatcher.addEventListener(Macro.ADAPT_SCREEN, this.onAdaptScreen, this)
      }
  
      private onAdaptScreen() {
@@ -80,7 +82,7 @@ import { i18n } from "../language/CommonLanguage";
              }
              this.node.name = "Reconnect";
              this.node.removeFromParent();
-             Manager.uiManager.addChild(this.node,td.ViewZOrder.Loading);
+             Manager.uiManager.addChild(this.node,ViewZOrder.Loading);
              this.node.setPosition(new Vec3(0,0,0));
              if (this.isWaitingHide) {
                  this.isWaitingHide = false;

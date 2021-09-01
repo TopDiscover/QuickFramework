@@ -1,5 +1,4 @@
 import { instantiate, isValid, Node } from "cc";
-import { EDITOR } from "cc/env";
 
 export class NodePool {
     name: string = "unknown";

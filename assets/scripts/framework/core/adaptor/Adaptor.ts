@@ -1,6 +1,7 @@
 
 import { Canvas, log, Node, size, Size, sys, UITransform, view, Widget, widgetManager } from "cc";
 import { DEBUG, EDITOR, JSB, PREVIEW } from "cc/env";
+import { Macro } from "../../defines/Macros";
 
 type DeviceDirection = "" | "Landscape" | "Portrait";
 
@@ -106,7 +107,7 @@ export class Adaptor {
             view.setDesignResolutionSize(me.designResolution.width, me.designResolution.height, policy);
         }
         if (me.isNeedAdapt) {
-            dispatch(td.Adaptor.ADAPT_SCREEN);
+            dispatch(Macro.ADAPT_SCREEN);
             Manager.uiManager.fullScreenAdapt();
         }
     }

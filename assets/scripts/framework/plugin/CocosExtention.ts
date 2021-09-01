@@ -2,11 +2,12 @@ import WebEditBoxImpl from "./WebEditBoxImpl";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
-    createNodeWithPrefab, getBundle, _loadDirRes, _loadRes
+    createNodeWithPrefab,getBundle,_loadDirRes,_loadRes
 } from "./Utils";
-import { isValid, SpriteFrame, sp, Font, ParticleSystem2D, ParticleAsset, sys, EditBox, Sprite,Node, Button, Label, randomRange, Asset, AssetManager} from "cc";
-import { DEBUG, EDITOR, PREVIEW } from "cc/env";
-import UIView from "../core/ui/UIView";
+import { Resource } from "../core/asset/Resource";
+import { Macro } from "../defines/Macros";
+import { Sprite , Node, isValid , SpriteFrame, sp, Button, Label, Font, ParticleSystem2D , ParticleAsset, EditBox, AssetManager, Asset } from "cc";
+import { EDITOR } from "cc/env";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
 if (typeof Reflect == "object") {
@@ -74,7 +75,7 @@ prototype.loadRemoteImage = function (config: any) {
     let defaultBundle = getBundle({ bundle: config.defaultBundle, view: config.view })
     Manager.assetManager.remote.loadImage(config.url, config.isNeedCache).then((data) => {
         if (data) {
-            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback, td.Macro.BUNDLE_REMOTE, td.Resource.Type.Remote, isRetain);
+            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback, Macro.BUNDLE_REMOTE, Resource.Type.Remote, isRetain);
         } else {
             if (config.defaultSpriteFrame) {
                 if (typeof config.defaultSpriteFrame == "string") {
@@ -118,7 +119,7 @@ prototype.loadImage = function (config: any) {
             if (data && data.isTryReload) {
                 //来到这里面程序已经崩溃了，无意义在处理了
             } else {
-                setSpriteSpriteFrame(view, data.url, me, data.spriteFrame as SpriteFrame, completeCallback, bundle, td.Resource.Type.Local, false, true);
+                setSpriteSpriteFrame(view, data.url, me, data.spriteFrame as SpriteFrame, completeCallback, bundle, Resource.Type.Local, false, true);
             }
         });
     }
@@ -151,7 +152,7 @@ prototype.loadRemoteSkeleton = function (config: any) {
         config.isNeedCache = true;
     }
     Manager.assetManager.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then((data) => {
-        setSkeletonSkeletonData(me, config, data as sp.SkeletonData, td.Resource.Type.Remote);
+        setSkeletonSkeletonData(me, config, data as sp.SkeletonData, Resource.Type.Remote);
     });
 }
 
@@ -240,16 +241,16 @@ Reflect.defineProperty(Label.prototype, "language", {
                 self.string = "";
             }
         }
-        if (td.Macro.ENABLE_CHANGE_LANGUAGE) {
+        if (Macro.ENABLE_CHANGE_LANGUAGE) {
             updateLanguage(v, (isUsing: boolean) => {
                 if (isUsing) {
                     if (!!!self._isUsinglanguage) {
                         self._isUsinglanguage = true;
-                        Manager.eventDispatcher.addEventListener(td.Language.CHANGE_LANGUAGE, self._onChangeLanguage, self);
+                        Manager.eventDispatcher.addEventListener(Macro.CHANGE_LANGUAGE, self._onChangeLanguage, self);
                     }
                 } else {
                     if (self._language) {
-                        Manager.eventDispatcher.removeEventListener(td.Language.CHANGE_LANGUAGE, self);
+                        Manager.eventDispatcher.removeEventListener(Macro.CHANGE_LANGUAGE, self);
                     }
                 }
             })
@@ -260,7 +261,7 @@ Reflect.defineProperty(Label.prototype, "language", {
 });
 
 prototype = Label.prototype;
-if (!EDITOR && td.Macro.ENABLE_CHANGE_LANGUAGE) {
+if (!EDITOR && Macro.ENABLE_CHANGE_LANGUAGE) {
     prototype._onChangeLanguage = function () {
         this.language = this.language;
     }
@@ -268,14 +269,14 @@ if (!EDITOR && td.Macro.ENABLE_CHANGE_LANGUAGE) {
     let __label_onDestroy__ = prototype.onDestroy;
     prototype.onDestroy = function () {
         if (this._isUsinglanguage) {
-            Manager.eventDispatcher.removeEventListener(td.Language.CHANGE_LANGUAGE, this);
+            Manager.eventDispatcher.removeEventListener(Macro.CHANGE_LANGUAGE, this);
         }
         __label_onDestroy__ && __label_onDestroy__.call(this);
     }
 
     let __label_onLoad__ = prototype.onLoad;
     prototype.onLoad = function () {
-        if (this.string.indexOf(td.Macro.USING_LAN_KEY) > -1) {
+        if (this.string.indexOf(Macro.USING_LAN_KEY) > -1) {
             this.language = [this.string];
         }
         __label_onLoad__ && __label_onLoad__.call(this);
@@ -372,7 +373,7 @@ export function loadDirRes( config:{
     type : typeof Asset, 
     view : any, 
     onProgress?:(finish:number,total:number,item:AssetManager.RequestItem) => void , 
-    onComplete:(data:td.Resource.CacheData)=>void
+    onComplete:(data:Resource.CacheData)=>void
     }):void{
     _cc.loadDirRes(config);  
 }

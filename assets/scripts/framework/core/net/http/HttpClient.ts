@@ -1,3 +1,5 @@
+import { Http } from "./Http";
+
 /**
  * @description http网络请求
  */
@@ -11,7 +13,7 @@ class HttpPackageData {
     /**@description 超时设置 默认为10s*/
     timeout: number = 10000;
     /**@description 请求类型 默认为GET请求*/
-    type: td.Http.RequestType = td.Http.RequestType.GET;
+    type: Http.Type = Http.Type.GET;
     requestHeader: { name: string, value: string }[] | { name: string, value: string } | null = null;
     /**@description 发送接口时，默认为false 仅浏览器端生效
      * 自动附加当前时间的参数字段
@@ -72,7 +74,7 @@ export class HttpPackage {
      * @param cb 
      * @param errorcb 
      */
-    public send(cb?: (data: any) => void, errorcb?: (errorData: td.Http.Error) => void) {
+    public send(cb?: (data: any) => void, errorcb?: (errorData: Http.Error) => void) {
         HttpClient.request(this, cb, errorcb);
     }
 }
@@ -126,14 +128,14 @@ class HttpClient {
         return result;
     }
 
-    static request(httpPackage: HttpPackage, cb?: (data: any) => void, errorcb?: (errorData: td.Http.Error) => void) {
+    static request(httpPackage: HttpPackage, cb?: (data: any) => void, errorcb?: (errorData: Http.Error) => void) {
 
         let url = httpPackage.data.url;
         if (!url) {
-            if (DEBUG) {
+            if ( DEBUG ){
                 error(`reuqest url error`);
             }
-            if (errorcb) errorcb({ type: td.Http.ErrorType.UrlError, reason: "错误的Url地址" });
+            if (errorcb) errorcb({ type: Http.ErrorType.UrlError, reason: "错误的Url地址" });
             return;
         }
 
@@ -144,13 +146,13 @@ class HttpClient {
                     if (xhr.responseType == "arraybuffer" || xhr.responseType == "blob") {
                         if (cb) cb(xhr.response);
                     } else {
-                        if (DEBUG) log(`htpp res(${xhr.responseText})`);
+                        if ( DEBUG) log(`htpp res(${xhr.responseText})`);
                         if (cb) cb(xhr.responseText);
                     }
                 } else {
                     let reason = `请求错误,错误状态:${xhr.status}`;
                     error(`request error status : ${xhr.status} url : ${url} `);
-                    if (errorcb) errorcb({ type: td.Http.ErrorType.RequestError, reason: reason });
+                    if (errorcb) errorcb({ type: Http.ErrorType.RequestError, reason: reason });
                 }
             }
             else {
@@ -163,61 +165,61 @@ class HttpClient {
         xhr.timeout = httpPackage.data.timeout;
         xhr.ontimeout = () => {
             xhr.abort();//网络超时，断开连接
-            if (DEBUG) warn(`request timeout : ${url}`);
-            if (errorcb) errorcb({ type: td.Http.ErrorType.TimeOut, reason: "连接超时" });
+            if ( DEBUG) warn(`request timeout : ${url}`);
+            if (errorcb) errorcb({ type: Http.ErrorType.TimeOut, reason: "连接超时" });
         };
 
         xhr.onerror = () => {
             error(`request error : ${url} `);
-            if (errorcb) errorcb({ type: td.Http.ErrorType.RequestError, reason: "请求错误" });
+            if (errorcb) errorcb({ type: Http.ErrorType.RequestError, reason: "请求错误" });
         };
 
-        if (DEBUG) log(`[send http request] url : ${url} request type : ${httpPackage.data.type} , responseType : ${xhr.responseType}`);
+        if ( DEBUG ) log(`[send http request] url : ${url} request type : ${httpPackage.data.type} , responseType : ${xhr.responseType}`);
 
         url = this.crossProxy(url);
-        url = this.convertParams(url, httpPackage.params);
+        url = this.convertParams(url,httpPackage.params);
 
-        if (sys.isBrowser) {
-            if (httpPackage.data.isAutoAttachCurrentTime) {
-                if (url.indexOf("?") >= 0) {
+        if ( sys.isBrowser ){
+            if ( httpPackage.data.isAutoAttachCurrentTime ){
+                if ( url.indexOf("?") >=0 ){
                     url = `${url}&cur_loc_t=${Date.timeNow()}`;
-                } else {
+                }else{
                     url = `${url}?cur_loc_t=${Date.timeNow()}`;
                 }
             }
         }
 
         if (sys.isBrowser && !PREVIEW) {
-            if (DEBUG) log(`[send http request] corss prox url : ${url} request type : ${httpPackage.data.type} , responseType : ${xhr.responseType}`);
+            if ( DEBUG) log(`[send http request] corss prox url : ${url} request type : ${httpPackage.data.type} , responseType : ${xhr.responseType}`);
         }
 
-        if (httpPackage.data.type === td.Http.RequestType.POST) {
-            xhr.open(td.Http.RequestType.POST, url);
+        if (httpPackage.data.type === Http.Type.POST) {
+            xhr.open(Http.Type.POST, url);
             if (httpPackage.data.requestHeader) {
-                if (httpPackage.data.requestHeader instanceof Array) {
-                    httpPackage.data.requestHeader.forEach((header) => {
+                if( httpPackage.data.requestHeader instanceof Array ){
+                    httpPackage.data.requestHeader.forEach((header)=>{
                         xhr.setRequestHeader(header.name, header.value);
                     });
-                } else {
-                    let header: { name: string, value: string } = httpPackage.data.requestHeader;
-                    xhr.setRequestHeader(header.name, header.value);
+                }else{
+                    let header : { name: string, value: string } = httpPackage.data.requestHeader;
+                    xhr.setRequestHeader(header.name,header.value);
                 }
             }
             else {
                 xhr.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
             }
-            xhr.send(httpPackage.data.data);
+            xhr.send( httpPackage.data.data );
         }
         else {
-            xhr.open(td.Http.RequestType.GET, url, true);
-            if (httpPackage.data.requestHeader) {
-                if (httpPackage.data.requestHeader instanceof Array) {
-                    httpPackage.data.requestHeader.forEach((header) => {
+            xhr.open(Http.Type.GET, url, true);
+            if( httpPackage.data.requestHeader ){
+                if( httpPackage.data.requestHeader instanceof Array ){
+                    httpPackage.data.requestHeader.forEach((header)=>{
                         xhr.setRequestHeader(header.name, header.value);
                     });
-                } else {
-                    let header: { name: string, value: string } = httpPackage.data.requestHeader;
-                    xhr.setRequestHeader(header.name, header.value);
+                }else{
+                    let header : { name: string, value: string } = httpPackage.data.requestHeader;
+                    xhr.setRequestHeader(header.name,header.value);
                 }
             }
             xhr.send();

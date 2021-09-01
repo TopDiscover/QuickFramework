@@ -1,17 +1,15 @@
+import { js , Node } from "cc";
+import { setClassName } from "../../../decorator/Decorators";
+
 /**
  * @description 网络控制器管理器
  */
-
-import { js, Node} from "cc";
-
- export class NetManager {
+@setClassName()
+export class NetManager {
     private name = "";
-    constructor(name : string) {
+    constructor(name: string) {
         this.name = name;
     }
-
-    /**@description 注册的网络控制器组件类型 */
-    private types : any[] = [];
 
     private node: Node | null = null;
     public onLoad(node: Node) {
@@ -58,5 +56,6 @@ import { js, Node} from "cc";
             }
         }
     }
-    
+    /**@description 注册的网络控制器组件类型 */
+    private types : any[] = [];
 }

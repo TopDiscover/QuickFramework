@@ -9,11 +9,11 @@ class _BitEncrypt {
 
     private readonly logTag = `[BitEncrypt]:`;
     private _encryptKey: string = "EskKbMvzZBILhcTv";
-    public set encryptKey(value: string) {
+    public set encryptKey( value : string ){
         this._encryptKey = value;
     }
     /**@description 加密解密 密钥 */
-    public get encryptKey() {
+    public get encryptKey( ){
         return this._encryptKey;
     }
     /**

@@ -1,9 +1,9 @@
-import { Message, MessageHeader } from "./Message";
+import { Codec, Message } from "./Message";
+
 /**
  * @description protobuf解析基类
  */
-export class ProtoMessage<T> extends Message {
-
+export abstract class ProtoMessage<T> extends Message {
     /**@description 发送或接收的消息流 */
     buffer: Uint8Array = null!;
 
@@ -42,6 +42,6 @@ export class ProtoMessage<T> extends Message {
     }
 }
 
-export class ProtoMessageHeader extends MessageHeader {
+export abstract class ProtoCodec extends Codec {
 
 }

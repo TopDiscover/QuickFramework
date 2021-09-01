@@ -1,4 +1,6 @@
 import { find, instantiate, Label ,Node, Prefab, Tween, tween, UIOpacity, Vec3} from "cc";
+import { Macro } from "../../framework/defines/Macros";
+import { Config, ViewZOrder } from "../config/Config";
 /**
  * @description 加载动画
  */
@@ -9,7 +11,7 @@ export default class UILoading {
     /**@description 当前loading节点 */
     private _node: Node = null!;
     constructor() {
-        Manager.eventDispatcher.addEventListener(td.Adaptor.ADAPT_SCREEN, this.onAdaptScreen, this);
+        Manager.eventDispatcher.addEventListener(Macro.ADAPT_SCREEN, this.onAdaptScreen, this);
     }
     private onAdaptScreen() {
         Manager.adaptor.fullScreenAdapt(this._node);
@@ -42,7 +44,7 @@ export default class UILoading {
     */
     public show( delay : number ,name : string) {
         if( delay == undefined || delay == null || delay < 0 ){
-            this.delay = td.Config.LOAD_VIEW_DELAY;
+            this.delay = Config.LOAD_VIEW_DELAY;
         }else{
             this.delay = delay;
         }
@@ -61,7 +63,7 @@ export default class UILoading {
         let finish = await this.loadPrefab();
         if (finish) {
             this._node.removeFromParent();
-            Manager.uiManager.addChild(this._node,td.ViewZOrder.UILoading);
+            Manager.uiManager.addChild(this._node,ViewZOrder.UILoading);
             this._node.position = Vec3.ZERO;
             this.content = find("content", this._node) as Node;
             Tween.stopAllByTarget(this.contentOpacity);
@@ -78,7 +80,7 @@ export default class UILoading {
                 this._node.active = false;
                 return;
             }
-            this.startTimeOutTimer(td.Config.LOAD_VIEW_TIME_OUT);
+            this.startTimeOutTimer(Config.LOAD_VIEW_TIME_OUT);
             this._node.active = true;
         }
     }
@@ -123,14 +125,14 @@ export default class UILoading {
             }
             this._isLoadingPrefab = true;
             Manager.assetManager.load(
-                td.Macro.BUNDLE_RESOURCES, 
-                td.Config.CommonPrefabs.uiLoading,
+                Macro.BUNDLE_RESOURCES, 
+                Config.CommonPrefabs.uiLoading,
                 Prefab,
                 (finish, total, item)=>{},
                 (data) => {
                 this._isLoadingPrefab = false;
                 if (data && data.data && data.data instanceof Prefab) {
-                    Manager.assetManager.addPersistAsset(td.Config.CommonPrefabs.uiLoading,data.data,td.Macro.BUNDLE_RESOURCES);
+                    Manager.assetManager.addPersistAsset(Config.CommonPrefabs.uiLoading,data.data,Macro.BUNDLE_RESOURCES);
                     this._node = instantiate(data.data);
                     if (this.finishLoadCb) {
                         this.finishLoadCb(true);

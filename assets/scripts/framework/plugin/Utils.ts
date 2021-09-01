@@ -1,8 +1,11 @@
-import { Button, Component, Font, isValid, Label, ParticleAsset, ParticleSystem2D, Sprite, SpriteFrame, sp, Node, Prefab, instantiate, Asset, AssetManager } from "cc";
+import { Asset, AssetManager, BUNDLE_TYPE, Component, instantiate, isValid, Sprite, SpriteFrame , Node, Button, ParticleSystem2D, ParticleAsset, Label, Font, sp, Prefab } from "cc";
+import { Resource } from "../core/asset/Resource";
 import UIView from "../core/ui/UIView";
+import { ButtonSpriteType } from "../defines/Enums";
+import { Macro } from "../defines/Macros";
 
 /**@description 添加加载本地的资源 */
-export function addExtraLoadResource(view: UIView, info: td.Resource.Info) {
+export function addExtraLoadResource(view: UIView, info: Resource.Info) {
     let uiManager = Manager.uiManager;
     if (view == <any>(uiManager.retainMemory)) {
         uiManager.retainMemory.addLocal(info);
@@ -15,7 +18,7 @@ export function addExtraLoadResource(view: UIView, info: td.Resource.Info) {
 }
 
 /**@description 添加加载远程的资源 */
-export function addRemoteLoadResource(view: UIView, info: td.Resource.Info) {
+export function addRemoteLoadResource(view: UIView, info: Resource.Info) {
     let uiManager = Manager.uiManager;
     if (view == <any>(uiManager.retainMemory)) {
         uiManager.retainMemory.addRemote(info);
@@ -28,15 +31,15 @@ export function addRemoteLoadResource(view: UIView, info: td.Resource.Info) {
 }
 
 /**@description 获取Bundle,如果没有传入，会默认指定当前View打开时的bundle,否则批定resources */
-export function getBundle(config: { bundle?: BUNDLE_TYPE, view?: UIView }):BUNDLE_TYPE {
-    let bundle = config.bundle;
-    if (config.bundle == undefined || config.bundle == null) {
-        bundle = td.Macro.BUNDLE_RESOURCES;
-        if (config.view) {
+export function getBundle( config : { bundle? : BUNDLE_TYPE , view? : UIView}){
+    let bundle : BUNDLE_TYPE = config.bundle as BUNDLE_TYPE;
+    if ( config.bundle == undefined || config.bundle == null ){
+        bundle = Macro.BUNDLE_RESOURCES;
+        if( config.view ){
             bundle = config.view.bundle;
         }
     }
-    return bundle as BUNDLE_TYPE;
+    return bundle;
 }
 
 function isValidComponent(component: Component): boolean {
@@ -64,19 +67,19 @@ export function setSpriteSpriteFrame(
     spriteFrame: SpriteFrame,
     completeCallback: (data: SpriteFrame | null) => void,
     bundle: BUNDLE_TYPE,
-    resourceType: td.Resource.Type = td.Resource.Type.Local,
+    resourceType: Resource.Type = Resource.Type.Local,
     retain: boolean = false,
     isAtlas: boolean = false) {
 
     if (!isAtlas) {
         //纹理只需要把纹理单独添加引用，不需要把spirteFrame也添加引用
-        let info = new td.Resource.Info;
+        let info = new Resource.Info;
         info.url = url;
         info.type = SpriteFrame;
         info.data = spriteFrame;
         info.retain = retain;
         info.bundle = bundle;
-        if (resourceType == td.Resource.Type.Remote) {
+        if (resourceType == Resource.Type.Remote) {
             addRemoteLoadResource(view, info);
         } else {
             addExtraLoadResource(view, info);
@@ -123,7 +126,7 @@ function _setSpriteFrame(
     bundle: BUNDLE_TYPE) {
 
     if (!isAtlas) {
-        let info = new td.Resource.Info;
+        let info = new Resource.Info;
         info.url = url;
         info.type = SpriteFrame;
         info.data = spriteFrame;
@@ -162,7 +165,7 @@ function _setSpriteFrame(
  */
 function _setButtonSpriteFrame(
     button: Button,
-    memberName: td.ButtonSpriteType,
+    memberName: ButtonSpriteType,
     view: UIView,
     url: string,
     spriteFrame: SpriteFrame,
@@ -188,7 +191,7 @@ function _setButtonSpriteFrame(
  */
 function _setButtonWithType(
     button: Button,
-    memberName: td.ButtonSpriteType,
+    memberName: ButtonSpriteType,
     view: UIView,
     url: string | { urls: string[], key: string },
     completeCallback?: (type: string, spriteFrame: SpriteFrame | null) => void,
@@ -227,10 +230,10 @@ export function setButtonSpriteFrame(button: Button, config: {
     bundle?: BUNDLE_TYPE
 }) {
     let bundle = getBundle(config);
-    _setButtonWithType(button, td.ButtonSpriteType.Norml, config.view, config.normalSprite as any, config.completeCallback, bundle);
-    _setButtonWithType(button, td.ButtonSpriteType.Pressed, config.view, config.pressedSprite as any, config.completeCallback, bundle);
-    _setButtonWithType(button, td.ButtonSpriteType.Hover, config.view, config.hoverSprite as any, config.completeCallback, bundle);
-    _setButtonWithType(button, td.ButtonSpriteType.Disable, config.view, config.disabledSprite as any, config.completeCallback, bundle);
+    _setButtonWithType(button, ButtonSpriteType.Norml, config.view, config.normalSprite as any, config.completeCallback, bundle);
+    _setButtonWithType(button, ButtonSpriteType.Pressed, config.view, config.pressedSprite as any, config.completeCallback, bundle);
+    _setButtonWithType(button, ButtonSpriteType.Hover, config.view, config.hoverSprite as any, config.completeCallback, bundle);
+    _setButtonWithType(button, ButtonSpriteType.Disable, config.view, config.disabledSprite as any, config.completeCallback, bundle);
 }
 
 /**
@@ -244,7 +247,7 @@ export function setParticleSystemFile(
     config: { url: string, view: any, completeCallback?: (file: ParticleAsset | null) => void, bundle: BUNDLE_TYPE },
     data: ParticleAsset
 ) {
-    let info = new td.Resource.Info;
+    let info = new Resource.Info;
     info.url = config.url;
     info.type = ParticleAsset;
     info.data = data;
@@ -279,7 +282,7 @@ export function setLabelFont(
     component: Label,
     config: { font: string, view: any, completeCallback?: (font: Font | null) => void, bundle: BUNDLE_TYPE },
     data: Font) {
-    let info = new td.Resource.Info;
+    let info = new Resource.Info;
     info.url = config.font;
     info.type = Font;
     info.data = data;
@@ -315,10 +318,10 @@ export function setSkeletonSkeletonData(
     config: { url: string, view: any, completeCallback: (data: sp.SkeletonData | null) => void, bundle: BUNDLE_TYPE } |
     { view: any, path: string, name: string, completeCallback: (data: sp.SkeletonData | null) => void, bundle: BUNDLE_TYPE, isNeedCache?: boolean, retain?: boolean },
     data: sp.SkeletonData,
-    resourceType: td.Resource.Type = td.Resource.Type.Local) {
+    resourceType: Resource.Type = Resource.Type.Local) {
     let url = "";
     let retain = false;
-    if (resourceType == td.Resource.Type.Remote) {
+    if (resourceType == Resource.Type.Remote) {
         let realConfig: { view: any, path: string, name: string, completeCallback: (data: sp.SkeletonData | null) => void, isNeedCache?: boolean, retain?: boolean } = <any>config;
         url = `${realConfig.path}/${realConfig.name}`;
         retain = realConfig.retain ? true : false;
@@ -326,14 +329,14 @@ export function setSkeletonSkeletonData(
         let realConfig: { url: string, view: any, completeCallback: (data: sp.SkeletonData | null) => void } = <any>config;
         url = realConfig.url;
     }
-    let info = new td.Resource.Info;
+    let info = new Resource.Info;
     info.url = url;
     info.type = sp.SkeletonData;
     info.data = data;
     info.retain = retain;
     info.bundle = getBundle(config);
-    if (resourceType == td.Resource.Type.Remote) {
-        info.bundle = td.Macro.BUNDLE_REMOTE;
+    if (resourceType == Resource.Type.Remote) {
+        info.bundle = Macro.BUNDLE_REMOTE;
         addRemoteLoadResource(config.view, info);
     } else {
         addExtraLoadResource(config.view, info);
@@ -368,7 +371,7 @@ export function createNodeWithPrefab(config: { bundle: BUNDLE_TYPE, url: string,
     let cache = Manager.cacheManager.get(bundle, url);
     Manager.cacheManager.getCacheByAsync(url, Prefab, bundle).then((data) => {
         if (!cache) {
-            let info = new td.Resource.Info;
+            let info = new Resource.Info;
             info.url = config.url;
             info.type = Prefab;
             info.data = data;
@@ -390,7 +393,7 @@ export function _loadDirRes(config: {
     type: typeof Asset,
     view: any,
     onProgress?: (finish: number, total: number, item: AssetManager.RequestItem) => void,
-    onComplete: (data: td.Resource.CacheData) => void
+    onComplete: (data: Resource.CacheData) => void
 }) {
     let bundle = getBundle(config);
     let cache = Manager.cacheManager.get(bundle, config.url);
@@ -399,7 +402,7 @@ export function _loadDirRes(config: {
 
         if (!cache) {
             //如果已经有了，可能是从logic中加载过来的，不在进行引用计数操作
-            let info = new td.Resource.Info;
+            let info = new Resource.Info;
             info.url = config.url;
             info.type = config.type;
             info.data = data.data as any;
@@ -430,7 +433,7 @@ export function _loadRes(config: {
         config.onProgress as any,
         (data) => {
             if (!cache) {
-                let info = new td.Resource.Info;
+                let info = new Resource.Info;
                 info.url = config.url;
                 info.type = config.type;
                 info.data = data.data as any;

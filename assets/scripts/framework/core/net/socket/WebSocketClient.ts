@@ -1,15 +1,14 @@
 import { DEBUG, JSB } from "cc/env";
-
+import { Net } from "../Net";
 /**
  * @description websocket封装
  */
-
 export default class WebSocketClinet {
 
     private _tag: string = "[WebSocketClinet]";
     private _ip: string = "";
     private _port: string | null = null;
-    private _protocol: td.Net.Type = "wss";
+    private _protocol: Net.Type = "wss";
     private _dataArr: any[] = [];
     /**@description 是否处于等待连接状态 */
     private _isWaitingConnect = false;
@@ -71,7 +70,7 @@ export default class WebSocketClinet {
 
     private _closeEvent: any = null;
 
-    private init(ip: string, port: string | null, protocol: td.Net.Type) {
+    private init(ip: string, port: string | null, protocol: Net.Type) {
         this._ip = ip;
         this._port = port;
         this._protocol = protocol;
@@ -82,7 +81,7 @@ export default class WebSocketClinet {
     }
 
 
-    private connectWebSocket(ip: string, port: string | null, protocol: td.Net.Type) {
+    private connectWebSocket(ip: string, port: string | null, protocol: Net.Type) {
         this.init(ip, port, protocol);
         if (!this._ip) return;
         let fullUrl = `${protocol}://${this._ip}`;
@@ -123,7 +122,7 @@ export default class WebSocketClinet {
      * @param ip ip
      * @param port 端口
      */
-    public initWebSocket(ip: string, port: string | null, protocol: td.Net.Type) {
+    public initWebSocket(ip: string, port: string | null, protocol: Net.Type) {
         if (ip == undefined || ip == null || ip.length < 0) {
             if (DEBUG) error(this._tag, `init websocket error ip : ${ip} port : ${port}`);
             return;
@@ -257,7 +256,7 @@ export default class WebSocketClinet {
      */
     public close(isEnd: boolean) {
         if (this._ws) {
-            this._closeEvent = { type: td.Net.NetEvent.ON_CUSTOM_CLOSE, isEnd: isEnd };
+            this._closeEvent = { type: Net.NetEvent.ON_CUSTOM_CLOSE, isEnd: isEnd };
             this._ws.close();
         }
         //清空发送

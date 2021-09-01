@@ -1,7 +1,8 @@
 
 import EventComponent from "./EventComponent";
-import { Service } from "../core/net/service/Service";
 import { Message } from "../core/net/message/Message";
+import { Service } from "../core/net/service/Service";
+import { Net } from "../core/net/Net";
 import { _decorator } from "cc";
 import { DEBUG } from "cc/env";
 
@@ -24,14 +25,14 @@ export default class Controller<ServiceType> extends EventComponent {
         this._service = <any>value;
     }
 
-    protected bindingEvents() {
-        super.bindingEvents();
-        this.registerEvent(td.Net.NetEvent.ON_OPEN, this.onNetOpen);
-        this.registerEvent(td.Net.NetEvent.ON_CLOSE, this.onNetClose);
-        this.registerEvent(td.Net.NetEvent.ON_ERROR, this.onNetError);
+    protected addEvents() {
+        super.addEvents();
+        this.addUIEvent(Net.NetEvent.ON_OPEN, this.onNetOpen);
+        this.addUIEvent(Net.NetEvent.ON_CLOSE, this.onNetClose);
+        this.addUIEvent(Net.NetEvent.ON_ERROR, this.onNetError);
     }
 
-    protected onNetOpen(event: td.Net.ServiceEvent) {
+    protected onNetOpen(event: Net.ServiceEvent) {
         if (this.service as any == event.service) {
             if (DEBUG) log(`${event.service.serviceName}网络 onNetOpen`);
             return true;
@@ -39,14 +40,14 @@ export default class Controller<ServiceType> extends EventComponent {
         return false;
     }
 
-    protected onNetClose(event: td.Net.ServiceEvent) {
+    protected onNetClose(event: Net.ServiceEvent) {
         if (this.service as any == event.service) {
             if (DEBUG) log(`${event.service.serviceName}网络 onNetClose`);
             return true;
         }
         return false;
     }
-    protected onNetError(event: td.Net.ServiceEvent) {
+    protected onNetError(event: Net.ServiceEvent) {
         if (this.service as any == event.service) {
             if (DEBUG) log(`${event.service.serviceName}网络 onNetError`);
             return true;
