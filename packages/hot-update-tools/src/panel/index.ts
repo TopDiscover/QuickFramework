@@ -166,7 +166,7 @@ class _Helper {
 
   getManifestDir(buildDir: string) {
     if (buildDir && buildDir.length > 0) {
-      return buildDir + "\\manifest";
+      return buildDir + "/manifest";
     } else {
       return "";
     }

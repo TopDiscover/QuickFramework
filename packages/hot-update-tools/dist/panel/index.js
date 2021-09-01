@@ -118,7 +118,7 @@ var _Helper = /** @class */ (function () {
     });
     _Helper.prototype.getManifestDir = function (buildDir) {
         if (buildDir && buildDir.length > 0) {
-            return buildDir + "\\manifest";
+            return buildDir + "/manifest";
         }
         else {
             return "";
@@ -1045,7 +1045,7 @@ var _Helper = /** @class */ (function () {
     });
     Object.defineProperty(_Helper.prototype, "style", {
         get: function () {
-            var content = fs.readFileSync(path.join(Editor.Project.path, "/packages/hot-update-tools/dist/panel/index.html"), "utf-8");
+            var content = fs.readFileSync(path.join(Editor.Project.path, "/packages/hot-update-tools/dist/panel/index.css"), "utf-8");
             return content;
         },
         enumerable: false,
