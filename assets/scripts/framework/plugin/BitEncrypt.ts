@@ -32,46 +32,46 @@ class _BitEncrypt {
         return this._code(content, key);
     }
 
-    private _code(content: string, key: string): string {
-        let result = this._check(content,key);
-        if ( result.isOK ){
+    private _code(content: string, key?: string): string {
+        let result = this._check(content, key);
+        if (result.isOK) {
 
-            let contentCharCode : number[] = [];
-            for( let i = 0 ; i < content.length ; i++ ){
+            let contentCharCode: number[] = [];
+            for (let i = 0; i < content.length; i++) {
                 contentCharCode.push(content.charCodeAt(i));
             }
-            
+
             let index = 0;
             let ch = "";
             //对中文，及以下的其它字符串进行位加密
             let regex = /[\w\d_-`~#!$%^&*(){}=+;:'"<,>,/?|\\\u4e00-\u9fa5]/g;
-            for ( let i = 0 ; i < contentCharCode.length ; i++ ){
+            for (let i = 0; i < contentCharCode.length; i++) {
 
                 //只有子母，数字，
                 let matchs = content[i].match(regex);
-                if ( matchs && matchs.length > 0 ){
+                if (matchs && matchs.length > 0) {
                     //替换字符
                     contentCharCode[i] ^= result.key.charCodeAt(index);
                     ch = String.fromCharCode(contentCharCode[i]);
                     matchs = ch.match(regex);
-                    if ( matchs && matchs.length ){
+                    if (matchs && matchs.length) {
                         //转换后仍然是可显示字符
-                    }else{
+                    } else {
                         //转成了不能显示的字符，把它恢复原样
                         contentCharCode[i] ^= result.key.charCodeAt(index);
                     }
-    
+
                     index++;
-                    if ( index >= result.key.length ){
+                    if (index >= result.key.length) {
                         index = 0;
                     }
-                }else{
+                } else {
                     //不替换字符
                 }
             }
 
             let newContent = "";
-            for ( let i = 0 ; i < contentCharCode.length ; i++ ){
+            for (let i = 0; i < contentCharCode.length; i++) {
                 newContent += String.fromCharCode(contentCharCode[i]);
             }
             return newContent;
@@ -82,20 +82,20 @@ class _BitEncrypt {
         }
     }
 
-    private _check( content : string , key : string ) : {isOK : boolean, key : string } {
-        if (content && content.length > 0 ) {
-            if ( key && key.length > 0 ){
+    private _check(content: string, key?: string): { isOK: boolean, key: string } {
+        if (content && content.length > 0) {
+            if (key && key.length > 0) {
                 //使用传的key进行加解密
-                return { isOK : true , key : key };
-            }else{
-                if ( this.encryptKey && this.encryptKey.length > 0 ){
-                    return { isOK : true , key : this.encryptKey };
-                }else{
-                    return { isOK : false , key : key };
+                return { isOK: true, key: key };
+            } else {
+                if (this.encryptKey && this.encryptKey.length > 0) {
+                    return { isOK: true, key: this.encryptKey };
+                } else {
+                    return { isOK: false, key: "" };
                 }
             }
         } else {
-            return { isOK :  false , key : key };
+            return { isOK: false, key: "" };
         }
     }
 }

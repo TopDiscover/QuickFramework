@@ -5,13 +5,13 @@ import { Codec, Message } from "./Message";
  */
 export abstract class ProtoMessage<T> extends Message {
     /**@description 发送或接收的消息流 */
-    buffer: Uint8Array = null;
+    buffer: Uint8Array = null!;
 
     /**@description 直接把真正的Proto类型给赋值 */
     private type: any = null;
 
     /**@description 真空的Proto数据 */
-    data: T = null;
+    data: T = null!;
 
     constructor(protoType?: any) {
         super();

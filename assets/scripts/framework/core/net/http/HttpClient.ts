@@ -5,12 +5,12 @@ import { Http } from "./Http";
  */
 class HttpPackageData {
     data: any = null;
-    url: string = null;
+    url: string = null!;
     /**@description 超时设置 默认为10s*/
     timeout: number = 10000;
     /**@description 请求类型 默认为GET请求*/
     type: Http.Type = Http.Type.GET;
-    requestHeader: { name: string, value: string }[] | { name: string, value: string } = null;
+    requestHeader: { name: string, value: string }[] | { name: string, value: string } | null = null;
     /**@description 发送接口时，默认为false 仅浏览器端生效
      * 自动附加当前时间的参数字段
      * 但如果服务器做了接口参数效验，可能会导致接口无法通过服务器验证，返回错误数据
@@ -41,9 +41,9 @@ class HttpPackageData {
 export class HttpPackage {
 
     /**@description 跨域代理 */
-    public static crossProxy = {};
+    public static crossProxy: any = {};
     /**@description 当前主机地址 */
-    public static location = { host : "" , pathname : "" , protocol : ""};
+    public static location = { host: "", pathname: "", protocol: "" };
 
     private _data: HttpPackageData = new HttpPackageData();
     public set data(data: HttpPackageData) {
@@ -53,16 +53,16 @@ export class HttpPackage {
         return this._data;
     }
 
-    private _params : Object = null;
+    private _params: Object = null!;
     /**
      * @description 传入的请求参数会拼在data.url 
      * @example params = { a : 10 , b : 20 }
      * 最终的url 为data.url?&a=10&b=20
      */
-    public set params( value : Object ){
+    public set params(value: Object) {
         this._params = value;
     }
-    public get params(){
+    public get params() {
         return this._params;
     }
     /**
@@ -88,7 +88,7 @@ class HttpClient {
                 let key = keys[i];
                 let value = config[key];
 
-                if(url.indexOf(key) > -1){
+                if (url.indexOf(key) > -1) {
                     if (value.protocol && value.api) {
                         if (location.protocol != value.protocol) {
                             //所有跨域的都从当前服务器的代理转发，把https也得转化成http:
@@ -104,24 +104,24 @@ class HttpClient {
         }
     }
 
-    private static convertParams( url : string , params : Object ) : string{
-        if( params == null || params == undefined ){
+    private static convertParams(url: string, params: Object): string {
+        if (params == null || params == undefined) {
             return url;
         }
         let result = "&";
-        if ( url.indexOf("?") < 0 ){
+        if (url.indexOf("?") < 0) {
             result = "?";
         }
         let keys = Object.keys(params)
-        for( let i = 0 ; i < keys.length ; i++ ){
-            if( i == 0 ){
-                result += `${keys[i]}=${params[keys[i]]}`;
-            }else{
-                result += `&${keys[i]}=${params[keys[i]]}`
+        for (let i = 0; i < keys.length; i++) {
+            if (i == 0) {
+                result += `${keys[i]}=${(<any>params)[keys[i]]}`;
+            } else {
+                result += `&${keys[i]}=${(<any>params)[keys[i]]}`
             }
         }
         result = url + result;
-        return  result;
+        return result;
     }
 
     static request(httpPackage: HttpPackage, cb?: (data: any) => void, errorcb?: (errorData: Http.Error) => void) {

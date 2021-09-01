@@ -4,7 +4,7 @@
  * 可参考HallNetHelper
  */
 export default class NetHelper<ServiceType> {
-    private _service: Service = null;
+    private _service: Service = null!;
     public get service(): ServiceType {
         return <any>(this._service);
     };

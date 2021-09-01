@@ -27,8 +27,8 @@ export class Framewok {
     get logicManager() {
         return getSingleton(LogicManager);
     }
-    
-    private _hallNetManager: NetManager = null;
+
+    private _hallNetManager: NetManager = null!;
     /**@description 大厅的网络控制器组件管理器，注册到该管理器的网络组件，除登录界面外，都会被移除掉*/
     get hallNetManager() {
         if (!this._hallNetManager) {
@@ -37,7 +37,7 @@ export class Framewok {
         return this._hallNetManager;
     }
 
-    private _netManager: NetManager = null;
+    private _netManager: NetManager = null!;
     /**@description 全局常驻网络组件管理器,注册到该管理器的网络组件会跟游戏的生命周期一致 */
     get netManager() {
         if (!this._netManager) {
@@ -45,7 +45,7 @@ export class Framewok {
         }
         return this._netManager;
     }
-    
+
     /**@description 热更新管理器 */
     get hotupdate() { return getSingleton(HotupdateManager) }
 
@@ -93,12 +93,12 @@ export class Framewok {
     }
 
     /**@description 小提示 */
-    get tips() {
+    get tips() : any{
         return null;
     }
 
     /**@description 界面加载时的全屏Loading,显示加载进度 */
-    get uiLoading() {
+    get uiLoading():any {
         return null;
     }
 
@@ -108,10 +108,10 @@ export class Framewok {
     }
 
     /**@description 当前游戏GameView, GameView进入onLoad赋值 */
-    gameView: GameView = null;
+    gameView: GameView | null = null;
 
     /**@description 游戏数据 */
-    gameData: GameData = null;
+    gameData: GameData | null = null;
 
     /**@description 游戏控制器，在自己的模块内写函数有类型化读取,此值在Logic.addNetComponent赋值
      * @example 
@@ -160,7 +160,7 @@ export class Framewok {
      * @description 获取语言包 
      * 
      */
-    getLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE = null): string {
+    getLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE | null = null): any {
         let key = "";
         if (typeof param == "string") {
             if (bundle) {
