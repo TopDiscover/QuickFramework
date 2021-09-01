@@ -13,7 +13,7 @@ export class LogicImpl extends EventComponent {
     protected _loader: ResourceLoader = null!;
 
     protected logicType : Logic.Type = Logic.Type.UNKNOWN;
-    protected language : Language.DataSourceDelegate = null;
+    protected language : Language.DataSourceDelegate = null!;
 
     constructor() {
         super();
@@ -51,7 +51,6 @@ export class LogicImpl extends EventComponent {
 
     public onDestroy() {
         super.onDestroy();
-        this.node = null;
     }
 
     /**@description 获取需要加载的资源 */

@@ -2,17 +2,17 @@ import { Message } from "./Message";
 
 type JsonMessageConstructor = typeof JsonMessage;
 
-export function serialize(key: string, type: JsonMessageConstructor | NumberConstructor | StringConstructor);
-export function serialize(key: string, type: ArrayConstructor, arrayType: JsonMessageConstructor | NumberConstructor | StringConstructor);
-export function serialize(key: string, type: MapConstructor, mapKeyType: NumberConstructor | StringConstructor, mapValueType: JsonMessageConstructor | NumberConstructor | StringConstructor);
-export function serialize(key: string, type, arrTypeOrMapKeyType?, mapValueType?) {
-    return function (target, memberName) {
+export function serialize(key: string, type: JsonMessageConstructor | NumberConstructor | StringConstructor): Function;
+export function serialize(key: string, type: ArrayConstructor, arrayType: JsonMessageConstructor | NumberConstructor | StringConstructor): Function;
+export function serialize(key: string, type: MapConstructor, mapKeyType: NumberConstructor | StringConstructor, mapValueType: JsonMessageConstructor | NumberConstructor | StringConstructor): Function;
+export function serialize(key: string, type: any, arrTypeOrMapKeyType?: any, mapValueType?: any): Function {
+    return function (target: any, memberName: any): void {
         if (Reflect.getOwnPropertyDescriptor(target, '__serialize__') === undefined) {
-            let selfSerializeInfo = {};
-            if (Reflect.getPrototypeOf(target)['__serialize__']) {
+            let selfSerializeInfo: any = {};
+            if ((<any>Reflect.getPrototypeOf(target))['__serialize__']) {
                 // 父类拥有序列化信息,并且自己没有序列化信息,则拷贝父类到当前类中来
                 if (Reflect.getOwnPropertyDescriptor(target, '__serialize__') === undefined) {
-                    let parentSerializeInfo = Reflect.getPrototypeOf(target)['__serialize__'];
+                    let parentSerializeInfo = (<any>Reflect.getPrototypeOf(target))['__serialize__'];
                     let serializeKeyList = Object.keys(parentSerializeInfo);
                     for (let len = serializeKeyList.length, i = 0; i < len; i++) {
                         selfSerializeInfo[serializeKeyList[i]] = parentSerializeInfo[serializeKeyList[i]].slice(0);
@@ -29,14 +29,13 @@ export function serialize(key: string, type, arrTypeOrMapKeyType?, mapValueType?
         target['__serialize__'][key] = [memberName, type, arrTypeOrMapKeyType, mapValueType];
     }
 }
-
 /**
  * @description JSON的序列化与序列化
  */
 export abstract class JsonMessage extends Message {
     private data = null;
 
-    buffer: Uint8Array;
+    buffer: Uint8Array = null!;
     encode() : boolean {
         this.data = this.serialize();
         let result = JSON.stringify(this.data);
@@ -46,14 +45,14 @@ export abstract class JsonMessage extends Message {
 
     /**@description 序列化 */
     protected serialize(): any {
-        let result = {};
-        let __serialize__ = Reflect.getPrototypeOf(this)['__serialize__'];
+        let result:any = {};
+        let __serialize__ = (<any>Reflect.getPrototypeOf(this))['__serialize__'];
         if (!__serialize__) return result;
         let serializeKeyList = Object.keys(__serialize__);
         for (let len = serializeKeyList.length, i = 0; i < len; i++) {
             let serializeKey = serializeKeyList[i];
             let [memberName] = __serialize__[serializeKey];
-            let serializeObj = this.serializeMember(this[memberName]);
+            let serializeObj = this.serializeMember((<any>this)[memberName]);
             if (null === serializeObj) {
                 cc.warn("Invalid serialize member : " + memberName);
             }
@@ -94,8 +93,8 @@ export abstract class JsonMessage extends Message {
         return (value === undefined || value === null) ? '' : value.toString();
     }
 
-    private serializeArray(value: Array<any>) {
-        let result = [];
+    private serializeArray(value: Array<any>): any {
+        let result: any[] = [];
         value.forEach(element => {
             result.push(this.serializeMember(element));
         });
@@ -103,7 +102,7 @@ export abstract class JsonMessage extends Message {
     }
 
     private serializeMap(value: Map<any, any>) {
-        let result = [];
+        let result: any[] = [];
         let self = this;
         value.forEach((value, key) => {
             let serVal = { k: self.serializeMember(key), v: self.serializeMember(value) };
@@ -141,7 +140,7 @@ export abstract class JsonMessage extends Message {
      * @param data json压缩对象
      * */
     private deserialize(data: any) {
-        let __serializeInfo = Reflect.getPrototypeOf(this)['__serialize__'];
+        let __serializeInfo = (<any>Reflect.getPrototypeOf(this))['__serialize__'];
         if (!__serializeInfo) return true;
         let serializeKeyList = Object.keys(__serializeInfo);
         for (let len = serializeKeyList.length, i = 0; i < len; i++) {
@@ -166,11 +165,11 @@ export abstract class JsonMessage extends Message {
      */
     private deserializeMember(memberName: any, memberType: any, arrOrmapKeyType: any, mapValType: any, value: any) {
         try {
-            let originValue = this[memberName];
+            let originValue = (<any>this)[memberName];
             if (typeof originValue === 'number') {
-                this[memberName] = this.deserializeNumber(memberName, value);
+                (<any>this)[memberName] = this.deserializeNumber(memberName, value);
             } else if (typeof originValue === 'string') {
-                this[memberName] = this.deserializeString(memberName, value);
+                (<any>this)[memberName] = this.deserializeString(memberName, value);
             } else if (originValue instanceof Array) {
                 this.deserializeArray(memberName, arrOrmapKeyType, value);
             } else if (originValue instanceof Map) {
@@ -179,14 +178,14 @@ export abstract class JsonMessage extends Message {
                 originValue.deserialize(value);
             } else if (null === originValue) {
                 switch (memberType) {
-                    case Number: this[memberName] = this.deserializeNumber(memberName, value); break;
-                    case String: this[memberName] = this.deserializeString(memberName, value); break;
-                    case Array: this[memberName] = [];break;
-                    case Map: this[memberName] = new Map; break;
+                    case Number: (<any>this)[memberName] = this.deserializeNumber(memberName, value); break;
+                    case String: (<any>this)[memberName] = this.deserializeString(memberName, value); break;
+                    case Array: (<any>this)[memberName] = []; break;
+                    case Map: (<any>this)[memberName] = new Map; break;
                     default: {
-                        this[memberName] = new memberType;
-                        if (this[memberName] instanceof JsonMessage) {
-                            this[memberName].deserialize(value);
+                        (<any>this)[memberName] = new memberType;
+                        if ((<any>this)[memberName] instanceof JsonMessage) {
+                            (<any>this)[memberName].deserialize(value);
                         } else {
                             cc.warn("Invalid deserialize member :" + memberName + " value:" + originValue);
                             return false;
@@ -200,7 +199,7 @@ export abstract class JsonMessage extends Message {
             return true;
         } catch (error) {
             cc.warn(error.message);
-            this[memberName] = error.data || null;
+            (<any>this)[memberName] = error.data || null;
             return false;
         }
     }
@@ -224,23 +223,23 @@ export abstract class JsonMessage extends Message {
             throw { message: `Invalid deserializeArray member : ${memberName} value : ${value}`, data: [] };
         }
         //重新解析，初始化时可能已经赋值，需要先清空对象
-        this[memberName] = [];
+        (<any>this)[memberName] = [];
         value.forEach((element, i) => {
             if (valueType === Number) {
-                this[memberName].push(this.deserializeNumber(memberName + "[" + i + "]", element));
+                (<any>this)[memberName].push(this.deserializeNumber(memberName + "[" + i + "]", element));
             } else if (valueType === String) {
-                this[memberName].push(this.deserializeString(memberName + "[" + i + "]", element));
+                (<any>this)[memberName].push(this.deserializeString(memberName + "[" + i + "]", element));
             } else if (valueType === Array) {
                 throw { message: `Invalid deserializeArray member : ${memberName} array value type is Array` };
             } else if (valueType instanceof Map) {
                 throw { message: `Invalid deserializeArray member : ${memberName} array value type is Map` };
-            } else if (this[memberName] instanceof JsonMessage) {
-                this[memberName].deserialize(element);
+            } else if ((<any>this)[memberName] instanceof JsonMessage) {
+                (<any>this)[memberName].deserialize(element);
             } else {
                 let elementObj = new valueType;
                 if (elementObj instanceof JsonMessage) {
                     elementObj.deserialize(element);
-                    this[memberName].push(elementObj);
+                    (<any>this)[memberName].push(elementObj);
                 } else {
                     throw { message: `Invalid deserializeArray member : ${memberName} array value type is ` + valueType };
                 }
@@ -253,7 +252,7 @@ export abstract class JsonMessage extends Message {
             throw { message: `Invalid deserializeMap member : ${memberName} value : ${value}`, data: new Map };
         }
         //重新解析，初始化时可能已经赋值，需要先清空对象
-        this[memberName].clear();
+        (<any>this)[memberName].clear();
         value.forEach((element, i) => {
             if (element === null || element.k === undefined || element.k === null || element.v === undefined || element.v === null) {
                 throw { message: `Invalid deserializeMap member : ${memberName} invalid element : ${element}` };
@@ -285,7 +284,7 @@ export abstract class JsonMessage extends Message {
                     throw { message: `Invalid deserializeMap member : ${memberName} invalid value type : ${valueType}` };
                 }
             }
-            this[memberName].set(elementKey, elementValue);
+            (<any>this)[memberName].set(elementKey, elementValue);
         });
     }
 }

@@ -1,6 +1,6 @@
 class Base64 {
-    revLookup = []
-    lookup = []
+    revLookup : any[] = []
+    lookup : any[] = []
 
     constructor() {
         var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
@@ -11,8 +11,8 @@ class Base64 {
 
         // Support decoding URL-safe base64 strings, as Node.js does.
         // See: https://en.wikipedia.org/wiki/Base64#URL_applications
-        this['-'.charCodeAt(0)] = 62
-        this['_'.charCodeAt(0)] = 63
+        (<any>this)['-'.charCodeAt(0)] = 62;
+        (<any>this)['_'.charCodeAt(0)] = 63;
     }
 
     public toByteArray(b64: string): Uint8Array {
@@ -92,14 +92,14 @@ class Base64 {
     }
 
 
-    public byteLength(b64) {
+    public byteLength(b64:string) {
         var lens = this.getLens(b64)
         var validLen = lens[0]
         var placeHoldersLen = lens[1]
         return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
     }
 
-    private _byteLength(b64, validLen, placeHoldersLen) {
+    private _byteLength(b64:string, validLen:number, placeHoldersLen:number) {
         return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
     }
 
@@ -132,7 +132,7 @@ class Base64 {
         return output.join('')
     }
 
-    private tripletToBase64(num) {
+    private tripletToBase64(num:number) {
         return this.lookup[num >> 18 & 0x3F] + this.lookup[num >> 12 & 0x3F] + this.lookup[num >> 6 & 0x3F] + this.lookup[num & 0x3F]
     }
 

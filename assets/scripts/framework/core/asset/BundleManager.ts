@@ -5,9 +5,9 @@
 import { HotUpdate } from "../hotupdate/Hotupdate";
 
 export class BundleManager {
-   private static _instance: BundleManager = null;
+   private static _instance: BundleManager = null!;
    public static Instance() { return this._instance || (this._instance = new BundleManager()); }
-   private curBundle: HotUpdate.BundleConfig = null;
+   private curBundle: HotUpdate.BundleConfig = null!;
    private isLoading = false;
 
    /**@description 大厅Bundle名 */
@@ -41,7 +41,7 @@ export class BundleManager {
     */
    public enterBundle(config: HotUpdate.BundleConfig) {
       if (this.isLoading) {
-         Manager.tips.show(Manager.getLanguage("updating"));
+         Manager.tips.show(Manager.getLanguage("updating") as string);
          cc.log("正在更新游戏，请稍等");
          return;
       }
@@ -74,7 +74,7 @@ export class BundleManager {
             Manager.eventDispatcher.addEventListener(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload, this);
             cc.log(`检测到${versionInfo.name}(${versionInfo.bundle})有新的版本`);
             if (versionInfo.isNeedPrompt) {
-               let content = Manager.getLanguage(["newVersionForBundle", versionInfo.name]);
+               let content = Manager.getLanguage(["newVersionForBundle", versionInfo.name]) as string;
                Manager.alert.show({
                   text: content,
                   confirmCb: (isOK) => {
@@ -95,7 +95,7 @@ export class BundleManager {
             Manager.eventDispatcher.addEventListener(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload, this);
             cc.log(`正在尝试重新下载之前下载失败的资源`);
             if (versionInfo.isNeedPrompt) {
-               let content = Manager.getLanguage(["newVersionForBundle", versionInfo.name]);
+               let content = Manager.getLanguage(["newVersionForBundle", versionInfo.name]) as string;
                Manager.alert.show({
                   text: content,
                   confirmCb: (isOK) => {
@@ -120,11 +120,11 @@ export class BundleManager {
             code == HotUpdate.Code.ERROR_PARSE_MANIFEST) {
             //下载manifest文件失败
             this.isLoading = false;
-            let content = Manager.getLanguage("downloadFailManifest");
+            let content = Manager.getLanguage("downloadFailManifest") as string;
             if (code == HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST) {
-               content = Manager.getLanguage("noFindManifest");
+               content = Manager.getLanguage("noFindManifest") as string;
             } else if (code == HotUpdate.Code.ERROR_PARSE_MANIFEST) {
-               content = Manager.getLanguage("manifestError");
+               content = Manager.getLanguage("manifestError") as string;
             }
             Manager.tips.show(content);
          } else if (code == HotUpdate.Code.CHECKING) {
@@ -143,11 +143,11 @@ export class BundleManager {
       let me = this;
       //加载子包
       let versionInfo = Manager.hotupdate.bundlesConfig[this.curBundle.bundle];
-      Manager.assetManager.loadBundle(versionInfo.bundle, (err: Error, bundle: cc.AssetManager.Bundle) => {
+      Manager.assetManager.loadBundle(versionInfo.bundle, (err, bundle) => {
          me.isLoading = false;
          if (err) {
             cc.error(`load bundle : ${versionInfo.bundle} fail !!!`);
-            let content = Manager.getLanguage(["updateFaild",versionInfo.name]);
+            let content = Manager.getLanguage(["updateFaild",versionInfo.name]) as string;
             Manager.tips.show(content);
          } else {
             cc.log(`load bundle : ${versionInfo.bundle} success !!!`);

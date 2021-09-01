@@ -4,7 +4,7 @@ import { Message } from "../../framework/core/net/message/Message";
 
 /**@description protobuf心跳包 */
 export class HeartbeatProto extends Message {
-    buffer: Uint8Array;
+    buffer: Uint8Array = null!;
     encode(): boolean { return true }
     decode(data: any): boolean { return true }
     get cmd(){ return String(this.mainCmd) + String(this.subCmd) }

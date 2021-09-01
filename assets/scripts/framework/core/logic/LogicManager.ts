@@ -10,11 +10,11 @@ import { LogicImpl } from "./LogicImpl";
 export class LogicManager{
     
     private _logTag = `[LogicManager]`;
-    private static _instance: LogicManager = null;
+    private static _instance: LogicManager = null!;
     public static Instance() { return this._instance || (this._instance = new LogicManager()); }
 
     private _logics : LogicImpl[] = [];
-    private _logicTypes = [];
+    private _logicTypes : any[] = [];
     private node : cc.Node = null;
 
     public push( logicType : any ){

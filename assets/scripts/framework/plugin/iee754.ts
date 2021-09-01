@@ -1,5 +1,5 @@
 export namespace ieee754 {/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
-    export function read(buffer, offset, isLE, mLen, nBytes) {
+    export function read(buffer:any, offset:number, isLE:boolean, mLen:number, nBytes:number) {
         var e, m
         var eLen = (nBytes * 8) - mLen - 1
         var eMax = (1 << eLen) - 1
@@ -32,7 +32,7 @@ export namespace ieee754 {/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh
         return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
     }
 
-    export function write(buffer, value, offset, isLE, mLen, nBytes) {
+    export function write(buffer:any, value:number, offset:number, isLE:boolean, mLen:number, nBytes:number) {
         var e, m, c
         var eLen = (nBytes * 8) - mLen - 1
         var eMax = (1 << eLen) - 1

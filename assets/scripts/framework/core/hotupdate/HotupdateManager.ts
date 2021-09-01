@@ -11,7 +11,7 @@ class AssetsManager {
     /**@description 当前资源管理器的名称 */
     name: string = "";
     /**@description 当前资源管理器的实体 jsb.AssetsManager */
-    manager: jsb.AssetsManager = null;
+    manager: jsb.AssetsManager = null!;
 }
 
 const HALL_ASSETS_MANAGER_NAME = "HALL";
@@ -20,7 +20,7 @@ const HALL_ASSETS_MANAGER_NAME = "HALL";
  * @description 热更新组件
  */
 export class HotupdateManager {
-    private static _instance: HotupdateManager = null;
+    private static _instance: HotupdateManager = null!;
     public static Instance() { return this._instance || (this._instance = new HotupdateManager()); }
     private manifestRoot: string = `manifest/`;
     /**@description 本地存储热更新文件的路径 */
@@ -34,7 +34,7 @@ export class HotupdateManager {
         if (this._commonHotUpdateUrl.length > 0) {
             return this._commonHotUpdateUrl;
         } else {
-            return this.projectManifest.packageUrl;
+            return this.projectManifest.packageUrl as string;
         }
     }
     public set commonHotUpdateUrl(value){
@@ -44,7 +44,7 @@ export class HotupdateManager {
     /**@description 是否路过热更新 */
     public isSkipCheckUpdate = true;
 
-    private _projectManifest: HotUpdate.Manifest = null;
+    private _projectManifest: HotUpdate.Manifest | null = null;
     private get projectManifest(): HotUpdate.Manifest {
         if (CC_JSB && !this._projectManifest) {
             let content = jsb.fileUtils.getStringFromFile(this.hallProjectMainfest);
@@ -55,7 +55,7 @@ export class HotupdateManager {
                 cc.error(`读取${this.hallProjectMainfest}失败`);
             }
         }
-        return this._projectManifest;
+        return this._projectManifest as any;
     }
 
     /**@description 大厅本地的版本项目更新文件配置路径 */
@@ -63,7 +63,7 @@ export class HotupdateManager {
         return `${this.manifestRoot}project.manifest`;
     }
     /**@description 检测更新回调 */
-    public checkCallback: (code: HotUpdate.Code, state: HotUpdate.State) => void = null;
+    public checkCallback: ((code: HotUpdate.Code, state: HotUpdate.State) => void) | null = null;
 
     /**@description bundle版本信息 */
     public bundlesConfig: { [key: string]: HotUpdate.BundleConfig } = {};
@@ -79,8 +79,8 @@ export class HotupdateManager {
                 "gameOne": this._commonHotUpdateUrl,
                 "gameTwo": this._commonHotUpdateUrl,
             }
-            if (config[moduleName]) {
-                return config[moduleName];
+            if ((<any>config)[moduleName]) {
+                return (<any>config)[moduleName];
             } else {
                 return this.commonHotUpdateUrl;
             }
@@ -94,7 +94,7 @@ export class HotupdateManager {
     }
 
     /**@description 当前热更新的资源管理器 */
-    private currentAssetsManager: AssetsManager = null;
+    private currentAssetsManager: AssetsManager = null!;
 
     /**@description 获取Bundle名 */
     public getBundleName(gameName: string) {
@@ -105,7 +105,7 @@ export class HotupdateManager {
     private destroyAssetsManager(name: string = HALL_ASSETS_MANAGER_NAME) {
         if (this.assetsManagers[name]) {
             cc.log("destroyAssetsManager : " + name);
-            this.currentAssetsManager = null;
+            this.currentAssetsManager = <any>null;
             delete this.assetsManagers[name];
         }
     }
@@ -147,7 +147,7 @@ export class HotupdateManager {
     /**@description 判断是否需要重新尝试下载之前下载失败的文件 */
     private isTryDownloadFailedAssets( ) {
         if (this.currentAssetsManager &&(
-            this.currentAssetsManager.manager.getState() == HotUpdate.State.FAIL_TO_UPDATE ||
+            this.currentAssetsManager.manager.getState() == HotUpdate.State.FAIL_TO_UPDATE as any ||
             this.currentAssetsManager.code == HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
             this.currentAssetsManager.code == HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST ||
             this.currentAssetsManager.code == HotUpdate.Code.ERROR_PARSE_MANIFEST)
@@ -225,7 +225,7 @@ export class HotupdateManager {
      * @param gameName 子游戏名
      * @returns manifest url
      */
-    private getGameManifest(gameName): string {
+    private getGameManifest(gameName:string): string {
         return `${this.manifestRoot}${gameName}_project.manifest`;
     }
 
@@ -275,7 +275,7 @@ export class HotupdateManager {
     }
 
     /**@description 检测更新 */
-    private checkCb(event) {
+    private checkCb(event:any) {
 
         //这里不能置空，下载manifest文件也会回调过来
         //this.checkCallback = null;
@@ -304,8 +304,8 @@ export class HotupdateManager {
         this.updating = false;
 
         //如果正在下载更新文件，先下载更新文件比较完成后，再回调
-        if (this.checkCallback && this.currentAssetsManager.manager.getState() != HotUpdate.State.DOWNLOADING_VERSION) {
-            this.checkCallback(event.getEventCode(), this.currentAssetsManager.manager.getState());
+        if (this.checkCallback && this.currentAssetsManager.manager.getState() != HotUpdate.State.DOWNLOADING_VERSION as any) {
+            this.checkCallback(event.getEventCode(), this.currentAssetsManager.manager.getState() as any);
             this.checkCallback = null;
         }
     }
@@ -325,7 +325,7 @@ export class HotupdateManager {
     }
 
     /**@description 热更新回调 */
-    private updateCb(event) {
+    private updateCb(event:any) {
         var isUpdateFinished = false;
         var failed = false;
         cc.log(`--update cb code : ${event.getEventCode()} state : ${this.currentAssetsManager.manager.getState()}`);
@@ -373,7 +373,7 @@ export class HotupdateManager {
                 break;
         }
         if (failed) {
-            this.currentAssetsManager.manager.setEventCallback(null);
+            this.currentAssetsManager.manager.setEventCallback(null as any);
             this.updating = false;
         }
 
@@ -389,7 +389,7 @@ export class HotupdateManager {
             // !!! Re-add the search paths in main.js is very important, otherwise, new scripts won't take effect.
 
             //这里做一个搜索路径去重处理
-            let obj = {};
+            let obj : any = {};
             for (let i = 0; i < searchPaths.length; i++) {
                 obj[searchPaths[i]] = true;
             }
@@ -401,7 +401,7 @@ export class HotupdateManager {
         let state = this.currentAssetsManager.manager.getState();
         if (this.currentAssetsManager.name == HALL_ASSETS_MANAGER_NAME) {
             if (isUpdateFinished) {
-                this.currentAssetsManager.manager.setEventCallback(null);
+                this.currentAssetsManager.manager.setEventCallback(null as any);
                 //下载数量大于0，才有必要进入重启，在如下这种情况下，并不会发生下载
                 //当只提升了版本号，而并未对代码进行修改时，此时的只下载了一个project.manifest文件，
                 //不需要对游戏进行重启的操作
@@ -428,7 +428,7 @@ export class HotupdateManager {
             percent : event.getPercent(),
             percentByFile : event.getPercentByFile(),
             code : event.getEventCode(),
-            state : state,
+            state : state as any,
             needRestart : isUpdateFinished,
         };
 

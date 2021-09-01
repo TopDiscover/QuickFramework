@@ -11,10 +11,10 @@ interface IEvent {
 
 export class EventDispatcher {
 
-    private static _instance: EventDispatcher = null;
+    private static _instance: EventDispatcher = null!;
     public static Instance() { return this._instance || (this._instance = new EventDispatcher()); }
     private logTag = `[EventDispatcher] `;
-    private _eventCaches: { [key: string]: Array<IEvent> } = null;
+    private _eventCaches: { [key: string]: Array<IEvent> } = null!;
     constructor() {
         this._eventCaches = {};
     }
@@ -24,7 +24,7 @@ export class EventDispatcher {
      * @param callback 事件回调
      * @param target target
      */
-    public addEventListener(type: string, callback: ((data: any) => void) | string, target: any) {
+    public addEventListener(type: string, callback: ((data: any) => void) | string | undefined, target: any) {
         if (!type || !callback || !target) return;
         let eventCaches: Array<IEvent> = this._eventCaches[type] || [];
         let hasSame = false;

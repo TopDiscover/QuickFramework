@@ -263,7 +263,7 @@ export abstract class BinaryStream extends Message {
     protected _dataView: DataView = null!;
     /**@description 读取数据的偏移量 */
     protected _byteOffset = 0;
-    buffer: Uint8Array;
+    buffer: Uint8Array = null!;
     /**@description 将当前数据转成buffer */
     encode(): boolean {
         let size = this.size()
