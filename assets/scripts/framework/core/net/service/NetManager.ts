@@ -1,10 +1,8 @@
 import { js , Node } from "cc";
-import { setClassName } from "../../../decorator/Decorators";
 
 /**
  * @description 网络控制器管理器
  */
-@setClassName()
 export class NetManager {
     private name = "";
     constructor(name: string) {
