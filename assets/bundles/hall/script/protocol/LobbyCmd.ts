@@ -1,5 +1,5 @@
 /**@description 大厅类公共cmd定义 */
-export let SUB_CMD_LOBBY = {
+export const SUB_CMD_LOBBY = {
     /**@description json消息测试 */
     TEST_JSON_MSG: 2,
     /**@description proto消息测试 */

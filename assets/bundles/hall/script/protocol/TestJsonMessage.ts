@@ -6,7 +6,6 @@ export class TestData extends JsonMessage {
     get cmd(): string {
         return "";
     }
-    getMsgID(): string { return null }
 
     @serialize("test", String)
     test: string = "这是一个中文的字符串测试";
