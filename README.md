@@ -16,17 +16,34 @@
 3，重新构建项目
 # 项目框架结构
 ## [公共组件](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/componects)
+公共组件基类，声音管理组件，事件组件
 ## [框架核心](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core)
+### 1,[适配器](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/adaptor)
+屏幕适配相关
+### 2,[资源管理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/asset)
+资源的管理，如加载释放等相关资源管理
+### 3,[事件管理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/event)
+### 4,[热更新模块](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/hotupdate)
+### 5,[多语言模块](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/language)
+### 6,[日志](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/log)
+### 7,[逻辑处理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/logic)
+该模块为主流程控制模块，可以理解为管理每个Bundle的入口流程逻辑控制
+### 8,[网络](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/net)
+该网络部分已经集成了相关的网络，对网络数据的收发等操作，目前支持市面上主流的几种数据流格式，
+#### json 数据格式
+#### proto 数据格式
+#### BinaryStream 数据格式 (即二进制数据流)
+### 9,[对象池](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/nodePool)
+### 10,[本地存储](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/storage)
+### 11,[UI管理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/ui)
+该模块为整个框架最为核心部分，所有界面通过预置跟界面UIView绑定，通过UIManager工厂创建及显示视图
+并关联界面视图的动态加载资源，通知到资源管理器，
+当界面打开时，管理器会拿到绑定预置的预置，加载预置并显示界面
+当界面关闭时，会自动清除，释放UIView中动态加载的所有资源，及UIView本身绑定
+的预置资源的释放工作
 ## [装饰器](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/decorator)
 ## [框架扩展](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/plugin)
-
-[界面管理器](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/script/framework/base/UIManager.ts)
---------
-视图全部以预置体方式，通过管理界面进行打开,所有界面都必须继承自界面视图[UIView](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/script/framework/ui/UIView.ts)
-
-[引擎组件load接口扩展](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/script/framework/extentions/CocosExtention.js)
---------
-
+1，对引擎的接口扩展
 对cocos引擎 cc.Sprite/cc.Button/cc.Label/cc.ParticleSystem/sp.Skeleton组件添加了loadXX接口，实现动态的加载替换组件相关信息
 
 如需要加载一个网络图片你只需要使用：
@@ -36,24 +53,42 @@ let sprite = imageNode.getComponent(cc.Sprite);
 
 sprite.loadRemoteImage({url :"http://tools.itharbors.com/res/logo.png", view : this});
 ```
+2，全局扩展函数
+如对String的格式化扩展
+```ts
+declare interface StringConstructor {
+	/**
+	 * @description 格式化字符串
+	 * @example
+	 * String.format("{0}-->{1}-->{2}","one","two","three") | String.format("{0}-->{1}-->{2}",["one","two","three"])
+	 * => "one-->two-->three"
+	 * */
+	format(...args: any[]): string;
+}
+```
+## [数据](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/data)
+数据中心，完善中
+## [框架类型及常量](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/defines)
+1,常用检举
+2,常用宏定义
 
-当界面关闭时，界面管理器会把当前界面load进入的资源关联的释放，不需要关心资源释放的问题，框架已经处理了这个资源的释放
-
-[子游戏资源引用检测插件](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/packages/check_resources)
----------
+# 强大的插件
+## 1,[热更新插件](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/packages/hot-update-tools)
+项目自己定制了热更新模块，目前还在完善中，并不完美，但基础的热更新逻辑已经实现
+可支持热更新地址动态设置，不同Bundle资源分别放置到不同服务器部署
+## 2,[引擎修正插件](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/packages/fix_engine)
+项目对引擎源码扩展，都放到了这个修正插件上，再你使用本框架时，请务必执行到少一次的热更新插件，如果有新插件版本升级，也需要重新执行插件
+## 3,[bundle资源相互引用检测插件](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/packages/check_resources)
+主要只争对A Bundle 引用 B Bundle这种情况下的检测，相互引用的资源会显示在creator 控制台中
 主要是检测子游戏的预置体是否引用了其它子游戏的资源，当打包apk/ipa包时，下载子游戏A，但子游戏A中引用了子游戏B的资源，从而导致子游戏A无法运行
 当你开发完成子游戏后，要该插件来检测你的资源是否引用正确，如果有错误的引用，请注意查看你的控制台信息，会提示你哪一个资源引用错误
 
-[引擎修正插件](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/packages/fix_engine)
----------
-当前是为了实现大厅+子游戏，对引擎的源码进行了修改，修改的内容放到[packages/engine](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/packages/engine)下，当执行完成插件，会对你当前的Cocos Creator进行修正，
-即把对引擎的改动替换到你的Cocos Creator中，如果你已经build过，请自己手动对编译出来的文件进行替换，后期会支持对build目录下的源码修正。
+更为详细的文档，请在本项目的Wiki中查看，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
+同时也希望有更多的人参与，一起让creator的开发更加的简单。
 
-[热更新生成工具](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/packages/hot-update-tools)
---------
-生成版本控制文件
+# 分支说明
+2.4.3 分支为 creator 版本在>=2.4.3版本以上使用，为2.4.x的对外分支
+3.1.0 分支为 creator 版本在>=3.1.0版本以上使用，为3.x的对外分支
+其它分支为开发中的分支，请不要轻易使用
 
-注意事项
--------
-跑热更新示例时，需要修改[TEST_HOT_UPDATE_URL_ROOT](https://gitee.com/top-discover/QuickFramework/blob/2.4.3/assets/script/common/config/Config.ts#L25)为自己的服务器测试地址.
 ![欢迎大家进群讨论](https://images.gitee.com/uploads/images/2021/0704/233403_8c07fe63_393413.jpeg "qrcode_1625412690446.jpg")
