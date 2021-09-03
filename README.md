@@ -30,9 +30,9 @@
 该模块为主流程控制模块，可以理解为管理每个Bundle的入口流程逻辑控制
 ### 8,[网络](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/net)
 该网络部分已经集成了相关的网络，对网络数据的收发等操作，目前支持市面上主流的几种数据流格式，
-#### json 数据格式
-#### proto 数据格式
-#### BinaryStream 数据格式 (即二进制数据流)
+1,json 数据格式
+2,proto 数据格式
+3,BinaryStream 数据格式 (即二进制数据流)
 ### 9,[对象池](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/nodePool)
 ### 10,[本地存储](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/storage)
 ### 11,[UI管理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/ui)
