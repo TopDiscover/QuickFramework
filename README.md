@@ -86,7 +86,7 @@ declare interface StringConstructor {
 # 分支说明
 ## [2.4.3](https://gitee.com/top-discover/QuickFramework/tree/2.4.3)
 2.4.3 分支为 creator 版本在>=2.4.3版本以上使用，为2.4.x的对外分支
-## [3.1.0](https://gitee.com/top-discover/QuickFramework/tree/2.4.3)
+## [3.1.0](https://gitee.com/top-discover/QuickFramework/tree/3.1.0)
 3.1.0 分支为 creator 版本在>=3.1.0版本以上使用，为3.x的对外分支
 ## 其它分支为开发中的分支，请不要轻易使用
 
