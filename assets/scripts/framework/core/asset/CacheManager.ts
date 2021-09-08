@@ -301,6 +301,13 @@ export class CacheManager {
         }
     }
 
+    /**
+     * @description 同步获取资源缓存，此接口不会检查资源的状态，只要建立了缓存，就会立即返回
+     * @param bundle bundle名
+     * @param path 资源路径
+     * @param isCheck 是否检查资源有效性，当为ture时，会检查资源是否有效，如果有效直接返回，如果无效，则返回nll
+     * @returns 
+     */
     public get(bundle: BUNDLE_TYPE, path: string, isCheck: boolean = true): Resource.CacheData {
         let bundleName = this.getBundleName(bundle);
         if (bundleName && this._bundles.has(bundleName)) {
