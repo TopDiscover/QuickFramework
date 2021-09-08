@@ -7,9 +7,15 @@ import { TankBattleLanguage } from "./data/TankBattleLanguage";
 import { Resource } from "../../../scripts/framework/core/asset/Resource";
 import { Logic } from "../../../scripts/framework/core/logic/Logic";
 /**
- * @description 坦克大战Logic 
- * 1，处理LogicEvent的事件
- * 2，
+ * @description 坦克大战Logic
+ * 1，指定logic类型
+ * 2，监听logic进入事件
+ * 3，监听logic进入完成事件
+ * 4，返回当前bundle名
+ * 5，返回该模块网络控制器数据
+ * 6，监听资源加载与卸载相关事件
+ * 7，返回需要加载资源的配置信息
+ * 8，添加logic到logic管理器中
  */
 class TankBattleLogic extends LogicImpl {
 
