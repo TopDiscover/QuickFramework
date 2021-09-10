@@ -127,7 +127,7 @@ export namespace HotUpdate {
         name: string = "";
         index = 0;
         /**@description 加载bundle完成后，发出的bundle事件 */
-        event: string = Logic.Event.ENTER_GAME;
+        event: Logic.Event = Logic.Event.ENTER_GAME;
         /**@description 是否需要提示弹出框提示升级 */
         isNeedPrompt: boolean = false;
         /**
@@ -142,7 +142,7 @@ export namespace HotUpdate {
             name: string,
             bundle: string,
             index: number,
-            event?: string,
+            event?: Logic.Event,
             isNeedPrompt: boolean = false) {
             this.name = name;
             this.bundle = bundle;
