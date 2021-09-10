@@ -241,6 +241,8 @@ export default class AudioComponent extends EventComponent {
     /**@description 设置背景音乐开关 */
     public set isMusicOn(isOn: boolean) { this.audioData.setMusicStatus(isOn); }
 
+    public save(): void { this.audioData.save(); }
+
     /**@description 停止 */
     public stopEffect(url: string, bundle: BUNDLE_TYPE) { this.audioData.stopEffect(url, bundle); }
 

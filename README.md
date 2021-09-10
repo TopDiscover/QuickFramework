@@ -13,6 +13,10 @@
 2，删除build目录
 
 3，重新构建项目
+# 详细文档
+更为详细的文档，[请在本项目的doc中查看](https://gitee.com/top-discover/QuickFramework/tree/3.1.0/doc)，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
+同时也希望有更多的人参与，一起让creator的开发更加的简单。
+
 # 项目框架结构
 ## [公共组件](https://gitee.com/top-discover/QuickFramework/tree/3.1.0/assets/scripts/framework/componects)
 公共组件基类，声音管理组件，事件组件
@@ -84,9 +88,5 @@ declare interface StringConstructor {
 ## [3.1.0](https://gitee.com/top-discover/QuickFramework/tree/3.1.0)
 3.1.0 分支为 creator 版本在>=3.1.0版本以上使用，为3.x的对外分支
 ## 其它分支为开发中的分支，请不要轻易使用
-
-# 其它注意事项
-更为详细的文档，[请在本项目的Wiki中查看](https://gitee.com/top-discover/QuickFramework/wikis/%E6%96%87%E6%A1%A3%E8%AF%B4%E6%98%8E?sort_id=4437056)，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
-同时也希望有更多的人参与，一起让creator的开发更加的简单。
 
 ![欢迎大家进群讨论](https://images.gitee.com/uploads/images/2021/0704/233403_8c07fe63_393413.jpeg "qrcode_1625412690446.jpg")
