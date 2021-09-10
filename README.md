@@ -15,7 +15,7 @@
 
 3，重新构建项目
 # 详细文档
-更为详细的文档，[请在本项目的Wiki中查看](https://gitee.com/top-discover/QuickFramework/wikis/%E6%96%87%E6%A1%A3%E8%AF%B4%E6%98%8E?sort_id=4437056)，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
+更为详细的文档，[请在本项目的Wiki中查看](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/doc)，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
 同时也希望有更多的人参与，一起让creator的开发更加的简单。
 
 # 项目框架结构
