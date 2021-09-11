@@ -3,6 +3,8 @@ import HallView from "./view/HallView";
 import { HallData } from "./data/HallData";
 import { HallLanguage } from "./data/HallLanguage";
 import { Logic } from "../../../scripts/framework/core/logic/Logic";
+import { MainCmd } from "../../../scripts/common/protocol/CmdDefines";
+import { SUB_CMD_LOBBY } from "./protocol/LobbyCmd";
 
 class HallLogic extends LogicImpl {
 
@@ -25,7 +27,15 @@ class HallLogic extends LogicImpl {
         Manager.language.addSourceDelegate(this.language);
         //添加大厅网络组件
         Manager.hallNetManager.addNetControllers();
-        Manager.uiManager.open({ type: HallView, bundle: this.bundle });
+        //加载大厅proto文件
+        //后面再优化下用到时，再加载，但可能会收到消息后，没加载proto文件会有消息延迟，建议先加载
+        Manager.protoTypeManager.register({ 
+            cmd : String(MainCmd.CMD_LOBBY) + String(SUB_CMD_LOBBY.TEST_PROTO_MSG),
+            url : "proto/test2",
+            bundle : this.bundle});
+        Manager.protoTypeManager.load([String(MainCmd.CMD_LOBBY) + String(SUB_CMD_LOBBY.TEST_PROTO_MSG)]).then((isSuccess)=>{
+            Manager.uiManager.open({ type: HallView, bundle: this.bundle });
+        });
     }
 
     public onEnterComplete(data: Logic.EventData) {

@@ -3,6 +3,7 @@
  */
 
 import { Macro } from "../../../defines/Macros";
+import { Net } from "../Net";
 import { Message } from "./Message";
 
 
@@ -558,4 +559,8 @@ export abstract class BinaryStream extends Message {
         }
     }
 
+}
+
+export abstract class BinaryStreamHeartbeat extends BinaryStream{
+    static type = Net.ServiceType.BinaryStream;
 }

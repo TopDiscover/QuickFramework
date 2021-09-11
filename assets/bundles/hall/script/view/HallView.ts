@@ -6,7 +6,7 @@ import { ChatService } from "../../../../scripts/common/net/ChatService";
 import SettingView from "../../../../scripts/common/component/SettingView";
 import { HotUpdate } from "../../../../scripts/framework/core/hotupdate/Hotupdate";
 import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
-import { ViewZOrder } from "../../../../scripts/common/config/Config";
+import { Config, ViewZOrder } from "../../../../scripts/common/config/Config";
 import { Macro } from "../../../../scripts/framework/defines/Macros";
 
 const { ccclass, property } = cc._decorator;
@@ -95,12 +95,6 @@ export default class HallView extends UIView {
             } else if (lan == cc.sys.LANGUAGE_ENGLISH) {
                 lan = cc.sys.LANGUAGE_CHINESE;
             }
-            Manager.language.change(lan);
-            // dispatch(CommonEvent.DOWNLOAD_PROGRESS, { progress: this.testProgress, config: this.bundles[0] });
-            // this.testProgress += 0.1;
-            // if (this.testProgress >= 1) {
-            //     this.testProgress = 0;
-            // }
         });
 
         // this.audioHelper.playMusic("audio/background",this.bundle)

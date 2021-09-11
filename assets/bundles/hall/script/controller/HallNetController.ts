@@ -5,7 +5,6 @@ import { setService } from "../../../../scripts/framework/decorator/Decorators";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import Controller from "../../../../scripts/framework/componects/Controller";
 import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
-import { TestProtoMessage } from "../protocol/TestProtoMessage";
 import { TestBinaryMessage } from "../protocol/TestBinaryMessage";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { SUB_CMD_LOBBY } from "../protocol/LobbyCmd";
@@ -22,7 +21,7 @@ export default class HallNetController extends Controller<LobbyService> {
         super.addEvents()
 
         this.addNetEvent(GetCmdKey(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_JSON_MSG), this.onTestJsonMessage, TestJsonMessage);
-        this.addNetEvent(GetCmdKey(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_PROTO_MSG), this.onTestProtoMessage, TestProtoMessage);
+        this.addNetEvent(GetCmdKey(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_PROTO_MSG), this.onTestProtoMessage, "awesomepackage.TestType");
         this.addNetEvent(GetCmdKey(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_BINARY_MSG), this.onTestBinaryMessage, TestBinaryMessage);
     }
 
@@ -30,8 +29,13 @@ export default class HallNetController extends Controller<LobbyService> {
         dispatch(CommonEvent.TEST_JSON_MSG, data.hello);
     }
 
-    private onTestProtoMessage(data: TestProtoMessage) {
-        dispatch(CommonEvent.TEST_PROTO_MSG, data.data.hello);
+    private onTestProtoMessage(buffer: Uint8Array) {
+        let data = Manager.protoTypeManager.decode<awesomepackage.TestType>({
+            buffer:buffer,
+            cmd:GetCmdKey(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_PROTO_MSG),
+            className : "awesomepackage.TestType"
+        })
+        dispatch(CommonEvent.TEST_PROTO_MSG, data.myStr);
     }
 
     private onTestBinaryMessage(data: TestBinaryMessage) {

@@ -1,10 +1,12 @@
 import NetHelper from "../../../../scripts/framework/core/net/service/NetHelper";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
-import { TestProtoMessage } from "../protocol/TestProtoMessage";
 import { TestBinaryMessage } from "../protocol/TestBinaryMessage";
 import { HttpPackage } from "../../../../scripts/framework/core/net/http/HttpClient";
 import { TestJsonMessage } from "../protocol/TestJsonMessage";
 import { Http } from "../../../../scripts/framework/core/net/http/Http";
+import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
+import { SUB_CMD_LOBBY } from "../protocol/LobbyCmd";
+import { CmmProto } from "../../../../scripts/common/net/CmmProto";
 
 class _HallNetHelper extends NetHelper<LobbyService>{
 
@@ -13,9 +15,25 @@ class _HallNetHelper extends NetHelper<LobbyService>{
     }
 
     sendProtoMessage(hello: string) {
-        let testProto = new TestProtoMessage();
-        testProto.data.hello = hello;
-        testProto.data.afvalue = 4.5;
+
+        let result = Manager.protoTypeManager.getParserResult(String(MainCmd.CMD_LOBBY) + String(SUB_CMD_LOBBY.TEST_PROTO_MSG));
+        type TestType = typeof awesomepackage.TestType;
+        let TestType : TestType = result.root.lookup("awesomepackage.TestType") ;
+        
+        let testProto = new CmmProto<awesomepackage.TestType>(TestType);
+        testProto.data = TestType.create();
+        testProto.mainCmd = MainCmd.CMD_LOBBY;
+        testProto.subCmd = SUB_CMD_LOBBY.TEST_PROTO_MSG;
+        testProto.cmd = String(MainCmd.CMD_LOBBY) + String(SUB_CMD_LOBBY.TEST_PROTO_MSG);
+        testProto.data.awesomeField = "这只是一个测试";
+        testProto.data.myStr = "这是另一个测试的字符串";
+        type AwesomeMessage = typeof awesomepackage.AwesomeMessage;
+        let AwesomeMessage : AwesomeMessage = result.root.lookup("awesomepackage.AwesomeMessage") ;
+        let message = AwesomeMessage.create();
+        message.testValue = "40000";
+        message.testOne = "wiouiou";
+        testProto.data.value = [];
+        testProto.data.value.push(message);
         this.service.send(testProto);
     }
 

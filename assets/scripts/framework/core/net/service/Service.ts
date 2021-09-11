@@ -11,21 +11,28 @@ export abstract class Service extends ServerConnector {
     private _Process: Process = new Process()
     public set Process(val: typeof Process) {
         if (val == null) { return }
-        this._Process = new val
+        this._Process = new val;
+        this._Process.serviceType = this.serviceType;
     }
 
     /**@description 数据流消息包头定义类型 */
     public set Codec(value: new () => Codec) { this._Process.Codec = value }
     // protected get messageHeader() { return this._messageHeader }
 
-    private _Heartbeat: new () => Message = null;
+    private _Heartbeat: Net.HeartbeatClass<Message> = null;
     /**@description 心跳的消息定义类型 */
-    public get heartbeat(): new () => Message { return this._Heartbeat }
-    public set heartbeat(value: new () => Message) { this._Heartbeat = value }
+    public get heartbeat(): Net.HeartbeatClass<Message> { return this._Heartbeat }
+    public set heartbeat(value: Net.HeartbeatClass<Message>) { 
+        this._Heartbeat = value;
+        this.serviceType = value.type;
+        this._Process.serviceType = value.type;
+    }
 
     public serviceName = "CommonService";
     /**@description 值越大，优先级越高 */
     public priority: number = 0;
+
+    private serviceType : Net.ServiceType = Net.ServiceType.Unknown;
 
     protected onOpen() {
         super.onOpen();

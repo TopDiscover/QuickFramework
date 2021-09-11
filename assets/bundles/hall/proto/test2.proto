@@ -1,0 +1,9 @@
+// awesome.proto
+package awesomepackage;
+syntax = "proto3";
+import "hall/proto/test.proto";
+message TestType {
+    string awesome_field = 1; // becomes awesomeField
+    repeated AwesomeMessage value = 2;
+    string myStr = 3;
+}

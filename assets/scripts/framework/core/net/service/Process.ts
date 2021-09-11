@@ -18,6 +18,7 @@ export class Process {
 
     /** @description 可能后面有其它特殊需要，特定情况下暂停消息队列的处理, true为停止消息队列处理 */
     public isPause: boolean = false;
+    serviceType: Net.ServiceType;
 
     /**
      * @description 暂停消息队列消息处理
@@ -74,7 +75,7 @@ export class Process {
 
     public onMessage(code: Codec) {
         cc.log(`recv data main cmd : ${code.cmd}`);
-        let key = code.cmd;
+        let key = String(code.cmd);
         if (!this._listeners[key]) {
             cc.warn(`no find listener data main cmd : ${code.cmd}`);
             return;
@@ -202,15 +203,21 @@ export class Process {
 
     protected decode(o: Net.ListenerData, header: Codec): Message | null {
         let obj: Message = null!;
-        if (o.type) {
-            obj = new o.type();
-            //解包
-            obj.decode(header.buffer);
-        } else {
-            //把数据放到里面，让后面使用都自己解析,数据未解析，此消息推后解析
+        if ( this.serviceType == Net.ServiceType.Proto ){
+            //proto，再用的时候，自己解析，里面有很多的类型
             obj = header.buffer as any;
+            return obj;
+        }else{
+            if (o.type && typeof o.type != "string") {
+                obj = new o.type();
+                //解包
+                obj.decode(header.buffer);
+            } else {
+                //把数据放到里面，让后面使用都自己解析,数据未解析，此消息推后解析
+                obj = header.buffer as any;
+            }
+            return obj
         }
-        return obj
     }
 
     public addMessageQueue(key: string, data: any, encode: boolean) {
