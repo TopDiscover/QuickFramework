@@ -14,10 +14,10 @@ export class LogicManager{
     public static Instance() { return this._instance || (this._instance = new LogicManager()); }
 
     private _logics : LogicImpl[] = [];
-    private _logicTypes : any[] = [];
+    private _logicTypes : LogicClass<LogicImpl>[] = [];
     private node : cc.Node = null;
 
-    public push( logicType : any ){
+    public push( logicType : LogicClass<LogicImpl> ){
         for ( let i = 0 ; i < this._logicTypes.length ; i++ ){
             if ( this._logicTypes[i] == logicType ){
                 cc.error(this._logTag, `重复添加${cc.js.getClassName(logicType)}`);
@@ -26,7 +26,7 @@ export class LogicManager{
         }
         if ( this.node ){
             //已经进入过onLoad,这里需要单独的进行初始化
-            let logic : LogicImpl = new logicType;
+            let logic = new logicType;
             logic.init(this.node);
             this._logics.push(logic);
             logic.onLoad();
@@ -48,7 +48,7 @@ export class LogicManager{
             }
         }
 
-        this._logics.forEach((data : LogicImpl)=>{
+        this._logics.forEach((data)=>{
             data.onLoad();
         });
         
@@ -56,7 +56,7 @@ export class LogicManager{
 
     public onDestroy( node : cc.Node ){
         Manager.eventDispatcher.removeEventListener(Logic.Event.ENTER_COMPLETE,this);
-        this._logics.forEach((data : LogicImpl)=>{
+        this._logics.forEach((data)=>{
             data.onDestroy();
         });
     }

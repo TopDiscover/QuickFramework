@@ -14,7 +14,7 @@ import { LogLevel } from "./scripts/framework/defines/Enums";
 import { Framewok } from "./scripts/framework/Framework";
 
 /**@description 游戏所有运行单例的管理 */
-class _Manager extends Framewok implements GameEventInterface {
+export class _Manager extends Framewok implements GameEventInterface {
 
     /**@description 进入后台的时间 */
     private _enterBackgroundTime = 0;
