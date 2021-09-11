@@ -1,7 +1,7 @@
 import { Codec, Message } from "../message/Message";
 import { Net } from "../Net";
 import { ServerConnector } from "../socket/ServerConnector";
-import { Process } from "./process";
+import { Process } from "./Process";
 
 
 /** @description 处理函数声明 handleType 为你之前注册的handleType类型的数据 返回值number 为处理函数需要的时间 */
