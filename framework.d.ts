@@ -1,4 +1,4 @@
-
+declare type UIView = import("./assets/scripts/framework/core/ui/UIView").default;
 declare module cc {
 	export function dump(...args);
 	//相当于console.info //引擎已经设置为只读，没办法在取一个一样的名字
@@ -29,7 +29,7 @@ declare module cc {
 	 *     }
 	 * }});
 	 **/
-	export function createPrefab(config: { url: string, view: import("./assets/scripts/framework/core/ui/UIView").default, completeCallback: (node: cc.Node) => void, bundle?: BUNDLE_TYPE });
+	export function createPrefab(config: { url: string, view: UIView, completeCallback: (node: cc.Node) => void, bundle?: BUNDLE_TYPE });
 
 	/**
 	 * @description 扩展一个在界面中加载指定目录的接口
@@ -45,7 +45,7 @@ declare module cc {
 		bundle?: BUNDLE_TYPE,
 		url: string,
 		type: typeof cc.Asset,
-		view: import("./assets/scripts/framework/core/ui/UIView").default,
+		view: UIView,
 		onProgress?: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
 		onComplete: (data: td.Resource.CacheData) => void
 	});
@@ -66,7 +66,7 @@ declare module cc {
 		type: typeof cc.Asset,
 		onProgress?: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
 		onComplete: (data: td.Resource.CacheData) => void,
-		view: import("./assets/scripts/framework/core/ui/UIView").default,
+		view: UIView,
 	});
 
 	export interface Sprite {
@@ -96,7 +96,7 @@ declare module cc {
 		 */
 		loadRemoteImage(config: {
 			url: string,
-			view: import("./assets/scripts/framework/core/ui/UIView").default,
+			view: UIView,
 			completeCallback?: (data: cc.SpriteFrame) => void,
 			defaultSpriteFrame?: string,
 			defaultBundle?: BUNDLE_TYPE,
@@ -118,7 +118,7 @@ declare module cc {
 		 */
 		loadImage(config: {
 			url: string | { urls: string[], key: string },
-			view: import("./assets/scripts/framework/core/ui/UIView").default,
+			view: UIView,
 			completeCallback?: (data: SpriteFrame) => void,
 			bundle?: BUNDLE_TYPE
 		});
@@ -144,7 +144,7 @@ declare module cc {
 		 */
 		loadButton(config: {
 			normalSprite?: string | { urls: string[], key: string },
-			view: import("./assets/scripts/framework/core/ui/UIView").default,//UIView的子类
+			view: UIView,//UIView的子类
 			pressedSprite?: string | { urls: string[], key: string },
 			hoverSprite?: string | { urls: string[], key: string },
 			disabledSprite?: string | { urls: string[], key: string },
@@ -161,7 +161,7 @@ declare module cc {
 		  * let content = cc.find("content",this.node); 
 		  * content.getComponent(cc.Label).loadFont({font:"font/DFYUANW7-GB2312",view:this});
 		  */
-		loadFont(config: { font: string, view: import("./assets/scripts/framework/core/ui/UIView").default, completeCallback?: (font: Font) => void, bundle?: BUNDLE_TYPE });
+		loadFont(config: { font: string, view: UIView, completeCallback?: (font: Font) => void, bundle?: BUNDLE_TYPE });
 
 		/**@description 强制label在当前帧进行绘制 */
 		forceDoLayout();
@@ -201,7 +201,7 @@ declare module cc {
 		 * par.loadFile({url:GAME_RES( "res/action/DDZ_win_lizi" ),view:null});
 		 * this.node.addChild(node);
 		 */
-		loadFile(config: { url: string, view: import("./assets/scripts/framework/core/ui/UIView").default, completeCallback?: (file: ParticleAsset) => void, bundle?: BUNDLE_TYPE });
+		loadFile(config: { url: string, view: UIView, completeCallback?: (file: ParticleAsset) => void, bundle?: BUNDLE_TYPE });
 
 	}
 }
@@ -228,7 +228,7 @@ declare namespace sp {
 		 * }});
 		 */
 		loadRemoteSkeleton(config: {
-			view: import("./assets/scripts/framework/core/ui/UIView").default,
+			view: UIView,
 			path: string,
 			name: string,
 			completeCallback: (data: sp.SkeletonData) => void,
@@ -248,7 +248,7 @@ declare namespace sp {
 		 *	}
 		 * }});
 		 */
-		loadSkeleton(config: { url: string, view: import("./assets/scripts/framework/core/ui/UIView").default, completeCallback: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE });
+		loadSkeleton(config: { url: string, view: UIView, completeCallback: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE });
 	}
 }
 
@@ -369,7 +369,6 @@ declare interface Singleton<T> {
 /**@description 获取根据类型获取单列 */
 declare function getSingleton<T>(SingletonClass: Singleton<T>): T;
 
-declare type UIView = import("./assets/scripts/framework/core/ui/UIView").default;
 declare interface UIClass<T extends UIView> {
 	new(): T;
 	/**

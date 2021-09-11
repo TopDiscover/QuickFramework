@@ -1,7 +1,7 @@
 {
   "name": "quickframework",
   "version": "1.0.0",
-  "description": "CocosCreator 快速开发轻量级棋牌框架 ========",
+  "description": "CocosCreator 快速开发轻量级框架 ========",
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
