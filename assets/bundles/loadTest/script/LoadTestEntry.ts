@@ -18,6 +18,7 @@ class LoadTestEntry extends Entry {
             }
             completeCb();
         };
+        this.loader.loadResources();
     }
     protected openGameView(): void {
         Manager.uiManager.open({ type: LoadTestView, bundle: this.bundle });

@@ -28,6 +28,7 @@ class TankBattleEntry extends Entry {
             }
             completeCb();
         };
+        this.loader.loadResources();
     }
     protected openGameView(): void {
         Manager.uiManager.open({ type: TankBattleGameView, bundle: this.bundle });

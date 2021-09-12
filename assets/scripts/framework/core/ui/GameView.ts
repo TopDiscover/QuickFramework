@@ -12,16 +12,13 @@ const {ccclass, property} = cc._decorator;
 export default class GameView extends UIView {
 
     onLoad(){
-        //调用进入后台重连的时间
-        Manager.gameView = this;
         super.onLoad();
-
         //进入场景完成，即onLoad最后一行  必须发进入完成事件
         this.onEnterComplete()
     }
 
     protected onEnterComplete(){
-        Manager.entryManager.onEnterBundleComplete(this.bundle);
+        Manager.entryManager.onEnterBundleComplete(this.bundle,this);
     }
 
     enterBundle( bundle : BUNDLE_TYPE){
@@ -34,8 +31,6 @@ export default class GameView extends UIView {
             //this.audioHelper.stopMusic();
             this.audioHelper.stopAllEffects();
         }
-        
-        Manager.gameView = null;
         Manager.entryManager.onUnloadBundle(this.bundle);
         super.onDestroy();
     }

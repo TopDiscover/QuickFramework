@@ -1,6 +1,7 @@
 import { i18n } from "../../../common/language/CommonLanguage";
 import { Macro } from "../../defines/Macros";
 import { HotUpdate } from "../hotupdate/Hotupdate";
+import GameView from "../ui/GameView";
 
 /**@description entry入口代理 */
 export class EntryDelegate {
@@ -118,10 +119,17 @@ export class EntryDelegate {
 
 
     /**@description 进入bundle完成 */
-    onEnterBundleComplete( entry : Entry ){
+    onEnterBundleComplete( entry : Entry , gameView : GameView){
         //删除除自己之外的其它bundle
         let excludeBundles = this.getPersistBundle();
         excludeBundles.push(entry.bundle);
+
+        //进入下一场景，关闭掉当前的场景
+        if ( Manager.gameView ){
+            Manager.gameView.close();
+        }
+        Manager.gameView = gameView;
+
         Manager.bundleManager.removeLoadedBundle(this,excludeBundles);
     }
 

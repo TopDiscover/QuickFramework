@@ -1,4 +1,5 @@
 import { HotUpdate } from "../hotupdate/Hotupdate";
+import GameView from "../ui/GameView";
 import { EntryDelegate } from "./EntryDelegate";
 
 /**@description 入口管理 */
@@ -88,12 +89,12 @@ export class EntryManager {
     }
 
     /**@description 进入GameView完成，卸载除了自己之外的其它bundle */
-    onEnterBundleComplete( bundle : BUNDLE_TYPE ){
+    onEnterBundleComplete( bundle : BUNDLE_TYPE , gameView : GameView ){
         let entry = this.getEntry(bundle);
         if( entry ){
             entry.onEnterComplete();
         }
-        this.delegate.onEnterBundleComplete(entry);
+        this.delegate.onEnterBundleComplete(entry,gameView);
     }
 
     /**@description bundle管事器卸载bundle前通知 */
