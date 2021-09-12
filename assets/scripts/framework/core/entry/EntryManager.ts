@@ -56,14 +56,17 @@ export class EntryManager {
         if ( mainEntry ){
             mainEntry.onEnter();
         }
-        //检测更新
-        this.delegate.onCheckUpdate();
     }
 
     onDestroy(node: cc.Node) {
         this._entrys.forEach((entry) => {
             entry.onDestroy();
         });
+    }
+
+    /**@description 主包检测更新 */
+    onCheckUpdate(){
+        this.delegate.onCheckUpdate();
     }
 
     /**

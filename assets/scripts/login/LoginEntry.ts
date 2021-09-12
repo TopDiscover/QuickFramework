@@ -24,6 +24,10 @@ class LoginEntry extends Entry {
     }
     protected openGameView(): void {
         Manager.uiManager.open({ type: LoginView, zIndex: ViewZOrder.zero, bundle: this.bundle });
+        Manager.entryManager.onCheckUpdate();
+    }
+    protected closeGameView(): void {
+        Manager.uiManager.close(LoginView);
     }
     protected initData(): void {
         

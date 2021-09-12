@@ -79,6 +79,7 @@ export abstract class Entry {
 
     /**@description 打开游戏主场景视图 */
     protected abstract openGameView(): void;
+    protected abstract closeGameView(): void;
 
     /**@description 初始化游戏数据 */
     protected abstract initData(): void;

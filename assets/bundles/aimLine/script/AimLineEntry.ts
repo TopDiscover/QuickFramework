@@ -14,6 +14,9 @@ class AimLineEntry extends Entry {
     protected openGameView(): void {
         Manager.uiManager.open({ type: AimLineView, bundle: this.bundle });
     }
+    protected closeGameView(): void {
+        Manager.uiManager.close(AimLineView);
+    }
     protected initData(): void {
     }
     protected pauseMessageQueue(): void {

@@ -32,6 +32,9 @@ class TankBattleEntry extends Entry {
     protected openGameView(): void {
         Manager.uiManager.open({ type: TankBattleGameView, bundle: this.bundle });
     }
+    protected closeGameView(): void {
+        Manager.uiManager.close(TankBattleGameView);
+    }
     protected initData(): void {
         //游戏数据初始化
         Manager.gameData = TankBettle.gameData;

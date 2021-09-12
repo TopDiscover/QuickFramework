@@ -17,6 +17,9 @@ class ShaderEntry extends Entry {
     protected openGameView(): void {
         Manager.uiManager.open({ type: ShaderView, bundle: this.bundle });
     }
+    protected closeGameView(): void {
+        Manager.uiManager.close(ShaderView);
+    }
     protected initData(): void {
         
     }

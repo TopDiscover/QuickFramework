@@ -15,6 +15,9 @@ class NetTestEntry extends Entry {
     protected openGameView(): void {
         Manager.uiManager.open({ type: NetTestView, bundle: this.bundle });
     }
+    protected closeGameView(): void {
+        Manager.uiManager.close(NetTestView);
+    }
     protected initData(): void {
         
     }

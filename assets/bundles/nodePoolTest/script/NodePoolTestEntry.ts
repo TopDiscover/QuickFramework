@@ -15,6 +15,9 @@ class NodePoolTestEntry extends Entry {
     protected openGameView(): void {
         Manager.uiManager.open({ type: NodePoolView, bundle: this.bundle });
     }
+    protected closeGameView(): void {
+        Manager.uiManager.close(NodePoolView);
+    }
     protected initData(): void {
         
     }

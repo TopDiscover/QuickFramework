@@ -21,6 +21,9 @@ class HallEntry extends Entry {
     protected openGameView(): void {
         Manager.uiManager.open({ type: HallView, bundle: this.bundle });
     }
+    protected closeGameView(): void {
+        Manager.uiManager.close(HallView);
+    }
     protected initData(): void {
         //向Config.ENTRY_CONFIG合并配置
         HallData.backupConfig();

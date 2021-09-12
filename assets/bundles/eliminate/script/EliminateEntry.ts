@@ -35,6 +35,9 @@ class EliminateEntry extends Entry {
     protected openGameView(): void {
         Manager.uiManager.open({ type: EliminateGameView, bundle: this.bundle });
     }
+    protected closeGameView(): void {
+        Manager.uiManager.close(EliminateGameView);
+    }
     protected initData(): void {
     }
     protected pauseMessageQueue(): void {

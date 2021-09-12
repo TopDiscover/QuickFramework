@@ -22,6 +22,9 @@ class LoadTestEntry extends Entry {
     protected openGameView(): void {
         Manager.uiManager.open({ type: LoadTestView, bundle: this.bundle });
     }
+    protected closeGameView(): void {
+        Manager.uiManager.close(LoadTestView);
+    }
     protected initData(): void {
     }
     protected pauseMessageQueue(): void {
