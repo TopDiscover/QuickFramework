@@ -35,7 +35,7 @@ class _HallNetHelper extends NetHelper<LobbyService>{
         userInfo.name = "我就是玩！！！"
 
         let GenderType = Manager.protoManager.lookup("tp.GenderType") as protobuf.Enum;
-        userInfo.gender = GenderType.values.female;
+        userInfo.gender = ((GenderType.values as any) as typeof tp.GenderType).female;
         roomInfo.data.players = [];
         roomInfo.data.players.push(userInfo);
         this.service.send(roomInfo);
