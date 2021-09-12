@@ -1,7 +1,7 @@
-import { IEntry } from "../../../scripts/framework/core/entry/IEntry";
+import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import NetTestView from "./view/NetTestView";
 
-class NetTestLogic extends IEntry {
+class NetTestLogic extends Entry {
     static bundle = "netTest";
     protected addNetComponent(): void {
         

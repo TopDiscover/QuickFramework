@@ -50,7 +50,7 @@ export class CmmEntry extends EntryDelegate {
     }
 
     /**@description 进入bundle完成 */
-    onEnterBundleComplete( entry : IEntry ){
+    onEnterBundleComplete( entry : Entry ){
         super.onEnterBundleComplete(entry);
         Manager.serviceManager.hideReconnet();
     }

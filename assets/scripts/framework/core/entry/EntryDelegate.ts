@@ -118,7 +118,7 @@ export class EntryDelegate {
 
 
     /**@description 进入bundle完成 */
-    onEnterBundleComplete( entry : IEntry ){
+    onEnterBundleComplete( entry : Entry ){
         //删除除自己之外的其它bundle
         let excludeBundles = this.getPersistBundle();
         excludeBundles.push(entry.bundle);

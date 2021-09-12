@@ -1,7 +1,7 @@
-import { IEntry } from "../../../scripts/framework/core/entry/IEntry";
+import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import GameTwoView from "./GameTwoView";
 
-class GameTwoLogic extends IEntry {
+class GameTwoLogic extends Entry {
     static bundle = "gameTwo";
     protected addNetComponent(): void {
     }

@@ -1,7 +1,7 @@
-import { IEntry } from "../../../scripts/framework/core/entry/IEntry";
+import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import NodePoolView from "./view/NodePoolView";
 
-class NodePoolTestLogic extends IEntry {
+class NodePoolTestLogic extends Entry {
     static bundle = "nodePoolTest";
     protected addNetComponent(): void {
         

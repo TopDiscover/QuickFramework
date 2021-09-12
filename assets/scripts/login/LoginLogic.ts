@@ -5,11 +5,11 @@
 
 import LoginView from "./view/LoginView";
 import { i18n } from "../common/language/CommonLanguage";
-import { Config, ViewZOrder } from "../common/config/Config";
+import { ViewZOrder } from "../common/config/Config";
 import { Macro } from "../framework/defines/Macros";
-import { IEntry } from "../framework/core/entry/IEntry";
+import { Entry } from "../framework/core/entry/Entry";
 
-class LoginEntry extends IEntry {
+class LoginEntry extends Entry {
     static bundle = Macro.BUNDLE_RESOURCES;
     static isMain = true;
 

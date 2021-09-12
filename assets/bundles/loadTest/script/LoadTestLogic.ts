@@ -1,8 +1,8 @@
 import { Resource } from "../../../scripts/framework/core/asset/Resource";
-import { IEntry } from "../../../scripts/framework/core/entry/IEntry";
+import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import LoadTestView from "./view/LoadTestView";
 
-class LoadTestLogic extends IEntry {
+class LoadTestLogic extends Entry {
     static bundle = "loadTest"
     protected addNetComponent(): void {
     }

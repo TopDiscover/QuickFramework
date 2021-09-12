@@ -1,8 +1,8 @@
-import { IEntry } from "../../../scripts/framework/core/entry/IEntry";
+import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import { AimLineData } from "./data/AimLineData";
 import AimLineView from "./view/AimLineView";
 
-class AimLineLogic extends IEntry {
+class AimLineLogic extends Entry {
     static bundle = AimLineData.bundle;
     protected addNetComponent(): void {
     }

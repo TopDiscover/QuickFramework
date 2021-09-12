@@ -1,6 +1,6 @@
 import ResourceLoader from "../asset/ResourceLoader";
 
-export abstract class IEntry {
+export abstract class Entry {
 
     static bundle = "";
     /**@description 是否是主包 */

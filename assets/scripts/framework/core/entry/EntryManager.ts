@@ -6,8 +6,8 @@ export class EntryManager {
     private static _instance: EntryManager = null!;
     public static Instance() { return this._instance || (this._instance = new EntryManager()); }
     private tag: "[EntryManager] : ";
-    private _entryTypes: EntryClass<IEntry>[] = [];
-    private _entrys: IEntry[] = [];
+    private _entryTypes: EntryClass<Entry>[] = [];
+    private _entrys: Entry[] = [];
 
     /**@description 默认代理，可根据自己项目需要重新实现 */
     public delegate: EntryDelegate = new EntryDelegate();
@@ -15,7 +15,7 @@ export class EntryManager {
     private node: cc.Node | null = null;
 
     /**@description 注册入口 */
-    register(entryClass: EntryClass<IEntry>) {
+    register(entryClass: EntryClass<Entry>) {
         let index = this._entryTypes.indexOf(entryClass);
         if (index != -1) {
             if (CC_DEBUG) {
@@ -36,7 +36,7 @@ export class EntryManager {
 
     onLoad(node: cc.Node) {
         this.node = node;
-        let mainEntry : IEntry = null;
+        let mainEntry : Entry = null;
         for (let i = 0; i < this._entryTypes.length; i++) {
             let type = this._entryTypes[i];
             if (!this.isRunning(type)) {
@@ -112,7 +112,7 @@ export class EntryManager {
         return null;
     }
 
-    private isRunning(entryClass: EntryClass<IEntry>) {
+    private isRunning(entryClass: EntryClass<Entry>) {
         for (let i = 0; i < this._entrys.length; i++) {
             let entry = this._entrys[i];
             if (entry.bundle == entryClass.bundle) {

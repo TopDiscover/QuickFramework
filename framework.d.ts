@@ -376,8 +376,8 @@ declare interface UIClass<T extends UIView> {
 	 */
 	getPrefabUrl(): string;
 }
-declare type IEntry = import("./assets/scripts/framework/core/entry/IEntry").IEntry;
-declare interface EntryClass<T extends IEntry>{
+declare type Entry = import("./assets/scripts/framework/core/entry/Entry").Entry;
+declare interface EntryClass<T extends Entry>{
 	new():T;
 	/**@description 当前bundle名 */
     bundle : string;

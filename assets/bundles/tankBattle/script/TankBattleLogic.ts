@@ -3,12 +3,12 @@ import TankBattleGameView from "./view/TankBattleGameView";
 import { TankBettle } from "./data/TankBattleGameData";
 import TankBattleNetController from "./controller/TankBattleNetController";
 import { TankBattleLanguage } from "./data/TankBattleLanguage";
-import { IEntry } from "../../../scripts/framework/core/entry/IEntry";
+import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import { Resource } from "../../../scripts/framework/core/asset/Resource";
 /**
  * @description 坦克大战入口
  */
-class TankBattleEntry extends IEntry {
+class TankBattleEntry extends Entry {
     static bundle = TankBettle.gameData.bundle;
     protected language = new TankBattleLanguage;
 

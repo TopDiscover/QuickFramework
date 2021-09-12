@@ -1,7 +1,7 @@
-import { IEntry } from "../../../scripts/framework/core/entry/IEntry";
+import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import ShaderView from "./view/ShaderView";
 
-class ShaderLogic extends IEntry {
+class ShaderLogic extends Entry {
 
     static bundle = "shaders";
 

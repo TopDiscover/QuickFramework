@@ -1,10 +1,10 @@
 import { Resource } from "../../../scripts/framework/core/asset/Resource";
-import { IEntry } from "../../../scripts/framework/core/entry/IEntry";
+import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import { EliminateData } from "./data/EliminateData";
 import { CELL_PREFAB_URL, EFFECTS_CONFIG } from "./data/EliminateDefines";
 import EliminateGameView from "./view/EliminateGameView";
 
-class EliminateLogic extends IEntry {
+class EliminateLogic extends Entry {
     static bundle = EliminateData.bundle;
     protected addNetComponent(): void {
     }

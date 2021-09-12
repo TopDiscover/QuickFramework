@@ -1,10 +1,10 @@
 import HallView from "./view/HallView";
 import { HallData } from "./data/HallData";
 import { HallLanguage } from "./data/HallLanguage";
-import { IEntry } from "../../../scripts/framework/core/entry/IEntry";
+import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import { Config } from "../../../scripts/common/config/Config";
 
-class HallLogic extends IEntry {
+class HallLogic extends Entry {
     static bundle = Config.BUNDLE_HALL;
     protected language = new HallLanguage;
     protected addNetComponent(): void {
