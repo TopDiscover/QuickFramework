@@ -54,6 +54,12 @@ export class ProtoManager {
         });
     }
 
+    /**@description 当进入登录界面，不需要网络配置时，卸载proto的类型，以防止后面有更新，原有的proto类型还保存在内存中 */
+    unload(){
+        this._loadDir = {};
+        this._root = new protobuf.Root();
+    }
+
     /**
      * @description 查找 proto类型
      * @param className 类型名
