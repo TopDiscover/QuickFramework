@@ -64,7 +64,7 @@ class ResourceCache {
             if( Array.isArray(value.data) ){
                 let isAllDelete = true;
                 for( let i = 0 ; i < value.data.length ; i++){
-                    if( value.data[i] && value.data[i].refCount != 0 ){
+                    if( value.data[i] && value.data[i].refCount > 0 ){
                         isAllDelete = false;
                     }
                 }
@@ -73,7 +73,7 @@ class ResourceCache {
                     if( CC_DEBUG ) cc.log(`删除不使用的资源目录 bundle : ${this.name} dir : ${key}`);
                 }
             }else{
-                if( value.data && value.data.refCount == 0 ){
+                if( value.data && value.data.refCount <= 0 ){
                     this._caches.delete(key);
                     if( CC_DEBUG ) cc.log(`删除不使用的资源 bundle : ${this.name} url : ${key}`);
                 }

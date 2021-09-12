@@ -4,6 +4,9 @@ import { Net } from "../Net";
 export class ProtoManager {
     private static _instance: ProtoManager = null!;
     public static Instance() { return this._instance || (this._instance = new ProtoManager()); }
+    private tag = "[ProtoManager] : "
+    /**@description 记录已经加载过的目录，加载过的proto将不会重新加载 */
+    private _loadDir : {[key : string] : boolean} = {};
 
     private _root: protobuf.Root = null!;
     constructor() {
@@ -18,6 +21,14 @@ export class ProtoManager {
      */
     load(bundle: string, path: string = "proto") {
         return new Promise<boolean>((resolove, reject) => {
+            if( this._loadDir[`${bundle}/${path}`] ){
+                if ( CC_DEBUG ){
+                    cc.warn(this.tag,`${bundle}/${path}目录下所有proto文件已经存在，无需加载`);
+                }
+                resolove(true);
+                return;
+            }
+            this._loadDir[`${bundle}/${path}`] = false;
             Manager.assetManager.loadDir(bundle, path, cc.TextAsset, (finish, total, item) => { }, (cacheData) => {
                 if (cacheData && cacheData.data && Array.isArray(cacheData.data)) {
 
@@ -34,6 +45,7 @@ export class ProtoManager {
                     info.data = cacheData.data;
                     info.bundle = bundle;
                     Manager.assetManager.releaseAsset(info);
+                    this._loadDir[`${bundle}/${path}`] = true;
                     resolove(true);
                 } else {
                     resolove(false);
