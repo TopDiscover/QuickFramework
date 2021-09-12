@@ -179,7 +179,7 @@ export class HotupdateManager {
     }
 
     /**@description 检测更新 */
-    private checkUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
+    private _checkUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
         if( this.isNeedUpdate(callback) ){
             cc.log(`--checkUpdate--`);
             if (this.updating) {
@@ -216,7 +216,20 @@ export class HotupdateManager {
         if( this.isNeedUpdate(callback) ){
             this.currentAssetsManager = this.getAssetsManager();
             this.currentAssetsManager.manager.loadLocalManifest(this.hallProjectMainfest);
-            this.checkUpdate(callback);
+            this._checkUpdate(callback);
+        }
+    }
+
+    /**
+     * @description 检测更新
+     * @param callback 回调
+     * @param bundle bundle,如果不传，则为对主包的检测
+     */
+    checkUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void,bundle?:string){
+        if( typeof bundle == "string" ){
+            this.checkGameUpdate(bundle,callback);
+        }else{
+            this.checkHallUpdate(callback);
         }
     }
 
@@ -246,7 +259,7 @@ export class HotupdateManager {
                 cc.log(`--存在本地版本控制文件checkUpdate--`);
                 cc.log(`mainifestUrl : ${manifestUrl}`);
                 this.currentAssetsManager.manager.loadLocalManifest(jsbGameManifest, "");
-                this.checkUpdate(callback);
+                this._checkUpdate(callback);
             } else {
                 //不存在版本控制文件 ，生成一个初始版本
                 if (this.updating) {
@@ -269,7 +282,7 @@ export class HotupdateManager {
                 cc.log(`--checkUpdate--`);
                 cc.log(`mainifest content : ${gameManifestContent}`);
                 this.currentAssetsManager.manager.loadLocalManifest(jsbGameManifest, "");
-                this.checkUpdate(callback);
+                this._checkUpdate(callback);
             }
         }
     }

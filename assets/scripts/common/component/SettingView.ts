@@ -1,5 +1,5 @@
-import { Logic } from "../../framework/core/logic/Logic";
 import UIView from "../../framework/core/ui/UIView";
+import { Macro } from "../../framework/defines/Macros";
 import { i18n } from "../language/CommonLanguage";
 
 const { ccclass, property } = cc._decorator;
@@ -63,7 +63,7 @@ export default class SettingView extends UIView {
             text: i18n.quitGame,
             confirmCb: (isOk) => {
                 if (isOk) {
-                    dispatch(Logic.Event.ENTER_LOGIN);
+                    Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
                 }
             },
         });

@@ -1,46 +1,43 @@
-import { LogicImpl } from "../../../scripts/framework/core/logic/LogicImpl";
 import HallView from "./view/HallView";
 import { HallData } from "./data/HallData";
 import { HallLanguage } from "./data/HallLanguage";
-import { Logic } from "../../../scripts/framework/core/logic/Logic";
-import { MainCmd } from "../../../scripts/common/protocol/CmdDefines";
-import { SUB_CMD_LOBBY } from "./protocol/LobbyCmd";
+import { IEntry } from "../../../scripts/framework/core/entry/IEntry";
+import { Config } from "../../../scripts/common/config/Config";
 
-class HallLogic extends LogicImpl {
-
-    logicType: Logic.Type = Logic.Type.HALL;
-
-    language = new HallLanguage;
-
-    get bundle() {
-        return HallData.bundle;
-    }
-
-    addEvents() {
-        super.addEvents();
-        this.addUIEvent(Logic.Event.ENTER_HALL, this.onEnterHall);
-        this.addUIEvent(Logic.Event.ENTER_COMPLETE, this.onEnterComplete);
-    }
-
-    private onEnterHall() {
-        console.log("login hall")
-        Manager.language.addSourceDelegate(this.language);
-        //添加大厅网络组件
+class HallLogic extends IEntry {
+    static bundle = Config.BUNDLE_HALL;
+    protected language = new HallLanguage;
+    protected addNetComponent(): void {
         Manager.hallNetManager.addNetControllers();
-        //加载大厅proto文件
-        //后面再优化下用到时，再加载，但可能会收到消息后，没加载proto文件会有消息延迟，建议先加载
+    }
+    protected removeNetComponent(): void {
+        Manager.hallNetManager.removeNetControllers();
+    }
+    protected loadResources(completeCb: () => void): void {
         Manager.protoManager.load(this.bundle).then((isSuccess)=>{
-            Manager.uiManager.open({ type: HallView, bundle: this.bundle });
-        });
+            completeCb();
+        })
+    }
+    protected openGameView(): void {
+        Manager.uiManager.open({ type: HallView, bundle: this.bundle });
+    }
+    protected initData(): void {
+        //向Config.ENTRY_CONFIG合并配置
+        HallData.backupConfig();
+        HallData.mergeConfig();
+    }
+    protected pauseMessageQueue(): void {
+        
+    }
+    protected resumeMessageQueue(): void {
+        
     }
 
-    public onEnterComplete(data: Logic.EventData) {
-        super.onEnterComplete(data);
-        if (data.type == Logic.Type.LOGIN) {
-            //进入登录界面，移除大厅的网络组件
-            Manager.hallNetManager.removeNetControllers();
-        }
+    /**@description 卸载bundle,即在自己bundle删除之前最后的一条消息 */
+    onUnloadBundle(): void {
+        super.onUnloadBundle();
+        HallData.restoreConfig();
     }
 }
 
-Manager.logicManager.push(HallLogic);
+Manager.entryManager.register(HallLogic);

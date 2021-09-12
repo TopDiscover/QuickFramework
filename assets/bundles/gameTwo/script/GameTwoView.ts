@@ -1,10 +1,10 @@
-import { dispatchEnterComplete, Logic } from "../../../scripts/framework/core/logic/Logic";
-import UIView from "../../../scripts/framework/core/ui/UIView";
+import { Config } from "../../../scripts/common/config/Config";
+import GameView from "../../../scripts/framework/core/ui/GameView";
 
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class GameTwoView extends UIView {
+export default class GameTwoView extends GameView {
 
     public static getPrefabUrl(){
         return "prefabs/GameTwoView";
@@ -14,9 +14,7 @@ export default class GameTwoView extends UIView {
         super.onLoad();
 
         cc.find("goBack",this.node).on(cc.Node.EventType.TOUCH_END,()=>{
-            dispatch(Logic.Event.ENTER_HALL);
+            Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
         });
-
-        dispatchEnterComplete({type:Logic.Type.GAME,views:[this]});
     }
 }

@@ -1,14 +1,13 @@
 import SettingView from "../../../../scripts/common/component/SettingView";
-import { ViewZOrder } from "../../../../scripts/common/config/Config";
-import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
-import UIView from "../../../../scripts/framework/core/ui/UIView";
+import { Config, ViewZOrder } from "../../../../scripts/common/config/Config";
+import GameView from "../../../../scripts/framework/core/ui/GameView";
 import { Macro } from "../../../../scripts/framework/defines/Macros";
 
 
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class GameOneView extends UIView {
+export default class GameOneView extends GameView {
 
     public static getPrefabUrl(){
         return "prefabs/GameOneView";
@@ -20,7 +19,7 @@ export default class GameOneView extends UIView {
         super.onLoad();
         let goback = cc.find("goBack",this.node);
         goback.on(cc.Node.EventType.TOUCH_END,()=>{
-            dispatch(Logic.Event.ENTER_HALL);
+            Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
         });
         goback.zIndex = 10;
 
@@ -28,7 +27,6 @@ export default class GameOneView extends UIView {
 
         cc.find("setting",this.node).on(cc.Node.EventType.TOUCH_END,this.onSetting,this);
 
-        dispatchEnterComplete({type:Logic.Type.GAME,views:[this]});
     }
 
     private onSetting(){

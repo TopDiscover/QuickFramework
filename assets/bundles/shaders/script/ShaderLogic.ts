@@ -1,29 +1,31 @@
-import { Logic } from "../../../scripts/framework/core/logic/Logic";
-import { LogicImpl } from "../../../scripts/framework/core/logic/LogicImpl";
+import { IEntry } from "../../../scripts/framework/core/entry/IEntry";
 import ShaderView from "./view/ShaderView";
 
-class ShaderLogic extends LogicImpl {
+class ShaderLogic extends IEntry {
 
-    logicType: Logic.Type = Logic.Type.GAME;
+    static bundle = "shaders";
 
-    onLoad() {
-        super.onLoad();
+    protected addNetComponent(): void {
+        
     }
-
-    protected addEvents() {
-        super.addEvents();
-        this.addUIEvent(Logic.Event.ENTER_GAME, this.onEnterGame);
+    protected removeNetComponent(): void {
+        
     }
-
-    protected get bundle() {
-        return "shaders";
+    protected loadResources(completeCb: () => void): void {
+        completeCb();
     }
-
-    private onEnterGame(data) {
-        if (data == this.bundle) {
-            Manager.uiManager.open({ type: ShaderView, bundle: this.bundle });
-        }
+    protected openGameView(): void {
+        Manager.uiManager.open({ type: ShaderView, bundle: this.bundle });
+    }
+    protected initData(): void {
+        
+    }
+    protected pauseMessageQueue(): void {
+        
+    }
+    protected resumeMessageQueue(): void {
+        
     }
 }
 
-Manager.logicManager.push(ShaderLogic);
+Manager.entryManager.register(ShaderLogic);

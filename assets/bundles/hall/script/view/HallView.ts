@@ -1,48 +1,32 @@
-import UIView from "../../../../scripts/framework/core/ui/UIView";
 import { HallData } from "../data/HallData";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import { GameService } from "../../../../scripts/common/net/GameService";
 import { ChatService } from "../../../../scripts/common/net/ChatService";
 import SettingView from "../../../../scripts/common/component/SettingView";
 import { HotUpdate } from "../../../../scripts/framework/core/hotupdate/Hotupdate";
-import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
-import { Config, ViewZOrder } from "../../../../scripts/common/config/Config";
+import { ViewZOrder } from "../../../../scripts/common/config/Config";
 import { Macro } from "../../../../scripts/framework/defines/Macros";
+import GameView from "../../../../scripts/framework/core/ui/GameView";
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class HallView extends UIView {
+export default class HallView extends GameView {
     public static getPrefabUrl() {
         return "prefabs/HallView";
     }
 
     private onClick(ev: cc.Event.EventTouch) {
-        Manager.bundleManager.enterBundle(this.bundles[ev.target.userData]);
+        Manager.entryManager.enterBundle((ev.target as cc.Node).userData);
     }
 
     private gamePage: cc.Node = null;
     private gameItem: cc.Node = null;
     private pageView: cc.PageView = null;
     private readonly PAGE_COUNT = 6;
-    private testProgress = 0;
 
-    private _bundles: HotUpdate.BundleConfig[] = [];
     private get bundles() {
-        if (this._bundles.length <= 0) {
-            this._bundles = [
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.0", HallData.bundle), "gameOne", 1),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.1", HallData.bundle), "gameTwo", 2),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.2", HallData.bundle), "tankBattle", 3),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.3", HallData.bundle), "loadTest", 4),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.4", HallData.bundle), "netTest", 5),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.5", HallData.bundle), "aimLine", 6),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.6", HallData.bundle), "nodePoolTest", 7),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.7", HallData.bundle), "shaders", 8),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.8", HallData.bundle), "eliminate", 9),
-            ];
-        }
-        return this._bundles;
+        return HallData.games;
     }
 
     private createPage() {
@@ -57,9 +41,9 @@ export default class HallView extends UIView {
 
         for (let i = 0; i < this.bundles.length; i++) {
             let game = cc.instantiate(this.gameItem);
-            game.name = `game_${i + 1}`;
+            game.name = `game_${this.bundles[i].bundle}`;
             game.active = true;
-            game.userData = i
+            game.userData = this.bundles[i].bundle;
             cc.find("Background/label", game).getComponent(cc.Label).language = Manager.makeLanguage(`hall_view_game_name.${i}`, this.bundle);
             game.on(cc.Node.EventType.TOUCH_END, this.onClick, this);
 
@@ -95,11 +79,9 @@ export default class HallView extends UIView {
             } else if (lan == cc.sys.LANGUAGE_ENGLISH) {
                 lan = cc.sys.LANGUAGE_CHINESE;
             }
+            Manager.language.change(lan);
         });
 
-        // this.audioHelper.playMusic("audio/background",this.bundle)
-
-        dispatchEnterComplete({ type: Logic.Type.HALL, views: [this] });
     }
 
     addEvents() {
@@ -111,7 +93,7 @@ export default class HallView extends UIView {
         let pages = this.pageView.getPages();
         for (let i = 0; i < pages.length; i++) {
             let page = pages[i];
-            let item = cc.find(`game_${config.index}`, page);
+            let item = cc.find(`game_${config.bundle}`, page);
             if (item) {
                 return item;
             }

@@ -1,4 +1,3 @@
-import { Logic } from "../logic/Logic";
 
 /**@description 热更新相关*/
 export namespace HotUpdate {
@@ -125,9 +124,6 @@ export namespace HotUpdate {
         bundle: string = "";
         /**@description Bundle名 如:大厅  */
         name: string = "";
-        index = 0;
-        /**@description 加载bundle完成后，发出的bundle事件 */
-        event: Logic.Event = Logic.Event.ENTER_GAME;
         /**@description 是否需要提示弹出框提示升级 */
         isNeedPrompt: boolean = false;
         /**
@@ -141,16 +137,19 @@ export namespace HotUpdate {
         constructor(
             name: string,
             bundle: string,
-            index: number,
-            event?: Logic.Event,
             isNeedPrompt: boolean = false) {
             this.name = name;
             this.bundle = bundle;
-            this.index = index;
             this.isNeedPrompt = isNeedPrompt;
-            if (event) {
-                this.event = event;
-            }
+        }
+
+        clone(){
+            return BundleConfig.clone(this);
+        }
+
+        static clone( config : BundleConfig){
+            let result = new BundleConfig(config.name,config.bundle,config.isNeedPrompt);
+            return result;
         }
     }
 }

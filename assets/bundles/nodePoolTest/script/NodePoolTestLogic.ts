@@ -1,29 +1,29 @@
-import { Logic } from "../../../scripts/framework/core/logic/Logic";
-import { LogicImpl } from "../../../scripts/framework/core/logic/LogicImpl";
+import { IEntry } from "../../../scripts/framework/core/entry/IEntry";
 import NodePoolView from "./view/NodePoolView";
 
-class NodePoolTestLogic extends LogicImpl {
-
-    logicType: Logic.Type = Logic.Type.GAME;
-
-    onLoad() {
-        super.onLoad();
+class NodePoolTestLogic extends IEntry {
+    static bundle = "nodePoolTest";
+    protected addNetComponent(): void {
+        
     }
-
-    protected addEvents() {
-        super.addEvents();
-        this.addUIEvent(Logic.Event.ENTER_GAME, this.onEnterGame);
+    protected removeNetComponent(): void {
+        
     }
-
-    protected get bundle() {
-        return "nodePoolTest";
+    protected loadResources(completeCb: () => void): void {
+        completeCb();
     }
-
-    private onEnterGame(data) {
-        if (data == this.bundle) {
-            Manager.uiManager.open({ type: NodePoolView, bundle: this.bundle });
-        }
+    protected openGameView(): void {
+        Manager.uiManager.open({ type: NodePoolView, bundle: this.bundle });
+    }
+    protected initData(): void {
+        
+    }
+    protected pauseMessageQueue(): void {
+        
+    }
+    protected resumeMessageQueue(): void {
+        
     }
 }
 
-Manager.logicManager.push(NodePoolTestLogic);
+Manager.entryManager.register(NodePoolTestLogic);

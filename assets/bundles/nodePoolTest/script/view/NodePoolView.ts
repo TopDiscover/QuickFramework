@@ -1,10 +1,10 @@
-import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
+import { Config } from "../../../../scripts/common/config/Config";
 import { NodePool } from "../../../../scripts/framework/core/nodePool/NodePoolManager";
-import UIView from "../../../../scripts/framework/core/ui/UIView";
+import GameView from "../../../../scripts/framework/core/ui/GameView";
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class NodePoolView extends UIView {
+export default class NodePoolView extends GameView {
 
     static getPrefabUrl(){
         return "prefabs/NodePoolView";
@@ -17,7 +17,7 @@ export default class NodePoolView extends UIView {
         super.onLoad();
 
         cc.find("goback", this.node).on(cc.Node.EventType.TOUCH_END, () => {
-            dispatch(Logic.Event.ENTER_HALL);
+            Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
         });
 
         this.star = cc.find("star",this.node);
@@ -34,7 +34,6 @@ export default class NodePoolView extends UIView {
         getNode.on(cc.Node.EventType.TOUCH_END,this.onGet,this);
         putNode.on(cc.Node.EventType.TOUCH_END,this.onPut,this);
 
-        dispatchEnterComplete({ type: Logic.Type.GAME, views: [this] });
     }
 
     private onCreate( ){

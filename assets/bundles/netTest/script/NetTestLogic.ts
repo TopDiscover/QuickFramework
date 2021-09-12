@@ -1,29 +1,30 @@
-import { Logic } from "../../../scripts/framework/core/logic/Logic";
-import { LogicImpl } from "../../../scripts/framework/core/logic/LogicImpl";
+import { IEntry } from "../../../scripts/framework/core/entry/IEntry";
 import NetTestView from "./view/NetTestView";
 
-class NetTestLogic extends LogicImpl {
-
-    logicType: Logic.Type = Logic.Type.GAME;
-
-    onLoad() {
-        super.onLoad();
+class NetTestLogic extends IEntry {
+    static bundle = "netTest";
+    protected addNetComponent(): void {
+        
+    }
+    protected removeNetComponent(): void {
+        
+    }
+    protected loadResources(completeCb: () => void): void {
+        completeCb();
+    }
+    protected openGameView(): void {
+        Manager.uiManager.open({ type: NetTestView, bundle: this.bundle });
+    }
+    protected initData(): void {
+        
+    }
+    protected pauseMessageQueue(): void {
+        
+    }
+    protected resumeMessageQueue(): void {
+        
     }
 
-    protected addEvents() {
-        super.addEvents();
-        this.addUIEvent(Logic.Event.ENTER_GAME, this.onEnterGame);
-    }
-
-    protected get bundle() {
-        return "netTest";
-    }
-
-    private onEnterGame(data) {
-        if (data == this.bundle) {
-            Manager.uiManager.open({ type: NetTestView, bundle: this.bundle });
-        }
-    }
 }
 
-Manager.logicManager.push(NetTestLogic);
+Manager.entryManager.register(NetTestLogic);

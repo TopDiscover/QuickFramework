@@ -1,13 +1,13 @@
 
-import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
-import UIView from "../../../../scripts/framework/core/ui/UIView";
+import { Config } from "../../../../scripts/common/config/Config";
+import GameView from "../../../../scripts/framework/core/ui/GameView";
 import { ButtonSpriteType } from "../../../../scripts/framework/defines/Enums";
 import { HallData } from "../../../hall/script/data/HallData";
 
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class LoadTestView extends UIView {
+export default class LoadTestView extends GameView {
 
     public static getPrefabUrl(){
         return "prefabs/LoadTestView";
@@ -37,12 +37,10 @@ export default class LoadTestView extends UIView {
         cc.find("loadNetSpine",op).on(cc.Node.EventType.TOUCH_END,this.onLoadNetSpine,this);
 
         cc.find("loadDir",op).on(cc.Node.EventType.TOUCH_END,this.onLoadDir,this);
-
-        dispatchEnterComplete({ type: Logic.Type.GAME, views: [this] });
     }
 
     private onGoback(){
-        dispatch(Logic.Event.ENTER_HALL);
+        Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
     }
 
     private onLoadFont( ){

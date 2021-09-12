@@ -104,6 +104,10 @@ class ViewData {
     isPreload: boolean = false;
     /**@description 资源信息 */
     info: Resource.Info = null;
+    /**@description 界面的类型 */
+    viewType : UIClass<UIView> = null!;
+    /**@description bundle */
+    bundle : BUNDLE_TYPE = null!;
 
     /**@description 界面动态加载的数据 */
     loadData: ViewDynamicLoadData = new ViewDynamicLoadData();
@@ -253,6 +257,8 @@ export class UIManager {
                 viewData.loadData.name = className;
                 let prefabUrl = uiClass.getPrefabUrl();
                 viewData.isPreload = isPreload;
+                viewData.viewType = uiClass;
+                viewData.bundle = bundle;
                 this._viewDatas.set(className, viewData);
 
                 let progressCallback: (completedCount: number, totalCount: number, item: any) => void = null;
@@ -485,6 +491,16 @@ export class UIManager {
         });
 
         this.printViews();
+    }
+
+    /**@description 关闭指定bundle的视图 */
+    public closeBundleView( bundle : BUNDLE_TYPE ){
+        let self = this;
+        this._viewDatas.forEach((viewData,key)=>{
+            if ( viewData.bundle == bundle ){
+                self.close(key);
+            }
+        });
     }
 
     public hide(className: string);

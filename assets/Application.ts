@@ -5,6 +5,7 @@ import Loading from "./scripts/common/component/Loading";
 import Tips from "./scripts/common/component/Tips";
 import UILoading from "./scripts/common/component/UILoading";
 import { Config, ViewZOrder } from "./scripts/common/config/Config";
+import { CmmEntry } from "./scripts/common/entry/CmmEntry";
 import { CommonLanguage } from "./scripts/common/language/CommonLanguage";
 import { ServiceManager } from "./scripts/common/manager/ServiceManager";
 import { Reconnect } from "./scripts/common/net/Reconnect";
@@ -68,6 +69,10 @@ export class _Manager extends Framewok implements GameEventInterface {
         this.hotupdate.commonHotUpdateUrl = Config.TEST_HOT_UPDATE_URL_ROOT;
         this.hotupdate.isSkipCheckUpdate = Config.isSkipCheckUpdate;
         this.bundleManager.bundleHall = Config.BUNDLE_HALL;
+
+        //初始化自定主entry代理
+        this.entryManager.delegate = new CmmEntry();
+
         //语言包初始化
         //cc.log("language init");
         this.language.addSourceDelegate(new CommonLanguage);
@@ -87,8 +92,8 @@ export class _Manager extends Framewok implements GameEventInterface {
         Reconnect.preloadPrefab();
         //Service onLoad
         Manager.serviceManager.onLoad();
-        //逻辑管理器
-        Manager.logicManager.onLoad(node);
+        //入口管理器
+        Manager.entryManager.onLoad(node);
     }
 
     update(node: cc.Node) {
@@ -105,10 +110,8 @@ export class _Manager extends Framewok implements GameEventInterface {
         Manager.netManager.onDestroy(node);
         Manager.hallNetManager.onDestroy(node);
         Manager.serviceManager.onDestroy();
-
-        //逻辑管理器
-        Manager.logicManager.onDestroy(node);
-
+        //入口管理器
+        Manager.entryManager.onDestroy(node);
     }
 
     onEnterBackground(): void {
@@ -125,7 +128,7 @@ export class _Manager extends Framewok implements GameEventInterface {
         Manager.serviceManager.onEnterForgeground(inBackgroundTime);
     }
 
-    onHotupdateMessage(data: HotUpdate.MessageData){
+    onHotupdateMessage(data: HotUpdate.MessageData) {
         if (data.isOk) {
             Manager.uiManager.open({ type: DownloadLoading, zIndex: ViewZOrder.Loading, args: [data.state, data.name, data.bundle] });
         } else {

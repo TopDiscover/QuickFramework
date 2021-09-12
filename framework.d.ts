@@ -376,10 +376,15 @@ declare interface UIClass<T extends UIView> {
 	 */
 	getPrefabUrl(): string;
 }
-declare type LogicImpl = import("./assets/scripts/framework/core/logic/LogicImpl").LogicImpl;
-declare interface LogicClass<T extends LogicImpl>{
+declare type IEntry = import("./assets/scripts/framework/core/entry/IEntry").IEntry;
+declare interface EntryClass<T extends IEntry>{
 	new():T;
+	/**@description 当前bundle名 */
+    bundle : string;
+	/**@description 主入口,即主包，主入口只能有一个 */
+    isMain : boolean;
 };
+declare type EntryDelegate = import("./assets/scripts/framework/core/entry/EntryDelegate").EntryDelegate;
 declare type Message = import("./assets/scripts/framework/core/net/message/Message").Message;
 declare type Service = import("./assets/scripts/framework/core/net/service/Service").Service;
 /**@description 语言包相关 */

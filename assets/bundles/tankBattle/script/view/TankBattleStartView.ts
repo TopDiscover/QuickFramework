@@ -1,4 +1,4 @@
-import { Logic } from "../../../../scripts/framework/core/logic/Logic";
+import { Config } from "../../../../scripts/common/config/Config";
 import UIView from "../../../../scripts/framework/core/ui/UIView";
 import { TankBettle } from "../data/TankBattleGameData";
 
@@ -44,7 +44,7 @@ export default class TankBattleStartView extends UIView {
 
     onKeyBack(ev: cc.Event.EventKeyboard) {
         super.onKeyBack(ev);
-        dispatch(Logic.Event.ENTER_HALL);
+        Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
     }
 
     onKeyUp(ev: cc.Event.EventKeyboard) {

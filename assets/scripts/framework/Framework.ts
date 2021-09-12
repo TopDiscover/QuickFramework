@@ -6,7 +6,6 @@ import { CacheManager } from "./core/asset/CacheManager";
 import { NodePoolManager } from "./core/nodePool/NodePoolManager";
 import { HotupdateManager } from "./core/hotupdate/HotupdateManager";
 import { NetManager } from "./core/net/service/NetManager";
-import { LogicManager } from "./core/logic/LogicManager";
 import { BundleManager } from "./core/asset/BundleManager";
 import GameView from "./core/ui/GameView";
 import { GameData } from "./data/GameData";
@@ -15,9 +14,15 @@ import { Language } from "./core/language/Language";
 import { Macro } from "./defines/Macros";
 import { Adaptor } from "./core/adaptor/Adaptor";
 import { ProtoManager } from "./core/net/service/ProtoManager";
+import { EntryManager } from "./core/entry/EntryManager";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
+
+    /**@description 入口管理器 */
+    get entryManager(){
+        return getSingleton(EntryManager);
+    }
 
     /**@description protobuf类型管理 */
     get protoManager(){
@@ -27,11 +32,6 @@ export class Framewok {
     /**@description bundle管理器 */
     get bundleManager() {
         return getSingleton(BundleManager);
-    }
-
-    /**@description 逻辑控制器管理器 */
-    get logicManager() {
-        return getSingleton(LogicManager);
     }
 
     private _hallNetManager: NetManager = null!;

@@ -35,7 +35,7 @@ export default class ResourceLoader {
     }
 
     /**@description 加载进度 */
-    public _onLoadProgress: (loadedCount: number, toatl: number, data: Resource.CacheData) => void;
+    private _onLoadProgress: (loadedCount: number, toatl: number, data: Resource.CacheData) => void;
     public set onLoadProgress(value: (loadedCount: number, toatl: number, data: Resource.CacheData) => void) {
         this._onLoadProgress = value;
     }

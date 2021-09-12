@@ -1,5 +1,5 @@
-import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
-import UIView from "../../../../scripts/framework/core/ui/UIView";
+import { Config } from "../../../../scripts/common/config/Config";
+import GameView from "../../../../scripts/framework/core/ui/GameView";
 
 /**
  * @description 瞄准线视图
@@ -8,7 +8,7 @@ import UIView from "../../../../scripts/framework/core/ui/UIView";
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class AimLineView extends UIView {
+export default class AimLineView extends GameView {
 
     static getPrefabUrl(){
         return "prefabs/AimLineView";
@@ -40,10 +40,6 @@ export default class AimLineView extends UIView {
         this.graphics.node.on(cc.Node.EventType.TOUCH_MOVE,this.onTouchMove,this);
         this.graphics.node.on(cc.Node.EventType.TOUCH_END,this.onTouchEnd,this);
         this.graphics.node.on(cc.Node.EventType.TOUCH_CANCEL,this.onTouchEnd,this);
-
-        
-        //通知进入bundle完成
-        dispatchEnterComplete({type :Logic.Type.GAME,views:[this]});
     }
 
     onFullScreenAdapt(){
@@ -108,7 +104,7 @@ export default class AimLineView extends UIView {
     }
 
     private onGoBack( ){
-        dispatch(Logic.Event.ENTER_HALL);
+        Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
     }
 
     /**

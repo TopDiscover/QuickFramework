@@ -12,7 +12,6 @@ import { INetHelper } from "../controller/INetHelper";
 import { TestChatNetHelper } from "../controller/TestChatNetHelper";
 import { TestGameNetHelper } from "../controller/TestGameNetHelper";
 import { NetTest } from "../data/NetTestData";
-import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
 import { Config } from "../../../../scripts/common/config/Config";
 
 
@@ -86,7 +85,7 @@ export default class NetTestView extends GameView {
         super.onLoad();
 
         cc.find("goback", this.node).on(cc.Node.EventType.TOUCH_END, () => {
-            dispatch(Logic.Event.ENTER_HALL);
+            Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
         });
 
         this.netToggleContainer = cc.find("netType", this.node).getComponent(cc.ToggleContainer);
@@ -124,8 +123,6 @@ export default class NetTestView extends GameView {
         }
 
         this.init();
-
-        dispatchEnterComplete({ type: Logic.Type.GAME, views: [this] });
     }
 
     private init() {
