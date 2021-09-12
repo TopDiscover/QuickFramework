@@ -85,7 +85,7 @@ export default class NetTestView extends GameView {
         super.onLoad();
 
         cc.find("goback", this.node).on(cc.Node.EventType.TOUCH_END, () => {
-            Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
+            this.enterBundle(Config.BUNDLE_HALL);
         });
 
         this.netToggleContainer = cc.find("netType", this.node).getComponent(cc.ToggleContainer);

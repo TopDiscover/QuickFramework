@@ -16,7 +16,7 @@ export default class LoginView extends GameView {
         super.onLoad();
         this._login = cc.find("login", this.node);
         this._login.on(cc.Node.EventType.TOUCH_END, () => {
-            Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
+            this.enterBundle(Config.BUNDLE_HALL);
         });
     }
     getClassName(cls: Object): string {

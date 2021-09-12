@@ -43,7 +43,7 @@ export default class EliminateGameView extends GameView {
     }
 
     private onGoBack() {
-        Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
+        this.enterBundle(Config.BUNDLE_HALL);
     }
 
     playClick() {

@@ -16,7 +16,7 @@ export default class ShaderView extends GameView {
         super.onLoad();
 
         cc.find("goback",this.node).on(cc.Node.EventType.TOUCH_END,()=>{
-            Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
+            this.enterBundle(Config.BUNDLE_HALL);
         },this);
 
         this.prefabs = cc.find("prefabs",this.node);

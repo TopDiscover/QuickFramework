@@ -17,7 +17,7 @@ export default class NodePoolView extends GameView {
         super.onLoad();
 
         cc.find("goback", this.node).on(cc.Node.EventType.TOUCH_END, () => {
-            Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
+            this.enterBundle(Config.BUNDLE_HALL);
         });
 
         this.star = cc.find("star",this.node);

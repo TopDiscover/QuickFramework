@@ -17,7 +17,7 @@ export default class HallView extends GameView {
     }
 
     private onClick(ev: cc.Event.EventTouch) {
-        Manager.entryManager.enterBundle((ev.target as cc.Node).userData);
+        this.enterBundle((ev.target as cc.Node).userData);
     }
 
     private gamePage: cc.Node = null;

@@ -24,6 +24,10 @@ export default class GameView extends UIView {
         Manager.entryManager.onEnterBundleComplete(this.bundle);
     }
 
+    enterBundle( bundle : BUNDLE_TYPE){
+        Manager.entryManager.enterBundle(bundle);
+    }
+
     onDestroy(){
         if ( this.audioHelper ){
             //停止背景音乐
@@ -32,6 +36,7 @@ export default class GameView extends UIView {
         }
         
         Manager.gameView = null;
+        Manager.entryManager.onUnloadBundle(this.bundle);
         super.onDestroy();
     }
 }

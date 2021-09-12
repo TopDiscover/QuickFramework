@@ -40,7 +40,7 @@ export default class LoadTestView extends GameView {
     }
 
     private onGoback(){
-        Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
+        this.enterBundle(Config.BUNDLE_HALL);
     }
 
     private onLoadFont( ){
