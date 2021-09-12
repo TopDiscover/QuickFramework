@@ -4,7 +4,7 @@ import { EliminateData } from "./data/EliminateData";
 import { CELL_PREFAB_URL, EFFECTS_CONFIG } from "./data/EliminateDefines";
 import EliminateGameView from "./view/EliminateGameView";
 
-class EliminateLogic extends Entry {
+class EliminateEntry extends Entry {
     static bundle = EliminateData.bundle;
     protected addNetComponent(): void {
     }
@@ -43,4 +43,4 @@ class EliminateLogic extends Entry {
     }
 }
 
-Manager.entryManager.register(EliminateLogic);
+Manager.entryManager.register(EliminateEntry);

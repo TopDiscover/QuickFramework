@@ -2,8 +2,6 @@ export let HALL_ZH = {
   language: cc.sys.LANGUAGE_CHINESE,
   data: {
     hall_view_game_name: [
-      '游戏1',
-      '游戏2',
       '坦克大战',
       '扩展Load接口示例',
       '网络示例',

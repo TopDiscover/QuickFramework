@@ -3,8 +3,6 @@ export let HALL_EN = {
     language: cc.sys.LANGUAGE_ENGLISH,
     data: {
         hall_view_game_name: [
-            'game1',
-            'game2',
             `BATTLE
 CITY`,
             'Load Test',

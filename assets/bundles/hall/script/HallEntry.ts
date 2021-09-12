@@ -4,7 +4,7 @@ import { HallLanguage } from "./data/HallLanguage";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import { Config } from "../../../scripts/common/config/Config";
 
-class HallLogic extends Entry {
+class HallEntry extends Entry {
     static bundle = Config.BUNDLE_HALL;
     protected language = new HallLanguage;
     protected addNetComponent(): void {
@@ -40,4 +40,4 @@ class HallLogic extends Entry {
     }
 }
 
-Manager.entryManager.register(HallLogic);
+Manager.entryManager.register(HallEntry);

@@ -41,15 +41,13 @@ class _HallData extends GameData {
     get games(){
         if( this._games.length <= 0 ){
             this._games = [
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.0", this.bundle), "gameOne"),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.1", this.bundle), "gameTwo"),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.2", this.bundle), "tankBattle"),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.3", this.bundle), "loadTest"),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.4", this.bundle), "netTest"),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.5", this.bundle), "aimLine"),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.6", this.bundle), "nodePoolTest"),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.7", this.bundle), "shaders"),
-                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.8", this.bundle), "eliminate"),
+                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.0", this.bundle), "tankBattle"),
+                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.1", this.bundle), "loadTest"),
+                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.2", this.bundle), "netTest"),
+                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.3", this.bundle), "aimLine"),
+                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.4", this.bundle), "nodePoolTest"),
+                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.5", this.bundle), "shaders"),
+                new HotUpdate.BundleConfig(Manager.getLanguage("hall_view_game_name.6", this.bundle), "eliminate"),
             ];
         }
         return this._games;

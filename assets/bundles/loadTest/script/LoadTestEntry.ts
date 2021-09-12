@@ -2,7 +2,7 @@ import { Resource } from "../../../scripts/framework/core/asset/Resource";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import LoadTestView from "./view/LoadTestView";
 
-class LoadTestLogic extends Entry {
+class LoadTestEntry extends Entry {
     static bundle = "loadTest"
     protected addNetComponent(): void {
     }
@@ -30,4 +30,4 @@ class LoadTestLogic extends Entry {
     }
 }
 
-Manager.entryManager.register(LoadTestLogic);
+Manager.entryManager.register(LoadTestEntry);

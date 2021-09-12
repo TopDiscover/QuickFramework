@@ -1,8 +1,9 @@
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
-import GameTwoView from "./GameTwoView";
+import { AimLineData } from "./data/AimLineData";
+import AimLineView from "./view/AimLineView";
 
-class GameTwoLogic extends Entry {
-    static bundle = "gameTwo";
+class AimLineEntry extends Entry {
+    static bundle = AimLineData.bundle;
     protected addNetComponent(): void {
     }
     protected removeNetComponent(): void {
@@ -11,7 +12,7 @@ class GameTwoLogic extends Entry {
         completeCb();
     }
     protected openGameView(): void {
-        Manager.uiManager.open({ type: GameTwoView, bundle: this.bundle });
+        Manager.uiManager.open({ type: AimLineView, bundle: this.bundle });
     }
     protected initData(): void {
     }
@@ -21,4 +22,4 @@ class GameTwoLogic extends Entry {
     }
 }
 
-Manager.entryManager.register(GameTwoLogic);
+Manager.entryManager.register(AimLineEntry);

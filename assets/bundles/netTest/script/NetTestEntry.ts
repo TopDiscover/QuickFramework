@@ -1,10 +1,8 @@
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
-import ShaderView from "./view/ShaderView";
+import NetTestView from "./view/NetTestView";
 
-class ShaderLogic extends Entry {
-
-    static bundle = "shaders";
-
+class NetTestEntry extends Entry {
+    static bundle = "netTest";
     protected addNetComponent(): void {
         
     }
@@ -15,7 +13,7 @@ class ShaderLogic extends Entry {
         completeCb();
     }
     protected openGameView(): void {
-        Manager.uiManager.open({ type: ShaderView, bundle: this.bundle });
+        Manager.uiManager.open({ type: NetTestView, bundle: this.bundle });
     }
     protected initData(): void {
         
@@ -26,6 +24,7 @@ class ShaderLogic extends Entry {
     protected resumeMessageQueue(): void {
         
     }
+
 }
 
-Manager.entryManager.register(ShaderLogic);
+Manager.entryManager.register(NetTestEntry);
