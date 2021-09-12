@@ -75,15 +75,7 @@ export class HotupdateManager {
     /**@description 热更新地址，为了方便后面当只更新一个游戏，或cdn服务器 */
     private getHotUpdateUrl(moduleName: string) {
         if (CC_DEBUG) {
-            let config = {
-                "gameOne": this._commonHotUpdateUrl,
-                "gameTwo": this._commonHotUpdateUrl,
-            }
-            if ((<any>config)[moduleName]) {
-                return (<any>config)[moduleName];
-            } else {
-                return this.commonHotUpdateUrl;
-            }
+            return this.commonHotUpdateUrl;
         } else {
             if (this._hotUpdateUrls[moduleName]) {
                 return this._hotUpdateUrls[moduleName];
@@ -97,8 +89,8 @@ export class HotupdateManager {
     private currentAssetsManager: AssetsManager = null!;
 
     /**@description 获取Bundle名 */
-    public getBundleName(gameName: string) {
-        return this.bundlesConfig[gameName];
+    public getBundleName(bundle: string) {
+        return this.bundlesConfig[bundle];
     }
 
     /**@description 释放资源管理器，默认为hall 大厅资源管理器 */
@@ -211,8 +203,8 @@ export class HotupdateManager {
         }
     }
 
-    /**@description 检查大厅是否需要更新 */
-    checkHallUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
+    /**@description 检查主包是否需要更新 */
+    private checkMainUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
         if( this.isNeedUpdate(callback) ){
             this.currentAssetsManager = this.getAssetsManager();
             this.currentAssetsManager.manager.loadLocalManifest(this.hallProjectMainfest);
@@ -227,30 +219,30 @@ export class HotupdateManager {
      */
     checkUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void,bundle?:string){
         if( typeof bundle == "string" ){
-            this.checkGameUpdate(bundle,callback);
+            this.checkBundleUpdate(bundle,callback);
         }else{
-            this.checkHallUpdate(callback);
+            this.checkMainUpdate(callback);
         }
     }
 
     /**
-     * @description 获取子游戏manifest url
-     * @param gameName 子游戏名
+     * @description 获取bundlemanifest url
+     * @param bundle bundle
      * @returns manifest url
      */
-    private getGameManifest(gameName:string): string {
-        return `${this.manifestRoot}${gameName}_project.manifest`;
+    private getBundleManifest(bundle:string): string {
+        return `${this.manifestRoot}${bundle}_project.manifest`;
     }
 
     /**
-     * @description 检测子游戏更新
-     * @param gameName 子游戏名
+     * @description 检测Bundle更新
+     * @param bundle 子游戏名
      * @param callback 检测完成回调
      */
-    checkGameUpdate(gameName: string, callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
+    private checkBundleUpdate(bundle: string, callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
         if( this.isNeedUpdate(callback) ){
-            this.currentAssetsManager = this.getAssetsManager(gameName);
-            let manifestUrl = this.getGameManifest(gameName);
+            this.currentAssetsManager = this.getAssetsManager(bundle);
+            let manifestUrl = this.getBundleManifest(bundle);
             //先检测本地是否已经存在子游戏版本控制文件 
             if (jsb.fileUtils.isFileExist(manifestUrl)) {
                 //存在版本控制文件 
@@ -268,12 +260,12 @@ export class HotupdateManager {
                     return;
                 }
 
-                let packageUrl = this.getHotUpdateUrl(gameName);
+                let packageUrl = this.getHotUpdateUrl(bundle);
                 let gameManifest = {
                     version: "0",
                     packageUrl: packageUrl,
                     remoteManifestUrl: `${packageUrl}/${manifestUrl}`,
-                    remoteVersionUrl: `${packageUrl}/${this.manifestRoot}${gameName}_version.manifest`,
+                    remoteVersionUrl: `${packageUrl}/${this.manifestRoot}${bundle}_version.manifest`,
                     assets: {},
                     searchPaths: []
                 };
