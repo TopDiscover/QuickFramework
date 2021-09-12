@@ -12,6 +12,7 @@ import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessa
 import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
 import { GetCmdKey } from "../../../hall/script/controller/GetCmdKey";
 import { Net } from "../../../../scripts/framework/core/net/Net";
+import { HallProtoConfig } from "../../../hall/proto/HallProtoConfig";
 const { ccclass, property } = cc._decorator;
 
 @ccclass
@@ -21,7 +22,7 @@ export default class TestChatNetController extends Controller<ChatService> {
     protected addEvents() {
         super.addEvents()
         this.addNetEvent(GetCmdKey(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_JSON_MSG), this.onTestJsonMessage, TestJsonMessage, true);
-        this.addNetEvent(GetCmdKey(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_PROTO_MSG), this.onTestProtoMessage, "awesomepackage.TestType");
+        this.addNetEvent(HallProtoConfig.CMD_ROOM_INFO.cmd, this.onTestProtoMessage,HallProtoConfig.CMD_ROOM_INFO.className);
         this.addNetEvent(GetCmdKey(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_BINARY_MSG), this.onTestBinaryMessage, TestBinaryMessage);
     }
 
@@ -29,13 +30,8 @@ export default class TestChatNetController extends Controller<ChatService> {
         dispatch(CommonEvent.TEST_JSON_MSG, data.hello);
     }
 
-    private onTestProtoMessage(buffer: Uint8Array) {
-        let data = Manager.protoTypeManager.decode<awesomepackage.TestType>({
-            buffer:buffer,
-            cmd:GetCmdKey(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_PROTO_MSG),
-            className : "awesomepackage.TestType"
-        })
-        dispatch(CommonEvent.TEST_PROTO_MSG, data.myStr);
+    private onTestProtoMessage(data: tp.RoomInfo) {
+        dispatch(CommonEvent.TEST_PROTO_MSG, data.name);
     }
 
     private onTestBinaryMessage(data: TestBinaryMessage) {

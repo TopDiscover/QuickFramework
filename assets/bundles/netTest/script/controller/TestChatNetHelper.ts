@@ -5,6 +5,7 @@ import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
 import { CmmProto } from "../../../../scripts/common/net/CmmProto";
 import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { SUB_CMD_LOBBY } from "../../../hall/script/protocol/LobbyCmd";
+import { HallProtoConfig } from "../../../hall/proto/HallProtoConfig";
 
 class _TestChatNetHelper extends NetHelper<ChatService>{
 
@@ -13,25 +14,29 @@ class _TestChatNetHelper extends NetHelper<ChatService>{
     }
 
     sendProtoMessage(hello: string) {
-        let result = Manager.protoTypeManager.getParserResult(String(MainCmd.CMD_LOBBY) + String(SUB_CMD_LOBBY.TEST_PROTO_MSG));
-        type TestType = typeof awesomepackage.TestType;
-        let TestType : TestType = result.root.lookup("awesomepackage.TestType") ;
-        
-        let testProto = new CmmProto<awesomepackage.TestType>(TestType);
-        testProto.data = TestType.create();
-        testProto.mainCmd = MainCmd.CMD_LOBBY;
-        testProto.subCmd = SUB_CMD_LOBBY.TEST_PROTO_MSG;
-        testProto.cmd = String(MainCmd.CMD_LOBBY) + String(SUB_CMD_LOBBY.TEST_PROTO_MSG);
-        testProto.data.awesomeField = "这只是一个测试";
-        testProto.data.myStr = "这是另一个测试的字符串";
-        type AwesomeMessage = typeof awesomepackage.AwesomeMessage;
-        let AwesomeMessage : AwesomeMessage = result.root.lookup("awesomepackage.AwesomeMessage") ;
-        let message = AwesomeMessage.create();
-        message.testValue = "40000";
-        message.testOne = "wiouiou";
-        testProto.data.value = [];
-        testProto.data.value.push(message);
-        this.service.send(testProto);
+
+        type RoomInfo = typeof tp.RoomInfo;
+        let RoomInfo : RoomInfo = Manager.protoManager.lookup(HallProtoConfig.CMD_ROOM_INFO.className) as any;
+        let roomInfo = new CmmProto<tp.RoomInfo>(RoomInfo);
+        roomInfo.data = RoomInfo.create();
+        roomInfo.mainCmd = HallProtoConfig.CMD_ROOM_INFO.mainCmd;
+        roomInfo.subCmd = HallProtoConfig.CMD_ROOM_INFO.subCmd;
+        roomInfo.cmd = HallProtoConfig.CMD_ROOM_INFO.cmd;
+        roomInfo.data.name = "高级VIP专场";
+        roomInfo.data.roomID = 9999;
+        type UserInfo = typeof tp.UserInfo;
+        let UserInfo : UserInfo = Manager.protoManager.lookup("tp.UserInfo") as any ;
+        let userInfo = UserInfo.create();
+        userInfo.id = 6666;
+        userInfo.level = 10;
+        userInfo.money = 9900009999
+        userInfo.name = "我就是玩！！！"
+
+        let GenderType = Manager.protoManager.lookup("tp.GenderType") as protobuf.Enum;
+        userInfo.gender = GenderType.values.female;
+        roomInfo.data.players = [];
+        roomInfo.data.players.push(userInfo);
+        this.service.send(roomInfo);
     }
 
     sendJsonMessage(hello: string) {

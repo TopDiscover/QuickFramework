@@ -799,7 +799,7 @@ declare namespace protobuf {
          * @param [parentAlreadyChecked=false] Whether the parent has already been checked
          * @returns Looked up object or `null` if none could be found
          */
-        public lookup(path: (string | string[]), parentAlreadyChecked?: boolean): any;//(ReflectionObject | null);
+        public lookup(path: (string | string[]), parentAlreadyChecked?: boolean): (ReflectionObject | null);
 
         /**
          * Looks up the {@link Type|type} at the specified path, relative to this namespace.

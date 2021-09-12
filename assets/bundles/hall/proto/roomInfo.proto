@@ -1,0 +1,9 @@
+// roomInfo.proto
+package tp;
+syntax = "proto3";
+import "hall/proto/userInfo.proto";
+message RoomInfo {
+    int32 roomID = 1; // 房间id
+    string name = 2;//房间名称
+    repeated UserInfo players = 3;//玩家信息
+}

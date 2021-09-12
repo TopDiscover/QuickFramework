@@ -376,7 +376,7 @@ export class AssetManager {
                     if (CC_DEBUG){
                         if( Array.isArray(info.data) ){
                             for( let i = 0 ; i < info.data.length ; i++ ){
-                                if( info.data[i].refCount != 0 ){
+                                if( info.data[i].refCount > 0 ){
                                     cc.warn(`资源bundle : ${info.bundle} url : ${info.url}/${info.data[i].name} 被其它界面引用 refCount : ${info.data[i].refCount}`)
                                 }
                             }

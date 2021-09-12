@@ -1,200 +1,224 @@
 // import * as $protobuf from "protobufjs";
-/** Namespace awesomepackage. */
-declare namespace awesomepackage {
+/** Namespace tp. */
+declare namespace tp {
 
-    /** Properties of an AwesomeMessage. */
-    interface IAwesomeMessage {
+    /** Properties of a RoomInfo. */
+    interface IRoomInfo {
 
-        /** AwesomeMessage testValue */
-        testValue?: (string|null);
+        /** RoomInfo roomID */
+        roomID?: (number|null);
 
-        /** AwesomeMessage testOne */
-        testOne?: (string|null);
+        /** RoomInfo name */
+        name?: (string|null);
+
+        /** RoomInfo players */
+        players?: (tp.IUserInfo[]|null);
     }
 
-    /** Represents an AwesomeMessage. */
-    class AwesomeMessage implements IAwesomeMessage {
+    /** Represents a RoomInfo. */
+    class RoomInfo implements IRoomInfo {
 
         /**
-         * Constructs a new AwesomeMessage.
+         * Constructs a new RoomInfo.
          * @param [properties] Properties to set
          */
-        constructor(properties?: awesomepackage.IAwesomeMessage);
+        constructor(properties?: tp.IRoomInfo);
 
-        /** AwesomeMessage testValue. */
-        public testValue: string;
+        /** RoomInfo roomID. */
+        public roomID: number;
 
-        /** AwesomeMessage testOne. */
-        public testOne: string;
+        /** RoomInfo name. */
+        public name: string;
+
+        /** RoomInfo players. */
+        public players: tp.IUserInfo[];
 
         /**
-         * Creates a new AwesomeMessage instance using the specified properties.
+         * Creates a new RoomInfo instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns AwesomeMessage instance
+         * @returns RoomInfo instance
          */
-        public static create(properties?: awesomepackage.IAwesomeMessage): awesomepackage.AwesomeMessage;
+        public static create(properties?: tp.IRoomInfo): tp.RoomInfo;
 
         /**
-         * Encodes the specified AwesomeMessage message. Does not implicitly {@link awesomepackage.AwesomeMessage.verify|verify} messages.
-         * @param message AwesomeMessage message or plain object to encode
+         * Encodes the specified RoomInfo message. Does not implicitly {@link tp.RoomInfo.verify|verify} messages.
+         * @param message RoomInfo message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: awesomepackage.IAwesomeMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: tp.IRoomInfo, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified AwesomeMessage message, length delimited. Does not implicitly {@link awesomepackage.AwesomeMessage.verify|verify} messages.
-         * @param message AwesomeMessage message or plain object to encode
+         * Encodes the specified RoomInfo message, length delimited. Does not implicitly {@link tp.RoomInfo.verify|verify} messages.
+         * @param message RoomInfo message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: awesomepackage.IAwesomeMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: tp.IRoomInfo, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes an AwesomeMessage message from the specified reader or buffer.
+         * Decodes a RoomInfo message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns AwesomeMessage
+         * @returns RoomInfo
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): awesomepackage.AwesomeMessage;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tp.RoomInfo;
 
         /**
-         * Decodes an AwesomeMessage message from the specified reader or buffer, length delimited.
+         * Decodes a RoomInfo message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns AwesomeMessage
+         * @returns RoomInfo
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): awesomepackage.AwesomeMessage;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tp.RoomInfo;
 
         /**
-         * Verifies an AwesomeMessage message.
+         * Verifies a RoomInfo message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates an AwesomeMessage message from a plain object. Also converts values to their respective internal types.
+         * Creates a RoomInfo message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns AwesomeMessage
+         * @returns RoomInfo
          */
-        public static fromObject(object: { [k: string]: any }): awesomepackage.AwesomeMessage;
+        public static fromObject(object: { [k: string]: any }): tp.RoomInfo;
 
         /**
-         * Creates a plain object from an AwesomeMessage message. Also converts values to other types if specified.
-         * @param message AwesomeMessage
+         * Creates a plain object from a RoomInfo message. Also converts values to other types if specified.
+         * @param message RoomInfo
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: awesomepackage.AwesomeMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: tp.RoomInfo, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this AwesomeMessage to JSON.
+         * Converts this RoomInfo to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
     }
 
-    /** Properties of a TestType. */
-    interface ITestType {
-
-        /** TestType awesomeField */
-        awesomeField?: (string|null);
-
-        /** TestType value */
-        value?: (awesomepackage.IAwesomeMessage[]|null);
-
-        /** TestType myStr */
-        myStr?: (string|null);
+    /** GenderType enum. */
+    enum GenderType {
+        male = 1,
+        female = 2
     }
 
-    /** Represents a TestType. */
-    class TestType implements ITestType {
+    /** Properties of a UserInfo. */
+    interface IUserInfo {
+
+        /** UserInfo name */
+        name?: (string|null);
+
+        /** UserInfo gender */
+        gender?: (tp.GenderType|null);
+
+        /** UserInfo id */
+        id?: (number|Long|null);
+
+        /** UserInfo level */
+        level?: (number|null);
+
+        /** UserInfo money */
+        money?: (number|Long|null);
+    }
+
+    /** Represents a UserInfo. */
+    class UserInfo implements IUserInfo {
 
         /**
-         * Constructs a new TestType.
+         * Constructs a new UserInfo.
          * @param [properties] Properties to set
          */
-        constructor(properties?: awesomepackage.ITestType);
+        constructor(properties?: tp.IUserInfo);
 
-        /** TestType awesomeField. */
-        public awesomeField: string;
+        /** UserInfo name. */
+        public name: string;
 
-        /** TestType value. */
-        public value: awesomepackage.IAwesomeMessage[];
+        /** UserInfo gender. */
+        public gender: tp.GenderType;
 
-        /** TestType myStr. */
-        public myStr: string;
+        /** UserInfo id. */
+        public id: (number|Long);
+
+        /** UserInfo level. */
+        public level: number;
+
+        /** UserInfo money. */
+        public money: (number|Long);
 
         /**
-         * Creates a new TestType instance using the specified properties.
+         * Creates a new UserInfo instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns TestType instance
+         * @returns UserInfo instance
          */
-        public static create(properties?: awesomepackage.ITestType): awesomepackage.TestType;
+        public static create(properties?: tp.IUserInfo): tp.UserInfo;
 
         /**
-         * Encodes the specified TestType message. Does not implicitly {@link awesomepackage.TestType.verify|verify} messages.
-         * @param message TestType message or plain object to encode
+         * Encodes the specified UserInfo message. Does not implicitly {@link tp.UserInfo.verify|verify} messages.
+         * @param message UserInfo message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: awesomepackage.ITestType, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: tp.IUserInfo, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified TestType message, length delimited. Does not implicitly {@link awesomepackage.TestType.verify|verify} messages.
-         * @param message TestType message or plain object to encode
+         * Encodes the specified UserInfo message, length delimited. Does not implicitly {@link tp.UserInfo.verify|verify} messages.
+         * @param message UserInfo message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: awesomepackage.ITestType, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: tp.IUserInfo, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a TestType message from the specified reader or buffer.
+         * Decodes a UserInfo message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns TestType
+         * @returns UserInfo
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): awesomepackage.TestType;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tp.UserInfo;
 
         /**
-         * Decodes a TestType message from the specified reader or buffer, length delimited.
+         * Decodes a UserInfo message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns TestType
+         * @returns UserInfo
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): awesomepackage.TestType;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tp.UserInfo;
 
         /**
-         * Verifies a TestType message.
+         * Verifies a UserInfo message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a TestType message from a plain object. Also converts values to their respective internal types.
+         * Creates a UserInfo message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns TestType
+         * @returns UserInfo
          */
-        public static fromObject(object: { [k: string]: any }): awesomepackage.TestType;
+        public static fromObject(object: { [k: string]: any }): tp.UserInfo;
 
         /**
-         * Creates a plain object from a TestType message. Also converts values to other types if specified.
-         * @param message TestType
+         * Creates a plain object from a UserInfo message. Also converts values to other types if specified.
+         * @param message UserInfo
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: awesomepackage.TestType, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: tp.UserInfo, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this TestType to JSON.
+         * Converts this UserInfo to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };

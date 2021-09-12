@@ -204,8 +204,19 @@ export class Process {
     protected decode(o: Net.ListenerData, header: Codec): Message | null {
         let obj: Message = null!;
         if ( this.serviceType == Net.ServiceType.Proto ){
-            //proto，再用的时候，自己解析，里面有很多的类型
-            obj = header.buffer as any;
+            if ( o.type && typeof o.type == "string" ){
+                let type = Manager.protoManager.lookup(o.type) as protobuf.Type;
+                if( type ){
+                    obj = Manager.protoManager.decode({
+                        className : o.type,
+                        buffer : header.buffer,
+                    });
+                }else{
+                    obj = header.buffer as any;
+                }
+            }else{
+                obj = header.buffer as any;
+            }
             return obj;
         }else{
             if (o.type && typeof o.type != "string") {

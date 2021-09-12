@@ -29,11 +29,7 @@ class HallLogic extends LogicImpl {
         Manager.hallNetManager.addNetControllers();
         //加载大厅proto文件
         //后面再优化下用到时，再加载，但可能会收到消息后，没加载proto文件会有消息延迟，建议先加载
-        Manager.protoTypeManager.register({ 
-            cmd : String(MainCmd.CMD_LOBBY) + String(SUB_CMD_LOBBY.TEST_PROTO_MSG),
-            url : "proto/test2",
-            bundle : this.bundle});
-        Manager.protoTypeManager.load([String(MainCmd.CMD_LOBBY) + String(SUB_CMD_LOBBY.TEST_PROTO_MSG)]).then((isSuccess)=>{
+        Manager.protoManager.load(this.bundle).then((isSuccess)=>{
             Manager.uiManager.open({ type: HallView, bundle: this.bundle });
         });
     }

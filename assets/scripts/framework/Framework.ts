@@ -14,14 +14,14 @@ import { CocosExtentionInit } from "./plugin/CocosExtention";
 import { Language } from "./core/language/Language";
 import { Macro } from "./defines/Macros";
 import { Adaptor } from "./core/adaptor/Adaptor";
-import { ProtoTypeManager } from "./core/net/service/ProtoTypeManager";
+import { ProtoManager } from "./core/net/service/ProtoManager";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
 
     /**@description protobuf类型管理 */
-    get protoTypeManager(){
-        return getSingleton(ProtoTypeManager);
+    get protoManager(){
+        return getSingleton(ProtoManager);
     }
 
     /**@description bundle管理器 */
