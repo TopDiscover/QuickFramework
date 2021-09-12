@@ -14,7 +14,7 @@ class AssetsManager {
     manager: jsb.AssetsManager = null!;
 }
 
-const HALL_ASSETS_MANAGER_NAME = "HALL";
+const MAIN_PACK = "main";
 
 /**
  * @description 热更新组件
@@ -94,7 +94,7 @@ export class HotupdateManager {
     }
 
     /**@description 释放资源管理器，默认为hall 大厅资源管理器 */
-    private destroyAssetsManager(name: string = HALL_ASSETS_MANAGER_NAME) {
+    private destroyAssetsManager(name: string = MAIN_PACK) {
         if (this.assetsManagers[name]) {
             cc.log("destroyAssetsManager : " + name);
             this.currentAssetsManager = <any>null;
@@ -103,7 +103,7 @@ export class HotupdateManager {
     }
 
     /**@description 获取资源管理器，默认为hall 大厅的资源管理器 */
-    private getAssetsManager(name: string = HALL_ASSETS_MANAGER_NAME) {
+    private getAssetsManager(name: string = MAIN_PACK) {
         if (this.assetsManagers[name]) {
             return this.assetsManagers[name];
         } else {
@@ -112,7 +112,7 @@ export class HotupdateManager {
                 this.storagePath = jsb.fileUtils.getWritablePath();
                 cc.log(`Storage path for remote asset : ${this.storagePath}`);
                 this.assetsManagers[name] = new AssetsManager(name);
-                this.assetsManagers[name].manager = new jsb.AssetsManager(name == HALL_ASSETS_MANAGER_NAME ? "type.hall" : `type.${name}_`, this.storagePath, this.versionCompareHanle.bind(this));
+                this.assetsManagers[name].manager = new jsb.AssetsManager(name == MAIN_PACK ? `type.${MAIN_PACK}` : `type.${name}_`, this.storagePath, this.versionCompareHanle.bind(this));
                 //设置下载并发量
                 this.assetsManagers[name].manager.setMaxConcurrentTask(8);
                 this.assetsManagers[name].manager.setHotUpdateUrl(this.getHotUpdateUrl(name));
@@ -384,14 +384,10 @@ export class HotupdateManager {
 
         if (isUpdateFinished) {
             //下载完成,需要重新设置搜索路径，添加下载路径
-            // Prepend the manifest's search path
             var searchPaths: string[] = jsb.fileUtils.getSearchPaths();
             var newPaths: string[] = this.currentAssetsManager.manager.getLocalManifest().getSearchPaths();
             cc.log(JSON.stringify(newPaths));
             Array.prototype.unshift.apply(searchPaths, newPaths);
-            // This value will be retrieved and appended to the default search path during game startup,
-            // please refer to samples/js-tests/main.js for detailed usage.
-            // !!! Re-add the search paths in main.js is very important, otherwise, new scripts won't take effect.
 
             //这里做一个搜索路径去重处理
             let obj : any = {};
@@ -404,7 +400,7 @@ export class HotupdateManager {
         }
 
         let state = this.currentAssetsManager.manager.getState();
-        if (this.currentAssetsManager.name == HALL_ASSETS_MANAGER_NAME) {
+        if (this.currentAssetsManager.name == MAIN_PACK) {
             if (isUpdateFinished) {
                 this.currentAssetsManager.manager.setEventCallback(null as any);
                 //下载数量大于0，才有必要进入重启，在如下这种情况下，并不会发生下载
