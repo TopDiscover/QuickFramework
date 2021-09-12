@@ -1,7 +1,7 @@
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import NodePoolView from "./view/NodePoolView";
 
-class NodePoolTestLogic extends Entry {
+class NodePoolTestEntry extends Entry {
     static bundle = "nodePoolTest";
     protected addNetComponent(): void {
         
@@ -26,4 +26,4 @@ class NodePoolTestLogic extends Entry {
     }
 }
 
-Manager.entryManager.register(NodePoolTestLogic);
+Manager.entryManager.register(NodePoolTestEntry);
