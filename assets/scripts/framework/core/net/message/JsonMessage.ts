@@ -1,3 +1,4 @@
+import { Net } from "../Net";
 import { Message } from "./Message";
 
 type JsonMessageConstructor = typeof JsonMessage;
@@ -287,4 +288,8 @@ export abstract class JsonMessage extends Message {
             (<any>this)[memberName].set(elementKey, elementValue);
         });
     }
+}
+
+export abstract class JsonMessageHeartbeat extends JsonMessage{
+    static type = Net.ServiceType.Json;
 }

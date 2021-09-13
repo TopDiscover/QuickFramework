@@ -1,7 +1,7 @@
 import { Macro } from "../../../defines/Macros";
 import { Codec } from "./Message";
 
-interface MessageStruct {
+export interface MessageStruct {
     mainCmd: number
     subCmd: number
     buffer: Uint8Array

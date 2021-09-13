@@ -1,6 +1,6 @@
 import GameView from "../../../../scripts/framework/core/ui/GameView";
 import { Graphics, _decorator ,Node, find, EventTouch, Vec2, UITransform, Vec3, PhysicsSystem2D, physics, EPhysics2DDrawFlags, ERaycast2DType, view} from "cc";
-import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
+import { Config } from "../../../../scripts/common/config/Config";
 
 /**
  * @description 瞄准线视图
@@ -42,10 +42,6 @@ export default class AimLineView extends GameView {
         this.graphics.node.on(Node.EventType.TOUCH_MOVE,this.onTouchMove,this);
         this.graphics.node.on(Node.EventType.TOUCH_END,this.onTouchEnd,this);
         this.graphics.node.on(Node.EventType.TOUCH_CANCEL,this.onTouchEnd,this);
-
-
-        //通知进入bundle完成
-        dispatchEnterComplete({type :Logic.Type.GAME,views:[this]});
     }
 
     private onTouchStart( ev : EventTouch ){
@@ -73,7 +69,7 @@ export default class AimLineView extends GameView {
     }
 
     private onGoBack( ){
-        dispatch(Logic.Event.ENTER_HALL);
+        this.enterBundle(Config.BUNDLE_HALL);
     }
 
     /**

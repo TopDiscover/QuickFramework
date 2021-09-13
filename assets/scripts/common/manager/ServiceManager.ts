@@ -4,7 +4,7 @@
 
 import { js } from "cc";
 import { DEBUG } from "cc/env";
-import { Logic } from "../../framework/core/logic/Logic";
+import { Macro } from "../../framework/defines/Macros";
 import { Config } from "../config/Config";
 import { CommonService } from "../net/CommonService";
 export class ServiceManager implements GameEventInterface {
@@ -113,12 +113,12 @@ export class ServiceManager implements GameEventInterface {
                             service.reconnect.show();
                         } else {
                             log(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
-                            dispatch(Logic.Event.ENTER_LOGIN, true);
+                            Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
                         }
                     },
                     cancelCb: () => {
                         log(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
-                        dispatch(Logic.Event.ENTER_LOGIN, true);
+                        Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
                     }
                 });
             });
@@ -168,6 +168,13 @@ export class ServiceManager implements GameEventInterface {
                 this.services[i].reconnect.show();
                 break;
             }
+        }
+    }
+
+    hideReconnet(){
+        for( let i = 0 ; i < this.services.length ; i++ ){
+            let service = this.services[i];
+            service.reconnect.hide();
         }
     }
 }

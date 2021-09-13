@@ -3,7 +3,6 @@ import TankBattleMap from "../model/TankBattleMap";
 import { TankBettle } from "../data/TankBattleGameData";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
 import { _decorator,Node, Label, director, PhysicsSystem2D, find, systemEvent, SystemEvent, EventKeyboard, macro, instantiate } from "cc";
-import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
 
 
 const { ccclass, property } = _decorator;
@@ -48,8 +47,6 @@ export default class TankBattleGameView extends GameView{
         // cc.director.getCollisionManager().enabledDebugDraw = true;
 
         this.init()
-
-        dispatchEnterComplete({ type: Logic.Type.GAME, views: [this, TankBattleStartView] });
     }
 
     onDestroy(){

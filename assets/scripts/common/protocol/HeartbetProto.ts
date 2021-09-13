@@ -1,9 +1,9 @@
 
 import { MainCmd, SUB_CMD_SYS } from "./CmdDefines";
-import { Message } from "../../framework/core/net/message/Message";
+import { ProtoMessageHeartbeat } from "../../framework/core/net/message/ProtoMessage";
 
 /**@description protobuf心跳包 */
-export class HeartbeatProto extends Message {
+export class HeartbeatProto extends ProtoMessageHeartbeat {
     buffer: Uint8Array = null!;
     encode(): boolean { return true }
     decode(data: any): boolean { return true }

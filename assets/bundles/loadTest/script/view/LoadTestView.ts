@@ -1,15 +1,15 @@
 
 import { _decorator,Node, find,Animation, Label, Sprite, instantiate, Button, Vec2, Vec3, UITransform, ParticleSystem, ParticleSystem2D, sp, SpriteFrame, AnimationClip, Layers, Widget, size } from "cc";
 import { loadDirRes } from "../../../../scripts/framework/plugin/CocosExtention";
-import UIView from "../../../../scripts/framework/core/ui/UIView";
 import { HallData } from "../../../hall/script/data/HallData";
-import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
 import { ButtonSpriteType } from "../../../../scripts/framework/defines/Enums";
+import GameView from "../../../../scripts/framework/core/ui/GameView";
+import { Config } from "../../../../scripts/common/config/Config";
 
 const {ccclass, property} = _decorator;
 
 @ccclass
-export default class LoadTestView extends UIView {
+export default class LoadTestView extends GameView {
 
     public static getPrefabUrl(){
         return "prefabs/LoadTestView";
@@ -40,11 +40,10 @@ export default class LoadTestView extends UIView {
 
         find("loadDir",op)?.on(Node.EventType.TOUCH_END,this.onLoadDir,this);
 
-        dispatchEnterComplete({ type: Logic.Type.GAME, views: [this] });
     }
 
     private onGoback(){
-        dispatch(Logic.Event.ENTER_HALL);
+        this.enterBundle(Config.BUNDLE_HALL);
     }
 
     private onLoadFont( ){

@@ -1,7 +1,7 @@
 import { js, _decorator } from "cc";
 import Controller from "../../framework/componects/Controller";
-import { Logic } from "../../framework/core/logic/Logic";
 import { Net } from "../../framework/core/net/Net";
+import { Macro } from "../../framework/defines/Macros";
 import { Config } from "../config/Config";
 import { CommonService } from "./CommonService";
 
@@ -24,17 +24,6 @@ export default class ReconnectComponent extends Controller<CommonService> {
 
     private get logName() {
         return `[${js.getClassName(this.service)}].${this.logTag}`
-    }
-
-    protected addEvents() {
-        super.addEvents();
-        this.addUIEvent(Logic.Event.ENTER_COMPLETE, this.enterComplete);
-    }
-
-    private enterComplete(data: Logic.EventData) {
-        if (data.type == Logic.Type.LOGIN) {
-            this.service && this.service.reconnect.hide();
-        }
     }
 
     start() {
@@ -107,12 +96,12 @@ export default class ReconnectComponent extends Controller<CommonService> {
                     this.connect();
                 } else {
                     log(`${this.logName} 玩家网络不好，不重连，退回到登录界面`);
-                    dispatch(Logic.Event.ENTER_LOGIN, true);
+                    Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
                 }
             },
             cancelCb: () => {
                 log(`${this.logName} 玩家网络不好，不重连，退回到登录界面`);
-                dispatch(Logic.Event.ENTER_LOGIN, true);
+                Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
             }
         });
     }

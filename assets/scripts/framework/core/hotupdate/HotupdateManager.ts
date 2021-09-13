@@ -16,7 +16,7 @@ class AssetsManager {
     manager: jsb.AssetsManager = null!;
 }
 
-const HALL_ASSETS_MANAGER_NAME = "HALL";
+const MAIN_PACK = "main";
 
 /**
  * @description 热更新组件
@@ -52,7 +52,7 @@ export class HotupdateManager {
             let content = jsb.fileUtils.getStringFromFile(this.hallProjectMainfest);
             try {
                 this._projectManifest = JSON.parse(content);
-            } catch (error) {
+            } catch (err) {
                 this._projectManifest = null;
                 error(`读取${this.hallProjectMainfest}失败`);
             }
@@ -77,15 +77,7 @@ export class HotupdateManager {
     /**@description 热更新地址，为了方便后面当只更新一个游戏，或cdn服务器 */
     private getHotUpdateUrl(moduleName: string) {
         if (DEBUG) {
-            let config = {
-                "gameOne": this._commonHotUpdateUrl,
-                "gameTwo": this._commonHotUpdateUrl,
-            }
-            if ((<any>config)[moduleName]) {
-                return (<any>config)[moduleName];
-            } else {
-                return this.commonHotUpdateUrl;
-            }
+            return this.commonHotUpdateUrl;
         } else {
             if (this._hotUpdateUrls[moduleName]) {
                 return this._hotUpdateUrls[moduleName];
@@ -99,12 +91,12 @@ export class HotupdateManager {
     private currentAssetsManager: AssetsManager = null!;
 
     /**@description 获取Bundle名 */
-    public getBundleName(gameName: string) {
-        return this.bundlesConfig[gameName];
+    public getBundleName(bundle: string) {
+        return this.bundlesConfig[bundle];
     }
 
     /**@description 释放资源管理器，默认为hall 大厅资源管理器 */
-    private destroyAssetsManager(name: string = HALL_ASSETS_MANAGER_NAME) {
+    private destroyAssetsManager(name: string = MAIN_PACK) {
         if (this.assetsManagers[name]) {
             log("destroyAssetsManager : " + name);
             this.currentAssetsManager = <any>null;
@@ -113,7 +105,7 @@ export class HotupdateManager {
     }
 
     /**@description 获取资源管理器，默认为hall 大厅的资源管理器 */
-    private getAssetsManager(name: string = HALL_ASSETS_MANAGER_NAME) {
+    private getAssetsManager(name: string = MAIN_PACK) {
         if (this.assetsManagers[name]) {
             return this.assetsManagers[name];
         } else {
@@ -122,7 +114,7 @@ export class HotupdateManager {
                 this.storagePath = jsb.fileUtils.getWritablePath();
                 log(`Storage path for remote asset : ${this.storagePath}`);
                 this.assetsManagers[name] = new AssetsManager(name);
-                this.assetsManagers[name].manager = new jsb.AssetsManager(name == HALL_ASSETS_MANAGER_NAME ? "type.hall" : `type.${name}_`, this.storagePath, this.versionCompareHanle.bind(this));
+                this.assetsManagers[name].manager = new jsb.AssetsManager(name == MAIN_PACK ? `type.${MAIN_PACK}` : `type.${name}_`, this.storagePath, this.versionCompareHanle.bind(this));
                 //设置下载并发量
                 this.assetsManagers[name].manager.setHotUpdateUrl(this.getHotUpdateUrl(name));
                 this.assetsManagers[name].manager.setVerifyCallback(function (path, asset) {
@@ -180,7 +172,7 @@ export class HotupdateManager {
     }
 
     /**@description 检测更新 */
-    private checkUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
+    private _checkUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
         if( this.isNeedUpdate(callback) ){
             log(`--checkUpdate--`);
             if (this.updating) {
@@ -212,33 +204,46 @@ export class HotupdateManager {
         }
     }
 
-    /**@description 检查大厅是否需要更新 */
-    checkHallUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
+    /**@description 检查主包是否需要更新 */
+    private checkMainUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
         if( this.isNeedUpdate(callback) ){
             this.currentAssetsManager = this.getAssetsManager();
             this.currentAssetsManager.manager.loadLocalManifest(this.hallProjectMainfest);
-            this.checkUpdate(callback);
+            this._checkUpdate(callback);
         }
     }
 
     /**
-     * @description 获取子游戏manifest url
-     * @param gameName 子游戏名
-     * @returns manifest url
+     * @description 检测更新
+     * @param callback 回调
+     * @param bundle bundle,如果不传，则为对主包的检测
      */
-    private getGameManifest(gameName:string): string {
-        return `${this.manifestRoot}${gameName}_project.manifest`;
+    checkUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void,bundle?:string){
+        if( typeof bundle == "string" ){
+            this.checkBundleUpdate(bundle,callback);
+        }else{
+            this.checkMainUpdate(callback);
+        }
     }
 
     /**
-     * @description 检测子游戏更新
-     * @param gameName 子游戏名
+     * @description 获取bundlemanifest url
+     * @param bundle bundle
+     * @returns manifest url
+     */
+    private getBundleManifest(bundle:string): string {
+        return `${this.manifestRoot}${bundle}_project.manifest`;
+    }
+
+    /**
+     * @description 检测Bundle更新
+     * @param bundle 子游戏名
      * @param callback 检测完成回调
      */
-    checkGameUpdate(gameName: string, callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
+    private checkBundleUpdate(bundle: string, callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
         if( this.isNeedUpdate(callback) ){
-            this.currentAssetsManager = this.getAssetsManager(gameName);
-            let manifestUrl = this.getGameManifest(gameName);
+            this.currentAssetsManager = this.getAssetsManager(bundle);
+            let manifestUrl = this.getBundleManifest(bundle);
             //先检测本地是否已经存在子游戏版本控制文件 
             if (jsb.fileUtils.isFileExist(manifestUrl)) {
                 //存在版本控制文件 
@@ -247,7 +252,7 @@ export class HotupdateManager {
                 log(`--存在本地版本控制文件checkUpdate--`);
                 log(`mainifestUrl : ${manifestUrl}`);
                 this.currentAssetsManager.manager.loadLocalManifest(jsbGameManifest, "");
-                this.checkUpdate(callback);
+                this._checkUpdate(callback);
             } else {
                 //不存在版本控制文件 ，生成一个初始版本
                 if (this.updating) {
@@ -256,12 +261,12 @@ export class HotupdateManager {
                     return;
                 }
 
-                let packageUrl = this.getHotUpdateUrl(gameName);
+                let packageUrl = this.getHotUpdateUrl(bundle);
                 let gameManifest = {
                     version: "0",
                     packageUrl: packageUrl,
                     remoteManifestUrl: `${packageUrl}/${manifestUrl}`,
-                    remoteVersionUrl: `${packageUrl}/${this.manifestRoot}${gameName}_version.manifest`,
+                    remoteVersionUrl: `${packageUrl}/${this.manifestRoot}${bundle}_version.manifest`,
                     assets: {},
                     searchPaths: []
                 };
@@ -270,7 +275,7 @@ export class HotupdateManager {
                 log(`--checkUpdate--`);
                 log(`mainifest content : ${gameManifestContent}`);
                 this.currentAssetsManager.manager.loadLocalManifest(jsbGameManifest, "");
-                this.checkUpdate(callback);
+                this._checkUpdate(callback);
             }
         }
     }
@@ -380,14 +385,10 @@ export class HotupdateManager {
 
         if (isUpdateFinished) {
             //下载完成,需要重新设置搜索路径，添加下载路径
-            // Prepend the manifest's search path
             var searchPaths: string[] = jsb.fileUtils.getSearchPaths();
             var newPaths: string[] = this.currentAssetsManager.manager.getLocalManifest().getSearchPaths();
             log(JSON.stringify(newPaths));
             Array.prototype.unshift.apply(searchPaths, newPaths);
-            // This value will be retrieved and appended to the default search path during game startup,
-            // please refer to samples/js-tests/main.js for detailed usage.
-            // !!! Re-add the search paths in main.js is very important, otherwise, new scripts won't take effect.
 
             //这里做一个搜索路径去重处理
             let obj : any = {};
@@ -400,7 +401,7 @@ export class HotupdateManager {
         }
 
         let state = this.currentAssetsManager.manager.getState();
-        if (this.currentAssetsManager.name == HALL_ASSETS_MANAGER_NAME) {
+        if (this.currentAssetsManager.name == MAIN_PACK) {
             if (isUpdateFinished) {
                 this.currentAssetsManager.manager.setEventCallback(null as any);
                 //下载数量大于0，才有必要进入重启，在如下这种情况下，并不会发生下载

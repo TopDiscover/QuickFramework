@@ -5,13 +5,13 @@ import { setService } from "../../../../scripts/framework/decorator/Decorators";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import Controller from "../../../../scripts/framework/componects/Controller";
 import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
-import { TestProtoMessage } from "../protocol/TestProtoMessage";
 import { TestBinaryMessage } from "../protocol/TestBinaryMessage";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { SUB_CMD_LOBBY } from "../protocol/LobbyCmd";
 import { TestJsonMessage } from "../protocol/TestJsonMessage";
 import { GetCmdKey } from "./GetCmdKey";
 import { Net } from "../../../../scripts/framework/core/net/Net";
+import { HallProtoConfig } from "../../proto/HallProtoConfig";
 import { _decorator } from "cc";
 const { ccclass, property } = _decorator;
 
@@ -23,7 +23,7 @@ export default class HallNetController extends Controller<LobbyService> {
         super.addEvents()
 
         this.addNetEvent(GetCmdKey(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_JSON_MSG), this.onTestJsonMessage, TestJsonMessage);
-        this.addNetEvent(GetCmdKey(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_PROTO_MSG), this.onTestProtoMessage, TestProtoMessage);
+        this.addNetEvent(HallProtoConfig.CMD_ROOM_INFO.cmd, this.onTestProtoMessage,HallProtoConfig.CMD_ROOM_INFO.className);
         this.addNetEvent(GetCmdKey(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_BINARY_MSG), this.onTestBinaryMessage, TestBinaryMessage);
     }
 
@@ -31,8 +31,8 @@ export default class HallNetController extends Controller<LobbyService> {
         dispatch(CommonEvent.TEST_JSON_MSG, data.hello);
     }
 
-    private onTestProtoMessage(data: TestProtoMessage) {
-        dispatch(CommonEvent.TEST_PROTO_MSG, data.data.hello);
+    private onTestProtoMessage(data: tp.RoomInfo) {
+        dispatch(CommonEvent.TEST_PROTO_MSG, data.name);
     }
 
     private onTestBinaryMessage(data: TestBinaryMessage) {

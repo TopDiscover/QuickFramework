@@ -8,13 +8,12 @@ import { EventTouch, _decorator,Node, PageView, instantiate, find, Label, Progre
 import { HotUpdate } from "../../../../scripts/framework/core/hotupdate/Hotupdate";
 import { ViewZOrder } from "../../../../scripts/common/config/Config";
 import { Macro } from "../../../../scripts/framework/defines/Macros";
-import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
-
+import GameView from "../../../../scripts/framework/core/ui/GameView";
 
 const { ccclass, property } = _decorator;
 
 @ccclass
-export default class HallView extends UIView {
+export default class HallView extends GameView {
     public static getPrefabUrl() {
         return "prefabs/HallView";
     }
@@ -35,7 +34,7 @@ export default class HallView extends UIView {
                     return;
                 }
             }
-            Manager.bundleManager.enterBundle(config);
+        this.enterBundle((ev.target as Node).userData);
         }
     }
 
@@ -44,40 +43,26 @@ export default class HallView extends UIView {
     private pageView : PageView = null!;
     private readonly PAGE_COUNT = 6;
 
-    private _bundleNames = [
-        "tankBattle",
-        "loadTest",
-        "netTest",
-        "aimLine",
-        "nodePoolTest",
-        "eliminate",
-    ];
-    private _bundles: HotUpdate.BundleConfig[] = [];
     private get bundles() {
-        if (this._bundles.length <= 0) {
-            let names : string[] = Manager.getLanguage("hall_view_game_name",HallData.bundle);
-            for( let i = 0 ; i < this._bundleNames.length ;i++ ){
-                this._bundles.push(new HotUpdate.BundleConfig(names[i],this._bundleNames[i],i+1));
-            }
-        }
-        return this._bundles;
+        return HallData.games;
     }
 
     private createPage(){
 
         //计算出总页数
-        let pageCount = Math.ceil( this.bundles.length / this.PAGE_COUNT );
+        let keys = Object.keys(this.bundles);
+        let pageCount = Math.ceil( keys.length / this.PAGE_COUNT );
         for( let i = 0 ;i < pageCount ; i++ ){
             let page = instantiate(this.gamePage);
             page.active = true;
             this.pageView.addPage(page);
         }
 
-        for (let i = 0; i < this.bundles.length; i++) {
+        for (let i = 0; i < keys.length; i++) {
             let game = instantiate(this.gameItem);
-            game.name = `game_${i + 1}`;
+            game.name = `game_${this.bundles[keys[i]].bundle}`;
             game.active = true;
-            game.userData = i;
+            game.userData = this.bundles[keys[i]].bundle;
             let labelNode = find("Background/label", game);
             if( labelNode ){
                 let label = labelNode.getComponent(Label);
@@ -122,8 +107,6 @@ export default class HallView extends UIView {
         ChatService.instance.enabled = false;
 
         this.audioHelper.playMusic("audio/background",this.bundle)
-        
-        dispatchEnterComplete({ type: Logic.Type.HALL, views: [this] });
     }
 
     addEvents() {
@@ -135,7 +118,7 @@ export default class HallView extends UIView {
         let pages = this.pageView.getPages();
         for (let i = 0; i < pages.length; i++) {
             let page = pages[i];
-            let item = find(`game_${config.index}`, page);
+            let item = find(`game_${config.bundle}`, page);
             if (item) {
                 return item;
             }

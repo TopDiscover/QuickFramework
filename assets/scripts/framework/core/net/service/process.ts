@@ -1,5 +1,5 @@
 import { DEBUG } from "cc/env";
-import { DefaultCodec } from "../message/defaultCodec";
+import { DefaultCodec } from "../message/DefaultCodec";
 import { Codec, Message } from "../message/Message";
 import { Net } from "../Net";
 
@@ -19,6 +19,7 @@ export class Process {
 
     /** @description 可能后面有其它特殊需要，特定情况下暂停消息队列的处理, true为停止消息队列处理 */
     public isPause: boolean = false;
+    serviceType: Net.ServiceType = null!;
 
     /**
      * @description 暂停消息队列消息处理
@@ -56,8 +57,8 @@ export class Process {
                     if (typeof tempTime == "number") {
                         handleTime = Math.max(handleTime, tempTime);
                     }
-                } catch (error) {
-                    error(error);
+                } catch (err) {
+                    error(err);
                 }
             }
         }
@@ -75,7 +76,7 @@ export class Process {
 
     public onMessage(code: Codec) {
         log(`recv data main cmd : ${code.cmd}`);
-        let key = code.cmd;
+        let key = String(code.cmd);
         if (!this._listeners[key]) {
             warn(`no find listener data main cmd : ${code.cmd}`);
             return;
@@ -203,15 +204,32 @@ export class Process {
 
     protected decode(o: Net.ListenerData, header: Codec): Message | null {
         let obj: Message = null!;
-        if (o.type) {
-            obj = new o.type();
-            //解包
-            obj.decode(header.buffer);
-        } else {
-            //把数据放到里面，让后面使用都自己解析,数据未解析，此消息推后解析
-            obj = header.buffer as any;
+        if ( this.serviceType == Net.ServiceType.Proto ){
+            if ( o.type && typeof o.type == "string" ){
+                let type = Manager.protoManager.lookup(o.type) as protobuf.Type;
+                if( type ){
+                    obj = Manager.protoManager.decode({
+                        className : o.type,
+                        buffer : header.buffer,
+                    }) as any;
+                }else{
+                    obj = header.buffer as any;
+                }
+            }else{
+                obj = header.buffer as any;
+            }
+            return obj;
+        }else{
+            if (o.type && typeof o.type != "string") {
+                obj = new o.type();
+                //解包
+                obj.decode(header.buffer);
+            } else {
+                //把数据放到里面，让后面使用都自己解析,数据未解析，此消息推后解析
+                obj = header.buffer as any;
+            }
+            return obj
         }
-        return obj
     }
 
     public addMessageQueue(key: string, data: any, encode: boolean) {

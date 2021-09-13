@@ -1,14 +1,11 @@
-import UIView from "../../framework/core/ui/UIView";
-import DownloadLoading from "../../common/component/DownloadLoading";
-import { _decorator,Node, find, SystemEventType } from "cc";
-import { HotUpdate } from "../../framework/core/hotupdate/Hotupdate";
+import { _decorator,Node, find } from "cc";
 import { Config } from "../../common/config/Config";
-import { dispatchEnterComplete, Logic } from "../../framework/core/logic/Logic";
+import GameView from "../../framework/core/ui/GameView";
 
 const {ccclass, property} = _decorator;
 
 @ccclass
-export default class LoginView extends UIView {
+export default class LoginView extends GameView {
 
     static getPrefabUrl(){
         return "login/prefabs/LoginView"
@@ -18,13 +15,9 @@ export default class LoginView extends UIView {
 
     onLoad(){
         super.onLoad();
-        this._login = find("login",this.node) as Node;
-        this._login.on(SystemEventType.TOUCH_END,()=>{
-            Manager.bundleManager.enterBundle(new HotUpdate.BundleConfig("大厅",Config.BUNDLE_HALL,0,Logic.Event.ENTER_HALL,true));
+        this._login = find("login", this.node) as Node;
+        this._login.on(Node.EventType.TOUCH_END, () => {
+            this.enterBundle(Config.BUNDLE_HALL);
         });
-
-        // let version = cc.find("version", this.node).getComponent(cc.Label).string = "版本3";
-        
-        dispatchEnterComplete({type:Logic.Type.LOGIN,views:[this,DownloadLoading]})
     }
 }

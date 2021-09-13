@@ -13,7 +13,6 @@ import { INetHelper } from "../controller/INetHelper";
 import { TestChatNetHelper } from "../controller/TestChatNetHelper";
 import { TestGameNetHelper } from "../controller/TestGameNetHelper";
 import { NetTest } from "../data/NetTestData";
-import { dispatchEnterComplete, Logic } from "../../../../scripts/framework/core/logic/Logic";
 import { Config } from "../../../../scripts/common/config/Config";
 
 
@@ -107,7 +106,7 @@ export default class NetTestView extends GameView {
 
         //返回
         find("goback", this.node)?.on(Node.EventType.TOUCH_END, () => {
-            dispatch(Logic.Event.ENTER_HALL);
+            this.enterBundle(Config.BUNDLE_HALL);
         });
 
         //重连
@@ -138,8 +137,6 @@ export default class NetTestView extends GameView {
         this.logItem.removeFromParent();
 
         this.init();
-
-        dispatchEnterComplete({ type: Logic.Type.GAME, views: [this] });
     }
 
     private init() {

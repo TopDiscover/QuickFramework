@@ -65,8 +65,8 @@ class ResourceCache {
         this._caches.forEach((value, key, origin) => {
             if (Array.isArray(value.data)) {
                 let isAllDelete = true;
-                for (let i = 0; i < value.data.length; i++) {
-                    if (value.data[i] && value.data[i].refCount != 0) {
+                for( let i = 0 ; i < value.data.length ; i++){
+                    if( value.data[i] && value.data[i].refCount > 0 ){
                         isAllDelete = false;
                     }
                 }
@@ -74,8 +74,8 @@ class ResourceCache {
                     this._caches.delete(key);
                     if (DEBUG) log(`删除不使用的资源目录 bundle : ${this.name} dir : ${key}`);
                 }
-            } else {
-                if (value.data && value.data.refCount == 0) {
+            }else{
+                if( value.data && value.data.refCount <= 0 ){
                     this._caches.delete(key);
                     if (DEBUG) log(`删除不使用的资源 bundle : ${this.name} url : ${key}`);
                 }
@@ -307,6 +307,13 @@ export class CacheManager {
         }
     }
 
+    /**
+     * @description 同步获取资源缓存，此接口不会检查资源的状态，只要建立了缓存，就会立即返回
+     * @param bundle bundle名
+     * @param path 资源路径
+     * @param isCheck 是否检查资源有效性，当为ture时，会检查资源是否有效，如果有效直接返回，如果无效，则返回nll
+     * @returns 
+     */
     public get(bundle: BUNDLE_TYPE, path: string, isCheck: boolean = true) {
         let bundleName = this.getBundleName(bundle);
         if (bundleName && this._bundles.has(bundleName)) {

@@ -3,7 +3,7 @@ export abstract class IMessage {
     /**@description 发送或接收的字节数据流 */
     abstract buffer: Uint8Array;
     /**@description 消息命令码 */
-    abstract get cmd(): string
+    abstract get cmd(): string | number
 }
 
 export abstract class Codec extends IMessage {

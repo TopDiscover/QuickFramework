@@ -8,12 +8,12 @@ import { Resource } from "./Resource";
 export default class ResourceLoader {
 
     /** @description 加载资源数据 */
-    private _resources: Map<string, Resource.Data> = new Map<string, Resource.Data>();
+    private _resources: Map<string,Resource.Data> = new Map<string,Resource.Data>();
     /**@description 当前已经加载的资源数量 */
     private _loadedCount: number = 0;
 
     /**@description 加载完成后的数据，为了方便释放时精准释放，没加载成功的资源，不在做释放的判断 */
-    private _loadedResource: Map<string, Resource.Info> = new Map<string, Resource.Info>();
+    private _loadedResource: Map<string,Resource.Info>  = new Map<string,Resource.Info>();
 
     /**@description 当前是否正在加载资源 */
     private _isLoading: boolean = false;
@@ -107,7 +107,7 @@ export default class ResourceLoader {
         });
 
         this._loadedCount = 0;
-        this._resources.forEach((value: Resource.Data, key, source) => {
+        this._resources.forEach((value, key, source) => {
             if (value.preloadView) {
                 Manager.uiManager.preload(value.preloadView, value.bundle as BUNDLE_TYPE).then((view) => {
                     let cache = new Resource.CacheData();

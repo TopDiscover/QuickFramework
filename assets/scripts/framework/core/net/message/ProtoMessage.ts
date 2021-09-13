@@ -1,3 +1,4 @@
+import { Net } from "../Net";
 import { Codec, Message } from "./Message";
 
 /**
@@ -13,14 +14,9 @@ export abstract class ProtoMessage<T> extends Message {
     /**@description 真空的Proto数据 */
     data: T = null!;
 
-    constructor(protoType?: any) {
+    constructor(protoType:any){
         super();
-        if (protoType) {
-            this.type = protoType;
-            this.data = new protoType();
-        } else {
-            error("没有指定proto数据类型")
-        }
+        this.type = protoType;
     }
 
     /**@description 打包数据 */
@@ -44,4 +40,8 @@ export abstract class ProtoMessage<T> extends Message {
 
 export abstract class ProtoCodec extends Codec {
 
+}
+
+export abstract class ProtoMessageHeartbeat extends Message{
+    static type = Net.ServiceType.Proto;
 }

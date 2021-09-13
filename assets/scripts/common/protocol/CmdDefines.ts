@@ -1,4 +1,4 @@
-export let MainCmd = {
+export const MainCmd = {
     /**@description 系统类 */
     CMD_SYS: 1,
     /**@description 游戏类 */
@@ -12,7 +12,7 @@ export let MainCmd = {
 
 }
 
-export let SUB_CMD_SYS = {
+export const SUB_CMD_SYS = {
     /** 心跳 -- 客户端、服务器使用 **/
     CMD_SYS_HEART: 1,
 }

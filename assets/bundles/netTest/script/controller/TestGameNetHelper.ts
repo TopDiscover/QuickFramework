@@ -2,7 +2,10 @@ import NetHelper from "../../../../scripts/framework/core/net/service/NetHelper"
 import { GameService } from "../../../../scripts/common/net/GameService";
 import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessage";
 import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
-import { TestProtoMessage } from "../../../hall/script/protocol/TestProtoMessage";
+import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
+import { CmmProto } from "../../../../scripts/common/net/CmmProto";
+import { SUB_CMD_LOBBY } from "../../../hall/script/protocol/LobbyCmd";
+import { HallProtoConfig } from "../../../hall/proto/HallProtoConfig";
 
 class _TestGameNetHelper extends NetHelper<GameService>{
 
@@ -11,10 +14,28 @@ class _TestGameNetHelper extends NetHelper<GameService>{
     }
 
     sendProtoMessage(hello: string) {
-        let testProto = new TestProtoMessage();
-        testProto.data.hello = hello;
-        testProto.data.afvalue = 4.5;
-        this.service.send(testProto);
+        type RoomInfo = typeof tp.RoomInfo;
+        let RoomInfo : RoomInfo = Manager.protoManager.lookup(HallProtoConfig.CMD_ROOM_INFO.className) as any;
+        let roomInfo = new CmmProto<tp.RoomInfo>(RoomInfo);
+        roomInfo.data = RoomInfo.create();
+        roomInfo.mainCmd = HallProtoConfig.CMD_ROOM_INFO.mainCmd;
+        roomInfo.subCmd = HallProtoConfig.CMD_ROOM_INFO.subCmd;
+        roomInfo.cmd = HallProtoConfig.CMD_ROOM_INFO.cmd;
+        roomInfo.data.name = "高级VIP专场";
+        roomInfo.data.roomID = 9999;
+        type UserInfo = typeof tp.UserInfo;
+        let UserInfo : UserInfo = Manager.protoManager.lookup("tp.UserInfo") as any ;
+        let userInfo = UserInfo.create();
+        userInfo.id = 6666;
+        userInfo.level = 10;
+        userInfo.money = 9900009999
+        userInfo.name = "我就是玩！！！"
+
+        let GenderType = Manager.protoManager.lookup("tp.GenderType") as protobuf.Enum;
+        userInfo.gender = ((GenderType.values as any) as typeof tp.GenderType).female;
+        roomInfo.data.players = [];
+        roomInfo.data.players.push(userInfo);
+        this.service.send(roomInfo);
     }
 
     sendJsonMessage(hello: string) {
