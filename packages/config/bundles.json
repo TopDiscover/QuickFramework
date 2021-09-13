@@ -20,55 +20,41 @@
         },
         {
             "id": "3",
-            "name": "游戏1",
-            "dir": "gameOne",
-            "version": "1",
-            "includeApk": false
-        },
-        {
-            "id": "4",
-            "name": "游戏2",
-            "dir": "gameTwo",
-            "version": "1",
-            "includeApk": false
-        },
-        {
-            "id": "5",
             "name": "大厅",
             "dir": "hall",
             "version": "1",
             "includeApk": true
         },
         {
-            "id": "6",
+            "id": "4",
             "name": "动态加载测试示例",
             "dir": "loadTest",
             "version": "1",
             "includeApk": false
         },
         {
-            "id": "7",
+            "id": "5",
             "name": "网络测试示例",
             "dir": "netTest",
             "version": "1",
             "includeApk": false
         },
         {
-            "id": "8",
+            "id": "6",
             "name": "节点缓存测试示例",
             "dir": "nodePoolTest",
             "version": "1",
             "includeApk": false
         },
         {
-            "id": "9",
+            "id": "7",
             "name": "shaders",
             "dir": "shaders",
             "version": "1",
             "includeApk": false
         },
         {
-            "id": "10",
+            "id": "8",
             "name": "坦克大战",
             "dir": "tankBattle",
             "version": "1",
