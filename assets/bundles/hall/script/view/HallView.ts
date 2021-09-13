@@ -32,18 +32,19 @@ export default class HallView extends GameView {
     private createPage() {
 
         //计算出总页数
-        let pageCount = Math.ceil(this.bundles.length / this.PAGE_COUNT);
+        let keys = Object.keys(this.bundles);
+        let pageCount = Math.ceil(keys.length / this.PAGE_COUNT);
         for (let i = 0; i < pageCount; i++) {
             let page = cc.instantiate(this.gamePage);
             page.active = true;
             this.pageView.addPage(page);
         }
 
-        for (let i = 0; i < this.bundles.length; i++) {
+        for (let i = 0; i < keys.length; i++) {
             let game = cc.instantiate(this.gameItem);
-            game.name = `game_${this.bundles[i].bundle}`;
+            game.name = `game_${this.bundles[keys[i]].bundle}`;
             game.active = true;
-            game.userData = this.bundles[i].bundle;
+            game.userData = this.bundles[keys[i]].bundle;
             cc.find("Background/label", game).getComponent(cc.Label).language = Manager.makeLanguage(`hall_view_game_name.${i}`, this.bundle);
             game.on(cc.Node.EventType.TOUCH_END, this.onClick, this);
 
