@@ -71,11 +71,19 @@ export class EntryManager {
     }
 
     /**
-     * @description 进入bundle,默认代理没办法满足需求的情况，可自行定制 */
-    enterBundle(bundle:BUNDLE_TYPE) {
+     * @description 进入bundle,默认代理没办法满足需求的情况，可自行定制 
+     * @param bundle bundle
+     * @param isQuitGame 是否退出游戏，bundel为主包时有效果
+     **/
+    enterBundle(bundle:BUNDLE_TYPE,isQuitGame:boolean = false) {
         let config = this.delegate.getEntryConfig(bundle);
         if ( config ){
-            Manager.bundleManager.enterBundle(config, this.delegate);
+            if( isQuitGame ){
+                let entry = this.getEntry(bundle);
+                this.delegate.onQuitGame(entry);
+            }else{
+                Manager.bundleManager.enterBundle(config, this.delegate);
+            }
         }   
     }
 

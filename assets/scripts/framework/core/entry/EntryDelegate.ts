@@ -148,6 +148,15 @@ export class EntryDelegate {
         return [Macro.BUNDLE_RESOURCES,Manager.bundleManager.bundleHall];
     }
 
+    onQuitGame(mainEntry : Entry ){
+        if ( mainEntry ){
+            if ( Manager.gameView ){
+                Manager.gameView.close();
+            }
+            mainEntry.onEnter(true);
+        }
+    }
+
     getEntryConfig(bundle:BUNDLE_TYPE) : HotUpdate.BundleConfig | null {
         return null;
     }

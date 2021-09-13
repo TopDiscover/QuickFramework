@@ -95,12 +95,12 @@ export default class ReconnectComponent extends Controller<CommonService> {
                     this.connect();
                 } else {
                     cc.log(`${this.logName} 玩家网络不好，不重连，退回到登录界面`);
-                    Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
+                    Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
                 }
             },
             cancelCb: () => {
                 cc.log(`${this.logName} 玩家网络不好，不重连，退回到登录界面`);
-                Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
+                Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
             }
         });
     }

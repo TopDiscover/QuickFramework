@@ -43,10 +43,12 @@ class LoginEntry extends Entry {
 
     
     /**@description 管理器通知自己进入GameView */
-    onEnter() {
+    onEnter( isQuitGame : boolean) {
         super.onEnter();
         cc.log(`--------------onEnterLogin--------------`);
-        Manager.loading.show(i18n.checkingUpdate);
+        if ( !isQuitGame ){
+            Manager.loading.show(i18n.checkingUpdate);
+        }
     }
 
     /**@description 这个位置说明自己GameView 进入onLoad完成 */

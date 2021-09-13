@@ -21,8 +21,8 @@ export default class GameView extends UIView {
         Manager.entryManager.onEnterBundleComplete(this.bundle,this);
     }
 
-    enterBundle( bundle : BUNDLE_TYPE){
-        Manager.entryManager.enterBundle(bundle);
+    enterBundle( bundle : BUNDLE_TYPE , isQuitGame : boolean = false ){
+        Manager.entryManager.enterBundle(bundle,isQuitGame);
     }
 
     onDestroy(){

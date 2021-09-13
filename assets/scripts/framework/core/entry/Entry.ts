@@ -35,7 +35,7 @@ export abstract class Entry {
     }
 
     /**@description 管理器通知自己进入GameView */
-    onEnter(): void {
+    onEnter( isQuitGame ?: boolean): void {
         //语言包初始化
         if (this.language) {
             Manager.language.addSourceDelegate(this.language);

@@ -111,12 +111,12 @@ export class ServiceManager implements GameEventInterface {
                             service.reconnect.show();
                         } else {
                             cc.log(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
-                            Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
+                            Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
                         }
                     },
                     cancelCb: () => {
                         cc.log(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
-                        Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
+                        Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
                     }
                 });
             });

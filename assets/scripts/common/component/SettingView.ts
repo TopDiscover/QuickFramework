@@ -63,7 +63,7 @@ export default class SettingView extends UIView {
             text: i18n.quitGame,
             confirmCb: (isOk) => {
                 if (isOk) {
-                    Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
+                    Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
                 }
             },
         });
