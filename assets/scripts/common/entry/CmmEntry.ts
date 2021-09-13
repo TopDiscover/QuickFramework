@@ -73,12 +73,9 @@ export class CmmEntry extends EntryDelegate {
     }
 
     getEntryConfig(bundle:string) : HotUpdate.BundleConfig | null {
-        let keys = Object.keys(Config.ENTRY_CONFIG);
-        for( let i = 0 ; i < keys.length ; i++ ){
-            let config : HotUpdate.BundleConfig = Config.ENTRY_CONFIG[keys[i]];
-            if ( config && config.bundle == bundle ){
-                return config;
-            }
+        let config = Config.ENTRY_CONFIG[bundle];
+        if ( config ){
+            return config;
         }
         if( CC_DEBUG ){
             cc.error(`未找到入口配置信息`);

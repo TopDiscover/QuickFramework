@@ -17,7 +17,7 @@ export default class ResourceLoader {
     private _isLoading: boolean = false;
 
     /**@description 标识 */
-    private _tag: string = null;
+    private _tag: string = null!;
     public get tag() {
         return this._tag;
     }

@@ -6,7 +6,7 @@ import { EntryDelegate } from "./EntryDelegate";
 export class EntryManager {
     private static _instance: EntryManager = null!;
     public static Instance() { return this._instance || (this._instance = new EntryManager()); }
-    private tag: "[EntryManager] : ";
+    private tag = "[EntryManager] : ";
     private _entryTypes: EntryClass<Entry>[] = [];
     private _entrys: Entry[] = [];
 
@@ -37,7 +37,7 @@ export class EntryManager {
 
     onLoad(node: cc.Node) {
         this.node = node;
-        let mainEntry : Entry = null;
+        let mainEntry : Entry | null = null;
         for (let i = 0; i < this._entryTypes.length; i++) {
             let type = this._entryTypes[i];
             if (!this.isRunning(type)) {

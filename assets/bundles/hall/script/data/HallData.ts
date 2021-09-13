@@ -4,7 +4,7 @@ import { HotUpdate } from "../../../../scripts/framework/core/hotupdate/Hotupdat
 import { GameData } from "../../../../scripts/framework/data/GameData";
 /**@description 大厅数据 */
 class _HallData extends GameData {
-    private static _instance: _HallData = null;
+    private static _instance: _HallData = null!;
     public static Instance() { return this._instance || (this._instance = new _HallData()); }
 
     get bundle() {

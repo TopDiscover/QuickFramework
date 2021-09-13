@@ -5,9 +5,10 @@
 
 import LoginView from "./view/LoginView";
 import { i18n } from "../common/language/CommonLanguage";
-import { ViewZOrder } from "../common/config/Config";
+import { Config, ViewZOrder } from "../common/config/Config";
 import { Macro } from "../framework/defines/Macros";
 import { Entry } from "../framework/core/entry/Entry";
+import { HotUpdate } from "../framework/core/hotupdate/Hotupdate";
 
 class LoginEntry extends Entry {
     static bundle = Macro.BUNDLE_RESOURCES;
@@ -30,7 +31,8 @@ class LoginEntry extends Entry {
         Manager.uiManager.close(LoginView);
     }
     protected initData(): void {
-        
+        Config.ENTRY_CONFIG[Config.BUNDLE_HALL] = new HotUpdate.BundleConfig(i18n.hallText,Config.BUNDLE_HALL);
+        Config.ENTRY_CONFIG[Macro.BUNDLE_RESOURCES] = new HotUpdate.BundleConfig(i18n.mainPack,Macro.BUNDLE_RESOURCES);
     }
     protected pauseMessageQueue(): void {
         

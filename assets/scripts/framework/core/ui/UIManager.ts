@@ -103,7 +103,7 @@ class ViewData {
     /**是否预加载,不显示出来，但会加到当前场景上 */
     isPreload: boolean = false;
     /**@description 资源信息 */
-    info: Resource.Info = null;
+    info: Resource.Info = null!;
     /**@description 界面的类型 */
     viewType : UIClass<UIView> = null!;
     /**@description bundle */

@@ -19,7 +19,7 @@ export abstract class Service extends ServerConnector {
     public set Codec(value: new () => Codec) { this._Process.Codec = value }
     // protected get messageHeader() { return this._messageHeader }
 
-    private _Heartbeat: Net.HeartbeatClass<Message> = null;
+    private _Heartbeat: Net.HeartbeatClass<Message> = null!;
     /**@description 心跳的消息定义类型 */
     public get heartbeat(): Net.HeartbeatClass<Message> { return this._Heartbeat }
     public set heartbeat(value: Net.HeartbeatClass<Message>) { 

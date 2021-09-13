@@ -19,9 +19,4 @@ export default class LoginView extends GameView {
             this.enterBundle(Config.BUNDLE_HALL);
         });
     }
-    getClassName(cls: Object): string {
-        for (let key in cls) {
-            return key
-        }
-    }
 }

@@ -1,8 +1,6 @@
 /**@description 全局配置 */
 
 import { HotUpdate } from "../../framework/core/hotupdate/Hotupdate";
-import { Macro } from "../../framework/defines/Macros";
-import { i18n } from "../language/CommonLanguage";
 
 export namespace Config {
     /**@description 是否显示调试按钮 */
@@ -58,10 +56,7 @@ export namespace Config {
     /**@description 网络重连弹出框tag */
     export const RECONNECT_ALERT_TAG = 100;
 
-    export let ENTRY_CONFIG ={
-        HALL : new HotUpdate.BundleConfig(i18n.hallText,Config.BUNDLE_HALL),
-        LOGIN : new HotUpdate.BundleConfig(i18n.mainPack,Macro.BUNDLE_RESOURCES),
-    }
+    export const ENTRY_CONFIG : {[key:string] : HotUpdate.BundleConfig} ={};
 }
 
 /**

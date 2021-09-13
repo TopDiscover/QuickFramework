@@ -55,12 +55,12 @@ export class _Manager extends Framewok implements GameEventInterface {
     }
 
     /**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
-    private _globalAudio: GlobalAudio = null;
+    private _globalAudio: GlobalAudio = null!;
     get globalAudio() {
         if (this._globalAudio) {
             return this._globalAudio;
         }
-        this._globalAudio = this.uiManager.getCanvas().getComponent(GlobalAudio);
+        this._globalAudio = this.uiManager.getCanvas().getComponent(GlobalAudio) as GlobalAudio;
         return this._globalAudio;
     }
 

@@ -1,4 +1,3 @@
-import { i18n } from "../../../common/language/CommonLanguage";
 import { Macro } from "../../defines/Macros";
 import { HotUpdate } from "../hotupdate/Hotupdate";
 import GameView from "../ui/GameView";
@@ -119,10 +118,12 @@ export class EntryDelegate {
 
 
     /**@description 进入bundle完成 */
-    onEnterBundleComplete( entry : Entry , gameView : GameView){
+    onEnterBundleComplete( entry : Entry | null , gameView : GameView){
         //删除除自己之外的其它bundle
         let excludeBundles = this.getPersistBundle();
-        excludeBundles.push(entry.bundle);
+        if ( entry ){
+            excludeBundles.push(entry.bundle);
+        }
 
         //进入下一场景，关闭掉当前的场景
         if ( Manager.gameView ){
@@ -136,7 +137,7 @@ export class EntryDelegate {
     /**@description 主包检测更新 */
     onCheckUpdate(){
         let config = new HotUpdate.BundleConfig(
-            i18n.mainPack,
+            Manager.getLanguage("mainPack"),
             Macro.BUNDLE_RESOURCES,
         );
         Manager.bundleManager.enterBundle(config,this);

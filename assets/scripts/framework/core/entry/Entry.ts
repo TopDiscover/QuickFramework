@@ -6,9 +6,9 @@ export abstract class Entry {
     /**@description 是否是主包 */
     static isMain = false;
     /**@description 当前bundle名,由管理器指定 */
-    bundle: string;
+    bundle: string = "";
     /**@description 当前语言包数据源代码，可为null */
-    protected language: Language.DataSourceDelegate | null;
+    protected language: Language.DataSourceDelegate | null = null;
 
     /**@description 模块资源加载器 */
     protected loader: ResourceLoader = null!;
