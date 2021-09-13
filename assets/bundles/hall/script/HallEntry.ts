@@ -11,7 +11,7 @@ class HallEntry extends Entry {
         Manager.hallNetManager.addNetControllers();
     }
     protected removeNetComponent(): void {
-        Manager.hallNetManager.removeNetControllers();
+        // Manager.hallNetManager.removeNetControllers();
     }
     protected loadResources(completeCb: () => void): void {
         Manager.protoManager.load(this.bundle).then((isSuccess)=>{
