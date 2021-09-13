@@ -55,6 +55,7 @@ class LoginEntry extends Entry {
     onEnterComplete() {
         super.onEnterComplete();
         //进入到登录，关闭掉所有网络连接，请求登录成功后才连接网络
+        Manager.hallNetManager.removeNetControllers();
         Manager.serviceManager.close();
         Manager.protoManager.unload();
         Manager.uiManager.closeExcept([LoginView]);

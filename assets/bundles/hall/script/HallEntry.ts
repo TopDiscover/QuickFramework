@@ -11,7 +11,8 @@ class HallEntry extends Entry {
         Manager.hallNetManager.addNetControllers();
     }
     protected removeNetComponent(): void {
-        Manager.hallNetManager.removeNetControllers();
+        //大厅网络层，返回登录在关闭
+        // Manager.hallNetManager.removeNetControllers();
     }
     protected loadResources(completeCb: () => void): void {
         Manager.protoManager.load(this.bundle).then((isSuccess)=>{
