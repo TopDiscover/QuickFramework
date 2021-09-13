@@ -4,6 +4,9 @@ import { TankBettle } from "./data/TankBattleGameData";
 import { TankBattleLanguage } from "./data/TankBattleLanguage";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import { Resource } from "../../../scripts/framework/core/asset/Resource";
+import TankBattleChangeStageView from "./view/TankBattleChangeStageView";
+import TankBattleStartView from "./view/TankBattleStartView";
+import TankBattleGameOver from "./view/TankBattleGameOver";
 /**
  * @description 坦克大战入口
  */
@@ -37,6 +40,9 @@ class TankBattleEntry extends Entry {
         //游戏数据初始化
         Manager.gameData = TankBettle.gameData;
         Manager.gameData.clear();
+        TankBettle.gameData.TankBattleChangeStageView = TankBattleChangeStageView;
+        TankBettle.gameData.TankBattleStartView = TankBattleStartView;
+        TankBettle.gameData.TankBattleGameOver = TankBattleGameOver;
     }
     protected pauseMessageQueue(): void {
         LobbyService.instance.pauseMessageQueue();
