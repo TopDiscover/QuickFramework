@@ -1,6 +1,6 @@
 {
     "name": "fix_engine",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "main": "dist/main.js",
     "description": "把对引擎的改动复制到Cocos Creator的安装目录下，如果没有执行过该插件时，在构建时，提示先执行本插件，以保证热更新相关代码替换",
     "author": "zheng_fasheng",

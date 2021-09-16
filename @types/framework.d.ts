@@ -133,33 +133,94 @@ declare interface UIClass<T extends UIView> {
 	getPrefabUrl(): string;
 }
 declare type Entry = import("../assets/scripts/framework/core/entry/Entry").Entry;
-declare interface EntryClass<T extends Entry>{
-	new():T;
+declare interface EntryClass<T extends Entry> {
+	new(): T;
 	/**@description 当前bundle名 */
-    bundle : string;
+	bundle: string;
 	/**@description 主入口,即主包，主入口只能有一个 */
-    isMain : boolean;
+	isMain: boolean;
 }
 
 declare type GameData = import("../assets/scripts/framework/data/GameData").GameData;
-declare interface GameDataClass<T extends GameData>{
-	new():T;
+declare interface GameDataClass<T extends GameData> {
+	new(): T;
 	/**@description 当前数据所属bundle */
-	bundle : string;
+	bundle: string;
 }
 
 declare type Logic = import("../assets/scripts/framework/core/logic/Logic").Logic;
-declare interface LogicClass<T extends Logic>{
-	new():T;
+declare interface LogicClass<T extends Logic> {
+	new(): T;
 	/**@description 当前Logic所属bundle */
-	bundle : string;
+	bundle: string;
 }
 
 declare type GameView = import("../assets/scripts/framework/core/ui/GameView").default;
-declare interface GameViewClass< T extends UIView>{
-	new():T;
-	logicType : LogicClass<Logic>;
+declare interface GameViewClass<T extends UIView> {
+	new(): T;
+	logicType: LogicClass<Logic>;
 }
+
+/**
+ * @description 通过预置体路径创建节点 请使用全局的导入
+ * @param config 配置信息
+ * @param config.url 预置体路径
+ * @param config.view 预置视图资源管理器，继承自UIView
+ * @param config.completeCallback 创建完成回调 
+ * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
+ * @example 
+ * createPrefab({url :GAME_RES("res/animations/shzDealerCommon"),view:this,completeCallback:(node)=>{
+ *     if ( node ){
+ *         // to do 
+ *     }
+ * }});
+ **/
+export function createPrefab(
+	config: {
+		url: string,
+		view: any,
+		completeCallback: (node: Node) => void,
+		bundle?: BUNDLE_TYPE
+	}): void;
+
+/**
+* @description 扩展一个在界面中加载指定目录的接口 请使用全局的导入
+* @param config 配置信息
+* @param config.url 资源路径
+* @param config.view 资源持有者,继承自UIView
+* @param config.onComplete 加载完成回调 data为ResourceCacheData，用之前先判断当前返回的data.data是否是数组
+* @param config.onProgress 加载进度
+* @param config.bundle 可不填，默认为view指向的bundle
+* @param config.type 加载的资源类型
+* */
+export function loadDirRes(config: {
+	bundle?: BUNDLE_TYPE,
+	url: string,
+	type: typeof import("cc").Asset,
+	view: any,
+	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
+	onComplete: (data: any) => void
+}): void;
+
+/**
+* @description 扩展一个在界面加载指定资源接口 请使用全局的导入
+* @param config 配置信息
+* @param config.bundle 可不填，默认为view指向的bundle
+* @param config.url 资源路径
+* @param config.type 加载的资源类型
+* @param config.onProgress 加载进度
+* @param config.onComplete 加载完成回调 data为ResourceCacheData
+* @param config.view 资源持有者,继承自UIView
+*/
+export function loadRes(config: {
+	bundle?: BUNDLE_TYPE,
+	url: string,
+	type: typeof import("cc").Asset,
+	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
+	onComplete: (data: any) => void,
+	view: any
+}): void;
+
 
 declare type EntryDelegate = import("../assets/scripts/framework/core/entry/EntryDelegate").EntryDelegate;
 declare type Message = import("../assets/scripts/framework/core/net/message/Message").Message;

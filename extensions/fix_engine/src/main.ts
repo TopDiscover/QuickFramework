@@ -107,7 +107,7 @@ export class _Helper {
         console.log("Creator 安装路径 : " + this.appPath);
         console.log("Creator 引擎路径 : " + this.engineRoot);
         
-
+        
         let keys = Object.keys(this.config);
         for( let i = 0 ; i < keys.length ; i++ ){
             let data : ConfigData = this.config[keys[i]];
@@ -120,7 +120,21 @@ export class _Helper {
                 let sourceData = fs.readFileSync(sourcePath,"utf-8");
                 fs.writeFileSync(destPath,sourceData,{ encoding : "utf-8"});
                 console.log(data.desc);
-            }else{
+            } else if( data.name == "ccdts"){
+                //更新声明文件
+                let destPath = `${this.appPath}/${data.path}`;
+                destPath = path.normalize(destPath);
+                let sourcePath = `${path.join(__dirname,`../engine/${data.name}`)}`;
+                sourcePath = path.normalize(sourcePath);
+                let sourceData = fs.readFileSync(sourcePath,"utf-8");
+                let destData = fs.readFileSync(destPath,"utf-8");
+                let replace = function(){
+                    return arguments[1] + sourceData + arguments[3];
+                }
+                destData = destData.replace(/(declare\s*module\s*"cc"\s*\{)([\s\n\S]*)(export\s*class\s*MeshBuffer\s*\{)/g,replace);
+                fs.writeFileSync(destPath,destData,{encoding:"utf-8"});
+                console.log(data.desc);
+            } else{
                 //查看本地是否有文件
                 let sourcePath = `${path.join(__dirname,`../engine/${data.name}`)}`;
                 sourcePath = path.normalize(sourcePath);
