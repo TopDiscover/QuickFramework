@@ -1,5 +1,6 @@
 import ResourceLoader from "../asset/ResourceLoader";
-import { Node } from "cc";
+import { js, Node, warn } from "cc";
+import { DEBUG } from "cc/env";
 
 export abstract class Entry {
 
@@ -19,6 +20,14 @@ export abstract class Entry {
 
     /**@description 当胆入口是否已经运行中 */
     isRunning: boolean = false;
+
+    protected _gameView : GameView = null!;
+    set gameView( gameView : GameView ){
+        this._gameView = gameView;
+    }
+    get gameView() {
+        return this._gameView;
+    }
 
     constructor() {
         this.loader = new ResourceLoader();
@@ -54,8 +63,26 @@ export abstract class Entry {
     }
 
     /**@description 这个位置说明自己GameView 进入onLoad完成 */
-    onEnterComplete(): void {
+    onEnterGameView( gameViw : GameView ): void {
+        this._gameView = gameViw;
+        let viewType = Manager.uiManager.getViewType(gameViw);
+        if ( viewType ){
+            if ( viewType.logicType ){
+                viewType.logicType.bundle = gameViw.bundle as string;
+                let logic = Manager.logicManager.getLogic(viewType.logicType,true);
+                if ( logic ){
+                    gameViw.setLogic(logic);
+                }
+            }else{
+                if ( DEBUG ){
+                    warn(`${js.getClassName(viewType)}未指定logictype`);
+                }
+            }
+        }
+    }
 
+    onDestroyGameView(gameView: GameView) {
+        this._gameView = null as any;
     }
 
     /**@description 卸载bundle,即在自己bundle删除之前最后的一条消息 */
@@ -89,4 +116,9 @@ export abstract class Entry {
     protected abstract pauseMessageQueue(): void;
 
     protected abstract resumeMessageQueue(): void;
+
+    /**@description 外部模块可直接指定bund进行去bundle内调用 */
+    public call(eventName:string,args:any[]):void{
+
+    }
 }

@@ -1,7 +1,6 @@
 import { AssetManager } from "cc";
 import { Macro } from "../../defines/Macros";
 import { HotUpdate } from "../hotupdate/Hotupdate";
-import GameView from "../ui/GameView";
 
 /**@description entry入口代理 */
 export class EntryDelegate {
@@ -119,7 +118,7 @@ export class EntryDelegate {
 
 
     /**@description 进入bundle完成 */
-    onEnterBundleComplete( entry : Entry | null , gameView : GameView){
+    onEnterGameView( entry : Entry | null , gameView : GameView){
         //删除除自己之外的其它bundle
         let excludeBundles = this.getPersistBundle();
         if ( entry ){

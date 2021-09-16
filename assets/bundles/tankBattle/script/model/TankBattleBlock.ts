@@ -1,5 +1,5 @@
 import { BoxCollider2D, Component, Contact2DType, IPhysics2DContact, _decorator } from "cc";
-import { TankBettle } from "../data/TankBattleGameData";
+import { TankBettle } from "../data/TankBattleConfig";
 import TankBettleBullet from "./TankBattleBullet";
 import { TankBattleEntity } from "./TankBattleEntity";
 import { TankBettleTankPlayer } from "./TankBattleTank";
@@ -45,7 +45,7 @@ export default class TankBattleBlock extends TankBattleEntity {
                     break;
                 case TankBettle.BLOCK_TYPE.HOME: {
                     //老巢
-                    this.data.gameOver();
+                    this.logic && this.logic.gameOver();
                 }
                     break;
             }

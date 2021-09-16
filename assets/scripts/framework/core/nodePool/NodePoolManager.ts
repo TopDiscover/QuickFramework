@@ -1,7 +1,8 @@
 import { instantiate, isValid, Node } from "cc";
+import { Macro } from "../../defines/Macros";
 
 export class NodePool {
-    name: string = "unknown";
+    name: string = Macro.UNKNOWN;
     private pool: Array<Node> = [];
     /**@description 用来克隆的节点 */
     private node: Node | null = null;

@@ -2,6 +2,7 @@ import EventComponent from "../../componects/EventComponent";
 import AudioComponent from "../../componects/AudioComponent";
 import { _decorator, Node, game, Game, EventKeyboard, tween, Tween, Vec3, systemEvent, SystemEvent, js, macro } from "cc";
 import { DEBUG } from "cc/env";
+import { Macro } from "../../defines/Macros";
 
 /**
  * @description 视图基类
@@ -21,7 +22,7 @@ export default class UIView extends EventComponent implements IFullScreenAdapt {
         if (DEBUG) {
             error(`请求实现public static getPrefabUrl`);
         }
-        return "unknown";
+        return Macro.UNKNOWN;
     }
 
     /**@description init代码参数 */

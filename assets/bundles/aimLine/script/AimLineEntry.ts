@@ -1,9 +1,8 @@
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
-import { AimLineData } from "./data/AimLineData";
 import AimLineView from "./view/AimLineView";
 
 class AimLineEntry extends Entry {
-    static bundle = AimLineData.bundle;
+    static bundle = "aimLine";
     protected addNetComponent(): void {
     }
     protected removeNetComponent(): void {

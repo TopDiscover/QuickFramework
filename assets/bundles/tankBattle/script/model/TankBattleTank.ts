@@ -1,5 +1,5 @@
 import { instantiate, _decorator, Node, BoxCollider2D, Tween, UITransform, Vec3,Animation, tween, Sprite, randomRange, randomRangeInt, IPhysics2DContact, Rect, Vec2 } from "cc";
-import { TankBettle } from "../data/TankBattleGameData";
+import { TankBettle } from "../data/TankBattleConfig";
 import { TankBattleAI } from "./TankBattleAI";
 
 const { ccclass, property } = _decorator;
@@ -27,13 +27,14 @@ export default class TankBettleTank extends TankBattleAI {
     }
 
     public shoot() {
+        if ( !this.logic ) return false;
         if (this.bullet) {
             //正在发射
             return false;
         } else {
-            let prefab = this.data.bulletPrefab;
+            let prefab = this.logic.bulletPrefab;
             if( !prefab ) return false;
-            let bulletNode = instantiate(this.data.bulletPrefab);
+            let bulletNode = instantiate(this.logic.bulletPrefab);
             if( bulletNode ){
                 this.bullet = bulletNode.addComponent(this.bulletType);
                 this.bullet.move(this);
@@ -92,7 +93,7 @@ export default class TankBettleTank extends TankBattleAI {
             this.isMoving = false;
             if (this.isAI && other.group == TankBettle.GROUP.Home) {
                 //如果是AI碰撞到老巢，直接GameOver
-                this.data.gameOver();
+                this.logic && this.logic.gameOver();
             }
             if (this.isAI) {
                 this.changeDirection(other);
@@ -164,20 +165,22 @@ export class TankBettleTankPlayer extends TankBettleTank {
 
     addLive() {
         this.config.live++;
-        this.data.updateGameInfo();
+        this.logic && this.logic.updateGameInfo();
     }
 
     shoot() {
+        if ( !this.logic ) return true;
         if (super.shoot()) {
-            this.data.playAttackAudio();
+            this.logic.playEffect(TankBettle.AUDIO_PATH.ATTACK);
         }
         return true;
     }
 
     public addStatus(status: TankBettle.PLAYER_STATUS) {
+        if ( !this.logic ) return;
         this._status.set(status, true);
         if (status == TankBettle.PLAYER_STATUS.PROTECTED) {
-            let aniNode = instantiate(this.data.animationPrefab) as Node;
+            let aniNode = instantiate(this.logic.animationPrefab) as Node;
             this.node.addChild(aniNode);
             let animation = aniNode.getComponent(Animation) as Animation;
             animation.play("tank_protected");
@@ -208,6 +211,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
     }
 
     public hurt() {
+        if ( !this.logic ) return;
         if (this.hasStatus(TankBettle.PLAYER_STATUS.PROTECTED)) {
             //受保护下
             return;
@@ -215,20 +219,20 @@ export class TankBettleTankPlayer extends TankBettleTank {
         this.config.live--;
         if (this.config.live == 0) {
             this.stopAllActions();
-            let aniNode = instantiate(this.data.animationPrefab) as Node;
+            let aniNode = instantiate(this.logic.animationPrefab) as Node;
             this.node.addChild(aniNode);
             let animation = aniNode.getComponent(Animation) as Animation;
             animation.play("tank_boom");
             let state = animation.getState("tank_boom");
             //玩家销毁声音
-            this.data.playerCrackAudio();
+            this.logic.playEffect(TankBettle.AUDIO_PATH.PLAYERCRACK);
             aniNode.setPosition(new Vec3())
             tween(this.dieAction).delay(state.duration).call(() => {
                 this.stopAllActions();
-                this.data.gameMap?.removePlayer(this);
+                this.logic && this.logic.onMapRemovePlayer(this);
             }).start()
         }
-        this.data.updateGameInfo();
+        if (this.logic) this.logic.updateGameInfo();
     }
 
     move() {
@@ -313,8 +317,8 @@ export class TankBettleTankEnemy extends TankBettleTank {
         } else if (value == TankBettle.EnemyType.STRONG) {
             spriteFrameKey = "tank_4_0";
         }
-        let sprite = this.node.getComponent(Sprite) as Sprite;
-        sprite.loadImage({ url: { urls: ["texture/images"], key: spriteFrameKey }, view: this.data.gameView, bundle: this.data.gameView.bundle });
+        let sprite = this.node.getComponent(Sprite);
+        this.logic && this.logic.loadImage(sprite,spriteFrameKey);
     }
 
     protected stopAllActions(){
@@ -356,7 +360,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
             if (this.config.live == 1) {
                 spriteFrameKey = "tank_6_0"
             }
-            sprite.loadImage({ url: { urls: ["texture/images"], key: spriteFrameKey }, view: this.data.gameView, bundle: this.data.gameView.bundle });
+            this.logic && this.logic.loadImage(sprite,spriteFrameKey);
         }
         if (this.config.live == 0) {
             this.die()
@@ -364,18 +368,18 @@ export class TankBettleTankEnemy extends TankBettleTank {
     }
 
     public die() {
+        if ( !this.logic ) return;
         this.stopAllActions();
-        let aniNode = instantiate(this.data.animationPrefab) as Node;
+        let aniNode = instantiate(this.logic.animationPrefab) as Node;
         this.node.addChild(aniNode);
         let animation = aniNode.getComponent(Animation) as Animation;
         animation.play("tank_boom");
         let state = animation.getState("tank_boom");
-
-        this.data.enemyCrackAudio();
+        this.logic.playEffect(TankBettle.AUDIO_PATH.ENEMYCRACK);
         aniNode.setPosition(new Vec3());
         tween(this.dieAction).delay(state.duration).call(() => {
             this.stopAllActions();
-            this.data.gameMap?.removeEnemy(this.node);
+            this.logic && this.logic.onMapRemoveEnemy(this.node);
         }).start()
     }
 

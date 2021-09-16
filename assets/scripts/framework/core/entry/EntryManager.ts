@@ -1,5 +1,4 @@
 import { HotUpdate } from "../hotupdate/Hotupdate";
-import GameView from "../ui/GameView";
 import { EntryDelegate } from "./EntryDelegate";
 import { AssetManager, Node } from "cc";
 import { DEBUG } from "cc/env";
@@ -72,6 +71,13 @@ export class EntryManager {
         this.delegate.onCheckUpdate();
     }
 
+    call(bundle:BUNDLE_TYPE,eventName:string,...args:any[]){
+        let entry = this.getEntry(bundle);
+        if( entry ){
+            entry.call(eventName,args);
+        }
+    }
+
     /**
      * @description 进入bundle,默认代理没办法满足需求的情况，可自行定制 
      * @param bundle bundle
@@ -99,24 +105,32 @@ export class EntryManager {
     }
 
     /**@description 进入GameView完成，卸载除了自己之外的其它bundle */
-    onEnterBundleComplete( bundle : BUNDLE_TYPE , gameView : GameView ){
+    onEnterGameView( bundle : BUNDLE_TYPE , gameView : GameView ){
         let entry = this.getEntry(bundle);
         if( entry ){
-            entry.onEnterComplete();
+            entry.onEnterGameView(gameView);
         }
-        this.delegate.onEnterBundleComplete(entry,gameView);
+        this.delegate.onEnterGameView(entry,gameView);
     }
 
     /**@description bundle管事器卸载bundle前通知 */
-    onUnloadBundle( bundle : BUNDLE_TYPE ){
+    onUnloadBundle( bundle : BUNDLE_TYPE){
         let entry = this.getEntry(bundle);
         if ( entry ){
             entry.onUnloadBundle();
         }
     }
 
+    onDestroyGameView(bundle: BUNDLE_TYPE, gameView: GameView) {
+        let entry = this.getEntry(bundle);
+        if ( entry ){
+            entry.onUnloadBundle();
+            entry.onDestroyGameView(gameView);
+        }
+    }
+
     /**@description 获取bundle入口 */
-    private getEntry( bundle : BUNDLE_TYPE ){
+    getEntry( bundle : BUNDLE_TYPE ){
         for ( let i = 0 ; i < this._entrys.length ; i++){
             let entry = this._entrys[i];
             if ( entry && entry.bundle == bundle ){

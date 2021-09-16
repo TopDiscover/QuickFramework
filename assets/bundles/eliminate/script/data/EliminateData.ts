@@ -1,14 +1,8 @@
 import { GameData } from "../../../../scripts/framework/data/GameData";
 import EliminateGameModel from "../model/EliminateGameModel";
 
-class _EliminateData extends GameData {
-
-    private static _instance: _EliminateData = null!;
-    public static Instance() { return this._instance || (this._instance = new _EliminateData()); }
-    get bundle() {
-        return "eliminate";
-    }
-
+export class EliminateData extends GameData {
+    static bundle = "eliminate";
     gameModel: EliminateGameModel = null!;
 
     initGameModel() {
@@ -17,4 +11,3 @@ class _EliminateData extends GameData {
     }
 
 }
-export const EliminateData = getSingleton(_EliminateData);

@@ -3,19 +3,28 @@
  */
 
  import { MapLevel } from "../data/TankBattleLevel";
- import { TankBettle } from "../data/TankBattleGameData";
- import { TankBettleTankPlayer, TankBettleTankEnemy } from "./TankBattleTank";
- import TankBettleBullet from "./TankBattleBullet";
- import TankBattleBlock from "./TankBattleBlock";
- import TankBattleGameView from "../view/TankBattleGameView";
- import TankBattleProps from "./TankBattleProps";
-import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, randomRangeInt, UITransform, instantiate, BoxCollider2D, Rect, Size, randomRange, tween, macro, Sprite, size, Widget } from "cc";
+ import { TankBettleTankPlayer, TankBettleTankEnemy } from "../model/TankBattleTank";
+ import TankBettleBullet from "../model/TankBattleBullet";
+ import TankBattleBlock from "../model/TankBattleBlock";
+ import TankBattleProps from "../model/TankBattleProps";
+import { _decorator,Node,Animation, EventKeyboard, Tween, Vec3, randomRangeInt, UITransform, instantiate, BoxCollider2D, Rect, Size, randomRange, tween, macro, Sprite, size, Widget } from "cc";
+import { TankBettle } from "../data/TankBattleConfig";
+import { TankBettleGameData } from "../data/TankBattleGameData";
  
  const { ccclass, property } = _decorator;
  
  @ccclass
- export default class TankBattleMap extends Component {
+ export default class TankBattleMapCtrl {
+    node: Node = null!;
  
+    private get data(){
+        return Manager.dataCenter.getData(TankBettleGameData) as TankBettleGameData;
+    }
+
+    private get logic():TankBattleLogic{
+        return Manager.logicManager.getLogic<TankBattleLogic>(this.data.bundle) as any;
+    }
+
      /**@description 用于克隆的节点 */
      private _blockPrefab: Node = null!;
  
@@ -29,8 +38,6 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
      /**@description 玩家2 */
      public playerTwo: TankBettleTankPlayer|null = null;
      private outWall: Node[] = [];
- 
-     public owner: TankBattleGameView = null!;
  
      /**@description 敌人 */
      private _enemys: Node[] = [];
@@ -46,13 +53,13 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
 
      private nodes : Node[] = [];
  
-     protected onLoad() {
+     onLoad() {
          this.node.children.forEach(node => {
              this.outWall.push(node);
          })
          this.node.removeAllChildren();
         
-         let thisTransform = this.getComponent(UITransform) as UITransform;
+         let thisTransform = this.node.getComponent(UITransform) as UITransform;
          for( let i = TankBettle.ZIndex.MIN ; i < TankBettle.ZIndex.MAX ; i++ ){
             let node = new Node();
             let transform = node.addComponent(UITransform);
@@ -76,7 +83,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
          this.getNode(zIndex).addChild(node);
      }
  
-     protected onDestroy() {
+     onDestroy() {
          this.outWall.forEach((value) => {
              value.destroy();
          });
@@ -85,7 +92,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
          Tween.stopAllByTarget(this.getNode(TankBettle.ZIndex.PROPS));
      }
  
-     protected update() {
+     update() {
          this.addEnemy();
          this.doKeyboardEvents();
      }
@@ -131,15 +138,16 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
      }
  
      public addEnemy() {
+         if ( !this.logic ) return;
          //要在游戏中且当前剩余敌人数量要大于0才创建
          if( this._waitingDestory.length > 0 ){
              return;
          }
-         if (TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME && //游戏状态下
-             TankBettle.gameData.curLeftEnemy > 0 && //有剩余敌人
+         if (this.data.gameStatus == TankBettle.GAME_STATUS.GAME && //游戏状态下
+             this.data.curLeftEnemy > 0 && //有剩余敌人
              this._enemys.length < TankBettle.MAX_APPEAR_ENEMY) { //可以生产敌人
              let type: TankBettle.EnemyType = randomRangeInt(TankBettle.EnemyType.MIN, TankBettle.EnemyType.MAX + 1);
-             let prefab = TankBettle.gameData.getEnemyPrefab(type) as Node;
+             let prefab = this.logic.getEnemyPrefab(type) as Node;
              let randomPos = this.randomEnemyPosition(prefab);
              let enemyNode = this._waitEnemy.shift();
              if ( enemyNode == undefined) {
@@ -155,7 +163,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
                  enemy.bulletType = TankBettleBullet;
              }
              enemy.type = type;
-             enemy.config = TankBettle.gameData.getEnemyConfig(type);
+             enemy.config = this.data.getEnemyConfig(type);
              enemyNode.setPosition(randomPos.position);
              enemy.direction = this.randomEnemyDirction(randomPos.bornPosition);
              (enemyNode.getComponent(BoxCollider2D) as BoxCollider2D).enabled = false;
@@ -164,8 +172,8 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
                  enemy.startShoot();
                  this._enemys.push(enemyNode);
                  (enemyNode.getComponent(BoxCollider2D)as BoxCollider2D).enabled = true;
-                 TankBettle.gameData.curLeftEnemy -= 1;
-                 TankBettle.gameData.updateGameInfo();
+                 this.data.curLeftEnemy -= 1;
+                 this.logic.updateGameInfo();
              } else {
                  // cc.log("生成敌机周围有敌机，不出现")
                  enemyNode.removeFromParent();
@@ -246,11 +254,13 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
  
      /**@description 检测游戏是否通关了 */
      private checkGamePass() {
-         if (TankBettle.gameData.curLeftEnemy <= 0 ) {
+         if (this.data.curLeftEnemy <= 0 ) {
              if (this._enemys.length <= 0) {
                  //通关了
-                 TankBettle.gameData.isNeedReducePlayerLive = false;
-                 TankBettle.gameData.nextLevel();
+                 this.data.isNeedReducePlayerLive = false;
+                 if ( this.logic ){
+                     this.logic.nextLevel();
+                 }
              }
          }
      }
@@ -317,7 +327,8 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
      }
  
      protected randomPropPosition( ){
-         let tank = TankBettle.gameData.getPlayerPrefab(true) as Node;
+        if ( !this.logic ) return new Vec3();
+         let tank = this.logic.getPlayerPrefab(true) as Node;
          let transform = tank.getComponent(UITransform) as UITransform;
          let thisTransform = this.node.getComponent(UITransform) as UITransform;
          let xMin = transform.width / 2;
@@ -330,17 +341,18 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
      }
  
      private createProps( ){
+        if ( !this.logic ) return;
          let type = randomRangeInt(TankBettle.PropsType.MIN,TankBettle.PropsType.MAX);
-         let prefab = TankBettle.gameData.getPropsPrefab(type);
+         let prefab = this.logic.getPropsPrefab(type);
          let node = instantiate(prefab) as Node;
          let props = node.addComponent(TankBattleProps);
          props.type = type;
          this.addNodeChild(node,TankBettle.ZIndex.PROPS);
-         node.position = this.randomPropPosition();
+         node.setPosition(this.randomPropPosition());
      }
  
      public startCreateProps() {
-         if( TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME ){
+         if( this.data.gameStatus == TankBettle.GAME_STATUS.GAME ){
              let time = randomRange(TankBettle.PROPS_CREATE_INTERVAL.min,TankBettle.PROPS_CREATE_INTERVAL.max);
              Tween.stopAllByTarget(this.getNode(TankBettle.ZIndex.PROPS));
              tween(this.getNode(TankBettle.ZIndex.PROPS)).delay(time).call(()=>{
@@ -351,8 +363,8 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
      }
  
      public addPlayer(isOne: boolean) {
- 
-         let playerNode = instantiate(TankBettle.gameData.getPlayerPrefab(isOne)) as Node;
+        if ( !this.logic ) return;
+         let playerNode = instantiate(this.logic.getPlayerPrefab(isOne)) as Node;
          let playerTrans = playerNode.getComponent(UITransform) as UITransform;
          let thisTrans = this.node.getComponent(UITransform) as UITransform;
          if (isOne) {
@@ -379,36 +391,37 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
      }
  
      public removePlayer(player: TankBettleTankPlayer) {
+        if ( !this.logic ) return;
          let isOne = player.isOnePlayer;
          player.node.removeFromParent();
          player.node.destroy();
-         if (TankBettle.gameData.isSingle) {
+         if (this.data.isSingle) {
              this.playerOne = null;
-             if (TankBettle.gameData.playerOneLive > 0) {
+             if (this.data.playerOneLive > 0) {
                  this.addPlayer(isOne);
-                 TankBettle.gameData.reducePlayerLive(true);
-                 TankBettle.gameData.updateGameInfo();
+                 this.data.reducePlayerLive(true);
+                 this.logic.updateGameInfo();
              } else {
-                 TankBettle.gameData.gameOver();
+                this.logic && this.logic.gameOver();
              }
          } else {
              //双人
              if (isOne) {
                  this.playerOne = null;
-                 if (TankBettle.gameData.playerOneLive > 0) {
+                 if (this.data.playerOneLive > 0) {
                      this.addPlayer(isOne);
                  }
-                 TankBettle.gameData.reducePlayerLive(true)
+                 this.data.reducePlayerLive(true)
              } else {
                  this.playerTwo = null;
-                 if (TankBettle.gameData.playerTwoLive > 0) {
+                 if (this.data.playerTwoLive > 0) {
                      this.addPlayer(isOne);
                  }
-                 TankBettle.gameData.reducePlayerLive(false)
+                 this.data.reducePlayerLive(false)
              }
-             TankBettle.gameData.updateGameInfo();
-             if (TankBettle.gameData.playerTwoLive < 0 && TankBettle.gameData.playerOneLive < 0) {
-                 TankBettle.gameData.gameOver();
+             this.logic.updateGameInfo();
+             if (this.data.playerTwoLive < 0 && this.data.playerOneLive < 0) {
+                this.logic && this.logic.gameOver();
              }
          }
      }
@@ -454,7 +467,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
              this._handlePlayerShoot(this.playerOne);
          }
          if( this._keyboardEvents.has(macro.KEY.space)){
-             if( TankBettle.gameData.isSingle ){
+             if( this.data.isSingle ){
                  this._handlePlayerShoot(this.playerOne);
              }
              this._handlePlayerShoot(this.playerTwo);
@@ -462,7 +475,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
      }
  
      private _handlePlayerMove(player: TankBettleTankPlayer | null, dir: TankBettle.Direction) {
-         if (TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME) {
+         if (this.data.gameStatus == TankBettle.GAME_STATUS.GAME) {
              if (player) {
                  player.direction = dir;
                  player.move();
@@ -471,7 +484,7 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
      }
  
      private _handlePlayerShoot(player: TankBettleTankPlayer|null) {
-         if (TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME) {
+         if (this.data.gameStatus == TankBettle.GAME_STATUS.GAME) {
              if (player) {
                  player.shoot();
              }
@@ -479,8 +492,9 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
      }
  
      public gameOver() {
+         if ( !this.logic ) return;
          if (this._heart) {
-             let aniNode = instantiate(TankBettle.gameData.animationPrefab) as Node;
+             let aniNode = instantiate(this.logic.animationPrefab) as Node;
              this._heart.addChild(aniNode);
              let animation = aniNode.getComponent(Animation) as Animation;
              let state = animation.getState("king_boom")
@@ -489,10 +503,9 @@ import { Component, _decorator,Node,Animation, EventKeyboard, Tween, Vec3, rando
              tween(aniNode).delay(state.duration).call(() => {
                  aniNode.removeFromParent()
                  aniNode.destroy();
-                 let sprite = this._heart.getComponent(Sprite) as Sprite;
-                 sprite.loadImage({ url: { urls: ["texture/images"], key: "heart_0" }, view: this.owner, bundle: this.owner.bundle });
+                 let sprite = this._heart.getComponent(Sprite);
+                 this.logic?.loadImage(sprite,"heart_0");
              }).removeSelf().start()
- 
          }
      }
  

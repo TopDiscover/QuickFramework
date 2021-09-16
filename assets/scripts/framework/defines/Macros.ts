@@ -19,4 +19,6 @@ export namespace Macro{
     export const CHANGE_LANGUAGE = "Event_CHANGE_LANGUAGE";
     /**@description 屏幕适配 */
     export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
+    /**@description 未知 */
+    export const UNKNOWN = "UNKNOWN"
 }

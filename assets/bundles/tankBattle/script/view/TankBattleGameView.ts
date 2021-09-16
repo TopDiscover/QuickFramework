@@ -1,8 +1,8 @@
-import TankBattleStartView from "./TankBattleStartView";
-import TankBattleMap from "../model/TankBattleMap";
-import { TankBettle } from "../data/TankBattleGameData";
+import TankBattleMapCtrl from "../logic/TankBattleMapCtrl";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
-import { _decorator,Node, Label, director, PhysicsSystem2D, find, systemEvent, SystemEvent, EventKeyboard, macro, instantiate } from "cc";
+import { _decorator,Node, Label, PhysicsSystem2D, find, systemEvent, SystemEvent, EventKeyboard, macro, instantiate } from "cc";
+import { TankBattleLogic } from "../logic/TankBattleLogic";
+import { TankBettle } from "../data/TankBattleConfig";
 
 
 const { ccclass, property } = _decorator;
@@ -10,8 +10,10 @@ const { ccclass, property } = _decorator;
 @ccclass
 export default class TankBattleGameView extends GameView{
 
-    private  get data(){
-        return TankBettle.gameData;
+    static logicType = TankBattleLogic;
+
+    protected get logic() : TankBattleLogic | null{
+        return this._logic as any;
     }
 
     public static getPrefabUrl() {
@@ -32,11 +34,6 @@ export default class TankBattleGameView extends GameView{
     private _playerOneTankLive: Label = null!;
     private _playerTwoTankLive: Label = null!;
 
-    addEvents() {
-        super.addEvents()
-        this.addUIEvent(TankBettle.EVENT.SHOW_MAP_LEVEL, this.onShowMapLevel)
-    }
-
     onLoad() {
         super.onLoad();
         //允许碰撞
@@ -49,26 +46,12 @@ export default class TankBattleGameView extends GameView{
         this.init()
     }
 
-    onDestroy(){
-        this.data.gameMap = null;
-        this.data.gamePrefabs = null;
-        super.onDestroy();
-    }
-
     private init() {
-        this.data.enterStart();
-
         let prefabs = find("prefabs", this.node) as Node;
-        this.data.gamePrefabs = prefabs;
         let game = find("Game", this.node) as Node
-        this.data.gameMap = game.addComponent(TankBattleMap);
-        this.data.gameMap.owner = this;
-        this.data.gameMap.setPrefabs(prefabs);
-        this.data.initMapRange(game,this.data.getEnemyPrefab(TankBettle.EnemyType.NORMAL));
         let gameInfo = find("Info", this.node) as Node;
         this._enemyTankCount = find("enemy_count", gameInfo) as Node;
         this._enemyTankPrefab = find("enemy_tank_prefab", gameInfo) as Node;
-
         this._playerOneLive = find("player_count_1", gameInfo)?.getComponent(Label) as Label;
         this._playerTwoLive = find("player_count_2", gameInfo)?.getComponent(Label) as Label;
         this._playerOneTankLive = find("player_live_1", gameInfo)?.getComponent(Label) as Label;
@@ -82,66 +65,48 @@ export default class TankBattleGameView extends GameView{
 
         systemEvent.off(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
         systemEvent.on(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
+        if(this.logic ){
+            this.logic.gamePrefabs = prefabs;
+            let mapCtrl = new TankBattleMapCtrl();
+            mapCtrl.node = game;
+            mapCtrl.setPrefabs(prefabs);
+            this.logic.initMap(mapCtrl);
+            this.logic.onOpenSlectedView();
+        }
     }
 
     onKeyUp(ev: EventKeyboard) {
-        if( this.data.gameMap){
-            this.data.gameMap.onKeyUp(ev);
-        }
-        if (ev.keyCode == macro.KEY.n) {
-            //手动下一关，恢复下生命
-            this.data.isSingle = this.data.isSingle;
-            this.data.nextLevel();
-        } else if (ev.keyCode == macro.KEY.p) {
-            //手动下一关，恢复下生命
-            this.data.isSingle = this.data.isSingle;
-            this.data.prevLevel();
-        } else if( ev.keyCode == macro.KEY.escape ){
-            ev.propagationStopped = true;
-            this.data.gameMap?.clear();
-            this.data.enterStart();
+        if ( this.logic ){
+            this.logic.onKeyUp(ev,TankBettle.ViewType.GAME_VIEW);
         }
     }
 
     onKeyDown(ev: EventKeyboard) {
-        if (this.data.gameMap) {
-            this.data.gameMap.onKeyDown(ev)
+        if ( this.logic ){
+            this.logic.onKeyDown(ev,TankBettle.ViewType.GAME_VIEW);
         }
     }
 
-    protected onShowMapLevel(data: any) {
-        this.data.showMap(data);
-        this.audioHelper.playMusic(TankBettle.AUDIO_PATH.START,this.bundle,false);
-    }
-
-    public showGameInfo() {
+    public showGameInfo( gameInfo : TankBattleGameInfo ) {
         //当前关卡
-        this._gameLevel.string = (this.data.currentLevel + 1).toString();
+        this._gameLevel.string = gameInfo.level;
         //玩家的生命
-        this._playerOneLive.string = (this.data.playerOneLive < 0 ? 0 : this.data.playerOneLive).toString();
-        this._playerTwoLive.string = (this.data.playerTwoLive < 0 ? 0 : this.data.playerTwoLive).toString();
-        if( this.data.gameMap && this.data.gameMap.playerOne && this.data.gameMap.playerOne.config.live > 0 ){
-            this._playerOneTankLive.string = `-${this.data.gameMap.playerOne.config.live}`
-        }else{
-            this._playerOneTankLive.string = "";
-        }
-        if( this.data.gameMap && this.data.gameMap.playerTwo && this.data.gameMap.playerTwo.config.live > 0 ){
-            this._playerTwoTankLive.string = `-${this.data.gameMap.playerTwo.config.live}`
-        }else{
-            this._playerTwoTankLive.string = "";
-        }
-
+        this._playerOneLive.string = gameInfo.playerOneLive;
+        this._playerTwoLive.string = gameInfo.playerTwoLive;
+        this._playerOneTankLive.string = gameInfo.playerOneTankLive;
+        this._playerTwoTankLive.string = gameInfo.playerTwoTankLive;
+        let curLeftEnemy = gameInfo.curLeftEnemy;
         //当前剩余敌人数量 
         let count = this._enemyTankCount.children.length;
-        if (count < this.data.curLeftEnemy) {
-            let addCount = this.data.curLeftEnemy - count;
+        if (count < curLeftEnemy) {
+            let addCount = curLeftEnemy - count;
             for (let i = 0; i < addCount; i++) {
                 let tank = instantiate(this._enemyTankPrefab);
                 this._enemyTankCount.addChild(tank);
             }
-        } else if (count > this.data.curLeftEnemy) {
+        } else if (count > curLeftEnemy) {
             //删除多余出来的
-            let delCount = count - this.data.curLeftEnemy;
+            let delCount = count - curLeftEnemy;
             for (let i = 0; i < delCount; i++) {
                 this._enemyTankCount.removeChild(this._enemyTankCount.children[0]);
             }

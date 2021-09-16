@@ -7,6 +7,11 @@ import { Config } from "../../../scripts/common/config/Config";
 class HallEntry extends Entry {
     static bundle = Config.BUNDLE_HALL;
     protected language = new HallLanguage;
+
+    private get data(){
+        return Manager.dataCenter.getData(HallData) as HallData;
+    }
+
     protected addNetComponent(): void {
         Manager.hallNetManager.addNetControllers();
     }
@@ -26,8 +31,8 @@ class HallEntry extends Entry {
     }
     protected initData(): void {
         //向Config.ENTRY_CONFIG合并配置
-        HallData.backupConfig();
-        HallData.mergeConfig();
+        this.data.backupConfig();
+        this.data.mergeConfig();
     }
     protected pauseMessageQueue(): void {
         
@@ -39,7 +44,7 @@ class HallEntry extends Entry {
     /**@description 卸载bundle,即在自己bundle删除之前最后的一条消息 */
     onUnloadBundle(): void {
         super.onUnloadBundle();
-        HallData.restoreConfig();
+        this.data.restoreConfig();
     }
 }
 

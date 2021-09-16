@@ -1,6 +1,6 @@
 import UIView from "../../../../scripts/framework/core/ui/UIView";
-import { TankBettle } from "../data/TankBattleGameData";
 import { _decorator,Node, find, Label, tween, Vec3, UITransform } from "cc";
+import { TankBettleGameData } from "../data/TankBattleGameData";
 
 const { ccclass, property } = _decorator;
 
@@ -11,8 +11,13 @@ export default class TankBattleGameOver extends UIView {
         return "prefabs/TankBattleGameOver";
     }
 
+    private logic : TankBattleLogic = null!;
+
     onLoad() {
         super.onLoad();
+        if ( this.args ){
+            this.logic = this.args[0];
+        }
         this.content = find("content", this.node) as Node;
         let title =  find("title", this.content) as Node;
         let trans = this.node.getComponent(UITransform) as UITransform;
@@ -23,8 +28,10 @@ export default class TankBattleGameOver extends UIView {
         .delay(2)
         .call(()=>{
             this.close();
-            TankBettle.gameData.gameMap?.clear();
-            TankBettle.gameData.enterStart();
+            if ( this.logic ){
+                this.logic.mapClear();
+                this.logic.onOpenSlectedView();
+            }
         })
         .start();
     }

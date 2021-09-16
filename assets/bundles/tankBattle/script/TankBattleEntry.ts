@@ -1,18 +1,25 @@
 import { LobbyService } from "../../../scripts/common/net/LobbyService";
 import TankBattleGameView from "./view/TankBattleGameView";
-import { TankBettle } from "./data/TankBattleGameData";
 import { TankBattleLanguage } from "./data/TankBattleLanguage";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import { Resource } from "../../../scripts/framework/core/asset/Resource";
-import TankBattleChangeStageView from "./view/TankBattleChangeStageView";
-import TankBattleStartView from "./view/TankBattleStartView";
-import TankBattleGameOver from "./view/TankBattleGameOver";
+import { TankBettleGameData } from "./data/TankBattleGameData";
 /**
  * @description 坦克大战入口
  */
 class TankBattleEntry extends Entry {
-    static bundle = TankBettle.gameData.bundle;
     protected language = new TankBattleLanguage;
+    static bundle = TankBettleGameData.bundle;
+    private get data(){
+        return Manager.dataCenter.getData(TankBettleGameData) as TankBettleGameData
+    }
+
+    set gameView( gameView : TankBattleGameView ){
+        this._gameView = gameView;
+    }
+    get gameView(){
+        return this._gameView as TankBattleGameView;
+    }
 
     protected addNetComponent(): void {
     }
@@ -38,11 +45,7 @@ class TankBattleEntry extends Entry {
     }
     protected initData(): void {
         //游戏数据初始化
-        Manager.gameData = TankBettle.gameData;
-        Manager.gameData.clear();
-        TankBettle.gameData.TankBattleChangeStageView = TankBattleChangeStageView;
-        TankBettle.gameData.TankBattleStartView = TankBattleStartView;
-        TankBettle.gameData.TankBattleGameOver = TankBattleGameOver;
+        this.data.clear();
     }
     protected pauseMessageQueue(): void {
         LobbyService.instance.pauseMessageQueue();

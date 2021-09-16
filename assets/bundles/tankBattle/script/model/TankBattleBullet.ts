@@ -1,5 +1,5 @@
 import { BoxCollider2D, tween, UITransform, Vec3, _decorator ,Node, Tween, IPhysics2DContact} from "cc";
-import { TankBettle } from "../data/TankBattleGameData";
+import { TankBettle } from "../data/TankBattleConfig";
 import { TankBattleAI } from "./TankBattleAI";
 
 const { ccclass, property } = _decorator;
@@ -14,8 +14,9 @@ export default class TankBettleBullet extends TankBattleAI {
     private curPosition = new Vec3();
 
     private addBullet() {
+        if ( !this.logic ) return;
         let transform = this.owner.node.getComponent(UITransform) as UITransform;
-        this.data.gameMap?.addBullet(this);
+        this.logic.onMapAddBullet(this);
         if (this.owner.direction == TankBettle.Direction.UP) {
             this.node.setPosition(new Vec3(this.owner.node.position.x, this.owner.node.position.y + transform.height / 2));
             this.node.angle = 0;
@@ -32,6 +33,7 @@ export default class TankBettleBullet extends TankBattleAI {
     }
 
     move(owner: TankBattleAI) {
+        if ( !this.logic ) return;
         this.owner = owner;
         //设置子弹的位置
         this.addBullet();
@@ -89,6 +91,7 @@ export default class TankBettleBullet extends TankBattleAI {
 
     protected onBeginContact (self: BoxCollider2D, other: BoxCollider2D, contact: IPhysics2DContact | null) {
         // cc.log(`Bullet : onCollisionEnter=>${other.node.name}`)
+        if ( !this.logic ) return;
         if (other.group == TankBettle.GROUP.Wall ||
             other.group == TankBettle.GROUP.StoneWall ||
             other.group == TankBettle.GROUP.Boundary ||
@@ -132,8 +135,9 @@ export default class TankBettleBullet extends TankBattleAI {
     }
 
     private removeSelf() {
+        if ( !this.logic ) return;
         //子弹销毁声音
-        this.data.bulletCrackAudio();
+        this.logic.playEffect(TankBettle.AUDIO_PATH.BULLETCRACK);
         Tween.stopAllByTarget(this.curPosition);
         this.owner.bullet = null;
         this.node.removeFromParent();

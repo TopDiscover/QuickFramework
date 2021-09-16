@@ -161,6 +161,26 @@ export class UIManager {
         return viewData;
     }
 
+    /**
+     * @description 通过当前视图，获取视图的类型
+     * @param view 
+     * @returns 
+     */
+    public getViewType<T extends UIView>( view : UIView ):GameViewClass<T>{
+        if ( !isValid(view) ){
+            return null as any;
+        }
+        
+        let className = view.className;
+        if (!className) return null as any;
+        let viewData = this._viewDatas.get(className);
+        if ( viewData ){
+            return viewData.viewType as any;
+        }else{
+            return null as any;
+        }
+    }
+
     private getClassName(className: string): string;
     private getClassName<T extends UIView>(uiClass: UIClass<T>): string;
     private getClassName(data: any): string | undefined {

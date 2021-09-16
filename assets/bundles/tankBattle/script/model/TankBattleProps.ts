@@ -1,5 +1,5 @@
 import { BoxCollider2D, Component, IPhysics2DContact, Tween, tween, UIOpacity, _decorator } from "cc";
-import { TankBettle } from "../data/TankBattleGameData";
+import { TankBettle } from "../data/TankBattleConfig";
 import { TankBattleEntity } from "./TankBattleEntity";
 import { TankBettleTankPlayer } from "./TankBattleTank";
 
@@ -27,15 +27,16 @@ export default class TankBattleProps extends TankBattleEntity {
     }
 
      protected onBeginContact (self: BoxCollider2D, other: BoxCollider2D, contact: IPhysics2DContact | null) {
+        if ( !this.logic ) return;
         if (other.group == TankBettle.GROUP.Player) {
             let player = other.node.getComponent(TankBettleTankPlayer)
             if( player ){
-                this.data.playPropsAudio();
+                this.logic.playEffect(TankBettle.AUDIO_PATH.PROP);
                 if( this.type == TankBettle.PropsType.LIVE ){
-                    this.data.addPlayerLive(player.isOnePlayer);
+                    this.logic && this.logic.addPlayerLive(player.isOnePlayer);
                     
                 }else if( this.type == TankBettle.PropsType.BOOM_ALL_ENEMY ){
-                    this.data.gameMap?.removeAllEnemy();
+                    this.logic && this.logic.onMapRemoveAllEnemy();
                 }else if( this.type == TankBettle.PropsType.GOD ){
                     player.addStatus(TankBettle.PLAYER_STATUS.PROTECTED)
                 }else if( this.type == TankBettle.PropsType.STRONG_BULLET){

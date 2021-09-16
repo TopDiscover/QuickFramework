@@ -1,7 +1,7 @@
 import UIView from "../../../../scripts/framework/core/ui/UIView";
-import { TankBettle } from "../data/TankBattleGameData";
 import { _decorator,Node, find, Label, Vec3, EventKeyboard, macro } from "cc";
 import { Config } from "../../../../scripts/common/config/Config";
+import { TankBettle } from "../data/TankBattleConfig";
 
 const { ccclass, property } = _decorator;
 
@@ -18,18 +18,13 @@ export default class TankBattleStartView extends UIView{
     private singlePlayer: Node = null!;
     /**@description 多人 */
     private doublePalyers: Node = null!;
-
-    private get data(){
-        return TankBettle.gameData;
-    }
-
-    addEvents(){
-        super.addEvents();
-        this.addUIEvent(TankBettle.EVENT.SHOW_MAP_LEVEL,this.onChangeStageFinished)
-    }
+    private logic : TankBattleLogic = null!;
 
     onLoad() {
         super.onLoad();
+        if ( this.args && this.args.length > 0 ){
+           this.logic = this.args[0];
+        }
         this.content = find("content", this.node) as Node;
         let title = find("title", this.content)?.getComponent(Label) as Label;
         title.language = Manager.makeLanguage("title", this.bundle);
@@ -51,25 +46,20 @@ export default class TankBattleStartView extends UIView{
 
     onKeyUp(ev: EventKeyboard) {
         super.onKeyUp(ev);
-        if( this.data.gameStatus != TankBettle.GAME_STATUS.SELECTED ){
-            return;
-        }
-        if (ev.keyCode == macro.KEY.down || ev.keyCode == macro.KEY.up ) {
-            let isSingle = false;
-            if (this.selectTank.position.y == this.singlePlayer.position.y) {
-                this.selectTank.setPosition(new Vec3(this.selectTank.position.x,this.doublePalyers.position.y,this.selectTank.position.z));
-            }else{
-                this.selectTank.setPosition(new Vec3(this.selectTank.position.x,this.singlePlayer.position.y,this.selectTank.position.z));
-                isSingle = true;
-            }
-            this.data.isSingle = isSingle;
-        }else if( ev.keyCode == macro.KEY.space || ev.keyCode == macro.KEY.enter ){
-            this.data.isSingle = this.data.isSingle;
-            this.data.enterGame();
+        if(this.logic ){
+            this.logic.onKeyUp(ev,TankBettle.ViewType.START_VIEW,this);
         }
     }
 
-    protected onChangeStageFinished(){
-        this.close();
+    isSingle(){
+        return this.selectTank.position.y == this.singlePlayer.position.y;
+    }
+
+    updateSelectTank( isSingle : boolean){
+        if ( isSingle ){
+            this.selectTank.setPosition(new Vec3(this.selectTank.position.x,this.singlePlayer.position.y,this.selectTank.position.z));
+        }else{
+            this.selectTank.setPosition(new Vec3(this.selectTank.position.x,this.doublePalyers.position.y,this.selectTank.position.z));
+        }
     }
 }

@@ -52,13 +52,15 @@ class LoginEntry extends Entry {
     }
 
     /**@description 这个位置说明自己GameView 进入onLoad完成 */
-    onEnterComplete() {
-        super.onEnterComplete();
+    onEnterGameView(gameView:GameView) {
+        super.onEnterGameView(gameView);
         //进入到登录，关闭掉所有网络连接，请求登录成功后才连接网络
         Manager.hallNetManager.removeNetControllers();
         Manager.serviceManager.close();
         Manager.protoManager.unload();
         Manager.uiManager.closeExcept([LoginView]);
+        //清理所有数据中数据
+        Manager.dataCenter.clear();
     }
 
     /**@description 卸载bundle,即在自己bundle删除之前最后的一条消息 */

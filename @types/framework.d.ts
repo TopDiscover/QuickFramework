@@ -124,7 +124,7 @@ declare interface Singleton<T> {
 /**@description 获取根据类型获取单列 */
 declare function getSingleton<T>(SingletonClass: Singleton<T>): T;
 
-declare type UIView = import("./assets/scripts/framework/core/ui/UIView").default;
+declare type UIView = import("../assets/scripts/framework/core/ui/UIView").default;
 declare interface UIClass<T extends UIView> {
 	new(): T;
 	/**
@@ -132,7 +132,7 @@ declare interface UIClass<T extends UIView> {
 	 */
 	getPrefabUrl(): string;
 }
-declare type Entry = import("./assets/scripts/framework/core/entry/Entry").Entry;
+declare type Entry = import("../assets/scripts/framework/core/entry/Entry").Entry;
 declare interface EntryClass<T extends Entry>{
 	new():T;
 	/**@description 当前bundle名 */
@@ -140,9 +140,30 @@ declare interface EntryClass<T extends Entry>{
 	/**@description 主入口,即主包，主入口只能有一个 */
     isMain : boolean;
 }
-declare type EntryDelegate = import("./assets/scripts/framework/core/entry/EntryDelegate").EntryDelegate;
-declare type Message = import("./assets/scripts/framework/core/net/message/Message").Message;
-declare type Service = import("./assets/scripts/framework/core/net/service/Service").Service;
+
+declare type GameData = import("../assets/scripts/framework/data/GameData").GameData;
+declare interface GameDataClass<T extends GameData>{
+	new():T;
+	/**@description 当前数据所属bundle */
+	bundle : string;
+}
+
+declare type Logic = import("../assets/scripts/framework/core/logic/Logic").Logic;
+declare interface LogicClass<T extends Logic>{
+	new():T;
+	/**@description 当前Logic所属bundle */
+	bundle : string;
+}
+
+declare type GameView = import("../assets/scripts/framework/core/ui/GameView").default;
+declare interface GameViewClass< T extends UIView>{
+	new():T;
+	logicType : LogicClass<Logic>;
+}
+
+declare type EntryDelegate = import("../assets/scripts/framework/core/entry/EntryDelegate").EntryDelegate;
+declare type Message = import("../assets/scripts/framework/core/net/message/Message").Message;
+declare type Service = import("../assets/scripts/framework/core/net/service/Service").Service;
 /**@description 语言包相关 */
 declare namespace Language {
 	export interface Data {
@@ -158,4 +179,4 @@ declare namespace Language {
 	}
 }
 
-declare let Manager: import("./assets/Application")._Manager;
+declare let Manager: import("../assets/Application")._Manager;

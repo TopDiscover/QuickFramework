@@ -2,6 +2,7 @@ import UIView from "../ui/UIView";
 import { DEBUG } from "cc/env";
 import { Asset, assetManager, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D, ImageAsset } from "cc";
 import { Resource } from "./Resource";
+import { Macro } from "../../defines/Macros";
 class ResourceCache {
     print() {
         let content: any[] = [];
@@ -34,7 +35,7 @@ class ResourceCache {
     }
 
     private _caches = new Map<string, Resource.CacheData>();
-    private name = "unknown";
+    private name = Macro.UNKNOWN;
     constructor(name: string) {
         this.name = name;
     }

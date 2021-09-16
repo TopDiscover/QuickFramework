@@ -1,7 +1,6 @@
 import { DEBUG } from "cc/env";
 import { EntryDelegate } from "../../framework/core/entry/EntryDelegate";
 import { HotUpdate } from "../../framework/core/hotupdate/Hotupdate";
-import GameView from "../../framework/core/ui/GameView";
 import { Macro } from "../../framework/defines/Macros";
 import { Config } from "../config/Config";
 import { i18n } from "../language/CommonLanguage";
@@ -52,8 +51,8 @@ export class CmmEntry extends EntryDelegate {
     }
 
     /**@description 进入bundle完成 */
-    onEnterBundleComplete( entry : Entry , gameView : GameView){
-        super.onEnterBundleComplete(entry,gameView);
+    onEnterGameView( entry : Entry , gameView : GameView){
+        super.onEnterGameView(entry,gameView);
         Manager.serviceManager.hideReconnet();
     }
 

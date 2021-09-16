@@ -1,6 +1,6 @@
 
 import { _decorator } from 'cc';
-import { TankBettle } from '../data/TankBattleGameData';
+import { TankBettle } from '../data/TankBattleConfig';
 import { TankBattleEntity } from './TankBattleEntity';
 const { ccclass, property } = _decorator;
 

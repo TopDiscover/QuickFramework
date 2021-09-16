@@ -1,6 +1,7 @@
 /**@description 游戏层公共基类 */
 
 import { _decorator } from "cc";
+import { Logic } from "../logic/Logic";
 import UIView from "./UIView";
 
 /**
@@ -13,14 +14,26 @@ const {ccclass, property} = _decorator;
 @ccclass
 export default class GameView extends UIView {
 
+    static logicType : LogicClass<Logic> | null = null;
+    protected _logic : Logic | null = null;
+    protected get logic(){
+        return this._logic;
+    }
+    /**@description 由管理器统一设置，请勿操作 */
+    setLogic(logic : Logic ){
+        this._logic = logic;
+        if ( logic ){
+            logic.onLoad(this);
+        }
+    }
     onLoad(){
         super.onLoad();
         //进入场景完成，即onLoad最后一行  必须发进入完成事件
-        this.onEnterComplete()
+        this.onEnterGameView()
     }
 
-    protected onEnterComplete(){
-        Manager.entryManager.onEnterBundleComplete(this.bundle,this);
+    protected onEnterGameView(){
+        Manager.entryManager.onEnterGameView(this.bundle,this);
     }
 
     enterBundle( bundle : BUNDLE_TYPE , isQuitGame : boolean = false){
@@ -33,7 +46,23 @@ export default class GameView extends UIView {
             //this.audioHelper.stopMusic();
             this.audioHelper.stopAllEffects();
         }
-        Manager.entryManager.onUnloadBundle(this.bundle);
+        if ( this.logic ){
+            Manager.logicManager.destory(this.logic.bundle);
+        }
+        Manager.entryManager.onDestroyGameView(this.bundle,this);
         super.onDestroy();
+    }
+
+    update(dt:number){
+        if ( this.logic ){
+            this.logic.update(dt);
+        }
+    }
+
+    /**@description 游戏重置 */
+    protected reset(){
+        if ( this.logic ){
+            this.logic.reset(this);
+        }
     }
 }

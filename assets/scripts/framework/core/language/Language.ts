@@ -7,7 +7,7 @@ export class Language {
     private static _instance: Language = null!;
     public static Instance() { return this._instance || (this._instance = new Language()); }
 
-    private _data: Language.Data = { language: "unknown" };
+    private _data: Language.Data = { language: Macro.UNKNOWN };
     private delegates: Language.DataSourceDelegate[] = [];
 
     public addSourceDelegate(delegate: Language.DataSourceDelegate) {
