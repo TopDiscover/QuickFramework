@@ -48,5 +48,10 @@
         "path" : "resources/3d/engine/bin/.declarations/cc.d.ts",
         "name" : "ccdts",
         "desc" : "执行更新添加对自定义引擎扩展接口声明"
+    },
+    "jsbdts":{
+        "path" : "resources/3d/engine/@types/jsb.d.ts",
+        "name" : "jsbdts",
+        "desc" : "执行更新添加对自定义引擎扩展热更新接口声明"
     }
 }

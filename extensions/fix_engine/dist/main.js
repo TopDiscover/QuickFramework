@@ -22,6 +22,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.unload = exports.load = exports.methods = exports._Helper = void 0;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const jsbdts_1 = require("./jsbdts");
 class _Helper {
     constructor() {
         /**@description creator 安所路径 */
@@ -141,6 +142,23 @@ class _Helper {
                     return arguments[1] + sourceData + arguments[3];
                 };
                 destData = destData.replace(/(declare\s*module\s*"cc"\s*\{)([\s\n\S]*)(export\s*class\s*MeshBuffer\s*\{)/g, replace);
+                fs.writeFileSync(destPath, destData, { encoding: "utf-8" });
+                console.log(data.desc);
+            }
+            else if (data.name == "jsbdts") {
+                //更新热更新声明文件
+                //(export\s*class\s*Manifest)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string\))
+                let destPath = `${this.appPath}/${data.path}`;
+                destPath = path.normalize(destPath);
+                let destData = fs.readFileSync(destPath, "utf-8");
+                let replaceManifest = function () {
+                    return arguments[1] + jsbdts_1.HotUpdateDTS.manifest + arguments[3];
+                };
+                destData = destData.replace(/(export\s*class\s*Manifest\s*\{)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string\))/g, replaceManifest);
+                let replaceAssetsManager = function () {
+                    return arguments[1] + jsbdts_1.HotUpdateDTS.assetsManager + arguments[3];
+                };
+                destData = destData.replace(/(export\s*class\s*AssetsManager\s*\{)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string)/g, replaceAssetsManager);
                 fs.writeFileSync(destPath, destData, { encoding: "utf-8" });
                 console.log(data.desc);
             }
