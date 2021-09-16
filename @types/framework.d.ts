@@ -175,7 +175,7 @@ declare interface GameViewClass<T extends UIView> {
  *     }
  * }});
  **/
-export function createPrefab(
+declare function createPrefab(
 	config: {
 		url: string,
 		view: any,
@@ -193,7 +193,7 @@ export function createPrefab(
 * @param config.bundle 可不填，默认为view指向的bundle
 * @param config.type 加载的资源类型
 * */
-export function loadDirRes(config: {
+declare function loadDirRes(config: {
 	bundle?: BUNDLE_TYPE,
 	url: string,
 	type: typeof import("cc").Asset,
@@ -212,7 +212,7 @@ export function loadDirRes(config: {
 * @param config.onComplete 加载完成回调 data为ResourceCacheData
 * @param config.view 资源持有者,继承自UIView
 */
-export function loadRes(config: {
+declare function loadRes(config: {
 	bundle?: BUNDLE_TYPE,
 	url: string,
 	type: typeof import("cc").Asset,

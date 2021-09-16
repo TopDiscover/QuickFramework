@@ -1,4 +1,4 @@
 pbjs -t static-module -w commonjs -o compiled.js file1.proto file2.proto
 pbts -o compiled.d.ts compiled.js
 
-pbjs -t static-module -w commonjs -o compiled.js ..\assets\bundles\hall\proto\*.proto
+pbjs -t static-module -w commonjs -o compiled.js ..\..\assets\bundles\hall\proto\*.proto
