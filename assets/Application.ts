@@ -61,7 +61,7 @@ export class _Manager extends Framewok implements GameEventInterface {
         if (this._globalAudio) {
             return this._globalAudio;
         }
-        this._globalAudio = this.uiManager.getCanvas().getComponent(GlobalAudio) as GlobalAudio;
+        this._globalAudio = this.uiManager.addComponent(GlobalAudio);
         return this._globalAudio;
     }
 

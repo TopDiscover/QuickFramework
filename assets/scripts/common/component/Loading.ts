@@ -66,7 +66,7 @@ export default class Loading {
         let finish = await this.loadPrefab();
         if (finish) {
             this._node.removeFromParent();
-            Manager.uiManager.addChild(this._node,ViewZOrder.Loading);
+            Manager.uiManager.addView(this._node,ViewZOrder.Loading);
             this._node.position = Vec3.ZERO;
             this._text = find("content/text",this._node)?.getComponent(Label) as Label;
             this._showContentIndex = 0;

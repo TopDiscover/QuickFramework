@@ -1,5 +1,6 @@
-import { Asset, find, Game, game, SystemEvent, systemEvent, SystemEventType, _decorator } from "cc";
+import { Asset, find, Game, game, SystemEvent, systemEvent, SystemEventType, _decorator , Node, DebugMode } from "cc";
 import { Config } from "./scripts/common/config/Config";
+import { DebugView } from "./scripts/common/debug/DebugView";
 import EventComponent from "./scripts/framework/componects/EventComponent";
 import { HotUpdate } from "./scripts/framework/core/hotupdate/Hotupdate";
 /**
@@ -24,45 +25,36 @@ export default class MainController extends EventComponent {
         Manager.onHotupdateMessage(data);
     }
 
+    private debugView : Node | null = null!;
+
     onLoad() {
         super.onLoad();
         Manager.onLoad(this.node);
         if (this.wssCacert) {
             Manager.wssCacertUrl = this.wssCacert.nativeUrl;
         }
-        let show = find("show", this.node);
-        if (show) {
-            show.zIndex = 9999;
-            //调试按钮事件注册
-            let showUI = find("showUI", show);
-            let showNode = find("showNode", show);
-            let showRes = find("showRes", show);
-            let showComp = find("showComponent", show);
-            if (showUI && showNode && showRes && showComp) {
-                let isShow = false;
-                if (Config.isShowDebugButton) {
-                    isShow = true;
-                    showUI.on(SystemEventType.TOUCH_END, () => {
-                        Manager.uiManager.printViews();
-                    });
-                    showNode.on(SystemEventType.TOUCH_END, () => {
-                        Manager.uiManager.printCanvasChildren();
-                    });
-                    showRes.on(SystemEventType.TOUCH_END, () => {
-                        Manager.cacheManager.printCaches();
-                    });
-                    showComp.on(SystemEventType.TOUCH_END, () => {
-                        Manager.uiManager.printComponent();
-                    });
+        let debug = find("debug", this.node);
+        this.debugView = find("debugView",this.node);
+        if (debug&&this.debugView) {
+            if ( Config.isShowDebugButton ){
+                debug.active = true;
+                let view = this.debugView.addComponent(DebugView)
+                if ( view ){
+                    view.debug = debug;
                 }
-                showUI.active = isShow;
-                showNode.active = isShow;
-                showRes.active = isShow;
-                showComp.active = isShow;
+                this.debugView.active = false;
+                debug.on(SystemEventType.TOUCH_END,()=>{
+                    if ( debug ) debug.active = false;
+                    if ( this.debugView ){
+                        this.debugView.active = true;
+                    }
+                });
+            }else{
+                debug.destroy();
+                this.debugView.destroy();
             }
+            
         }
-
-
         //游戏事件注册
         game.on(Game.EVENT_HIDE, this.onEnterBackground, this);
         game.on(Game.EVENT_SHOW, this.onEnterForgeground, this);

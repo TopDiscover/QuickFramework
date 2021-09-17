@@ -142,7 +142,7 @@ class ToastItem extends Component {
                 itemComp.fadeIn();
                 node.userData = this._id++;
                 node.name = `Tips${node.userData}`;
-                Manager.uiManager.addChild(node,ViewZOrder.Tips);
+                Manager.uiManager.addView(node,ViewZOrder.Tips);
 
                 //整体上移
                 let length = this._queue.length;

@@ -1,4 +1,4 @@
-import { isValid, js, Node, Prefab, Widget, instantiate, director, Component } from "cc";
+import { isValid, js, Node, Prefab, Widget, instantiate, director, Component, find } from "cc";
 import { DEBUG } from "cc/env";
 import { ViewStatus } from "../../defines/Enums";
 import { Macro } from "../../defines/Macros";
@@ -246,8 +246,8 @@ export class UIManager {
             }
             let className = js.getClassName(uiClass);
 
-            let canvas = this.getCanvas();
-            if (!canvas) {
+            let root = this.viewRoot;
+            if (!root) {
                 if (DEBUG) error(`${this._logTag}找不到场景的Canvas节点`);
                 reslove(<any>null);
                 return;
@@ -262,7 +262,7 @@ export class UIManager {
                         if (viewData.view && isValid(viewData.node)) {
                             viewData.node.zIndex = zOrder;
                             if (!viewData.node.parent) {
-                                this.addChild(viewData.node, zOrder);
+                                this.addView(viewData.node, zOrder);
                             }
                             viewData.view.show(args);
                         }
@@ -377,7 +377,7 @@ export class UIManager {
             }
 
             if (!viewData.isPreload) {
-                this.addChild(uiNode, zOrder);
+                this.addView(uiNode, zOrder);
             }
             return view;
         }
@@ -448,7 +448,7 @@ export class UIManager {
         });
     }
 
-    public getCanvas(): Node {
+    private get canvas(): Node {
         let rootScene = director.getScene();
         if (!rootScene) {
             if (DEBUG) error(`${this._logTag}当前场景为空`);
@@ -463,10 +463,10 @@ export class UIManager {
         return root;
     }
 
-    public addChild(node: Node, zOrder: number, adpater?: IFullScreenAdapt) {
-        this.getCanvas().addChild(node);
+    public addView(node: Node, zOrder: number, adpater?: IFullScreenAdapt) {
+        this.viewRoot.addChild(node);
         node.zIndex = zOrder;
-        (<any>window)["cc"].updateZIndex(this.getCanvas());
+        (<any>window)["cc"].updateZIndex(this.viewRoot);
         Manager.adaptor.fullScreenAdapt(node, adpater);
     }
 
@@ -478,6 +478,22 @@ export class UIManager {
                 viewData.loadData.addLocal(info, className);
             }
         }
+    }
+
+    private _viewRoot : Node = null!;
+    private get viewRoot(){
+        if ( !this._viewRoot ){
+            this._viewRoot = find("viewRoot",this.canvas) as Node;
+        }
+        return this._viewRoot;
+    }
+
+    private _componentRoot : Node = null!;
+    private get componentRoot(){
+        if ( !this._componentRoot ){
+            this._componentRoot = find("componentRoot",this.canvas) as Node;
+        }
+        return this._componentRoot;
     }
 
     /**@description 添加动态加载的远程资源 */
@@ -636,8 +652,8 @@ export class UIManager {
     }
 
     /*获取当前canvas的组件 */
-    public getCanvasComponent(): Component | null {
-        let canvas = this.getCanvas();
+    public getMainController(): Component | null {
+        let canvas = this.canvas;
         if (canvas) {
             return canvas.getComponent("MainController");
         }
@@ -647,9 +663,9 @@ export class UIManager {
     public addComponent<T extends Component>(type: { new(): T }): T;
     public addComponent(className: string): any;
     public addComponent(data: any) {
-        let canvas = this.getCanvas();
-        if (canvas) {
-            let component = canvas.getComponent(data);
+        let root = this.componentRoot;
+        if (root) {
+            let component = root.getComponent(data);
             if (component) {
                 if (typeof data == "string") {
                     if (DEBUG) warn(`${this._logTag}已经存在 Component ${component}`)
@@ -660,16 +676,16 @@ export class UIManager {
                 return component;
             }
             else {
-                return canvas.addComponent(data);
+                return root.addComponent(data);
             }
         }
         return null;
     }
 
     public removeComponent(component: string | Component) {
-        let canvas = this.getCanvas();
-        if (canvas) {
-            let comp = canvas.getComponent(component as any);
+        let root = this.componentRoot;
+        if (root) {
+            let comp = root.getComponent(component as any);
             if (comp) {
                 comp.destroy();
             }
@@ -684,11 +700,11 @@ export class UIManager {
         log(`${this._logTag}---------views----end-----`);
     }
 
-    public printCanvasChildren() {
+    public printViewRootChildren() {
         log(`${this._logTag}-----------printCanvasChildren--start-----------`);
-        let canvas = this.getCanvas();
-        if (canvas) {
-            let children = canvas.children;
+        let root = this.viewRoot;
+        if (root) {
+            let children = root.children;
             for (let i = 0; i < children.length; i++) {
                 log(`${children[i].name} active : ${children[i].active}`);
             }
@@ -697,9 +713,9 @@ export class UIManager {
     }
 
     public printComponent() {
-        let canvas: any = this.getCanvas();
-        if (canvas) {
-            let comps: any[] = canvas._components;
+        let root: any = this.componentRoot;
+        if (root) {
+            let comps: any[] = root._components;
             log(`${this._logTag} -------------- print component start --------------`);
             for (let i = 0; i < comps.length; i++) {
                 log(js.getClassName(comps[i]));

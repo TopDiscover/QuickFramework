@@ -82,7 +82,7 @@ import { i18n } from "../language/CommonLanguage";
              }
              this.node.name = "Reconnect";
              this.node.removeFromParent();
-             Manager.uiManager.addChild(this.node,ViewZOrder.Loading);
+             Manager.uiManager.addView(this.node,ViewZOrder.Loading);
              this.node.setPosition(new Vec3(0,0,0));
              if (this.isWaitingHide) {
                  this.isWaitingHide = false;
