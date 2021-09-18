@@ -1,5 +1,5 @@
 
-import { Canvas, log, Node, size, Size, sys, UITransform, view, Widget, widgetManager } from "cc";
+import { Canvas, Node, size, Size, sys, UITransform, view, Widget, widgetManager } from "cc";
 import { DEBUG, EDITOR, JSB, PREVIEW } from "cc/env";
 import { Macro } from "../../defines/Macros";
 
@@ -99,7 +99,7 @@ export class Adaptor {
             view.setDesignResolutionSize(winsize.width, winsize.height, policy);
         } else if (me.screenAdaptType == ScreenAdaptType.Max) {
             let winsize = me.getMaxWinsize();
-            if (DEBUG) log(`max winsize : ${winsize.width} * ${winsize.height}`);
+            if (DEBUG) Log.d(`max winsize : ${winsize.width} * ${winsize.height}`);
             let policy = view.getResolutionPolicy();
             view.setDesignResolutionSize(winsize.width, winsize.height, policy);
         } else {
@@ -182,7 +182,7 @@ export class Adaptor {
                     if (me.landscapeHeight != 0) {
                         offsetY = me.landscapeHeight - height;//Math.abs(me.landscapeHeight - height);
                         if (me.isFirstResize) {
-                            if (DEBUG) log(me._logTag, `在有导行条情况下进行刷新操作`);
+                            if (DEBUG) Log.d(me._logTag, `在有导行条情况下进行刷新操作`);
                             me.waitScorllY = offsetY;
                             me.doAdapt();
                             me.isFirstResize = false;
@@ -206,16 +206,16 @@ export class Adaptor {
                     }
                     if (me.dviceDirection == "Landscape") {
                         me.recordHeight();
-                        log(`cur scrolly : ${window.scrollY}`);
+                        Log.d(`cur scrolly : ${window.scrollY}`);
                         if (window.scrollY > 0 || me.isSafari) {
-                            if (DEBUG) log(me._logTag, me.dviceDirection);
+                            if (DEBUG) Log.d(me._logTag, me.dviceDirection);
                             if (me.isSafari) {
                                 //在safari浏览器下，做一个强制移动，让浏览器的导行条显示出来,不然在ios13之前，最顶部分按钮无法点击
                                 me.waitScorllY = window.scrollY > 0 ? -window.scrollY : -50;
                             } else {
                                 me.waitScorllY = -window.scrollY;
                             }
-                            if (DEBUG) log(me._logTag, `scrollY : ${me.waitScorllY}`);
+                            if (DEBUG) Log.d(me._logTag, `scrollY : ${me.waitScorllY}`);
                             me.doAdapt();
                         } else {
                             me.doAdapt();
@@ -237,7 +237,7 @@ export class Adaptor {
         if (me.canvas) {
             if (me.waitScorllY != null) {
                 let top = me.waitScorllY;
-                if (DEBUG) log(me._logTag, `scroll top : ${top}`);
+                if (DEBUG) Log.d(me._logTag, `scroll top : ${top}`);
                 if (window.scrollTo) {
                     let fun: any = window.scrollTo;
                     fun(0, top);
@@ -248,7 +248,7 @@ export class Adaptor {
             me.doChangeResolution();
         }
         else {
-            if (DEBUG) log(me._logTag, `等待场景加载完成做适配`);
+            if (DEBUG) Log.d(me._logTag, `等待场景加载完成做适配`);
         }
     }
 
@@ -304,19 +304,19 @@ export class Adaptor {
             design = 1 / design;
             rate = 1 / rate;
         }
-        if (DEBUG) log(me._logTag, `design : ${design} real : ${rate}`);
+        if (DEBUG) Log.d(me._logTag, `design : ${design} real : ${rate}`);
 
         me.screenAdaptType = ScreenAdaptType.None;
         if (design == rate) {
             //相等比率，
-            if (DEBUG) log(me._logTag, `相等比率`);
+            if (DEBUG) Log.d(me._logTag, `相等比率`);
         } else if (rate < design) {
             me.screenAdaptType = ScreenAdaptType.Decrease;
-            if (DEBUG) log(me._logTag, `当前设计比率大于实际比率，按宽进行适配，上下有黑边`);
+            if (DEBUG) Log.d(me._logTag, `当前设计比率大于实际比率，按宽进行适配，上下有黑边`);
         } else {
-            if (DEBUG) log(me._logTag, `当前设计比率小于实际比率，将会对支持全屏的界面进行重重布局`);
+            if (DEBUG) Log.d(me._logTag, `当前设计比率小于实际比率，将会对支持全屏的界面进行重重布局`);
             if (rate >= me.MAX_RATE) {
-                if (DEBUG) log(me._logTag, `超过上限比率，按最大值来`)
+                if (DEBUG) Log.d(me._logTag, `超过上限比率，按最大值来`)
                 me.screenAdaptType = ScreenAdaptType.Max;
             } else {
                 me.screenAdaptType = ScreenAdaptType.Increase;

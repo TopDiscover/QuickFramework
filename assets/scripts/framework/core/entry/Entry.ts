@@ -75,7 +75,7 @@ export abstract class Entry {
                 }
             }else{
                 if ( DEBUG ){
-                    warn(`${js.getClassName(viewType)}未指定logictype`);
+                    Log.w(`${js.getClassName(viewType)}未指定logictype`);
                 }
             }
         }

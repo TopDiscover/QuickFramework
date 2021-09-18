@@ -1,4 +1,3 @@
-import { DEBUG } from "cc/env";
 import { DefaultCodec } from "../message/DefaultCodec";
 import { Codec, Message } from "../message/Message";
 import { Net } from "../Net";
@@ -48,7 +47,6 @@ export class Process {
 
         this._isDoingMessage = true;
         let handleTime = 0;
-        if (DEBUG) Log.d("---handMessage---");
         for (let i = 0; i < datas.length; i++) {
             let data = datas[i];
             if (data.func instanceof Function) {
