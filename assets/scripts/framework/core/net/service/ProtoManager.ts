@@ -25,7 +25,7 @@ export class ProtoManager {
         return new Promise<boolean>((resolove, reject) => {
             if( this._loadDir[`${bundle}/${path}`] ){
                 if ( DEBUG ){
-                    warn(this.tag,`${bundle}/${path}目录下所有proto文件已经存在，无需加载`);
+                    Log.w(this.tag,`${bundle}/${path}目录下所有proto文件已经存在，无需加载`);
                 }
                 resolove(true);
                 return;

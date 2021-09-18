@@ -125,12 +125,12 @@ export default class LoadTestView extends GameView {
                 if( type == ButtonSpriteType.Norml && spriteFrame ){
                     let buttonTrans = button.getComponent(UITransform) as UITransform;
                     let targetTrans = btn.target.getComponent(UITransform) as UITransform;
-                    log(spriteFrame.originalSize);
+                    Log.d(spriteFrame.originalSize);
                     buttonTrans.contentSize = spriteFrame.originalSize;
                     buttonTrans.setContentSize(spriteFrame.originalSize);
                     targetTrans.contentSize = spriteFrame.originalSize;
                     targetTrans.setContentSize(spriteFrame.originalSize);
-                    log(button.getComponent(UITransform))
+                    Log.d(button.getComponent(UITransform))
                 }
             },
         })

@@ -63,32 +63,32 @@ export default class ResourceLoader {
     public loadResources() {
 
         if (!this.getLoadResources) {
-            if (DEBUG) error("未指定 getLoadResources 函数");
+            if (DEBUG) Log.e("未指定 getLoadResources 函数");
             this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
             return;
         }
 
         let res = this.getLoadResources();
         if (!res) {
-            if (DEBUG) error(`未指定加载资源`);
+            if (DEBUG) Log.e(`未指定加载资源`);
             this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
             return;
         }
         if (res.length <= 0) {
-            if (DEBUG) warn(`加载的资源为空`);
+            if (DEBUG) Log.w(`加载的资源为空`);
             this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
             return;
         }
 
         //如果正在加载中，防止重复调用
         if (this._isLoading) {
-            if (DEBUG) warn(`资源加载中，未完成加载`);
+            if (DEBUG) Log.w(`资源加载中，未完成加载`);
             this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.LOADING);
             return;
         }
 
         if (this._resources.size > 0 && this.isLoadComplete()) {
-            if (DEBUG) warn(`资源已经加载完成，使用已经加载完成的资源`);
+            if (DEBUG) Log.w(`资源已经加载完成，使用已经加载完成的资源`);
             this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.SUCCESS);
             this.onLoadResourceComplete();
             return;
@@ -136,7 +136,7 @@ export default class ResourceLoader {
         if (this._isLoading || this._resources.size <= 0) {
             //当前正在加载中
             if (this._isLoading) {
-                log("resources is loading , waiting for unload!!!");
+                Log.d("resources is loading , waiting for unload!!!");
             }
             return;
         }

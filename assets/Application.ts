@@ -11,7 +11,6 @@ import { CommonLanguage } from "./scripts/common/language/CommonLanguage";
 import { ServiceManager } from "./scripts/common/manager/ServiceManager";
 import { Reconnect } from "./scripts/common/net/Reconnect";
 import { HotUpdate } from "./scripts/framework/core/hotupdate/Hotupdate";
-import { Log } from "./scripts/framework/core/log/Log";
 import { LogLevel } from "./scripts/framework/defines/Enums";
 import { Framewok } from "./scripts/framework/Framework";
 
@@ -117,14 +116,14 @@ export class _Manager extends Framewok implements GameEventInterface {
 
     onEnterBackground(): void {
         this._enterBackgroundTime = Date.timeNow();
-        log(`[MainController]`, `onEnterBackground ${this._enterBackgroundTime}`);
+        Log.d(`[MainController]`, `onEnterBackground ${this._enterBackgroundTime}`);
         Manager.globalAudio.onEnterBackground();
         Manager.serviceManager.onEnterBackground();
     }
     onEnterForgeground(): void {
         let now = Date.timeNow();
         let inBackgroundTime = now - this._enterBackgroundTime;
-        log(`[MainController]`, `onEnterForgeground ${now} background total time : ${inBackgroundTime}`);
+        Log.d(`[MainController]`, `onEnterForgeground ${now} background total time : ${inBackgroundTime}`);
         Manager.globalAudio.onEnterForgeground(inBackgroundTime);
         Manager.serviceManager.onEnterForgeground(inBackgroundTime);
     }
@@ -138,7 +137,7 @@ export class _Manager extends Framewok implements GameEventInterface {
     }
 }
 
-Log.logLevel = LogLevel.ERROR | LogLevel.LOG | LogLevel.WARN | LogLevel.DUMP;
 let mgr = new _Manager();
+mgr.logger.level = LogLevel.ALL;
 (<any>window)["Manager"] = mgr;
 mgr.init();

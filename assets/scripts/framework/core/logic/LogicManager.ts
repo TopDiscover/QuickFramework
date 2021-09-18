@@ -26,7 +26,7 @@ export class LogicManager {
         }else{
             if (LogicTypeOrBundle.bundle == Macro.UNKNOWN) {
                 if (DEBUG) {
-                    error(`请先指定bunlde`);
+                    Log.e(`请先指定bunlde`);
                 }
                 return null;
             }

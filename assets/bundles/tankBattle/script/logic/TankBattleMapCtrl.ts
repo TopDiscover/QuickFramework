@@ -267,7 +267,7 @@ import { TankBettleGameData } from "../data/TankBattleGameData";
  
      public setLevel(level: number) {
          if (!!!this._blockPrefab) {
-             error(`请先设置预置节点`);
+            Log.e(`请先设置预置节点`);
              return
          }
  

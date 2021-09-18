@@ -15,9 +15,15 @@ import { ProtoManager } from "./core/net/service/ProtoManager";
 import { EntryManager } from "./core/entry/EntryManager";
 import { DataCenter } from "./data/DataCenter";
 import { LogicManager } from "./core/logic/LogicManager";
+import { LoggerImpl } from "./core/log/Logger";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
+
+    /**@description 日志 */
+    get logger(){
+        return getSingleton(LoggerImpl);
+    }
 
     /**@description 逻辑管理器 */
     get logicManager(){
@@ -195,7 +201,7 @@ export class Framewok {
             }
             return this.language.get(param);
         }
-        error(`传入参数有误`);
+        Log.e(`传入参数有误`);
         return "";
     }
 

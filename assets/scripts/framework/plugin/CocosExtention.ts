@@ -432,6 +432,6 @@ export function CocosExtentionInit() {
         if (Manager.adaptor.isBrowser) {
             (<any>EditBox)._EditBoxImpl = WebEditBoxImpl;
         }
-        log("Cocos扩展初始化");
+        Log.d("Cocos扩展初始化");
     }
 }

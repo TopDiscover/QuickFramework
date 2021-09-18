@@ -20,7 +20,7 @@ export default class UIView extends EventComponent implements IFullScreenAdapt {
     private action: Tween<any> | null = null;
     public static getPrefabUrl(): string {
         if (DEBUG) {
-            error(`请求实现public static getPrefabUrl`);
+            Log.e(`请求实现public static getPrefabUrl`);
         }
         return Macro.UNKNOWN;
     }
@@ -172,7 +172,7 @@ export default class UIView extends EventComponent implements IFullScreenAdapt {
 
     onKeyUp(ev: EventKeyboard) {
         if (DEBUG) {
-            log(`[${js.getClassName(this)}] onKeyUp keyCode : ${ev.keyCode}`);
+            Log.d(`[${js.getClassName(this)}] onKeyUp keyCode : ${ev.keyCode}`);
         }
         if (ev.keyCode == macro.KEY.escape) {
             this.onKeyBack(ev);

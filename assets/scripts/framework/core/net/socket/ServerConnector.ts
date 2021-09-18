@@ -26,7 +26,7 @@ export abstract class ServerConnector {
      * @description 发送心跳
      */
     protected sendHeartbeat() {
-        if (DEBUG) error(`请重写sendHeartbeat`);
+        if (DEBUG) Log.e(`请重写sendHeartbeat`);
     }
 
     /**
@@ -117,7 +117,7 @@ export abstract class ServerConnector {
      */
     public connect_server(ip: string, port: number | string | null = null, protocol: Net.Type = "wss") {
         if (!this.enabled) {
-            if (DEBUG) warn(`请求先启用`)
+            if (DEBUG) Log.w(`请求先启用`)
             return;
         }
         if (port) {

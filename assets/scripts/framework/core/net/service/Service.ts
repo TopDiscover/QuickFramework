@@ -54,7 +54,7 @@ export abstract class Service extends ServerConnector {
         //先对包信进行解析
         let header = new this._Process.Codec;
         if (!header.unPack(data)) {
-            error(`decode header error`);
+            Log.e(`decode header error`);
             return;
         }
         super.onMessage(data);
@@ -117,15 +117,15 @@ export abstract class Service extends ServerConnector {
                 let header = new this._Process.Codec
                 header.pack(msg)
                 if (this.isHeartBeat(msg)) {
-                    if (DEBUG) log(`send request cmd : ${msg.cmd} `);
+                    if (DEBUG) Log.d(`send request cmd : ${msg.cmd} `);
                 } else {
-                    log(`send request main cmd : ${msg.cmd} `);
+                    Log.d(`send request main cmd : ${msg.cmd} `);
                 }
                 this.sendBuffer(header.buffer);
             } else {
-                error(`encode error`);
+                Log.e(`encode error`);
             }
-        } else { error("请求指定数据包头处理类型") }
+        } else { Log.e("请求指定数据包头处理类型") }
 
     }
 }

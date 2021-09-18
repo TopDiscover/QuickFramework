@@ -13,11 +13,11 @@ export function setServiceByClassName(name: string) {
         let __load = target.prototype.onLoad
         target.prototype.onLoad = function () {
             if (DEBUG) {
-                log(`[setService] ${js.getClassName(this)} onLoad`)
+                Log.d(`[setService] ${js.getClassName(this)} onLoad`)
             }
             let service = Manager.serviceManager.getServiceByNmame(name)
             if (DEBUG && !service) {
-                log(`[ByNameSetService] 在 ${js.getClassName(this)} 注入[${name}]失败! `)
+                Log.d(`[ByNameSetService] 在 ${js.getClassName(this)} 注入[${name}]失败! `)
                 service = null
             }
             this._service = service
@@ -30,7 +30,7 @@ export function setService(service: Service) {
         let __load = target.prototype.onLoad
         target.prototype.onLoad = function () {
             if (DEBUG) {
-                log(`[setService] ${js.getClassName(this)} onLoad`)
+                Log.d(`[setService] ${js.getClassName(this)} onLoad`)
             }
             this._service = service
             __load && __load.call(this)
@@ -43,7 +43,7 @@ export function setServiceCodec(header: typeof Codec) {
         let __load = target.prototype.onLoad
         target.prototype.onLoad = function () {
             if (DEBUG) {
-                log(`[setServiceCodec] ${js.getClassName(this)} onLoad`)
+                Log.d(`[setServiceCodec] ${js.getClassName(this)} onLoad`)
             }
             if (this._service) {
                 this._service.Codec = header

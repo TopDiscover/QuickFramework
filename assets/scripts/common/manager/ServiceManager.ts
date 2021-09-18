@@ -81,7 +81,7 @@ export class ServiceManager implements GameEventInterface {
     /**@description 尝试重连 */
     tryReconnect(service: CommonService, isShowTips: boolean = false) {
         if (!service) {
-            error(`service is null`);
+            Log.e(`service is null`);
             return;
         }
         if (!service.enabled || !service.reconnect.enabled) {
@@ -93,13 +93,13 @@ export class ServiceManager implements GameEventInterface {
             Manager.uiManager.getView("LoginView").then((view) => {
                 if (view) return;
                 service.reconnect.hide();
-                log(`${service.serviceName} 断开`)
+                Log.d(`${service.serviceName} 断开`)
                 let current = Manager.alert.currentShow(Config.RECONNECT_ALERT_TAG);
                 if (current) {
                     let showService: CommonService = current.userData;
                     if (service.priority > showService.priority) {
                         //如果尝试连接的优先级更高，显示优先级更高的连接
-                        log(`显示更新优先级重连弹出框 : ${service.serviceName}`);
+                        Log.d(`显示更新优先级重连弹出框 : ${service.serviceName}`);
                         Manager.alert.close(Config.RECONNECT_ALERT_TAG);
                     }
                 }
@@ -112,19 +112,19 @@ export class ServiceManager implements GameEventInterface {
                         if (isOK) {
                             service.reconnect.show();
                         } else {
-                            log(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
+                            Log.d(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
                             Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
                         }
                     },
                     cancelCb: () => {
-                        log(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
+                        Log.d(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
                         Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
                     }
                 });
             });
         } else {
             if (Manager.alert.isCurrentShow(Config.RECONNECT_ALERT_TAG)) {
-                if (DEBUG) warn(`有一个重连提示框显示，等待玩家操作`);
+                if (DEBUG) Log.w(`有一个重连提示框显示，等待玩家操作`);
                 return;
             }
             let prev: CommonService = null!;

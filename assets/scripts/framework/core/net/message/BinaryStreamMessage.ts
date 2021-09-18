@@ -275,7 +275,7 @@ export abstract class BinaryStream extends Message {
         this.buffer = new Uint8Array(this._dataView.buffer);
         let success = this._byteOffset == this._dataView.byteLength;
         if (!success) {
-            error(`encode 当前读取大小为 : ${this._byteOffset} 数据大小为 : ${this._dataView.byteLength}`);
+            Log.e(`encode 当前读取大小为 : ${this._byteOffset} 数据大小为 : ${this._dataView.byteLength}`);
         }
         return success;
     }
@@ -303,7 +303,7 @@ export abstract class BinaryStream extends Message {
             let [memberName, type, arrTypeOrMapKeyType, mapValueType] = __serialize__[serializeKey];
             let memberSize = this.memberSize((<any>this)[memberName], type, arrTypeOrMapKeyType, mapValueType);
             if (null === memberSize) {
-                warn("Invalid serialize member size : " + memberName);
+                Log.w("Invalid serialize member size : " + memberName);
             }
             byteSize += memberSize;
         }
@@ -327,7 +327,7 @@ export abstract class BinaryStream extends Message {
         } else if (valueType == String) {//Map的key
             return this.memberStringSize(value, StringValue)
         } else {
-            warn("Invalid serialize value : " + value);
+            Log.w("Invalid serialize value : " + value);
             return 0;
         }
     }
@@ -395,7 +395,7 @@ export abstract class BinaryStream extends Message {
             value.serialize();
             this._byteOffset = value._byteOffset;
         } else {
-            error(`序列化成员 : ${memberName} 出错!!`);
+            Log.e(`序列化成员 : ${memberName} 出错!!`);
         }
     }
 
@@ -447,7 +447,7 @@ export abstract class BinaryStream extends Message {
         this.deserialize();
         let success = this._dataView.byteLength == this._byteOffset;
         if (!success) {
-            error(`decode 当前读取大小为 : ${this._byteOffset} 数据大小为 : ${this._dataView.byteLength}`);
+            Log.e(`decode 当前读取大小为 : ${this._byteOffset} 数据大小为 : ${this._dataView.byteLength}`);
         }
 
         return success;
@@ -493,11 +493,11 @@ export abstract class BinaryStream extends Message {
                 originValue.deserialize();
                 this._byteOffset = originValue._byteOffset;
             } else {
-                error(`deserializeMember ${memberName} error!!!`);
+                Log.e(`deserializeMember ${memberName} error!!!`);
             }
-        } catch (error) {
-            warn(error.message);
-            error(`deserializeMember ${memberName} error!!!`);
+        } catch (err:any) {
+            Log.w(err.message);
+            Log.e(`deserializeMember ${memberName} error!!!`);
         }
     }
 

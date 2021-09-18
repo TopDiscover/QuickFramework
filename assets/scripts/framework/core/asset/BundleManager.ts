@@ -38,7 +38,7 @@ export class BundleManager {
    public enterBundle(config: HotUpdate.BundleConfig, delegate: EntryDelegate) {
       if (this.isLoading) {
          if (delegate) delegate.onBundleLoading(config);
-         log("正在更新游戏，请稍等");
+         Log.d("正在更新游戏，请稍等");
          return;
       }
       this.curBundle = config;
@@ -55,7 +55,7 @@ export class BundleManager {
    /**@description 检测子游戏更新 */
    private checkUpdate(versionInfo: HotUpdate.BundleConfig, delegate: EntryDelegate) {
       let self = this;
-      log(`检测更新信息:${versionInfo.name}(${versionInfo.bundle})`);
+      Log.d(`检测更新信息:${versionInfo.name}(${versionInfo.bundle})`);
       Manager.eventDispatcher.removeEventListener(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this);
       let bundle : string | undefined = this.curBundle.bundle;
       if ( this.curBundle.bundle == Macro.BUNDLE_RESOURCES ){
@@ -65,12 +65,12 @@ export class BundleManager {
          if (code == HotUpdate.Code.NEW_VERSION_FOUND) {
             //有新版本
             Manager.eventDispatcher.addEventListener(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload.bind(this, delegate), this);
-            log(`检测到${versionInfo.name}(${versionInfo.bundle})有新的版本`);
+            Log.d(`检测到${versionInfo.name}(${versionInfo.bundle})有新的版本`);
             if (delegate) delegate.onNewVersionFund(versionInfo, code, state);
          } else if (state == HotUpdate.State.TRY_DOWNLOAD_FAILED_ASSETS) {
             //尝试重新下载之前下载失败的文件
             Manager.eventDispatcher.addEventListener(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload.bind(this, delegate), this);
-            log(`正在尝试重新下载之前下载失败的资源`);
+            Log.d(`正在尝试重新下载之前下载失败的资源`);
             if (delegate) delegate.onDownloadFailed(versionInfo, code, state);
          } else if (code == HotUpdate.Code.ALREADY_UP_TO_DATE) {
             //已经是最新版本
@@ -84,18 +84,18 @@ export class BundleManager {
             if (delegate) delegate.onDownloadManifestFailed(versionInfo, code, state);
          } else if (code == HotUpdate.Code.CHECKING) {
             //当前正在检测更新
-            log(`正在检测更新!!`);
+            Log.d(`正在检测更新!!`);
             if (delegate) delegate.onCheckingVersion(versionInfo, code, state);
          } else {
             this.isLoading = false;
-            log(`检测更新当前状态 code : ${code} state : ${state}`);
+            Log.d(`检测更新当前状态 code : ${code} state : ${state}`);
             if (delegate) delegate.onOtherReason(versionInfo, code, state);
          }
       },bundle);
    }
 
    public loadBundle(delegate: EntryDelegate) {
-      log(`loadBundle : ${this.curBundle.bundle}`);
+      Log.d(`loadBundle : ${this.curBundle.bundle}`);
       let me = this;
       this.isLoading = true;
       //加载子包
@@ -103,27 +103,27 @@ export class BundleManager {
       Manager.assetManager.loadBundle(versionInfo.bundle, (err, bundle) => {
          me.isLoading = false;
          if (err) {
-            error(`load bundle : ${versionInfo.bundle} fail !!!`);
+            Log.e(`load bundle : ${versionInfo.bundle} fail !!!`);
             if( delegate ) delegate.onLoadBundleError(versionInfo,err);
          } else {
-            log(`load bundle : ${versionInfo.bundle} success !!!`);
+            Log.d(`load bundle : ${versionInfo.bundle} success !!!`);
             this.loadedBundle.push(versionInfo.bundle);
             if ( delegate ) delegate.onLoadBundleComplete(versionInfo,bundle);
          }
       });
    }
    private onDownload(delegate: EntryDelegate, info: HotUpdate.DownLoadInfo) {
-      if (DEBUG) log(JSON.stringify(info));
+      if (DEBUG) Log.d(JSON.stringify(info));
       let config = Manager.hotupdate.getBundleName(this.curBundle.bundle);
       if (info.code == HotUpdate.Code.UPDATE_FINISHED) {
-         log(`更新${config.name}成功`);
+         Log.d(`更新${config.name}成功`);
       } else if (info.code == HotUpdate.Code.UPDATE_FAILED ||
          info.code == HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
          info.code == HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST ||
          info.code == HotUpdate.Code.ERROR_PARSE_MANIFEST ||
          info.code == HotUpdate.Code.ERROR_DECOMPRESS) {
          this.isLoading = false;
-         error(`更新${config.name}失败`);
+         Log.e(`更新${config.name}失败`);
       }
       if (delegate) delegate.onDownloading(this.curBundle, info);
    }

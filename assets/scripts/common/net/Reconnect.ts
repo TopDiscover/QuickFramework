@@ -22,7 +22,7 @@ import { i18n } from "../language/CommonLanguage";
          return new Promise<boolean>((resolove, reject) => {
              //正在加载中
              if (this.isLoadingPrefab) {
-                 warn(`正在加载Reconnect预置体`);
+                Log.w(`正在加载Reconnect预置体`);
                  return;
              }
              if (this.prefab) {
@@ -70,7 +70,7 @@ import { i18n } from "../language/CommonLanguage";
      }
  
      public async show(content: string = i18n.reconnect) {
-         if( DEBUG ) log(`${this.service.serviceName} 显示重连`);
+         if( DEBUG ) Log.d(`${this.service.serviceName} 显示重连`);
          if (this.isExistReconnectComponent()) {
              return;
          }
@@ -126,7 +126,7 @@ import { i18n } from "../language/CommonLanguage";
      }
  
      public hide() {
-         log(`Reconnect hide`);
+        Log.d(`Reconnect hide`);
          if (this.node) {
              this.isWaitingHide = true;
              this.setActive(false);
@@ -137,7 +137,7 @@ import { i18n } from "../language/CommonLanguage";
      }
  
      public hideNode() {
-         log(`Reconnect hideNode`);
+        Log.d(`Reconnect hideNode`);
          if (this.node) {
              this.isWaitingHide = true;
              this.node.active = false;
@@ -147,7 +147,7 @@ import { i18n } from "../language/CommonLanguage";
      }
  
      public showNode(content: string) {
-         log(`Reconnect showNode`);
+        Log.d(`Reconnect showNode`);
          if (this.node) {
              this.node.active = true;
              if (content) {

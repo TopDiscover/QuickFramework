@@ -1,14 +1,19 @@
 /**@description 调试 */
-declare function log(...args: any[]): void;
-declare function error(...args: any[]): void;
-declare function warn(...args: any[]): void;
-/**
- * @description 界面当前value的值信息
- * @param value 值 
- * @param name 名字
- * @param level 打印对象深度，不传入，如果有对象嵌套对象，默认只打印10层
- */
-declare function dump(value: any, name?: string, level?: number): void;
+interface Logger{
+	/**@description 错误日志 */
+	e(...data:any[]):void;
+	/**@description debug日志 */
+	d(...data:any[]):void;
+	/**@description 警告输出 */
+	w(...data:any[]):void;
+	/**
+	 * @description dump 对象数据
+	 * @param object dump的对象
+	 * @param label 标签
+	 */
+	dump(object : Object , label?:string):void;
+}
+declare let Log : Logger;
 
 declare type BUNDLE_TYPE = string | import("cc").AssetManager.Bundle;
 /**

@@ -85,10 +85,10 @@ export class EventDispatcher {
                     if (typeof event.callback == "string") {
                         let func = Reflect.get(event.target, event.callback);
                         if (func) {
-                            if (DEBUG) log(`${this.logTag} apply string func : ${event.callback} class : ${js.getClassName(event.target)}`);
+                            if (DEBUG) Log.d(`${this.logTag} apply string func : ${event.callback} class : ${js.getClassName(event.target)}`);
                             Reflect.apply(func.bind(event.target), event.target, [data]);
                         } else {
-                            if (DEBUG) error(`${this.logTag} class : ${js.getClassName(event.target)} no func : ${event.callback}`);
+                            if (DEBUG) Log.e(`${this.logTag} class : ${js.getClassName(event.target)} no func : ${event.callback}`);
                         }
                     }
                     else {
@@ -101,29 +101,29 @@ export class EventDispatcher {
                             if (func && typeof func == "function") {
                                 func.apply(event.target, [data]);
                             } else {
-                                if (DEBUG) error(`${event.callback} is not function`);
+                                if (DEBUG) Log.e(`${event.callback} is not function`);
                             }
                         } else {
-                            if (DEBUG) error(`target or callback is null`);
+                            if (DEBUG) Log.e(`target or callback is null`);
                         }
                     } else {
                         if (event.callback && event.target) {
                             event.callback.apply(event.target, [data]);
                         } else {
-                            if (DEBUG) error(`callback is null`);
+                            if (DEBUG) Log.e(`callback is null`);
                         }
                     }
                 }
 
             } catch (err) {
-                error(err);
+                Log.e(err);
             }
         }
     }
 }
 
 window.dispatch = function (name: string, data?: any) {
-    if (DEBUG && !EDITOR) log(`[dispatch] ${name} data : ${data}`);
+    if (DEBUG && !EDITOR) Log.d(`[dispatch] ${name} data : ${data}`);
     //向自己封闭的管理器中也分发
     EventDispatcher.Instance().dispatchEvent(name, data);
 }

@@ -48,7 +48,7 @@ export class Process {
 
         this._isDoingMessage = true;
         let handleTime = 0;
-        if (DEBUG) log("---handMessage---");
+        if (DEBUG) Log.d("---handMessage---");
         for (let i = 0; i < datas.length; i++) {
             let data = datas[i];
             if (data.func instanceof Function) {
@@ -58,7 +58,7 @@ export class Process {
                         handleTime = Math.max(handleTime, tempTime);
                     }
                 } catch (err) {
-                    error(err);
+                    Log.e(err);
                 }
             }
         }
@@ -75,10 +75,10 @@ export class Process {
     }
 
     public onMessage(code: Codec) {
-        log(`recv data main cmd : ${code.cmd}`);
+        Log.d(`recv data main cmd : ${code.cmd}`);
         let key = String(code.cmd);
         if (!this._listeners[key]) {
-            warn(`no find listener data main cmd : ${code.cmd}`);
+            Log.w(`no find listener data main cmd : ${code.cmd}`);
             return;
         }
         if (this._listeners[key].length <= 0) {
@@ -252,7 +252,7 @@ export class Process {
                 try {
                     listenerDatas[i].func && listenerDatas[i].func.call(listenerDatas[i].target, obj);
                 } catch (err) {
-                    error(err);
+                    Log.e(err);
                 }
 
             }

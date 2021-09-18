@@ -30,7 +30,7 @@ export class CommonService extends ICommonService implements GameEventInterface 
         if (value < Config.MIN_INBACKGROUND_TIME || value > Config.MAX_INBACKGROUND_TIME) {
             value = Config.MIN_INBACKGROUND_TIME;
         }
-        log(this.serviceName, `maxEnterBackgroundTime ${value}`);
+        Log.d(this.serviceName, `maxEnterBackgroundTime ${value}`);
         this._maxEnterBackgroundTime = value;
     }
 
@@ -56,7 +56,7 @@ export class CommonService extends ICommonService implements GameEventInterface 
         if (this.heartbeat) {
             this.send(new this.heartbeat());
         } else {
-            error("请先设置心跳解析类型")
+            Log.e("请先设置心跳解析类型")
         }
     }
     /**
@@ -74,7 +74,7 @@ export class CommonService extends ICommonService implements GameEventInterface 
      * @description 心跳超时
      */
     protected onHeartbeatTimeOut() {
-        warn(`${this.serviceName} 心跳超时，您已经断开网络`);
+        Log.w(`${this.serviceName} 心跳超时，您已经断开网络`);
         this.close();
         Manager.serviceManager.tryReconnect(this, true);
     }
@@ -91,7 +91,7 @@ export class CommonService extends ICommonService implements GameEventInterface 
         Manager.uiManager.getView("LoginView").then(view => {
             me._backgroundTimeOutId = setTimeout(() => {
                 //进入后台超时，主动关闭网络
-                log(`进入后台时间过长，主动关闭网络，等玩家切回前台重新连接网络`);
+                Log.d(`进入后台时间过长，主动关闭网络，等玩家切回前台重新连接网络`);
                 me.close();
             }, me.maxEnterBackgroundTime * 1000);
         });
@@ -99,17 +99,17 @@ export class CommonService extends ICommonService implements GameEventInterface 
 
     onEnterForgeground(inBackgroundTime: number) {
         if (this._backgroundTimeOutId != -1) {
-            log(`清除进入后台的超时关闭网络定时器`);
+            Log.d(`清除进入后台的超时关闭网络定时器`);
             clearTimeout(this._backgroundTimeOutId);
             let self = this;
             //登录界面，不做处理
             Manager.uiManager.getView("LoginView").then((view) => {
-                log(`在后台时间${inBackgroundTime} , 最大时间为: ${self.maxEnterBackgroundTime}`)
+                Log.d(`在后台时间${inBackgroundTime} , 最大时间为: ${self.maxEnterBackgroundTime}`)
                 if (view) {
                     return;
                 }
                 if (inBackgroundTime > self.maxEnterBackgroundTime) {
-                    log(`从回台切换，显示重新连接网络`);
+                    Log.d(`从回台切换，显示重新连接网络`);
                     self.close();
                     Manager.serviceManager.tryReconnect(self);
                 }
@@ -128,7 +128,7 @@ export class CommonService extends ICommonService implements GameEventInterface 
     protected onClose(ev: Event) {
         super.onClose(ev)
         if (ev.type == Net.NetEvent.ON_CUSTOM_CLOSE) {
-            log(`${this.serviceName} 应用层主动关闭Socket`);
+            Log.d(`${this.serviceName} 应用层主动关闭Socket`);
             return;
         }
         Manager.uiManager.getView("LoginView").then(view => {

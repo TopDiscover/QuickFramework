@@ -62,10 +62,10 @@ export class LocalStorage {
                 let data = this.encrypt(saveObj);
                 this.storage.setItem(key, data);
             } catch (err) {
-                if (DEBUG) error(err);
+                if (DEBUG) Log.e(err);
             }
         } else {
-            if (DEBUG) error(`存储数据类型不支持 当前的存储类型: ${type}`);
+            if (DEBUG) Log.e(`存储数据类型不支持 当前的存储类型: ${type}`);
         }
     }
 

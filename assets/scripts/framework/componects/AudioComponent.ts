@@ -27,7 +27,7 @@ export class AudioInfo {
         this.isPause = false;
         if (this.source) {
             if( this.source.playing ){
-                log(this.url,"isPlaying to pause");
+                Log.d(this.url,"isPlaying to pause");
                 this.isPause = true;
                 this.source.pause();
             }
@@ -43,7 +43,7 @@ export class AudioInfo {
 
     resume() {
         if (this.source && this.isPause ) {
-            log(this.url,"resume play")
+            Log.d(this.url,"resume play")
             this.source.play();
         }
         this.isPause = false;
@@ -254,7 +254,7 @@ export default class AudioComponent extends EventComponent {
         return new Promise<boolean>((resolve) => {
             if (DEBUG) {
                 if (!this.owner) {
-                    error(`必须要指定资源的管理都才能播放`);
+                    Log.e(`必须要指定资源的管理都才能播放`);
                     resolve(false);
                     return;
                 }
@@ -305,7 +305,7 @@ export default class AudioComponent extends EventComponent {
         return new Promise<boolean>((resolve) => {
             if (DEBUG) {
                 if (!this.owner) {
-                    error(`必须要指定资源的管理都才能播放`);
+                    Log.e(`必须要指定资源的管理都才能播放`);
                     resolve(false);
                     return;
                 }

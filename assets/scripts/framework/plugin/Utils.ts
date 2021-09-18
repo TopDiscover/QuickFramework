@@ -97,7 +97,7 @@ export function setSpriteSpriteFrame(
             sprite.spriteFrame = temp;
             if (completeCallback) completeCallback(null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
-            error(`${url} : ${err ? err : "replace spriteframe error"}`);
+            Log.e(`${url} : ${err ? err : "replace spriteframe error"}`);
         }
     } else {
         //完成回调
@@ -145,7 +145,7 @@ function _setSpriteFrame(
             (<any>button)[memberName] = temp;
             if (completeCallback) completeCallback(memberName, null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
-            error(`${url} : ${err ? err : "replace spriteframe error"}`);
+            Log.e(`${url} : ${err ? err : "replace spriteframe error"}`);
         }
     } else {
         if (completeCallback && isValidComponent(button)) completeCallback(memberName, spriteFrame);
@@ -264,7 +264,7 @@ export function setParticleSystemFile(
             component.file = temp;
             if (config.completeCallback) config.completeCallback(null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
-            error(`${config.url} : ${err ? err : "replace file error"}`);
+            Log.e(`${config.url} : ${err ? err : "replace file error"}`);
         }
     } else {
         //完成回调
@@ -299,7 +299,7 @@ export function setLabelFont(
             component.font = temp;
             if (config.completeCallback) config.completeCallback(null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
-            error(`${config.font} : ${err ? err : "replace font error"}`);
+            Log.e(`${config.font} : ${err ? err : "replace font error"}`);
         }
     } else {
         //完成回调
@@ -352,7 +352,7 @@ export function setSkeletonSkeletonData(
             component.skeletonData = temp as sp.SkeletonData;
             if (config.completeCallback) config.completeCallback(null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
-            error(`${url} : ${err ? err : "replace skeletonData error"}`);
+            Log.e(`${url} : ${err ? err : "replace skeletonData error"}`);
         }
     } else {
         //完成回调

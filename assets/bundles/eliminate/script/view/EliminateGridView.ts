@@ -114,7 +114,7 @@ export default class EliminateGridView extends Component {
                     cellView?.initWithModel(model);
                     view = node;
                 }else{
-                    error(prefabUrl,"not found");
+                    Log.e(prefabUrl,"not found");
                 }
                 
             } else {
@@ -204,7 +204,7 @@ export default class EliminateGridView extends Component {
         if (time <= 0) {
             return;
         }
-        log(`disableTouch time : ${time} step : ${step}`);
+        Log.d(`disableTouch time : ${time} step : ${step}`);
         this.isPlayAni = true;
         tween(this.node).delay(time).call(()=>{
             this.isPlayAni = false;

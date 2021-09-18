@@ -5,11 +5,11 @@
 
 /**@description 日志等级 */
 export enum LogLevel {
-    LOG = 0X00000001,
+    DEBUG = 0X00000001,
     DUMP = 0X00000010,
     WARN = 0X00000100,
     ERROR = 0X00001000,
-    ALL = LOG | DUMP | WARN | ERROR,
+    ALL = DEBUG | DUMP | WARN | ERROR,
 }
 
 /**

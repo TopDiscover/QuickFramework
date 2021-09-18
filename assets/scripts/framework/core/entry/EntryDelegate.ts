@@ -89,7 +89,7 @@ export class EntryDelegate {
             dispatch(HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
         } else if (info.code == HotUpdate.Code.UPDATE_FINISHED) {
             newPercent = 1.1;
-            log(`正在加载${config.name}`);
+            Log.d(`正在加载${config.name}`);
             Manager.bundleManager.loadBundle(this);
             dispatch(HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
         } else if (info.code == HotUpdate.Code.UPDATE_FAILED ||

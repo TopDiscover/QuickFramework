@@ -45,7 +45,7 @@ class LoginEntry extends Entry {
     /**@description 管理器通知自己进入GameView */
     onEnter(isQuitGame : boolean) {
         super.onEnter(isQuitGame);
-        log(`--------------onEnterLogin--------------`);
+        Log.d(`--------------onEnterLogin--------------`);
         if ( !isQuitGame ){
             Manager.loading.show(i18n.checkingUpdate);
         }

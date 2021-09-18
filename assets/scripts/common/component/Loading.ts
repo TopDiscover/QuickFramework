@@ -135,7 +135,7 @@ export default class Loading {
         return new Promise<boolean>((resolove, reject) => {
             //正在加载中
             if (this._isLoadingPrefab) {
-                warn(`正在加载Loading预置体`);
+                Log.w(`正在加载Loading预置体`);
                 return;
             }
             if (this._node) {

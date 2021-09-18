@@ -88,12 +88,12 @@ export default class WebSocketClinet {
         if (this._port) {
             fullUrl = fullUrl + `:${this._port}`;
         }
-        if (DEBUG) log(this._tag, `initWebSocket : ${fullUrl}`);
+        if (DEBUG) Log.d(this._tag, `initWebSocket : ${fullUrl}`);
 
 
         if (JSB && protocol == "wss") {
             if (!Manager.wssCacertUrl) {
-                error(`请先设置wss的证书url,MainController脚本中直接挂载证书`);
+                Log.e(`请先设置wss的证书url,MainController脚本中直接挂载证书`);
             }
             this._ws = new (<any>(WebSocket))(fullUrl, [], Manager.wssCacertUrl);
         } else {
@@ -124,7 +124,7 @@ export default class WebSocketClinet {
      */
     public initWebSocket(ip: string, port: string | null, protocol: Net.Type) {
         if (ip == undefined || ip == null || ip.length < 0) {
-            if (DEBUG) error(this._tag, `init websocket error ip : ${ip} port : ${port}`);
+            if (DEBUG) Log.e(this._tag, `init websocket error ip : ${ip} port : ${port}`);
             return;
         }
         //先判断当前是否已经有连接
@@ -139,22 +139,22 @@ export default class WebSocketClinet {
                     return;
                 }
                 else {
-                    if (DEBUG) error(this._tag, `当前有正在连接的socket??`);
+                    if (DEBUG) Log.e(this._tag, `当前有正在连接的socket??`);
                 }
             } else if (this._ws.readyState == WebSocket.OPEN) {
                 //当前连接已经打开
                 if (this._ip == ip && this._port == port) {
-                    if (DEBUG) warn(this._tag, `当前连接已经是打开的，不重复连接`);
+                    if (DEBUG) Log.w(this._tag, `当前连接已经是打开的，不重复连接`);
                 }
                 else {
-                    if (DEBUG) error(this._tag, `当前已经存在连接，请先关闭${this._ip}:${this._port} 再连接 ${ip} : ${port}`);
+                    if (DEBUG) Log.e(this._tag, `当前已经存在连接，请先关闭${this._ip}:${this._port} 再连接 ${ip} : ${port}`);
                 }
             } else if (this._ws.readyState == WebSocket.CLOSING) {
                 //连接正在关闭，等连接关闭后在进行重新连接
                 this._isWaitingConnect = true;
                 this._ip = ip;
                 this._port = port;
-                if (DEBUG) warn(this._tag, `当前网络关闭连接中，关闭完成后重新连接`);
+                if (DEBUG) Log.w(this._tag, `当前网络关闭连接中，关闭完成后重新连接`);
             } else {
                 //连接处于关闭状态，直接创建新的连接
                 this._ws = null;
@@ -169,7 +169,7 @@ export default class WebSocketClinet {
 
     private __onConected(event: any) {
         if (this._ws) {
-            if (DEBUG) log(this._tag, `onConected state : ${this._ws.readyState}`);
+            if (DEBUG) Log.d(this._tag, `onConected state : ${this._ws.readyState}`);
         }
         if (this._dataArr.length > 0) {
             for (let i = 0; i < this._dataArr.length; i++) {
@@ -194,15 +194,15 @@ export default class WebSocketClinet {
         }
 
         if (event) {
-            if (DEBUG) log(this._tag, `onClose type : ${event.type}`);
+            if (DEBUG) Log.d(this._tag, `onClose type : ${event.type}`);
         }
         else {
-            if (DEBUG) log(this._tag, `onClose`);
+            if (DEBUG) Log.d(this._tag, `onClose`);
         }
 
         //等待关闭后连接
         if (this._isWaitingConnect) {
-            if (DEBUG) log(this._tag, `收到连接关闭，有等待连接的网络，重连连接网络`);
+            if (DEBUG) Log.d(this._tag, `收到连接关闭，有等待连接的网络，重连连接网络`);
             this._closeEvent = null;
             this.connectWebSocket(this._ip, this._port, this._protocol);
             this._isWaitingConnect = false;
@@ -213,9 +213,9 @@ export default class WebSocketClinet {
 
     private __onError(event: Event) {
         if (event) {
-            if (DEBUG) error(this._tag, `onError`, event);
+            if (DEBUG) Log.e(this._tag, `onError`, event);
         } else {
-            if (DEBUG) error(this._tag, `onError`);
+            if (DEBUG) Log.e(this._tag, `onError`);
         }
         if (this.onError) this.onError(event);
     }
@@ -245,7 +245,7 @@ export default class WebSocketClinet {
             else {
                 //关闭或者正在关闭状态
                 let content = this._ws.readyState == WebSocket.CLOSING ? `网络正在关闭` : `网络已经关闭`;
-                if (DEBUG) warn(this._tag, `发送消息失败: ${content}`);
+                if (DEBUG) Log.w(this._tag, `发送消息失败: ${content}`);
             }
         }
     }
@@ -261,6 +261,6 @@ export default class WebSocketClinet {
         }
         //清空发送
         this._dataArr = [];
-        if (DEBUG) log(this._tag, `close websocket`);
+        if (DEBUG) Log.d(this._tag, `close websocket`);
     }
 }

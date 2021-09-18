@@ -25,12 +25,12 @@ class ResourceCache {
             }
         });
         if (content.length > 0) {
-            log(`----------- Current valid caches -----------`);
-            log(JSON.stringify(content));
+            Log.d(`----------- Current valid caches -----------`);
+            Log.d(JSON.stringify(content));
         }
         if (invalidContent.length > 0) {
-            log(`----------- Current invalid caches -----------`);
-            log(JSON.stringify(invalidContent));
+            Log.d(`----------- Current invalid caches -----------`);
+            Log.d(JSON.stringify(invalidContent));
         }
     }
 
@@ -45,7 +45,7 @@ class ResourceCache {
             let cache = this._caches.get(path);
             if (isCheck && cache && cache.isInvalid) {
                 //资源已经释放
-                warn(`资源加载完成，但已经被释放 , 重新加载资源 : ${path}`);
+                Log.w(`资源加载完成，但已经被释放 , 重新加载资源 : ${path}`);
                 this.remove(path);
                 return null;
             }
@@ -73,12 +73,12 @@ class ResourceCache {
                 }
                 if (isAllDelete) {
                     this._caches.delete(key);
-                    if (DEBUG) log(`删除不使用的资源目录 bundle : ${this.name} dir : ${key}`);
+                    if (DEBUG) Log.d(`删除不使用的资源目录 bundle : ${this.name} dir : ${key}`);
                 }
             }else{
                 if( value.data && value.data.refCount <= 0 ){
                     this._caches.delete(key);
-                    if (DEBUG) log(`删除不使用的资源 bundle : ${this.name} url : ${key}`);
+                    if (DEBUG) Log.d(`删除不使用的资源 bundle : ${this.name} url : ${key}`);
                 }
             }
         });
@@ -174,7 +174,7 @@ class RemoteCaches {
             if (cache) {
                 if (cache.retain) {
                     if (!info.retain) {
-                        if (DEBUG) warn(`资源 : ${info.url} 已经被设置成常驻资源，不能改变其属性`);
+                        if (DEBUG) Log.w(`资源 : ${info.url} 已经被设置成常驻资源，不能改变其属性`);
                     }
                 } else {
                     cache.retain = info.retain;
@@ -213,7 +213,7 @@ class RemoteCaches {
             //先释放引用计数
             (<Asset>(this._spriteFrameCaches.get(url) as Resource.CacheData).data).decRef();
             this._spriteFrameCaches.delete(url);
-            if (DEBUG) log(`remove remote sprite frames resource url : ${url}`);
+            if (DEBUG) Log.d(`remove remote sprite frames resource url : ${url}`);
         }
 
         let cache = this._caches.has(url) ? this._caches.get(url) : null;
@@ -224,16 +224,16 @@ class RemoteCaches {
             this.remove(`${cache.info.url}.json`);
         }
         if (cache && cache.data instanceof Asset) {
-            if (DEBUG) log(`释放加载的本地远程资源:${cache.info.url}`);
+            if (DEBUG) Log.d(`释放加载的本地远程资源:${cache.info.url}`);
             cache.data.decRef();
             assetManager.releaseAsset(cache.data as Asset);
         }
-        if (DEBUG) log(`remove remote cache url : ${url}`);
+        if (DEBUG) Log.d(`remove remote cache url : ${url}`);
         return this._caches.delete(url);
     }
 
     showCaches() {
-        log(`---- [RemoteCaches] showCaches ----`);
+        Log.d(`---- [RemoteCaches] showCaches ----`);
 
         let content: any[] = [];
         let invalidContent: any[] = [];
@@ -248,12 +248,12 @@ class RemoteCaches {
         });
 
         if (content.length > 0) {
-            log(`----------------Current valid spriteFrame Caches------------------`);
-            log(JSON.stringify(content));
+            Log.d(`----------------Current valid spriteFrame Caches------------------`);
+            Log.d(JSON.stringify(content));
         }
         if (invalidContent.length > 0) {
-            log(`----------------Current invalid spriteFrame Caches------------------`);
-            log(JSON.stringify(invalidContent));
+            Log.d(`----------------Current invalid spriteFrame Caches------------------`);
+            Log.d(JSON.stringify(invalidContent));
         }
 
 
@@ -269,22 +269,22 @@ class RemoteCaches {
             }
         });
         if (content.length > 0) {
-            log(`----------------Current valid Caches------------------`);
-            log(JSON.stringify(content));
+            Log.d(`----------------Current valid Caches------------------`);
+            Log.d(JSON.stringify(content));
         }
         if (invalidContent.length > 0) {
-            log(`----------------Current invalid Caches------------------`);
-            log(JSON.stringify(invalidContent));
+            Log.d(`----------------Current invalid Caches------------------`);
+            Log.d(JSON.stringify(invalidContent));
         }
 
         if (this._resMap.size > 0) {
-            log(`----------------Current resource reference Caches------------------`);
+            Log.d(`----------------Current resource reference Caches------------------`);
             content = [];
             this._resMap.forEach((value, key) => {
                 let item = { url: key, data: { refCount: value.refCount, url: value.url, retain: value.retain } };
                 content.push(item);
             });
-            log(JSON.stringify(content));
+            Log.d(JSON.stringify(content));
         }
     }
 }
@@ -372,10 +372,10 @@ export class CacheManager {
                     }
                 }
             } else {
-                error(`info.data is null , bundle : ${info.bundle} url : ${info.url}`);
+                Log.e(`info.data is null , bundle : ${info.bundle} url : ${info.url}`);
             }
         } else {
-            error(`info is null`);
+            Log.e(`info is null`);
         }
         return false;
     }
@@ -384,11 +384,11 @@ export class CacheManager {
         let bundleName = this.getBundleName(bundle);
         if (bundleName && this._bundles.has(bundleName)) {
             if (DEBUG) {
-                log(`移除bundle cache : ${bundleName}`)
+                Log.d(`移除bundle cache : ${bundleName}`)
                 let data = this._bundles.get(bundleName);
                 this._removeUnuseCaches();
                 if (data && data.size > 0) {
-                    error(`移除bundle ${bundleName} 还有未释放的缓存`);
+                    Log.e(`移除bundle ${bundleName} 还有未释放的缓存`);
                 }
             }
             this._bundles.delete(bundleName);
@@ -405,16 +405,16 @@ export class CacheManager {
 
     private _getGetCacheByAsyncArgs(): { url: string, type: typeof Asset, bundle: BUNDLE_TYPE } | null {
         if (arguments.length < 3) {
-            if (DEBUG) error(`${this.logTag}参数传入有误，必须两个参数`);
+            if (DEBUG) Log.e(`${this.logTag}参数传入有误，必须两个参数`);
             return null;
         }
         if (typeof arguments[0] != "string") {
-            if (DEBUG) error(`${this.logTag}传入第一个参数有误,必须是string`);
+            if (DEBUG) Log.e(`${this.logTag}传入第一个参数有误,必须是string`);
             return null;
         }
 
         if (!js.isChildClassOf(arguments[1], Asset)) {
-            if (DEBUG) error(`${this.logTag}传入的第二个参数有误,必须是cc.Asset的子类`);
+            if (DEBUG) Log.e(`${this.logTag}传入的第二个参数有误,必须是cc.Asset的子类`);
             return null;
         }
         return { url: arguments[0], type: arguments[1], bundle: arguments[2] };
@@ -444,7 +444,7 @@ export class CacheManager {
                         if (cache.data instanceof _args.type) {
                             resolve(cache.data);
                         } else {
-                            if (DEBUG) error(`${this.logTag}传入类型:${js.getClassName(_args.type)}与资源实际类型: ${js.getClassName(cache.data as any)}不同 url : ${cache.info.url}`);
+                            if (DEBUG) Log.e(`${this.logTag}传入类型:${js.getClassName(_args.type)}与资源实际类型: ${js.getClassName(cache.data as any)}不同 url : ${cache.info.url}`);
                             resolve(null);
                         }
                     } else {
@@ -486,7 +486,7 @@ export class CacheManager {
                         if (cache && cache.data && cache.data instanceof args.type) {
                             resolve(cache.data);
                         } else {
-                            error(`${this.logTag}加载失败 : ${args.url}`);
+                            Log.e(`${this.logTag}加载失败 : ${args.url}`);
                             resolve(null);
                         }
                     });
@@ -514,7 +514,7 @@ export class CacheManager {
                                 resolve({ url: url, spriteFrame: spriteFrame });
                             } else {
                                 //来到这里面，其实程序已经崩溃了，已经没什么意思，也不知道写这个有啥用，尽量安慰,哈哈哈
-                                error(`精灵帧被释放，释放当前无法的图集资源 url ：${url} key : ${key}`);
+                                Log.e(`精灵帧被释放，释放当前无法的图集资源 url ：${url} key : ${key}`);
                                 Manager.assetManager.releaseAsset(info);
                                 resolve({ url: url, spriteFrame: null, isTryReload: true });
                             }
@@ -539,9 +539,9 @@ export class CacheManager {
     /**@description 打印当前缓存资源 */
     public printCaches() {
         this._bundles.forEach((value, key, originMap) => {
-            if (DEBUG) log(`----------------Bundle ${key} caches begin----------------`)
+            if (DEBUG) Log.d(`----------------Bundle ${key} caches begin----------------`)
             value.print();
-            if (DEBUG) log(`----------------Bundle ${key} caches end----------------`)
+            if (DEBUG) Log.d(`----------------Bundle ${key} caches end----------------`)
         });
 
         this.remoteCaches.showCaches();

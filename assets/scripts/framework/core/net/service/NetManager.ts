@@ -23,7 +23,7 @@ export class NetManager {
     public register(controllerType: any) {
         for (let i = 0; i < this.types.length; i++) {
             if (this.types[i] == controllerType) {
-                error(this.name, `重复添加${js.getClassName(controllerType)}`);
+                Log.e(this.name, `重复添加${js.getClassName(controllerType)}`);
                 return;
             }
         }

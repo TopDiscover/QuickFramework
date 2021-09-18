@@ -27,7 +27,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
     }
 
     start() {
-        log(`${this.logName} start`);
+        Log.d(`${this.logName} start`);
         this.tryReconnect();
     }
 
@@ -43,7 +43,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
             if (this._connectCount > 0) {
                 time = (this._connectCount + 1) * time;
                 if (time > 3) { time = 3; }//最多推后3秒进行重连
-                log(`${this.logName}${time}秒后尝试重新连接`);
+                Log.d(`${this.logName}${time}秒后尝试重新连接`);
             }
             this.scheduleOnce(this.connect, time);
             this._isDoConnect = false;
@@ -58,7 +58,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
         if (loginView) {
             //现在已经在登录界面，不再尝试重新连接
             this.service.reconnect.hide();
-            warn(`${this.logName} 重连处于登录界面，停止重连`);
+            Log.w(`${this.logName} 重连处于登录界面，停止重连`);
             return;
         }
         this._isDoConnect = true;
@@ -84,23 +84,23 @@ export default class ReconnectComponent extends Controller<CommonService> {
 
     private showReconnectDialog() {
         this.service && this.service.reconnect.hideNode();
-        log(`${this.logName} ${this.service.serviceName} 断开`)
+        Log.d(`${this.logName} ${this.service.serviceName} 断开`)
         Manager.alert.show({
             tag: Config.RECONNECT_ALERT_TAG,
             isRepeat:false,
             text: Manager.getLanguage(["warningReconnect", this.service.serviceName]) as string,
             confirmCb: (isOK) => {
                 if (isOK) {
-                    log(`${this.logName} 重连连接网络`);
+                    Log.d(`${this.logName} 重连连接网络`);
                     this._connectCount = 0;
                     this.connect();
                 } else {
-                    log(`${this.logName} 玩家网络不好，不重连，退回到登录界面`);
+                    Log.d(`${this.logName} 玩家网络不好，不重连，退回到登录界面`);
                     Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
                 }
             },
             cancelCb: () => {
-                log(`${this.logName} 玩家网络不好，不重连，退回到登录界面`);
+                Log.d(`${this.logName} 玩家网络不好，不重连，退回到登录界面`);
                 Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
             }
         });
@@ -114,7 +114,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
             this._connectCount = 0;
             Manager.alert.close(Config.RECONNECT_ALERT_TAG);
             Manager.serviceManager.onReconnectSuccess(this.service);
-            log(`${this.logName} ${this.service.serviceName}服务器重连成功`);
+            Log.d(`${this.logName} ${this.service.serviceName}服务器重连成功`);
         }
         return result;
     }
@@ -134,7 +134,7 @@ export default class ReconnectComponent extends Controller<CommonService> {
         let result = super.onNetClose(event);
         if (result) {
             if (event.event.type == Net.NetEvent.ON_CUSTOM_CLOSE) {
-                log(`${this.logName} 应用层主动关闭socket`);
+                Log.d(`${this.logName} 应用层主动关闭socket`);
                 return false;
             }
             Manager.loading.hide();

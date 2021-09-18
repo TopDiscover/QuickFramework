@@ -21,7 +21,7 @@ export class EntryManager {
         let index = this._entryTypes.indexOf(entryClass);
         if (index != -1) {
             if (DEBUG) {
-                error(`${this.tag}重复添加 : ${entryClass.bundle}`);
+                Log.e(`${this.tag}重复添加 : ${entryClass.bundle}`);
             }
             return;
         }
@@ -44,7 +44,7 @@ export class EntryManager {
             if (!this.isRunning(type)) {
                 //如果当前entry没有运行,执行它
                 let entry = new type();
-                log(`${this.tag}添加${entry.bundle}入口程序!!!`);
+                Log.d(`${this.tag}添加${entry.bundle}入口程序!!!`);
                 entry.bundle = type.bundle;
                 entry.onLoad(this.node);
                 if( type.isMain ){

@@ -57,7 +57,7 @@ export class CmmEntry extends EntryDelegate {
     }
 
     private showUpdate(versionInfo: HotUpdate.BundleConfig, code: HotUpdate.Code, state: HotUpdate.State) {
-        log(`提示更新`);
+        Log.d(`提示更新`);
         Manager.loading.hide();
         Manager.alert.show({
             text: i18n.newVersion, confirmCb: (isOK) => {
@@ -78,7 +78,7 @@ export class CmmEntry extends EntryDelegate {
             return config;
         }
         if( DEBUG ){
-            error(`未找到入口配置信息`);
+            Log.e(`未找到入口配置信息`);
         }
         return null;
     }

@@ -52,7 +52,7 @@ export default class NodePoolView extends GameView {
 
     private onGet(){
         if( this.pool == null ){
-            error("未创建对象池")
+            Log.e("未创建对象池")
             return;
         }
         if( !this.content ) return;
@@ -69,7 +69,7 @@ export default class NodePoolView extends GameView {
 
     private onPut(){
         if( this.pool == null ){
-            error("未创建对象池")
+            Log.e("未创建对象池")
             return;
         }
         if( !this.content ) return;

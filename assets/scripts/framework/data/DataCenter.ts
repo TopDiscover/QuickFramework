@@ -27,7 +27,7 @@ export class DataCenter {
         }else{
             if (DataTypeOrBundle.bundle == Macro.UNKNOWN) {
                 if (DEBUG) {
-                    error("未设计数据bundle");
+                    Log.e("未设计数据bundle");
                 }
                 return null;
             }
