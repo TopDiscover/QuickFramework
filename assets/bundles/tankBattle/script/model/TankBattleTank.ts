@@ -1,4 +1,5 @@
-import { TankBettle } from "../data/TankBattleGameData";
+import { TankBettle } from "../data/TankBattleConfig";
+import { TankBattleGameData } from "../data/TankBattleGameData";
 import TankBettleBullet from "./TankBattleBullet";
 
 const { ccclass, property } = cc._decorator;
@@ -10,6 +11,14 @@ export default class TankBettleTank extends cc.Component {
     public config: TankBettle.TankConfig = null;
     /** @description 子弹 */
     public bullet: TankBettleBullet = null;
+
+    protected get data( ){
+        return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData;
+    }
+
+    protected get logic():TankBattleLogic | null{
+        return Manager.logicManager.getLogic<TankBattleLogic>(this.data.bundle);
+    }
 
     public _direction: TankBettle.Direction = TankBettle.Direction.UP;
     /**@description 移动方向 */
@@ -39,7 +48,7 @@ export default class TankBettleTank extends cc.Component {
             //正在发射
             return false;
         } else {
-            let bulletNode = cc.instantiate(TankBettle.gameData.bulletPrefab);
+            let bulletNode = cc.instantiate(this.logic.bulletPrefab);
             this.bullet = bulletNode.addComponent(TankBettleBullet);
             this.bullet.move(this);
 
@@ -116,7 +125,7 @@ export default class TankBettleTank extends cc.Component {
             this.isMoving = false;
             if (this.isAI && other.node.group == TankBettle.GROUP.Home) {
                 //如果是AI碰撞到老巢，直接GameOver
-                TankBettle.gameData.gameOver();
+                this.logic.gameOver();
             }
             if (this.isAI) {
                 this.changeDirection(other);
@@ -173,7 +182,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
 
     constructor() {
         super();
-        this.config = TankBettle.gameData.playerConfig;
+        this.config = this.data.playerConfig;
     }
 
     /**@description 是否是玩家1 */
@@ -192,12 +201,12 @@ export class TankBettleTankPlayer extends TankBettleTank {
 
     addLive() {
         this.config.live++;
-        TankBettle.gameData.updateGameInfo();
+        this.logic.updateGameInfo();
     }
 
     shoot() {
         if (super.shoot()) {
-            TankBettle.gameData.playAttackAudio();
+            this.logic.playAttackAudio();
         }
         return true;
     }
@@ -205,7 +214,7 @@ export class TankBettleTankPlayer extends TankBettleTank {
     public addStatus(status: TankBettle.PLAYER_STATUS) {
         this._status.set(status, true);
         if (status == TankBettle.PLAYER_STATUS.PROTECTED) {
-            let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
+            let aniNode = cc.instantiate(this.logic.animationPrefab);
             this.node.addChild(aniNode);
             let animation = aniNode.getComponent(cc.Animation);
             animation.play("tank_protected");
@@ -246,20 +255,20 @@ export class TankBettleTankPlayer extends TankBettleTank {
         this.config.live--;
         if (this.config.live == 0) {
             cc.Tween.stopAllByTarget(this.node);
-            let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
+            let aniNode = cc.instantiate(this.logic.animationPrefab);
             this.node.addChild(aniNode);
             let animation = aniNode.getComponent(cc.Animation);
             let state = animation.play("tank_boom");
             //玩家销毁声音
-            TankBettle.gameData.playerCrackAudio();
+            this.logic.playerCrackAudio();
 
             aniNode.x = 0;
             aniNode.y = 0;
             cc.tween(aniNode).delay(state.duration).call(() => {
-                TankBettle.gameData.gameMap.removePlayer(this);
+                this.logic.mapCtrl.removePlayer(this);
             }).removeSelf().start()
         }
-        TankBettle.gameData.updateGameInfo();
+        this.logic.updateGameInfo();
     }
 
     move() {
@@ -332,7 +341,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
             spriteFrameKey = "tank_4_0";
         }
         let sprite = this.node.getComponent(cc.Sprite);
-        sprite.loadImage({ url: { urls: ["texture/images"], key: spriteFrameKey }, view: TankBettle.gameData.gameView, bundle: TankBettle.gameData.gameView.bundle });
+        this.logic.loadImage(sprite,spriteFrameKey);
     }
 
     private stopShootAction() {
@@ -379,7 +388,7 @@ export class TankBettleTankEnemy extends TankBettleTank {
             if (this.config.live == 1) {
                 spriteFrameKey = "tank_6_0"
             }
-            sprite.loadImage({ url: { urls: ["texture/images"], key: spriteFrameKey }, view: TankBettle.gameData.gameView, bundle: TankBettle.gameData.gameView.bundle });
+            this.logic.loadImage(sprite,spriteFrameKey);
         }
         if (this.config.live == 0) {
             this.die()
@@ -389,17 +398,17 @@ export class TankBettleTankEnemy extends TankBettleTank {
     public die() {
         cc.Tween.stopAllByTarget(this.node);
         this.stopShootAction();
-        let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
+        let aniNode = cc.instantiate(this.logic.animationPrefab);
         this.node.addChild(aniNode);
         let animation = aniNode.getComponent(cc.Animation);
         let state = animation.play("tank_boom");
 
-        TankBettle.gameData.enemyCrackAudio();
+        this.logic.enemyCrackAudio();
 
         aniNode.x = 0;
         aniNode.y = 0;
         cc.tween(aniNode).delay(state.duration).call(() => {
-            TankBettle.gameData.gameMap.removeEnemy(this.node);
+            this.logic.mapCtrl.removeEnemy(this.node);
         }).removeSelf().start()
     }
 

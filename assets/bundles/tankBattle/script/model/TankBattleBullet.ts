@@ -1,4 +1,5 @@
-import { TankBettle } from "../data/TankBattleGameData";
+import { TankBettle } from "../data/TankBattleConfig";
+import { TankBattleGameData } from "../data/TankBattleGameData";
 import TankBettleTank, { TankBettleTankEnemy, TankBettleTankPlayer } from "./TankBattleTank";
 
 const { ccclass, property } = cc._decorator;
@@ -8,9 +9,15 @@ export default class TankBettleBullet extends cc.Component {
 
     /**@description 拥有者 */
     public owner : TankBettleTank = null;
+    protected get data( ){
+        return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData;
+    }
 
+    protected get logic():TankBattleLogic | null{
+        return Manager.logicManager.getLogic<TankBattleLogic>(this.data.bundle);
+    }
     private addBullet( ){
-        TankBettle.gameData.gameMap.addBullet(this);
+        this.logic.mapCtrl.addBullet(this);
         if( this.owner.direction == TankBettle.Direction.UP ){
             this.node.x = this.owner.node.x;
             this.node.y = this.owner.node.y + this.owner.node.height /2 ;
@@ -107,7 +114,7 @@ export default class TankBettleBullet extends cc.Component {
 
     private removeSelf(){
         //子弹销毁声音
-        TankBettle.gameData.bulletCrackAudio();
+        this.logic.bulletCrackAudio();
         cc.Tween.stopAllByTarget(this.node);
         this.owner.bullet = null;
         this.node.removeFromParent();

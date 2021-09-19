@@ -2,19 +2,28 @@
  * @description 地图绘制
  */
 
+import { TankBettle } from "../data/TankBattleConfig";
+import { TankBattleGameData } from "../data/TankBattleGameData";
 import { MapLevel } from "../data/TankBattleLevel";
-import { TankBettle } from "../data/TankBattleGameData";
-import { TankBettleTankPlayer, TankBettleTankEnemy } from "./TankBattleTank";
-import TankBettleBullet from "./TankBattleBullet";
-import TankBattleBlock from "./TankBattleBlock";
+import TankBattleBlock from "../model/TankBattleBlock";
+import TankBettleBullet from "../model/TankBattleBullet";
+import TankBattleProps from "../model/TankBattleProps";
+import { TankBettleTankEnemy, TankBettleTankPlayer } from "../model/TankBattleTank";
 import TankBattleGameView from "../view/TankBattleGameView";
-import TankBattleProps from "./TankBattleProps";
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class TankBattleMap extends cc.Component {
+export default class TankBattleMapCtrl {
 
+    protected get data( ){
+        return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData;
+    }
+
+    protected get logic():TankBattleLogic | null{
+        return Manager.logicManager.getLogic<TankBattleLogic>(this.data.bundle);
+    }
+    
     /**@description 用于克隆的节点 */
     private _blockPrefab: cc.Node = null;
 
@@ -22,6 +31,8 @@ export default class TankBattleMap extends cc.Component {
     public setPrefabs(node: cc.Node) {
         this._blockPrefab = node
     }
+
+    node : cc.Node = null!;
 
     /**@description 玩家1 */
     public playerOne: TankBettleTankPlayer = null;
@@ -45,7 +56,7 @@ export default class TankBattleMap extends cc.Component {
     /**@description 放入按钮事件 */
     private _keyboardEvents : Map<number,cc.Event.EventKeyboard> = new Map();
 
-    protected onLoad() {
+    onLoad() {
         this.node.children.forEach(node => {
             this.outWall.push(node);
         })
@@ -55,7 +66,7 @@ export default class TankBattleMap extends cc.Component {
         this.propsProductNode = node;
     }
 
-    protected onDestroy() {
+    onDestroy() {
         this.outWall.forEach((value) => {
             value.destroy();
         });
@@ -65,7 +76,7 @@ export default class TankBattleMap extends cc.Component {
         this.propsProductNode = null;
     }
 
-    protected update() {
+    update() {
         this.addEnemy();
         this.doKeyboardEvents();
     }
@@ -113,11 +124,11 @@ export default class TankBattleMap extends cc.Component {
         if( this._waitingDestory.length > 0 ){
             return;
         }
-        if (TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME && //游戏状态下
-            TankBettle.gameData.curLeftEnemy > 0 && //有剩余敌人
+        if (this.data.gameStatus == TankBettle.GAME_STATUS.GAME && //游戏状态下
+            this.data.curLeftEnemy > 0 && //有剩余敌人
             this._enemys.length < TankBettle.MAX_APPEAR_ENEMY) { //可以生产敌人
             let type: TankBettle.EnemyType = cc.randomRangeInt(TankBettle.EnemyType.MIN, TankBettle.EnemyType.MAX + 1);
-            let prefab = TankBettle.gameData.getEnemyPrefab(type);
+            let prefab = this.logic.getEnemyPrefab(type);
             let randomPos = this.randomEnemyPosition(prefab);
             let enemyNode = this._waitEnemy.shift();
             if (enemyNode == null) {
@@ -132,7 +143,7 @@ export default class TankBattleMap extends cc.Component {
                 enemy = enemyNode.addComponent(TankBettleTankEnemy);
             }
             enemy.type = type;
-            enemy.config = TankBettle.gameData.getEnemyConfig(type);
+            enemy.config = this.data.getEnemyConfig(type);
             enemyNode.position = randomPos.position;
             enemy.direction = this.randomEnemyDirction(randomPos.bornPosition);
             enemyNode.getComponent(cc.BoxCollider).enabled = false;
@@ -141,8 +152,8 @@ export default class TankBattleMap extends cc.Component {
                 enemy.startShoot();
                 this._enemys.push(enemyNode);
                 enemyNode.getComponent(cc.BoxCollider).enabled = true;
-                TankBettle.gameData.curLeftEnemy -= 1;
-                TankBettle.gameData.updateGameInfo();
+                this.data.curLeftEnemy -= 1;
+                this.logic.updateGameInfo();
             } else {
                 // cc.log("生成敌机周围有敌机，不出现")
                 enemyNode.removeFromParent(false);
@@ -220,11 +231,11 @@ export default class TankBattleMap extends cc.Component {
 
     /**@description 检测游戏是否通关了 */
     private checkGamePass() {
-        if (TankBettle.gameData.curLeftEnemy <= 0 ) {
+        if (this.data.curLeftEnemy <= 0 ) {
             if (this._enemys.length <= 0) {
                 //通关了
-                TankBettle.gameData.isNeedReducePlayerLive = false;
-                TankBettle.gameData.nextLevel();
+                this.data.isNeedReducePlayerLive = false;
+                this.logic.nextLevel();
             }
         }
     }
@@ -284,7 +295,7 @@ export default class TankBattleMap extends cc.Component {
     }
 
     protected randomPropPosition( ){
-        let tank = TankBettle.gameData.getPlayerPrefab(true);
+        let tank = this.logic.getPlayerPrefab(true);
         let xMin = tank.width / 2;
         let xMax = this.node.width - tank.width /2 ;
         let yMin = -tank.height/2;
@@ -296,7 +307,7 @@ export default class TankBattleMap extends cc.Component {
 
     private createProps( ){
         let type = cc.randomRangeInt(TankBettle.PropsType.MIN,TankBettle.PropsType.MAX);
-        let prefab = TankBettle.gameData.getPropsPrefab(type);
+        let prefab = this.logic.getPropsPrefab(type);
         let node = cc.instantiate(prefab);
         let props = node.addComponent(TankBattleProps);
         props.type = type;
@@ -305,7 +316,7 @@ export default class TankBattleMap extends cc.Component {
     }
 
     public startCreateProps() {
-        if( TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME ){
+        if( this.data.gameStatus == TankBettle.GAME_STATUS.GAME ){
             let time = cc.randomRange(TankBettle.PROPS_CREATE_INTERVAL.min,TankBettle.PROPS_CREATE_INTERVAL.max)
             cc.Tween.stopAllByTarget(this.propsProductNode);
             cc.tween(this.propsProductNode).delay(time).call(()=>{
@@ -317,7 +328,7 @@ export default class TankBattleMap extends cc.Component {
 
     public addPlayer(isOne: boolean) {
 
-        let playerNode = cc.instantiate(TankBettle.gameData.getPlayerPrefab(isOne))
+        let playerNode = cc.instantiate(this.logic.getPlayerPrefab(isOne))
         if (isOne) {
             this.playerOne = playerNode.addComponent(TankBettleTankPlayer);
             this.playerOne.isOnePlayer = isOne;
@@ -339,33 +350,33 @@ export default class TankBattleMap extends cc.Component {
         let isOne = player.isOnePlayer;
         player.node.removeFromParent();
         player.node.destroy();
-        if (TankBettle.gameData.isSingle) {
+        if (this.data.isSingle) {
             this.playerOne = null;
-            if (TankBettle.gameData.playerOneLive > 0) {
+            if (this.data.playerOneLive > 0) {
                 this.addPlayer(isOne);
-                TankBettle.gameData.reducePlayerLive(true);
-                TankBettle.gameData.updateGameInfo();
+                this.data.reducePlayerLive(true);
+                this.logic.updateGameInfo();
             } else {
-                TankBettle.gameData.gameOver();
+                this.logic.gameOver();
             }
         } else {
             //双人
             if (isOne) {
                 this.playerOne = null;
-                if (TankBettle.gameData.playerOneLive > 0) {
+                if (this.data.playerOneLive > 0) {
                     this.addPlayer(isOne);
                 }
-                TankBettle.gameData.reducePlayerLive(true)
+                this.data.reducePlayerLive(true)
             } else {
                 this.playerTwo = null;
-                if (TankBettle.gameData.playerTwoLive > 0) {
+                if (this.data.playerTwoLive > 0) {
                     this.addPlayer(isOne);
                 }
-                TankBettle.gameData.reducePlayerLive(false)
+                this.data.reducePlayerLive(false)
             }
-            TankBettle.gameData.updateGameInfo();
-            if (TankBettle.gameData.playerTwoLive < 0 && TankBettle.gameData.playerOneLive < 0) {
-                TankBettle.gameData.gameOver();
+            this.logic.updateGameInfo();
+            if (this.data.playerTwoLive < 0 && this.data.playerOneLive < 0) {
+                this.logic.gameOver();
             }
         }
     }
@@ -411,7 +422,7 @@ export default class TankBattleMap extends cc.Component {
             this._handlePlayerShoot(this.playerOne);
         }
         if( this._keyboardEvents.has(cc.macro.KEY.space)){
-            if( TankBettle.gameData.isSingle ){
+            if( this.data.isSingle ){
                 this._handlePlayerShoot(this.playerOne);
             }
             this._handlePlayerShoot(this.playerTwo);
@@ -419,7 +430,7 @@ export default class TankBattleMap extends cc.Component {
     }
 
     private _handlePlayerMove(player: TankBettleTankPlayer, dir: TankBettle.Direction) {
-        if (TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME) {
+        if (this.data.gameStatus == TankBettle.GAME_STATUS.GAME) {
             if (player) {
                 player.direction = dir;
                 player.move();
@@ -428,7 +439,7 @@ export default class TankBattleMap extends cc.Component {
     }
 
     private _handlePlayerShoot(player: TankBettleTankPlayer) {
-        if (TankBettle.gameData.gameStatus == TankBettle.GAME_STATUS.GAME) {
+        if (this.data.gameStatus == TankBettle.GAME_STATUS.GAME) {
             if (player) {
                 player.shoot();
             }
@@ -437,7 +448,7 @@ export default class TankBattleMap extends cc.Component {
 
     public gameOver() {
         if (this._heart) {
-            let aniNode = cc.instantiate(TankBettle.gameData.animationPrefab);
+            let aniNode = cc.instantiate(this.logic.animationPrefab);
             this._heart.addChild(aniNode);
             let animation = aniNode.getComponent(cc.Animation);
             let state = animation.play("king_boom");
@@ -447,9 +458,8 @@ export default class TankBattleMap extends cc.Component {
                 aniNode.removeFromParent()
                 aniNode.destroy();
                 let sprite = this._heart.getComponent(cc.Sprite);
-                sprite.loadImage({ url: { urls: ["texture/images"], key: "heart_0" }, view: this.owner, bundle: this.owner.bundle });
+                this.logic.loadImage(sprite,"heart_0");
             }).removeSelf().start()
-
         }
     }
 

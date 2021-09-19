@@ -1,15 +1,11 @@
 import { Config } from "../../../../scripts/common/config/Config";
 import UIView from "../../../../scripts/framework/core/ui/UIView";
-import { TankBettle } from "../data/TankBattleGameData";
+import { TankBettle } from "../data/TankBattleConfig";
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class TankBattleStartView extends UIView {
-    get data() {
-        return TankBettle.gameData;
-    }
-
     public static getPrefabUrl() {
         return "prefabs/TankBattleStartView";
     }
@@ -20,14 +16,13 @@ export default class TankBattleStartView extends UIView {
     private singlePlayer: cc.Node = null;
     /**@description 多人 */
     private doublePalyers: cc.Node = null;
-
-    protected addEvents() {
-        super.addEvents();
-        this.addUIEvent(TankBettle.EVENT.SHOW_MAP_LEVEL, this.onChangeStageFinished)
-    }
+    private logic : TankBattleLogic = null!;
 
     onLoad() {
         super.onLoad();
+        if ( this.args && this.args.length > 0 ){
+            this.logic = this.args[0];
+         }
         this.content = cc.find("content", this.node);
 
         cc.find("title", this.content).getComponent(cc.Label).language = Manager.makeLanguage("title", this.bundle);
@@ -49,25 +44,20 @@ export default class TankBattleStartView extends UIView {
 
     onKeyUp(ev: cc.Event.EventKeyboard) {
         super.onKeyUp(ev);
-        if (this.data.gameStatus != TankBettle.GAME_STATUS.SELECTED) {
-            return;
-        }
-        if (ev.keyCode == cc.macro.KEY.down || ev.keyCode == cc.macro.KEY.up) {
-            let isSingle = false;
-            if (this.selectTank.y == this.singlePlayer.y) {
-                this.selectTank.y = this.doublePalyers.y;
-            } else {
-                this.selectTank.y = this.singlePlayer.y;
-                isSingle = true;
-            }
-            this.data.isSingle = isSingle;
-        } else if (ev.keyCode == cc.macro.KEY.space || ev.keyCode == cc.macro.KEY.enter) {
-            this.data.isSingle = this.data.isSingle;
-            this.data.enterGame();
+        if ( this.logic ){
+            this.logic.onKeyUp(ev,TankBettle.ViewType.START_VIEW,this);
         }
     }
 
-    protected onChangeStageFinished() {
-        this.close();
+    isSingle(){
+        return this.selectTank.position.y == this.singlePlayer.position.y;
+    }
+
+    updateSelectTank( isSingle : boolean){
+        if ( isSingle ){
+            this.selectTank.setPosition(new cc.Vec3(this.selectTank.position.x,this.singlePlayer.position.y,this.selectTank.position.z));
+        }else{
+            this.selectTank.setPosition(new cc.Vec3(this.selectTank.position.x,this.doublePalyers.position.y,this.selectTank.position.z));
+        }
     }
 }

@@ -1,4 +1,5 @@
-import { TankBettle } from "../data/TankBattleGameData";
+import { TankBettle } from "../data/TankBattleConfig";
+import { TankBattleGameData } from "../data/TankBattleGameData";
 import TankBettleBullet from "./TankBattleBullet";
 import { TankBettleTankPlayer } from "./TankBattleTank";
 
@@ -7,6 +8,14 @@ const {ccclass, property} = cc._decorator;
 export default class TankBattleBlock extends cc.Component {
 
     public type : TankBettle.BLOCK_TYPE = null;
+
+    protected get data( ){
+        return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData;
+    }
+
+    protected get logic():TankBattleLogic | null{
+        return Manager.logicManager.getLogic<TankBattleLogic>(this.data.bundle);
+    }
 
    /**
      * @description 当碰撞产生的时候调用
@@ -63,7 +72,7 @@ export default class TankBattleBlock extends cc.Component {
                 break;
                 case TankBettle.BLOCK_TYPE.HOME:{
                     //老巢
-                    TankBettle.gameData.gameOver();
+                    if ( this.logic ) this.logic.gameOver();
                 }
                 break;
             }

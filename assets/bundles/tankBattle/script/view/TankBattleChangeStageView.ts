@@ -1,6 +1,4 @@
 import UIView from "../../../../scripts/framework/core/ui/UIView";
-import { TankBettle } from "../data/TankBattleGameData";
-
 
 const {ccclass, property} = cc._decorator;
 
@@ -11,8 +9,14 @@ export default class TankBattleChangeStageView extends UIView {
         return "prefabs/TankBattleChangeStageView";
     }
 
+    private level = 0;
+    private logic : TankBattleLogic = null!;
     onLoad(){
         super.onLoad()
+        if ( this.args ){
+            this.level = this.args[0];
+            this.logic = this.args[1];
+        }
         let level : number = this.args[0]
         let node = cc.find("level",this.node)
         node.getComponent(cc.Label).language = Manager.makeLanguage(["stage",level + 1],this.bundle);
@@ -30,12 +34,11 @@ export default class TankBattleChangeStageView extends UIView {
             comp.off(cc.Animation.EventType.FINISHED,this.onStartFinished,this);
             comp.on(cc.Animation.EventType.FINISHED,this.onStartQuitFinished,this)
             comp.play("startQuit");
-            dispatch(TankBettle.EVENT.SHOW_MAP_LEVEL,this.args[0]);
+            this.logic?.onShowMapLevel(this.level);
         }).start()
     }
 
     private onStartQuitFinished(type: string, state: cc.AnimationState){
-        dispatch(TankBettle.EVENT.CHANGE_STAGE_FINISHED)
         this.close()
     }
 }

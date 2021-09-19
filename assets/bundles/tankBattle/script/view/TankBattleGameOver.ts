@@ -1,5 +1,4 @@
 import UIView from "../../../../scripts/framework/core/ui/UIView";
-import { TankBettle } from "../data/TankBattleGameData";
 
 const { ccclass, property } = cc._decorator;
 
@@ -10,8 +9,13 @@ export default class TankBattleGameOver extends UIView {
         return "prefabs/TankBattleGameOver";
     }
 
+    private logic : TankBattleLogic = null!;
+
     onLoad() {
         super.onLoad();
+        if ( this.args ){
+            this.logic = this.args[0];
+        }
         this.content = cc.find("content", this.node);
         let title =  cc.find("title", this.content);
         title.getComponent(cc.Label).language = Manager.makeLanguage("gameOver", this.bundle);
@@ -21,8 +25,10 @@ export default class TankBattleGameOver extends UIView {
         .delay(2)
         .call(()=>{
             this.close();
-            TankBettle.gameData.gameMap.clear();
-            TankBettle.gameData.enterStart();
+            if ( this.logic ){
+                this.logic.mapClear();
+                this.logic.onOpenSlectedView();
+            }
         })
         .start();
     }

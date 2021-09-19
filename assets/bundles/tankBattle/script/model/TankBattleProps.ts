@@ -1,4 +1,5 @@
-import { TankBettle } from "../data/TankBattleGameData";
+import { TankBettle } from "../data/TankBattleConfig";
+import { TankBattleGameData } from "../data/TankBattleGameData";
 import { TankBettleTankPlayer } from "./TankBattleTank";
 
 const { ccclass, property } = cc._decorator;
@@ -6,7 +7,13 @@ const { ccclass, property } = cc._decorator;
 export default class TankBattleProps extends cc.Component {
 
     public type: TankBettle.PropsType = null;
+    protected get data( ){
+        return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData;
+    }
 
+    protected get logic():TankBattleLogic | null{
+        return Manager.logicManager.getLogic<TankBattleLogic>(this.data.bundle);
+    }
     onLoad(){
         let time = TankBettle.PROPS_DISAPPEAR;
         cc.tween(this.node).delay(time -3).blink(3,5).call(()=>{
@@ -23,12 +30,12 @@ export default class TankBattleProps extends cc.Component {
         if (other.node.group == TankBettle.GROUP.Player) {
             let player = other.node.getComponent(TankBettleTankPlayer)
             if( player ){
-                TankBettle.gameData.playPropsAudio();
+                this.logic.playPropsAudio();
                 if( this.type == TankBettle.PropsType.LIVE ){
-                    TankBettle.gameData.addPlayerLive(player.isOnePlayer);
+                    this.logic.addPlayerLive(player.isOnePlayer);
                     
                 }else if( this.type == TankBettle.PropsType.BOOM_ALL_ENEMY ){
-                    TankBettle.gameData.gameMap.removeAllEnemy();
+                    this.logic.mapCtrl.removeAllEnemy();
                 }else if( this.type == TankBettle.PropsType.GOD ){
                     player.addStatus(TankBettle.PLAYER_STATUS.PROTECTED)
                 }else if( this.type == TankBettle.PropsType.STRONG_BULLET){
@@ -36,7 +43,7 @@ export default class TankBattleProps extends cc.Component {
                 }else if( this.type == TankBettle.PropsType.STRONG_MY_SELF){
                     player.addLive()
                 }else if( this.type == TankBettle.PropsType.TIME){
-                    TankBettle.gameData.addGameTime();
+                    this.data.addGameTime();
                 }
                 cc.Tween.stopAllByTarget(this.node);
                 this.node.removeFromParent();

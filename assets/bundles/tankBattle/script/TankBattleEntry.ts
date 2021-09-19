@@ -1,7 +1,5 @@
-import { LobbyService } from "../../../scripts/common/net/LobbyService";
 import TankBattleGameView from "./view/TankBattleGameView";
-import { TankBettle } from "./data/TankBattleGameData";
-import TankBattleNetController from "./controller/TankBattleNetController";
+import { TankBattleGameData } from "./data/TankBattleGameData";
 import { TankBattleLanguage } from "./data/TankBattleLanguage";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import { Resource } from "../../../scripts/framework/core/asset/Resource";
@@ -9,14 +7,16 @@ import { Resource } from "../../../scripts/framework/core/asset/Resource";
  * @description 坦克大战入口
  */
 class TankBattleEntry extends Entry {
-    static bundle = TankBettle.gameData.bundle;
+    static bundle = TankBattleGameData.bundle;
     protected language = new TankBattleLanguage;
 
+    private get data(){
+        return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData
+    }
+
     protected addNetComponent(): void {
-        this.node.addComponent(TankBattleNetController);
     }
     protected removeNetComponent(): void {
-        this.node.removeComponent(TankBattleNetController);
     }
     protected loadResources(completeCb: () => void): void {
         this.loader.getLoadResources = ()=>{
@@ -38,14 +38,11 @@ class TankBattleEntry extends Entry {
     }
     protected initData(): void {
         //游戏数据初始化
-        Manager.gameData = TankBettle.gameData;
-        Manager.gameData.clear();
+        this.data.clear();
     }
     protected pauseMessageQueue(): void {
-        LobbyService.instance.pauseMessageQueue();
     }
     protected resumeMessageQueue(): void {
-        LobbyService.instance.resumeMessageQueue();
     }
 }
 
