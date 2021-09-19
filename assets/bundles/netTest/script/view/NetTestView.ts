@@ -177,7 +177,7 @@ export default class NetTestView extends GameView {
             service.heartbeat = HeartbeatBinary;
             service.maxEnterBackgroundTime = Config.MAX_INBACKGROUND_TIME;
         } else {
-            cc.error(`未知网络类型`);
+            Log.e(`未知网络类型`);
         }
         this.netType = type;
     }

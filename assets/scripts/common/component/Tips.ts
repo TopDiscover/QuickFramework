@@ -125,7 +125,7 @@ class ToastItem extends cc.Component {
         if ( msg == null || msg == undefined || msg == ""){
             return;
         }
-        cc.log("Toast.show msg=%s",msg);
+        Log.d("Toast.show msg=%s",msg);
         this._show(msg);
     }
 

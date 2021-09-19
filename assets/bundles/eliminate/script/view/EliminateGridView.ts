@@ -99,7 +99,7 @@ export default class EliminateGridView extends cc.Component {
             //如果原来的cell不存在，创建
             if (!viewInfo) {
                 let prefabUrl = model.prefabUrl;
-                // cc.log(`create prefabUrl : ${prefabUrl}`);
+                // Log.d(`create prefabUrl : ${prefabUrl}`);
                 let cache = Manager.cacheManager.get(this.view.bundle, prefabUrl);
                 let node = cc.instantiate(<cc.Prefab>cache.data)
                 this.node.addChild(node);
@@ -185,7 +185,7 @@ export default class EliminateGridView extends cc.Component {
         if (time <= 0) {
             return;
         }
-        cc.log(`disableTouch time : ${time} step : ${step}`);
+        Log.d(`disableTouch time : ${time} step : ${step}`);
         this.isPlayAni = true;
         this.node.runAction(cc.sequence(cc.delayTime(time), cc.callFunc(() => {
             this.isPlayAni = false;

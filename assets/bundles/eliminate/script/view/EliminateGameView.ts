@@ -48,12 +48,12 @@ export default class EliminateGameView extends GameView {
     }
 
     playClick() {
-        cc.log(`playClick : audios/click.bubble`);
+        Log.d(`playClick : audios/click.bubble`);
         this.audioHelper.playEffect("audios/click.bubble",this.bundle);
     }
 
     playSwap() {
-        cc.log(`playSwap : audios/swap`);
+        Log.d(`playSwap : audios/swap`);
         this.audioHelper.playEffect("audios/swap",this.bundle);
     }
 
@@ -62,12 +62,12 @@ export default class EliminateGameView extends GameView {
             step = 1;
         }
         step = Math.min(8,step);
-        cc.log(`playEliminate : audios/eliminate${step}`);
+        Log.d(`playEliminate : audios/eliminate${step}`);
         this.audioHelper.playEffect(`audios/eliminate${step}`,this.bundle);
     }
 
     playContinuousMatch(step: number) {
-        cc.log(`playContinuousMatch : step ${step}`);
+        Log.d(`playContinuousMatch : step ${step}`);
         step = Math.min(step,11);
         if( step < 2 ){
             return;
@@ -75,7 +75,7 @@ export default class EliminateGameView extends GameView {
         let arr = [3,5,7,9,11];
         let index = Math.floor(step/2) -1;
         let url = `audios/contnuousMatch${arr[index]}`;
-        cc.log(`playContinuousMatch : ${url}`);
+        Log.d(`playContinuousMatch : ${url}`);
         this.audioHelper.playEffect(url,this.bundle);
     }
 

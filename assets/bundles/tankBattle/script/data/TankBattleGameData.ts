@@ -28,7 +28,7 @@ export class TankBattleGameData extends GameData {
     private _gameStatus: TankBettle.GAME_STATUS = TankBettle.GAME_STATUS.UNKNOWN;
     /**@description 当前游戏状态 */
     public set gameStatus(status) {
-        cc.log(`gamestatus : ${this._gameStatus} => ${status}`)
+        Log.d(`gamestatus : ${this._gameStatus} => ${status}`)
         this._gameStatus = status;
     }
     public get gameStatus() {

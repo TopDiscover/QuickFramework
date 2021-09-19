@@ -70,7 +70,7 @@ export default class DownloadLoading extends UIView {
     }
 
     private onDownload(info: HotUpdate.DownLoadInfo) {
-        if (CC_DEBUG) cc.log(JSON.stringify(info));
+        if (CC_DEBUG) Log.d(JSON.stringify(info));
         if (info.code == HotUpdate.Code.UPDATE_PROGRESSION) {
             this.progress.progress = info.percent == Number.NaN ? 0 : info.percent;
         } else if (info.code == HotUpdate.Code.ALREADY_UP_TO_DATE) {

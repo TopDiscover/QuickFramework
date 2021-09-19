@@ -101,7 +101,7 @@ export default class UILoading {
         return new Promise<boolean>((resolove, reject) => {
             //正在加载中
             if (this._isLoadingPrefab) {
-                cc.warn(`正在加载Loading预置体`);
+                Log.w(`正在加载Loading预置体`);
                 this.finishLoadCb = resolove;
                 return;
             }

@@ -75,7 +75,7 @@ class AlertDialog extends cc.Component {
             if (config.text) {
                 this._textContent.string = config.text;
             } else {
-                cc.error("请指定提示内容");
+                Log.e("请指定提示内容");
                 this._textContent.string = "";
             }
 
@@ -141,7 +141,7 @@ class AlertDialog extends cc.Component {
                     this._cancel.x = 0;
                 } else {
                     //无按钮显示，输入警告
-                    cc.warn("提示框无按钮显示");
+                    Log.w("提示框无按钮显示");
                 }
             }
 
@@ -237,7 +237,7 @@ export default class Alert {
     public show(config: AlertConfig) {
         if (config.tag && config.isRepeat === false) {
             if (this.isRepeat(config.tag)) {
-                cc.warn(`弹出框已经存在 config : ${JSON.stringify(this.getConfig(config))}`);
+                Log.w(`弹出框已经存在 config : ${JSON.stringify(this.getConfig(config))}`);
                 return false;
             }
         }
@@ -277,14 +277,14 @@ export default class Alert {
         if (this.curPanel) {
             let current = this.curPanel.getComponent(AlertDialog).config;
             if (current.tag == tag) {
-                cc.warn(`重复的弹出框 config ; ${JSON.stringify(this.getConfig(current))}`)
+                Log.w(`重复的弹出框 config ; ${JSON.stringify(this.getConfig(current))}`)
                 return true;
             }
         } else {
             for (let i = 0; i < this.queue.length; i++) {
                 let data = this.queue[i];
                 if (data.tag == tag) {
-                    cc.warn(`重复的弹出框 config ; ${JSON.stringify(this.getConfig(data))}`)
+                    Log.w(`重复的弹出框 config ; ${JSON.stringify(this.getConfig(data))}`)
                     return true;
                 }
             }

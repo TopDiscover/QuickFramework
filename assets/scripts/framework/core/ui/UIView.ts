@@ -170,7 +170,7 @@ export default class UIView extends EventComponent implements IFullScreenAdapt {
 
     onKeyUp(ev: cc.Event.EventKeyboard) {
         if (CC_DEBUG) {
-            cc.log(`[${cc.js.getClassName(this)}] onKeyUp keyCode : ${ev.keyCode}`);
+            Log.d(`[${cc.js.getClassName(this)}] onKeyUp keyCode : ${ev.keyCode}`);
         }
         if (ev.keyCode == cc.macro.KEY.escape) {
             this.onKeyBack(ev);

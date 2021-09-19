@@ -63,9 +63,9 @@ class _HallNetHelper extends NetHelper<LobbyService>{
         httpPackage.data.requestHeader = { name: "Content-Type", value: "text/plain" }
         httpPackage.data.data = new Uint8Array([1, 2, 3, 4, 5]);
         httpPackage.send((data) => {
-            cc.log("数据返回")
+            Log.d("数据返回")
         }, () => {
-            cc.log("数据错误")
+            Log.d("数据错误")
         })
 
         httpPackage = new HttpPackage();
@@ -76,9 +76,9 @@ class _HallNetHelper extends NetHelper<LobbyService>{
             b: "zheng"
         }
         httpPackage.send((data) => {
-            cc.log("数据返回")
+            Log.d("数据返回")
         }, () => {
-            cc.log("数据错误")
+            Log.d("数据错误")
         })
 
     }

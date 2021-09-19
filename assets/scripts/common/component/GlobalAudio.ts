@@ -23,7 +23,7 @@ export default class GlobalAudio extends AudioComponent {
         let me = this;
         return new Promise<{ url: string, isSuccess: boolean }>((resolve) => {
             if( bundle != Macro.BUNDLE_RESOURCES ){
-                cc.error(`${url} 不在 ${Macro.BUNDLE_RESOURCES} 全局播放的声音发现存放到${Macro.BUNDLE_RESOURCES}`)
+                Log.e(`${url} 不在 ${Macro.BUNDLE_RESOURCES} 全局播放的声音发现存放到${Macro.BUNDLE_RESOURCES}`)
                 resolve({ url:url,isSuccess:false});
                 return;
             }
@@ -49,7 +49,7 @@ export default class GlobalAudio extends AudioComponent {
     public playEffect(url: string, bundle:BUNDLE_TYPE, loop: boolean = false) {
         return new Promise<number>((resolve) => {
             if( bundle != Macro.BUNDLE_RESOURCES ){
-                cc.error(`${url} 不在 ${Macro.BUNDLE_RESOURCES} 全局播放的声音发现存放到${Macro.BUNDLE_RESOURCES}`)
+                Log.e(`${url} 不在 ${Macro.BUNDLE_RESOURCES} 全局播放的声音发现存放到${Macro.BUNDLE_RESOURCES}`)
                 resolve(-1);
                 return;
             }

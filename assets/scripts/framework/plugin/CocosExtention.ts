@@ -333,7 +333,7 @@ cc.updateAlignment = function (node) {
         if (backcc._widgetManager) {
             backcc._widgetManager.updateAlignment(node);
         } else {
-            if (CC_DEBUG) cc.error(this._logTag, `引擎变化,原始引擎版本2.1.2，找不到cc._widgetManager`);
+            if (CC_DEBUG) Log.e(this._logTag, `引擎变化,原始引擎版本2.1.2，找不到cc._widgetManager`);
         }
     }
 }
@@ -358,9 +358,9 @@ export function CocosExtentionInit() {
 
         //对引擎输入框进行修改 ,原始引擎版本2.1.2
         if ( Manager.adaptor.isBrowser && !CC_PREVIEW && cc.sys.os != cc.sys.OS_WINDOWS) {
-            if (CC_DEBUG) cc.log(`浏览器`);
+            if (CC_DEBUG) Log.d(`浏览器`);
             (<any>cc.EditBox)._ImplClass = WebEditBoxImpl;
         }
-        cc.log("Cocos引擎扩展初始化");
+        Log.d("Cocos引擎扩展初始化");
     }
 }

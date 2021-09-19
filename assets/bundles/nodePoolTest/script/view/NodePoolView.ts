@@ -48,7 +48,7 @@ export default class NodePoolView extends GameView {
 
     private onGet(){
         if( this.pool == null ){
-            cc.error("未创建对象池")
+            Log.e("未创建对象池")
             return;
         }
         //从对象池中取出一个节点并添加到界面
@@ -62,7 +62,7 @@ export default class NodePoolView extends GameView {
 
     private onPut(){
         if( this.pool == null ){
-            cc.error("未创建对象池")
+            Log.e("未创建对象池")
             return;
         }
         //从界面上取出一个节点，添加到对象池中
