@@ -1,6 +1,5 @@
 
-import { _decorator,Node, find,Animation, Label, Sprite, instantiate, Button, Vec2, Vec3, UITransform, ParticleSystem, ParticleSystem2D, sp, SpriteFrame, AnimationClip, Layers, Widget, size } from "cc";
-import { loadDirRes } from "../../../../scripts/framework/plugin/CocosExtention";
+import { _decorator,Node, find,Animation, Label, Sprite, instantiate, Button, Vec3, UITransform, ParticleSystem2D, sp, SpriteFrame, AnimationClip, Layers, Widget, size } from "cc";
 import { HallData } from "../../../hall/script/data/HallData";
 import { ButtonSpriteType } from "../../../../scripts/framework/defines/Enums";
 import GameView from "../../../../scripts/framework/core/ui/GameView";

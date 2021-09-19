@@ -183,8 +183,8 @@ declare interface GameViewClass<T extends UIView> {
 declare function createPrefab(
 	config: {
 		url: string,
-		view: any,
-		completeCallback: (node: Node) => void,
+		view: UIView,
+		completeCallback: (node: import("cc").Node) => void,
 		bundle?: BUNDLE_TYPE
 	}): void;
 
@@ -202,7 +202,7 @@ declare function loadDirRes(config: {
 	bundle?: BUNDLE_TYPE,
 	url: string,
 	type: typeof import("cc").Asset,
-	view: any,
+	view: UIView,
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
 	onComplete: (data: any) => void
 }): void;
@@ -223,7 +223,7 @@ declare function loadRes(config: {
 	type: typeof import("cc").Asset,
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
 	onComplete: (data: any) => void,
-	view: any
+	view: UIView
 }): void;
 
 
