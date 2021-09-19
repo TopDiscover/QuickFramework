@@ -145,13 +145,14 @@ export default class EliminateGridView extends cc.Component {
 
     private selectCell(cellPos: cc.Vec2) {
         //model数据处理
-        let result = EliminateData.gameModel.selectCell(cellPos);
+        let data = Manager.dataCenter.getData(EliminateData) as EliminateData;
+        let result = data.gameModel.selectCell(cellPos);
         let changeModels = result.models;
         let effectsQueue = result.effects;
         this.playEffect(effectsQueue);
         this.disableTouch(this.getPlayAniTime(changeModels), this.getStep(effectsQueue));
         this.updateView(changeModels);
-        EliminateData.gameModel.cleanCmd();
+        data.gameModel.cleanCmd();
         if (changeModels.length >= 2) {
             this.updateSelect(cc.v2(-1, -1));
             this.view.playSwap();

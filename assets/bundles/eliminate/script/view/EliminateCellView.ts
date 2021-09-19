@@ -1,6 +1,5 @@
 import { ANITIME, CELL_SIZE, CELL_STATUS } from "../data/EliminateDefines";
 import EliminateCellModel from "../model/EliminateCellModel";
-import EliminateGridView from "./EliminateGridView";
 
 //格子
 const { ccclass, property } = cc._decorator;

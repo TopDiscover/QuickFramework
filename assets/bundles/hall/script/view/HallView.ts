@@ -26,7 +26,8 @@ export default class HallView extends GameView {
     private readonly PAGE_COUNT = 6;
 
     private get bundles() {
-        return HallData.games;
+        let data = Manager.dataCenter.getData(HallData) as HallData;
+        return data.games;
     }
 
     private createPage() {

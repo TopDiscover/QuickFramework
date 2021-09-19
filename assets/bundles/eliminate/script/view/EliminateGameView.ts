@@ -24,12 +24,13 @@ export default class EliminateGameView extends GameView {
         goback.on(cc.Node.EventType.TOUCH_END, this.onGoBack, this);
 
         //初始化游戏数据模型
-        EliminateData.initGameModel();
+        let data = Manager.dataCenter.getData(EliminateData) as EliminateData;
+        data.initGameModel();
         let gridView = cc.find("GridView", this.node);
         if (gridView) {
             let view = gridView.addComponent(EliminateGridView);
             view.view = this;
-            view.initWithCellModels(EliminateData.gameModel.getCells());
+            view.initWithCellModels(data.gameModel.getCells());
         }
 
         let effectsView = cc.find("EffectsView",this.node);

@@ -1,5 +1,4 @@
-import { EliminateData } from "../data/EliminateData";
-import { CELL_STATUS, CELL_TYPE, ANITIME, EliminateCmd } from "../data/EliminateDefines";
+import { CELL_STATUS, CELL_TYPE, ANITIME, EliminateCmd, CELL_PREFAB_URL } from "../data/EliminateDefines";
 
 export default class EliminateCellModel {
 
@@ -13,7 +12,7 @@ export default class EliminateCellModel {
     isDeath = false;
 
     get prefabUrl() {
-        return EliminateData.getCellPrefabUrl(this.type);
+        return CELL_PREFAB_URL[this.type];
     }
 
     setXY(x: number, y: number) {
