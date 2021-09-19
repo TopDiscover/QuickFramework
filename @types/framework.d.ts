@@ -204,7 +204,7 @@ declare function loadDirRes(config: {
 	type: typeof cc.Asset,
 	view: UIView,
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
-	onComplete: (data: any) => void
+	onComplete: (data: import("../assets/scripts/framework/core/asset/Resource").Resource.CacheData) => void
 }): void;
 
 /**
@@ -222,8 +222,8 @@ declare function loadRes(config: {
 	url: string,
 	type: typeof import("cc").Asset,
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
-	onComplete: (data: any) => void,
-	view: any
+	onComplete: (data: import("../assets/scripts/framework/core/asset/Resource").Resource.CacheData) => void,
+	view: UIView
 }): void;
 
 
