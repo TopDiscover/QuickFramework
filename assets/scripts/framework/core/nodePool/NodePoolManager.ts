@@ -131,4 +131,8 @@ export class NodePoolManager {
         }
     }
 
+    print( delegate : ManagerPrintDelegate<Map<string, NodePool>>){
+        delegate.print(this.pools);
+    }
+
 }

@@ -4,34 +4,8 @@ import { Asset, assetManager, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture
 import { Resource } from "./Resource";
 import { Macro } from "../../defines/Macros";
 class ResourceCache {
-    print() {
-        let content: any[] = [];
-        let invalidContent: any[] = [];
-        this._caches.forEach((data, key, source) => {
-            let itemContent = {
-                url: data.info.url,
-                isLoaded: data.isLoaded,
-                isValid: isValid(data.data),
-                assetType: js.getClassName(data.info.type),
-                data: data.data ? js.getClassName(data.data) : null,
-                status: data.status
-            }
-            let item = { url: key, data: itemContent };
-
-            if (data.isLoaded && data.data && !isValid(data.data)) {
-                invalidContent.push(item);
-            } else {
-                content.push(item);
-            }
-        });
-        if (content.length > 0) {
-            Log.d(`----------- Current valid caches -----------`);
-            Log.d(JSON.stringify(content));
-        }
-        if (invalidContent.length > 0) {
-            Log.d(`----------- Current invalid caches -----------`);
-            Log.d(JSON.stringify(invalidContent));
-        }
+    print( delegate : CacheManagerPrintDelegate<Map<string,Resource.CacheData>,Map<string, CacheInfo>>) {
+        delegate.printLocal(this._caches,this.name);
     }
 
     private _caches = new Map<string, Resource.CacheData>();
@@ -232,60 +206,8 @@ class RemoteCaches {
         return this._caches.delete(url);
     }
 
-    showCaches() {
-        Log.d(`---- [RemoteCaches] showCaches ----`);
-
-        let content: any[] = [];
-        let invalidContent: any[] = [];
-        this._spriteFrameCaches.forEach((data, key, source) => {
-            let itemContent = { url: data.info.url, isLoaded: data.isLoaded, isValid: isValid(data.data), assetType: js.getClassName(data.info.type), data: data.data ? js.getClassName(data.data) : null, status: data.status };
-            let item = { url: key, data: itemContent };
-            if (data.isLoaded && ((data.data && !isValid(data.data)) || !data.data)) {
-                invalidContent.push(item);
-            } else {
-                content.push(item);
-            }
-        });
-
-        if (content.length > 0) {
-            Log.d(`----------------Current valid spriteFrame Caches------------------`);
-            Log.d(JSON.stringify(content));
-        }
-        if (invalidContent.length > 0) {
-            Log.d(`----------------Current invalid spriteFrame Caches------------------`);
-            Log.d(JSON.stringify(invalidContent));
-        }
-
-
-        content = [];
-        invalidContent = [];
-        this._caches.forEach((data, key, source) => {
-            let itemContent = { url: data.info.url, isLoaded: data.isLoaded, isValid: isValid(data.data), assetType: js.getClassName(data.info.type), data: data.data ? js.getClassName(data.data) : null, status: data.status }
-            let item = { url: key, data: itemContent };
-            if (data.isLoaded && data.data && !isValid(data.data)) {
-                invalidContent.push(item);
-            } else {
-                content.push(item);
-            }
-        });
-        if (content.length > 0) {
-            Log.d(`----------------Current valid Caches------------------`);
-            Log.d(JSON.stringify(content));
-        }
-        if (invalidContent.length > 0) {
-            Log.d(`----------------Current invalid Caches------------------`);
-            Log.d(JSON.stringify(invalidContent));
-        }
-
-        if (this._resMap.size > 0) {
-            Log.d(`----------------Current resource reference Caches------------------`);
-            content = [];
-            this._resMap.forEach((value, key) => {
-                let item = { url: key, data: { refCount: value.refCount, url: value.url, retain: value.retain } };
-                content.push(item);
-            });
-            Log.d(JSON.stringify(content));
-        }
+    print(delegate : CacheManagerPrintDelegate<Map<string,Resource.CacheData>,Map<string, CacheInfo>>) {
+        delegate.printRemote(this._spriteFrameCaches,this._caches,this._resMap);
     }
 }
 
@@ -301,11 +223,7 @@ export class CacheManager {
     public get remoteCaches() { return this._remoteCaches; }
 
     public getBundleName(bundle: BUNDLE_TYPE) {
-        if (typeof bundle == "string") {
-            return bundle;
-        } else {
-            return bundle ? bundle.name : null;
-        }
+        return Manager.bundleManager.getBundleName(bundle);
     }
 
     /**
@@ -536,14 +454,10 @@ export class CacheManager {
         });
     }
 
-    /**@description 打印当前缓存资源 */
-    public printCaches() {
+    print( delegate : CacheManagerPrintDelegate<Map<string,Resource.CacheData>,Map<string, CacheInfo>>){
         this._bundles.forEach((value, key, originMap) => {
-            if (DEBUG) Log.d(`----------------Bundle ${key} caches begin----------------`)
-            value.print();
-            if (DEBUG) Log.d(`----------------Bundle ${key} caches end----------------`)
+            value.print(delegate);
         });
-
-        this.remoteCaches.showCaches();
+        this.remoteCaches.print(delegate);
     }
 }

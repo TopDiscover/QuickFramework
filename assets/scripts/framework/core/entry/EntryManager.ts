@@ -149,4 +149,15 @@ export class EntryManager {
         }
         return false;
     }
+
+    print( delegate : EntryPrintDelegate<Entry,EntryClass<Entry>>){
+        if( delegate ){
+            for( let i = 0 ; i < this._entrys.length ; i++){
+                delegate.print(this._entrys[i]);
+            }
+            for( let i = 0 ; i < this._entryTypes.length ; i++){
+                delegate.printType(this._entryTypes[i]);
+            }
+        }
+    }
 }

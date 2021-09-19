@@ -1,6 +1,8 @@
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
+import { setClassName } from "../../../scripts/framework/decorator/Decorators";
 import NetTestView from "./view/NetTestView";
 
+@setClassName()
 class NetTestEntry extends Entry {
     static bundle = "netTest";
     protected addNetComponent(): void {

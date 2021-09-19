@@ -1,5 +1,5 @@
 import ResourceLoader from "../asset/ResourceLoader";
-import { js, Node, warn } from "cc";
+import { js, Node } from "cc";
 import { DEBUG } from "cc/env";
 
 export abstract class Entry {

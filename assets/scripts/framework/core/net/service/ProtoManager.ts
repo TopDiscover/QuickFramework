@@ -80,4 +80,10 @@ export class ProtoManager {
         }
         return null;
     }
+
+    print( delegate : ManagerPrintDelegate<{[key : string] : boolean}>){
+        if( delegate ){
+            delegate.print(this._loadDir);
+        }
+    }
 }

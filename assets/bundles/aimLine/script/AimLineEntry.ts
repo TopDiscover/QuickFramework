@@ -1,6 +1,8 @@
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
+import { setClassName } from "../../../scripts/framework/decorator/Decorators";
 import AimLineView from "./view/AimLineView";
 
+@setClassName()
 class AimLineEntry extends Entry {
     static bundle = "aimLine";
     protected addNetComponent(): void {

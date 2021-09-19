@@ -176,7 +176,7 @@ class AudioData {
     }
 
     public makeKey(url: string, bundle: BUNDLE_TYPE) {
-        return `${Manager.assetManager.getBundleName(bundle)}_${url}`;
+        return `${Manager.bundleManager.getBundleName(bundle)}_${url}`;
     }
 
     public stopEffect(url: string, bundle: BUNDLE_TYPE) {

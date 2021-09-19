@@ -1,6 +1,7 @@
 import { EventKeyboard, macro, Node, Sprite } from "cc";
 import { ViewZOrder } from "../../../../scripts/common/config/Config";
 import { Logic } from "../../../../scripts/framework/core/logic/Logic";
+import { setClassName } from "../../../../scripts/framework/decorator/Decorators";
 import { TankBettle } from "../data/TankBattleConfig";
 import { TankBettleGameData } from "../data/TankBattleGameData";
 import { MapLevel } from "../data/TankBattleLevel";
@@ -10,6 +11,7 @@ import TankBattleChangeStageView from "../view/TankBattleChangeStageView";
 import TankBattleGameOver from "../view/TankBattleGameOver";
 import TankBattleStartView from "../view/TankBattleStartView";
 
+@setClassName()
 export class TankBattleLogic extends Logic {
 
     private get data() {

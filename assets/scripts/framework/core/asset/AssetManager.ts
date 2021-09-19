@@ -179,40 +179,8 @@ export class _AssetManager {
      * @description 获取Bundle
      * @param bundle Bundle名|Bundle
      */
-    public getBundle(bundle: BUNDLE_TYPE) {
-        if (bundle) {
-            if (typeof bundle == "string") {
-                return assetManager.getBundle(bundle);
-            }
-            return bundle;
-        }
-        return null;
-    }
-
-    public getBundleName( bundle : BUNDLE_TYPE ) : string | null{
-        if( bundle ){
-            if( typeof bundle == "string" ){
-                return bundle;
-            }else{
-                return bundle.name;
-            }
-        }
-        return null;
-    }
-
-    /**@description 加载bundle */
-    public loadBundle(nameOrUrl: string, onComplete: (err: Error, bundle: AssetManager.Bundle) => void): void {
-        assetManager.loadBundle(nameOrUrl, onComplete);
-    }
-
-    /**@description 移除bundle */
-    public removeBundle(bundle: BUNDLE_TYPE) {
-        let result = this.getBundle(bundle);
-        if (result) {
-            Manager.cacheManager.removeBundle(bundle);
-            result.releaseAll();
-            assetManager.removeBundle(result);
-        }
+    private getBundle(bundle: BUNDLE_TYPE) {
+        return Manager.bundleManager.getBundle(bundle);
     }
 
     public load(

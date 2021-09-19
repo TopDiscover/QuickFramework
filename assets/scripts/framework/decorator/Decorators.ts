@@ -4,7 +4,7 @@
  */
 
 import { js } from "cc"
-import { DEBUG } from "cc/env"
+import { DEBUG, EDITOR } from "cc/env"
 import { Codec } from "../core/net/message/Message"
 
 export function setServiceByClassName(name: string) {
@@ -56,8 +56,10 @@ export function setServiceCodec(header: typeof Codec) {
 
 export function setClassName() {
     return function (target:any) {
-        let frameInfo = (<any>cc['_RF']).peek()
-        let script = frameInfo.script;
-        js.setClassName(script, target)
+        if (!EDITOR){
+            let frameInfo = (<any>cc['_RF']).peek()
+            let script = frameInfo.script;
+            js.setClassName(script, target)
+        }
     }
 }
