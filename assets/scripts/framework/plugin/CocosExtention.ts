@@ -105,50 +105,6 @@ cc.Sprite.prototype.loadImage = function (config) {
     }
 }
 
-/**@description 通过预置体路径创建节点 
- * @param config 配置信息
- * @param config.url 预置体路径
- * @param config.view 预置视图资源管理器，继承自UIView
- * @param config.completeCallback 创建完成回调 
- * @example 
- * cc.createPrefab({url :GAME_RES("res/animations/shzDealerCommon"),view:this,completeCallback:(node)=>{
- *     if ( node ){
- *         // to do 
- *     }
- * }});
- */
-cc.createPrefab = function (config) {
-    createNodeWithPrefab(config);
-}
-
-/**
- * @description 扩展一个在界面中加载指定目录的接口
- * @param config 配置信息
- * @param config.url 资源路径
- * @param config.view 资源持有者,继承自UIView
- * @param config.onComplete 加载完成回调 data为ResourceCacheData，用之前先判断当前返回的data.data是否是数组
- * @param config.onProgress 加载进度
- * @param config.bundle 可不填，默认为view指向的bundle
- * @param config.type 加载的资源类型
- * */
-cc.loadDir = function(config){
-    _loadDirRes(config)
-}
-
-/**
- * @description 扩展一个在界面加载指定资源接口
- * @param config 配置信息
- * @param config.bundle 可不填，默认为view指向的bundle
- * @param config.url 资源路径
- * @param config.type 加载的资源类型
- * @param config.onProgress 加载进度
- * @param config.onComplete 加载完成回调 data为ResourceCacheData
- * @param config.view 资源持有者,继承自UIView
- */
-cc.load = function (config) {
-    _loadRes(config);
-}
-
 /**
  * @description 扩展方法
  * @param remotePath 远程资源路径
@@ -225,18 +181,6 @@ cc.Label.prototype.loadFont = function (config) {
     });
 }
 
-/**@description 强制label在当前帧进行绘制 */
-cc.Label.prototype.forceDoLayout = function () {
-    //2.2.0
-    if (this._forceUpdateRenderData) {
-        this._forceUpdateRenderData();
-    }
-    //2.2.0以下版本
-    else if (this._updateRenderData) {
-        this._updateRenderData(true);
-    }
-}
-
 /**
  * @description 加载特效文件 view 为null时，加载之前不会释
  * @example
@@ -254,47 +198,15 @@ cc.ParticleSystem.prototype.loadFile = function (config) {
     });
 }
 
-/**
- * @description 强制节点在当前帧进行一次布局 
- * @example
- * cc.updateAlignment(this.node);
- * */
-cc.updateAlignment = function (node) {
-    if (node) {
-        //强制当前节点进行本帧强制布局
-        let backcc : any = cc;
-        if (backcc._widgetManager) {
-            backcc._widgetManager.updateAlignment(node);
-        } else {
-            if (CC_DEBUG) cc.error(this._logTag, `引擎变化,原始引擎版本2.1.2，找不到cc._widgetManager`);
-        }
+/**@description 强制label在当前帧进行绘制 */
+cc.Label.prototype.forceDoLayout = function () {
+    //2.2.0
+    if (this._forceUpdateRenderData) {
+        this._forceUpdateRenderData();
     }
-}
-
-if( !cc.randomRangeInt ){
-    cc.randomRangeInt = function ( min , max){
-        let value = (max- min) * Math.random() + min;
-        let result = Math.floor(value);
-        return result;
-    }
-}
-
-if( !cc.randomRange ){
-    cc.randomRange = function ( min , max){
-        let value = (max- min) * Math.random() + min;
-        return value;
-    }
-}
-
-export function CocosExtentionInit() {
-    if (!CC_EDITOR) {
-
-        //对引擎输入框进行修改 ,原始引擎版本2.1.2
-        if ( Manager.adaptor.isBrowser && !CC_PREVIEW && cc.sys.os != cc.sys.OS_WINDOWS) {
-            if (CC_DEBUG) cc.log(`浏览器`);
-            (<any>cc.EditBox)._ImplClass = WebEditBoxImpl;
-        }
-        cc.log("Cocos引擎扩展初始化");
+    //2.2.0以下版本
+    else if (this._updateRenderData) {
+        this._updateRenderData(true);
     }
 }
 
@@ -363,4 +275,92 @@ if ( !CC_EDITOR && Macro.ENABLE_CHANGE_LANGUAGE ){
         __label_onLoad__ && __label_onLoad__.call(this);
     }
 
+}
+
+/**@description 通过预置体路径创建节点 
+ * @param config 配置信息
+ * @param config.url 预置体路径
+ * @param config.view 预置视图资源管理器，继承自UIView
+ * @param config.completeCallback 创建完成回调 
+ * @example 
+ * cc.createPrefab({url :GAME_RES("res/animations/shzDealerCommon"),view:this,completeCallback:(node)=>{
+ *     if ( node ){
+ *         // to do 
+ *     }
+ * }});
+ */
+window.createPrefab = function (config:any) {
+    createNodeWithPrefab(config);
+}
+
+/**
+ * @description 扩展一个在界面中加载指定目录的接口
+ * @param config 配置信息
+ * @param config.url 资源路径
+ * @param config.view 资源持有者,继承自UIView
+ * @param config.onComplete 加载完成回调 data为ResourceCacheData，用之前先判断当前返回的data.data是否是数组
+ * @param config.onProgress 加载进度
+ * @param config.bundle 可不填，默认为view指向的bundle
+ * @param config.type 加载的资源类型
+ * */
+window.loadDirRes = function (config:any) {
+    _loadDirRes(config)
+}
+
+/**
+ * @description 扩展一个在界面加载指定资源接口
+ * @param config 配置信息
+ * @param config.bundle 可不填，默认为view指向的bundle
+ * @param config.url 资源路径
+ * @param config.type 加载的资源类型
+ * @param config.onProgress 加载进度
+ * @param config.onComplete 加载完成回调 data为ResourceCacheData
+ * @param config.view 资源持有者,继承自UIView
+ */
+window.loadRes = function (config:any) {
+    _loadRes(config);
+}
+
+/**
+ * @description 强制节点在当前帧进行一次布局 
+ * @example
+ * cc.updateAlignment(this.node);
+ * */
+cc.updateAlignment = function (node) {
+    if (node) {
+        //强制当前节点进行本帧强制布局
+        let backcc : any = cc;
+        if (backcc._widgetManager) {
+            backcc._widgetManager.updateAlignment(node);
+        } else {
+            if (CC_DEBUG) cc.error(this._logTag, `引擎变化,原始引擎版本2.1.2，找不到cc._widgetManager`);
+        }
+    }
+}
+
+if( !cc.randomRangeInt ){
+    cc.randomRangeInt = function ( min , max){
+        let value = (max- min) * Math.random() + min;
+        let result = Math.floor(value);
+        return result;
+    }
+}
+
+if( !cc.randomRange ){
+    cc.randomRange = function ( min , max){
+        let value = (max- min) * Math.random() + min;
+        return value;
+    }
+}
+
+export function CocosExtentionInit() {
+    if (!CC_EDITOR) {
+
+        //对引擎输入框进行修改 ,原始引擎版本2.1.2
+        if ( Manager.adaptor.isBrowser && !CC_PREVIEW && cc.sys.os != cc.sys.OS_WINDOWS) {
+            if (CC_DEBUG) cc.log(`浏览器`);
+            (<any>cc.EditBox)._ImplClass = WebEditBoxImpl;
+        }
+        cc.log("Cocos引擎扩展初始化");
+    }
 }

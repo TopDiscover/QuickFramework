@@ -191,7 +191,7 @@ export default class LoadTestView extends GameView {
         node.addComponent(cc.Sprite);
         //添加动画
         let ani = node.addComponent(cc.Animation);
-        cc.loadDir({
+        loadDirRes({
             url:"texture/sheep",
             type:cc.SpriteFrame,
             view : this,

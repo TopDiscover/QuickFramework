@@ -68,7 +68,7 @@ export default class ShaderView extends GameView {
            view : this,
            completeCallback:(data)=>{
                //加载新的灰色材质
-               cc.load({
+               loadRes({
                    url : "material/sprite_gray",
                    view:this,
                    type : cc.Material,
@@ -97,7 +97,7 @@ export default class ShaderView extends GameView {
             url:"texture/content",
             view:this,
             completeCallback:(data)=>{
-                cc.load({
+                loadRes({
                     url:"material/sprite_circle",
                     view:this,
                     type:cc.Material,

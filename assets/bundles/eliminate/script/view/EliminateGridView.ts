@@ -24,7 +24,7 @@ export default class EliminateGridView extends cc.Component {
             this.cellViews[i] = [];
             for (let j = 1; j <= GRID_WIDTH; j++) {
                 let prefabUrl = cells[i][j].prefabUrl;
-                cc.createPrefab({
+                createPrefab({
                     url: prefabUrl,
                     view: this.view,
                     completeCallback: (node) => {

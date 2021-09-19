@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.messages = exports.unload = exports.load = exports._Helper = void 0;
 const fs = require("fs");
 const path = require("path");
+const jsbdts_1 = require("./jsbdts");
 class _Helper {
     constructor() {
         /**@description creator 安所路径 */
@@ -119,6 +120,38 @@ class _Helper {
                 let sourceData = fs.readFileSync(sourcePath, "utf-8");
                 fs.writeFileSync(destPath, sourceData, { encoding: "utf-8" });
                 Editor.log(data.desc);
+            }
+            else if (data.name == "ccdts") {
+                //更新声明文件
+                let destPath = `${this.engineRoot}/${data.path}`;
+                destPath = path.normalize(destPath);
+                let sourcePath = `${path.join(__dirname, `../../engine/${data.name}`)}`;
+                sourcePath = path.normalize(sourcePath);
+                let sourceData = fs.readFileSync(sourcePath, "utf-8");
+                let destData = fs.readFileSync(destPath, "utf-8");
+                let replace = function () {
+                    return arguments[1] + sourceData + arguments[3];
+                };
+                destData = destData.replace(/(\*\/)([\s\S\n]*)(declare\s*namespace\s*cc\s*\{)/g, replace);
+                fs.writeFileSync(destPath, destData, { encoding: "utf-8" });
+                Editor.log(data.desc);
+            }
+            else if (data.name == "jsbdts") {
+                //更新热更新声明文件
+                //(export\s*class\s*Manifest)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string\))
+                let destPath = `${this.engineRoot}/${data.path}`;
+                destPath = path.normalize(destPath);
+                let destData = fs.readFileSync(destPath, "utf-8");
+                let replaceManifest = function () {
+                    return arguments[1] + jsbdts_1.HotUpdateDTS.manifest + arguments[3];
+                };
+                destData = destData.replace(/(export\s*class\s*Manifest\s*\{)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string\))/g, replaceManifest);
+                let replaceAssetsManager = function () {
+                    return arguments[1] + jsbdts_1.HotUpdateDTS.assetsManager + arguments[3];
+                };
+                destData = destData.replace(/(export\s*class\s*AssetsManager\s*\{)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string)/g, replaceAssetsManager);
+                fs.writeFileSync(destPath, destData, { encoding: "utf-8" });
+                console.log(data.desc);
             }
             else {
                 //查看本地是否有文件

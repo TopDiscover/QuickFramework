@@ -15,7 +15,7 @@ interface Logger{
 }
 declare let Log : Logger;
 
-declare type BUNDLE_TYPE = string | import("cc").AssetManager.Bundle;
+declare type BUNDLE_TYPE = string | cc.AssetManager.Bundle;
 /**
  * @description 发事件 参考framework/extentions/extentions dispatch 方法
  * @param name 
@@ -183,8 +183,8 @@ declare interface GameViewClass<T extends UIView> {
 declare function createPrefab(
 	config: {
 		url: string,
-		view: any,
-		completeCallback: (node: Node) => void,
+		view: UIView,
+		completeCallback: (node: cc.Node) => void,
 		bundle?: BUNDLE_TYPE
 	}): void;
 
@@ -201,8 +201,8 @@ declare function createPrefab(
 declare function loadDirRes(config: {
 	bundle?: BUNDLE_TYPE,
 	url: string,
-	type: typeof import("cc").Asset,
-	view: any,
+	type: typeof cc.Asset,
+	view: UIView,
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
 	onComplete: (data: any) => void
 }): void;

@@ -768,7 +768,7 @@ class _Helper {
   mkdirSync(dir: string) {
     try {
       fs.mkdirSync(dir)
-    } catch (e) {
+    } catch (e:any) {
       if ("EEXIST" !== e.code) throw e
     }
   }

@@ -2,7 +2,7 @@
 import { LogLevel } from '../../framework/defines/Enums';
 const { ccclass, property } = cc._decorator;
 
-@ccclass('DebugView')
+@ccclass
 export class DebugView extends cc.Component {
 
     private logView: cc.Node = null!;
