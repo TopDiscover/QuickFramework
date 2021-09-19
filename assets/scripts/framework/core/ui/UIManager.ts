@@ -260,7 +260,7 @@ export class UIManager {
                         if (viewData.view && cc.isValid(viewData.node)) {
                             viewData.node.zIndex = zOrder;
                             if (!viewData.node.parent) {
-                                this.addView(viewData.node, zOrder);
+                                this.addView(viewData.node, zOrder,viewData.view);
                             }
                             viewData.view.show(args);
                         }
@@ -375,7 +375,7 @@ export class UIManager {
             }
 
             if (!viewData.isPreload) {
-                this.addView(uiNode, zOrder);
+                this.addView(uiNode, zOrder,view);
             }
             return view;
         }
