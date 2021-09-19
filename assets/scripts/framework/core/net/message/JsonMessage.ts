@@ -1,11 +1,12 @@
+import { ByteArray } from "../../../plugin/ByteArray";
 import { Net } from "../Net";
 import { Message } from "./Message";
 
 type JsonMessageConstructor = typeof JsonMessage;
 
-export function serialize(key: string, type: JsonMessageConstructor | NumberConstructor | StringConstructor): Function;
-export function serialize(key: string, type: ArrayConstructor, arrayType: JsonMessageConstructor | NumberConstructor | StringConstructor): Function;
-export function serialize(key: string, type: MapConstructor, mapKeyType: NumberConstructor | StringConstructor, mapValueType: JsonMessageConstructor | NumberConstructor | StringConstructor): Function;
+export function serialize(key: string, type: JsonMessageConstructor | NumberConstructor | StringConstructor | BooleanConstructor ): Function;
+export function serialize(key: string, type: ArrayConstructor, arrayType: JsonMessageConstructor | NumberConstructor | StringConstructor | BooleanConstructor): Function;
+export function serialize(key: string, type: MapConstructor, mapKeyType: NumberConstructor | StringConstructor, mapValueType: JsonMessageConstructor | NumberConstructor | StringConstructor | BooleanConstructor ): Function;
 export function serialize(key: string, type: any, arrTypeOrMapKeyType?: any, mapValueType?: any): Function {
     return function (target: any, memberName: any): void {
         if (Reflect.getOwnPropertyDescriptor(target, '__serialize__') === undefined) {
@@ -35,12 +36,14 @@ export function serialize(key: string, type: any, arrTypeOrMapKeyType?: any, map
  */
 export abstract class JsonMessage extends Message {
     private data = null;
-
+    protected byteArray: ByteArray = null!;
     buffer: Uint8Array = null!;
     encode() : boolean {
         this.data = this.serialize();
         let result = JSON.stringify(this.data);
-        this.buffer = StringToUtf8Array(result);
+        this.byteArray = new ByteArray();
+        this.byteArray.writeUTFBytes(result);
+        this.buffer = this.byteArray.bytes;
         return true;
     }
 
@@ -69,6 +72,8 @@ export abstract class JsonMessage extends Message {
     private serializeMember(value: any) {
         if (typeof value == 'number') {
             return this.serializeNumber(value);
+        } else if ( typeof value == "boolean"){
+            return this.serializeBool(value);
         } else if (typeof value == 'string') {
             return this.serializeString(value);
         } else if (value instanceof Array) {
@@ -87,6 +92,15 @@ export abstract class JsonMessage extends Message {
         if (value === undefined || value === null) { value = 0 }
         if ( typeof value == "string" ){ value = Number(value);}
         if (Number.isNaN(value)) { value = 0 }
+        return value;
+    }
+
+    private serializeBool(value: boolean) {
+        if (value === undefined || value === null) { value = false }
+        if ( typeof value == "string" ){
+            value = value == "true";
+        }
+        if (Number.isNaN(value)) { value = false }
         return value;
     }
 
@@ -123,7 +137,8 @@ export abstract class JsonMessage extends Message {
     decode(data: Uint8Array): boolean {
         if (data) {
             this.buffer = data;
-            let result = Utf8ArrayToString(data);
+            let buffer = new ByteArray(data);
+            let result = buffer.readUTFBytes(buffer.length);
             if (result.length > 0) {
                 try {
                     this.data = JSON.parse(result);
@@ -169,7 +184,9 @@ export abstract class JsonMessage extends Message {
             let originValue = (<any>this)[memberName];
             if (typeof originValue === 'number') {
                 (<any>this)[memberName] = this.deserializeNumber(memberName, value);
-            } else if (typeof originValue === 'string') {
+            } else if(typeof originValue === "boolean"){
+                (<any>this)[memberName] = this.deserializeBool(memberName, value);
+            }else if (typeof originValue === 'string') {
                 (<any>this)[memberName] = this.deserializeString(memberName, value);
             } else if (originValue instanceof Array) {
                 this.deserializeArray(memberName, arrOrmapKeyType, value);
@@ -210,6 +227,13 @@ export abstract class JsonMessage extends Message {
             throw { message: `Invalid deserializeNumber member : ${memberName} value : ${value}`, data: 0 };
         }
         return Number(value);
+    }
+
+    private deserializeBool(memberName: any, value: any) {
+        if (value === null || value === undefined || value === NaN) {
+            throw { message: `Invalid deserializeNumber member : ${memberName} value : ${value}`, data: 0 };
+        }
+        return Boolean(value);
     }
 
     private deserializeString(memberName: any, value: any) {

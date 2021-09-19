@@ -2,11 +2,13 @@
  * 框架常量宏定义
  */
 
+import { Endian } from "../plugin/ByteArray";
+
 export namespace Macro{
     /**@description 公共语言包数据名 */
     export const COMMON_LANGUAGE_NAME: string = "COMMON_LANGUAGE_NAME";
     /**@description 网络数据全以大端方式进行处理 */
-    export const USING_LITTLE_ENDIAN = false;
+    export const USING_LITTLE_ENDIAN = Endian.BIG_ENDIAN;
     /**@description 主包bundle名 */
     export const BUNDLE_RESOURCES = 'resources';
     /**@description 远程资源包bundle名 */

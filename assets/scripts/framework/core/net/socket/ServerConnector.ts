@@ -80,7 +80,7 @@ export abstract class ServerConnector {
     /**
      * @description 收到网络消息
      */
-    protected onMessage(data: Uint8Array) {
+    protected onMessage(data: MessageEvent) {
         this.recvHeartbeat();
     }
 
@@ -161,7 +161,7 @@ export abstract class ServerConnector {
      * @description 发送请求
      * @param msg 消息
      */
-    protected sendBuffer(buffer: Uint8Array) {
+    protected sendBuffer(buffer: SocketBuffer) {
         this._wsClient && this._wsClient.send(buffer);
     }
 

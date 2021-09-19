@@ -46,7 +46,7 @@ class _TestGameNetHelper extends NetHelper<GameService>{
 
     sendBinaryMessage(hello: string) {
         let binaryMessage = new TestBinaryMessage();
-        binaryMessage.hello = hello;
+        binaryMessage.vHello = hello;
         this.service.send(binaryMessage);
     }
 }

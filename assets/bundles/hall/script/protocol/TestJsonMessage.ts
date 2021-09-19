@@ -19,6 +19,9 @@ export class TestJsonMessage extends JsonMessage {
     @serialize("count", Number)
     count: number = 1000;
 
+    @serialize("vBool",Boolean)
+    vBool : boolean = true;
+
     @serialize("arr", Array, String)
     testArr: Array<string> = ["1", "2", "3", "4"];//null;
 

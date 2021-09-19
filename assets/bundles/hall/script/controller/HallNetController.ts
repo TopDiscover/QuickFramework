@@ -35,7 +35,7 @@ export default class HallNetController extends Controller<LobbyService> {
     }
 
     private onTestBinaryMessage(data: TestBinaryMessage) {
-        dispatch(CommonEvent.TEST_BINARY_MSG, data.hello)
+        dispatch(CommonEvent.TEST_BINARY_MSG, data.vHello)
     }
 
     protected onNetOpen(event: Net.ServiceEvent) {
