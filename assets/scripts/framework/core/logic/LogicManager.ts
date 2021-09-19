@@ -1,11 +1,6 @@
 import { Macro } from "../../defines/Macros";
 import { Logic } from "./Logic";
 
-/**@description 打印代理 */
-export abstract class LogicDelegate {
-    abstract print(data: Logic): void;
-}
-
 export class LogicManager {
     private static _instance: LogicManager = null!;
     public static Instance() { return this._instance || (this._instance = new LogicManager()); }
@@ -79,7 +74,7 @@ export class LogicManager {
     }
 
     /**@description 打印当前所有bundle数据数据 */
-    print(delegate: LogicDelegate) {
+    print(delegate: ManagerPrintDelegate<Logic>) {
         if (delegate) {
             this._logics.forEach((logic, key, source) => {
                 delegate.print(logic);

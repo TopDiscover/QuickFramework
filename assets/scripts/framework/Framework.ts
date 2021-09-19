@@ -136,15 +136,6 @@ export class Framewok {
         return <T>this.gameView;
     }
 
-    /**@description 游戏控制器，在自己的模块内写函数有类型化读取,此值在Logic.addNetComponent赋值
-     * @example 
-     * export function netController() : TankBattleNetController{
-     * return Manager.gameController;
-     * }
-     * 
-     */
-    gameController: any = null;
-
     /**
      * @description 把语言包转换成i18n.xxx形式
      * @param param 语言包配置

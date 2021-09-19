@@ -3,10 +3,13 @@ import { HallData } from "./data/HallData";
 import { HallLanguage } from "./data/HallLanguage";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import { Config } from "../../../scripts/common/config/Config";
+import { setClassName } from "../../../scripts/framework/decorator/Decorators";
 
+@setClassName()
 class HallEntry extends Entry {
     static bundle = Config.BUNDLE_HALL;
     protected language = new HallLanguage;
+
     private get data(){
         return Manager.dataCenter.getData(HallData) as HallData;
     }
@@ -15,7 +18,6 @@ class HallEntry extends Entry {
         Manager.hallNetManager.addNetControllers();
     }
     protected removeNetComponent(): void {
-        //大厅网络层，返回登录在关闭
         // Manager.hallNetManager.removeNetControllers();
     }
     protected loadResources(completeCb: () => void): void {

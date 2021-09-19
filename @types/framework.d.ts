@@ -241,6 +241,25 @@ declare namespace Language {
 	}
 }
 
+/**@description 各管理器打印输出代理 */
+declare interface ManagerPrintDelegate<T>{
+	print(data: T): void;
+}
+declare interface EntryPrintDelegate<T,U> extends ManagerPrintDelegate<T>{
+	printType( data : U) :void;
+}
+
+declare interface UIManagerPrintDelegate<T,U,V>{
+	printViews?( data : T , key : string):void;
+	printChildren?(data : U):void;
+	printComp?(data:V):void;
+}
+
+declare interface CacheManagerPrintDelegate<T,U>{
+	printLocal(data:T,key:string):void;
+	printRemote(spriteFrameCaches:T,caches:T,infos:U):void;
+}
+
 declare type ByteArray = import("../assets/scripts/framework/plugin/ByteArray").ByteArray;
 
 declare let Manager: import("../assets/Application")._Manager;

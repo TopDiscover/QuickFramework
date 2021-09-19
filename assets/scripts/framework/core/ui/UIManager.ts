@@ -547,8 +547,6 @@ export class UIManager {
             }
             self.close(key);
         });
-
-        this.printViews();
     }
 
     /**@description 关闭指定bundle的视图 */
@@ -689,35 +687,35 @@ export class UIManager {
         }
     }
 
-    public printViews() {
-        Log.d(`${this._logTag}---------views----start-----`);
-        this._viewDatas.forEach((value: ViewData, key: string) => {
-            Log.d(`[${key}] isLoaded : ${value.isLoaded} status : ${value.status} view : ${this.getClassName(value.view as any)} active : ${value.view && value.view.node ? value.view.node.active : false}`);
-        });
-        Log.d(`${this._logTag}---------views----end-----`);
-    }
-
-    public printViewRootChildren() {
-        Log.d(`${this._logTag}-----------printCanvasChildren--start-----------`);
-        let root = this.viewRoot;
-        if (root) {
-            let children = root.children;
-            for (let i = 0; i < children.length; i++) {
-                Log.d(`${children[i].name} active : ${children[i].active}`);
+    print( delegate : UIManagerPrintDelegate<ViewData,cc.Node,cc.Component>){
+        if ( delegate ){
+            if ( delegate.printViews ){
+                this._viewDatas.forEach((data,key)=>{
+                    if ( delegate.printViews ){
+                        delegate.printViews(data,key);
+                    }
+                });
             }
-        }
-        Log.d(`${this._logTag}-----------printCanvasChildren--end-----------`);
-    }
 
-    public printComponent() {
-        let root: any = this.componentRoot;
-        if (root) {
-            let comps: any[] = root._components;
-            Log.d(`${this._logTag} -------------- print component start --------------`);
-            for (let i = 0; i < comps.length; i++) {
-                Log.d(cc.js.getClassName(comps[i]));
+            if ( delegate.printChildren ){
+                let root = this.viewRoot;
+                if ( root ){
+                    let children = root.children;
+                    for ( let i = 0 ; i < children.length ; i++){
+                        delegate.printChildren(children[i]);
+                    }
+                }
             }
-            Log.d(`${this._logTag} -------------- print component end --------------`);
+            
+            if (delegate.printComp) {
+                let root: any = this.componentRoot;
+                if (root) {
+                    let comps: any[] = root._components;
+                    for (let i = 0; i < comps.length; i++) {
+                        delegate.printComp(comps[i]);
+                    }
+                }
+            }
         }
     }
 }

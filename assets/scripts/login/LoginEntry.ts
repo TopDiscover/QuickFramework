@@ -9,7 +9,9 @@ import { Config, ViewZOrder } from "../common/config/Config";
 import { Macro } from "../framework/defines/Macros";
 import { Entry } from "../framework/core/entry/Entry";
 import { HotUpdate } from "../framework/core/hotupdate/Hotupdate";
+import { setClassName } from "../framework/decorator/Decorators";
 
+@setClassName()
 class LoginEntry extends Entry {
     static bundle = Macro.BUNDLE_RESOURCES;
     static isMain = true;

@@ -12,22 +12,53 @@ export class BundleManager {
    private isLoading = false;
    /**@description 大厅Bundle名 */
    public bundleHall = "hall";
-   /**@description 已经加载的bundle */
-   private loadedBundle: string[] = []
    /**@description 删除已经加载的bundle */
-   public removeLoadedBundle( delegate : EntryDelegate, excludeBundles ?: string[]) {
-      if ( !excludeBundles ){
+   public removeLoadedBundle(delegate: EntryDelegate, excludeBundles?: string[]) {
+      if (!excludeBundles) {
          excludeBundles = delegate.getPersistBundle();
       }
-      let i = this.loadedBundle.length;
-      while(i--){
-         let bundle = this.loadedBundle[i];
-         if( excludeBundles.indexOf(bundle) == -1){
+      let loaded : string[]= [];
+      cc.assetManager.bundles.forEach((bundle,key)=>{
+         loaded.push(key);
+      });
+      let i = loaded.length;
+      while (i--) {
+         let bundle = loaded[i];
+         if (excludeBundles.indexOf(bundle) == -1) {
             //在排除bundle中找不到，直接删除
             Manager.entryManager.onUnloadBundle(bundle);
-            Manager.assetManager.removeBundle(bundle);
+            let result = this.getBundle(bundle);
+            if ( result ){
+               Manager.cacheManager.removeBundle(bundle);
+               cc.assetManager.removeBundle(result);
+            }
          }
       }
+   }
+
+   /**
+    * @description 获取Bundle
+    * @param bundle Bundle名|Bundle
+    **/
+   public getBundle(bundle: BUNDLE_TYPE) {
+      if (bundle) {
+         if (typeof bundle == "string") {
+            return cc.assetManager.getBundle(bundle);
+         }
+         return bundle;
+      }
+      return null;
+   }
+
+   public getBundleName(bundle: BUNDLE_TYPE): string | null {
+      if (bundle) {
+         if (typeof bundle == "string") {
+            return bundle;
+         } else {
+            return bundle.name;
+         }
+      }
+      return null;
    }
 
    /**
@@ -42,10 +73,7 @@ export class BundleManager {
       }
       this.curBundle = config;
       this.isLoading = true;
-
-      if (!Manager.hotupdate.bundlesConfig[this.curBundle.bundle]) {
-         Manager.hotupdate.bundlesConfig[this.curBundle.bundle] = config;
-      }
+      Manager.hotupdate.bundlesConfig[this.curBundle.bundle] = config;
 
       let versionInfo = Manager.hotupdate.bundlesConfig[this.curBundle.bundle];
       this.checkUpdate(versionInfo, delegate);
@@ -56,9 +84,9 @@ export class BundleManager {
       let self = this;
       Log.d(`检测更新信息:${versionInfo.name}(${versionInfo.bundle})`);
       Manager.eventDispatcher.removeEventListener(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this);
-      let bundle : string | undefined = this.curBundle.bundle;
-      if ( this.curBundle.bundle == Macro.BUNDLE_RESOURCES ){
-         bundle  = undefined;
+      let bundle: string | undefined = this.curBundle.bundle;
+      if (this.curBundle.bundle == Macro.BUNDLE_RESOURCES) {
+         bundle = undefined;
       }
       Manager.hotupdate.checkUpdate((code, state) => {
          if (code == HotUpdate.Code.NEW_VERSION_FOUND) {
@@ -90,24 +118,28 @@ export class BundleManager {
             Log.d(`检测更新当前状态 code : ${code} state : ${state}`);
             if (delegate) delegate.onOtherReason(versionInfo, code, state);
          }
-      },bundle);
+      }, bundle);
    }
 
    public loadBundle(delegate: EntryDelegate) {
-      Log.d(`loadBundle : ${this.curBundle.bundle}`);
-      let me = this;
-      this.isLoading = true;
-      //加载子包
+      let bundle = this.getBundle(this.curBundle.bundle);
       let versionInfo = Manager.hotupdate.bundlesConfig[this.curBundle.bundle];
-      Manager.assetManager.loadBundle(versionInfo.bundle, (err, bundle) => {
-         me.isLoading = false;
+      if ( bundle ){
+         Log.d(`${this.curBundle.bundle}已经加载在缓存中，直接使用`);
+         this.isLoading = false;
+         if ( delegate ) delegate.onLoadBundleComplete(versionInfo,bundle);
+         return;
+      }
+      this.isLoading = true;
+      Log.d(`loadBundle : ${this.curBundle.bundle}`);
+      cc.assetManager.loadBundle(versionInfo.bundle, (err, bundle) => {
+         this.isLoading = false;
          if (err) {
             Log.e(`load bundle : ${versionInfo.bundle} fail !!!`);
-            if( delegate ) delegate.onLoadBundleError(versionInfo,err);
+            if (delegate) delegate.onLoadBundleError(versionInfo, err);
          } else {
             Log.d(`load bundle : ${versionInfo.bundle} success !!!`);
-            this.loadedBundle.push(versionInfo.bundle);
-            if ( delegate ) delegate.onLoadBundleComplete(versionInfo,bundle);
+            if (delegate) delegate.onLoadBundleComplete(versionInfo, bundle);
          }
       });
    }
@@ -125,5 +157,29 @@ export class BundleManager {
          Log.e(`更新${config.name}失败`);
       }
       if (delegate) delegate.onDownloading(this.curBundle, info);
+   }
+
+   /**
+    * @description 打印bundle管理器状态信息
+    * @param delegate 
+    */
+   print(delegate: ManagerPrintDelegate<{
+      loaded: cc.AssetManager.Bundle[], //已在加载的bundle
+      curBundle: HotUpdate.BundleConfig, //当前运行的bundle
+      areadyLoaded: { [key: string]: HotUpdate.BundleConfig } //已经加载过的bundle配置信息
+      isLoading: boolean //是否存在加载bundle过程中
+   }>) {
+      if (delegate) {
+         let loaded :cc.AssetManager.Bundle[] = [];
+         cc.assetManager.bundles.forEach((bundle,key)=>{
+            loaded.push(bundle);
+         });
+         delegate.print({
+            loaded: loaded,
+            curBundle: this.curBundle,
+            areadyLoaded: Manager.hotupdate.bundlesConfig,
+            isLoading: this.isLoading
+         })
+      }
    }
 }

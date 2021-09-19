@@ -1,10 +1,6 @@
 import { Macro } from "../defines/Macros";
 import { GameData } from "./GameData";
 
-/**@description 数据中心,所有数据必须为GameData的子类 */
-export abstract class DataCenterDelegate {
-    abstract print(data: GameData): void;
-}
 export class DataCenter {
 
     private static _instance: DataCenter = null!;
@@ -77,7 +73,7 @@ export class DataCenter {
     }
 
     /**@description 打印当前所有bundle数据数据 */
-    print(delegate: DataCenterDelegate) {
+    print(delegate: ManagerPrintDelegate<GameData>) {
         if (delegate) {
             this._datas.forEach((data, key, source) => {
                 delegate.print(data);

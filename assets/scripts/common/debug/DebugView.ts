@@ -6,11 +6,45 @@ const { ccclass, property } = cc._decorator;
 export class DebugView extends cc.Component {
 
     private logView: cc.Node = null!;
+    private content: cc.Node = null!;
     onLoad() {
-        let showUI = cc.find("content/showUI", this.node);
-        let showNode = cc.find("content/showNode", this.node);
-        let showRes = cc.find("content/showRes", this.node);
-        let showComp = cc.find("content/showComponent", this.node);
+
+        this.content = cc.find("content", this.node);
+        //显示界面信息
+        this.bindEvent("showUI",this.onShowUI);
+        //显示节点信息
+        this.bindEvent("showNode",this.onShowNode);
+        //显示资源缓存信息
+        this.bindEvent("showRes",this.onShowRes);
+        //显示当前组件信息
+        this.bindEvent("showComponent",this.onShowComp);
+        //显示调试信息
+        this.bindEvent("showDebugInfo",this.onShowDebugInfo);
+        this.bindEvent("log",this.onLog);
+        //逻辑管理器信息输出
+        this.bindEvent("logic",this.onLogicManager);
+        //数据中心
+        this.bindEvent("dataCenter",this.onDataCenter);
+        //bundle入口管理器
+        this.bindEvent("entry",this.onEntry);
+        //proto 信息输出 
+        this.bindEvent("proto",this.onProto);
+        //bundle管理器
+        this.bindEvent("bundleMgr",this.onBundleMgr);
+        //节点缓存池
+        this.bindEvent("pool",this.onPool);
+        this.doOther();
+    }
+    debug: cc.Node = null!;
+
+    private doOther(){
+        let logView = cc.find("logView", this.node);
+        if (logView) {
+            logView.active = false;
+            this.logView = logView;
+            this.initLogView();
+        }
+
         let background = cc.find("background", this.node);
         if (background) {
             background.on(cc.Node.EventType.TOUCH_END, () => {
@@ -18,38 +52,14 @@ export class DebugView extends cc.Component {
                 if (this.debug) this.debug.active = true;
             });
         }
-        if (showUI && showNode && showRes && showComp) {
-            showUI.on(cc.Node.EventType.TOUCH_END, () => {
-                Manager.uiManager.printViews();
-            });
-            showNode.on(cc.Node.EventType.TOUCH_END, () => {
-                Manager.uiManager.printViewRootChildren();
-            });
-            showRes.on(cc.Node.EventType.TOUCH_END, () => {
-                Manager.cacheManager.printCaches();
-            });
-            showComp.on(cc.Node.EventType.TOUCH_END, () => {
-                Manager.uiManager.printComponent();
-            });
-        }
-        let showDebugInfo = cc.find("content/showDebugInfo", this.node);
-        if (showDebugInfo) {
-            showDebugInfo.on(cc.Node.EventType.TOUCH_END, () => {
-                cc.debug.setDisplayStats(!cc.debug.isDisplayStats())
-            });
-        }
-        let logLevel = cc.find("content/log", this.node);
-        let logView = cc.find("logView", this.node);
-        if (logLevel && logView) {
-            logView.active = false;
-            this.logView = logView;
-            this.initLogView();
-            logLevel.on(cc.Node.EventType.TOUCH_END, () => {
-                this.logView.active = true;
-            });
+    }
+
+    private bindEvent(path : string ,cb:Function){
+        let node = cc.find(path,this.content);
+        if( node ){
+            node.on(cc.Node.EventType.TOUCH_END,cb,this);
         }
     }
-    debug: cc.Node = null!;
 
     private initLogView() {
         let background = cc.find("background", this.logView);
@@ -59,7 +69,6 @@ export class DebugView extends cc.Component {
             });
         }
 
-        //连接网络 
         let level = cc.find("level", this.logView);
         if (level) {
             for (let i = 0; i < level.children.length - 1; i++) {
@@ -70,30 +79,10 @@ export class DebugView extends cc.Component {
                         toggle.isChecked = Manager.logger.isValid(this.getLogLevel(i));
                     }
                     node.on("toggle", (toggle: cc.Toggle) => {
-                        if ( toggle.isChecked ){
+                        if (toggle.isChecked) {
                             Manager.logger.attach(this.getLogLevel(i));
-                        }else{
-                            Manager.logger.detach(this.getLogLevel(i));
-                        }
-                    });
-                }
-            }
-        }
-
-        let test = cc.find("test", this.logView);
-        if (test) {
-            for (let i = 0; i < test.children.length - 1; i++) {
-                let node = cc.find(`type${i}`, test);
-                if (node) {
-                    node.on("toggle", (toggle: cc.Toggle) => {
-                        if ( i == 0 ){
-                            Log.d("sssss");
-                        }else if( i == 1 ){
-                            Log.w("sssssssssfffffff");
-                        }else if( i == 2 ){
-                            Log.e("eeeeeeee");
                         } else {
-                            Log.dump({a :100,b:300,c : { b :300,d : 400}},"test");
+                            Manager.logger.detach(this.getLogLevel(i));
                         }
                     });
                 }
@@ -107,8 +96,201 @@ export class DebugView extends cc.Component {
             case 1: return LogLevel.WARN;
             case 2: return LogLevel.ERROR;
             case 3: return LogLevel.DUMP;
-            default : return LogLevel.DEBUG;
+            default: return LogLevel.DEBUG;
         }
+    }
+
+    private onLogicManager() {
+        Log.d(`-------逻辑管理器数据-------`)
+        Manager.logicManager.print({
+            print: (data) => {
+                Log.d(cc.js.getClassName(data));
+            }
+        });
+    }
+
+    private onDataCenter() {
+        Log.d(`-------数据中心-------`)
+        Manager.dataCenter.print({
+            print: (data) => {
+                Log.dump(data);
+            }
+        });
+    }
+
+    private onEntry() {
+        Log.d(`-------Bundle入口管理器-------`)
+        Manager.entryManager.print({
+            print: (data) => {
+                Log.d(`bundle : ${data.bundle}`);
+            },
+            printType: (data) => {
+                Log.d(`name : ${cc.js.getClassName(data)} bundle : ${data.bundle}`);
+            }
+        })
+    }
+
+    private onProto() {
+        Log.d(`-------Proto文件加载信息,所有proto文件都加载在同一个root下,文件加载完成后，资源文件就会初释放-------`);
+        Manager.protoManager.print({
+            print: (data) => {
+                Log.d(data);
+            }
+        })
+    }
+
+    private onBundleMgr() {
+        Log.d(`-------Bundle管理器状态信息-------`);
+        Manager.bundleManager.print({
+            print: (data) => {
+                Log.d(`是否有加载中Bundle : ${data.isLoading}`);
+                let bundles = [];
+                for (let i = 0; i < data.loaded.length; i++) {
+                    bundles.push(data.loaded[i].name);
+                }
+                Log.d(`当前所有加载完成的bundle : ${bundles.toString()}`);
+
+                Log.d("当前运行bundle:", data.curBundle);
+                Log.d("加载过保存下的bundle信息：", data.areadyLoaded)
+            }
+        })
+    }
+
+    private onPool(){
+        Log.d(`-------对象池节点缓存信息-------`);
+        Manager.nodePoolManager.print({
+            print:( source )=>{
+                source.forEach((data,key)=>{
+                    Log.d(key);
+                })
+            }
+        })
+    }
+
+    private onLog(){
+        this.logView.active = true;
+    }
+
+    private onShowDebugInfo(){
+        cc.debug.setDisplayStats(!cc.debug.isDisplayStats())
+    }
+
+    private onShowUI(){
+        Log.d(`-----------当前所有视图------------`);
+        Manager.uiManager.print({
+            printViews: (value, key) => {
+                Log.d(`[${key}] isLoaded : ${value.isLoaded} status : ${value.status} view : ${cc.js.getClassName(value.view)} active : ${value.view && value.view.node ? value.view.node.active : false}`);
+            }
+        })
+    }
+
+    private onShowNode(){
+        Log.d(`-----------当前所有节点信息------------`);
+        Manager.uiManager.print({
+            printChildren: (data) => {
+                Log.d(`${data.name} active : ${data.active}`);
+            }
+        })
+    }
+
+    private onShowRes(){
+        Manager.cacheManager.print({
+            printLocal: (caches, key) => {
+                if (CC_DEBUG) Log.d(`----------------Bundle ${key} caches begin----------------`)
+                let content: any[] = [];
+                let invalidContent: any[] = [];
+                caches.forEach((data, key, source) => {
+                    let itemContent = {
+                        url: data.info.url,
+                        isLoaded: data.isLoaded,
+                        isValid: cc.isValid(data.data),
+                        assetType: cc.js.getClassName(data.info.type),
+                        data: data.data ? cc.js.getClassName(data.data) : null,
+                        status: data.status
+                    }
+                    let item = { url: key, data: itemContent };
+
+                    if (data.isLoaded && data.data && !cc.isValid(data.data)) {
+                        invalidContent.push(item);
+                    } else {
+                        content.push(item);
+                    }
+                });
+                if (content.length > 0) {
+                    Log.d(`----------- Current valid caches -----------`);
+                    Log.d(JSON.stringify(content));
+                }
+                if (invalidContent.length > 0) {
+                    Log.d(`----------- Current invalid caches -----------`);
+                    Log.d(JSON.stringify(invalidContent));
+                }
+                if (CC_DEBUG) Log.d(`----------------Bundle ${key} caches end----------------`)
+            },
+            printRemote: (spCaches, caches, infos) => {
+                Log.d(`---- [RemoteCaches] showCaches ----`);
+
+                let content: any[] = [];
+                let invalidContent: any[] = [];
+                spCaches.forEach((data, key, source) => {
+                    let itemContent = { url: data.info.url, isLoaded: data.isLoaded, isValid: cc.isValid(data.data), assetType: cc.js.getClassName(data.info.type), data: data.data ? cc.js.getClassName(data.data) : null, status: data.status };
+                    let item = { url: key, data: itemContent };
+                    if (data.isLoaded && ((data.data && !cc.isValid(data.data)) || !data.data)) {
+                        invalidContent.push(item);
+                    } else {
+                        content.push(item);
+                    }
+                });
+
+                if (content.length > 0) {
+                    Log.d(`----------------Current valid spriteFrame Caches------------------`);
+                    Log.d(JSON.stringify(content));
+                }
+                if (invalidContent.length > 0) {
+                    Log.d(`----------------Current invalid spriteFrame Caches------------------`);
+                    Log.d(JSON.stringify(invalidContent));
+                }
+
+
+                content = [];
+                invalidContent = [];
+                caches.forEach((data, key, source) => {
+                    let itemContent = { url: data.info.url, isLoaded: data.isLoaded, isValid: cc.isValid(data.data), assetType: cc.js.getClassName(data.info.type), data: data.data ? cc.js.getClassName(data.data) : null, status: data.status }
+                    let item = { url: key, data: itemContent };
+                    if (data.isLoaded && data.data && !cc.isValid(data.data)) {
+                        invalidContent.push(item);
+                    } else {
+                        content.push(item);
+                    }
+                });
+                if (content.length > 0) {
+                    Log.d(`----------------Current valid Caches------------------`);
+                    Log.d(JSON.stringify(content));
+                }
+                if (invalidContent.length > 0) {
+                    Log.d(`----------------Current invalid Caches------------------`);
+                    Log.d(JSON.stringify(invalidContent));
+                }
+
+                if (infos.size > 0) {
+                    Log.d(`----------------Current resource reference Caches------------------`);
+                    content = [];
+                    infos.forEach((value, key) => {
+                        let item = { url: key, data: { refCount: value.refCount, url: value.url, retain: value.retain } };
+                        content.push(item);
+                    });
+                    Log.d(JSON.stringify(content));
+                }
+            }
+        })
+    }
+
+    private onShowComp(){
+        Log.d(`-----------当前所有组件信息------------`);
+        Manager.uiManager.print({
+            printComp: (data) => {
+                Log.d(cc.js.getClassName(data));
+            }
+        })
     }
 }
 
