@@ -2,7 +2,7 @@ import TankBattleGameView from "./view/TankBattleGameView";
 import { TankBattleLanguage } from "./data/TankBattleLanguage";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import { Resource } from "../../../scripts/framework/core/asset/Resource";
-import { TankBettleGameData } from "./data/TankBattleGameData";
+import { TankBattleGameData } from "./data/TankBattleGameData";
 import { setClassName } from "../../../scripts/framework/decorator/Decorators";
 /**
  * @description 坦克大战入口
@@ -10,9 +10,9 @@ import { setClassName } from "../../../scripts/framework/decorator/Decorators";
  @setClassName()
 class TankBattleEntry extends Entry {
     protected language = new TankBattleLanguage;
-    static bundle = TankBettleGameData.bundle;
+    static bundle = TankBattleGameData.bundle;
     private get data(){
-        return Manager.dataCenter.getData(TankBettleGameData) as TankBettleGameData
+        return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData
     }
 
     protected addNetComponent(): void {

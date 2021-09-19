@@ -3,7 +3,7 @@ import { ViewZOrder } from "../../../../scripts/common/config/Config";
 import { Logic } from "../../../../scripts/framework/core/logic/Logic";
 import { setClassName } from "../../../../scripts/framework/decorator/Decorators";
 import { TankBettle } from "../data/TankBattleConfig";
-import { TankBettleGameData } from "../data/TankBattleGameData";
+import { TankBattleGameData } from "../data/TankBattleGameData";
 import { MapLevel } from "../data/TankBattleLevel";
 import TankBettleBullet from "../model/TankBattleBullet";
 import { TankBettleTankPlayer } from "../model/TankBattleTank";
@@ -15,7 +15,7 @@ import TankBattleStartView from "../view/TankBattleStartView";
 export class TankBattleLogic extends Logic {
 
     private get data() {
-        return Manager.dataCenter.getData(TankBettleGameData) as TankBettleGameData;
+        return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData;
     }
 
     /**@description 游戏的各种预置 */

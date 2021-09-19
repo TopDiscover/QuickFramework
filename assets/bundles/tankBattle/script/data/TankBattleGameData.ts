@@ -4,7 +4,7 @@ import { GameData } from "../../../../scripts/framework/data/GameData";
 import { Node, Rect, UITransform, Vec2, Vec3 } from "cc"
 import { TankBettle } from "./TankBattleConfig";
 
-export class TankBettleGameData extends GameData {
+export class TankBattleGameData extends GameData {
     static bundle = "tankBattle";
     addGameTime() {
         //待处理

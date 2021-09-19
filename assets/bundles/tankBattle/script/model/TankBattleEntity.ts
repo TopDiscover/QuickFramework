@@ -1,6 +1,6 @@
 
 import { _decorator, Component, Node, BoxCollider2D, Contact2DType, IPhysics2DContact } from 'cc';
-import { TankBettleGameData } from '../data/TankBattleGameData';
+import { TankBattleGameData } from '../data/TankBattleGameData';
 const { ccclass, property } = _decorator;
 
 @ccclass('TankBattleEntity')
@@ -8,7 +8,7 @@ export class TankBattleEntity extends Component {
 
 
     protected get data( ){
-        return Manager.dataCenter.getData(TankBettleGameData) as TankBettleGameData;
+        return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData;
     }
 
     protected get logic():TankBattleLogic | null{

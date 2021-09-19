@@ -9,7 +9,7 @@
  import TankBattleProps from "../model/TankBattleProps";
 import { _decorator,Node,Animation, EventKeyboard, Tween, Vec3, randomRangeInt, UITransform, instantiate, BoxCollider2D, Rect, Size, randomRange, tween, macro, Sprite, size, Widget } from "cc";
 import { TankBettle } from "../data/TankBattleConfig";
-import { TankBettleGameData } from "../data/TankBattleGameData";
+import { TankBattleGameData } from "../data/TankBattleGameData";
  
  const { ccclass, property } = _decorator;
  
@@ -18,7 +18,7 @@ import { TankBettleGameData } from "../data/TankBattleGameData";
     node: Node = null!;
  
     private get data(){
-        return Manager.dataCenter.getData(TankBettleGameData) as TankBettleGameData;
+        return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData;
     }
 
     private get logic():TankBattleLogic{
