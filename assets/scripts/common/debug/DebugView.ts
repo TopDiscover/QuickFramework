@@ -198,7 +198,7 @@ export class DebugView extends Component {
     private onShowRes(){
         Manager.cacheManager.print({
             printLocal: (caches, key) => {
-                if (DEBUG) Log.d(`----------------Bundle ${key} caches begin----------------`)
+                if (DEBUG) Log.d(`----------------Bundle ${key} 资源缓存信息开始----------------`)
                 let content: any[] = [];
                 let invalidContent: any[] = [];
                 caches.forEach((data, key, source) => {
@@ -219,17 +219,17 @@ export class DebugView extends Component {
                     }
                 });
                 if (content.length > 0) {
-                    Log.d(`----------- Current valid caches -----------`);
+                    Log.d(`----------- 有效缓存信息 -----------`);
                     Log.d(JSON.stringify(content));
                 }
                 if (invalidContent.length > 0) {
-                    Log.d(`----------- Current invalid caches -----------`);
+                    Log.d(`----------- 无效缓存信息 -----------`);
                     Log.d(JSON.stringify(invalidContent));
                 }
-                if (DEBUG) Log.d(`----------------Bundle ${key} caches end----------------`)
+                if (DEBUG) Log.d(`----------------Bundle ${key} 资源缓存信息结束----------------`)
             },
             printRemote: (spCaches, caches, infos) => {
-                Log.d(`---- [RemoteCaches] showCaches ----`);
+                Log.d(`---- 远程加载资源缓存信息 ----`);
 
                 let content: any[] = [];
                 let invalidContent: any[] = [];
@@ -244,11 +244,11 @@ export class DebugView extends Component {
                 });
 
                 if (content.length > 0) {
-                    Log.d(`----------------Current valid spriteFrame Caches------------------`);
+                    Log.d(`----------------有效 spriteFrame 缓存信息------------------`);
                     Log.d(JSON.stringify(content));
                 }
                 if (invalidContent.length > 0) {
-                    Log.d(`----------------Current invalid spriteFrame Caches------------------`);
+                    Log.d(`----------------无效 spriteFrame 缓存信息------------------`);
                     Log.d(JSON.stringify(invalidContent));
                 }
 
@@ -265,16 +265,16 @@ export class DebugView extends Component {
                     }
                 });
                 if (content.length > 0) {
-                    Log.d(`----------------Current valid Caches------------------`);
+                    Log.d(`----------------有效缓存信息------------------`);
                     Log.d(JSON.stringify(content));
                 }
                 if (invalidContent.length > 0) {
-                    Log.d(`----------------Current invalid Caches------------------`);
+                    Log.d(`----------------无效缓存信息------------------`);
                     Log.d(JSON.stringify(invalidContent));
                 }
 
                 if (infos.size > 0) {
-                    Log.d(`----------------Current resource reference Caches------------------`);
+                    Log.d(`----------------当前资源引用计数信息------------------`);
                     content = [];
                     infos.forEach((value, key) => {
                         let item = { url: key, data: { refCount: value.refCount, url: value.url, retain: value.retain } };
