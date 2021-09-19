@@ -2,7 +2,7 @@ import { Macro } from "../../defines/Macros";
 
 type DeviceDirection = "" | "Landscape" | "Portrait";
 
-enum ScreenAdaptType {
+export enum ScreenAdaptType {
     /**@description 无处理 */
     None,
     /**@description 放大 */
@@ -13,13 +13,13 @@ enum ScreenAdaptType {
     Max,
 }
 
-function instance(){
+function instance() {
     return getSingleton(Adaptor);
 }
 
 export class Adaptor {
     private _logTag = "[Adaptor]";
-    private static _instance: Adaptor = null;
+    private static _instance: Adaptor = null!;
     public static Instance() { return this._instance || (this._instance = new Adaptor()); }
     private canvas: cc.Canvas = null;
     /**@description 是否需要进行全屏幕适配 */
@@ -41,10 +41,7 @@ export class Adaptor {
     }
     public set isShowKeyboard(value) {
         let me = instance();
-        //let content = value ? "键盘显示!!!" : "键盘隐藏!!!";
-        //cc.log(me._logTag,`${content}`);
         me._isShowKeyboard = value;
-
         if (!value) {
             me._onResize(true);
         }
@@ -109,7 +106,7 @@ export class Adaptor {
             me.canvas.designResolution = winsize;
         } else if (me.screenAdaptType == ScreenAdaptType.Max) {
             let winsize = me.getMaxWinsize();
-            if (CC_DEBUG) cc.log(`max winsize : ${winsize.width} * ${winsize.height}`);
+            if (CC_DEBUG) Log.d(`max winsize : ${winsize.width} * ${winsize.height}`);
             me.canvas.designResolution = winsize;
         } else {
             me.canvas.designResolution = me.designResolution;
@@ -159,7 +156,7 @@ export class Adaptor {
         let me = instance();
         me.recordHeight();
         me.isFirstResize = false;
-        //cc.log(me._logTag,`onOrientationChange`);
+        //Log.d(me._logTag,`onOrientationChange`);
     }
 
     private onResize() {
@@ -169,7 +166,7 @@ export class Adaptor {
 
     private _onResize(isHideKeyboard: boolean) {
         let me = instance();
-        //cc.log(me._logTag,`onResize`);
+        //Log.d(me._logTag,`onResize`);
         if (me.node) {
             if (CC_PREVIEW || cc.sys.platform == cc.sys.WECHAT_GAME) {
                 me.recordHeight();
@@ -178,7 +175,7 @@ export class Adaptor {
             else {
 
                 if (me.isShowKeyboard) {
-                    //cc.log(`键盘显示，不做重新适配处理`);
+                    //Log.d(`键盘显示，不做重新适配处理`);
                     me.recordHeight();
                     return;
                 }
@@ -190,7 +187,7 @@ export class Adaptor {
                     if (me.landscapeHeight != 0) {
                         offsetY = me.landscapeHeight - height;//Math.abs(me.landscapeHeight - height);
                         if (me.isFirstResize) {
-                            if (CC_DEBUG) cc.log(me._logTag, `在有导行条情况下进行刷新操作`);
+                            if (CC_DEBUG) Log.d(me._logTag, `在有导行条情况下进行刷新操作`);
                             me.waitScorllY = offsetY;
                             me.doAdapt();
                             me.isFirstResize = false;
@@ -200,7 +197,7 @@ export class Adaptor {
                 }
 
                 if (isHideKeyboard && me.dviceDirection == "Landscape") {
-                    //cc.log(`maxHeigth : ${me._maxLandscapeHeight} curHeigth : ${me.landscapeHeight}`);
+                    //Log.d(`maxHeigth : ${me._maxLandscapeHeight} curHeigth : ${me.landscapeHeight}`);
                     me.waitScorllY = Math.abs(me._maxLandscapeHeight - me.landscapeHeight);
                 }
 
@@ -209,21 +206,21 @@ export class Adaptor {
 
                 setTimeout(() => {
                     if (me.isShowKeyboard) {
-                        //cc.log(`键盘显示11，不做重新适配处理`);
+                        //Log.d(`键盘显示11，不做重新适配处理`);
                         return;
                     }
                     if (me.dviceDirection == "Landscape") {
                         me.recordHeight();
-                        cc.log(`cur scrolly : ${window.scrollY}`);
+                        Log.d(`cur scrolly : ${window.scrollY}`);
                         if (window.scrollY > 0 || me.isSafari) {
-                            if (CC_DEBUG) cc.log(me._logTag, me.dviceDirection);
+                            if (CC_DEBUG) Log.d(me._logTag, me.dviceDirection);
                             if (me.isSafari) {
                                 //在safari浏览器下，做一个强制移动，让浏览器的导行条显示出来,不然在ios13之前，最顶部分按钮无法点击
                                 me.waitScorllY = window.scrollY > 0 ? -window.scrollY : -50;
                             } else {
                                 me.waitScorllY = -window.scrollY;
                             }
-                            if (CC_DEBUG) cc.log(me._logTag, `scrollY : ${me.waitScorllY}`);
+                            if (CC_DEBUG) Log.d(me._logTag, `scrollY : ${me.waitScorllY}`);
                             me.doAdapt();
                         } else {
                             me.doAdapt();
@@ -245,7 +242,7 @@ export class Adaptor {
         if (me.canvas) {
             if (me.waitScorllY != null) {
                 let top = me.waitScorllY;
-                if (CC_DEBUG) cc.log(me._logTag, `scroll top : ${top}`);
+                if (CC_DEBUG) Log.d(me._logTag, `scroll top : ${top}`);
                 if (window.scrollTo) {
                     window.scrollTo(0, top);
                 }
@@ -255,7 +252,7 @@ export class Adaptor {
             me.doChangeResolution();
         }
         else {
-            if (CC_DEBUG) cc.log(me._logTag, `等待场景加载完成做适配`);
+            if (CC_DEBUG) Log.d(me._logTag, `等待场景加载完成做适配`);
         }
     }
 
@@ -312,19 +309,19 @@ export class Adaptor {
             design = 1 / design;
             rate = 1 / rate;
         }
-        if (CC_DEBUG) cc.log(me._logTag, `design : ${design} real : ${rate}`);
+        if (CC_DEBUG) Log.d(me._logTag, `design : ${design} real : ${rate}`);
 
         me.screenAdaptType = ScreenAdaptType.None;
         if (design == rate) {
             //相等比率，
-            if (CC_DEBUG) cc.log(me._logTag, `相等比率`);
+            if (CC_DEBUG) Log.d(me._logTag, `相等比率`);
         } else if (rate < design) {
             me.screenAdaptType = ScreenAdaptType.Decrease;
-            if (CC_DEBUG) cc.log(me._logTag, `当前设计比率大于实际比率，按宽进行适配，上下有黑边`);
+            if (CC_DEBUG) Log.d(me._logTag, `当前设计比率大于实际比率，按宽进行适配，上下有黑边`);
         } else {
-            if (CC_DEBUG) cc.log(me._logTag, `当前设计比率小于实际比率，将会对支持全屏的界面进行重重布局`);
+            if (CC_DEBUG) Log.d(me._logTag, `当前设计比率小于实际比率，将会对支持全屏的界面进行重重布局`);
             if (rate >= me.MAX_RATE) {
-                if (CC_DEBUG) cc.log(me._logTag, `超过上限比率，按最大值来`)
+                if (CC_DEBUG) Log.d(me._logTag, `超过上限比率，按最大值来`)
                 me.screenAdaptType = ScreenAdaptType.Max;
             } else {
                 me.screenAdaptType = ScreenAdaptType.Increase;

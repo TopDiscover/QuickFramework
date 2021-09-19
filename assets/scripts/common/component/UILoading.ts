@@ -53,7 +53,7 @@ export default class UILoading {
         let finish = await this.loadPrefab();
         if (finish) {
             this._node.removeFromParent();
-            Manager.uiManager.addChild(this._node,ViewZOrder.UILoading);
+            Manager.uiManager.addView(this._node,ViewZOrder.UILoading);
             this._node.position = cc.Vec3.ZERO;
             this.content = cc.find("content", this._node);
             cc.Tween.stopAllByTarget(this.content);

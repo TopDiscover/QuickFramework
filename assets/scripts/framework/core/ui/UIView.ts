@@ -1,5 +1,6 @@
 import EventComponent from "../../componects/EventComponent";
 import AudioComponent from "../../componects/AudioComponent";
+import { Macro } from "../../defines/Macros";
 
 /**
  * @description 视图基类
@@ -17,9 +18,9 @@ export default class UIView extends EventComponent implements IFullScreenAdapt {
 
     public static getPrefabUrl(): string {
         if (CC_DEBUG) {
-            cc.error(`请求实现public static getPrefabUrl`);
+            Log.e(`请求实现public static getPrefabUrl`);
         }
-        return "unknown";
+        return Macro.UNKNOWN;
     }
 
     /**@description init代码参数 */
@@ -27,6 +28,9 @@ export default class UIView extends EventComponent implements IFullScreenAdapt {
     /**@description 当前传入参数，即通过UI管理器打开时的传入参数 */
     public get args() {
         return this._args;
+    }
+    public set args(args) {
+        this._args = args;
     }
 
     /**

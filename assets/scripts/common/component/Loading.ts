@@ -67,7 +67,7 @@ export default class Loading {
         let finish = await this.loadPrefab();
         if (finish) {
             this._node.removeFromParent();
-            Manager.uiManager.addChild(this._node,ViewZOrder.Loading);
+            Manager.uiManager.addView(this._node,ViewZOrder.Loading);
             this._node.position = cc.Vec3.ZERO;
             this._text = cc.find("content/text",this._node).getComponent(cc.Label);
             this._showContentIndex = 0;

@@ -1,5 +1,4 @@
 import { HotUpdate } from "../hotupdate/Hotupdate";
-import GameView from "../ui/GameView";
 import { EntryDelegate } from "./EntryDelegate";
 
 /**@description 入口管理 */
@@ -20,7 +19,7 @@ export class EntryManager {
         let index = this._entryTypes.indexOf(entryClass);
         if (index != -1) {
             if (CC_DEBUG) {
-                cc.error(`${this.tag}重复添加 : ${entryClass.bundle}`);
+                Log.e(`${this.tag}重复添加 : ${entryClass.bundle}`);
             }
             return;
         }
@@ -43,7 +42,7 @@ export class EntryManager {
             if (!this.isRunning(type)) {
                 //如果当前entry没有运行,执行它
                 let entry = new type();
-                cc.log(`${this.tag}添加${entry.bundle}入口程序!!!`);
+                Log.d(`${this.tag}添加${entry.bundle}入口程序!!!`);
                 entry.bundle = type.bundle;
                 entry.onLoad(this.node);
                 if( type.isMain ){
@@ -70,12 +69,19 @@ export class EntryManager {
         this.delegate.onCheckUpdate();
     }
 
+    call(bundle:BUNDLE_TYPE,eventName:string,...args:any[]){
+        let entry = this.getEntry(bundle);
+        if( entry ){
+            entry.call(eventName,args);
+        }
+    }
+
     /**
      * @description 进入bundle,默认代理没办法满足需求的情况，可自行定制 
      * @param bundle bundle
      * @param isQuitGame 是否退出游戏，bundel为主包时有效果
      **/
-    enterBundle(bundle:BUNDLE_TYPE,isQuitGame:boolean = false) {
+    enterBundle(bundle:BUNDLE_TYPE,isQuitGame : boolean = false) {
         let config = this.delegate.getEntryConfig(bundle);
         if ( config ){
             if( isQuitGame ){
@@ -97,24 +103,32 @@ export class EntryManager {
     }
 
     /**@description 进入GameView完成，卸载除了自己之外的其它bundle */
-    onEnterBundleComplete( bundle : BUNDLE_TYPE , gameView : GameView ){
+    onEnterGameView( bundle : BUNDLE_TYPE , gameView : GameView ){
         let entry = this.getEntry(bundle);
         if( entry ){
-            entry.onEnterComplete();
+            entry.onEnterGameView(gameView);
         }
-        this.delegate.onEnterBundleComplete(entry,gameView);
+        this.delegate.onEnterGameView(entry,gameView);
     }
 
     /**@description bundle管事器卸载bundle前通知 */
-    onUnloadBundle( bundle : BUNDLE_TYPE ){
+    onUnloadBundle( bundle : BUNDLE_TYPE){
         let entry = this.getEntry(bundle);
         if ( entry ){
             entry.onUnloadBundle();
         }
     }
 
+    onDestroyGameView(bundle: BUNDLE_TYPE, gameView: GameView) {
+        let entry = this.getEntry(bundle);
+        if ( entry ){
+            entry.onUnloadBundle();
+            entry.onDestroyGameView(gameView);
+        }
+    }
+
     /**@description 获取bundle入口 */
-    private getEntry( bundle : BUNDLE_TYPE ){
+    getEntry( bundle : BUNDLE_TYPE ){
         for ( let i = 0 ; i < this._entrys.length ; i++){
             let entry = this._entrys[i];
             if ( entry && entry.bundle == bundle ){

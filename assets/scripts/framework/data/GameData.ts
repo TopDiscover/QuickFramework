@@ -1,19 +1,13 @@
+import { Macro } from "../defines/Macros";
 
 /**@description 游戏内数据的公共基类 */
-export class GameData{
-
-    /**@description 当前的asset bundle name */
-    public get bundle(){
-        return "";
-    }
+export abstract class GameData{
+    static bundle = Macro.UNKNOWN;
+    /**@description 数据所有bundle，由数据中心设置 */
+    bundle : string = "";
 
     /**@description 清除数据 */
-    public clear(){
+    clear(){
 
-    }
-
-    /**@description 游戏类型 */
-    public gameType(){
-        return -1;
     }
 }

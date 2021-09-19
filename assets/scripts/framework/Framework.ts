@@ -7,17 +7,33 @@ import { NodePoolManager } from "./core/nodePool/NodePoolManager";
 import { HotupdateManager } from "./core/hotupdate/HotupdateManager";
 import { NetManager } from "./core/net/service/NetManager";
 import { BundleManager } from "./core/asset/BundleManager";
-import GameView from "./core/ui/GameView";
-import { GameData } from "./data/GameData";
 import { CocosExtentionInit } from "./plugin/CocosExtention";
 import { Language } from "./core/language/Language";
 import { Macro } from "./defines/Macros";
 import { Adaptor } from "./core/adaptor/Adaptor";
 import { ProtoManager } from "./core/net/service/ProtoManager";
 import { EntryManager } from "./core/entry/EntryManager";
+import { DataCenter } from "./data/DataCenter";
+import { LogicManager } from "./core/logic/LogicManager";
+import { LoggerImpl } from "./core/log/Logger";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
+
+    /**@description 日志 */
+    get logger(){
+        return getSingleton(LoggerImpl);
+    }
+
+    /**@description 逻辑管理器 */
+    get logicManager(){
+        return getSingleton(LogicManager);
+    }
+
+    /**@description 数据中心 */
+    get dataCenter(){
+        return getSingleton(DataCenter);
+    }
 
     /**@description 入口管理器 */
     get entryManager(){
@@ -116,8 +132,9 @@ export class Framewok {
     /**@description 当前游戏GameView, GameView进入onLoad赋值 */
     gameView: GameView | null = null;
 
-    /**@description 游戏数据 */
-    gameData: GameData | null = null;
+    getGameView<T extends GameView>(){
+        return <T>this.gameView;
+    }
 
     /**@description 游戏控制器，在自己的模块内写函数有类型化读取,此值在Logic.addNetComponent赋值
      * @example 
@@ -184,7 +201,7 @@ export class Framewok {
             }
             return this.language.get(param);
         }
-        cc.error(`传入参数有误`);
+        Log.e(`传入参数有误`);
         return "";
     }
 

@@ -19,7 +19,7 @@ type fn = (data: any) => void
 @ccclass
 export default class EventComponent extends cc.Component {
 
-    protected _service: Service = null;
+    protected _service: Service | null = null;
     protected logTag = `[EventComponent]`;
 
     private _events: EventArgs[] = [];
@@ -76,7 +76,7 @@ export default class EventComponent extends cc.Component {
     [addListeners]() {
         for (let i = 0; i < this._events.length; i++) {
             let event = this._events[i];
-            Manager.eventDispatcher.addEventListener(event.name, event.func, this);
+            Manager.eventDispatcher.addEventListener(event.name as string, event.func, this);
         }
     }
 

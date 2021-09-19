@@ -1,9 +1,6 @@
-import { setClassName } from "../../../decorator/Decorators";
-
 /**
  * @description 网络控制器管理器
  */
-@setClassName()
 export class NetManager {
     private name = "";
     constructor(name: string) {
@@ -24,7 +21,7 @@ export class NetManager {
     public register(controllerType: any) {
         for (let i = 0; i < this.types.length; i++) {
             if (this.types[i] == controllerType) {
-                cc.error(this.name, `重复添加${cc.js.getClassName(controllerType)}`);
+                Log.e(this.name, `重复添加${cc.js.getClassName(controllerType)}`);
                 return;
             }
         }
@@ -55,5 +52,5 @@ export class NetManager {
         }
     }
     /**@description 注册的网络控制器组件类型 */
-    private types = [];
+    private types : any[] = [];
 }

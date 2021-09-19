@@ -24,12 +24,11 @@ class EliminateEntry extends Entry {
             res.push({ url: EFFECTS_CONFIG.colBomb.url, type: cc.Prefab, bundle: this.bundle });
             return res;
         };
-        this.loader.onLoadProgress = (err: Resource.LoaderError) => {
-            if (err == Resource.LoaderError.LOADING) {
-                return;
+        this.loader.onLoadComplete = (err)=>{
+            if ( err = Resource.LoaderError.SUCCESS){
+                Manager.loading.hide();
+                completeCb();
             }
-            Manager.loading.hide();
-            completeCb();
         };
         this.loader.loadResources();
     }

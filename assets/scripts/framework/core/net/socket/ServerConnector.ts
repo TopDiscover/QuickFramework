@@ -24,9 +24,7 @@ export abstract class ServerConnector {
     /**
      * @description 发送心跳
      */
-    protected sendHeartbeat() {
-        if (CC_DEBUG) cc.error(`请重写sendHeartbeat`);
-    }
+    protected abstract sendHeartbeat();
 
     /**
      * @description 获取最大心跳超时的次数
@@ -116,7 +114,7 @@ export abstract class ServerConnector {
      */
     public connect_server(ip: string, port: number | string | null = null, protocol: Net.Type = "wss") {
         if (!this.enabled) {
-            if (CC_DEBUG) cc.warn(`请求先启用`)
+            if (CC_DEBUG) Log.w(`请求先启用`)
             return;
         }
         if (port) {

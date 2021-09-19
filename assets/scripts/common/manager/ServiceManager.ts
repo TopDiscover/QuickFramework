@@ -7,7 +7,7 @@ import { Config } from "../config/Config";
 import { CommonService } from "../net/CommonService";
 export class ServiceManager implements GameEventInterface {
 
-    private static _instance: ServiceManager = null;
+    private static _instance: ServiceManager = null!;
     public static Instance() { return this._instance || (this._instance = new ServiceManager()); }
 
     private services: CommonService[] = [];
@@ -79,7 +79,7 @@ export class ServiceManager implements GameEventInterface {
     /**@description 尝试重连 */
     tryReconnect(service: CommonService, isShowTips: boolean = false) {
         if (!service) {
-            cc.error(`service is null`);
+            Log.e(`service is null`);
             return;
         }
         if (!service.enabled || !service.reconnect.enabled) {
@@ -91,13 +91,13 @@ export class ServiceManager implements GameEventInterface {
             Manager.uiManager.getView("LoginView").then((view) => {
                 if (view) return;
                 service.reconnect.hide();
-                cc.log(`${service.serviceName} 断开`)
+                Log.d(`${service.serviceName} 断开`)
                 let current = Manager.alert.currentShow(Config.RECONNECT_ALERT_TAG);
                 if (current) {
                     let showService: CommonService = current.userData;
                     if (service.priority > showService.priority) {
                         //如果尝试连接的优先级更高，显示优先级更高的连接
-                        cc.log(`显示更新优先级重连弹出框 : ${service.serviceName}`);
+                        Log.d(`显示更新优先级重连弹出框 : ${service.serviceName}`);
                         Manager.alert.close(Config.RECONNECT_ALERT_TAG);
                     }
                 }
@@ -110,19 +110,19 @@ export class ServiceManager implements GameEventInterface {
                         if (isOK) {
                             service.reconnect.show();
                         } else {
-                            cc.log(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
+                            Log.d(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
                             Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
                         }
                     },
                     cancelCb: () => {
-                        cc.log(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
+                        Log.d(`${service.serviceName} 玩家网络不好，不重连，退回到登录界面`);
                         Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
                     }
                 });
             });
         } else {
             if (Manager.alert.isCurrentShow(Config.RECONNECT_ALERT_TAG)) {
-                if (CC_DEBUG) cc.warn(`有一个重连提示框显示，等待玩家操作`);
+                if (CC_DEBUG) Log.w(`有一个重连提示框显示，等待玩家操作`);
                 return;
             }
             let prev: CommonService = null!;

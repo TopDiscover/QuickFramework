@@ -76,8 +76,8 @@ class _BitEncrypt {
             }
             return newContent;
 
-        }else{
-            if (CC_DEBUG) cc.error(BitEncrypt.logTag, `encode/decode error content : ${content} key : ${key}`);
+        } else {
+            if (CC_DEBUG) Log.e(BitEncrypt.logTag, `encode/decode error content : ${content} key : ${key}`);
             return content;
         }
     }

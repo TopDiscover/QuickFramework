@@ -1,6 +1,7 @@
 import EventComponent from "./scripts/framework/componects/EventComponent";
 import { Config } from "./scripts/common/config/Config";
 import { HotUpdate } from "./scripts/framework/core/hotupdate/Hotupdate";
+import { DebugView } from "./scripts/common/debug/DebugView";
 /**
  * @description 主控制器 
  */
@@ -23,42 +24,35 @@ export default class MainController extends EventComponent {
         Manager.onHotupdateMessage(data);
     }
 
+    private debugView : cc.Node | null = null!;
+
     onLoad() {
         super.onLoad();
         Manager.onLoad(this.node);
         if (this.wssCacert) {
             Manager.wssCacertUrl = this.wssCacert.nativeUrl;
         }
-        //调试按钮事件注册
-        let showUI = cc.find("showUI", this.node);
-        let showNode = cc.find("showNode", this.node);
-        let showRes = cc.find("showRes", this.node);
-        let showComp = cc.find("showComponent", this.node);
-        if (showUI && showNode && showRes && showComp) {
-            showUI.zIndex = 9999;
-            showNode.zIndex = 9999;
-            showRes.zIndex = 9999;
-            showComp.zIndex = 9999;
-            let isShow = false;
-            if (Config.isShowDebugButton) {
-                isShow = true;
-                showUI.on(cc.Node.EventType.TOUCH_END, () => {
-                    Manager.uiManager.printViews();
+        let debug = cc.find("debug", this.node);
+        this.debugView = cc.find("debugView",this.node);
+        if (debug&&this.debugView) {
+            if ( Config.isShowDebugButton ){
+                debug.active = true;
+                let view = this.debugView.addComponent(DebugView)
+                if ( view ){
+                    view.debug = debug;
+                }
+                this.debugView.active = false;
+                debug.on(cc.Node.EventType.TOUCH_END,()=>{
+                    if ( debug ) debug.active = false;
+                    if ( this.debugView ){
+                        this.debugView.active = true;
+                    }
                 });
-                showNode.on(cc.Node.EventType.TOUCH_END, () => {
-                    Manager.uiManager.printCanvasChildren();
-                });
-                showRes.on(cc.Node.EventType.TOUCH_END, () => {
-                    Manager.cacheManager.printCaches();
-                });
-                showComp.on(cc.Node.EventType.TOUCH_END, () => {
-                    Manager.uiManager.printComponent();
-                });
+            }else{
+                debug.destroy();
+                this.debugView.destroy();
             }
-            showUI.active = isShow;
-            showNode.active = isShow;
-            showRes.active = isShow;
-            showComp.active = isShow;
+            
         }
         //游戏事件注册
         cc.game.on(cc.game.EVENT_HIDE, this.onEnterBackground, this);

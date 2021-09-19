@@ -50,9 +50,9 @@ export class HotupdateManager {
             let content = jsb.fileUtils.getStringFromFile(this.hallProjectMainfest);
             try {
                 this._projectManifest = JSON.parse(content);
-            } catch (error) {
+            } catch (err) {
                 this._projectManifest = null;
-                cc.error(`读取${this.hallProjectMainfest}失败`);
+                Log.e(`读取${this.hallProjectMainfest}失败`);
             }
         }
         return this._projectManifest as any;
@@ -96,7 +96,7 @@ export class HotupdateManager {
     /**@description 释放资源管理器，默认为hall 大厅资源管理器 */
     private destroyAssetsManager(name: string = MAIN_PACK) {
         if (this.assetsManagers[name]) {
-            cc.log("destroyAssetsManager : " + name);
+            Log.d("destroyAssetsManager : " + name);
             this.currentAssetsManager = <any>null;
             delete this.assetsManagers[name];
         }
@@ -110,11 +110,10 @@ export class HotupdateManager {
             //初始化资源管理器
             if (CC_JSB) {
                 this.storagePath = jsb.fileUtils.getWritablePath();
-                cc.log(`Storage path for remote asset : ${this.storagePath}`);
+                Log.d(`Storage path for remote asset : ${this.storagePath}`);
                 this.assetsManagers[name] = new AssetsManager(name);
                 this.assetsManagers[name].manager = new jsb.AssetsManager(name == MAIN_PACK ? `type.${MAIN_PACK}` : `type.${name}_`, this.storagePath, this.versionCompareHanle.bind(this));
                 //设置下载并发量
-                this.assetsManagers[name].manager.setMaxConcurrentTask(8);
                 this.assetsManagers[name].manager.setHotUpdateUrl(this.getHotUpdateUrl(name));
                 this.assetsManagers[name].manager.setVerifyCallback(function (path, asset) {
                     let compressed = asset.compressed;
@@ -122,15 +121,15 @@ export class HotupdateManager {
                     let relativePath = asset.path;
                     let size = asset.size;
                     if (compressed) {
-                        cc.log(`Verification passed : ${relativePath}`);
+                        Log.d(`Verification passed : ${relativePath}`);
                         return true;
                     }
                     else {
-                        cc.log(`Verification passed : ${relativePath} ( ${expectedMD5} )`);
+                        Log.d(`Verification passed : ${relativePath} ( ${expectedMD5} )`);
                         return true;
                     }
                 });
-                cc.log(`Hot update is ready , please check or directly update.`);
+                Log.d(`Hot update is ready , please check or directly update.`);
             }
             return this.assetsManagers[name];
         }
@@ -162,7 +161,7 @@ export class HotupdateManager {
             return false;
         }else{
             if( this.isSkipCheckUpdate ){
-                cc.log("跳过热更新，直接使用本地资源代码");
+                Log.d("跳过热更新，直接使用本地资源代码");
                 this.updating = false;
                 callback(HotUpdate.Code.ALREADY_UP_TO_DATE, HotUpdate.State.UP_TO_DATE);
             }
@@ -173,20 +172,20 @@ export class HotupdateManager {
     /**@description 检测更新 */
     private _checkUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
         if( this.isNeedUpdate(callback) ){
-            cc.log(`--checkUpdate--`);
+            Log.d(`--checkUpdate--`);
             if (this.updating) {
-                cc.log(`Checking or updating...`);
+                Log.d(`Checking or updating...`);
                 callback(HotUpdate.Code.CHECKING, HotUpdate.State.PREDOWNLOAD_VERSION);
                 return;
             }
             if (!this.currentAssetsManager.manager.getLocalManifest() || !this.currentAssetsManager.manager.getLocalManifest().isLoaded()) {
-                cc.log(`Failed to load local manifest ....`);
+                Log.d(`Failed to load local manifest ....`);
                 callback(HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST, HotUpdate.State.FAIL_TO_UPDATE);
                 return;
             }
             if (this.isTryDownloadFailedAssets()) {
                 //已经更新失败，尝试获取更新下载失败的
-                cc.log(`之前下载资源未完全下载完成，请尝试重新下载`);
+                Log.d(`之前下载资源未完全下载完成，请尝试重新下载`);
                 callback(HotUpdate.Code.UPDATE_FAILED, HotUpdate.State.TRY_DOWNLOAD_FAILED_ASSETS);
             } else {
                 this.updating = true;
@@ -248,14 +247,14 @@ export class HotupdateManager {
                 //存在版本控制文件 
                 let content = jsb.fileUtils.getStringFromFile(manifestUrl);
                 let jsbGameManifest = new jsb.Manifest(content, this.storagePath, this.getHotUpdateUrl(this.currentAssetsManager.name));
-                cc.log(`--存在本地版本控制文件checkUpdate--`);
-                cc.log(`mainifestUrl : ${manifestUrl}`);
+                Log.d(`--存在本地版本控制文件checkUpdate--`);
+                Log.d(`mainifestUrl : ${manifestUrl}`);
                 this.currentAssetsManager.manager.loadLocalManifest(jsbGameManifest, "");
                 this._checkUpdate(callback);
             } else {
                 //不存在版本控制文件 ，生成一个初始版本
                 if (this.updating) {
-                    cc.log(`Checking or updating...`);
+                    Log.d(`Checking or updating...`);
                     callback(HotUpdate.Code.CHECKING, HotUpdate.State.PREDOWNLOAD_VERSION);
                     return;
                 }
@@ -271,8 +270,8 @@ export class HotupdateManager {
                 };
                 let gameManifestContent = JSON.stringify(gameManifest);
                 let jsbGameManifest = new jsb.Manifest(gameManifestContent, this.storagePath, this.getHotUpdateUrl(this.currentAssetsManager.name));
-                cc.log(`--checkUpdate--`);
-                cc.log(`mainifest content : ${gameManifestContent}`);
+                Log.d(`--checkUpdate--`);
+                Log.d(`mainifest content : ${gameManifestContent}`);
                 this.currentAssetsManager.manager.loadLocalManifest(jsbGameManifest, "");
                 this._checkUpdate(callback);
             }
@@ -286,20 +285,20 @@ export class HotupdateManager {
         //this.checkCallback = null;
         //存储当前的状态，当下载版本文件失败时，state的状态与下载非版本文件是一样的状态
         this.currentAssetsManager.code = event.getEventCode();
-        cc.log(`checkCb event code : ${event.getEventCode()} state : ${this.currentAssetsManager.manager.getState()}`);
+        Log.d(`checkCb event code : ${event.getEventCode()} state : ${this.currentAssetsManager.manager.getState()}`);
         switch (event.getEventCode()) {
             case HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST:
-                cc.log(`No local manifest file found, hot update skipped.`);
+                Log.d(`No local manifest file found, hot update skipped.`);
                 break;
             case HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST:
             case HotUpdate.Code.ERROR_PARSE_MANIFEST:
-                cc.log(`Fail to download manifest file, hot update skipped.`);
+                Log.d(`Fail to download manifest file, hot update skipped.`);
                 break;
             case HotUpdate.Code.ALREADY_UP_TO_DATE:
-                cc.log(`Already up to date with the latest remote version.`);
+                Log.d(`Already up to date with the latest remote version.`);
                 break;
             case HotUpdate.Code.NEW_VERSION_FOUND:
-                cc.log(`New version found, please try to update.`);
+                Log.d(`New version found, please try to update.`);
                 break;
             default:
                 return;
@@ -318,12 +317,12 @@ export class HotupdateManager {
     /**@description 执行热更新*/
     hotUpdate() {
         if (!this.currentAssetsManager) {
-            cc.error(`热更新管理器未初始化`);
+            Log.e(`热更新管理器未初始化`);
             return;
         }
-        cc.log(`即将热更新模块为:${this.currentAssetsManager.name} , updating : ${this.updating}`);
+        Log.d(`即将热更新模块为:${this.currentAssetsManager.name} , updating : ${this.updating}`);
         if (!this.updating) {
-            cc.log(`执行更新 ${this.currentAssetsManager.name} `);
+            Log.d(`执行更新 ${this.currentAssetsManager.name} `);
             this.currentAssetsManager.manager.setEventCallback(this.updateCb.bind(this));
             this.currentAssetsManager.manager.update();
         }
@@ -333,46 +332,46 @@ export class HotupdateManager {
     private updateCb(event:any) {
         var isUpdateFinished = false;
         var failed = false;
-        cc.log(`--update cb code : ${event.getEventCode()} state : ${this.currentAssetsManager.manager.getState()}`);
+        Log.d(`--update cb code : ${event.getEventCode()} state : ${this.currentAssetsManager.manager.getState()}`);
         //存储当前的状态，当下载版本文件失败时，state的状态与下载非版本文件是一样的状态
         this.currentAssetsManager.code = event.getEventCode();
         switch (event.getEventCode()) {
             case HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST:
-                cc.log(`No local manifest file found, hot update skipped.`);
+                Log.d(`No local manifest file found, hot update skipped.`);
                 failed = true;
                 break;
             case HotUpdate.Code.UPDATE_PROGRESSION:
-                cc.log(`${event.getDownloadedBytes()} / ${event.getTotalBytes()}`);
-                cc.log(`${event.getDownloadedFiles()} / ${event.getTotalFiles()}`);
-                cc.log(`percent : ${event.getPercent()}`);
-                cc.log(`percent by file : ${event.getPercentByFile()}`);
+                Log.d(`${event.getDownloadedBytes()} / ${event.getTotalBytes()}`);
+                Log.d(`${event.getDownloadedFiles()} / ${event.getTotalFiles()}`);
+                Log.d(`percent : ${event.getPercent()}`);
+                Log.d(`percent by file : ${event.getPercentByFile()}`);
                 var msg = event.getMessage();
                 if (msg) {
-                    cc.log(`Updated file: ${msg}`);
+                    Log.d(`Updated file: ${msg}`);
                 }
                 break;
             case HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST:
             case HotUpdate.Code.ERROR_PARSE_MANIFEST:
-                cc.log(`Fail to download manifest file, hot update skipped.`);
+                Log.d(`Fail to download manifest file, hot update skipped.`);
                 failed = true;
                 break;
             case HotUpdate.Code.ALREADY_UP_TO_DATE:
-                cc.log(`Already up to date with the latest remote version.`);
+                Log.d(`Already up to date with the latest remote version.`);
                 failed = true;
                 break;
             case HotUpdate.Code.UPDATE_FINISHED:
-                cc.log(`Update finished. ${event.getMessage()}`);
+                Log.d(`Update finished. ${event.getMessage()}`);
                 isUpdateFinished = true;
                 break;
             case HotUpdate.Code.UPDATE_FAILED:
-                cc.log(`Update failed. ${event.getMessage()}`);
+                Log.d(`Update failed. ${event.getMessage()}`);
                 this.updating = false;
                 break;
             case HotUpdate.Code.ERROR_UPDATING:
-                cc.log(`Asset update error: ${event.getAssetId()} , ${event.getMessage()}`);
+                Log.d(`Asset update error: ${event.getAssetId()} , ${event.getMessage()}`);
                 break;
             case HotUpdate.Code.ERROR_DECOMPRESS:
-                cc.log(`${event.getMessage()}`);
+                Log.d(`${event.getMessage()}`);
                 break;
             default:
                 break;
@@ -386,7 +385,7 @@ export class HotupdateManager {
             //下载完成,需要重新设置搜索路径，添加下载路径
             var searchPaths: string[] = jsb.fileUtils.getSearchPaths();
             var newPaths: string[] = this.currentAssetsManager.manager.getLocalManifest().getSearchPaths();
-            cc.log(JSON.stringify(newPaths));
+            Log.d(JSON.stringify(newPaths));
             Array.prototype.unshift.apply(searchPaths, newPaths);
 
             //这里做一个搜索路径去重处理
@@ -415,7 +414,7 @@ export class HotupdateManager {
         } else {
             //子游戏更新
             if (isUpdateFinished) {
-                cc.log(`${this.currentAssetsManager.name} 下载资源数 : ${event.getDownloadedFiles()}`)
+                Log.d(`${this.currentAssetsManager.name} 下载资源数 : ${event.getDownloadedFiles()}`)
                 //下载完成 删除资源管理器
                 this.destroyAssetsManager(this.currentAssetsManager.name);
             }
@@ -435,14 +434,14 @@ export class HotupdateManager {
 
         dispatch(HotUpdate.Event.HOTUPDATE_DOWNLOAD,info)
 
-        cc.log(`update cb  failed : ${failed}  , need restart : ${isUpdateFinished} , updating : ${this.updating}`);
+        Log.d(`update cb  failed : ${failed}  , need restart : ${isUpdateFinished} , updating : ${this.updating}`);
     }
 
     private versionCompareHanle(versionA: string, versionB: string) {
-        cc.log(`JS Custom Version Compare : version A is ${versionA} , version B is ${versionB}`);
+        Log.d(`JS Custom Version Compare : version A is ${versionA} , version B is ${versionB}`);
         let vA = versionA.split('.');
         let vB = versionB.split('.');
-        cc.log(`version A ${vA} , version B ${vB}`);
+        Log.d(`version A ${vA} , version B ${vB}`);
         for (let i = 0; i < vA.length && i < vB.length; ++i) {
             let a = parseInt(vA[i]);
             let b = parseInt(vB[i]);

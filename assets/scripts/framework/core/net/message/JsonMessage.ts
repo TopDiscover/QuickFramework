@@ -55,7 +55,7 @@ export abstract class JsonMessage extends Message {
             let [memberName] = __serialize__[serializeKey];
             let serializeObj = this.serializeMember((<any>this)[memberName]);
             if (null === serializeObj) {
-                cc.warn("Invalid serialize member : " + memberName);
+                Log.w("Invalid serialize member : " + memberName);
             }
             result[serializeKey] = serializeObj;
         }
@@ -78,7 +78,7 @@ export abstract class JsonMessage extends Message {
         } else if (value instanceof JsonMessage) {
             return value.serialize();
         } else {
-            cc.warn("Invalid serialize value : " + value);
+            Log.w("Invalid serialize value : " + value);
             return null;
         }
     }
@@ -108,11 +108,11 @@ export abstract class JsonMessage extends Message {
         value.forEach((value, key) => {
             let serVal = { k: self.serializeMember(key), v: self.serializeMember(value) };
             if (null === serVal.k) {
-                cc.warn("Invalid map key!");
+                Log.w("Invalid map key!");
                 serVal.k = '';
             }
             if (null === serVal.v) {
-                cc.warn("Invalid map value");
+                Log.w("Invalid map value");
                 serVal.v = '';
             }
             result.push(serVal);
@@ -149,7 +149,7 @@ export abstract class JsonMessage extends Message {
             let [memberName, memberType, arrOrmapKeyType, mapValType] = __serializeInfo[serializeKey];
             let iscomplete = this.deserializeMember(memberName, memberType, arrOrmapKeyType, mapValType, data[serializeKey]);
             if (!iscomplete) {
-                cc.warn("Invalid deserialize member :" + memberName);
+                Log.w("Invalid deserialize member :" + memberName);
                 return false;
             }
         }
@@ -188,19 +188,19 @@ export abstract class JsonMessage extends Message {
                         if ((<any>this)[memberName] instanceof JsonMessage) {
                             (<any>this)[memberName].deserialize(value);
                         } else {
-                            cc.warn("Invalid deserialize member :" + memberName + " value:" + originValue);
+                            Log.w("Invalid deserialize member :" + memberName + " value:" + originValue);
                             return false;
                         }
                     } break;
                 }
             } else {
-                cc.warn("Invalid deserialize member : " + memberName + " value:" + originValue);
+                Log.w("Invalid deserialize member : " + memberName + " value:" + originValue);
                 return false;
             }
             return true;
-        } catch (error) {
-            cc.warn(error.message);
-            (<any>this)[memberName] = error.data || null;
+        } catch (err:any) {
+            Log.w(err.message);
+            (<any>this)[memberName] = err.data || null;
             return false;
         }
     }

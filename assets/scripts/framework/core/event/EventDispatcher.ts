@@ -82,10 +82,10 @@ export class EventDispatcher {
                     if (typeof event.callback == "string") {
                         let func = Reflect.get(event.target, event.callback);
                         if (func) {
-                            if (CC_DEBUG) cc.log(`${this.logTag} apply string func : ${event.callback} class : ${cc.js.getClassName(event.target)}`);
+                            if (CC_DEBUG) Log.d(`${this.logTag} apply string func : ${event.callback} class : ${cc.js.getClassName(event.target)}`);
                             Reflect.apply(func.bind(event.target), event.target, [data]);
                         } else {
-                            if (CC_DEBUG) cc.error(`${this.logTag} class : ${cc.js.getClassName(event.target)} no func : ${event.callback}`);
+                            if (CC_DEBUG) Log.e(`${this.logTag} class : ${cc.js.getClassName(event.target)} no func : ${event.callback}`);
                         }
                     }
                     else {
@@ -98,28 +98,29 @@ export class EventDispatcher {
                             if (func && typeof func == "function") {
                                 func.apply(event.target, [data]);
                             } else {
-                                if (CC_DEBUG) cc.error(`${event.callback} is not function`);
+                                if (CC_DEBUG) Log.e(`${event.callback} is not function`);
                             }
                         } else {
-                            if (CC_DEBUG) cc.error(`target or callback is null`);
+                            if (CC_DEBUG) Log.e(`target or callback is null`);
                         }
                     } else {
                         if (event.callback && event.target) {
                             event.callback.apply(event.target, [data]);
                         } else {
-                            if (CC_DEBUG) cc.error(`callback is null`);
+                            if (CC_DEBUG) Log.e(`callback is null`);
                         }
                     }
                 }
 
-            } catch (error) {
-                cc.error(error);
+            } catch (err) {
+                Log.e(err);
             }
         }
     }
 }
+
 window.dispatch = function (name: string, data?: any) {
-    if (CC_DEBUG && !CC_EDITOR) cc.log(`[dispatch] ${name} data : ${data}`);
+    if (CC_DEBUG && !CC_EDITOR) Log.d(`[dispatch] ${name} data : ${data}`);
     //向自己封闭的管理器中也分发
-    Manager.eventDispatcher.dispatchEvent(name, data);
+    EventDispatcher.Instance().dispatchEvent(name, data);
 }

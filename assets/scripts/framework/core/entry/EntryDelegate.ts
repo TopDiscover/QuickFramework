@@ -1,6 +1,5 @@
 import { Macro } from "../../defines/Macros";
 import { HotUpdate } from "../hotupdate/Hotupdate";
-import GameView from "../ui/GameView";
 
 /**@description entry入口代理 */
 export class EntryDelegate {
@@ -89,7 +88,7 @@ export class EntryDelegate {
             dispatch(HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
         } else if (info.code == HotUpdate.Code.UPDATE_FINISHED) {
             newPercent = 1.1;
-            cc.log(`正在加载${config.name}`);
+            Log.d(`正在加载${config.name}`);
             Manager.bundleManager.loadBundle(this);
             dispatch(HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
         } else if (info.code == HotUpdate.Code.UPDATE_FAILED ||
@@ -118,7 +117,7 @@ export class EntryDelegate {
 
 
     /**@description 进入bundle完成 */
-    onEnterBundleComplete( entry : Entry | null , gameView : GameView){
+    onEnterGameView( entry : Entry | null , gameView : GameView){
         //删除除自己之外的其它bundle
         let excludeBundles = this.getPersistBundle();
         if ( entry ){
@@ -148,7 +147,7 @@ export class EntryDelegate {
         return [Macro.BUNDLE_RESOURCES,Manager.bundleManager.bundleHall];
     }
 
-    onQuitGame(mainEntry : Entry ){
+    onQuitGame(mainEntry : Entry | null ){
         if ( mainEntry ){
             if ( Manager.gameView ){
                 Manager.gameView.close();

@@ -26,8 +26,8 @@ export default class ResourceLoader {
     }
 
     /**@description 加载完成回调 */
-    private _onLoadComplete: (error: Resource.LoaderError) => void = null;
-    public set onLoadComplete(cb: (error: Resource.LoaderError) => void) {
+    private _onLoadComplete?: (error: Resource.LoaderError) => void;
+    public set onLoadComplete(cb) {
         this._onLoadComplete = cb;
     }
     public get onLoadComplete() {
@@ -35,8 +35,8 @@ export default class ResourceLoader {
     }
 
     /**@description 加载进度 */
-    private _onLoadProgress: (loadedCount: number, toatl: number, data: Resource.CacheData) => void;
-    public set onLoadProgress(value: (loadedCount: number, toatl: number, data: Resource.CacheData) => void) {
+    public _onLoadProgress?: (loadedCount: number, toatl: number, data: Resource.CacheData) => void;
+    public set onLoadProgress(value) {
         this._onLoadProgress = value;
     }
     public get onLoadProgress() {
@@ -47,11 +47,11 @@ export default class ResourceLoader {
     /**
      * @description 实现类必须给个需要加载资源
      */
-    private _getLoadResource: () => Resource.Data[] = null;
-    public set getLoadResources(func: () => Resource.Data[]) {
+    private _getLoadResource?: () => Resource.Data[];
+    public set getLoadResources(func) {
         this._getLoadResource = func;
     }
-    public get getLoadResources(): () => Resource.Data[] {
+    public get getLoadResources() {
         return this._getLoadResource;
     }
 
@@ -61,32 +61,32 @@ export default class ResourceLoader {
     public loadResources() {
 
         if (!this.getLoadResources) {
-            if (CC_DEBUG) cc.error("未指定 getLoadResources 函数");
+            if (CC_DEBUG) Log.e("未指定 getLoadResources 函数");
             this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
             return;
         }
 
         let res = this.getLoadResources();
         if (!res) {
-            if (CC_DEBUG) cc.error(`未指定加载资源`);
+            if (CC_DEBUG) Log.e(`未指定加载资源`);
             this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
             return;
         }
         if (res.length <= 0) {
-            if (CC_DEBUG) cc.warn(`加载的资源为空`);
+            if (CC_DEBUG) Log.w(`加载的资源为空`);
             this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.NO_FOUND_LOAD_RESOURCE);
             return;
         }
 
         //如果正在加载中，防止重复调用
         if (this._isLoading) {
-            if (CC_DEBUG) cc.warn(`资源加载中，未完成加载`);
+            if (CC_DEBUG) Log.w(`资源加载中，未完成加载`);
             this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.LOADING);
             return;
         }
 
-        if ( this._resources.size > 0 && this.isLoadComplete() ){
-            if ( CC_DEBUG ) cc.warn(`资源已经加载完成，使用已经加载完成的资源`);
+        if (this._resources.size > 0 && this.isLoadComplete()) {
+            if (CC_DEBUG) Log.w(`资源已经加载完成，使用已经加载完成的资源`);
             this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.SUCCESS);
             this.onLoadResourceComplete();
             return;
@@ -94,31 +94,31 @@ export default class ResourceLoader {
 
         this._isLoading = true;
         //为防止重复，这里把资源放在一个map中
-        res.forEach((value,index)=>{
-            if ( value.url ){
-                this._resources.set(value.url,value);
-            }else if( value.dir ){
-                this._resources.set(value.dir,value);
-            }else{
-                if ( value.preloadView) this._resources.set(value.preloadView.getPrefabUrl(),value);
+        res.forEach((value, index) => {
+            if (value.url) {
+                this._resources.set(value.url, value);
+            } else if (value.dir) {
+                this._resources.set(value.dir, value);
+            } else {
+                if (value.preloadView) this._resources.set(value.preloadView.getPrefabUrl(), value);
             }
         });
 
         this._loadedCount = 0;
-        this._resources.forEach((value,key,source) => {
-            if ( value.preloadView ){
-                Manager.uiManager.preload(value.preloadView,value.bundle).then((view)=>{
+        this._resources.forEach((value, key, source) => {
+            if (value.preloadView) {
+                Manager.uiManager.preload(value.preloadView, value.bundle as BUNDLE_TYPE).then((view) => {
                     let cache = new Resource.CacheData();
                     cache.isLoaded = true;
                     cache.data = <any>view;
-                    cache.info.url = value.preloadView.getPrefabUrl();
-                    cache.info.bundle = value.bundle;
+                    if (value.preloadView) cache.info.url = value.preloadView.getPrefabUrl();
+                    cache.info.bundle = value.bundle as BUNDLE_TYPE;
                     this._onLoadResourceComplete(cache);
                 })
-            }else if(value.dir){
-                Manager.assetManager.loadDir(value.bundle,value.dir,value.type,null,this._onLoadResourceComplete.bind(this));
-            }else{
-                Manager.assetManager.load(value.bundle,value.url,value.type,null,this._onLoadResourceComplete.bind(this));
+            } else if (value.dir) {
+                Manager.assetManager.loadDir(value.bundle as BUNDLE_TYPE, value.dir, <any>(value.type), <any>null, this._onLoadResourceComplete.bind(this));
+            } else {
+                Manager.assetManager.load(value.bundle as BUNDLE_TYPE, value.url as string, <any>(value.type), <any>null, this._onLoadResourceComplete.bind(this));
             }
         });
     }
@@ -131,27 +131,27 @@ export default class ResourceLoader {
     }
 
     private _unLoadResources() {
-        if (this._isLoading || this._resources.size <= 0 ) {
+        if (this._isLoading || this._resources.size <= 0) {
             //当前正在加载中
             if (this._isLoading) {
-                cc.log("resources is loading , waiting for unload!!!");
+                Log.d("resources is loading , waiting for unload!!!");
             }
             return;
         }
         if (this._resources.size > 0) {
             this._resources.forEach((value) => {
-                if ( value.url ){
-                    if( this._loadedResource.has(value.url)){
+                if (value.url) {
+                    if (this._loadedResource.has(value.url)) {
                         let data = this._loadedResource.get(value.url);
-                        if( data ){
+                        if (data) {
                             Manager.assetManager.releaseAsset(data);
                         }
                         this._loadedResource.delete(value.url);
                     }
-                }else if( value.dir ){
-                    if( this._loadedResource.has(value.dir)){
+                } else if (value.dir) {
+                    if (this._loadedResource.has(value.dir)) {
                         let data = this._loadedResource.get(value.dir);
-                        if( data ){
+                        if (data) {
                             Manager.assetManager.releaseAsset(data);
                         }
                         this._loadedResource.delete(value.dir);
@@ -184,7 +184,7 @@ export default class ResourceLoader {
             info.data = data.data;
             info.bundle = data.info.bundle;
             Manager.assetManager.retainAsset(info);
-            this._loadedResource.set(info.url,info);
+            this._loadedResource.set(info.url, info);
         }
 
         this.checkLoadResourceComplete();

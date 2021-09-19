@@ -18,7 +18,7 @@ export class Process {
 
     /** @description 可能后面有其它特殊需要，特定情况下暂停消息队列的处理, true为停止消息队列处理 */
     public isPause: boolean = false;
-    serviceType: Net.ServiceType;
+    serviceType: Net.ServiceType = null!;
 
     /**
      * @description 暂停消息队列消息处理
@@ -47,7 +47,6 @@ export class Process {
 
         this._isDoingMessage = true;
         let handleTime = 0;
-        if (CC_DEBUG) cc.log("---handMessage---");
         for (let i = 0; i < datas.length; i++) {
             let data = datas[i];
             if (data.func instanceof Function) {
@@ -56,8 +55,8 @@ export class Process {
                     if (typeof tempTime == "number") {
                         handleTime = Math.max(handleTime, tempTime);
                     }
-                } catch (error) {
-                    cc.error(error);
+                } catch (err) {
+                    Log.e(err);
                 }
             }
         }
@@ -67,17 +66,17 @@ export class Process {
             this._isDoingMessage = false;
         }
         else {
-            Manager.uiManager.getCanvasComponent().scheduleOnce(() => {
+            Manager.uiManager.getMainController()?.scheduleOnce(() => {
                 this._isDoingMessage = false;
             }, handleTime);
         }
     }
 
     public onMessage(code: Codec) {
-        cc.log(`recv data main cmd : ${code.cmd}`);
+        Log.d(`recv data main cmd : ${code.cmd}`);
         let key = String(code.cmd);
         if (!this._listeners[key]) {
-            cc.warn(`no find listener data main cmd : ${code.cmd}`);
+            Log.w(`no find listener data main cmd : ${code.cmd}`);
             return;
         }
         if (this._listeners[key].length <= 0) {
@@ -210,7 +209,7 @@ export class Process {
                     obj = Manager.protoManager.decode({
                         className : o.type,
                         buffer : header.buffer,
-                    });
+                    }) as any;
                 }else{
                     obj = header.buffer as any;
                 }
@@ -251,7 +250,7 @@ export class Process {
                 try {
                     listenerDatas[i].func && listenerDatas[i].func.call(listenerDatas[i].target, obj);
                 } catch (err) {
-                    cc.error(err);
+                    Log.e(err);
                 }
 
             }

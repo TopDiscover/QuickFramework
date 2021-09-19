@@ -7,7 +7,7 @@ export class Language {
     private static _instance: Language = null!;
     public static Instance() { return this._instance || (this._instance = new Language()); }
 
-    private _data: Language.Data = { language: "unknown" };
+    private _data: Language.Data = { language: Macro.UNKNOWN };
     private delegates: Language.DataSourceDelegate[] = [];
 
     public addSourceDelegate(delegate: Language.DataSourceDelegate) {
@@ -69,21 +69,21 @@ export class Language {
             if (args.length < 1) break;
             let keyString = args[0];
             if (typeof keyString != "string") {
-                cc.error("key error");
+                Log.e("key error");
                 break;
             }
             if (keyString.indexOf(Macro.USING_LAN_KEY) > -1) {
 
                 let keys = keyString.split(".");
                 if (keys.length < 2) {
-                    cc.error("key error");
+                    Log.e("key error");
                     break;
                 }
                 keys.shift();//删除掉i18n.的头部
                 args.shift();
                 let data = (<any>this._data)[keys[0]];
                 if (!data) {
-                    cc.error(`语言包不存在 : ${keyString}`);
+                    Log.e(`语言包不存在 : ${keyString}`);
                     break;
                 }
                 let i = 1;
@@ -94,7 +94,7 @@ export class Language {
                     data = data[keys[i]];
                 }
                 if (i != keys.length) {
-                    cc.error(`语言包不存在 : ${keyString}`);
+                    Log.e(`语言包不存在 : ${keyString}`);
                 }
                 if (typeof (data) == "string") {
                     result = String.format(data, args);

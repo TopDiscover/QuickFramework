@@ -171,7 +171,7 @@ export default class AudioComponent extends EventComponent {
         return new Promise<{ url: string, isSuccess: boolean }>((resolve) => {
             if (CC_DEBUG) {
                 if (!this.owner) {
-                    cc.error(`必须要指定资源的管理都才能播放`);
+                    Log.e(`必须要指定资源的管理都才能播放`);
                     resolve({ url: url, isSuccess: false });
                     return;
                 }
@@ -212,7 +212,7 @@ export default class AudioComponent extends EventComponent {
         return new Promise<number>((resolve) => {
             if (CC_DEBUG) {
                 if (!this.owner) {
-                    cc.error(`必须要指定资源的管理都才能播放`);
+                    Log.e(`必须要指定资源的管理都才能播放`);
                     resolve(-1);
                     return;
                 }

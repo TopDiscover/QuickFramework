@@ -1,6 +1,7 @@
+import { Macro } from "../../defines/Macros";
 
 export class NodePool {
-    name: string = "unknown";
+    name: string = Macro.UNKNOWN;
     private pool: Array<cc.Node> = [];
     /**@description 用来克隆的节点 */
     private node: cc.Node = null;

@@ -339,7 +339,7 @@ export default class Alert {
             if (!this.curPanel) {
                 this.curPanel = cc.instantiate(this.prefab);
                 let dialog = this.curPanel.addComponent(AlertDialog);
-                Manager.uiManager.addChild(this.curPanel,ViewZOrder.Alert)
+                Manager.uiManager.addView(this.curPanel,ViewZOrder.Alert)
                 dialog.show(config);
             }
         }

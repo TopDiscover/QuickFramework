@@ -32,7 +32,7 @@ export default class Controller<ServiceType> extends EventComponent {
 
     protected onNetOpen(event: Net.ServiceEvent) {
         if (this.service as any == event.service) {
-            if (CC_DEBUG) cc.log(`${event.service.serviceName}网络 onNetOpen`);
+            if (CC_DEBUG) Log.d(`${event.service.serviceName}网络 onNetOpen`);
             return true;
         }
         return false;
@@ -40,14 +40,14 @@ export default class Controller<ServiceType> extends EventComponent {
 
     protected onNetClose(event: Net.ServiceEvent) {
         if (this.service as any == event.service) {
-            if (CC_DEBUG) cc.log(`${event.service.serviceName}网络 onNetClose`);
+            if (CC_DEBUG) Log.d(`${event.service.serviceName}网络 onNetClose`);
             return true;
         }
         return false;
     }
     protected onNetError(event: Net.ServiceEvent) {
         if (this.service as any == event.service) {
-            if (CC_DEBUG) cc.log(`${event.service.serviceName}网络 onNetError`);
+            if (CC_DEBUG) Log.d(`${event.service.serviceName}网络 onNetError`);
             return true;
         }
         return false;
@@ -62,13 +62,13 @@ export default class Controller<ServiceType> extends EventComponent {
         if (this.service instanceof Service) {
             this.service.send(msg)
         } else {
-            cc.error("this.service is null")
+            Log.e("this.service is null")
         }
 
     }
 
     protected get bundle(): string {
-        cc.error(`请子类重写protected get bundle,返回游戏的包名,即 asset bundle name`);
+        Log.e(`请子类重写protected get bundle,返回游戏的包名,即 asset bundle name`);
         return "";
     }
 

@@ -60,14 +60,14 @@ export namespace Resource {
         /**@description 完成回调，在资源正在加载过程中，又有其它地方调用加载同一个资源，此时需要等待资源加载完成，统一回调 */
         finishCb: ((data: any) => void)[] = [];
 
-        public doGet(data) {
+        public doGet(data:any) {
             for (let i = 0; i < this.getCb.length; i++) {
                 if (this.getCb[i]) this.getCb[i](data);
             }
             this.getCb = [];
         }
 
-        public doFinish(data) {
+        public doFinish(data:any) {
             for (let i = 0; i < this.finishCb.length; i++) {
                 if (this.finishCb[i]) this.finishCb[i](data);
             }

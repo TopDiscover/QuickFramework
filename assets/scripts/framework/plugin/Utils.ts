@@ -91,12 +91,12 @@ export function setSpriteSpriteFrame(
         try {
             if (replaceData) sprite.spriteFrame = replaceData;
             if (completeCallback) completeCallback(replaceData);
-        } catch (error) {
+        } catch (err) {
             let temp = cc.isValid(oldSpriteFrame) ? oldSpriteFrame : null;
             sprite.spriteFrame = temp;
             if (completeCallback) completeCallback(null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
-            cc.error(`${url} : ${error ? error : "replace spriteframe error"}`);
+            Log.e(`${url} : ${err ? err : "replace spriteframe error"}`);
         }
     } else {
         //完成回调
@@ -139,12 +139,12 @@ function _setSpriteFrame(
             let replaceData = cc.isValid(spriteFrame) ? spriteFrame : null;
             if (replaceData) button[memberName] = replaceData;
             if (completeCallback) completeCallback(memberName, replaceData);
-        } catch (error) {
+        } catch (err) {
             let temp = cc.isValid(oldSpriteFrame) ? oldSpriteFrame : null;
             button[memberName] = temp;
             if (completeCallback) completeCallback(memberName, null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
-            cc.error(`${url} : ${error ? error : "replace spriteframe error"}`);
+            Log.e(`${url} : ${err ? err : "replace spriteframe error"}`);
         }
     } else {
         if (completeCallback && isValidComponent(button)) completeCallback(memberName, spriteFrame);
@@ -258,12 +258,12 @@ export function setParticleSystemFile(
             let replaceData = cc.isValid(data) ? data : null;
             if (replaceData) component.file = replaceData;
             if (config.completeCallback) config.completeCallback(replaceData);
-        } catch (error) {
+        } catch (err) {
             let temp = cc.isValid(oldFile) ? oldFile : null;
             component.file = temp;
             if (config.completeCallback) config.completeCallback(null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
-            cc.error(`${config.url} : ${error ? error : "replace file error"}`);
+            Log.e(`${config.url} : ${err ? err : "replace file error"}`);
         }
     } else {
         //完成回调
@@ -293,12 +293,12 @@ export function setLabelFont(
             let replaceData = cc.isValid(data) ? data : null;
             if (replaceData) component.font = replaceData;
             if (config.completeCallback) config.completeCallback(replaceData);
-        } catch (error) {
+        } catch (err) {
             let temp = cc.isValid(oldFont) ? oldFont : null;
             component.font = temp;
             if (config.completeCallback) config.completeCallback(null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
-            cc.error(`${config.font} : ${error ? error : "replace font error"}`);
+            Log.e(`${config.font} : ${err ? err : "replace font error"}`);
         }
     } else {
         //完成回调
@@ -346,12 +346,12 @@ export function setSkeletonSkeletonData(
             let replaceData = cc.isValid(data) ? data : null;
             if (replaceData) component.skeletonData = replaceData;
             if (config.completeCallback) config.completeCallback(replaceData);
-        } catch (error) {
+        } catch (err) {
             let temp = cc.isValid(oldSkeletonData) ? oldSkeletonData : null;
             component.skeletonData = temp;
             if (config.completeCallback) config.completeCallback(null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
-            cc.error(`${url} : ${error ? error : "replace skeletonData error"}`);
+            Log.e(`${url} : ${err ? err : "replace skeletonData error"}`);
         }
     } else {
         //完成回调

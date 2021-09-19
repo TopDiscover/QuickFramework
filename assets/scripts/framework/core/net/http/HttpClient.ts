@@ -129,7 +129,7 @@ class HttpClient {
         let url = httpPackage.data.url;
         if (!url) {
             if ( CC_DEBUG ){
-                cc.error(`reuqest url error`);
+                Log.e(`reuqest url error`);
             }
             if (errorcb) errorcb({ type: Http.ErrorType.UrlError, reason: "错误的Url地址" });
             return;
@@ -142,12 +142,12 @@ class HttpClient {
                     if (xhr.responseType == "arraybuffer" || xhr.responseType == "blob") {
                         if (cb) cb(xhr.response);
                     } else {
-                        if ( CC_DEBUG) cc.log(`htpp res(${xhr.responseText})`);
+                        if ( CC_DEBUG) Log.d(`htpp res(${xhr.responseText})`);
                         if (cb) cb(xhr.responseText);
                     }
                 } else {
                     let reason = `请求错误,错误状态:${xhr.status}`;
-                    cc.error(`request error status : ${xhr.status} url : ${url} `);
+                    Log.e(`request error status : ${xhr.status} url : ${url} `);
                     if (errorcb) errorcb({ type: Http.ErrorType.RequestError, reason: reason });
                 }
             }
@@ -161,16 +161,16 @@ class HttpClient {
         xhr.timeout = httpPackage.data.timeout;
         xhr.ontimeout = () => {
             xhr.abort();//网络超时，断开连接
-            if ( CC_DEBUG) cc.warn(`request timeout : ${url}`);
+            if ( CC_DEBUG ) Log.w(`request timeout : ${url}`);
             if (errorcb) errorcb({ type: Http.ErrorType.TimeOut, reason: "连接超时" });
         };
 
         xhr.onerror = () => {
-            cc.error(`request error : ${url} `);
+            Log.e(`request error : ${url} `);
             if (errorcb) errorcb({ type: Http.ErrorType.RequestError, reason: "请求错误" });
         };
 
-        if ( CC_DEBUG ) cc.log(`[send http request] url : ${url} request type : ${httpPackage.data.type} , responseType : ${xhr.responseType}`);
+        if ( CC_DEBUG ) Log.d(`[send http request] url : ${url} request type : ${httpPackage.data.type} , responseType : ${xhr.responseType}`);
 
         url = this.crossProxy(url);
         url = this.convertParams(url,httpPackage.params);
@@ -186,7 +186,7 @@ class HttpClient {
         }
 
         if (cc.sys.isBrowser && !CC_PREVIEW) {
-            if ( CC_DEBUG) cc.log(`[send http request] corss prox url : ${url} request type : ${httpPackage.data.type} , responseType : ${xhr.responseType}`);
+            if ( CC_DEBUG) Log.d(`[send http request] corss prox url : ${url} request type : ${httpPackage.data.type} , responseType : ${xhr.responseType}`);
         }
 
         if (httpPackage.data.type === Http.Type.POST) {
