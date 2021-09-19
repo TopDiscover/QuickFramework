@@ -1,4 +1,4 @@
-import { serialize, Int8Value, Int16Value, Int32Value, Float32Value, Float64Value, Uint8Value, Uint16Value, Uint32Value, StringValue, BinaryStream } from "../../../../scripts/framework/core/net/message/BinaryStreamMessage"
+import { serialize, BYTE, SHORT, INT, FLOAT, DOUBLE, UBYTE, USHORT, UINT, STRING, BinaryStream, BOOL } from "../../../../scripts/framework/core/net/message/BinaryStreamMessage"
 import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { SUB_CMD_LOBBY } from "./LobbyCmd";
 
@@ -8,62 +8,66 @@ class BinaryStreamMessage extends BinaryStream{
 
 class TestData extends BinaryStreamMessage{
 
-    @serialize("value32",Float32Value)
-    float32 : number = 32;
+    @serialize("vFloat",FLOAT)
+    vFloat : number = 32.666666;
 
-    @serialize("value64",Float64Value)
-    float64: number = 64;
+    @serialize("vDouble",DOUBLE)
+    vDouble: number = 88888.33333;
 }
 
 export class TestBinaryMessage extends BinaryStreamMessage {
     get cmd(){ return String(this.mainCmd) + String(this.subCmd);}
     mainCmd = MainCmd.CMD_LOBBY;
     subCmd = SUB_CMD_LOBBY.TEST_BINARY_MSG;
-    // @serialize("value32",Float32Value)
-    // float32 : number = 32;
 
-    // @serialize("value64",Float64Value)
-    // float64: number = 64;
+    @serialize("vbool",BOOL)
+    vbool : boolean = true;
 
-    // @serialize("int8",Int8Value)
-    // int8: number = 18;
+    @serialize("vString",STRING)
+    vString : string = "这只是一个测试，你没看错";
 
-    // @serialize("int16",Int16Value)
-    // int16: number = 116;
+    @serialize("vFloat",FLOAT)
+    vFloat : number = 32.3333344;
 
-    // @serialize("int32",Int32Value)
-    // int32: number = 132;
+    @serialize("vDouble",DOUBLE)
+    vDouble: number = 64.9999999;
 
-    // @serialize("uint8",Uint8Value)
-    // uint8: number = 8;
+    @serialize("vByte",BYTE)
+    vByte: number = 18;
 
-    // @serialize("uint16",Uint16Value)
-    // uint16: number = 16;
+    @serialize("vShort",SHORT)
+    vShort: number = 116;
 
-    // @serialize("uint32",Uint32Value)
-    // uint32: number = 32;
+    @serialize("vInt",INT)
+    vInt: number = 132;
 
-    // @serialize("str",StringValue)
-    // str : string = "这只是一个测试，你没看错";
+    @serialize("vUByte",UBYTE)
+    vUByte: number = 8;
 
-    // @serialize("arr",Array,Int8Value)
-    // arr : Array<number> = [1,2,3,4,5,6]
+    @serialize("vUShort",USHORT)
+    vUShort: number = 16;
 
-    // @serialize("testMap",Map,String,Int32Value)
-    // testMap:Map<string,number> = new Map();
+    @serialize("vUInt",UINT)
+    vUInt: number = 32;
 
-    @serialize("user",TestData)
-    user : TestData = new TestData();
+    @serialize("vArray",Array,INT)
+    vArray : Array<number> = [1,2,3,4,5,6]
 
-    @serialize("hello",StringValue)
-    hello : string = "您好，我是Binary消息！"
+    @serialize("vMap",Map,String,DOUBLE)
+    vMap:Map<string,number> = new Map();
+
+    @serialize("vUser",TestData)
+    vUser : TestData = new TestData();
+
+    @serialize("vHello",STRING)
+    vHello : string = "您好，我是Binary消息！"
 
     constructor(){
         super();
-        // this.testMap.set("keyy_1",1);
-        // this.testMap.set("keyy_2",2);
-        // this.testMap.set("keyy_3",2);
-        // this.testMap.set("keyy_4",4);
-        // this.testMap.set("keyy_5",5);
+        this.vMap.set("keyy_1",1);
+        this.vMap.set("keyy_2",2);
+        this.vMap.set("keyy_3",2);
+        this.vMap.set("keyy_4",4);
+        this.vMap.set("keyy_5",5);
     }
 }

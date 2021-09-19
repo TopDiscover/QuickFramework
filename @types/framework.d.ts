@@ -16,6 +16,7 @@ interface Logger{
 declare let Log : Logger;
 
 declare type BUNDLE_TYPE = string | import("cc").AssetManager.Bundle;
+declare type SocketBuffer = string | Uint8Array;
 /**
  * @description 发事件 参考framework/extentions/extentions dispatch 方法
  * @param name 
@@ -61,11 +62,6 @@ declare interface StringConstructor {
 }
 
 declare function md5(data: any): any;
-
-/**@description utf-8 Uint8Array转字符串 */
-declare function Utf8ArrayToString(data: Uint8Array): string;
-/**@description utf-8 字符串转Uint8Array */
-declare function StringToUtf8Array(data: string): Uint8Array;
 
 declare interface IFullScreenAdapt {
 	/**@description 全屏幕适配 调用 */
@@ -244,5 +240,7 @@ declare namespace Language {
 		data(language: string): Data;
 	}
 }
+
+declare type ByteArray = import("../assets/scripts/framework/plugin/ByteArray").ByteArray;
 
 declare let Manager: import("../assets/Application")._Manager;

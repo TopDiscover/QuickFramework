@@ -2,9 +2,7 @@ import NetHelper from "../../../../scripts/framework/core/net/service/NetHelper"
 import { GameService } from "../../../../scripts/common/net/GameService";
 import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessage";
 import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
-import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
 import { CmmProto } from "../../../../scripts/common/net/CmmProto";
-import { SUB_CMD_LOBBY } from "../../../hall/script/protocol/LobbyCmd";
 import { HallProtoConfig } from "../../../hall/proto/HallProtoConfig";
 
 class _TestGameNetHelper extends NetHelper<GameService>{
@@ -46,7 +44,7 @@ class _TestGameNetHelper extends NetHelper<GameService>{
 
     sendBinaryMessage(hello: string) {
         let binaryMessage = new TestBinaryMessage();
-        binaryMessage.hello = hello;
+        binaryMessage.vHello = hello;
         this.service.send(binaryMessage);
     }
 }

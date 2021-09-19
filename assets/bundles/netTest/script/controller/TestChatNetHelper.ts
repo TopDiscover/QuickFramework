@@ -45,7 +45,7 @@ class _TestChatNetHelper extends NetHelper<ChatService>{
 
     sendBinaryMessage(hello: string) {
         let binaryMessage = new TestBinaryMessage();
-        binaryMessage.hello = hello;
+        binaryMessage.vHello = hello;
         this.service.send(binaryMessage);
     }
 }

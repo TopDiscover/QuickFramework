@@ -208,7 +208,7 @@ export class Process {
                 if( type ){
                     obj = Manager.protoManager.decode({
                         className : o.type,
-                        buffer : header.buffer,
+                        buffer : header.buffer as Uint8Array,
                     }) as any;
                 }else{
                     obj = header.buffer as any;

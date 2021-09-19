@@ -49,7 +49,7 @@ export abstract class Service extends ServerConnector {
         dispatch(Net.NetEvent.ON_ERROR, { service: this, event: ev });
     }
 
-    protected onMessage(data: Uint8Array) {
+    protected onMessage(data: MessageEvent) {
 
         //先对包信进行解析
         let header = new this._Process.Codec;

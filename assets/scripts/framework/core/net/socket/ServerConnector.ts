@@ -1,7 +1,7 @@
-import WebSocketClinet from "./WebSocketClient";
 import { IMessage } from "../message/Message";
 import { DEBUG } from "cc/env";
 import { Net } from "../Net";
+import WebSocketClinet from "./WebSocketClient";
 
 /**
  * @description 服务器连接器
@@ -81,7 +81,7 @@ export abstract class ServerConnector {
     /**
      * @description 收到网络消息
      */
-    protected onMessage(data: Uint8Array) {
+    protected onMessage(data: MessageEvent) {
         this.recvHeartbeat();
     }
 
@@ -162,7 +162,7 @@ export abstract class ServerConnector {
      * @description 发送请求
      * @param msg 消息
      */
-    protected sendBuffer(buffer: Uint8Array) {
+    protected sendBuffer(buffer: SocketBuffer) {
         this._wsClient && this._wsClient.send(buffer);
     }
 

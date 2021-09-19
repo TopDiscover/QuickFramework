@@ -36,7 +36,7 @@ export default class TestChatNetController extends Controller<ChatService> {
     }
 
     private onTestBinaryMessage(data: TestBinaryMessage) {
-        dispatch(CommonEvent.TEST_BINARY_MSG, data.hello)
+        dispatch(CommonEvent.TEST_BINARY_MSG, data.vHello)
     }
 
     protected onNetOpen(event: Net.ServiceEvent) {
