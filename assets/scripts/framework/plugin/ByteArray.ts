@@ -165,7 +165,7 @@
             this.$endian = value == Endian.LITTLE_ENDIAN ? EndianConst.LITTLE_ENDIAN : EndianConst.BIG_ENDIAN;
         }
 
-        protected $endian: EndianConst;
+        protected $endian: EndianConst = null!;
 
         /**
          * @version Egret 2.4
@@ -403,6 +403,7 @@
          */
         public readBoolean(): boolean {
             if (this.validate(ByteArraySize.SIZE_OF_BOOLEAN)) return !!this._bytes[this.position++];
+            return false;
         }
 
         /**
@@ -421,6 +422,7 @@
          */
         public readByte(): number {
             if (this.validate(ByteArraySize.SIZE_OF_INT8)) return this.data.getInt8(this.position++);
+            return 0;
         }
 
         /**
@@ -484,6 +486,7 @@
                 this.position += ByteArraySize.SIZE_OF_FLOAT64;
                 return value;
             }
+            return 0;
         }
 
         /**
@@ -506,6 +509,7 @@
                 this.position += ByteArraySize.SIZE_OF_FLOAT32;
                 return value;
             }
+            return 0
         }
 
         /**
@@ -528,6 +532,7 @@
                 this.position += ByteArraySize.SIZE_OF_INT32;
                 return value;
             }
+            return 0;
         }
 
         /**
@@ -550,6 +555,7 @@
                 this.position += ByteArraySize.SIZE_OF_INT16;
                 return value;
             }
+            return 0;
         }
 
         /**
@@ -568,6 +574,7 @@
          */
         public readUnsignedByte(): number {
             if (this.validate(ByteArraySize.SIZE_OF_UINT8)) return this._bytes[this.position++];
+            return 0;
         }
 
         /**
@@ -590,6 +597,7 @@
                 this.position += ByteArraySize.SIZE_OF_UINT32;
                 return value;
             }
+            return 0;
         }
 
         /**
@@ -612,6 +620,7 @@
                 this.position += ByteArraySize.SIZE_OF_UINT16;
                 return value;
             }
+            return 0;
         }
 
         /**
@@ -655,7 +664,7 @@
          */
         public readUTFBytes(length: number): string {
             if (!this.validate(length)) {
-                return;
+                return "";
             }
             let data = this.data;
             let bytes = new Uint8Array(data.buffer, data.byteOffset + this._position, length);
@@ -946,6 +955,7 @@
             if (bl > 0 && this._position + len <= bl) {
                 return true;
             } else {
+                return false;
             }
         }
 
@@ -981,7 +991,7 @@
                 else if (this.inRange(code_point, 0x0000, 0x007f)) {
                     outputBytes.push(code_point);
                 } else {
-                    let count, offset;
+                    let count = 0 , offset = 0;
                     if (this.inRange(code_point, 0x0080, 0x07FF)) {
                         count = 1;
                         offset = 0xC0;
@@ -1015,7 +1025,7 @@
             let fatal: boolean = false;
             let pos: number = 0;
             let result: string = "";
-            let code_point: number;
+            let code_point: number | null = null;
             let utf8_code_point = 0;
             let utf8_bytes_needed = 0;
             let utf8_bytes_seen = 0;
@@ -1105,7 +1115,7 @@
          *
          * @param code_point
          */
-        private encoderError(code_point) {
+        private encoderError(code_point:any) {
         }
 
         /**
@@ -1115,7 +1125,7 @@
          * @param opt_code_point
          * @returns
          */
-        private decoderError(fatal, opt_code_point?): number {
+        private decoderError(fatal : any, opt_code_point?:any): number {
             if (fatal) {
             }
             return opt_code_point || 0xFFFD;
@@ -1137,7 +1147,7 @@
          * @param min
          * @param max
          */
-        private inRange(a, min, max) {
+        private inRange(a:any, min:any, max:any) {
             return min <= a && a <= max;
         }
 
@@ -1147,7 +1157,7 @@
          * @param n
          * @param d
          */
-        private div(n, d) {
+        private div(n:any, d:any) {
             return Math.floor(n / d);
         }
 
@@ -1156,7 +1166,7 @@
          *
          * @param string
          */
-        private stringToCodePoints(string) {
+        private stringToCodePoints(string:string) {
             /** @type {Array.<number>} */
             let cps = [];
             // Based on http://www.w3.org/TR/WebIDL/#idl-DOMString
