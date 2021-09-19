@@ -1,4 +1,3 @@
-import { LobbyService } from "../../../scripts/common/net/LobbyService";
 import TankBattleGameView from "./view/TankBattleGameView";
 import { TankBattleLanguage } from "./data/TankBattleLanguage";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
@@ -12,13 +11,6 @@ class TankBattleEntry extends Entry {
     static bundle = TankBettleGameData.bundle;
     private get data(){
         return Manager.dataCenter.getData(TankBettleGameData) as TankBettleGameData
-    }
-
-    set gameView( gameView : TankBattleGameView ){
-        this._gameView = gameView;
-    }
-    get gameView(){
-        return this._gameView as TankBattleGameView;
     }
 
     protected addNetComponent(): void {
@@ -48,10 +40,10 @@ class TankBattleEntry extends Entry {
         this.data.clear();
     }
     protected pauseMessageQueue(): void {
-        LobbyService.instance.pauseMessageQueue();
+        
     }
     protected resumeMessageQueue(): void {
-        LobbyService.instance.resumeMessageQueue();
+        
     }
 }
 
