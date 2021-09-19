@@ -137,8 +137,8 @@ export abstract class JsonMessage extends Message {
     decode(data: Uint8Array): boolean {
         if (data) {
             this.buffer = data;
-            let buffer = new ByteArray(data);
-            let result = buffer.readUTFBytes(buffer.length);
+            this.byteArray = new ByteArray(data);
+            let result = this.byteArray.readUTFBytes(this.byteArray.length);
             if (result.length > 0) {
                 try {
                     this.data = JSON.parse(result);

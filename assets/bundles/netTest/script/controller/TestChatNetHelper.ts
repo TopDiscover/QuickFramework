@@ -3,8 +3,6 @@ import { ChatService } from "../../../../scripts/common/net/ChatService";
 import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessage";
 import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
 import { CmmProto } from "../../../../scripts/common/net/CmmProto";
-import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
-import { SUB_CMD_LOBBY } from "../../../hall/script/protocol/LobbyCmd";
 import { HallProtoConfig } from "../../../hall/proto/HallProtoConfig";
 
 class _TestChatNetHelper extends NetHelper<ChatService>{
