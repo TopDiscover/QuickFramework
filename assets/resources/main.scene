@@ -524,7 +524,7 @@
         "__id__": 103
       }
     ],
-    "_active": false,
+    "_active": true,
     "_components": [
       {
         "__id__": 200
@@ -6040,7 +6040,7 @@
         "__id__": 204
       }
     ],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 210
@@ -6059,7 +6059,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 320,
+      "y": 285,
       "z": 0
     },
     "_lrot": {
@@ -6146,7 +6146,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 160,
+      "width": 200,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -6185,8 +6185,8 @@
     "_string": "打开调试面板",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20,
-    "_fontSize": 20,
+    "_actualFontSize": 30,
+    "_fontSize": 30,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
     "_overflow": 3,
@@ -6246,8 +6246,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 160,
-      "height": 40
+      "width": 200,
+      "height": 50
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -6378,7 +6378,7 @@
     "_target": null,
     "_left": 0,
     "_right": 0,
-    "_top": 20,
+    "_top": 50,
     "_bottom": 0,
     "_horizontalCenter": 0,
     "_verticalCenter": 0,
