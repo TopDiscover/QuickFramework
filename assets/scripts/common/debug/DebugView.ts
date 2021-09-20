@@ -123,9 +123,6 @@ export class DebugView extends cc.Component {
         Manager.entryManager.print({
             print: (data) => {
                 Log.d(`bundle : ${data.bundle}`);
-            },
-            printType: (data) => {
-                Log.d(`name : ${cc.js.getClassName(data)} bundle : ${data.bundle}`);
             }
         })
     }

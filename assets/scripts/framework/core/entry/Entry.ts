@@ -3,8 +3,8 @@ import ResourceLoader from "../asset/ResourceLoader";
 export abstract class Entry {
 
     static bundle = "";
-    /**@description 是否是主包 */
-    static isMain = false;
+    /**@description 是否是主包入口，只能有一个主包入口 */
+    isMain = false;
     /**@description 当前bundle名,由管理器指定 */
     bundle: string = "";
     /**@description 当前语言包数据源代码，可为null */

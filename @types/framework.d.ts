@@ -138,8 +138,6 @@ declare interface EntryClass<T extends Entry> {
 	new(): T;
 	/**@description 当前bundle名 */
 	bundle: string;
-	/**@description 主入口,即主包，主入口只能有一个 */
-	isMain: boolean;
 }
 
 declare type GameData = import("../assets/scripts/framework/data/GameData").GameData;
@@ -244,9 +242,6 @@ declare namespace Language {
 /**@description 各管理器打印输出代理 */
 declare interface ManagerPrintDelegate<T>{
 	print(data: T): void;
-}
-declare interface EntryPrintDelegate<T,U> extends ManagerPrintDelegate<T>{
-	printType( data : U) :void;
 }
 
 declare interface UIManagerPrintDelegate<T,U,V>{

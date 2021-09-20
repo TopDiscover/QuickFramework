@@ -51,13 +51,3 @@ export function setServiceCodec(header: typeof Codec) {
         }
     }
 }
-
-export function setClassName() {
-    return function (target:any) {
-        if (!CC_EDITOR){
-            let frameInfo = (<any>cc['_RF']).peek()
-            let script = frameInfo.script;
-            cc.js.setClassName(script, target)
-        }
-    }
-}

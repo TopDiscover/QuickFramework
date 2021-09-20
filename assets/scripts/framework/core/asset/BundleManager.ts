@@ -10,8 +10,6 @@ export class BundleManager {
    public static Instance() { return this._instance || (this._instance = new BundleManager()); }
    private curBundle: HotUpdate.BundleConfig = null!;
    private isLoading = false;
-   /**@description 大厅Bundle名 */
-   public bundleHall = "hall";
    /**@description 删除已经加载的bundle */
    public removeLoadedBundle(delegate: EntryDelegate, excludeBundles?: string[]) {
       if (!excludeBundles) {
@@ -50,7 +48,7 @@ export class BundleManager {
       return null;
    }
 
-   public getBundleName(bundle: BUNDLE_TYPE): string | null {
+   public getBundleName(bundle: BUNDLE_TYPE): string {
       if (bundle) {
          if (typeof bundle == "string") {
             return bundle;
@@ -58,7 +56,8 @@ export class BundleManager {
             return bundle.name;
          }
       }
-      return null;
+      Log.e(`输入参数错误 : ${bundle}`);
+      return Macro.UNKNOWN;
    }
 
    /**
