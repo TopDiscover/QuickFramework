@@ -1,4 +1,4 @@
-import { ScrollView, Toggle, ToggleContainer, _decorator, Node, find, instantiate, Label, EventTouch, widgetManager } from "cc";
+import { ScrollView, Toggle, _decorator, Node, find, instantiate, Label, EventTouch } from "cc";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
 import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 import { ChatService } from "../../../../scripts/common/net/ChatService";
@@ -8,10 +8,9 @@ import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import { HeartbeatBinary } from "../../../../scripts/common/protocol/HeartbetBinary";
 import { HeartbeatJson } from "../../../../scripts/common/protocol/HeartbetJson";
 import { HeartbeatProto } from "../../../../scripts/common/protocol/HeartbetProto";
-import { HallNetHelper } from "../../../hall/script/controller/HallNetHelper";
-import { INetHelper } from "../controller/INetHelper";
-import { TestChatNetHelper } from "../controller/TestChatNetHelper";
-import { TestGameNetHelper } from "../controller/TestGameNetHelper";
+import { HallSender } from "../../../hall/script/net/HallSender";
+import { ChatSender } from "../net/ChatSender";
+import { GameSender } from "../net/GameSender";
 import { NetTest } from "../data/NetTestData";
 import { Config } from "../../../../scripts/common/config/Config";
 
@@ -33,8 +32,6 @@ export default class NetTestView extends GameView {
     private connects: Node[] = [];
     private enabledServices: Toggle[] = [];
     private netTypes: Toggle[] = [];
-
-    private netType: NetTest.NetType = NetTest.NetType.JSON;
 
     addEvents() {
         super.addEvents();
@@ -200,7 +197,6 @@ export default class NetTestView extends GameView {
         } else {
             Log.e(`未知网络类型`);
         }
-        this.netType = type;
     }
 
     private changeNetType(type: NetTest.NetType) {
@@ -263,28 +259,23 @@ export default class NetTestView extends GameView {
         }
     }
 
-    private send(helper: INetHelper) {
-        let msg = "";
-        if (this.netType == NetTest.NetType.JSON) {
-            msg = "您好，我是Json消息";
-            helper.sendJsonMessage(msg);
-        } else if (this.netType == NetTest.NetType.PROTO) {
-            msg = "您好，我是Proto消息";
-            helper.sendProtoMessage(msg);
-        } else if (this.netType == NetTest.NetType.BINARY) {
-            msg = "您好，我是Binary消息";
-            helper.sendBinaryMessage(msg);
-        }
-        this.log(`发送消息: ${msg}`);
-    }
     private onSend(toggle: Toggle) {
         let target = toggle.node;
         if (target.userData == NetTest.ServiceType.Lobby) {
-            this.send(HallNetHelper);
+            let sender = Manager.netHelper.getSender(HallSender);
+            if ( sender ){
+                sender.sendEx();
+            }
         } else if (target.userData == NetTest.ServiceType.Game) {
-            this.send(TestGameNetHelper);
+            let sender = Manager.netHelper.getSender(GameSender);
+            if ( sender ){
+                sender.sendEx();
+            }
         } else if (target.userData == NetTest.ServiceType.Chat) {
-            this.send(TestChatNetHelper);
+            let sender = Manager.netHelper.getSender(ChatSender);
+            if ( sender ){
+                sender.sendEx();
+            }
         }
     }
 

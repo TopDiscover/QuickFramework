@@ -1,6 +1,6 @@
 import { MainCmd } from "../../../scripts/common/protocol/CmdDefines";
 import { Net } from "../../../scripts/framework/core/net/Net";
-import { GetCmdKey } from "../script/controller/GetCmdKey";
+import { GetCmdKey } from "../script/net/GetCmdKey";
 import { SUB_CMD_LOBBY } from "../script/protocol/LobbyCmd";
 interface BindConfig extends Net.Proto.BindConfig {
     mainCmd : number;

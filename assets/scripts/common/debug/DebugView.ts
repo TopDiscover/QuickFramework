@@ -35,6 +35,8 @@ export class DebugView extends Component {
         this.bindEvent("bundleMgr",this.onBundleMgr);
         //节点缓存池
         this.bindEvent("pool",this.onPool);
+        //网络辅助类
+        this.bindEvent("netHelper",this.onNetHelper);
         this.doOther();
     }
     debug: Node = null!;
@@ -288,6 +290,22 @@ export class DebugView extends Component {
         Manager.uiManager.print({
             printComp: (data) => {
                 Log.d(js.getClassName(data));
+            }
+        })
+    }
+
+    private onNetHelper(){
+        Log.d(`-----------网络辅助相关信息------------`);
+        Log.d(`-----------当前所有Sender------------`);
+        Manager.netHelper.print({
+            printSender:(data)=>{
+                Log.d(data.module);
+            }
+        });
+        Log.d(`-----------当前所有Handler------------`);
+        Manager.netHelper.print({
+            printHander:(data)=>{
+                Log.d(data.module);
             }
         })
     }

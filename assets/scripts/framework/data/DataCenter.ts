@@ -16,11 +16,11 @@ export class DataCenter {
      * @returns 
      */
     getData<T extends GameData>(DataTypeOrBundle: GameDataClass<T> | string, isCreate: boolean = true): T | null {
-        if ( typeof DataTypeOrBundle == "string" ){
-            if ( this._datas.has(DataTypeOrBundle) ){
+        if (typeof DataTypeOrBundle == "string") {
+            if (this._datas.has(DataTypeOrBundle)) {
                 return <T>this._datas.get(DataTypeOrBundle);
             }
-        }else{
+        } else {
             if (DataTypeOrBundle.bundle == Macro.UNKNOWN) {
                 if (DEBUG) {
                     Log.e("未设计数据bundle");
@@ -41,12 +41,7 @@ export class DataCenter {
     }
 
     destory<T extends GameData>(DataTypeOrBundle: GameDataClass<T> | string) {
-        let bundle = "";
-        if (typeof DataTypeOrBundle == "string") {
-            bundle = DataTypeOrBundle;
-        } else {
-            bundle = DataTypeOrBundle.bundle;
-        }
+        let bundle = this.getBundle(DataTypeOrBundle);
         if (this._datas.has(bundle)) {
             this._datas.delete(bundle);
             return true;
@@ -55,22 +50,13 @@ export class DataCenter {
     }
 
     /**@description 清空数据中心所有数据 */
-    clear<T extends GameData>(exclude?: GameDataClass<T>[] | string[]) {
-        if (exclude) {
-            //需要排除指定数据类型
-            this._datas.forEach((data, key) => {
-                if (!this.isInExcule(data, exclude)) {
-                    this._datas.delete(key);
-                }
-            });
-        } else {
-            this._datas.forEach((data) => {
-                if (data) {
-                    data.clear();
-                }
-            });
-            this._datas.clear();
-        }
+    clear<T extends GameData>(exclude?: (GameDataClass<T> | string)[]) {
+        //需要排除指定数据类型
+        this._datas.forEach((data, key) => {
+            if (!this.isInExclude(data, exclude)) {
+                this._datas.delete(key);
+            }
+        });
     }
 
     /**@description 打印当前所有bundle数据数据 */
@@ -83,20 +69,25 @@ export class DataCenter {
     }
 
     /**@description 判断是否在排除项中 */
-    private isInExcule<T extends GameData>(data: T, exclude: GameDataClass<T>[] | string[]) {
+    private isInExclude<T extends GameData>(data: T, exclude?: (GameDataClass<T> | string)[]) {
+        if (!exclude) return false;
         for (let i = 0; i < exclude.length; i++) {
-            let bundle = "";
-            let dataClassOrBundle = exclude[i];
-            if (typeof dataClassOrBundle == "string") {
-                bundle = dataClassOrBundle;
-            } else {
-                bundle = dataClassOrBundle.bundle;
-            }
+            let bundle = this.getBundle(exclude[i]);
             if (bundle == data.bundle) {
                 return true;
             }
         }
         return false;
+    }
+
+    private getBundle<T extends GameData>(data: GameDataClass<T> | string) {
+        let bundle = "";
+        if (typeof data == "string") {
+            bundle = data;
+        } else {
+            bundle = data.bundle;
+        }
+        return bundle;
     }
 }
 

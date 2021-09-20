@@ -13,9 +13,9 @@ class TankBattleEntry extends Entry {
         return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData
     }
 
-    protected addNetComponent(): void {
+    protected addNetHandler(): void {
     }
-    protected removeNetComponent(): void {
+    protected removeNetHandler(): void {
     }
     protected loadResources(completeCb: () => void): void {
         this.loader.getLoadResources = ()=>{

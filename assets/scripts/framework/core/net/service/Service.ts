@@ -33,20 +33,46 @@ export abstract class Service extends ServerConnector {
     /**@description 值越大，优先级越高 */
     public priority: number = 0;
 
-    private serviceType : Net.ServiceType = Net.ServiceType.Unknown;
+    serviceType : Net.ServiceType = Net.ServiceType.Unknown;
+
+    /**@description Handlers */
+    private _handlers : Map<string,Handler> = new Map();
 
     protected onOpen() {
         super.onOpen();
+        this._handlers.forEach((handler)=>{
+            if ( handler ) handler.onOpen(this,null);
+        });
         dispatch(Net.NetEvent.ON_OPEN, { service: this, event: null });
     }
 
     protected onClose(ev: Event) {
         super.onClose(ev);
+        this._handlers.forEach((handler)=>{
+            if ( handler ) handler.onClose(this,ev);
+        });
         dispatch(Net.NetEvent.ON_CLOSE, { service: this, event: ev });
     }
     protected onError(ev: Event) {
         super.onError(ev);
+        this._handlers.forEach((handler)=>{
+            if ( handler ) handler.onError(this,ev);
+        });
         dispatch(Net.NetEvent.ON_ERROR, { service: this, event: ev });
+    }
+
+    /**@description 附加Sender */
+    attach( handler : Handler ){
+        if ( !this._handlers.has(handler.module) ){
+            this._handlers.set(handler.module,handler);
+        }
+    }
+
+    /**@description 分离Sender */
+    detach( handler : Handler ){
+        if ( this._handlers.has(handler.module) ){
+            this._handlers.delete(handler.module);
+        }
     }
 
     protected onMessage(data: MessageEvent) {

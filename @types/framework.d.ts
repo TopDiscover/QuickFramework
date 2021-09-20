@@ -160,6 +160,19 @@ declare interface GameViewClass<T extends UIView> {
 	logicType: LogicClass<Logic>;
 }
 
+declare type Sender = import("../assets/scripts/framework/core/net/service/Sender").Sender;
+declare interface SenderClass< T extends Sender >{
+	new():T;
+	/**@description Sender所属模块，如聊天,vip, */
+	module : string;
+}
+
+declare type Handler = import("../assets/scripts/framework/core/net/service/Handler").Handler;
+declare interface HandlerClass< T extends Handler >{
+	new():T;
+	/**@description Sender所属模块，如聊天,vip, */
+	module : string;
+}
 /**
  * @description 通过预置体路径创建节点 请使用全局的导入
  * @param config 配置信息
@@ -253,6 +266,11 @@ declare interface UIManagerPrintDelegate<T,U,V>{
 declare interface CacheManagerPrintDelegate<T,U>{
 	printLocal(data:T,key:string):void;
 	printRemote(spriteFrameCaches:T,caches:T,infos:U):void;
+}
+
+declare interface NetHelperPrintDelegate<T,U>{
+	printSender?(data:T):void;
+	printHander?(data:U):void;
 }
 
 declare type ByteArray = import("../assets/scripts/framework/plugin/ByteArray").ByteArray;

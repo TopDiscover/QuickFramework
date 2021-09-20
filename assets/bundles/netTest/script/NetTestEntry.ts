@@ -1,13 +1,17 @@
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
+import ChatHandler from "./net/ChatHandler";
+import GameHandler from "./net/GameHandler";
 import NetTestView from "./view/NetTestView";
 
 class NetTestEntry extends Entry {
     static bundle = "netTest";
-    protected addNetComponent(): void {
-        
+    protected addNetHandler(): void {
+        Manager.netHelper.getHandler(ChatHandler,true);
+        Manager.netHelper.getHandler(GameHandler,true);
     }
-    protected removeNetComponent(): void {
-        
+    protected removeNetHandler(): void {
+        Manager.netHelper.destoryHandler(ChatHandler);
+        Manager.netHelper.destoryHandler(GameHandler);
     }
     protected loadResources(completeCb: () => void): void {
         completeCb();
