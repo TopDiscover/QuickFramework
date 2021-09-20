@@ -24,7 +24,7 @@ export abstract class ServerConnector {
     /**
      * @description 发送心跳
      */
-    protected abstract sendHeartbeat();
+    protected abstract sendHeartbeat():void;
 
     /**
      * @description 获取最大心跳超时的次数

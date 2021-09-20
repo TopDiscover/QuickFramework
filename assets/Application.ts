@@ -78,10 +78,6 @@ export class _Manager extends Framewok implements GameEventInterface {
 
     onLoad(node: cc.Node) {
         Manager.adaptor.onLoad(node);
-        //全局网络管理器onLoad
-        Manager.netManager.onLoad(node);
-        //大厅
-        Manager.hallNetManager.onLoad(node);
         //预先加载下loading预置体
         Manager.tips.preloadPrefab();
         Manager.uiLoading.preloadPrefab();
@@ -104,9 +100,6 @@ export class _Manager extends Framewok implements GameEventInterface {
 
     onDestroy(node: cc.Node) {
         Manager.adaptor.onDestroy();
-        //网络管理器onDestroy
-        Manager.netManager.onDestroy(node);
-        Manager.hallNetManager.onDestroy(node);
         Manager.serviceManager.onDestroy();
         //入口管理器
         Manager.entryManager.onDestroy(node);

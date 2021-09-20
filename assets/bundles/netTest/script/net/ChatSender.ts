@@ -1,20 +1,21 @@
-import NetHelper from "../../../../scripts/framework/core/net/service/NetHelper";
 import { ChatService } from "../../../../scripts/common/net/ChatService";
 import { TestBinaryMessage } from "../../../hall/script/protocol/TestBinaryMessage";
 import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
 import { CmmProto } from "../../../../scripts/common/net/CmmProto";
 import { HallProtoConfig } from "../../../hall/proto/HallProtoConfig";
+import { Sender } from "../../../../scripts/framework/core/net/service/Sender";
+import { Service } from "../../../../scripts/framework/core/net/service/Service";
+import { Net } from "../../../../scripts/framework/core/net/Net";
+import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 
-class _TestChatNetHelper extends NetHelper<ChatService>{
+export class ChatSender extends Sender {
+    static module = "Chat"
+    protected service: Service = ChatService.instance;
 
-    constructor() {
-        super(ChatService.instance);
-    }
-
-    sendProtoMessage(hello: string) {
+    private sendProtoMessage(hello: string) {
 
         type RoomInfo = typeof tp.RoomInfo;
-        let RoomInfo : RoomInfo = Manager.protoManager.lookup(HallProtoConfig.CMD_ROOM_INFO.className) as any;
+        let RoomInfo: RoomInfo = Manager.protoManager.lookup(HallProtoConfig.CMD_ROOM_INFO.className) as any;
         let roomInfo = new CmmProto<tp.RoomInfo>(RoomInfo);
         roomInfo.data = RoomInfo.create();
         roomInfo.mainCmd = HallProtoConfig.CMD_ROOM_INFO.mainCmd;
@@ -23,7 +24,7 @@ class _TestChatNetHelper extends NetHelper<ChatService>{
         roomInfo.data.name = "高级VIP专场";
         roomInfo.data.roomID = 9999;
         type UserInfo = typeof tp.UserInfo;
-        let UserInfo : UserInfo = Manager.protoManager.lookup("tp.UserInfo") as any ;
+        let UserInfo: UserInfo = Manager.protoManager.lookup("tp.UserInfo") as any;
         let userInfo = UserInfo.create();
         userInfo.id = 6666;
         userInfo.level = 10;
@@ -34,19 +35,30 @@ class _TestChatNetHelper extends NetHelper<ChatService>{
         userInfo.gender = ((GenderType.values as any) as typeof tp.GenderType).female;
         roomInfo.data.players = [];
         roomInfo.data.players.push(userInfo);
-        this.service.send(roomInfo);
+        this.send(roomInfo);
     }
 
-    sendJsonMessage(hello: string) {
+    private sendJsonMessage(hello: string) {
         let msg = new TestJsonMessage();
         msg.hello = hello;
-        this.service.send(msg);
+        this.send(msg);
     }
 
-    sendBinaryMessage(hello: string) {
+    private sendBinaryMessage(hello: string) {
         let binaryMessage = new TestBinaryMessage();
         binaryMessage.vHello = hello;
-        this.service.send(binaryMessage);
+        this.send(binaryMessage);
+    }
+
+    sendEx() {
+        if (this.service) {
+            if (this.service.serviceType == Net.ServiceType.BinaryStream) {
+                this.sendBinaryMessage("您好，我是Binary消息");
+            } else if (this.service.serviceType == Net.ServiceType.Json) {
+                this.sendJsonMessage("您好，我是Json消息");
+            } else if (this.service.serviceType == Net.ServiceType.Proto) {
+                this.sendProtoMessage("您好，我是Proto消息");
+            }
+        }
     }
 }
-export let TestChatNetHelper = new _TestChatNetHelper();

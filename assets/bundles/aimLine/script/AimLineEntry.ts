@@ -3,9 +3,9 @@ import AimLineView from "./view/AimLineView";
 
 class AimLineEntry extends Entry {
     static bundle = "aimLine";
-    protected addNetComponent(): void {
+    protected addNetHandler(): void {
     }
-    protected removeNetComponent(): void {
+    protected removeNetHandler(): void {
     }
     protected loadResources(completeCb: () => void): void {
         completeCb();

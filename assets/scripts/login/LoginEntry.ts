@@ -15,10 +15,10 @@ class LoginEntry extends Entry {
     /**@description 是否是主包入口，只能有一个主包入口 */
     isMain = true;
 
-    protected addNetComponent(): void {
+    protected addNetHandler(): void {
         
     }
-    protected removeNetComponent(): void {
+    protected removeNetHandler(): void {
         
     }
     protected loadResources(completeCb: () => void): void {
@@ -55,10 +55,15 @@ class LoginEntry extends Entry {
     /**@description 这个位置说明自己GameView 进入onLoad完成 */
     onEnterGameView(gameView:GameView) {
         super.onEnterGameView(gameView);
-        //进入到登录，关闭掉所有网络连接，请求登录成功后才连接网络
-        Manager.hallNetManager.removeNetControllers();
+        //销毁所有网络Handler
+        Manager.netHelper.clearHandler();
+        //销毁所有网络Sender
+        Manager.netHelper.clearSender();
+        //关闭网络
         Manager.serviceManager.close();
+        //卸载proto
         Manager.protoManager.unload();
+        //关闭除登录之外的界面
         Manager.uiManager.closeExcept([LoginView]);
         //清理所有数据中数据
         Manager.dataCenter.clear();
@@ -67,7 +72,7 @@ class LoginEntry extends Entry {
     /**@description 卸载bundle,即在自己bundle删除之前最后的一条消息 */
     onUnloadBundle() {
         //移除本模块网络事件
-        this.removeNetComponent();
+        this.removeNetHandler();
         //卸载资源
         this.unloadResources();
     }

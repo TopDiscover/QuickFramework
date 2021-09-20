@@ -5,11 +5,9 @@ class ShaderEntry extends Entry {
 
     static bundle = "shaders";
 
-    protected addNetComponent(): void {
-        
+    protected addNetHandler(): void {
     }
-    protected removeNetComponent(): void {
-        
+    protected removeNetHandler(): void {
     }
     protected loadResources(completeCb: () => void): void {
         completeCb();

@@ -3,6 +3,7 @@ import { HallData } from "./data/HallData";
 import { HallLanguage } from "./data/HallLanguage";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import { Config } from "../../../scripts/common/config/Config";
+import HallHandler from "./net/HallHandler";
 
 class HallEntry extends Entry {
     static bundle = Config.BUNDLE_HALL;
@@ -12,11 +13,12 @@ class HallEntry extends Entry {
         return Manager.dataCenter.getData(HallData) as HallData;
     }
 
-    protected addNetComponent(): void {
-        Manager.hallNetManager.addNetControllers();
+    protected addNetHandler(): void {
+        Manager.netHelper.getHandler(HallHandler,true);
     }
-    protected removeNetComponent(): void {
-        // Manager.hallNetManager.removeNetControllers();
+    protected removeNetHandler(): void {
+        //大厅的到登录界面会自动初清除
+        // Manager.netHelper.destoryHandler(HallHandler);
     }
     protected loadResources(completeCb: () => void): void {
         Manager.protoManager.load(this.bundle).then((isSuccess)=>{

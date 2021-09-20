@@ -3,10 +3,10 @@ import NodePoolView from "./view/NodePoolView";
 
 class NodePoolTestEntry extends Entry {
     static bundle = "nodePoolTest";
-    protected addNetComponent(): void {
+    protected addNetHandler(): void {
         
     }
-    protected removeNetComponent(): void {
+    protected removeNetHandler(): void {
         
     }
     protected loadResources(completeCb: () => void): void {

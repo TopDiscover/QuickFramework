@@ -51,7 +51,7 @@ export abstract class Entry {
         //初始化游戏数据
         this.initData();
         //添加网络事件
-        this.addNetComponent();
+        this.addNetHandler();
         //暂停当前网络处理队列，等资源加载完成后打开界面
         this.pauseMessageQueue();
         //加载资源
@@ -88,14 +88,14 @@ export abstract class Entry {
         //自己bundle初始卸载前要关闭当前bundle的所有界面
         Manager.uiManager.closeBundleView(this.bundle);
         //移除本模块网络事件
-        this.removeNetComponent();
+        this.removeNetHandler();
         //卸载资源
         this.unloadResources();
     }
 
     /**@description 添加该模块网络事件 */
-    protected abstract addNetComponent(): void;
-    protected abstract removeNetComponent(): void;
+    protected abstract addNetHandler(): void;
+    protected abstract removeNetHandler(): void;
 
     /**@description 加载模块资源 */
     protected abstract loadResources(completeCb: () => void): void;

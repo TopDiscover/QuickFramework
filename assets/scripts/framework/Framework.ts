@@ -5,7 +5,6 @@ import { AssetManager } from "./core/asset/AssetManager";
 import { CacheManager } from "./core/asset/CacheManager";
 import { NodePoolManager } from "./core/nodePool/NodePoolManager";
 import { HotupdateManager } from "./core/hotupdate/HotupdateManager";
-import { NetManager } from "./core/net/service/NetManager";
 import { BundleManager } from "./core/asset/BundleManager";
 import { CocosExtentionInit } from "./plugin/CocosExtention";
 import { Language } from "./core/language/Language";
@@ -16,9 +15,15 @@ import { EntryManager } from "./core/entry/EntryManager";
 import { DataCenter } from "./data/DataCenter";
 import { LogicManager } from "./core/logic/LogicManager";
 import { LoggerImpl } from "./core/log/Logger";
+import NetHelper from "./core/net/service/NetHelper";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
+
+    /**@description 网络辅助类 */
+    get netHelper(){
+        return getSingleton(NetHelper);
+    }
 
     /**@description 日志 */
     get logger(){
@@ -48,24 +53,6 @@ export class Framewok {
     /**@description bundle管理器 */
     get bundleManager() {
         return getSingleton(BundleManager);
-    }
-
-    private _hallNetManager: NetManager = null!;
-    /**@description 大厅的网络控制器组件管理器，注册到该管理器的网络组件，除登录界面外，都会被移除掉*/
-    get hallNetManager() {
-        if (!this._hallNetManager) {
-            this._hallNetManager = new NetManager("hallNetManager");
-        }
-        return this._hallNetManager;
-    }
-
-    private _netManager: NetManager = null!;
-    /**@description 全局常驻网络组件管理器,注册到该管理器的网络组件会跟游戏的生命周期一致 */
-    get netManager() {
-        if (!this._netManager) {
-            this._netManager = new NetManager("netManager");
-        }
-        return this._netManager;
     }
 
     /**@description 热更新管理器 */

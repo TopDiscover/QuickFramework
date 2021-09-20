@@ -1,24 +1,22 @@
-import NetHelper from "../../../../scripts/framework/core/net/service/NetHelper";
 import { LobbyService } from "../../../../scripts/common/net/LobbyService";
 import { TestBinaryMessage } from "../protocol/TestBinaryMessage";
 import { HttpPackage } from "../../../../scripts/framework/core/net/http/HttpClient";
 import { TestJsonMessage } from "../protocol/TestJsonMessage";
 import { Http } from "../../../../scripts/framework/core/net/http/Http";
-import { MainCmd } from "../../../../scripts/common/protocol/CmdDefines";
-import { SUB_CMD_LOBBY } from "../protocol/LobbyCmd";
 import { CmmProto } from "../../../../scripts/common/net/CmmProto";
 import { HallProtoConfig } from "../../proto/HallProtoConfig";
+import { Sender } from "../../../../scripts/framework/core/net/service/Sender";
+import { Net } from "../../../../scripts/framework/core/net/Net";
 
-class _HallNetHelper extends NetHelper<LobbyService>{
+export class HallSender extends Sender {
 
-    constructor() {
-        super(LobbyService.instance);
-    }
+    static module = "Lobby"
+    protected service: Service = LobbyService.instance;
 
-    sendProtoMessage(hello: string) {
+    private sendProtoMessage(hello: string) {
 
         type RoomInfo = typeof tp.RoomInfo;
-        let RoomInfo : RoomInfo = Manager.protoManager.lookup(HallProtoConfig.CMD_ROOM_INFO.className) as any;
+        let RoomInfo: RoomInfo = Manager.protoManager.lookup(HallProtoConfig.CMD_ROOM_INFO.className) as any;
         let roomInfo = new CmmProto<tp.RoomInfo>(RoomInfo);
         roomInfo.data = RoomInfo.create();
         roomInfo.mainCmd = HallProtoConfig.CMD_ROOM_INFO.mainCmd;
@@ -27,7 +25,7 @@ class _HallNetHelper extends NetHelper<LobbyService>{
         roomInfo.data.name = "高级VIP专场";
         roomInfo.data.roomID = 9999;
         type UserInfo = typeof tp.UserInfo;
-        let UserInfo : UserInfo = Manager.protoManager.lookup("tp.UserInfo") as any ;
+        let UserInfo: UserInfo = Manager.protoManager.lookup("tp.UserInfo") as any;
         let userInfo = UserInfo.create();
         userInfo.id = 6666;
         userInfo.level = 10;
@@ -41,13 +39,13 @@ class _HallNetHelper extends NetHelper<LobbyService>{
         this.service.send(roomInfo);
     }
 
-    sendJsonMessage(hello: string) {
+    private sendJsonMessage(hello: string) {
         let msg = new TestJsonMessage();
         msg.hello = hello;
         this.service.send(msg);
     }
 
-    sendBinaryMessage(hello: string) {
+    private sendBinaryMessage(hello: string) {
         let binaryMessage = new TestBinaryMessage();
         binaryMessage.vHello = hello;
         this.service.send(binaryMessage);
@@ -82,5 +80,16 @@ class _HallNetHelper extends NetHelper<LobbyService>{
         })
 
     }
+
+    sendEx() {
+        if (this.service) {
+            if (this.service.serviceType == Net.ServiceType.BinaryStream) {
+                this.sendBinaryMessage("您好，我是Binary消息");
+            } else if (this.service.serviceType == Net.ServiceType.Json) {
+                this.sendJsonMessage("您好，我是Json消息");
+            } else if (this.service.serviceType == Net.ServiceType.Proto) {
+                this.sendProtoMessage("您好，我是Proto消息");
+            }
+        }
+    }
 }
-export let HallNetHelper = new _HallNetHelper();

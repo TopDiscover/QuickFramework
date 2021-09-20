@@ -4,9 +4,9 @@ import LoadTestView from "./view/LoadTestView";
 
 class LoadTestEntry extends Entry {
     static bundle = "loadTest"
-    protected addNetComponent(): void {
+    protected addNetHandler(): void {
     }
-    protected removeNetComponent(): void {
+    protected removeNetHandler(): void {
     }
     protected loadResources(completeCb: () => void): void {
         this.loader.getLoadResources = ()=>{

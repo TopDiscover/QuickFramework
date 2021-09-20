@@ -33,6 +33,8 @@ export class DebugView extends cc.Component {
         this.bindEvent("bundleMgr",this.onBundleMgr);
         //节点缓存池
         this.bindEvent("pool",this.onPool);
+        //网络辅助类
+        this.bindEvent("netHelper",this.onNetHelper);
         this.doOther();
     }
     debug: cc.Node = null!;
@@ -221,7 +223,7 @@ export class DebugView extends cc.Component {
                     Log.d(`----------- 无效缓存信息 -----------`);
                     Log.d(JSON.stringify(invalidContent));
                 }
-                if (DEBUG) Log.d(`----------------Bundle ${key} 资源缓存信息结束----------------`)
+                if (CC_DEBUG) Log.d(`----------------Bundle ${key} 资源缓存信息结束----------------`)
             },
             printRemote: (spCaches, caches, infos) => {
                 Log.d(`---- 远程加载资源缓存信息 ----`);
@@ -286,6 +288,22 @@ export class DebugView extends cc.Component {
         Manager.uiManager.print({
             printComp: (data) => {
                 Log.d(cc.js.getClassName(data));
+            }
+        })
+    }
+
+    private onNetHelper(){
+        Log.d(`-----------网络辅助相关信息------------`);
+        Log.d(`-----------当前所有Sender------------`);
+        Manager.netHelper.print({
+            printSender:(data)=>{
+                Log.d(data.module);
+            }
+        });
+        Log.d(`-----------当前所有Handler------------`);
+        Manager.netHelper.print({
+            printHander:(data)=>{
+                Log.d(data.module);
             }
         })
     }

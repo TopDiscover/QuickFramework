@@ -6,9 +6,9 @@ import EliminateGameView from "./view/EliminateGameView";
 
 class EliminateEntry extends Entry {
     static bundle = EliminateData.bundle;
-    protected addNetComponent(): void {
+    protected addNetHandler(): void {
     }
-    protected removeNetComponent(): void {
+    protected removeNetHandler(): void {
     }
     protected loadResources(completeCb: () => void): void {
         Manager.loading.show(Manager.getLanguage("loading_game_resources"));

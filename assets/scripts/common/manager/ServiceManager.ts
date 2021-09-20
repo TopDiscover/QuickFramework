@@ -4,7 +4,10 @@
 
 import { Macro } from "../../framework/defines/Macros";
 import { Config } from "../config/Config";
+import { ChatService } from "../net/ChatService";
 import { CommonService } from "../net/CommonService";
+import { GameService } from "../net/GameService";
+import { LobbyService } from "../net/LobbyService";
 export class ServiceManager implements GameEventInterface {
 
     private static _instance: ServiceManager = null!;
@@ -19,16 +22,12 @@ export class ServiceManager implements GameEventInterface {
      * */
     onLoad() {
         //可根据自己项目需要，添加多个service ,添加时必须从优先级 高->低 添加
-        // this.addService(EchoService.instance, 3)
-        // this.services.push(PinusGameService.instance, 3)
-
-        // PinusGameService.instance.priority = 3
-        //  this.services.push(LobbyService.instance);
-        //  this.services.push(GameService.instance);
-        //  this.services.push(ChatService.instance);
-        //  LobbyService.instance.priority = 3;
-        //  GameService.instance.priority = 2;
-        //  ChatService.instance.priority = 1;
+         this.services.push(LobbyService.instance);
+         this.services.push(GameService.instance);
+         this.services.push(ChatService.instance);
+         LobbyService.instance.priority = 3;
+         GameService.instance.priority = 2;
+         ChatService.instance.priority = 1;
     }
 
     public getServiceByNmame(name: string): CommonService | null {
