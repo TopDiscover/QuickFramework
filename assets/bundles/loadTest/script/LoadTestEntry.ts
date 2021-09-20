@@ -1,10 +1,8 @@
 import { SpriteFrame } from "cc";
 import { Resource } from "../../../scripts/framework/core/asset/Resource";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
-import { setClassName } from "../../../scripts/framework/decorator/Decorators";
 import LoadTestView from "./view/LoadTestView";
 
-@setClassName()
 class LoadTestEntry extends Entry {
     static bundle = "loadTest"
     protected addNetComponent(): void {

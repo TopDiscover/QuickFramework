@@ -8,8 +8,7 @@ export class EntryManager {
     private static _instance: EntryManager = null!;
     public static Instance() { return this._instance || (this._instance = new EntryManager()); }
     private tag = "[EntryManager] : ";
-    private _entryTypes: EntryClass<Entry>[] = [];
-    private _entrys: Entry[] = [];
+    private _entrys: Map<string, Entry> = new Map();
 
     /**@description 默认代理，可根据自己项目需要重新实现 */
     public delegate: EntryDelegate = new EntryDelegate();
@@ -18,46 +17,38 @@ export class EntryManager {
 
     /**@description 注册入口 */
     register(entryClass: EntryClass<Entry>) {
-        let index = this._entryTypes.indexOf(entryClass);
-        if (index != -1) {
-            if (DEBUG) {
-                Log.e(`${this.tag}重复添加 : ${entryClass.bundle}`);
+        let entry = this.getEntry(entryClass.bundle);
+        if (entry) {
+            if ( DEBUG ){
+                Log.w(`${this.tag}更新Bundle : ${entryClass.bundle} 入口程序!!!`);
             }
-            return;
+            this._entrys.delete(entryClass.bundle);
         }
+        entry = new entryClass;
+        entry.bundle = entryClass.bundle;
+        this._entrys.set(entry.bundle, entry);
         if (this.node) {
-            //场景已经进入了onLoad,创建该入口，初始化
-            let entry = new entryClass;
-            entry.bundle = entryClass.bundle;
+            if ( DEBUG ){
+                Log.d(`${this.tag} ${entry.bundle} onLoad`);
+            }
             entry.onLoad(this.node);
-            this._entrys.push(entry);
-        } else {
-            this._entryTypes.push(entryClass);
         }
     }
 
     onLoad(node: Node) {
         this.node = node;
-        let mainEntry : Entry | null = null;
-        for (let i = 0; i < this._entryTypes.length; i++) {
-            let type = this._entryTypes[i];
-            if (!this.isRunning(type)) {
-                //如果当前entry没有运行,执行它
-                let entry = new type();
-                Log.d(`${this.tag}添加${entry.bundle}入口程序!!!`);
-                entry.bundle = type.bundle;
-                entry.onLoad(this.node);
-                if( type.isMain ){
-                    mainEntry = entry;
+        this._entrys.forEach((entry,key)=>{
+            if ( !entry.isRunning ){
+                entry.onLoad(this.node as Node);
+                if ( entry.isMain ){
+                    if ( DEBUG ){
+                        Log.d(`${this.tag}${entry.bundle} onEnter`);
+                    }
+                    //启动主程序入口
+                    entry.onEnter();
                 }
-                this._entrys.push(entry);
             }
-        }
-
-        //启动主包入口，
-        if ( mainEntry ){
-            mainEntry.onEnter();
-        }
+        });
     }
 
     onDestroy(node: Node) {
@@ -67,14 +58,14 @@ export class EntryManager {
     }
 
     /**@description 主包检测更新 */
-    onCheckUpdate(){
+    onCheckUpdate() {
         this.delegate.onCheckUpdate();
     }
 
-    call(bundle:BUNDLE_TYPE,eventName:string,...args:any[]){
+    call(bundle: BUNDLE_TYPE, eventName: string, ...args: any[]) {
         let entry = this.getEntry(bundle);
-        if( entry ){
-            entry.call(eventName,args);
+        if (entry) {
+            entry.call(eventName, args);
         }
     }
 
@@ -83,81 +74,67 @@ export class EntryManager {
      * @param bundle bundle
      * @param isQuitGame 是否退出游戏，bundel为主包时有效果
      **/
-    enterBundle(bundle:BUNDLE_TYPE,isQuitGame : boolean = false) {
+    enterBundle(bundle: BUNDLE_TYPE, isQuitGame: boolean = false) {
         let config = this.delegate.getEntryConfig(bundle);
-        if ( config ){
-            if( isQuitGame ){
+        if (config) {
+            if (isQuitGame) {
                 let entry = this.getEntry(bundle);
                 this.delegate.onQuitGame(entry);
-            }else{
+            } else {
                 Manager.bundleManager.enterBundle(config, this.delegate);
             }
-        }   
+        }
     }
 
     /**@description 加载bundle完成 */
     onLoadBundleComplete(versionInfo: HotUpdate.BundleConfig, bundle: AssetManager.Bundle) {
         //通知入口管理进入bundle
         let entry = this.getEntry(versionInfo.bundle);
-        if ( entry ){
+        if (entry) {
             entry.onEnter();
         }
     }
 
     /**@description 进入GameView完成，卸载除了自己之外的其它bundle */
-    onEnterGameView( bundle : BUNDLE_TYPE , gameView : GameView ){
+    onEnterGameView(bundle: BUNDLE_TYPE, gameView: GameView) {
         let entry = this.getEntry(bundle);
-        if( entry ){
+        if (entry) {
             entry.onEnterGameView(gameView);
         }
-        this.delegate.onEnterGameView(entry,gameView);
+        this.delegate.onEnterGameView(entry, gameView);
     }
 
     /**@description bundle管事器卸载bundle前通知 */
-    onUnloadBundle( bundle : BUNDLE_TYPE){
+    onUnloadBundle(bundle: BUNDLE_TYPE) {
         let entry = this.getEntry(bundle);
-        if ( entry ){
+        if (entry) {
             entry.onUnloadBundle();
         }
     }
 
     onDestroyGameView(bundle: BUNDLE_TYPE, gameView: GameView) {
         let entry = this.getEntry(bundle);
-        if ( entry ){
+        if (entry) {
             entry.onUnloadBundle();
             entry.onDestroyGameView(gameView);
         }
     }
 
     /**@description 获取bundle入口 */
-    getEntry( bundle : BUNDLE_TYPE ){
-        for ( let i = 0 ; i < this._entrys.length ; i++){
-            let entry = this._entrys[i];
-            if ( entry && entry.bundle == bundle ){
-                return entry;
-            }
+    getEntry(bundle: BUNDLE_TYPE) {
+        let name = Manager.bundleManager.getBundleName(bundle);
+        let entry = this._entrys.get(name)
+        if (entry) {
+            return entry;
         }
         return null;
     }
 
-    private isRunning(entryClass: EntryClass<Entry>) {
-        for (let i = 0; i < this._entrys.length; i++) {
-            let entry = this._entrys[i];
-            if (entry.bundle == entryClass.bundle) {
-                return entry.isRunning;
-            }
-        }
-        return false;
-    }
-
-    print( delegate : EntryPrintDelegate<Entry,EntryClass<Entry>>){
-        if( delegate ){
-            for( let i = 0 ; i < this._entrys.length ; i++){
-                delegate.print(this._entrys[i]);
-            }
-            for( let i = 0 ; i < this._entryTypes.length ; i++){
-                delegate.printType(this._entryTypes[i]);
-            }
+    print(delegate: ManagerPrintDelegate<Entry>) {
+        if (delegate) {
+            this._entrys.forEach((data)=>{
+                delegate.print(data);
+            });
         }
     }
 }

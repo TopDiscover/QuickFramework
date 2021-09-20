@@ -3,11 +3,9 @@ import { TankBattleLanguage } from "./data/TankBattleLanguage";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import { Resource } from "../../../scripts/framework/core/asset/Resource";
 import { TankBattleGameData } from "./data/TankBattleGameData";
-import { setClassName } from "../../../scripts/framework/decorator/Decorators";
 /**
  * @description 坦克大战入口
  */
- @setClassName()
 class TankBattleEntry extends Entry {
     protected language = new TankBattleLanguage;
     static bundle = TankBattleGameData.bundle;

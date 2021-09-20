@@ -145,7 +145,7 @@ export class EntryDelegate {
 
     /**@description 获取常驻于内存不释放的bundle */
     getPersistBundle(){
-        return [Macro.BUNDLE_RESOURCES,Manager.bundleManager.bundleHall];
+        return [Macro.BUNDLE_RESOURCES];
     }
 
     onQuitGame(mainEntry : Entry | null ){

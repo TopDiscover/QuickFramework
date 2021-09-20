@@ -1,8 +1,6 @@
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
-import { setClassName } from "../../../scripts/framework/decorator/Decorators";
 import NodePoolView from "./view/NodePoolView";
 
-@setClassName()
 class NodePoolTestEntry extends Entry {
     static bundle = "nodePoolTest";
     protected addNetComponent(): void {

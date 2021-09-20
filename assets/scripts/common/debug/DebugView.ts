@@ -125,9 +125,6 @@ export class DebugView extends Component {
         Manager.entryManager.print({
             print: (data) => {
                 Log.d(`bundle : ${data.bundle}`);
-            },
-            printType: (data) => {
-                Log.d(`name : ${js.getClassName(data)} bundle : ${data.bundle}`);
             }
         })
     }
