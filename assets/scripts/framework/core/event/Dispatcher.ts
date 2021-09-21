@@ -9,10 +9,10 @@ interface IEvent {
     callback: Function;//事件回调
 }
 
-export class EventDispatcher {
+export class Dispatcher {
 
-    private static _instance: EventDispatcher = null!;
-    public static Instance() { return this._instance || (this._instance = new EventDispatcher()); }
+    private static _instance: Dispatcher = null!;
+    public static Instance() { return this._instance || (this._instance = new Dispatcher()); }
     private _eventCaches: { [key: string]: Array<IEvent> } = null!;
     constructor() {
         this._eventCaches = {};
@@ -96,5 +96,5 @@ export class EventDispatcher {
 
 window.dispatch = function () {
     //向自己封闭的管理器中也分发
-    Reflect.apply(EventDispatcher.Instance().dispatchEvent,EventDispatcher.Instance(),arguments);
+    Reflect.apply(Dispatcher.Instance().dispatchEvent,Dispatcher.Instance(),arguments);
 }

@@ -12,7 +12,7 @@ export default class UILoading {
     /**@description 当前loading节点 */
     private _node: cc.Node = null;
     constructor() {
-        Manager.eventDispatcher.addEventListener( Macro.ADAPT_SCREEN, this.onAdaptScreen, this);
+        Manager.dispatcher.addEventListener( Macro.ADAPT_SCREEN, this.onAdaptScreen, this);
     }
     private onAdaptScreen() {
         Manager.adaptor.fullScreenAdapt(this._node);
