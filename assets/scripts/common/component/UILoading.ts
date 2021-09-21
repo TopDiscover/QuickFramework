@@ -11,7 +11,7 @@ export default class UILoading {
     /**@description 当前loading节点 */
     private _node: Node = null!;
     constructor() {
-        Manager.dispatcher.addEventListener(Macro.ADAPT_SCREEN, this.onAdaptScreen, this);
+        Manager.dispatcher.add(Macro.ADAPT_SCREEN, this.onAdaptScreen, this);
     }
     private onAdaptScreen() {
         Manager.adaptor.fullScreenAdapt(this._node);

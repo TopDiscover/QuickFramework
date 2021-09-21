@@ -192,7 +192,7 @@ export default class Alert {
     private prefab: Prefab = null!;
 
     constructor() {
-        Manager.dispatcher.addEventListener(Macro.ADAPT_SCREEN, this.onAdaptScreen, this);
+        Manager.dispatcher.add(Macro.ADAPT_SCREEN, this.onAdaptScreen, this);
     }
 
     private _isLoadingPrefab = false;
