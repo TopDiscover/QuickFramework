@@ -87,3 +87,10 @@ export namespace ViewZOrder {
     /**@description 界面加载动画层，暂时放到最高层，加载动画时，界面未打开完成时，不让玩家点击其它地方 */
     export const UILoading = 700;
 }
+
+/**@description 网络优先级,值越大，优化级越高 */
+export enum NetPriority{
+    Game,
+    Chat,
+    Lobby,
+}

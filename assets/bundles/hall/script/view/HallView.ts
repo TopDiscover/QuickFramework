@@ -1,7 +1,4 @@
 import { HallData } from "../data/HallData";
-import { LobbyService } from "../../../../scripts/common/net/LobbyService";
-import { GameService } from "../../../../scripts/common/net/GameService";
-import { ChatService } from "../../../../scripts/common/net/ChatService";
 import SettingView from "../../../../scripts/common/component/SettingView";
 import { HotUpdate } from "../../../../scripts/framework/core/hotupdate/Hotupdate";
 import { ViewZOrder } from "../../../../scripts/common/config/Config";
@@ -26,7 +23,7 @@ export default class HallView extends GameView {
     private readonly PAGE_COUNT = 6;
 
     private get bundles() {
-        let data = Manager.dataCenter.getData(HallData) as HallData;
+        let data = Manager.dataCenter.get(HallData) as HallData;
         return data.games;
     }
 
@@ -67,11 +64,6 @@ export default class HallView extends GameView {
         setting.on(cc.Node.EventType.TOUCH_END, () => {
             Manager.uiManager.open({ type: SettingView, bundle: Macro.BUNDLE_RESOURCES, zIndex: ViewZOrder.UI, name: "设置界面" });
         });
-
-        LobbyService.instance.enabled = false;
-        GameService.instance.enabled = false;
-        ChatService.instance.enabled = false;
-
 
         let mail = cc.find("mial", bottom_op);
         mail.on(cc.Node.EventType.TOUCH_END, () => {

@@ -1,9 +1,8 @@
+import { Macro } from "../../../defines/Macros";
+import { Net } from "../Net";
 /**
  * @description websocket封装
  */
-
-import { Net } from "../Net";
-
 export default class WebSocketClinet {
 
     private _tag: string = "[WebSocketClinet]";
@@ -33,8 +32,8 @@ export default class WebSocketClinet {
 
     private _ws: WebSocket | null = null;
 
-    private _onOpen: () => void = null!;
-    public set onOpen(value: () => void) {
+    private _onOpen: (ev: Event) => void = null!;
+    public set onOpen(value) {
         this._onOpen = value;
     }
     /**@description 网络连接成功 */
@@ -178,7 +177,7 @@ export default class WebSocketClinet {
             }
             this._dataArr = [];
         }
-        if (this.onOpen) this.onOpen();
+        if (this.onOpen) this.onOpen(event);
     }
 
     private __onMessage(event: MessageEvent) {
@@ -256,7 +255,7 @@ export default class WebSocketClinet {
      */
     public close(isEnd: boolean) {
         if (this._ws) {
-            this._closeEvent = { type: Net.NetEvent.ON_CUSTOM_CLOSE, isEnd: isEnd };
+            this._closeEvent = { type: Macro.ON_CUSTOM_CLOSE, isEnd: isEnd };
             this._ws.close();
         }
         //清空发送

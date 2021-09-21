@@ -145,7 +145,7 @@ export default class EliminateGridView extends cc.Component {
 
     private selectCell(cellPos: cc.Vec2) {
         //model数据处理
-        let data = Manager.dataCenter.getData(EliminateData) as EliminateData;
+        let data = Manager.dataCenter.get(EliminateData) as EliminateData;
         let result = data.gameModel.selectCell(cellPos);
         let changeModels = result.models;
         let effectsQueue = result.effects;

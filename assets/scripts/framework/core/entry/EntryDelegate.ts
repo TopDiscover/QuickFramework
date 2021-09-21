@@ -133,6 +133,10 @@ export class EntryDelegate {
         Manager.bundleManager.removeLoadedBundle(this,excludeBundles);
     }
 
+    onShowGameView(entry: Entry | null, gameView: GameView) {
+        
+    }
+
     /**@description 主包检测更新 */
     onCheckUpdate(){
         let config = new HotUpdate.BundleConfig(

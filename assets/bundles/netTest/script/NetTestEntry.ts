@@ -1,3 +1,5 @@
+import { ChatService } from "../../../scripts/common/net/ChatService";
+import { GameService } from "../../../scripts/common/net/GameService";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import ChatHandler from "./net/ChatHandler";
 import GameHandler from "./net/GameHandler";
@@ -23,13 +25,20 @@ class NetTestEntry extends Entry {
         Manager.uiManager.close(NetTestView);
     }
     protected initData(): void {
-        
+        Manager.serviceManager.get(GameService,true);
+        Manager.serviceManager.get(ChatService,true);
     }
     protected pauseMessageQueue(): void {
         
     }
     protected resumeMessageQueue(): void {
         
+    }
+
+    onUnloadBundle(){
+        super.onUnloadBundle();
+        Manager.serviceManager.destory(GameService);
+        Manager.serviceManager.destory(ChatService);
     }
 
 }

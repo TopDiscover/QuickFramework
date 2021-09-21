@@ -35,6 +35,8 @@ export class DebugView extends cc.Component {
         this.bindEvent("pool",this.onPool);
         //网络辅助类
         this.bindEvent("netHelper",this.onNetHelper);
+        //网络管理器
+        this.bindEvent("serviceManager",this.onServiceManager);
         this.doOther();
     }
     debug: cc.Node = null!;
@@ -304,6 +306,25 @@ export class DebugView extends cc.Component {
         Manager.netHelper.print({
             printHander:(data)=>{
                 Log.d(data.module);
+            }
+        })
+    }
+
+    private onServiceManager(){
+        Log.d(`-----------网络管理器中相关网络信息------------`);
+        Manager.serviceManager.print({
+            print:(service)=>{
+                let content = `Module : ${service.module} , 进入后台的最大允许时间 : ${service.maxEnterBackgroundTime} , 优先级 : ${service.priority}`;
+                Log.d(content);
+                content = "重连信息 : "
+                if ( service.reconnectHandler ){
+                    content = `是否允许重连 : ${service.reconnectHandler.enabled}`
+                }else{
+                    content += "无重连Handler";
+                }
+                Log.d(content);
+                content = `状态信息 , 是否允许连接网络 : ${ service.enabled } 是否连接 : ${service.isConnected} 网络数据类型 : ${service.serviceType}`
+                Log.d(content);
             }
         })
     }

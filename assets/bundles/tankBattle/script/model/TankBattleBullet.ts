@@ -10,11 +10,11 @@ export default class TankBettleBullet extends cc.Component {
     /**@description 拥有者 */
     public owner : TankBettleTank = null;
     protected get data( ){
-        return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData;
+        return Manager.dataCenter.get(TankBattleGameData) as TankBattleGameData;
     }
 
     protected get logic():TankBattleLogic | null{
-        return Manager.logicManager.getLogic<TankBattleLogic>(this.data.bundle);
+        return Manager.logicManager.get<TankBattleLogic>(this.data.bundle);
     }
     private addBullet( ){
         this.logic.mapCtrl.addBullet(this);

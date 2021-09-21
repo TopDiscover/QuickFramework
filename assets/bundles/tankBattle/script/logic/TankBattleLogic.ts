@@ -12,7 +12,7 @@ import TankBattleStartView from "../view/TankBattleStartView";
 export class TankBattleLogic extends Logic {
 
     private get data() {
-        return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData;
+        return Manager.dataCenter.get(TankBattleGameData) as TankBattleGameData;
     }
 
     /**@description 游戏的各种预置 */

@@ -24,7 +24,7 @@ export default class EliminateGameView extends GameView {
         goback.on(cc.Node.EventType.TOUCH_END, this.onGoBack, this);
 
         //初始化游戏数据模型
-        let data = Manager.dataCenter.getData(EliminateData) as EliminateData;
+        let data = Manager.dataCenter.get(EliminateData) as EliminateData;
         data.initGameModel();
         let gridView = cc.find("GridView", this.node);
         if (gridView) {

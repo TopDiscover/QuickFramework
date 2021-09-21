@@ -23,4 +23,6 @@ export namespace Macro{
     export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
     /**@description 未知 */
     export const UNKNOWN = "UNKNOWN"
+    /**@description 应该层主动关闭Socket */
+    export const ON_CUSTOM_CLOSE = "";
 }

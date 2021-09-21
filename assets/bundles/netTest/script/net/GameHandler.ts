@@ -15,12 +15,14 @@ import { Handler } from "../../../../scripts/framework/core/net/service/Handler"
 export default class GameHandler extends Handler {
 
     static module = "Game"
-    protected service: Service = GameService.instance;
+    protected get service(){
+        return Manager.serviceManager.get(GameService);
+    }
 
     onLoad() {
         super.onLoad()
         this.register(GetCmdKey(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_JSON_MSG), this.onTestJsonMessage, TestJsonMessage);
-        this.register(HallProtoConfig.CMD_ROOM_INFO.cmd, this.onTestProtoMessage,HallProtoConfig.CMD_ROOM_INFO.className);
+        this.register(HallProtoConfig.CMD_ROOM_INFO.cmd, this.onTestProtoMessage, HallProtoConfig.CMD_ROOM_INFO.className);
         this.register(GetCmdKey(MainCmd.CMD_LOBBY, SUB_CMD_LOBBY.TEST_BINARY_MSG), this.onTestBinaryMessage, TestBinaryMessage);
     }
 
@@ -34,20 +36,5 @@ export default class GameHandler extends Handler {
 
     private onTestBinaryMessage(data: TestBinaryMessage) {
         dispatch(CommonEvent.TEST_BINARY_MSG, data.vHello)
-    }
-
-    /**@description 网络连接成功 */
-    onOpen( service : Service , ev : Event | null ) {
-        dispatch(CommonEvent.GAME_SERVICE_CONNECTED, service);
-    }
-
-    /**@description 网络关闭 */
-    onClose(service : Service , ev : Event) {
-        dispatch(CommonEvent.GAME_SERVICE_CLOSE, service);
-    }
-
-    /**@description 网络错误 */
-    onError(service : Service , ev : Event) {
-        
     }
 }

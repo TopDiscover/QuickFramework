@@ -16,10 +16,16 @@ import { DataCenter } from "./data/DataCenter";
 import { LogicManager } from "./core/logic/LogicManager";
 import { LoggerImpl } from "./core/log/Logger";
 import NetHelper from "./core/net/service/NetHelper";
+import { ServiceManager } from "./core/net/service/ServiceManager";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
 
+    /**@description 网络Service管理器 */
+    get serviceManager() {
+        return getSingleton(ServiceManager);
+    }
+    
     /**@description 网络辅助类 */
     get netHelper(){
         return getSingleton(NetHelper);

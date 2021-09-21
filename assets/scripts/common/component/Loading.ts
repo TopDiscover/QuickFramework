@@ -7,10 +7,10 @@ import { Config, ViewZOrder } from "../config/Config";
 
 
 export default class Loading {
-    private static _instance: Loading = null;
+    protected static _instance: Loading = null!;
     public static Instance() { return this._instance || (this._instance = new Loading()); }
     /**@description 当前loading节点 */
-    private _node: cc.Node = null;
+    protected _node: cc.Node = null!;
     constructor() {
         Manager.eventDispatcher.addEventListener(Macro.ADAPT_SCREEN, this.onAdaptScreen, this);
     }
@@ -18,10 +18,10 @@ export default class Loading {
         Manager.adaptor.fullScreenAdapt(this._node);
     }
     /**@description 是否等待关闭 */
-    private _isWaitingHide = false;
+    protected _isWaitingHide = false;
     /**@description 是否正在加载预置 */
-    private _isLoadingPrefab = false;
-    private _timeOutCb : ()=>void = null;
+    protected _isLoadingPrefab = false;
+    private _timeOutCb ?: ()=>void;
     /**@description 显示超时回调 */
     public set timeOutCb(value){
         this._timeOutCb = value;
@@ -62,7 +62,7 @@ export default class Loading {
         return this;
     }
 
-    private async _show( timeout : number ) {
+    protected async _show( timeout : number ) {
         this._isWaitingHide = false;
         let finish = await this.loadPrefab();
         if (finish) {
@@ -84,7 +84,7 @@ export default class Loading {
         }
     }
 
-    private startShowContent( ){
+    protected startShowContent( ){
         if( this._content.length == 1 ){
             this._text.string = this._content[0];
         }else{
@@ -112,7 +112,7 @@ export default class Loading {
     }
 
     /**@description 开始计时回调 */
-    private startTimeOutTimer(timeout: number) {
+    protected startTimeOutTimer(timeout: number) {
         if (timeout > 0) {
             this._timerId = setTimeout(() => {
                 this._timeOutCb && this._timeOutCb();
@@ -122,8 +122,8 @@ export default class Loading {
         }
     }
     /**@description 停止计时 */
-    private stopTimeOutTimer( ) {
-        this._timeOutCb = null;
+    protected stopTimeOutTimer( ) {
+        this._timeOutCb = undefined;
         clearTimeout(this._timerId);
         this._timerId = -1;
     }
@@ -132,7 +132,7 @@ export default class Loading {
      * @description 加载
      * @param completeCb 
      */
-    private async loadPrefab() {
+    protected async loadPrefab() {
         return new Promise<boolean>((resolove, reject) => {
             //正在加载中
             if (this._isLoadingPrefab) {
@@ -148,7 +148,7 @@ export default class Loading {
                 Macro.BUNDLE_RESOURCES, 
                 Config.CommonPrefabs.loading,
                 cc.Prefab,
-                (finish: number, total: number, item: cc.AssetManager.RequestItem)=>{},
+                (finish, total, item)=>{},
                 (data) => {
                 this._isLoadingPrefab = false;
                 if (data && data.data && data.data instanceof cc.Prefab) {

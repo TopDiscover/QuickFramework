@@ -4,13 +4,14 @@ import { HallLanguage } from "./data/HallLanguage";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import { Config } from "../../../scripts/common/config/Config";
 import HallHandler from "./net/HallHandler";
+import { LobbyService } from "../../../scripts/common/net/LobbyService";
 
 class HallEntry extends Entry {
     static bundle = Config.BUNDLE_HALL;
     protected language = new HallLanguage;
 
     private get data(){
-        return Manager.dataCenter.getData(HallData) as HallData;
+        return Manager.dataCenter.get(HallData) as HallData;
     }
 
     protected addNetHandler(): void {
@@ -32,6 +33,8 @@ class HallEntry extends Entry {
         Manager.uiManager.close(HallView);
     }
     protected initData(): void {
+        //初始化网络
+        Manager.serviceManager.get(LobbyService,true);
         //向Config.ENTRY_CONFIG合并配置
         this.data.backupConfig();
         this.data.mergeConfig();
