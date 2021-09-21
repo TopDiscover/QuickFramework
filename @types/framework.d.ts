@@ -20,9 +20,9 @@ declare type SocketBuffer = string | Uint8Array;
 /**
  * @description 发事件 参考framework/extentions/extentions dispatch 方法
  * @param name 
- * @param data 
+ * @param args 
  */
-declare function dispatch(name: string, data?: any): void;
+declare function dispatch(name: string, ...args:any[]): void;
 
 declare interface Date {
 	/**

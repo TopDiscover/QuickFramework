@@ -11,14 +11,14 @@ const removeEventListeners = Symbol("removeEventListeners");
 @ccclass
 export default class EventComponent extends cc.Component {
 
-    private _events: Map<string, (data: any) => any> = new Map();
+    private _events: Map<string, Function> = new Map();
 
     /**
      * 注册事件 ，在onLoad中注册，在onDestroy自动移除
      * @param name 
      * @param func 
      */
-    protected addEvent(name: string, func: (data: any) => void) {
+    protected addEvent(name: string, func: Function) {
         if (this._events.has(name)) {
             Log.e(`${name} 重复注册`);
             return;

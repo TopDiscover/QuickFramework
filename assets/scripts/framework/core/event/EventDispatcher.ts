@@ -6,14 +6,13 @@
 interface IEvent {
     type: string, // 事件类型
     target: any, //事件target
-    callback: ((data: any) => void) | string;//事件回调
+    callback: Function;//事件回调
 }
 
 export class EventDispatcher {
 
     private static _instance: EventDispatcher = null!;
     public static Instance() { return this._instance || (this._instance = new EventDispatcher()); }
-    private logTag = `[EventDispatcher] `;
     private _eventCaches: { [key: string]: Array<IEvent> } = null!;
     constructor() {
         this._eventCaches = {};
@@ -24,7 +23,7 @@ export class EventDispatcher {
      * @param callback 事件回调
      * @param target target
      */
-    public addEventListener(type: string, callback: ((data: any) => void) | string | undefined, target: any) {
+    public addEventListener(type: string, callback: Function, target: any) {
         if (!type || !callback || !target) return;
         let eventCaches: Array<IEvent> = this._eventCaches[type] || [];
         let hasSame = false;
@@ -71,47 +70,23 @@ export class EventDispatcher {
      * @param type 事件类型
      * @param data 事件数据
      */
-    public dispatchEvent(type: string, data?: any) {
+    public dispatchEvent() {
+        if ( arguments.length < 1 ){
+            return;
+        }
+        let type = arguments[0];
         if (!type) return;
+        Array.prototype.shift.apply(arguments);
         let eventCaches: Array<IEvent> = this._eventCaches[type];
         if (!eventCaches) return;
         for (let i = 0; i < eventCaches.length; i++) {
             let event = eventCaches[i];
             try {
                 if (typeof Reflect == "object") {
-                    if (typeof event.callback == "string") {
-                        let func = Reflect.get(event.target, event.callback);
-                        if (func) {
-                            if (CC_DEBUG) Log.d(`${this.logTag} apply string func : ${event.callback} class : ${cc.js.getClassName(event.target)}`);
-                            Reflect.apply(func.bind(event.target), event.target, [data]);
-                        } else {
-                            if (CC_DEBUG) Log.e(`${this.logTag} class : ${cc.js.getClassName(event.target)} no func : ${event.callback}`);
-                        }
-                    }
-                    else {
-                        Reflect.apply(event.callback, event.target, [data]);
-                    }
+                    Reflect.apply(event.callback,event.target,arguments);
                 } else {
-                    if (typeof event.callback == "string") {
-                        if (event.target && event.callback) {
-                            let func = event.target[event.callback];
-                            if (func && typeof func == "function") {
-                                func.apply(event.target, [data]);
-                            } else {
-                                if (CC_DEBUG) Log.e(`${event.callback} is not function`);
-                            }
-                        } else {
-                            if (CC_DEBUG) Log.e(`target or callback is null`);
-                        }
-                    } else {
-                        if (event.callback && event.target) {
-                            event.callback.apply(event.target, [data]);
-                        } else {
-                            if (CC_DEBUG) Log.e(`callback is null`);
-                        }
-                    }
+                    event.callback.apply(event.target, arguments);
                 }
-
             } catch (err) {
                 Log.e(err);
             }
@@ -119,8 +94,7 @@ export class EventDispatcher {
     }
 }
 
-window.dispatch = function (name: string, data?: any) {
-    if (CC_DEBUG && !CC_EDITOR) Log.d(`[dispatch] ${name} data : ${data}`);
+window.dispatch = function () {
     //向自己封闭的管理器中也分发
-    EventDispatcher.Instance().dispatchEvent(name, data);
+    Reflect.apply(EventDispatcher.Instance().dispatchEvent,EventDispatcher.Instance(),arguments);
 }
