@@ -99,11 +99,7 @@ export abstract class Handler {
      * @description 该方法会在Handler销毁时，调用
      */
     onDestroy(): void {
-
-        //停止所有动作
-        this.actions.forEach((data, key) => {
-            Tween.stopAllByTag(key);
-        });
+        this.stopActions();
         //移除当前Handler绑定事件
         this.unregister();
     }

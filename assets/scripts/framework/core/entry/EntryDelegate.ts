@@ -1,7 +1,6 @@
 import { AssetManager } from "cc";
 import { Macro } from "../../defines/Macros";
 import { HotUpdate } from "../hotupdate/Hotupdate";
-import GameView from "../ui/GameView";
 
 /**@description entry入口代理 */
 export class EntryDelegate {

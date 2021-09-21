@@ -1,7 +1,6 @@
 import ResourceLoader from "../asset/ResourceLoader";
 import { js, Node } from "cc";
 import { DEBUG } from "cc/env";
-import GameView from "../ui/GameView";
 
 export abstract class Entry {
 

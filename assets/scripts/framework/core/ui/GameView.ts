@@ -1,7 +1,6 @@
 /**@description 游戏层公共基类 */
 
 import { _decorator } from "cc";
-import { Logic } from "../logic/Logic";
 import UIView from "./UIView";
 
 /**
