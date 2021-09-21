@@ -43,20 +43,20 @@ export default class NetTestView extends GameView {
     private enabledServices: Toggle[] = [];
     private netTypes: Toggle[] = [];
 
-    addEvents() {
+    protected addEvents() {
         super.addEvents();
-        this.addUIEvent(CommonEvent.LOBBY_SERVICE_CONNECTED, this.onNetConnected);
-        this.addUIEvent(CommonEvent.LOBBY_SERVICE_CLOSE, this.onNetClose);
+        this.addEvent(CommonEvent.LOBBY_SERVICE_CONNECTED, this.onNetConnected);
+        this.addEvent(CommonEvent.LOBBY_SERVICE_CLOSE, this.onNetClose);
 
-        this.addUIEvent(CommonEvent.GAME_SERVICE_CONNECTED, this.onNetConnected);
-        this.addUIEvent(CommonEvent.GAME_SERVICE_CLOSE, this.onNetClose);
+        this.addEvent(CommonEvent.GAME_SERVICE_CONNECTED, this.onNetConnected);
+        this.addEvent(CommonEvent.GAME_SERVICE_CLOSE, this.onNetClose);
 
-        this.addUIEvent(CommonEvent.CHAT_SERVICE_CONNECTED, this.onNetConnected);
-        this.addUIEvent(CommonEvent.CHAT_SERVICE_CLOSE, this.onNetClose);
+        this.addEvent(CommonEvent.CHAT_SERVICE_CONNECTED, this.onNetConnected);
+        this.addEvent(CommonEvent.CHAT_SERVICE_CLOSE, this.onNetClose);
 
-        this.addUIEvent(CommonEvent.TEST_BINARY_MSG, this.onMessage);
-        this.addUIEvent(CommonEvent.TEST_JSON_MSG, this.onMessage);
-        this.addUIEvent(CommonEvent.TEST_PROTO_MSG, this.onMessage);
+        this.addEvent(CommonEvent.TEST_BINARY_MSG, this.onMessage);
+        this.addEvent(CommonEvent.TEST_JSON_MSG, this.onMessage);
+        this.addEvent(CommonEvent.TEST_PROTO_MSG, this.onMessage);
     }
     private onMessage(hello: string) {
         this.log(`收到：${hello}`);
