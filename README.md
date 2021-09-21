@@ -44,7 +44,6 @@
 当界面打开时，管理器会拿到绑定预置的预置，加载预置并显示界面
 当界面关闭时，会自动清除，释放UIView中动态加载的所有资源，及UIView本身绑定
 的预置资源的释放工作
-## [装饰器](https://gitee.com/top-discover/QuickFramework/tree/3.1.0/assets/scripts/framework/decorator)
 ## [框架扩展](https://gitee.com/top-discover/QuickFramework/tree/3.1.0/assets/scripts/framework/plugin)
 1，对引擎的接口扩展
 对cocos引擎 cc.Sprite/cc.Button/cc.Label/cc.ParticleSystem/sp.Skeleton组件添加了loadXX接口，实现动态的加载替换组件相关信息
