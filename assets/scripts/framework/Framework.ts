@@ -1,4 +1,4 @@
-import { EventDispatcher } from "./core/event/EventDispatcher";
+import { Dispatcher } from "./core/event/Dispatcher";
 import { UIManager } from "./core/ui/UIManager";
 import { LocalStorage } from "./core/storage/LocalStorage";
 import { _AssetManager } from "./core/asset/AssetManager";
@@ -73,8 +73,8 @@ export class Framewok {
     }
 
     /**@description 事件派发器 */
-    get eventDispatcher() {
-        return getSingleton(EventDispatcher);
+    get dispatcher() {
+        return getSingleton(Dispatcher);
     }
 
     /**@description 界面管理器 */

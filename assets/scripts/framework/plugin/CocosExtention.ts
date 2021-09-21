@@ -247,11 +247,11 @@ Reflect.defineProperty(Label.prototype, "language", {
                 if (isUsing) {
                     if (!!!self._isUsinglanguage) {
                         self._isUsinglanguage = true;
-                        Manager.eventDispatcher.addEventListener(Macro.CHANGE_LANGUAGE, self._onChangeLanguage, self);
+                        Manager.dispatcher.addEventListener(Macro.CHANGE_LANGUAGE, self._onChangeLanguage, self);
                     }
                 } else {
                     if (self._language) {
-                        Manager.eventDispatcher.removeEventListener(Macro.CHANGE_LANGUAGE, self);
+                        Manager.dispatcher.removeEventListener(Macro.CHANGE_LANGUAGE, self);
                     }
                 }
             })
@@ -270,7 +270,7 @@ if (!EDITOR && Macro.ENABLE_CHANGE_LANGUAGE) {
     let __label_onDestroy__ = prototype.onDestroy;
     prototype.onDestroy = function () {
         if (this._isUsinglanguage) {
-            Manager.eventDispatcher.removeEventListener(Macro.CHANGE_LANGUAGE, this);
+            Manager.dispatcher.removeEventListener(Macro.CHANGE_LANGUAGE, this);
         }
         __label_onDestroy__ && __label_onDestroy__.call(this);
     }

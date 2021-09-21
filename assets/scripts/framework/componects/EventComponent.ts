@@ -31,7 +31,7 @@ export default class EventComponent extends Component {
     protected removeEvent(eventName: string) {
         if (this._events.has(eventName)) {
             //事件移除
-            Manager.eventDispatcher.removeEventListener(eventName, this);
+            Manager.dispatcher.removeEventListener(eventName, this);
             //删除本地事件
             this._events.delete(eventName);
         }
@@ -51,13 +51,13 @@ export default class EventComponent extends Component {
 
     [addListeners]() {
         this._events.forEach((func,name)=>{
-            Manager.eventDispatcher.addEventListener(name,func,this);
+            Manager.dispatcher.addEventListener(name,func,this);
         });
     }
 
     [removeEventListeners]() {
         this._events.forEach((func,name)=>{
-            Manager.eventDispatcher.removeEventListener(name,this);
+            Manager.dispatcher.removeEventListener(name,this);
         });
         this._events.clear();
     }
