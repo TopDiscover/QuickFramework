@@ -82,7 +82,7 @@ export class BundleManager {
    private checkUpdate(versionInfo: HotUpdate.BundleConfig, delegate: EntryDelegate) {
       let self = this;
       Log.d(`检测更新信息:${versionInfo.name}(${versionInfo.bundle})`);
-      Manager.dispatcher.removeEventListener(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this);
+      Manager.dispatcher.remove(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this);
       let bundle: string | undefined = this.curBundle.bundle;
       if (this.curBundle.bundle == Macro.BUNDLE_RESOURCES) {
          bundle = undefined;
@@ -90,12 +90,12 @@ export class BundleManager {
       Manager.hotupdate.checkUpdate((code, state) => {
          if (code == HotUpdate.Code.NEW_VERSION_FOUND) {
             //有新版本
-            Manager.dispatcher.addEventListener(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload.bind(this, delegate), this);
+            Manager.dispatcher.add(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload.bind(this, delegate), this);
             Log.d(`检测到${versionInfo.name}(${versionInfo.bundle})有新的版本`);
             if (delegate) delegate.onNewVersionFund(versionInfo, code, state);
          } else if (state == HotUpdate.State.TRY_DOWNLOAD_FAILED_ASSETS) {
             //尝试重新下载之前下载失败的文件
-            Manager.dispatcher.addEventListener(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload.bind(this, delegate), this);
+            Manager.dispatcher.add(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload.bind(this, delegate), this);
             Log.d(`正在尝试重新下载之前下载失败的资源`);
             if (delegate) delegate.onDownloadFailed(versionInfo, code, state);
          } else if (code == HotUpdate.Code.ALREADY_UP_TO_DATE) {

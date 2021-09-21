@@ -29,7 +29,7 @@ export default class EventComponent extends cc.Component {
     protected removeEvent(eventName: string) {
         if (this._events.has(eventName)) {
             //事件移除
-            Manager.dispatcher.removeEventListener(eventName, this);
+            Manager.dispatcher.remove(eventName, this);
             //删除本地事件
             this._events.delete(eventName);
         }
@@ -49,13 +49,13 @@ export default class EventComponent extends cc.Component {
 
     [addListeners]() {
         this._events.forEach((func,name)=>{
-            Manager.dispatcher.addEventListener(name,func,this);
+            Manager.dispatcher.add(name,func,this);
         });
     }
 
     [removeEventListeners]() {
         this._events.forEach((func,name)=>{
-            Manager.dispatcher.removeEventListener(name,this);
+            Manager.dispatcher.remove(name,this);
         });
         this._events.clear();
     }

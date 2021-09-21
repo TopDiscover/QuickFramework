@@ -23,7 +23,7 @@ export class Dispatcher {
      * @param callback 事件回调
      * @param target target
      */
-    public addEventListener(type: string, callback: Function, target: any) {
+    public add(type: string, callback: Function, target: any) {
         if (!type || !callback || !target) return;
         let eventCaches: Array<IEvent> = this._eventCaches[type] || [];
         let hasSame = false;
@@ -46,7 +46,7 @@ export class Dispatcher {
      * @param type 事件类型
      * @param target 
      */
-    public removeEventListener(type: string, target: any) {
+    public remove(type: string, target: any) {
         if (!type || !target) {
             return;
         }
@@ -70,7 +70,7 @@ export class Dispatcher {
      * @param type 事件类型
      * @param data 事件数据
      */
-    public dispatchEvent() {
+    public dispatch() {
         if ( arguments.length < 1 ){
             return;
         }
@@ -96,5 +96,5 @@ export class Dispatcher {
 
 window.dispatch = function () {
     //向自己封闭的管理器中也分发
-    Reflect.apply(Dispatcher.Instance().dispatchEvent,Dispatcher.Instance(),arguments);
+    Reflect.apply(Dispatcher.Instance().dispatch,Dispatcher.Instance(),arguments);
 }
