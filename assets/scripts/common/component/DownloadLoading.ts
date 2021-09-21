@@ -30,9 +30,9 @@ export default class DownloadLoading extends UIView {
 
     private updateName = "";
 
-    addEvents() {
+    protected addEvents() {
         super.addEvents();
-        this.addUIEvent(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload);
+        this.addEvent(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this.onDownload);
     }
 
     onLoad() {

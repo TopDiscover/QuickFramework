@@ -68,7 +68,7 @@ export default class AudioComponent extends EventComponent {
 
     protected addEvents() {
         super.addEvents();
-        this.addUIEvent(PLAY_MUSIC, this.onPlayMusic);
+        this.addEvent(PLAY_MUSIC, this.onPlayMusic);
     }
 
     private onPlayMusic(data) {

@@ -15,9 +15,9 @@ export default class MainController extends EventComponent {
     @property(cc.Asset)
     wssCacert: cc.Asset = null;
 
-    addEvents() {
+    protected addEvents() {
         super.addEvents();
-        this.addUIEvent(HotUpdate.Event.DOWNLOAD_MESSAGE, this.onHotupdateMessage);
+        this.addEvent(HotUpdate.Event.DOWNLOAD_MESSAGE, this.onHotupdateMessage);
     }
 
     private onHotupdateMessage(data: HotUpdate.MessageData) {

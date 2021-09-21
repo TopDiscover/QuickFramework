@@ -78,9 +78,9 @@ export default class HallView extends GameView {
 
     }
 
-    addEvents() {
+    protected addEvents() {
         super.addEvents();
-        this.addUIEvent(HotUpdate.Event.DOWNLOAD_PROGRESS, this.onDownloadProgess);
+        this.addEvent(HotUpdate.Event.DOWNLOAD_PROGRESS, this.onDownloadProgess);
     }
 
     private getGameItem(config: HotUpdate.BundleConfig) {
