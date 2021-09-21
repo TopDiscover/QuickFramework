@@ -26,17 +26,20 @@
 屏幕适配相关
 ### 2,[资源管理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/asset)
 资源的管理，如加载释放等相关资源管理
+### 2,[Bundle入口管理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/entry)
+Bundle入口基类实现及bundle管理
 ### 3,[事件管理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/event)
 ### 4,[热更新模块](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/hotupdate)
 ### 5,[多语言模块](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/language)
 ### 6,[日志](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/log)
 ### 7,[逻辑处理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/logic)
-该模块为主流程控制模块，可以理解为管理每个Bundle的入口流程逻辑控制
+该模块与模块游戏场景GameView绑定，建立一个MVC的模式
 ### 8,[网络](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/net)
 该网络部分已经集成了相关的网络，对网络数据的收发等操作，目前支持市面上主流的几种数据流格式，
 1,json 数据格式
 2,proto 数据格式
 3,BinaryStream 数据格式 (即二进制数据流)
+内部分集成了网络Handler 及 Sender 可参考网络示例代码
 ### 9,[对象池](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/nodePool)
 ### 10,[本地存储](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/storage)
 ### 11,[UI管理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/ui)
@@ -45,7 +48,6 @@
 当界面打开时，管理器会拿到绑定预置的预置，加载预置并显示界面
 当界面关闭时，会自动清除，释放UIView中动态加载的所有资源，及UIView本身绑定
 的预置资源的释放工作
-## [装饰器](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/decorator)
 ## [框架扩展](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/plugin)
 1，对引擎的接口扩展
 对cocos引擎 cc.Sprite/cc.Button/cc.Label/cc.ParticleSystem/sp.Skeleton组件添加了loadXX接口，实现动态的加载替换组件相关信息
@@ -71,7 +73,7 @@ declare interface StringConstructor {
 }
 ```
 ## [数据](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/data)
-数据中心，完善中
+数据中心,框架严格来说除各管理器外，禁止使用全局变更及单例，游戏的各种数据都从数据中心中获取
 ## [框架类型及常量](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/defines)
 1,常用检举
 2,常用宏定义
