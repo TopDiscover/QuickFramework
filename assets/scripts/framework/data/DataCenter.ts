@@ -1,4 +1,3 @@
-import { DEBUG } from "cc/env";
 import { Macro } from "../defines/Macros";
 import { GameData } from "./GameData";
 
@@ -15,21 +14,15 @@ export class DataCenter {
      * @param isCreate 再找不到数据时，是否创建数据
      * @returns 
      */
-    getData<T extends GameData>(DataTypeOrBundle: GameDataClass<T> | string, isCreate: boolean = true): T | null {
-        if (typeof DataTypeOrBundle == "string") {
-            if (this._datas.has(DataTypeOrBundle)) {
-                return <T>this._datas.get(DataTypeOrBundle);
-            }
-        } else {
-            if (DataTypeOrBundle.bundle == Macro.UNKNOWN) {
-                if (DEBUG) {
-                    Log.e("未设计数据bundle");
-                }
-                return null;
-            }
-            if (this._datas.has(DataTypeOrBundle.bundle)) {
-                return <T>this._datas.get(DataTypeOrBundle.bundle)
-            }
+    get<T extends GameData>(DataTypeOrBundle: GameDataClass<T> | string, isCreate: boolean = true): T | null {
+        let bundle = this.getBundle(DataTypeOrBundle);
+        if ( bundle == Macro.UNKNOWN){
+            return null;
+        }
+        if (this._datas.has(bundle)) {
+            return <T>this._datas.get(bundle);
+        }
+        if (typeof DataTypeOrBundle != "string") {
             if (isCreate) {
                 let data = new DataTypeOrBundle();
                 data.bundle = DataTypeOrBundle.bundle;
@@ -54,7 +47,7 @@ export class DataCenter {
         //需要排除指定数据类型
         this._datas.forEach((data, key) => {
             if (!this.isInExclude(data, exclude)) {
-                this._datas.delete(key);
+                this.destory(key);
             }
         });
     }
@@ -81,7 +74,7 @@ export class DataCenter {
     }
 
     private getBundle<T extends GameData>(data: GameDataClass<T> | string) {
-        let bundle = "";
+        let bundle = Macro.UNKNOWN;
         if (typeof data == "string") {
             bundle = data;
         } else {

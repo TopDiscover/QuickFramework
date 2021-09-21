@@ -11,7 +11,9 @@ import { Net } from "../../../../scripts/framework/core/net/Net";
 export class HallSender extends Sender {
 
     static module = "Lobby"
-    protected service: Service = LobbyService.instance;
+    protected get service(){
+        return Manager.serviceManager.get(LobbyService);
+    }
 
     private sendProtoMessage(hello: string) {
 
@@ -36,19 +38,19 @@ export class HallSender extends Sender {
         userInfo.gender = ((GenderType.values as any) as typeof tp.GenderType).female;
         roomInfo.data.players = [];
         roomInfo.data.players.push(userInfo);
-        this.service.send(roomInfo);
+        this.service?.send(roomInfo);
     }
 
     private sendJsonMessage(hello: string) {
         let msg = new TestJsonMessage();
         msg.hello = hello;
-        this.service.send(msg);
+        this.service?.send(msg);
     }
 
     private sendBinaryMessage(hello: string) {
         let binaryMessage = new TestBinaryMessage();
         binaryMessage.vHello = hello;
-        this.service.send(binaryMessage);
+        this.service?.send(binaryMessage);
     }
 
     sendHttpMessage() {

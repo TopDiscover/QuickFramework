@@ -1,5 +1,6 @@
 import { DEBUG } from "cc/env";
-import { Codec, Message } from "../message/Message";
+import { Macro } from "../../../defines/Macros";
+import { Codec, IMessage, Message } from "../message/Message";
 import { Net } from "../Net";
 import { ServerConnector } from "../socket/ServerConnector";
 import { Process } from "./Process";
@@ -9,6 +10,37 @@ import { Process } from "./Process";
 
 
 export abstract class Service extends ServerConnector {
+    /**@description Service所属模块，如Lobby,game */
+    static module: string = Macro.UNKNOWN;
+    /**@description 该字段由ServiceManager指定 */
+    module = Macro.UNKNOWN;
+
+    /**@description 进入后台的最大允许时间，超过了最大值，则进入网络重连 */
+    abstract maxEnterBackgroundTime : number;
+    /**@description 连接服务器 */
+    abstract connect(): void;
+
+    /**
+     * @description 发送心跳
+     */
+    protected abstract sendHeartbeat():void ;
+    /**
+     * @description 是否为心跳消息
+     */
+    protected abstract isHeartBeat(data: IMessage): boolean;
+
+    /**@description 进入后台网络处理 */
+    abstract onEnterBackground() : void;
+
+    /**
+     * @description 进入前台网络处理
+     * @param inBackgroundTime 进入后面总时间
+     **/
+    abstract onEnterForgeground(inBackgroundTime: number) : void;
+
+    /**@description 网络重连 */
+    reconnectHandler: ReconnectHandler | null = null;
+
     private _Process: Process = new Process()
     public set Process(val: typeof Process) {
         if (val == null) { return }
@@ -29,50 +61,23 @@ export abstract class Service extends ServerConnector {
         this._Process.serviceType = value.type;
     }
 
-    public serviceName = "CommonService";
     /**@description 值越大，优先级越高 */
     public priority: number = 0;
 
     serviceType : Net.ServiceType = Net.ServiceType.Unknown;
 
-    /**@description Handlers */
-    private _handlers : Map<string,Handler> = new Map();
-
-    protected onOpen() {
-        super.onOpen();
-        this._handlers.forEach((handler)=>{
-            if ( handler ) handler.onOpen(this,null);
-        });
-        dispatch(Net.NetEvent.ON_OPEN, { service: this, event: null });
+    protected onOpen(ev: Event) {
+        super.onOpen(ev);
+        Manager.serviceManager.onOpen(ev,this);
     }
 
     protected onClose(ev: Event) {
         super.onClose(ev);
-        this._handlers.forEach((handler)=>{
-            if ( handler ) handler.onClose(this,ev);
-        });
-        dispatch(Net.NetEvent.ON_CLOSE, { service: this, event: ev });
+        Manager.serviceManager.onClose(ev,this);
     }
     protected onError(ev: Event) {
         super.onError(ev);
-        this._handlers.forEach((handler)=>{
-            if ( handler ) handler.onError(this,ev);
-        });
-        dispatch(Net.NetEvent.ON_ERROR, { service: this, event: ev });
-    }
-
-    /**@description 附加Sender */
-    attach( handler : Handler ){
-        if ( !this._handlers.has(handler.module) ){
-            this._handlers.set(handler.module,handler);
-        }
-    }
-
-    /**@description 分离Sender */
-    detach( handler : Handler ){
-        if ( this._handlers.has(handler.module) ){
-            this._handlers.delete(handler.module);
-        }
+        Manager.serviceManager.onError(ev,this);
     }
 
     protected onMessage(data: MessageEvent) {
@@ -134,7 +139,6 @@ export abstract class Service extends ServerConnector {
         //this.resumeMessageQueue();
         super.close(isEnd);
     }
-
 
 
     public send(msg: Message) {

@@ -1,19 +1,19 @@
 /**@description 调试 */
-interface Logger{
+interface Logger {
 	/**@description 错误日志 */
-	e(...data:any[]):void;
+	e(...data: any[]): void;
 	/**@description debug日志 */
-	d(...data:any[]):void;
+	d(...data: any[]): void;
 	/**@description 警告输出 */
-	w(...data:any[]):void;
+	w(...data: any[]): void;
 	/**
 	 * @description dump 对象数据
 	 * @param object dump的对象
 	 * @param label 标签
 	 */
-	dump(object : Object , label?:string):void;
+	dump(object: Object, label?: string): void;
 }
-declare let Log : Logger;
+declare let Log: Logger;
 
 declare type BUNDLE_TYPE = string | import("cc").AssetManager.Bundle;
 declare type SocketBuffer = string | Uint8Array;
@@ -133,25 +133,23 @@ declare interface UIClass<T extends UIView> {
 	 */
 	getPrefabUrl(): string;
 }
-declare type Entry = import("../assets/scripts/framework/core/entry/Entry").Entry;
-declare interface EntryClass<T extends Entry> {
+
+declare interface BundleClass<T> {
 	new(): T;
 	/**@description 当前bundle名 */
 	bundle: string;
 }
 
+declare type Entry = import("../assets/scripts/framework/core/entry/Entry").Entry;
+declare interface EntryClass<T extends Entry> extends BundleClass<T> {
+}
+
 declare type GameData = import("../assets/scripts/framework/data/GameData").GameData;
-declare interface GameDataClass<T extends GameData> {
-	new(): T;
-	/**@description 当前数据所属bundle */
-	bundle: string;
+declare interface GameDataClass<T extends GameData> extends BundleClass<T> {
 }
 
 declare type Logic = import("../assets/scripts/framework/core/logic/Logic").Logic;
-declare interface LogicClass<T extends Logic> {
-	new(): T;
-	/**@description 当前Logic所属bundle */
-	bundle: string;
+declare interface LogicClass<T extends Logic> extends BundleClass<T> {
 }
 
 declare type GameView = import("../assets/scripts/framework/core/ui/GameView").default;
@@ -160,19 +158,28 @@ declare interface GameViewClass<T extends UIView> {
 	logicType: LogicClass<Logic>;
 }
 
+declare interface ModuleClass<T> {
+	new(): T;
+	module: string;
+}
+
 declare type Sender = import("../assets/scripts/framework/core/net/service/Sender").Sender;
-declare interface SenderClass< T extends Sender >{
-	new():T;
-	/**@description Sender所属模块，如聊天,vip, */
-	module : string;
+declare interface SenderClass<T extends Sender> extends ModuleClass<T> {
 }
 
 declare type Handler = import("../assets/scripts/framework/core/net/service/Handler").Handler;
-declare interface HandlerClass< T extends Handler >{
-	new():T;
-	/**@description Sender所属模块，如聊天,vip, */
-	module : string;
+declare interface HandlerClass<T extends Handler> extends ModuleClass<T> {
 }
+
+declare type ReconnectHandler = import("../assets/scripts/common/net/ReconnectHandler").ReconnectHandler;
+declare interface ReconnectHandlerClass<T extends ReconnectHandler> {
+	new(service: Service): T;
+}
+
+declare type Service = import("../assets/scripts/framework/core/net/service/Service").Service;
+declare interface ServiceClass<T extends Service> extends ModuleClass<T> {
+}
+
 /**
  * @description 通过预置体路径创建节点 请使用全局的导入
  * @param config 配置信息
@@ -236,7 +243,6 @@ declare function loadRes(config: {
 
 declare type EntryDelegate = import("../assets/scripts/framework/core/entry/EntryDelegate").EntryDelegate;
 declare type Message = import("../assets/scripts/framework/core/net/message/Message").Message;
-declare type Service = import("../assets/scripts/framework/core/net/service/Service").Service;
 /**@description 语言包相关 */
 declare namespace Language {
 	export interface Data {
@@ -253,24 +259,24 @@ declare namespace Language {
 }
 
 /**@description 各管理器打印输出代理 */
-declare interface ManagerPrintDelegate<T>{
+declare interface ManagerPrintDelegate<T> {
 	print(data: T): void;
 }
 
-declare interface UIManagerPrintDelegate<T,U,V>{
-	printViews?( data : T , key : string):void;
-	printChildren?(data : U):void;
-	printComp?(data:V):void;
+declare interface UIManagerPrintDelegate<T, U, V> {
+	printViews?(data: T, key: string): void;
+	printChildren?(data: U): void;
+	printComp?(data: V): void;
 }
 
-declare interface CacheManagerPrintDelegate<T,U>{
-	printLocal(data:T,key:string):void;
-	printRemote(spriteFrameCaches:T,caches:T,infos:U):void;
+declare interface CacheManagerPrintDelegate<T, U> {
+	printLocal(data: T, key: string): void;
+	printRemote(spriteFrameCaches: T, caches: T, infos: U): void;
 }
 
-declare interface NetHelperPrintDelegate<T,U>{
-	printSender?(data:T):void;
-	printHander?(data:U):void;
+declare interface NetHelperPrintDelegate<T, U> {
+	printSender?(data: T): void;
+	printHander?(data: U): void;
 }
 
 declare type ByteArray = import("../assets/scripts/framework/plugin/ByteArray").ByteArray;

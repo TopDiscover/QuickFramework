@@ -1,21 +1,20 @@
 
-import { Reconnect } from "./Reconnect";
-import { ICommonService } from "../../framework/core/net/socket/ICommonService";
 import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdDefines";
 import { Net } from "../../framework/core/net/Net";
 import { Config } from "../config/Config";
+import { Service } from "../../framework/core/net/service/Service";
+import { Global } from "../data/Global";
+import { Macro } from "../../framework/defines/Macros";
+import { ReconnectHandler } from "./ReconnectHandler";
 
 /**
  * @description service公共基类
  */
+export class CommonService extends Service {
 
-export class CommonService extends ICommonService implements GameEventInterface {
-
-    protected static _instance: CommonService = null!;
-    public static get instance() { return this._instance || (this._instance = new CommonService()); }
-    // protected ip = ""
-    // protected port: number = null;
-    // protected protocol: WebSocketType = "wss"
+    private get data() {
+        return Manager.dataCenter.get(Global) as Global;
+    }
     protected ip = "localhost";
     protected port = 3000;
     protected protocol: Net.Type = "ws"
@@ -30,22 +29,21 @@ export class CommonService extends ICommonService implements GameEventInterface 
         if (value < Config.MIN_INBACKGROUND_TIME || value > Config.MAX_INBACKGROUND_TIME) {
             value = Config.MIN_INBACKGROUND_TIME;
         }
-        Log.d(this.serviceName, `maxEnterBackgroundTime ${value}`);
+        Log.d(this.module, `maxEnterBackgroundTime ${value}`);
         this._maxEnterBackgroundTime = value;
     }
+
+    constructor(){
+        super();
+        this.reconnectHandler = new ReconnectHandler(this);
+    }
+    
 
     /**
     * @description 连接网络
     */
     public connect() {
         super.connect_server(this.ip, this.port, this.protocol);
-    }
-
-    /**@description 网络重连 */
-    public reconnect: Reconnect = null!;
-    constructor() {
-        super();
-        this.reconnect = new Reconnect(this);
     }
 
     /**
@@ -74,9 +72,9 @@ export class CommonService extends ICommonService implements GameEventInterface 
      * @description 心跳超时
      */
     protected onHeartbeatTimeOut() {
-        Log.w(`${this.serviceName} 心跳超时，您已经断开网络`);
+        Log.w(`${this.module} 心跳超时，您已经断开网络`);
         this.close();
-        Manager.serviceManager.tryReconnect(this, true);
+        Manager.serviceManager.reconnect(this);
     }
     /**
      * @description 是否为心跳消息
@@ -87,53 +85,33 @@ export class CommonService extends ICommonService implements GameEventInterface 
     }
 
     onEnterBackground() {
+        if (this.data.userInfo.where == Macro.BUNDLE_RESOURCES) {
+            return;
+        }
         let me = this;
-        Manager.uiManager.getView("LoginView").then(view => {
-            me._backgroundTimeOutId = setTimeout(() => {
-                //进入后台超时，主动关闭网络
-                Log.d(`进入后台时间过长，主动关闭网络，等玩家切回前台重新连接网络`);
-                me.close();
-            }, me.maxEnterBackgroundTime * 1000);
-        });
+        me._backgroundTimeOutId = setTimeout(() => {
+            //进入后台超时，主动关闭网络
+            Log.d(`进入后台时间过长，主动关闭网络，等玩家切回前台重新连接网络`);
+            me.close();
+            Manager.alert.close(Config.RECONNECT_ALERT_TAG);
+        }, me.maxEnterBackgroundTime * 1000);
     }
 
     onEnterForgeground(inBackgroundTime: number) {
         if (this._backgroundTimeOutId != -1) {
             Log.d(`清除进入后台的超时关闭网络定时器`);
             clearTimeout(this._backgroundTimeOutId);
-            let self = this;
+            Log.d(`在后台时间${inBackgroundTime} , 最大时间为: ${this.maxEnterBackgroundTime}`)
             //登录界面，不做处理
-            Manager.uiManager.getView("LoginView").then((view) => {
-                Log.d(`在后台时间${inBackgroundTime} , 最大时间为: ${self.maxEnterBackgroundTime}`)
-                if (view) {
-                    return;
-                }
-                if (inBackgroundTime > self.maxEnterBackgroundTime) {
-                    Log.d(`从回台切换，显示重新连接网络`);
-                    self.close();
-                    Manager.serviceManager.tryReconnect(self);
-                }
-            });
+            if (this.data.userInfo.where == Macro.BUNDLE_RESOURCES) {
+                return;
+            }
+            if (inBackgroundTime > this.maxEnterBackgroundTime) {
+                Log.d(`从回台切换，显示重新连接网络`);
+                this.close();
+                Manager.alert.close(Config.RECONNECT_ALERT_TAG);
+                Manager.serviceManager.reconnect(this);
+            }
         }
-    }
-
-    protected onError(ev: Event) {
-        super.onError(ev)
-        Manager.uiManager.getView("LoginView").then(view => {
-            if (view) return;
-            Manager.serviceManager.tryReconnect(this);
-        });
-    }
-
-    protected onClose(ev: Event) {
-        super.onClose(ev)
-        if (ev.type == Net.NetEvent.ON_CUSTOM_CLOSE) {
-            Log.d(`${this.serviceName} 应用层主动关闭Socket`);
-            return;
-        }
-        Manager.uiManager.getView("LoginView").then(view => {
-            if (view) return;
-            Manager.serviceManager.tryReconnect(this);
-        });
     }
 }

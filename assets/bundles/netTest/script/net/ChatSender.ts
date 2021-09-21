@@ -4,13 +4,13 @@ import { TestJsonMessage } from "../../../hall/script/protocol/TestJsonMessage";
 import { CmmProto } from "../../../../scripts/common/net/CmmProto";
 import { HallProtoConfig } from "../../../hall/proto/HallProtoConfig";
 import { Sender } from "../../../../scripts/framework/core/net/service/Sender";
-import { Service } from "../../../../scripts/framework/core/net/service/Service";
 import { Net } from "../../../../scripts/framework/core/net/Net";
-import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 
 export class ChatSender extends Sender {
     static module = "Chat"
-    protected service: Service = ChatService.instance;
+    protected get service(){
+        return Manager.serviceManager.get(ChatService);
+    }
 
     private sendProtoMessage(hello: string) {
 

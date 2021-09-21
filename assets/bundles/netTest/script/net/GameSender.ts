@@ -10,7 +10,9 @@ import { CommonEvent } from "../../../../scripts/common/event/CommonEvent";
 export class GameSender extends Sender {
 
     static module = "Game"
-    protected service: Service = GameService.instance;
+    protected get service(){
+        return Manager.serviceManager.get(GameService);
+    }
 
     private sendProtoMessage(hello: string) {
         type RoomInfo = typeof tp.RoomInfo;
@@ -34,19 +36,19 @@ export class GameSender extends Sender {
         userInfo.gender = ((GenderType.values as any) as typeof tp.GenderType).female;
         roomInfo.data.players = [];
         roomInfo.data.players.push(userInfo);
-        this.service.send(roomInfo);
+        this.service?.send(roomInfo);
     }
 
     private sendJsonMessage(hello: string) {
         let msg = new TestJsonMessage();
         msg.hello = hello;
-        this.service.send(msg);
+        this.service?.send(msg);
     }
 
     private sendBinaryMessage(hello: string) {
         let binaryMessage = new TestBinaryMessage();
         binaryMessage.vHello = hello;
-        this.service.send(binaryMessage);
+        this.service?.send(binaryMessage);
     }
 
     sendEx() {

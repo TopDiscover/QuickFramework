@@ -1,7 +1,4 @@
 import { HallData } from "../data/HallData";
-import { LobbyService } from "../../../../scripts/common/net/LobbyService";
-import { GameService } from "../../../../scripts/common/net/GameService";
-import { ChatService } from "../../../../scripts/common/net/ChatService";
 import SettingView from "../../../../scripts/common/component/SettingView";
 import { EventTouch, _decorator,Node, PageView, instantiate, find, Label, ProgressBar, sys, PhysicsSystem2D } from "cc";
 import { HotUpdate } from "../../../../scripts/framework/core/hotupdate/Hotupdate";
@@ -43,7 +40,7 @@ export default class HallView extends GameView {
     private readonly PAGE_COUNT = 6;
 
     private get bundles() {
-        let data = Manager.dataCenter.getData(HallData) as HallData;
+        let data = Manager.dataCenter.get(HallData) as HallData;
         return data.games;
     }
 
@@ -101,10 +98,6 @@ export default class HallView extends GameView {
             }
             Manager.language.change(lan);
         });
-
-        LobbyService.instance.enabled = false;
-        GameService.instance.enabled = false;
-        ChatService.instance.enabled = false;
 
         this.audioHelper.playMusic("audio/background",this.bundle)
     }

@@ -1,6 +1,7 @@
 import ResourceLoader from "../asset/ResourceLoader";
 import { js, Node } from "cc";
 import { DEBUG } from "cc/env";
+import GameView from "../ui/GameView";
 
 export abstract class Entry {
 
@@ -69,7 +70,7 @@ export abstract class Entry {
         if ( viewType ){
             if ( viewType.logicType ){
                 viewType.logicType.bundle = gameViw.bundle as string;
-                let logic = Manager.logicManager.getLogic(viewType.logicType,true);
+                let logic = Manager.logicManager.get(viewType.logicType,true);
                 if ( logic ){
                     gameViw.setLogic(logic);
                 }
@@ -79,6 +80,10 @@ export abstract class Entry {
                 }
             }
         }
+    }
+
+    onShowGameView(gameView: GameView) {
+        
     }
 
     onDestroyGameView(gameView: GameView) {

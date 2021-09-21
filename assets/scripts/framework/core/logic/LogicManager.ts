@@ -1,4 +1,3 @@
-import { DEBUG } from "cc/env";
 import { Macro } from "../../defines/Macros";
 import { Logic } from "./Logic";
 
@@ -10,44 +9,33 @@ export class LogicManager {
 
     /**
      * @description 返回Logic
-     * @param LogicTypeOrBundle logic类型,如果传入bundle,isCreate 无效
+     * @param classOrBundle logic类型,如果传入bundle,isCreate 无效
      * @param isCreate 找不到数据时，是否创建，默认为不创建
      */
-    getLogic<T extends Logic>(LogicTypeOrBundle: LogicClass<T> | string, isCreate: boolean = false): T | null {
-        if ( typeof LogicTypeOrBundle == "string" ){
-            if ( this._logics.has(LogicTypeOrBundle) ){
-                return <T>this._logics.get(LogicTypeOrBundle);
-            }
-        }else{
-            if (LogicTypeOrBundle.bundle == Macro.UNKNOWN) {
-                if (DEBUG) {
-                    Log.e(`请先指定bunlde`);
-                }
-                return null;
-            }
-            if (this._logics.has(LogicTypeOrBundle.bundle)) {
-                return <T>this._logics.get(LogicTypeOrBundle.bundle);
-            }
+    get<T extends Logic>(classOrBundle: LogicClass<T> | string, isCreate: boolean = false): T | null {
+        let bundle = this.getBundle(classOrBundle);
+        if (bundle == Macro.UNKNOWN) {
+            return null;
+        }
+        if (this._logics.has(bundle)) {
+            return <T>this._logics.get(bundle);
+        }
+        if (typeof classOrBundle != "string") {
             if (isCreate) {
-                let logic = new LogicTypeOrBundle();
-                logic.bundle = LogicTypeOrBundle.bundle;
-                this._logics.set(LogicTypeOrBundle.bundle, logic);
+                let logic = new classOrBundle();
+                logic.bundle = classOrBundle.bundle;
+                this._logics.set(classOrBundle.bundle, logic);
                 return <T>logic;
             }
         }
         return null;
     }
 
-    destory<T extends Logic>(LogicTypeOrBundle: LogicClass<T> | string) {
-        let bundle = "";
-        if (typeof LogicTypeOrBundle == "string") {
-            bundle = LogicTypeOrBundle;
-        } else {
-            bundle = LogicTypeOrBundle.bundle;
-        }
+    destory<T extends Logic>(classOrBundle: LogicClass<T> | string) {
+        let bundle = this.getBundle(classOrBundle);
         if (this._logics.has(bundle)) {
             let logic = this._logics.get(bundle);
-            if ( logic ){
+            if (logic) {
                 logic.onDestroy();
             }
             this._logics.delete(bundle);
@@ -58,20 +46,12 @@ export class LogicManager {
 
     /**@description 清空数据中心所有数据 */
     clear<T extends Logic>(exclude?: LogicClass<T>[] | string[]) {
-        if (exclude) {
-            //需要排除指定数据类型
-            this._logics.forEach((data, key) => {
-                if (!this.isInExcule(data, exclude)) {
-                    if ( data ) data.onDestroy();
-                    this._logics.delete(key);
-                }
-            });
-        } else {
-            this._logics.forEach((data,key)=>{
-                if ( data ) data.onDestroy();
-            });
-            this._logics.clear();
-        }
+        //需要排除指定数据类型
+        this._logics.forEach((data, key) => {
+            if (!this.isInExcule(data, exclude)) {
+                this.destory(key);
+            }
+        });
     }
 
     /**@description 打印当前所有bundle数据数据 */
@@ -84,20 +64,25 @@ export class LogicManager {
     }
 
     /**@description 判断是否在排除项中 */
-    private isInExcule<T extends Logic>(logic: T, exclude: LogicClass<T>[] | string[]) {
+    private isInExcule<T extends Logic>(logic: T, exclude?: LogicClass<T>[] | string[]) {
+        if (!exclude) return false;
         for (let i = 0; i < exclude.length; i++) {
-            let bundle = "";
-            let logicClassOrBundle = exclude[i];
-            if (typeof logicClassOrBundle == "string") {
-                bundle = logicClassOrBundle;
-            } else {
-                bundle = logicClassOrBundle.bundle;
-            }
+            let bundle = this.getBundle(exclude[i]);
             if (bundle == logic.bundle) {
                 return true;
             }
         }
         return false;
+    }
+
+    private getBundle<T extends Logic>(classOrBundle: LogicClass<T> | string) {
+        let bundle = Macro.UNKNOWN;
+        if (typeof classOrBundle == "string") {
+            bundle = classOrBundle;
+        } else {
+            bundle = classOrBundle.bundle;
+        }
+        return bundle;
     }
 
 }

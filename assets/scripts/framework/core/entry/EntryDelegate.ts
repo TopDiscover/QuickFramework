@@ -1,6 +1,7 @@
 import { AssetManager } from "cc";
 import { Macro } from "../../defines/Macros";
 import { HotUpdate } from "../hotupdate/Hotupdate";
+import GameView from "../ui/GameView";
 
 /**@description entry入口代理 */
 export class EntryDelegate {
@@ -132,6 +133,10 @@ export class EntryDelegate {
         Manager.gameView = gameView;
 
         Manager.bundleManager.removeLoadedBundle(this,excludeBundles);
+    }
+
+    onShowGameView(entry: Entry | null, gameView: GameView) {
+        
     }
 
     /**@description 主包检测更新 */

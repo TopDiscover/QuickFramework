@@ -5,11 +5,10 @@ import GlobalAudio from "./scripts/common/component/GlobalAudio";
 import Loading from "./scripts/common/component/Loading";
 import Tips from "./scripts/common/component/Tips";
 import UILoading from "./scripts/common/component/UILoading";
+import { UIReconnect } from "./scripts/common/component/UIReconnect";
 import { Config, ViewZOrder } from "./scripts/common/config/Config";
 import { CmmEntry } from "./scripts/common/entry/CmmEntry";
 import { CommonLanguage } from "./scripts/common/language/CommonLanguage";
-import { ServiceManager } from "./scripts/common/manager/ServiceManager";
-import { Reconnect } from "./scripts/common/net/Reconnect";
 import { HotUpdate } from "./scripts/framework/core/hotupdate/Hotupdate";
 import { LogLevel } from "./scripts/framework/defines/Enums";
 import { Framewok } from "./scripts/framework/Framework";
@@ -20,9 +19,9 @@ export class _Manager extends Framewok implements GameEventInterface {
     /**@description 进入后台的时间 */
     private _enterBackgroundTime = 0;
 
-    /**@description 网络Service管理器 */
-    get serviceManager() {
-        return getSingleton(ServiceManager);
+    /**@description 重连专用提示UI部分 */
+    get uiReconnect( ){
+        return getSingleton(UIReconnect);
     }
 
     /**@description 小提示 */
@@ -84,7 +83,6 @@ export class _Manager extends Framewok implements GameEventInterface {
         Manager.uiLoading.preloadPrefab();
         Manager.loading.preloadPrefab();
         Manager.alert.preloadPrefab();
-        Reconnect.preloadPrefab();
         //Service onLoad
         Manager.serviceManager.onLoad();
         //入口管理器

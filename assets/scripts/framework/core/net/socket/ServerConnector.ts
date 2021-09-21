@@ -55,7 +55,7 @@ export abstract class ServerConnector {
     /**
      * @description 网络打开
      */
-    protected onOpen() {
+    protected onOpen(ev: Event) {
         this._curRecvHartTimeOutCount = 0;
         this.stopSendHartSchedule();
         this.sendHeartbeat();

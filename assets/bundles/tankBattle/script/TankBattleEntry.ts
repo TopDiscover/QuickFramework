@@ -10,7 +10,7 @@ class TankBattleEntry extends Entry {
     protected language = new TankBattleLanguage;
     static bundle = TankBattleGameData.bundle;
     private get data(){
-        return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData
+        return Manager.dataCenter.get(TankBattleGameData) as TankBattleGameData
     }
 
     protected addNetHandler(): void {

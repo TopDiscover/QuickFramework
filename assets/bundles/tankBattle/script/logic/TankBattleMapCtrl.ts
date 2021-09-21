@@ -18,11 +18,11 @@ import { TankBattleGameData } from "../data/TankBattleGameData";
     node: Node = null!;
  
     private get data(){
-        return Manager.dataCenter.getData(TankBattleGameData) as TankBattleGameData;
+        return Manager.dataCenter.get(TankBattleGameData) as TankBattleGameData;
     }
 
     private get logic():TankBattleLogic{
-        return Manager.logicManager.getLogic<TankBattleLogic>(this.data.bundle) as any;
+        return Manager.logicManager.get<TankBattleLogic>(this.data.bundle) as any;
     }
 
      /**@description 用于克隆的节点 */
