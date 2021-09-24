@@ -29,8 +29,8 @@ export default class GameView extends UIView {
         this.onEnterGameView()
     }
 
-    show(args:any[]){
-        super.show(args);
+    show(options ?: ViewOption){
+        super.show(options);
         Manager.entryManager.onShowGameView(this.bundle,this);
     }
 

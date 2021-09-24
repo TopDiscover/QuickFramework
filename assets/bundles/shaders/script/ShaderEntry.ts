@@ -13,7 +13,7 @@ class ShaderEntry extends Entry {
         completeCb();
     }
     protected openGameView(): void {
-        Manager.uiManager.open({ type: ShaderView, bundle: this.bundle });
+        Manager.uiManager.open(ShaderView,{ bundle: this.bundle });
     }
     protected closeGameView(): void {
         Manager.uiManager.close(ShaderView);

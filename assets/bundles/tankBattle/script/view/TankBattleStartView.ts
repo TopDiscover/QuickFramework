@@ -34,15 +34,15 @@ export default class TankBattleStartView extends UIView {
         this.selectTank = cc.find("tank", this.content);
         this.selectTank.y = this.singlePlayer.y;
 
-        this.setEnabledKeyBack(true);
+        this.enabledKeyUp = true;
     }
 
-    onKeyBack(ev: cc.Event.EventKeyboard) {
-        super.onKeyBack(ev);
+    protected onKeyBackUp(ev: cc.Event.EventKeyboard) {
+        super.onKeyBackUp(ev);
         Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
     }
 
-    onKeyUp(ev: cc.Event.EventKeyboard) {
+    protected onKeyUp(ev: cc.Event.EventKeyboard) {
         super.onKeyUp(ev);
         if ( this.logic ){
             this.logic.onKeyUp(ev,TankBettle.ViewType.START_VIEW,this);

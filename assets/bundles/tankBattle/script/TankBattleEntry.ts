@@ -30,7 +30,7 @@ class TankBattleEntry extends Entry {
         this.loader.loadResources();
     }
     protected openGameView(): void {
-        Manager.uiManager.open({ type: TankBattleGameView, bundle: this.bundle });
+        Manager.uiManager.open(TankBattleGameView,{ bundle: this.bundle });
     }
     protected closeGameView(): void {
         Manager.uiManager.close(TankBattleGameView);

@@ -8,12 +8,18 @@ import { UIReconnect } from "./scripts/common/component/UIReconnect";
 import { Config, ViewZOrder } from "./scripts/common/config/Config";
 import { CmmEntry } from "./scripts/common/entry/CmmEntry";
 import { CommonLanguage } from "./scripts/common/language/CommonLanguage";
+import { Utils } from "./scripts/common/utils/Utils";
 import { HotUpdate } from "./scripts/framework/core/hotupdate/Hotupdate";
 import { LogLevel } from "./scripts/framework/defines/Enums";
 import { Framewok } from "./scripts/framework/Framework";
 
 /**@description 游戏所有运行单例的管理 */
 export class _Manager extends Framewok implements GameEventInterface {
+
+
+    get utils(){
+        return getSingleton(Utils)
+    }
 
     /**@description 进入后台的时间 */
     private _enterBackgroundTime = 0;
@@ -117,9 +123,9 @@ export class _Manager extends Framewok implements GameEventInterface {
         Manager.serviceManager.onEnterForgeground(inBackgroundTime);
     }
 
-    onHotupdateMessage(data: HotUpdate.MessageData) {
+    onHotupdateMessage(data: HotUpdate.MessageData){
         if (data.isOk) {
-            Manager.uiManager.open({ type: DownloadLoading, zIndex: ViewZOrder.Loading, args: [data.state, data.name, data.bundle] });
+            Manager.uiManager.open(DownloadLoading,{zIndex: ViewZOrder.Loading},{args: [data.state, data.name, data.bundle] });
         } else {
             cc.game.end();
         }

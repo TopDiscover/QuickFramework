@@ -32,13 +32,13 @@ export default class UILoading {
     * @description 显示全屏幕加载动画
     * @param delay 延迟显示时间 当为null时，不会显示loading进度，但会显示阻隔层 >0时为延迟显示的时间
     */
-    public show( delay : number ,name : string) {
+    public show( delay ?: number ,name ?: string) {
         if( delay == undefined || delay == null || delay < 0 ){
             this.delay = Config.LOAD_VIEW_DELAY;
         }else{
             this.delay = delay;
         }
-        this._uiName = name;
+        this._uiName = name ? name : "";
         this._show();
     }
     private _timerId : any = -1;

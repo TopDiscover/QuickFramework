@@ -62,7 +62,7 @@ export default class HallView extends GameView {
         let bottom_op = cc.find("bottom_op", this.node);
         let setting = cc.find("setting", bottom_op);
         setting.on(cc.Node.EventType.TOUCH_END, () => {
-            Manager.uiManager.open({ type: SettingView, bundle: Macro.BUNDLE_RESOURCES, zIndex: ViewZOrder.UI, name: "设置界面" });
+            Manager.uiManager.open(SettingView,{bundle:Macro.BUNDLE_RESOURCES,zIndex:ViewZOrder.UI,name:"设置界面"});
         });
 
         let mail = cc.find("mial", bottom_op);
