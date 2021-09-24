@@ -232,9 +232,9 @@ export class UIManager {
 
     /**
      * @description 打开视图
-     * @param type 
-     * @param OpenOption 
-     * @param viewOption 
+     * @param type UIView视图类型
+     * @param OpenOption 打开设置
+     * @param viewOption 视图显示设置参数，即UIView.show参数
      * @returns 
      */
     public open<T extends UIView>( type : UIClass<T>, openOption: OpenOption , viewOption ?: ViewOption): Promise<T> {
