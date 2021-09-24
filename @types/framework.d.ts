@@ -22,7 +22,7 @@ declare type SocketBuffer = string | Uint8Array;
  * @param name 
  * @param args 
  */
-declare function dispatch(name: string, ...args:any[]): void;
+declare function dispatch(name: string, ...args: any[]): void;
 
 declare interface Date {
 	/**
@@ -277,6 +277,51 @@ declare interface CacheManagerPrintDelegate<T, U> {
 declare interface NetHelperPrintDelegate<T, U> {
 	printSender?(data: T): void;
 	printHander?(data: U): void;
+}
+
+/**@description 显示/关闭/隐藏时,UIView.show/close/hide的参数 */
+declare interface ViewOption {
+	/**@description 是否显示动画 */
+	isAction?: boolean;
+	/**@description 执行动画前调用 isAction 为true时生效*/
+	start?: Function;
+	/**@description 动画执行 isAction 为true时生效 */
+	do?: Promise<void>;
+	/**@description 动画完成后调用 isAction 为true时生效*/
+	complete?: Function;
+	/**@description 用户自定义参数 */
+	args?: any | any[];
+}
+
+/**@description UIManager open参数说明 */
+declare interface OpenOption {
+	/**@description 视图绑定预置资源所在bundle,默认为resources目标 */
+	bundle?: BUNDLE_TYPE;
+	/**@description 节点层级，默认为0 */
+	zIndex?: number;
+	/**
+	 * @description 
+	 * delay > 0 时间未加载界面完成显示加载动画，
+	 * delay = 0 则不显示加载动画，但仍然会显示UILoading,在加载界面时阻挡玩家的触摸事件
+	 * delay 其它情况以UILoading的默认显示时间为准
+	 */
+	delay?: number;
+	/**@description 默认""
+	 * 界面名字，如商城，个人信息,当delay>0时，加载超时后，会提示显示某某界面失败 
+	 * 否则默认提示加载界面失败
+	 **/
+	name?: string;
+	/**@description 是否是预加载预置资源，默认为false */
+	preload?: boolean;
+}
+
+declare interface DefaultOpenOption extends OpenOption{
+	/**@description 视图绑定预置资源所在bundle,默认为resources目标 */
+	bundle: BUNDLE_TYPE;
+	/**@description 节点层级，默认为0 */
+	zIndex: number;
+	/**@description 是否是预加载预置资源，默认为false */
+	preload: boolean;
 }
 
 declare type ByteArray = import("../assets/scripts/framework/plugin/ByteArray").ByteArray;

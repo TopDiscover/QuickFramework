@@ -1,4 +1,4 @@
-import { isValid, js, Node, Prefab, Widget, instantiate, director, Component, find } from "cc";
+import { isValid, js, Node, Prefab, Widget, instantiate, director, Component, find, View } from "cc";
 import { DEBUG } from "cc/env";
 import { ViewStatus } from "../../defines/Enums";
 import { Macro } from "../../defines/Macros";
@@ -200,44 +200,49 @@ export class UIManager {
     /**@description 驻留内存资源 */
     public retainMemory = new ViewDynamicLoadData(DYNAMIC_LOAD_RETAIN_MEMORY);
 
-    public preload<T extends UIView>(uiClass: UIClass<T>, bundle: BUNDLE_TYPE) {
-        return this._open(uiClass, bundle, 0, true, undefined, undefined);
+    private defaultOpenOption(options : OpenOption ) {
+        let out : DefaultOpenOption = {
+            bundle : Macro.BUNDLE_RESOURCES,
+            delay : options.delay,
+            name : options.name,
+            zIndex : 0,
+            preload : false
+        };
+        if ( options.bundle != undefined ){
+            out.bundle = options.bundle;
+        }
+        if ( options.zIndex != undefined ){
+            out.zIndex = options.zIndex;
+        }
+        if ( options.preload != undefined ){
+            out.preload = options.preload;
+        }
+        return out;
     }
 
     /**
-     * @description open<T extends UIView>(config: { type: UIClass<T>, zIndex?: number, args?: any[] , delay?: number}) : Promise<T>
-     * @param config 配置信息 
-     * @param config.type UIView
-     * @param config.zIndex 节点层级，默认为0
-     * @param config.args 传入的参数列表
-     * @param config.delay 
-     * delay > 0 时间未加载界面完成显示加载动画，
-     * delay = 0 则不显示加载动画，但仍然会显示UILoading,在加载界面时阻挡玩家的触摸事件
-     * delay 其它情况以UILoading的默认显示时间为准
-     * @param config.name 界面名字，如 商城 首充
-     * @example 示例
-     * Manager.uiManager.open({type:GameLayer});
-     * Manager.uiManager.open({type:GameLayer,delay:ViewDelay.delay});
-     * Manager.uiManager.open({type:GameLayer,delay:ViewDelay.delay,zIndex:ViewZOrder.zero});
-     * Manager.uiManager.open({type:GameLayer,delay:ViewDelay.delay,zIndex:ViewZOrder.zero,args:["aa","bb"]});
-     * 
-     * @description 弃用接口 open<T extends UIView>(uiClass: UIClass<T>, zIndex?: number, ...args: any[]): Promise<T>
-     * @param uiClass UIView
-     * @param zIndex 节点层级 
-     * @param args 传入参数列表
+     * @description 预加载视图
+     * @param uiClass 
+     * @param bundle 
+     * @returns 
      */
-    public open<T extends UIView>(config: { type: UIClass<T>, bundle?: BUNDLE_TYPE, zIndex?: number, args?: any[], delay?: number, name?: string }): Promise<T> {
-        return this._open(config.type, config.bundle as BUNDLE_TYPE, config.zIndex ? config.zIndex : 0, false, config.args, config.delay, config.name);
+    public preload<T extends UIView>(uiClass: UIClass<T>, bundle: BUNDLE_TYPE) {
+        return this.open(uiClass,{preload:true,bundle:bundle});
     }
 
-    private _open<T extends UIView>(
-        uiClass: UIClass<T>,
-        bundle: BUNDLE_TYPE,
-        zOrder: number = 0,
-        isPreload: boolean,
-        args?: any[],
-        delay?: number,
-        name?: string) {
+    /**
+     * @description 打开视图
+     * @param type 
+     * @param OpenOption 
+     * @param viewOption 
+     * @returns 
+     */
+    public open<T extends UIView>( type : UIClass<T>, openOption: OpenOption , viewOption ?: ViewOption): Promise<T> {
+        let _OpenOption = this.defaultOpenOption(openOption);
+        return this._open(type,_OpenOption,viewOption);
+    }
+
+    private _open<T extends UIView>(uiClass: UIClass<T>,openOption : DefaultOpenOption,viewOption ?: ViewOption) {
         return new Promise<T>((reslove, reject) => {
             if (!uiClass) {
                 if (DEBUG) Log.d(`${this._logTag}open ui class error`);
@@ -254,17 +259,17 @@ export class UIManager {
             }
             let viewData = this.getViewData(uiClass);
             if (viewData) {
-                viewData.isPreload = isPreload;
+                viewData.isPreload = openOption.preload;
                 //已经加载
                 if (viewData.isLoaded) {
                     viewData.status = ViewStatus.WAITTING_NONE;
-                    if (!isPreload) {
+                    if (!openOption.preload) {
                         if (viewData.view && isValid(viewData.node)) {
-                            viewData.node.zIndex = zOrder;
+                            viewData.node.zIndex = openOption.zIndex;
                             if (!viewData.node.parent) {
-                                this.addView(viewData.node, zOrder,viewData.view);
+                                this.addView(viewData.node, openOption.zIndex,viewData.view);
                             }
-                            viewData.view.show(args);
+                            viewData.view.show(viewOption);
                         }
                     }
                     reslove(<T>viewData.view);
@@ -272,8 +277,8 @@ export class UIManager {
                 }
                 else {
                     viewData.status = ViewStatus.WAITTING_NONE;
-                    if (!isPreload) {
-                        Manager.uiLoading.show(delay as number, name as string);
+                    if (!openOption.preload) {
+                        Manager.uiLoading.show(openOption.delay,openOption.name);
                     }
                     //正在加载中
                     if (DEBUG) Log.w(`${this._logTag}${className} 正在加载中...`);
@@ -285,30 +290,30 @@ export class UIManager {
                 viewData = new ViewData();
                 viewData.loadData.name = className;
                 let prefabUrl = uiClass.getPrefabUrl();
-                viewData.isPreload = isPreload;
+                viewData.isPreload = openOption.preload;
                 viewData.viewType = uiClass;
-                viewData.bundle = bundle;
+                viewData.bundle = openOption.bundle;
                 this._viewDatas.set(className, viewData);
 
                 let progressCallback: (completedCount: number, totalCount: number, item: any) => void = null!;
 
-                if (!isPreload) {
-                    Manager.uiLoading.show(delay as number, name as string);
+                if (!openOption.preload) {
+                    Manager.uiLoading.show(openOption.delay,openOption.name);
                     //预加载界面不显示进度
                     progressCallback = (completedCount: number, totalCount: number, item: any) => {
                         let progress = Math.ceil((completedCount / totalCount) * 100);
                         Manager.uiLoading.updateProgress(progress);
                     };
                 }
-                this.loadPrefab(bundle, prefabUrl, progressCallback)
+                this.loadPrefab(openOption.bundle, prefabUrl, progressCallback)
                     .then((prefab) => {
                         viewData.info = new Resource.Info;
                         viewData.info.url = prefabUrl;
                         viewData.info.type = Prefab;
                         viewData.info.data = prefab;
-                        viewData.info.bundle = bundle;
+                        viewData.info.bundle = openOption.bundle;
                         Manager.assetManager.retainAsset(viewData.info);
-                        this.createNode(className, uiClass, reslove, prefab, args, zOrder, bundle);
+                        this.createNode(className, uiClass, reslove, prefab,openOption,viewOption);
                         Manager.uiLoading.hide();
                     }).catch((reason) => {
                         viewData.isLoaded = true;
@@ -320,8 +325,8 @@ export class UIManager {
                         if (DEBUG) {
                             uiName = className;
                         }
-                        if (name) {
-                            uiName = name;
+                        if (openOption.name) {
+                            uiName = openOption.name;
                         }
                         Manager.tips.show(`加载界面${uiName}失败，请重试`);
                         Manager.uiLoading.hide();
@@ -335,9 +340,8 @@ export class UIManager {
         uiClass: UIClass<T>,
         viewData: ViewData,
         className: string,
-        zOrder: number,
-        args: any[] | undefined,
-        bundle: BUNDLE_TYPE): UIView | null {
+        openOption : DefaultOpenOption ,
+        viewOption ?: ViewOption ): UIView | null {
         if (uiNode) {
             //挂载脚本
             let view = uiNode.getComponent(uiClass) as UIView;
@@ -353,9 +357,12 @@ export class UIManager {
             }
 
             view.className = className;
-            view.bundle = bundle
+            view.bundle = openOption.bundle;
             viewData.view = view;
-            view.args = args;
+            view.args = null;
+            if ( viewOption && viewOption.args ){
+                view.args = viewOption.args;
+            }
 
             //界面显示在屏幕中间
             let widget = view.getComponent(Widget);
@@ -377,7 +384,7 @@ export class UIManager {
             }
 
             if (!viewData.isPreload) {
-                this.addView(uiNode, zOrder,view);
+                this.addView(uiNode, openOption.zIndex,view);
             }
             return view;
         }
@@ -391,9 +398,8 @@ export class UIManager {
         uiClass: UIClass<T>,
         reslove: any,
         data: Prefab,
-        args: any[] | undefined,
-        zOrder: number,
-        bundle: BUNDLE_TYPE) {
+        openOptions : DefaultOpenOption,
+        viewOptions ?: ViewOption ) {
         let viewData = this._viewDatas.get(className);
         if (!viewData) return;
         viewData.isLoaded = true;
@@ -408,7 +414,7 @@ export class UIManager {
 
         let uiNode = instantiate(data);
         viewData.node = uiNode;
-        let view = this._addComponent(uiNode, uiClass, viewData, className, zOrder, args, bundle);
+        let view = this._addComponent(uiNode, uiClass, viewData, className,openOptions,viewOptions);
         if (!view) {
             reslove(null);
             return;
@@ -425,18 +431,15 @@ export class UIManager {
             if (DEBUG) Log.d(`${this._logTag}open view : ${className}`)
 
             if (!viewData.isPreload) {
-                view.show(args);
+                view.show(viewOptions);
             }
             reslove(view)
             viewData.doCallback(view, className, "加载完成，回调之前加载中的界面");
         }
     }
 
-    private loadPrefab(bundle: BUNDLE_TYPE | undefined, url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
+    private loadPrefab(bundle: BUNDLE_TYPE, url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
         return new Promise<Prefab>((resolove, reject) => {
-            if (bundle == undefined || bundle == "" || bundle == null) {
-                bundle = Macro.BUNDLE_RESOURCES;
-            }
             Manager.assetManager.load(bundle, url, Prefab, progressCallback, (data) => {
                 if (data && data.data && data.data instanceof Prefab) {
                     resolove(data.data);

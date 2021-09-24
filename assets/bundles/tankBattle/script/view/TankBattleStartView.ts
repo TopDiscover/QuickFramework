@@ -36,15 +36,15 @@ export default class TankBattleStartView extends UIView{
         tips.language = Manager.makeLanguage("tips", this.bundle);
         this.selectTank = find("tank", this.content) as Node;
         this.selectTank.setPosition(new Vec3(this.selectTank.position.x,this.singlePlayer.position.y,this.selectTank.position.z));
-        this.setEnabledKeyBack(true);
+        this.enabledKeyUp = true;
     }
 
-    onKeyBack(ev: EventKeyboard) {
-        super.onKeyBack(ev);
+    protected onKeyBackUp(ev: EventKeyboard) {
+        super.onKeyBackUp(ev);
         Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
     }
 
-    onKeyUp(ev: EventKeyboard) {
+    protected onKeyUp(ev: EventKeyboard) {
         super.onKeyUp(ev);
         if(this.logic ){
             this.logic.onKeyUp(ev,TankBettle.ViewType.START_VIEW,this);

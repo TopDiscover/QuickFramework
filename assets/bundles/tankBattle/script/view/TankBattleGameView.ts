@@ -61,10 +61,8 @@ export default class TankBattleGameView extends GameView{
 
         this._instructions = find("Instructions", this.node)?.getComponent(Label) as Label;
         this._instructions.language = Manager.makeLanguage("Instructions", this.bundle)
-        this.setEnabledKeyBack(true);
-
-        systemEvent.off(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
-        systemEvent.on(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
+        this.enabledKeyUp = true;
+        this.enabledKeyDown = true;
         if(this.logic ){
             this.logic.gamePrefabs = prefabs;
             let mapCtrl = new TankBattleMapCtrl();
@@ -75,13 +73,13 @@ export default class TankBattleGameView extends GameView{
         }
     }
 
-    onKeyUp(ev: EventKeyboard) {
+    protected onKeyUp(ev: EventKeyboard) {
         if ( this.logic ){
             this.logic.onKeyUp(ev,TankBettle.ViewType.GAME_VIEW);
         }
     }
 
-    onKeyDown(ev: EventKeyboard) {
+    protected onKeyDown(ev: EventKeyboard) {
         if ( this.logic ){
             this.logic.onKeyDown(ev,TankBettle.ViewType.GAME_VIEW);
         }

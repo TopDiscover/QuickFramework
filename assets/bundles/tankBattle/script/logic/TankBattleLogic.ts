@@ -65,13 +65,13 @@ export class TankBattleLogic extends Logic {
     /**@description 打开选择人数界面 */
     onOpenSlectedView() {
         this.data.gameStatus = TankBettle.GAME_STATUS.SELECTED;
-        Manager.uiManager.open({ type: TankBattleStartView, bundle: this.bundle, zIndex: ViewZOrder.UI, args: [this] });
+        Manager.uiManager.open(TankBattleStartView,{ bundle: this.bundle, zIndex: ViewZOrder.UI}, {args: [this] });
     }
 
     /**@description 打开过渡切换游戏关卡界面 */
     onOpenChangeView() {
         this.data.gameStatus = TankBettle.GAME_STATUS.INIT;
-        Manager.uiManager.open({ bundle: this.bundle, type: TankBattleChangeStageView, zIndex: ViewZOrder.UI, args: [this.data.currentLevel,this] })
+        Manager.uiManager.open(TankBattleChangeStageView,{ bundle: this.bundle, zIndex: ViewZOrder.UI},{args: [this.data.currentLevel,this] })
     }
 
     /**@description 下一关 */
@@ -164,7 +164,7 @@ export class TankBattleLogic extends Logic {
                 return;
             }
             this.data.gameStatus = TankBettle.GAME_STATUS.OVER;
-            Manager.uiManager.open({ type: TankBattleGameOver, bundle: this.bundle, zIndex: ViewZOrder.UI, args: [this] });
+            Manager.uiManager.open(TankBattleGameOver,{ bundle: this.bundle, zIndex: ViewZOrder.UI},{ args: [this] });
             this.mapCtrl.gameOver();
         }
     }

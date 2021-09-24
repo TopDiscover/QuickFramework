@@ -22,7 +22,7 @@ class LoadTestEntry extends Entry {
         this.loader.loadResources();
     }
     protected openGameView(): void {
-        Manager.uiManager.open({ type: LoadTestView, bundle: this.bundle });
+        Manager.uiManager.open(LoadTestView,{ bundle: this.bundle });
     }
     protected closeGameView(): void {
         Manager.uiManager.close(LoadTestView);

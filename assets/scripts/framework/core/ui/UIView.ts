@@ -1,7 +1,6 @@
 import EventComponent from "../../componects/EventComponent";
 import AudioComponent from "../../componects/AudioComponent";
 import { _decorator, Node, game, Game, EventKeyboard, tween, Tween, Vec3, systemEvent, SystemEvent, js, macro } from "cc";
-import { DEBUG } from "cc/env";
 import { Macro } from "../../defines/Macros";
 
 /**
@@ -12,22 +11,17 @@ const { ccclass, property } = _decorator;
 @ccclass
 export default class UIView extends EventComponent implements IFullScreenAdapt {
     onFullScreenAdapt(): void {
-        
+
     }
 
-    /**@description 是否允许接受键盘事件 */
-    private _isEnableKey = false;
-    private action: Tween<any> | null = null;
     public static getPrefabUrl(): string {
-        if (DEBUG) {
-            Log.e(`请求实现public static getPrefabUrl`);
-        }
+        Log.e(`请求实现public static getPrefabUrl`);
         return Macro.UNKNOWN;
     }
 
-    /**@description init代码参数 */
-    private _args?: any[];
-    /**@description 当前传入参数，即通过UI管理器打开时的传入参数 */
+    /**@description ViewOption.args参数 */
+    private _args?: any[] | any;
+    /**@description 通过UI管理器打开时的传入ViewOption.args参数 */
     public get args() {
         return this._args;
     }
@@ -36,11 +30,7 @@ export default class UIView extends EventComponent implements IFullScreenAdapt {
     }
 
     /**
-     * @description 当前界面的节点，如果界面需要使用动画打开或关闭，
-     * 可直接对content进行赋值，
-     * 使用showWithAction 有动画显示
-     * 使用hideWithAction 有动画隐藏
-     * 使用closeWithAction 有动画关闭
+     * @description 统一定义一个显示内容节点
      * */
     private _content: Node | null = null;
     protected set content(value) {
@@ -68,122 +58,129 @@ export default class UIView extends EventComponent implements IFullScreenAdapt {
         return this._bundle;
     }
 
-    public close() {
-        Manager.uiManager.close(this.className);
+    public close( options ?: ViewOption ) {
+        if ( options && options.isAction ){
+            //有动画
+            if ( options.start ){
+                options.start();
+            }
+            if ( !options.do ){
+                Log.e(`必须指定动画参数,界面将会直接关闭`);
+                Manager.uiManager.close(this.className);
+                return;
+            }
+            options.do.then(()=>{
+                if ( options.complete ) options.complete();
+                Manager.uiManager.close(this.className);
+            });
+        }else{
+            //没有设置项
+            Manager.uiManager.close(this.className);
+        }
     }
 
     /**@description args为open代入的参数 */
-    public show(args?: any[]) {
-        //再如果界面已经存在于界面管理器中，不会再进入init函数，此时传入新的参数，只从show里面过来,这里重新对_args重新赋值
-        this._args = args;
-        if (this.node) this.node.active = true;
-    }
+    public show(options ?: ViewOption) {
+        //再如果界面已经存在于界面管理器中，此时传入新的参数，只从show里面过来,这里重新对_args重新赋值
+        if ( options ){
+            this._args = options.args;
+        }else{
+            this._args = null;
+        }
 
-    public hide() {
-        if (this.node) this.node.removeFromParent();
-    }
-
-    /**@description 动画显示界面 
-     *@param isOverrideShow 是否是重写show调用的,如果是重写show调用了,必将此参数设置为true,否则会产生死循环递归调用 
-     *@param completeCallback 完成回调
-     *@example 
-     *  示例： 通常在init/onLoad函数中调用 showWithAction,
-     *  但如果需要界面通过hide隐藏，而不是关闭界面时，下一次显示时
-     *  管理器直接调用了show,没有执行界面的打开动画，如果还需要界面打开动画
-     *  需要按如下方式重写show方法
-     *  show( args : any[] ){
-     *      super.show(args);
-     *      this.showWithAction(true);
-     *      //to do => 
-     *  }
-     */
-    public showWithAction(isOverrideShow = false, completeCallback?: () => void) {
-        if (this.content) {
-            if (!isOverrideShow) this.show(this.args);
-            this.action?.stop();
-            this.action = tween(this.content);
-            this.action.set({ scale: new Vec3(0.2, 0.2, 0.2) })
-                .to(0.2, { scale: new Vec3(1.15, 1.15, 1.15) })
-                .delay(0.05)
-                .to(0.1, { scale: new Vec3(1, 1, 1) })
-                .call(() => {
-                    if (completeCallback) completeCallback();
-                })
-                .start();
+        if ( options && options.isAction ){
+            //有动画
+            if (this.node) this.node.active = true;
+            if ( options.start ){
+                options.start();
+            }
+            if ( options.do ){
+                options.do.then(()=>{
+                    if ( options.complete ) options.complete();
+                });
+            }else{
+                if ( options.complete ) options.complete();
+            }
+        }else{
+            //没有设置项
+            if (this.node) this.node.active = true;
         }
     }
 
-    /**@description 动画隐藏界面 
-     *@param isOverrideHide 是否是重写hide调用的,如果是重写hide调用了,必将此参数设置为true,否则会产生死循环递归调用 
-     *@param completeCallback 完成回调
-     */
-    public hideWithAction(completeCallback?: () => void) {
-        if (this.content) {
-            this.action?.stop();
-            this.action = tween(this.content);
-            this.action.to(0.2, { scale: new Vec3(1.15, 1.15, 1.15) })
-                .to(0.1, { scale: new Vec3(0.3, 0.3, 0.3) })
-                .call(() => {
-                    this.hide();
-                    this.content!.setScale(new Vec3(1, 1, 1));
-                    if (completeCallback) completeCallback();
-                })
-                .start();
+    public hide( options ?: ViewOption ) {
+        if ( options && options.isAction ){
+            //有动画
+            if ( options.start ){
+                options.start();
+            }
+            if ( !options.do ){
+                Log.e(`必须指定动画参数,界面将会直接隐藏`);
+                if (this.node) this.node.removeFromParent();
+                return;
+            }
+            options.do.then(()=>{
+                if ( options.complete ) options.complete();
+                if (this.node) this.node.removeFromParent();
+            });
+        }else{
+            //没有设置项
+            if (this.node) this.node.removeFromParent();
         }
     }
 
-    /**@description 动画关闭界面 
-     *@param completeCallback 完成回调
-     */
-    public closeWithAction(completeCallback?: () => void) {
-        if (this.content) {
-            this.action?.stop();
-            this.action = tween(this.content)
-                .to(0.2, { scale: new Vec3(1.15, 1.15, 1.15) })
-                .to(0.1, { scale: new Vec3(0.3, 0.3, 0.3) })
-                .call(() => {
-                    if (completeCallback) completeCallback();
-                    this.close();
-                })
-                .start();
-        }
+    protected _enabledKeyUp: boolean = false;
+    /**@description 是否启用键盘抬起事件 */
+    protected get enabledKeyUp() {
+        return this._enabledKeyUp;
     }
-
-
-    /**
-     * @description 启用物理返回键按钮
-     * @param isEnabled true 启用，
-     * @example 重写onKeyBack方法
-     */
-    setEnabledKeyBack(isEnabled: boolean) {
-        if (isEnabled) {
+    protected set enabledKeyUp(value) {
+        this._enabledKeyUp = value;
+        if (value) {
             systemEvent.off(SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
             systemEvent.on(SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
         } else {
             systemEvent.off(SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
         }
-
-        this._isEnableKey = isEnabled;
     }
 
-    isEnabledKeyBack() {
-        return this._isEnableKey;
+    protected _enabledKeyDown: boolean = false;
+    /**@description 是否启用键盘按下事件 */
+    protected get enabledKeyDown() {
+        return this._enabledKeyUp;
     }
-
-    onKeyUp(ev: EventKeyboard) {
-        if (DEBUG) {
-            Log.d(`[${js.getClassName(this)}] onKeyUp keyCode : ${ev.keyCode}`);
+    protected set enabledKeyDown(value) {
+        this._enabledKeyUp = value;
+        if (value) {
+            systemEvent.off(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
+            systemEvent.on(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
+        } else {
+            systemEvent.off(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
         }
+    }
+
+    protected onKeyUp(ev: EventKeyboard) {
         if (ev.keyCode == macro.KEY.escape) {
-            this.onKeyBack(ev);
+            this.onKeyBackUp(ev);
         } else {
             ev.propagationStopped = true;
         }
     }
 
-    onKeyBack(ev: EventKeyboard) {
+    protected onKeyDown(ev: EventKeyboard) {
+        if (ev.keyCode == macro.KEY.escape) {
+            this.onKeyBackDown(ev);
+        } else {
+            ev.propagationStopped = true;
+        }
+    }
+
+    protected onKeyBackUp(ev: EventKeyboard) {
         //只有一个接受，不再向上传播
-        //ev.stopPropagation();
+        ev.propagationStopped = true;
+    }
+
+    protected onKeyBackDown(ev: EventKeyboard) {
+        ev.propagationStopped = true;
     }
 
     audioHelper: AudioComponent = null!;
@@ -195,14 +192,15 @@ export default class UIView extends EventComponent implements IFullScreenAdapt {
     }
 
     onDestroy() {
-        this.setEnabledKeyBack(false);
+        this.enabledKeyDown = false;
+        this.enabledKeyUp = false;
         this.enableFrontAndBackgroundSwitch = false;
         super.onDestroy();
     }
 
     private _enterBackgroundTime = 0;
     private _enableFrontAndBackgroundSwitch = false;
-    public set enableFrontAndBackgroundSwitch(value) {
+    protected set enableFrontAndBackgroundSwitch(value) {
         this._enableFrontAndBackgroundSwitch = value;
         if (value) {
             game.on(Game.EVENT_SHOW, this._onEnterForgeGround, this);
@@ -212,11 +210,11 @@ export default class UIView extends EventComponent implements IFullScreenAdapt {
             game.off(Game.EVENT_HIDE, this._onEnterBackground, this);
         }
     }
-    public get enableFrontAndBackgroundSwitch() {
+    protected get enableFrontAndBackgroundSwitch() {
         return this._enableFrontAndBackgroundSwitch;
     }
 
-    protected _onEnterBackground() {
+    private _onEnterBackground() {
         this._enterBackgroundTime = Date.timeNow();
         this.onEnterBackground();
     }
@@ -227,10 +225,10 @@ export default class UIView extends EventComponent implements IFullScreenAdapt {
         this.onEnterForgeground(inBackgroundTime);
     }
 
-    onEnterForgeground(inBackgroundTime: number) {
+    protected onEnterForgeground(inBackgroundTime: number) {
 
     }
-    onEnterBackground() {
+    protected onEnterBackground() {
 
     }
 }
