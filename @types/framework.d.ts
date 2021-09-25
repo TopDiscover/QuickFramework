@@ -279,22 +279,13 @@ declare interface NetHelperPrintDelegate<T, U> {
 	printHander?(data: U): void;
 }
 
-/**@description 显示/关闭/隐藏时,UIView.show/close/hide的参数 */
-declare interface ViewOption {
-	/**@description 是否显示动画 */
-	isAction?: boolean;
-	/**@description 执行动画前调用 isAction 为true时生效*/
-	start?: Function;
-	/**@description 动画执行 isAction 为true时生效 */
-	do?: Promise<void>;
-	/**@description 动画完成后调用 isAction 为true时生效*/
-	complete?: Function;
-	/**@description 用户自定义参数 */
-	args?: any | any[];
-}
+/**@description 视图打开，关闭，隐藏动画 */
+declare type ViewAction = (complete : ()=>void)=>void;
 
 /**@description UIManager open参数说明 */
 declare interface OpenOption {
+	/**@description 打开界面的类型 */
+	type : UIClass<UIView>;
 	/**@description 视图绑定预置资源所在bundle,默认为resources目标 */
 	bundle?: BUNDLE_TYPE;
 	/**@description 节点层级，默认为0 */
@@ -313,6 +304,8 @@ declare interface OpenOption {
 	name?: string;
 	/**@description 是否是预加载预置资源，默认为false */
 	preload?: boolean;
+	/**@description 用户自定义参数 */
+	args?: any | any[];
 }
 
 declare interface DefaultOpenOption extends OpenOption{

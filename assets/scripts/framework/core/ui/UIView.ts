@@ -58,72 +58,45 @@ export default class UIView extends EventComponent implements IFullScreenAdapt {
         return this._bundle;
     }
 
-    public close( options ?: ViewOption ) {
-        if ( options && options.isAction ){
-            //有动画
-            if ( options.start ){
-                options.start();
-            }
-            if ( !options.do ){
-                Log.e(`必须指定动画参数,界面将会直接关闭`);
-                Manager.uiManager.close(this.className);
-                return;
-            }
-            options.do.then(()=>{
-                if ( options.complete ) options.complete();
+    /**@description 关闭界面动画 */
+    protected get closeAction() : ViewAction | null{
+        return null;
+    } 
+
+    public close( ) {
+        if ( this.closeAction ){
+            this.closeAction(()=>{
                 Manager.uiManager.close(this.className);
             });
         }else{
-            //没有设置项
             Manager.uiManager.close(this.className);
         }
     }
 
-    /**@description args为open代入的参数 */
-    public show(options ?: ViewOption) {
-        //再如果界面已经存在于界面管理器中，此时传入新的参数，只从show里面过来,这里重新对_args重新赋值
-        if ( options ){
-            this._args = options.args;
-        }else{
-            this._args = null;
-        }
+    protected get showAction() : ViewAction | null{
+        return null;
+    }
 
-        if ( options && options.isAction ){
-            //有动画
-            if (this.node) this.node.active = true;
-            if ( options.start ){
-                options.start();
-            }
-            if ( options.do ){
-                options.do.then(()=>{
-                    if ( options.complete ) options.complete();
-                });
-            }else{
-                if ( options.complete ) options.complete();
-            }
-        }else{
-            //没有设置项
-            if (this.node) this.node.active = true;
+    /**@description args为open代入的参数 */
+    public show( args ?: any[] | any) {
+        //再如果界面已经存在于界面管理器中，此时传入新的参数，只从show里面过来,这里重新对_args重新赋值
+        this._args = args;
+        if (this.node) this.node.active = true;
+        if ( this.showAction ){
+            this.showAction(()=>{});
         }
     }
 
-    public hide( options ?: ViewOption ) {
-        if ( options && options.isAction ){
-            //有动画
-            if ( options.start ){
-                options.start();
-            }
-            if ( !options.do ){
-                Log.e(`必须指定动画参数,界面将会直接隐藏`);
-                if (this.node) this.node.removeFromParent();
-                return;
-            }
-            options.do.then(()=>{
-                if ( options.complete ) options.complete();
+    protected get hideAction() : ViewAction | null{
+        return null;
+    }
+
+    public hide( ) {
+        if ( this.hideAction ){
+            this.hideAction(()=>{
                 if (this.node) this.node.removeFromParent();
             });
         }else{
-            //没有设置项
             if (this.node) this.node.removeFromParent();
         }
     }

@@ -206,7 +206,9 @@ export class UIManager {
             delay : options.delay,
             name : options.name,
             zIndex : 0,
-            preload : false
+            preload : false,
+            type : options.type,
+            args : options.args,
         };
         if ( options.bundle != undefined ){
             out.bundle = options.bundle;
@@ -227,7 +229,7 @@ export class UIManager {
      * @returns 
      */
     public preload<T extends UIView>(uiClass: UIClass<T>, bundle: BUNDLE_TYPE) {
-        return this.open(uiClass,{preload:true,bundle:bundle});
+        return this.open({ type : uiClass,preload:true,bundle:bundle});
     }
 
     /**
@@ -237,19 +239,19 @@ export class UIManager {
      * @param viewOption 视图显示设置参数，即UIView.show参数
      * @returns 
      */
-    public open<T extends UIView>( type : UIClass<T>, openOption: OpenOption , viewOption ?: ViewOption): Promise<T> {
+    public open<T extends UIView>( openOption: OpenOption): Promise<T> {
         let _OpenOption = this.defaultOpenOption(openOption);
-        return this._open(type,_OpenOption,viewOption);
+        return this._open(_OpenOption);
     }
 
-    private _open<T extends UIView>(uiClass: UIClass<T>,openOption : DefaultOpenOption,viewOption ?: ViewOption) {
+    private _open<T extends UIView>(openOption : DefaultOpenOption) {
         return new Promise<T>((reslove, reject) => {
-            if (!uiClass) {
+            if (!openOption.type) {
                 if (DEBUG) Log.d(`${this._logTag}open ui class error`);
                 reslove(<any>null);
                 return;
             }
-            let className = js.getClassName(uiClass);
+            let className = js.getClassName(openOption.type);
 
             let root = this.viewRoot;
             if (!root) {
@@ -257,7 +259,7 @@ export class UIManager {
                 reslove(<any>null);
                 return;
             }
-            let viewData = this.getViewData(uiClass);
+            let viewData = this.getViewData(openOption.type);
             if (viewData) {
                 viewData.isPreload = openOption.preload;
                 //已经加载
@@ -269,7 +271,7 @@ export class UIManager {
                             if (!viewData.node.parent) {
                                 this.addView(viewData.node, openOption.zIndex,viewData.view);
                             }
-                            viewData.view.show(viewOption);
+                            viewData.view.show(openOption.args);
                         }
                     }
                     reslove(<T>viewData.view);
@@ -289,9 +291,9 @@ export class UIManager {
             else {
                 viewData = new ViewData();
                 viewData.loadData.name = className;
-                let prefabUrl = uiClass.getPrefabUrl();
+                let prefabUrl = openOption.type.getPrefabUrl();
                 viewData.isPreload = openOption.preload;
-                viewData.viewType = uiClass;
+                viewData.viewType = openOption.type;
                 viewData.bundle = openOption.bundle;
                 this._viewDatas.set(className, viewData);
 
@@ -313,12 +315,12 @@ export class UIManager {
                         viewData.info.data = prefab;
                         viewData.info.bundle = openOption.bundle;
                         Manager.assetManager.retainAsset(viewData.info);
-                        this.createNode(className, uiClass, reslove, prefab,openOption,viewOption);
+                        this.createNode(viewData,reslove,openOption);
                         Manager.uiLoading.hide();
                     }).catch((reason) => {
                         viewData.isLoaded = true;
                         Log.e(reason);
-                        this.close(uiClass);
+                        this.close(openOption.type);
                         viewData.doCallback(null, className, "打开界面异常");
                         reslove(<any>null);
                         let uiName = "";
@@ -335,18 +337,13 @@ export class UIManager {
         });
     }
 
-    private _addComponent<T extends UIView>(
-        uiNode: Node,
-        uiClass: UIClass<T>,
-        viewData: ViewData,
-        className: string,
-        openOption : DefaultOpenOption ,
-        viewOption ?: ViewOption ): UIView | null {
+    private _addComponent(uiNode: Node,viewData: ViewData,openOption : DefaultOpenOption ): UIView | null {
         if (uiNode) {
+            let className = this.getClassName(viewData.viewType);
             //挂载脚本
-            let view = uiNode.getComponent(uiClass) as UIView;
+            let view = uiNode.getComponent(viewData.viewType);
             if (!view) {
-                view = uiNode.addComponent(uiClass);
+                view = uiNode.addComponent(viewData.viewType);
                 if (!view) {
                     if (DEBUG) Log.e(`${this._logTag}挂载脚本失败 : ${className}`);
                     return null;
@@ -359,10 +356,7 @@ export class UIManager {
             view.className = className;
             view.bundle = openOption.bundle;
             viewData.view = view;
-            view.args = null;
-            if ( viewOption && viewOption.args ){
-                view.args = viewOption.args;
-            }
+            view.args = openOption.args;
 
             //界面显示在屏幕中间
             let widget = view.getComponent(Widget);
@@ -393,16 +387,9 @@ export class UIManager {
         }
     }
 
-    private createNode<T extends UIView>(
-        className: string,
-        uiClass: UIClass<T>,
-        reslove: any,
-        data: Prefab,
-        openOptions : DefaultOpenOption,
-        viewOptions ?: ViewOption ) {
-        let viewData = this._viewDatas.get(className);
-        if (!viewData) return;
+    private createNode(viewData : ViewData,reslove: any,openOptions : DefaultOpenOption) {
         viewData.isLoaded = true;
+        let className = this.getClassName(viewData.viewType);
         if (viewData.status == ViewStatus.WAITTING_CLOSE) {
             //加载过程中有人关闭了界面
             reslove(null);
@@ -412,9 +399,9 @@ export class UIManager {
             return;
         }
 
-        let uiNode = instantiate(data);
+        let uiNode = instantiate(viewData.info.data as Prefab);
         viewData.node = uiNode;
-        let view = this._addComponent(uiNode, uiClass, viewData, className,openOptions,viewOptions);
+        let view = this._addComponent(uiNode,viewData,openOptions);
         if (!view) {
             reslove(null);
             return;
@@ -431,7 +418,7 @@ export class UIManager {
             if (DEBUG) Log.d(`${this._logTag}open view : ${className}`)
 
             if (!viewData.isPreload) {
-                view.show(viewOptions);
+                view.show(openOptions.args);
             }
             reslove(view)
             viewData.doCallback(view, className, "加载完成，回调之前加载中的界面");

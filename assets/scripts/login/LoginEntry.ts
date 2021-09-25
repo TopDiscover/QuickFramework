@@ -25,7 +25,7 @@ class LoginEntry extends Entry {
         completeCb();
     }
     protected openGameView(): void {
-        Manager.uiManager.open(LoginView,{ zIndex: ViewZOrder.zero, bundle: this.bundle });
+        Manager.uiManager.open({ type: LoginView, zIndex: ViewZOrder.zero, bundle: this.bundle });
         Manager.entryManager.onCheckUpdate();
     }
     protected closeGameView(): void {
