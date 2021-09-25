@@ -33,7 +33,7 @@ class EliminateEntry extends Entry {
         this.loader.loadResources();
     }
     protected openGameView(): void {
-        Manager.uiManager.open(EliminateGameView,{ bundle: this.bundle });
+        Manager.uiManager.open({ type: EliminateGameView, bundle: this.bundle });
     }
     protected closeGameView(): void {
         Manager.uiManager.close(EliminateGameView);

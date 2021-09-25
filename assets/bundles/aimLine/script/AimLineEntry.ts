@@ -11,7 +11,7 @@ class AimLineEntry extends Entry {
         completeCb();
     }
     protected openGameView(): void {
-        Manager.uiManager.open(AimLineView,{bundle: this.bundle });
+        Manager.uiManager.open({ type: AimLineView, bundle: this.bundle });
     }
     protected closeGameView(): void {
         Manager.uiManager.close(AimLineView);

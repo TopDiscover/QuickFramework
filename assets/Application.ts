@@ -125,7 +125,7 @@ export class _Manager extends Framewok implements GameEventInterface {
 
     onHotupdateMessage(data: HotUpdate.MessageData){
         if (data.isOk) {
-            Manager.uiManager.open(DownloadLoading,{zIndex: ViewZOrder.Loading},{args: [data.state, data.name, data.bundle] });
+            Manager.uiManager.open({ type: DownloadLoading, zIndex: ViewZOrder.Loading , args: [data.state, data.name, data.bundle] });
         } else {
             cc.game.end();
         }

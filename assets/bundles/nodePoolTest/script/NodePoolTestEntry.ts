@@ -13,7 +13,7 @@ class NodePoolTestEntry extends Entry {
         completeCb();
     }
     protected openGameView(): void {
-        Manager.uiManager.open(NodePoolView,{ bundle: this.bundle });
+        Manager.uiManager.open({ type: NodePoolView, bundle: this.bundle });
     }
     protected closeGameView(): void {
         Manager.uiManager.close(NodePoolView);

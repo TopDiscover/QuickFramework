@@ -13,19 +13,19 @@ class ShaderEntry extends Entry {
         completeCb();
     }
     protected openGameView(): void {
-        Manager.uiManager.open(ShaderView,{ bundle: this.bundle });
+        Manager.uiManager.open({ type: ShaderView, bundle: this.bundle });
     }
     protected closeGameView(): void {
         Manager.uiManager.close(ShaderView);
     }
     protected initData(): void {
-        
+
     }
     protected pauseMessageQueue(): void {
-        
+
     }
     protected resumeMessageQueue(): void {
-        
+
     }
 }
 

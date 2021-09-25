@@ -19,7 +19,7 @@ class NetTestEntry extends Entry {
         completeCb();
     }
     protected openGameView(): void {
-        Manager.uiManager.open(NetTestView,{ bundle: this.bundle });
+        Manager.uiManager.open({ type: NetTestView, bundle: this.bundle });
     }
     protected closeGameView(): void {
         Manager.uiManager.close(NetTestView);

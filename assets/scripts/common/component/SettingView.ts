@@ -49,15 +49,27 @@ export default class SettingView extends UIView {
         this.onMusicStatusChange(this.musicStatus, false);
         this.onEffectStatusChange(this.effectStatus, false);
 
-        Manager.utils.showView(this,this.content);
+        this.show(this.args);
+    }
+
+    protected get showAction(){
+        return ( complete : ()=>void )=>{
+            Manager.utils.showView(this.content,complete);
+        }
+    }
+
+    protected get closeAction(){
+        return ( complete : ()=>void )=>{
+            Manager.utils.hideView(this.content,complete);
+        };
     }
 
     private onClose() {
-        Manager.utils.closeView(this,this.content);
+        this.close();
     }
 
     private onQuit() {
-        Manager.utils.closeView(this,this.content);
+        this.close();
         Manager.alert.show({
             immediatelyCallback: true,
             text: i18n.quitGame,
