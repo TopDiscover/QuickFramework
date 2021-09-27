@@ -3,7 +3,7 @@ import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
     createNodeWithPrefab,getBundle,_loadDirRes,_loadRes
-} from "./Utils";
+} from "./CocosUtils";
 import { Resource } from "../core/asset/Resource";
 import { Macro } from "../defines/Macros";
 

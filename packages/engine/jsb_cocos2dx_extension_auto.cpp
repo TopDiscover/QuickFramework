@@ -1119,6 +1119,21 @@ static bool js_extension_AssetsManagerEx_isResuming(se::State& s)
 }
 SE_BIND_FUNC(js_extension_AssetsManagerEx_isResuming)
 
+static bool js_extension_AssetsManagerEx_cancelUpdate(se::State& s)
+{
+    cocos2d::extension::AssetsManagerEx* cobj = (cocos2d::extension::AssetsManagerEx*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_extension_AssetsManagerEx_cancelUpdate : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    if (argc == 0) {
+        cobj->cancelUpdate();
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+    return false;
+}
+SE_BIND_FUNC(js_extension_AssetsManagerEx_cancelUpdate)
+
 static bool js_extension_AssetsManagerEx_create(se::State& s)
 {
     const auto& args = s.args();
@@ -1254,6 +1269,7 @@ bool js_register_extension_AssetsManagerEx(se::Object* obj)
     cls->defineFunction("prepareUpdate", _SE(js_extension_AssetsManagerEx_prepareUpdate));
     cls->defineFunction("downloadFailedAssets", _SE(js_extension_AssetsManagerEx_downloadFailedAssets));
     cls->defineFunction("isResuming", _SE(js_extension_AssetsManagerEx_isResuming));
+    cls->defineFunction("cancelUpdate", _SE(js_extension_AssetsManagerEx_cancelUpdate));
     cls->defineStaticFunction("create", _SE(js_extension_AssetsManagerEx_create));
     cls->defineFinalizeFunction(_SE(js_cocos2d_extension_AssetsManagerEx_finalize));
     cls->install();

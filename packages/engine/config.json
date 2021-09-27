@@ -34,6 +34,11 @@
         "name" : "jsb_cocos2dx_extension_auto.cpp",
         "desc" : "执更新修改,jsb_cocos2dx_extension_auto.cpp"
     },
+    "jsb_cocos2dx_extension_auto.hpp":{
+        "path" : "cocos2d-x/cocos/scripting/js-bindings/auto/jsb_cocos2dx_extension_auto.hpp",
+        "name" : "jsb_cocos2dx_extension_auto.hpp",
+        "desc" : "执更新修改,jsb_cocos2dx_extension_auto.hpp"
+    },
     "jsb_default_settings.gradle":{
         "path" : "cocos2d-x/templates/js-template-default/frameworks/runtime-src/proj.android-studio/settings.gradle",
         "name" : "jsb-default/settings.gradle",
