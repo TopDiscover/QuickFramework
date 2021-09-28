@@ -9324,7 +9324,7 @@
     },
     "_autoAdapt": true,
     "_pcf": 0,
-    "_bias": 0.00001,
+    "_bias": 0.1,
     "_packing": false,
     "_linear": true,
     "_selfShadow": false,
@@ -9338,7 +9338,8 @@
       "__type__": "cc.Vec2",
       "x": 512,
       "y": 512
-    }
+    },
+    "_saturation": 1
   },
   {
     "__type__": "cc.SkyboxInfo",

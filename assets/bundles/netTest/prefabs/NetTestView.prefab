@@ -185,7 +185,7 @@
       "__id__": 6
     },
     "_visFlags": 0,
-    "_customMaterial":null,
+    "_customMaterial": null,
     "_srcBlendFactor": 2,
     "_dstBlendFactor": 4,
     "_color": {
@@ -2938,7 +2938,7 @@
       "__id__": 144
     },
     "_visFlags": 0,
-    "_customMaterial":null,
+    "_customMaterial": null,
     "_srcBlendFactor": 2,
     "_dstBlendFactor": 4,
     "_color": {
@@ -3945,7 +3945,7 @@
       "__id__": 196
     },
     "_visFlags": 0,
-    "_customMaterial":null,
+    "_customMaterial": null,
     "_srcBlendFactor": 2,
     "_dstBlendFactor": 4,
     "_color": {
@@ -4500,7 +4500,7 @@
       "__id__": 224
     },
     "_visFlags": 0,
-    "_customMaterial":null,
+    "_customMaterial": null,
     "_srcBlendFactor": 2,
     "_dstBlendFactor": 4,
     "_color": {
@@ -7065,7 +7065,7 @@
       "__id__": 362
     },
     "_visFlags": 0,
-    "_customMaterial":null,
+    "_customMaterial": null,
     "_srcBlendFactor": 2,
     "_dstBlendFactor": 4,
     "_color": {
@@ -7724,7 +7724,7 @@
       "__id__": 392
     },
     "_visFlags": 0,
-    "_customMaterial":null,
+    "_customMaterial": null,
     "_srcBlendFactor": 2,
     "_dstBlendFactor": 4,
     "_color": {
@@ -10005,7 +10005,7 @@
       "__id__": 512
     },
     "_visFlags": 0,
-    "_customMaterial":null,
+    "_customMaterial": null,
     "_srcBlendFactor": 2,
     "_dstBlendFactor": 4,
     "_color": {
@@ -12818,7 +12818,7 @@
       "__id__": 656
     },
     "_visFlags": 0,
-    "_customMaterial":null,
+    "_customMaterial": null,
     "_srcBlendFactor": 2,
     "_dstBlendFactor": 4,
     "_color": {
