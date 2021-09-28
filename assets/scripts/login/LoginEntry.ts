@@ -32,8 +32,8 @@ class LoginEntry extends Entry {
         Manager.uiManager.close(LoginView);
     }
     protected initData(): void {
-        Config.ENTRY_CONFIG[Config.BUNDLE_HALL] = new HotUpdate.BundleConfig(i18n.hallText,Config.BUNDLE_HALL);
-        Config.ENTRY_CONFIG[Macro.BUNDLE_RESOURCES] = new HotUpdate.BundleConfig(i18n.mainPack,Macro.BUNDLE_RESOURCES);
+        Config.ENTRY_CONFIG[Config.BUNDLE_HALL] = new HotUpdate.BundleConfig(i18n.hallText,Config.BUNDLE_HALL,true);
+        Config.ENTRY_CONFIG[Macro.BUNDLE_RESOURCES] = new HotUpdate.BundleConfig(i18n.mainPack,Macro.BUNDLE_RESOURCES,true);
     }
     protected pauseMessageQueue(): void {
         

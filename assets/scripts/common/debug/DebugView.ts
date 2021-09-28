@@ -135,7 +135,11 @@ export class DebugView extends cc.Component {
         Log.d(`-------Proto文件加载信息,所有proto文件都加载在同一个root下,文件加载完成后，资源文件就会初释放-------`);
         Manager.protoManager.print({
             print: (data) => {
-                Log.d(data);
+                if ( cc.sys.isNative ){
+                    Log.dump(data);
+                }else{
+                    Log.d(data);
+                }
             }
         })
     }
@@ -150,9 +154,16 @@ export class DebugView extends cc.Component {
                     bundles.push(data.loaded[i].name);
                 }
                 Log.d(`当前所有加载完成的bundle : ${bundles.toString()}`);
-
-                Log.d("当前运行bundle:", data.curBundle);
-                Log.d("加载过保存下的bundle信息：", data.areadyLoaded)
+                if ( cc.sys.isNative ){
+                    Log.dump(data.curBundle,"当前运行bundle:")
+                }else{
+                    Log.d("当前运行bundle:", data.curBundle);
+                }
+                if ( cc.sys.isNative ){
+                    Log.dump(data.areadyLoaded,"加载过保存下的bundle信息：")
+                }else{
+                    Log.d("加载过保存下的bundle信息：", data.areadyLoaded)
+                }
             }
         })
     }
