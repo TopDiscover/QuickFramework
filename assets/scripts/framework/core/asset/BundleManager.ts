@@ -12,6 +12,13 @@ export class BundleManager {
    public static Instance() { return this._instance || (this._instance = new BundleManager()); }
    private curBundle: HotUpdate.BundleConfig = null!;
    private isLoading = false;
+   protected isEngineBundle(key : string){
+      if ( key == AssetManager.BuiltinBundleName.MAIN ||
+         key == AssetManager.BuiltinBundleName.RESOURCES || key == AssetManager.BuiltinBundleName.START_SCENE){
+            return true;
+         }
+      return false;
+   }
    /**@description 删除已经加载的bundle */
    public removeLoadedBundle(delegate: EntryDelegate, excludeBundles?: string[]) {
       if (!excludeBundles) {
@@ -19,7 +26,10 @@ export class BundleManager {
       }
       let loaded : string[]= [];
       assetManager.bundles.forEach((bundle,key)=>{
-         loaded.push(key);
+         //引擎内置包不能删除
+         if ( !this.isEngineBundle(key) ){
+            loaded.push(key);
+         }
       });
       let i = loaded.length;
       while (i--) {

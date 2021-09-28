@@ -107,11 +107,11 @@ class _Helper {
             console.log(`您目录Creator 目录下的插件版本已经是最新`);
             return;
         }
-        if (this.appVersion == "3.1.0") {
+        if (this.appVersion == "3.3.1") {
             console.log("Creator 版本 : " + this.appVersion);
         }
         else {
-            console.log(`该插件只能使用在3.1.0版本的Creator`);
+            console.log(`该插件只能使用在3.3.1版本的Creator`);
             console.log("请自己手动对比extensions/fix_engine/engine目录下对引擎的修改");
             return;
         }
@@ -141,7 +141,7 @@ class _Helper {
                 let replace = function () {
                     return arguments[1] + sourceData + arguments[3];
                 };
-                destData = destData.replace(/(declare\s*module\s*"cc"\s*\{)([\s\n\S]*)(export\s*class\s*MeshBuffer\s*\{)/g, replace);
+                destData = destData.replace(/(declare\s*module\s*"cc"\s*\{)([\s\n\S]*)(export\s*function\s* murmurhash2_32_gc)/g, replace);
                 fs.writeFileSync(destPath, destData, { encoding: "utf-8" });
                 console.log(data.desc);
             }

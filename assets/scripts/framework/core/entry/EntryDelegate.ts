@@ -143,6 +143,7 @@ export class EntryDelegate {
         let config = new HotUpdate.BundleConfig(
             Manager.getLanguage("mainPack"),
             Macro.BUNDLE_RESOURCES,
+            true
         );
         Manager.bundleManager.enterBundle(config,this);
     }

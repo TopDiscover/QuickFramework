@@ -1,5 +1,5 @@
 
-import { _decorator, Component, Node, find, SystemEventType, setDisplayStats, isDisplayStats, Toggle, js, isValid } from 'cc';
+import { _decorator, Component, Node, find, SystemEventType, setDisplayStats, isDisplayStats, Toggle, js, isValid, sys } from 'cc';
 import { DEBUG } from 'cc/env';
 import { LogLevel } from '../../framework/defines/Enums';
 const { ccclass, property } = _decorator;
@@ -137,7 +137,11 @@ export class DebugView extends Component {
         Log.d(`-------Proto文件加载信息,所有proto文件都加载在同一个root下,文件加载完成后，资源文件就会初释放-------`);
         Manager.protoManager.print({
             print: (data) => {
-                Log.d(data);
+                if ( sys.isNative ){
+                    Log.dump(data);
+                }else{
+                    Log.d(data);
+                }
             }
         })
     }
@@ -152,9 +156,16 @@ export class DebugView extends Component {
                     bundles.push(data.loaded[i].name);
                 }
                 Log.d(`当前所有加载完成的bundle : ${bundles.toString()}`);
-
-                Log.d("当前运行bundle:", data.curBundle);
-                Log.d("加载过保存下的bundle信息：", data.areadyLoaded)
+                if ( sys.isNative ){
+                    Log.dump(data.curBundle,"当前运行bundle:")
+                }else{
+                    Log.d("当前运行bundle:", data.curBundle);
+                }
+                if ( sys.isNative ){
+                    Log.dump(data.areadyLoaded,"加载过保存下的bundle信息：")
+                }else{
+                    Log.d("加载过保存下的bundle信息：", data.areadyLoaded)
+                }
             }
         })
     }
