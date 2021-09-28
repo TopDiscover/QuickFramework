@@ -95,8 +95,8 @@ void AssetsManagerEx::init(const std::string &manifestUrl, const std::string &st
 	if ( pos != std::string::npos) {
 		auto amType = manifestUrl.substr(typeString.size());
 		this->_isUsingAssetsType = true;
-		if (amType == "hall") {
-			//大厅
+		if (amType == "main") {
+			//主包
 			this->_assetsType = "";
 			_tempVersionPath = _tempStoragePath + VERSION_FILENAME;
 			_cacheManifestPath = _storagePath + MANIFEST_FILENAME;
