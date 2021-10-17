@@ -100,6 +100,9 @@ class _Helper {
         }
         return false;
     }
+    get validVersions() {
+        return ["3.3.1", "3.3.2"];
+    }
     run() {
         console.log(`Creator Version : ${this.creatorPluginVersion}`);
         console.log(`Plugin Version : ${this.curPluginVersion}`);
@@ -107,11 +110,11 @@ class _Helper {
             console.log(`您目录Creator 目录下的插件版本已经是最新`);
             return;
         }
-        if (this.appVersion == "3.3.1") {
+        if (this.validVersions.indexOf(this.appVersion)) {
             console.log("Creator 版本 : " + this.appVersion);
         }
         else {
-            console.log(`该插件只能使用在3.3.1版本的Creator`);
+            console.log(`该插件只能使用在${this.validVersions.toString()}版本的Creator`);
             console.log("请自己手动对比extensions/fix_engine/engine目录下对引擎的修改");
             return;
         }
