@@ -112,7 +112,7 @@ export class _Helper {
             return;
         }
 
-        if ( this.validVersions.indexOf(this.appVersion) ) {
+        if ( this.validVersions.indexOf(this.appVersion) >= 0 ) {
             Editor.log("Creator 版本 : " + this.appVersion);
         }else{
             Editor.log(`该插件只能使用在${this.validVersions.toString()}版本的Creator`);
