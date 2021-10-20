@@ -110,7 +110,7 @@ class _Helper {
             console.log(`您目录Creator 目录下的插件版本已经是最新`);
             return;
         }
-        if (this.validVersions.indexOf(this.appVersion)) {
+        if (this.validVersions.indexOf(this.appVersion) >= 0) {
             console.log("Creator 版本 : " + this.appVersion);
         }
         else {

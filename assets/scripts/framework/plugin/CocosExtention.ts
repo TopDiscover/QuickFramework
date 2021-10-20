@@ -2,11 +2,11 @@ import WebEditBoxImpl from "./WebEditBoxImpl";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
-    createNodeWithPrefab,getBundle,_loadDirRes,_loadRes
+    createNodeWithPrefab,getBundle,_loadDirRes,_loadRes, loadDragonDisplay
 } from "./CocosUtils";
 import { Resource } from "../core/asset/Resource";
 import { Macro } from "../defines/Macros";
-import { Sprite , Node, isValid , SpriteFrame, sp, Button, Label, Font, ParticleSystem2D , ParticleAsset, EditBox, AssetManager, Asset } from "cc";
+import { Sprite , Node, isValid , SpriteFrame, sp, Button, Label, Font, ParticleSystem2D , ParticleAsset, EditBox, AssetManager, dragonBones } from "cc";
 import { EDITOR } from "cc/env";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
@@ -185,6 +185,13 @@ prototype.loadFont = function (config: any) {
     Manager.cacheManager.getCacheByAsync(font, Font, bundle).then((data) => {
         setLabelFont(me, config, data);
     });
+}
+
+/**
+ * @description 加载龙骨动画
+ */
+dragonBones.ArmatureDisplay.prototype.loadDisplay = function(config) {
+    loadDragonDisplay(this,config);
 }
 
 /**

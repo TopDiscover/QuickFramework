@@ -1,5 +1,5 @@
 
-import { _decorator,Node, find,Animation, Label, Sprite, instantiate, Button, Vec3, UITransform, ParticleSystem2D, sp, SpriteFrame, AnimationClip, Layers, Widget, size } from "cc";
+import { _decorator,Node, find,Animation, Label, Sprite, instantiate, Button, Vec3, UITransform, ParticleSystem2D, sp, SpriteFrame, AnimationClip, Layers, Widget, size, RenderTexture, dragonBones } from "cc";
 import { HallData } from "../../../hall/script/data/HallData";
 import { ButtonSpriteType } from "../../../../scripts/framework/defines/Enums";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
@@ -39,6 +39,7 @@ export default class LoadTestView extends GameView {
 
         find("loadDir",op)?.on(Node.EventType.TOUCH_END,this.onLoadDir,this);
 
+        find("loadDragon",op)?.on(Node.EventType.TOUCH_END,this.onLoadDragon,this);
     }
 
     private onGoback(){
@@ -235,5 +236,37 @@ export default class LoadTestView extends GameView {
                 }
             }
         })
+    }
+
+    private onLoadDragon(){
+        let name = "onLoadDragon";
+        if ( !this.content ) return;
+        if ( this.content.getChildByName(name)){
+            return;
+        }
+        this.content.removeAllChildren();
+        let node = new Node();
+        node.layer = Layers.Enum.UI_2D;
+        node.name = name;
+        this.content.addChild(node);
+        //添加动画
+        let ani = node.addComponent(dragonBones.ArmatureDisplay);
+        ani.loadDisplay({
+            assetUrl : "dragonBones/NewDragonTest",
+            atlasUrl : "dragonBones/texture",
+            view : this,
+            complete :(asset,atlas)=>{
+                if ( asset && atlas ){
+                    ani.armatureName = "armatureName";
+                    ani.setAnimationCacheMode(dragonBones.ArmatureDisplay.AnimationCacheMode.REALTIME);
+                    ani.timeScale = 1;
+                    ani.playTimes = 0;
+                    ani.playAnimation("stand", 0);
+                }
+            }
+        })
+        let trans = this.content.getComponent(UITransform) as UITransform;
+        node.setPosition(new Vec3(0,-trans.height/2));
+        node.setScale(new Vec3(0.9,0.9));
     }
 }
