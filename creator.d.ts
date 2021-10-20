@@ -195,6 +195,31 @@ declare namespace sp {
 	}
 }
 
+declare namespace dragonBones{
+	export interface ArmatureDisplay{
+		/**
+		 * @description 加载龙骨动画
+		 * @param config 可不填，默认为打开UIView时指向的Bundle
+		 * @example 
+		 * ani.loadDisplay({
+         *   assetUrl : "dragonBones/NewDragonTest",
+         *   atlasUrl : "dragonBones/texture",
+         *   view : this,
+         *   complete :(asset,atlas)=>{
+         *       if ( asset && atlas ){
+         *           ani.armatureName = "armatureName";
+         *           ani.setAnimationCacheMode(dragonBones.ArmatureDisplay.AnimationCacheMode.REALTIME);
+         *           ani.timeScale = 1;
+         *           ani.playTimes = 0;
+         *           ani.playAnimation("stand", 0);
+         *       }
+         *   }
+         * })
+		 **/
+		loadDisplay(config:{ assetUrl : string , atlasUrl : string , view : UIView , complete : (asset : DragonBonesAsset , atlas : DragonBonesAtlasAsset)=>void,bundle?:BUNDLE_TYPE}):void;
+	}
+}
+
 declare type BUNDLE_TYPE = string | cc.AssetManager.Bundle;
 
 declare function require(any);

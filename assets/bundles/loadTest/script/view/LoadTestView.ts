@@ -37,6 +37,8 @@ export default class LoadTestView extends GameView {
         cc.find("loadNetSpine",op).on(cc.Node.EventType.TOUCH_END,this.onLoadNetSpine,this);
 
         cc.find("loadDir",op).on(cc.Node.EventType.TOUCH_END,this.onLoadDir,this);
+
+        cc.find("loadDragon",op).on(cc.Node.EventType.TOUCH_END,this.onLoadDragon,this);
     }
 
     private onGoback(){
@@ -206,5 +208,34 @@ export default class LoadTestView extends GameView {
                 }
             }
         })
+    }
+
+    private onLoadDragon(){
+        let name = "onLoadDragon";
+        if ( this.content.getChildByName(name)){
+            return;
+        }
+        this.content.removeAllChildren();
+        let node = new cc.Node();
+        node.name = name;
+        this.content.addChild(node);
+        //添加动画
+        let ani = node.addComponent(dragonBones.ArmatureDisplay);
+        ani.loadDisplay({
+            assetUrl : "dragonBones/NewDragonTest",
+            atlasUrl : "dragonBones/texture",
+            view : this,
+            complete :(asset,atlas)=>{
+                if ( asset && atlas ){
+                    ani.armatureName = "armatureName";
+                    ani.setAnimationCacheMode(dragonBones.ArmatureDisplay.AnimationCacheMode.REALTIME);
+                    ani.timeScale = 1;
+                    ani.playTimes = 0;
+                    ani.playAnimation("stand", 0);
+                }
+            }
+        })
+        node.y = -this.content.height/2;
+        node.scale = 0.9;
     }
 }

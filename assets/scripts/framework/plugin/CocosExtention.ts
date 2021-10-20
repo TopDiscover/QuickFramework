@@ -2,7 +2,7 @@ import WebEditBoxImpl from "./WebEditBoxImpl";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
-    createNodeWithPrefab,getBundle,_loadDirRes,_loadRes
+    createNodeWithPrefab,getBundle,_loadDirRes,_loadRes, loadDragonDisplay
 } from "./CocosUtils";
 import { Resource } from "../core/asset/Resource";
 import { Macro } from "../defines/Macros";
@@ -179,6 +179,13 @@ cc.Label.prototype.loadFont = function (config) {
     Manager.cacheManager.getCacheByAsync(font, cc.Font,bundle).then((data) => {
         setLabelFont(me, config, data);
     });
+}
+
+/**
+ * @description 加载龙骨动画
+ */
+dragonBones.ArmatureDisplay.prototype.loadDisplay = function(config) {
+    loadDragonDisplay(this,config);
 }
 
 /**

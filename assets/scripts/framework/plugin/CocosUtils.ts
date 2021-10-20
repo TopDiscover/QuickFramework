@@ -444,3 +444,40 @@ export function _loadRes(config:{
         }
     )
 }
+
+export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay, config: { assetUrl: string, atlasUrl: string, view: UIView, complete: (asset: dragonBones.DragonBonesAsset, atlas: dragonBones.DragonBonesAtlasAsset) => void, bundle?: BUNDLE_TYPE }) {
+    let bundle = getBundle(config);
+    Manager.cacheManager.getCacheByAsync(config.assetUrl, dragonBones.DragonBonesAsset, bundle).then((asset) => {
+        if (asset) {
+            let info = new Resource.Info;
+            info.url = config.assetUrl;
+            info.type = dragonBones.DragonBonesAsset;
+            info.data = asset;
+            info.bundle = getBundle(config);
+            addExtraLoadResource(config.view, info);
+            Manager.cacheManager.getCacheByAsync(config.atlasUrl, dragonBones.DragonBonesAtlasAsset, bundle).then((atlas) => {
+                if (atlas) {
+                    let info = new Resource.Info;
+                    info.url = config.atlasUrl;
+                    info.type = dragonBones.DragonBonesAtlasAsset;
+                    info.data = atlas;
+                    info.bundle = getBundle(config);
+                    addExtraLoadResource(config.view, info);
+                    comp.dragonAsset = asset;
+                    comp.dragonAtlasAsset = atlas;
+                    if ( config.complete ){
+                        config.complete(asset,atlas);
+                    }
+                } else {
+                    if (config.complete) {
+                        config.complete(asset, null);
+                    }
+                }
+            });
+        } else {
+            if (config.complete) {
+                config.complete(null, null);
+            }
+        }
+    });
+}
