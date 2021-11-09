@@ -83,7 +83,7 @@ export class ReconnectHandler extends Handler {
         if (this.isInvalid) return;
         Manager.alert.close(Config.RECONNECT_ALERT_TAG);
         //说明进入了登录界面
-        if (this.data.userInfo.where == Macro.BUNDLE_RESOURCES) {
+        if (this.data.where == Macro.BUNDLE_RESOURCES) {
             Manager.uiReconnect.hide();
             Log.w(`重连处于登录界面，停止重连`);
             return;
@@ -166,7 +166,7 @@ export class ReconnectHandler extends Handler {
 
     /**@description 是否无效 */
     protected get isInvalid() {
-        if (!(this.service && this.enabled && this.data.userInfo.where != Macro.BUNDLE_RESOURCES)) {
+        if (!(this.service && this.enabled && this.data.where != Macro.BUNDLE_RESOURCES)) {
             return true;
         }
         return false;

@@ -97,18 +97,18 @@ export class EntryManager {
     onEnterGameView(bundle: BUNDLE_TYPE, gameView: GameView) {
         let entry = this.getEntry(bundle);
         if (entry) {
+            this.delegate.onEnterGameView(entry, gameView);
             entry.onEnterGameView(gameView);
         }
-        this.delegate.onEnterGameView(entry, gameView);
     }
 
     /**@description 管理器调用show时,在GameView的onLoad之后  */
     onShowGameView(bundle : BUNDLE_TYPE , gameView : GameView){
         let entry = this.getEntry(bundle);
         if ( entry ){
+            this.delegate.onShowGameView(entry,gameView);
             entry.onShowGameView(gameView);
         }
-        this.delegate.onShowGameView(entry,gameView);
     }
 
     /**@description bundle管事器卸载bundle前通知 */

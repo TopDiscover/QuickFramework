@@ -9,6 +9,7 @@ import { Config, ViewZOrder } from "../common/config/Config";
 import { Macro } from "../framework/defines/Macros";
 import { Entry } from "../framework/core/entry/Entry";
 import { HotUpdate } from "../framework/core/hotupdate/Hotupdate";
+import { Global } from "../common/data/Global";
 
 class LoginEntry extends Entry {
     static bundle = Macro.BUNDLE_RESOURCES;

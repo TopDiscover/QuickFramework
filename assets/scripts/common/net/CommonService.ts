@@ -85,7 +85,7 @@ export class CommonService extends Service {
     }
 
     onEnterBackground() {
-        if (this.data.userInfo.where == Macro.BUNDLE_RESOURCES) {
+        if (this.data.where == Macro.BUNDLE_RESOURCES) {
             return;
         }
         let me = this;
@@ -103,7 +103,7 @@ export class CommonService extends Service {
             clearTimeout(this._backgroundTimeOutId);
             Log.d(`在后台时间${inBackgroundTime} , 最大时间为: ${this.maxEnterBackgroundTime}`)
             //登录界面，不做处理
-            if (this.data.userInfo.where == Macro.BUNDLE_RESOURCES) {
+            if (this.data.where == Macro.BUNDLE_RESOURCES) {
                 return;
             }
             if (inBackgroundTime > this.maxEnterBackgroundTime) {
