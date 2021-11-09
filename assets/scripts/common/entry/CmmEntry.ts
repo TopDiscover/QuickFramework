@@ -53,6 +53,9 @@ export class CmmEntry extends EntryDelegate {
 
     /**@description 进入bundle完成 */
     onEnterGameView(entry: Entry, gameView: GameView) {
+        let data = Manager.dataCenter.get(Global) as Global;
+        data.prevWhere = data.where;
+        data.where = entry.bundle;
         super.onEnterGameView(entry, gameView);
         Manager.uiReconnect.hide();
     }
@@ -60,7 +63,7 @@ export class CmmEntry extends EntryDelegate {
     onShowGameView(entry: Entry | null, gameView: GameView) {
         let data = Manager.dataCenter.get(Global);
         if (data) {
-            data.userInfo.where = gameView.bundle as string;
+            data.where = gameView.bundle as string;
         }
     }
 

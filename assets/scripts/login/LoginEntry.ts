@@ -9,6 +9,7 @@ import { Config, ViewZOrder } from "../common/config/Config";
 import { Macro } from "../framework/defines/Macros";
 import { Entry } from "../framework/core/entry/Entry";
 import { HotUpdate } from "../framework/core/hotupdate/Hotupdate";
+import { Global } from "../common/data/Global";
 
 class LoginEntry extends Entry {
     static bundle = Macro.BUNDLE_RESOURCES;
@@ -65,6 +66,8 @@ class LoginEntry extends Entry {
         Manager.protoManager.unload();
         //关闭除登录之外的界面
         Manager.uiManager.closeExcept([LoginView]);
+        let data = Manager.dataCenter.get(Global);
+        Log.dump(data as any,"sss");
         //清理所有数据中数据
         Manager.dataCenter.clear();
     }
