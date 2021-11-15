@@ -27,7 +27,7 @@ export default class EliminateGridView extends cc.Component {
                 createPrefab({
                     url: prefabUrl,
                     view: this.view,
-                    completeCallback: (node) => {
+                    complete: (node) => {
                         if (node) {
                             me.node.addChild(node);
                             //这里面后面优化用对象池，暂时这样子处理
