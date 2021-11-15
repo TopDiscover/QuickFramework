@@ -238,7 +238,7 @@ export class _AssetManager {
         }
     }
 
-    private _onLoadComplete(cache: Resource.CacheData, completeCallback: (data: Resource.CacheData) => void, err: Error | null, data: Asset | Asset[] | null) {
+    private _onLoadComplete(cache: Resource.CacheData, complete: (data: Resource.CacheData) => void, err: Error | null, data: Asset | Asset[] | null) {
         cache.isLoaded = true;
         //添加引用关系
         let tempCache = cache;
@@ -247,13 +247,13 @@ export class _AssetManager {
             cache.data = null;
             tempCache.data = null;
             Manager.cacheManager.remove(cache.info.bundle, cache.info.url);
-            completeCallback(cache);
+            complete(cache);
         }
         else {
             if (DEBUG) Log.d(`${this.logTag}加载资源成功:${cache.info.url}`);
             cache.data = data;
             tempCache.data = data;
-            completeCallback(cache);
+            complete(cache);
         }
 
         //加载过程，有不同地方调用过来加载同一个资源的地方，都回调回去

@@ -23,14 +23,14 @@ if (typeof Reflect == "object") {
 /**
  * @description 从网络加载图片，推荐使用第二种方式
  * @param url 网络地址，如 : http://tools.itharbors.com/res/logo.png
- * @param completeCallback 加载完成回调
+ * @param complete 加载完成回调
  * @param defaultSpriteFrame 加载图片失败后，使用的默认图片,当传入string时，会动态加载该默认图片
  * @param isNeedCache 是否需要缓存到本地,如果不需要，每次都会从网络拉取资源,默认都会缓存到本地
  * @param config.retain 远程加载的资源是否驻留在内存中,默认都不驻留内存
  * @example
  * 示例1：
  * let sprite = imageNode.getComponent(cc.Sprite);
- * sprite.loadRemoteImage({url :"http://tools.itharbors.com/res/logo.png", defaultSpriteFrame : HALL("textures/avatar_default_0.png"), view : this,completeCallback : (data)=>{
+ * sprite.loadRemoteImage({url :"http://tools.itharbors.com/res/logo.png", defaultSpriteFrame : HALL("textures/avatar_default_0.png"), view : this,complete : (data)=>{
  * 		if ( data ) { do something }
  * }});
  * 
@@ -44,7 +44,7 @@ if (typeof Reflect == "object") {
  * }
  */
 
-//config : {url: string, view : any , completeCallback?: (data: cc.SpriteFrame) => void, defaultSpriteFrame?: string , isNeedCache ?: boolean }
+//config : {url: string, view : any , complete?: (data: cc.SpriteFrame) => void, defaultSpriteFrame?: string , isNeedCache ?: boolean }
 let prototype:any = Sprite.prototype;
 prototype.loadRemoteImage = function (config: any) {
     let me = this;
@@ -58,17 +58,17 @@ prototype.loadRemoteImage = function (config: any) {
     let defaultBundle = getBundle({ bundle: config.defaultBundle, view: config.view })
     Manager.assetManager.remote.loadImage(config.url, config.isNeedCache).then((data) => {
         if (data) {
-            setSpriteSpriteFrame(config.view, config.url, me, data, config.completeCallback, Macro.BUNDLE_REMOTE, Resource.Type.Remote, isRetain);
+            setSpriteSpriteFrame(config.view, config.url, me, data, config.complete, Macro.BUNDLE_REMOTE, Resource.Type.Remote, isRetain);
         } else {
             if (config.defaultSpriteFrame) {
                 if (typeof config.defaultSpriteFrame == "string") {
                     //动态加载了一张图片，把资源通知管理器
                     Manager.cacheManager.getCacheByAsync(config.defaultSpriteFrame, SpriteFrame, defaultBundle).then((spriteFrame) => {
-                        setSpriteSpriteFrame(config.view, config.defaultSpriteFrame, me, spriteFrame, config.completeCallback, defaultBundle);
+                        setSpriteSpriteFrame(config.view, config.defaultSpriteFrame, me, spriteFrame, config.complete, defaultBundle);
                     });
                 }
             }
-            if (config.completeCallback && isValid(me)) config.completeCallback(data);
+            if (config.complete && isValid(me)) config.complete(data);
         }
     });
 };
@@ -77,24 +77,24 @@ prototype.loadRemoteImage = function (config: any) {
  * @description 加载本地图片
  * @param url 图片路径 {urls:string[],key:string} urls 为纹理名如果有此纹理会打包成多张，此时需要传入所有纹理的地址，key指纹理中名字
  * @param view 所属视图，UIView的子类
- * @param completeCallback 完成回调
+ * @param complete 完成回调
  * @example
  * 示例1：
  * sprite.getComponent(cc.Sprite).loadImage({url:{urls:["plist/fish_30","plist/fish_30_1","plist/fish_30_2"],key:"fishMove_030_28"},view:this});
  * 示例2：
  * sprite.getComponent(cc.Sprite).loadImage({url:"hall/a",view:this});
  */
-//loadImage( config : { url : string | {urls:string[],key:string} , view : any , completeCallback?:(data : SpriteFrame)=>void});
+//loadImage( config : { url : string | {urls:string[],key:string} , view : any , complete?:(data : SpriteFrame)=>void});
 prototype.loadImage = function (config: any) {
 
     let me = this;
     let view = config.view;
     let url = config.url;
-    let completeCallback = config.completeCallback;
+    let complete = config.complete;
     let bundle = getBundle(config);
     if (typeof url == "string") {
         Manager.cacheManager.getCacheByAsync(url, SpriteFrame, bundle).then((spriteFrame) => {
-            setSpriteSpriteFrame(view, url, me, spriteFrame, completeCallback, bundle);
+            setSpriteSpriteFrame(view, url, me, spriteFrame, complete, bundle);
         });
     } else {
         //在纹理图集中查找
@@ -102,7 +102,7 @@ prototype.loadImage = function (config: any) {
             if (data && data.isTryReload) {
                 //来到这里面程序已经崩溃了，无意义在处理了
             } else {
-                setSpriteSpriteFrame(view, data.url, me, data.spriteFrame as SpriteFrame, completeCallback, bundle, Resource.Type.Local, false, true);
+                setSpriteSpriteFrame(view, data.url, me, data.spriteFrame as SpriteFrame, complete, bundle, Resource.Type.Local, false, true);
             }
         });
     }
@@ -112,7 +112,7 @@ prototype.loadImage = function (config: any) {
  * @description 扩展方法
  * @param remotePath 远程资源路径
  * @param name 远程Spine文件名，不再后缀
- * @param completeCallback 完成回调
+ * @param complete 完成回调
  * @param isNeedCache 是否需要缓存到本地,如果不需要，每次都会从网络拉取资源,默认都会缓存到本地
  * @param config.retain 远程加载的资源是否驻留在内存中,默认都不驻留内存
  * @example
@@ -120,7 +120,7 @@ prototype.loadImage = function (config: any) {
  *
  * let path = "https://bc-test1.oss-cn-shenzhen.aliyuncs.com/image/action";
  * let name = "nnoh_v4";
- * skeleton.loadRemoteSkeleton({view : this , path : path, name : name, completeCallback : (data:sp.SkeletonData)=>{
+ * skeleton.loadRemoteSkeleton({view : this , path : path, name : name, complete : (data:sp.SkeletonData)=>{
  *    if (data) {
  *        skeleton.animation = 'loop';
  *        skeleton.premultipliedAlpha = false;
@@ -142,7 +142,7 @@ prototype.loadRemoteSkeleton = function (config: any) {
 /**
  * @description 加载动画
  * @example
- * action.loadSkeleton({url:"hall/vip/vipAction/vip_10",view:this,completeCallback:(data)=>{
+ * action.loadSkeleton({url:"hall/vip/vipAction/vip_10",view:this,complete:(data)=>{
  *	if ( data ){
  *		action.animation = "loop";
  *		action.loop = true;
@@ -296,9 +296,9 @@ if (!EDITOR && Macro.ENABLE_CHANGE_LANGUAGE) {
  * @param config 配置信息
  * @param config.url 预置体路径
  * @param config.view 预置视图资源管理器，继承自UIView
- * @param config.completeCallback 创建完成回调 
+ * @param config.complete 创建完成回调 
  * @example 
- * cc.createPrefab({url :GAME_RES("res/animations/shzDealerCommon"),view:this,completeCallback:(node)=>{
+ * cc.createPrefab({url :GAME_RES("res/animations/shzDealerCommon"),view:this,complete:(node)=>{
  *     if ( node ){
  *         // to do 
  *     }

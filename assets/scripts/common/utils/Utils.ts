@@ -11,7 +11,7 @@ export class Utils {
     public static Instance() { return this._instance || (this._instance = new Utils()); }
 
     /**@description 显示视图动画 */
-    showView(node: Node | null, completeCallback: Function) {
+    showView(node: Node | null, complete: Function) {
         if (node) {
             Tween.stopAllByTag(VIEW_ACTION_TAG);
             tween(node).tag(VIEW_ACTION_TAG)
@@ -20,21 +20,21 @@ export class Utils {
                 .delay(0.05)
                 .to(0.1, { scale: new Vec3(1, 1, 1) })
                 .call(() => {
-                    if (completeCallback) completeCallback();
+                    if (complete) complete();
                 })
                 .start();
         }
     }
 
     /**@description 隐藏/关闭视图统一动画 */
-    hideView(node: Node | null, completeCallback: Function) {
+    hideView(node: Node | null, complete: Function) {
         if (node) {
             Tween.stopAllByTag(VIEW_ACTION_TAG);
             tween(node).tag(VIEW_ACTION_TAG)
                 .to(0.2, { scale: new Vec3(1.15, 1.15, 1.15) })
                 .to(0.1, { scale: new Vec3(0.3, 0.3, 0.3) })
                 .call(() => {
-                    if (completeCallback) completeCallback();
+                    if (complete) complete();
                 })
                 .start();
         }

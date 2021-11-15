@@ -185,10 +185,10 @@ declare interface ServiceClass<T extends Service> extends ModuleClass<T> {
  * @param config 配置信息
  * @param config.url 预置体路径
  * @param config.view 预置视图资源管理器，继承自UIView
- * @param config.completeCallback 创建完成回调 
+ * @param config.complete 创建完成回调 
  * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
  * @example 
- * createPrefab({url :GAME_RES("res/animations/shzDealerCommon"),view:this,completeCallback:(node)=>{
+ * createPrefab({url :GAME_RES("res/animations/shzDealerCommon"),view:this,complete:(node)=>{
  *     if ( node ){
  *         // to do 
  *     }
@@ -198,7 +198,7 @@ declare function createPrefab(
 	config: {
 		url: string,
 		view: UIView,
-		completeCallback: (node: import("cc").Node) => void,
+		complete: (node: import("cc").Node) => void,
 		bundle?: BUNDLE_TYPE
 	}): void;
 

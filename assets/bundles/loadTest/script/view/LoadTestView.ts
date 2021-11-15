@@ -58,7 +58,7 @@ export default class LoadTestView extends GameView {
         this.content.addChild(node);
         let label = node.addComponent(Label);
         label.string = "";
-        label.loadFont({font:"font/number",view:this,completeCallback:(font)=>{
+        label.loadFont({font:"font/number",view:this,complete:(font)=>{
             if( font ){
                 label.string = "+12345678.9万";
             }
@@ -121,7 +121,7 @@ export default class LoadTestView extends GameView {
             hoverSprite:"texture/btnbg/spriteFrame",
             view: this,
             bundle : HallData.bundle,
-            completeCallback:(type,spriteFrame)=>{
+            complete:(type,spriteFrame)=>{
                 if( type == ButtonSpriteType.Norml && spriteFrame ){
                     let buttonTrans = button.getComponent(UITransform) as UITransform;
                     let targetTrans = btn.target.getComponent(UITransform) as UITransform;
@@ -170,7 +170,7 @@ export default class LoadTestView extends GameView {
         spine.loadSkeleton({
             view:this,
             url:"spine/raptor",
-            completeCallback:()=>{
+            complete:()=>{
                 spine.setAnimation(0,"walk",true);
             }});
         let trans = this.content.getComponent(UITransform) as UITransform;
@@ -194,7 +194,7 @@ export default class LoadTestView extends GameView {
             view:this,
             path:"http://192.168.3.153",
             name:"raptor",
-            completeCallback:(data : sp.SkeletonData )=>{
+            complete:(data : sp.SkeletonData )=>{
                 if( data ){
                     spine.setAnimation(0,"walk",true);
                 }

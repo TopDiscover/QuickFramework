@@ -55,7 +55,7 @@ function isValidComponent(component: Component): boolean {
  * @param {*} url url
  * @param {*} sprite Sprite组件
  * @param {*} spriteFrame 新的精灵帧
- * @param {*} completeCallback 完成回调(data: cc.SpriteFrame) => void
+ * @param {*} complete 完成回调(data: cc.SpriteFrame) => void
  * @param {*} resourceType 资源类型 默认为ResourceType.Local
  * @param {*} retain 是否常驻内存 默认为false
  * @param {*} isAtlas 是否是大纹理图集加载 默认为false
@@ -65,7 +65,7 @@ export function setSpriteSpriteFrame(
     url: string,
     sprite: Sprite,
     spriteFrame: SpriteFrame,
-    completeCallback: (data: SpriteFrame | null) => void,
+    complete: (data: SpriteFrame | null) => void,
     bundle: BUNDLE_TYPE,
     resourceType: Resource.Type = Resource.Type.Local,
     retain: boolean = false,
@@ -91,17 +91,17 @@ export function setSpriteSpriteFrame(
         let replaceData = isValid(spriteFrame) ? spriteFrame : null;
         try {
             if (replaceData) sprite.spriteFrame = replaceData;
-            if (completeCallback) completeCallback(replaceData);
+            if (complete) complete(replaceData);
         } catch (err) {
             let temp = isValid(oldSpriteFrame) ? oldSpriteFrame : null;
             sprite.spriteFrame = temp;
-            if (completeCallback) completeCallback(null);
+            if (complete) complete(null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
             Log.e(`${url} : ${err ? err : "replace spriteframe error"}`);
         }
     } else {
         //完成回调
-        if (completeCallback && isValidComponent(sprite)) completeCallback(spriteFrame);
+        if (complete && isValidComponent(sprite)) complete(spriteFrame);
     }
 }
 
@@ -112,7 +112,7 @@ export function setSpriteSpriteFrame(
  * @param button 
  * @param spriteFrame 新的spriteFrame
  * @param memberName 替换成员变量名
- * @param completeCallback 完成回调
+ * @param complete 完成回调
  * @param isAtlas 是否是从大纹理图集中加载的
  */
 function _setSpriteFrame(
@@ -121,7 +121,7 @@ function _setSpriteFrame(
     button: Button,
     spriteFrame: SpriteFrame,
     memberName: string,
-    completeCallback: (type: string, data: SpriteFrame | null) => void,
+    complete: (type: string, data: SpriteFrame | null) => void,
     isAtlas: boolean,
     bundle: BUNDLE_TYPE) {
 
@@ -139,16 +139,16 @@ function _setSpriteFrame(
         try {
             let replaceData = isValid(spriteFrame) ? spriteFrame : null;
             if (replaceData) (<any>button)[memberName] = replaceData;
-            if (completeCallback) completeCallback(memberName, replaceData);
+            if (complete) complete(memberName, replaceData);
         } catch (err) {
             let temp = isValid(oldSpriteFrame) ? oldSpriteFrame : null;
             (<any>button)[memberName] = temp;
-            if (completeCallback) completeCallback(memberName, null);
+            if (complete) complete(memberName, null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
             Log.e(`${url} : ${err ? err : "replace spriteframe error"}`);
         }
     } else {
-        if (completeCallback && isValidComponent(button)) completeCallback(memberName, spriteFrame);
+        if (complete && isValidComponent(button)) complete(memberName, spriteFrame);
     }
 
 };
@@ -160,7 +160,7 @@ function _setSpriteFrame(
  * @param view 持有视图
  * @param url url
  * @param spriteFrame 待替换的精灵帧 
- * @param completeCallback 完成回调
+ * @param complete 完成回调
  * @param isAtlas 是否是从大纹理图集中加载的 默认为false
  */
 function _setButtonSpriteFrame(
@@ -169,15 +169,15 @@ function _setButtonSpriteFrame(
     view: UIView,
     url: string,
     spriteFrame: SpriteFrame,
-    completeCallback: (type: string, data: SpriteFrame | null) => void,
+    complete: (type: string, data: SpriteFrame | null) => void,
     bundle: BUNDLE_TYPE,
     isAtlas: boolean = false) {
 
     if (spriteFrame && isValidComponent(button)) {
-        _setSpriteFrame(view, url, button, spriteFrame, memberName, completeCallback, isAtlas, bundle);
+        _setSpriteFrame(view, url, button, spriteFrame, memberName, complete, isAtlas, bundle);
     } else {
         //完成回调
-        if (completeCallback && isValidComponent(button)) completeCallback(memberName, spriteFrame);
+        if (complete && isValidComponent(button)) complete(memberName, spriteFrame);
     }
 }
 
@@ -187,20 +187,20 @@ function _setButtonSpriteFrame(
  * @param memberName 成员变量名
  * @param view 
  * @param url 
- * @param completeCallback 
+ * @param complete 
  */
 function _setButtonWithType(
     button: Button,
     memberName: ButtonSpriteType,
     view: UIView,
     url: string | { urls: string[], key: string },
-    completeCallback?: (type: string, spriteFrame: SpriteFrame | null) => void,
+    complete?: (type: string, spriteFrame: SpriteFrame | null) => void,
     bundle?: BUNDLE_TYPE
 ) {
     if (url) {
         if (typeof url == "string") {
             Manager.cacheManager.getCacheByAsync(url, SpriteFrame, bundle as BUNDLE_TYPE).then((spriteFrame) => {
-                _setButtonSpriteFrame(button, memberName, view, url, spriteFrame, completeCallback as any, bundle as BUNDLE_TYPE);
+                _setButtonSpriteFrame(button, memberName, view, url, spriteFrame, complete as any, bundle as BUNDLE_TYPE);
             });
         } else {
             //在纹理图集中查找
@@ -208,7 +208,7 @@ function _setButtonWithType(
                 if (data && data.isTryReload) {
                     //来到这里面，程序已经崩溃，无意义在处理
                 } else {
-                    _setButtonSpriteFrame(button, memberName, view, data.url, data.spriteFrame as SpriteFrame, completeCallback as any, bundle as BUNDLE_TYPE, true);
+                    _setButtonSpriteFrame(button, memberName, view, data.url, data.spriteFrame as SpriteFrame, complete as any, bundle as BUNDLE_TYPE, true);
                 }
             });
         }
@@ -226,14 +226,14 @@ export function setButtonSpriteFrame(button: Button, config: {
     pressedSprite?: string | { urls: string[], key: string },
     hoverSprite?: string | { urls: string[], key: string },
     disabledSprite?: string | { urls: string[], key: string },
-    completeCallback?: (type: string, spriteFrame: SpriteFrame | null) => void,
+    complete?: (type: string, spriteFrame: SpriteFrame | null) => void,
     bundle?: BUNDLE_TYPE
 }) {
     let bundle = getBundle(config);
-    _setButtonWithType(button, ButtonSpriteType.Norml, config.view, config.normalSprite as any, config.completeCallback, bundle);
-    _setButtonWithType(button, ButtonSpriteType.Pressed, config.view, config.pressedSprite as any, config.completeCallback, bundle);
-    _setButtonWithType(button, ButtonSpriteType.Hover, config.view, config.hoverSprite as any, config.completeCallback, bundle);
-    _setButtonWithType(button, ButtonSpriteType.Disable, config.view, config.disabledSprite as any, config.completeCallback, bundle);
+    _setButtonWithType(button, ButtonSpriteType.Norml, config.view, config.normalSprite as any, config.complete, bundle);
+    _setButtonWithType(button, ButtonSpriteType.Pressed, config.view, config.pressedSprite as any, config.complete, bundle);
+    _setButtonWithType(button, ButtonSpriteType.Hover, config.view, config.hoverSprite as any, config.complete, bundle);
+    _setButtonWithType(button, ButtonSpriteType.Disable, config.view, config.disabledSprite as any, config.complete, bundle);
 }
 
 /**
@@ -244,7 +244,7 @@ export function setButtonSpriteFrame(button: Button, config: {
  */
 export function setParticleSystemFile(
     component: ParticleSystem2D,
-    config: { url: string, view: any, completeCallback?: (file: ParticleAsset | null) => void, bundle: BUNDLE_TYPE },
+    config: { url: string, view: any, complete?: (file: ParticleAsset | null) => void, bundle: BUNDLE_TYPE },
     data: ParticleAsset
 ) {
     let info = new Resource.Info;
@@ -258,17 +258,17 @@ export function setParticleSystemFile(
         try {
             let replaceData = isValid(data) ? data : null;
             if (replaceData) component.file = replaceData;
-            if (config.completeCallback) config.completeCallback(replaceData);
+            if (config.complete) config.complete(replaceData);
         } catch (err) {
             let temp = isValid(oldFile) ? oldFile : null;
             component.file = temp;
-            if (config.completeCallback) config.completeCallback(null);
+            if (config.complete) config.complete(null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
             Log.e(`${config.url} : ${err ? err : "replace file error"}`);
         }
     } else {
         //完成回调
-        if (config.completeCallback && isValidComponent(component)) config.completeCallback(data);
+        if (config.complete && isValidComponent(component)) config.complete(data);
     }
 }
 
@@ -280,7 +280,7 @@ export function setParticleSystemFile(
  */
 export function setLabelFont(
     component: Label,
-    config: { font: string, view: any, completeCallback?: (font: Font | null) => void, bundle: BUNDLE_TYPE },
+    config: { font: string, view: any, complete?: (font: Font | null) => void, bundle: BUNDLE_TYPE },
     data: Font) {
     let info = new Resource.Info;
     info.url = config.font;
@@ -293,17 +293,17 @@ export function setLabelFont(
         try {
             let replaceData = isValid(data) ? data : null;
             if (replaceData) component.font = replaceData;
-            if (config.completeCallback) config.completeCallback(replaceData);
+            if (config.complete) config.complete(replaceData);
         } catch (err) {
             let temp = isValid(oldFont) ? oldFont : null;
             component.font = temp;
-            if (config.completeCallback) config.completeCallback(null);
+            if (config.complete) config.complete(null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
             Log.e(`${config.font} : ${err ? err : "replace font error"}`);
         }
     } else {
         //完成回调
-        if (config.completeCallback && isValidComponent(component)) config.completeCallback(data);
+        if (config.complete && isValidComponent(component)) config.complete(data);
     }
 }
 
@@ -315,18 +315,18 @@ export function setLabelFont(
  */
 export function setSkeletonSkeletonData(
     component: sp.Skeleton,
-    config: { url: string, view: any, completeCallback: (data: sp.SkeletonData | null) => void, bundle: BUNDLE_TYPE } |
-    { view: any, path: string, name: string, completeCallback: (data: sp.SkeletonData | null) => void, bundle: BUNDLE_TYPE, isNeedCache?: boolean, retain?: boolean },
+    config: { url: string, view: any, complete: (data: sp.SkeletonData | null) => void, bundle: BUNDLE_TYPE } |
+    { view: any, path: string, name: string, complete: (data: sp.SkeletonData | null) => void, bundle: BUNDLE_TYPE, isNeedCache?: boolean, retain?: boolean },
     data: sp.SkeletonData,
     resourceType: Resource.Type = Resource.Type.Local) {
     let url = "";
     let retain = false;
     if (resourceType == Resource.Type.Remote) {
-        let realConfig: { view: any, path: string, name: string, completeCallback: (data: sp.SkeletonData | null) => void, isNeedCache?: boolean, retain?: boolean } = <any>config;
+        let realConfig: { view: any, path: string, name: string, complete: (data: sp.SkeletonData | null) => void, isNeedCache?: boolean, retain?: boolean } = <any>config;
         url = `${realConfig.path}/${realConfig.name}`;
         retain = realConfig.retain ? true : false;
     } else {
-        let realConfig: { url: string, view: any, completeCallback: (data: sp.SkeletonData | null) => void } = <any>config;
+        let realConfig: { url: string, view: any, complete: (data: sp.SkeletonData | null) => void } = <any>config;
         url = realConfig.url;
     }
     let info = new Resource.Info;
@@ -346,17 +346,17 @@ export function setSkeletonSkeletonData(
         try {
             let replaceData = isValid(data) ? data : null;
             if (replaceData) component.skeletonData = replaceData;
-            if (config.completeCallback) config.completeCallback(replaceData);
+            if (config.complete) config.complete(replaceData);
         } catch (err) {
             let temp = isValid(oldSkeletonData) ? oldSkeletonData : null;
             component.skeletonData = temp as sp.SkeletonData;
-            if (config.completeCallback) config.completeCallback(null);
+            if (config.complete) config.complete(null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
             Log.e(`${url} : ${err ? err : "replace skeletonData error"}`);
         }
     } else {
         //完成回调
-        if (config.completeCallback && isValidComponent(component)) config.completeCallback(data);
+        if (config.complete && isValidComponent(component)) config.complete(data);
     }
 }
 
@@ -364,7 +364,7 @@ export function setSkeletonSkeletonData(
  * @description 通过预置体创建Node
  * @param config 配置信息
  */
-export function createNodeWithPrefab(config: { bundle: BUNDLE_TYPE, url: string, view: any, completeCallback: (node: Node | null) => void }) {
+export function createNodeWithPrefab(config: { bundle: BUNDLE_TYPE, url: string, view: any, complete: (node: Node | null) => void }) {
 
     let url = config.url;
     let bundle = getBundle(config);
@@ -378,11 +378,11 @@ export function createNodeWithPrefab(config: { bundle: BUNDLE_TYPE, url: string,
             info.bundle = getBundle(config);
             addExtraLoadResource(config.view, info);
         }
-        if (data && isValidComponent(config.view) && config.completeCallback) {
+        if (data && isValidComponent(config.view) && config.complete) {
             let node = instantiate(data);
-            config.completeCallback(node);
-        } else if (isValidComponent(config.view) && config.completeCallback) {
-            config.completeCallback(null);
+            config.complete(node);
+        } else if (isValidComponent(config.view) && config.complete) {
+            config.complete(null);
         }
     });
 }
