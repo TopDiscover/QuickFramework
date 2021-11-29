@@ -56,7 +56,7 @@ export class CmmEntry extends EntryDelegate {
         data.prevWhere = data.where;
         data.where = entry.bundle;
         super.onEnterGameView(entry, gameView);
-        Manager.uiReconnect.hide();
+        Manager.loading.hide();
     }
 
     onShowGameView(entry: Entry | null, gameView: GameView) {
