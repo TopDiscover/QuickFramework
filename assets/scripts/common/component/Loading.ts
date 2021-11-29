@@ -166,7 +166,7 @@ export default class Loading {
         this.stopShowContent();
         this.stopTimeOutTimer();
         if (this._node) {
-            this._isWaitingHide = true;
+            this._isWaitingHide = false;
             this._node.active = false;
         } else {
             //没有加载好预置体，置一个标记
