@@ -1,6 +1,9 @@
 "use strict";
+
 const fs = require("fs");
 const path = require("path");
+const exec = require('child_process').exec;
+const os = require('os');
 //样式文本
 exports.style = fs.readFileSync(path.join(__dirname, "./index.css"), "utf8");
 
@@ -25,6 +28,7 @@ const elements = {
 const gamesConfigPath = path.join(__dirname, "../../../config/bundles.json");
 const gamesConfig = JSON.parse(fs.readFileSync(gamesConfigPath));
 let bundles = {};
+
 //html文本
 function GenerateTemplate() {
     //读取界面
@@ -268,7 +272,7 @@ exports.methods = {
         this.$.createManifest.addEventListener("confirm", this.onCreateManifest.bind(this, this.$.createManifest));
         //部署
         this.$.deployToRemote.addEventListener("confirm", this.onDeployToRemote.bind(this));
-        //主包地址刷新 
+        //主包地址刷新
         this.$.refreshMainVersion.addEventListener("confirm", this.onRefreshMainVersion.bind(this));
         //refresh${gameInfo.dir}Version 子包地址刷新
         keys.forEach((key) => {
@@ -286,15 +290,15 @@ exports.methods = {
         let code = fs.readFileSync(codePath, "utf8");
         // console.log(code);
         let sourcePath = userCache.buildDir + "/main.js";
-        let sourceCode = fs.readFileSync(sourcePath,"utf8");
+        let sourceCode = fs.readFileSync(sourcePath, "utf8");
         let templateReplace = function templateReplace() {
             // console.log(arguments);
             return arguments[1] + code + arguments[3];
         }
         //添加子游戏测试环境版本号
-        sourceCode = sourceCode.replace(/(\);)([\s\w\S]*)(const[ ]*importMapJson)/g,templateReplace);
+        sourceCode = sourceCode.replace(/(\);)([\s\w\S]*)(const[ ]*importMapJson)/g, templateReplace);
         console.log(`向${sourcePath}中插入热更新代码`);
-        fs.writeFileSync(sourcePath,sourceCode,{"encoding" : "utf8"});
+        fs.writeFileSync(sourcePath, sourceCode, {"encoding": "utf8"});
     },
     //初始化
     init() {
@@ -319,6 +323,7 @@ exports.methods = {
         const code = await Editor.Dialog.info('执行此操作将会删除不包含在包内的所有bundles,是否继续？', config);
         if (code.response == 1) {
             this.removeNotInApkBundle();
+            this.remake()
         }
     },
     /**@description 删除不包含在包内的所有bundles */
@@ -373,7 +378,7 @@ exports.methods = {
     },
     /**
      * @description 刷新测试环境子包信息
-     * @param {*} key 
+     * @param {*} key
      */
     onRefreshBundleLocalServerVersion(key) {
         if (this.isDoCreate()) return;
@@ -612,6 +617,7 @@ exports.methods = {
             this.addLog(`生成${versionManifestPath}成功`);
         }
         this._isDoCreate = false;
+        this.remake()
     },
     delDir(sourceDir, isRemoveSourceDir = false) {
         let delFile = function (dir) {
@@ -689,7 +695,7 @@ exports.methods = {
     },
     /**
      * @description 本地测试服务器选择确定
-     * @param {*} element 
+     * @param {*} element
      */
     onRemoteDirConfirm(element) {
         if (this.isDoCreate()) return;
@@ -698,7 +704,7 @@ exports.methods = {
     },
     /**
      * @description 构建目录选择
-     * @param {*} element 
+     * @param {*} element
      */
     onBuildDirConfirm(element) {
         if (this.isDoCreate()) return;
@@ -707,8 +713,8 @@ exports.methods = {
         this.saveUserCache();
     },
     /**
-     * @description 版本比较 curVersion >= prevVersion 返回ture 
-     * @example (1.0.1 > 1.0)  (1.0.1 <= 1.0.1) (1.0.1 < 1.0.2) (1.0.1 > 1.0.0) 
+     * @description 版本比较 curVersion >= prevVersion 返回ture
+     * @example (1.0.1 > 1.0)  (1.0.1 <= 1.0.1) (1.0.1 < 1.0.2) (1.0.1 > 1.0.0)
      * @param curVersion 当前构建版本
      * @param prevVersion 之前构建的版本
      */
@@ -740,9 +746,9 @@ exports.methods = {
     },
     /**
      * @description bundle输入版本号变化
-     * @param {*} element 
-     * @param {*} key 
-     * @returns 
+     * @param {*} element
+     * @param {*} key
+     * @returns
      */
     onBundleVersionChange(element, key) {
         if (this.isDoCreate()) return;
@@ -754,9 +760,9 @@ exports.methods = {
         }
         this.addLog(`${userCache.bundles[key].name}设置版本号无效,${version} 应大于 ${userCache.bundles[key].version}`);
     },
-    /** 
-     * @description 切换历史地址 
-     * @param element 控件自身 
+    /**
+     * @description 切换历史地址
+     * @param element 控件自身
      */
     onHistoryServerIPChange(element) {
         if (this.isDoCreate()) return;
@@ -789,8 +795,8 @@ exports.methods = {
     },
     /**
      * @description 输入服务器地址结束
-     * @param {*} element 
-     * @returns 
+     * @param {*} element
+     * @returns
      */
     onInputServerUrlOver(element) {
         if (this.isDoCreate()) return;
@@ -826,7 +832,7 @@ exports.methods = {
         }
     },
     /**
-     * @description 添加历史地址 
+     * @description 添加历史地址
      * @param url
      * */
     addHotAddress(url) {
@@ -839,7 +845,7 @@ exports.methods = {
     },
     /**
      * @description 是否正在创建
-     * @returns 
+     * @returns
      */
     isDoCreate() {
         if (this._isDoCreate) {
@@ -849,9 +855,9 @@ exports.methods = {
     },
     /**
      * @description 添加日志
-     * @param {*} message 
-     * @param {*} obj 
-     * @returns 
+     * @param {*} message
+     * @param {*} obj
+     * @returns
      */
     addLog(message, obj = null) {
         if (typeof obj == "function") {
@@ -881,11 +887,35 @@ exports.methods = {
             this.$.logView.$textarea.scrollTop = this.$.logView.$textarea.scrollHeight;
         }, 10)
     },
+    remake() {
+        if (os.type() !== 'Darwin') {//判断mac os平台
+            return
+        }
+        const projectPath = Editor.Project.path
+        const nativeIosPath = projectPath + "/native/engine/ios"
+        const iosProjPath = projectPath + "/build/ios/proj"
+        const resPath = projectPath + "/build/ios"
+        if (!fs.existsSync(resPath) || !fs.existsSync(nativeIosPath)) {
+            return;
+        }
+        const prev = path.resolve(Editor.App.path, "..")
+        const cmake = prev + "/tools/cmake/bin/cmake"//cocos目录下的cmake执行程序
+        console.log(cmake)
+        const cmd = cmake + " with -S " + nativeIosPath + " -GXcode -B" + iosProjPath +
+            " -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DRES_DIR=" + resPath
+        exec(cmd, {encoding: 'utf8'}, function (err, stdout, stderr) {//重新执行一下cmake
+            if (err) {
+                console.log(err);
+            }
+            if (stderr) {
+                console.log(stderr);
+            }
+            console.log(stdout);
+        });
+    }
 }
 //面板上的解发事件
-exports.listeners = {
-
-};
+exports.listeners = {};
 
 // 当面板渲染成功后触发
 exports.ready = async function () {
