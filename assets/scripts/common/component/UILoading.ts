@@ -145,7 +145,7 @@ export default class UILoading {
         this.stopTimeOutTimer();
         if (this._node) {
             cc.Tween.stopAllByTarget(this.content);
-            this._isWaitingHide = false;
+            this._isWaitingHide = true;
             this._node.active = false;
         } else {
             //没有加载好预置体，置一个标记
