@@ -809,7 +809,7 @@ exports.methods = {
             }
         }
 
-        if (/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-:]*)*\/?$/.test(url) == false) {
+        if (/^(https?:\/\/)?([\da-z\.-]+)\.([\da-z\.]{2,6})([\/\w \.-:]*)*\/?$/.test(url) == false) {
             this.addLog(url + `不是以http://https://开头，或者不是网址`);
             return;
         }
