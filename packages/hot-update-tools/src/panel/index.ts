@@ -972,7 +972,7 @@ class _Helper {
       }
     }
 
-    if (/^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/)(([A-Za-z0-9-~]+)\.)+([A-Za-z0-9-~\/])+$/.test(url) == false) {
+    if (/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-:]*)*\/?$/.test(url) == false) {
       this.addLog(url + `不是以http://https://开头，或者不是网址`);
       return;
     }
