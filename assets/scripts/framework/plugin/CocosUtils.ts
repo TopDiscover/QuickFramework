@@ -1,4 +1,4 @@
-import { Asset, AssetManager, BUNDLE_TYPE, Component, instantiate, isValid, Sprite, SpriteFrame , Node, Button, ParticleSystem2D, ParticleAsset, Label, Font, sp, Prefab, dragonBones } from "cc";
+import { Asset, AssetManager, BUNDLE_TYPE, Component, instantiate, isValid, Sprite, SpriteFrame, Node, Button, ParticleSystem2D, ParticleAsset, Label, Font, sp, Prefab, dragonBones, sys } from "cc";
 import { Resource } from "../core/asset/Resource";
 import UIView from "../core/ui/UIView";
 import { ButtonSpriteType } from "../defines/Enums";
@@ -31,11 +31,11 @@ export function addRemoteLoadResource(view: UIView, info: Resource.Info) {
 }
 
 /**@description 获取Bundle,如果没有传入，会默认指定当前View打开时的bundle,否则批定resources */
-export function getBundle( config : { bundle? : BUNDLE_TYPE , view? : UIView}){
-    let bundle : BUNDLE_TYPE = config.bundle as BUNDLE_TYPE;
-    if ( config.bundle == undefined || config.bundle == null ){
+export function getBundle(config: { bundle?: BUNDLE_TYPE, view?: UIView }) {
+    let bundle: BUNDLE_TYPE = config.bundle as BUNDLE_TYPE;
+    if (config.bundle == undefined || config.bundle == null) {
         bundle = Macro.BUNDLE_RESOURCES;
-        if( config.view ){
+        if (config.view) {
             bundle = config.view.bundle;
         }
     }
@@ -459,16 +459,19 @@ export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay, config: { a
             addExtraLoadResource(config.view, info);
             Manager.cacheManager.getCacheByAsync(config.atlasUrl, dragonBones.DragonBonesAtlasAsset, bundle).then((atlas) => {
                 if (atlas) {
-                    let info = new Resource.Info;
-                    info.url = config.atlasUrl;
-                    info.type = dragonBones.DragonBonesAtlasAsset;
-                    info.data = atlas;
-                    info.bundle = getBundle(config);
-                    addExtraLoadResource(config.view, info);
+                    if (sys.isBrowser) {
+                        let info = new Resource.Info;
+                        info.url = config.atlasUrl;
+                        info.type = dragonBones.DragonBonesAtlasAsset;
+                        info.data = atlas;
+                        info.bundle = getBundle(config);
+                        addExtraLoadResource(config.view, info);
+                    }
+
                     comp.dragonAsset = asset;
                     comp.dragonAtlasAsset = atlas;
-                    if ( config.complete ){
-                        config.complete(asset,atlas);
+                    if (config.complete) {
+                        config.complete(asset, atlas);
                     }
                 } else {
                     if (config.complete) {
