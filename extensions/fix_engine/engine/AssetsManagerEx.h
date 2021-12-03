@@ -216,7 +216,8 @@ public:
     /**
 	 * @brief 设置热更新地址,由于热更新地址会动态的发生变化，热更新的地址以下发的地址为准,设置热更新地址后，会自动的替换所有热更新的源地址
 	 */
-	void setHotUpdateUrl(const std::string& url) { _hotUpdateUrl = url; };
+	void setPackageUrl(const std::string& url) { _packageUrl = url; };
+	void reset();
 
 protected:
     void init(const std::string &manifestUrl, const std::string &storagePath);
@@ -415,11 +416,11 @@ private:
     bool _inited = false;
 
     /*是否启用资源下载类型*/
-	bool _isUsingAssetsType;
+	bool _isUsingBundle;
 	/*资源类型 ""为大厅 其它为子游戏包名*/
-	std::string _assetsType;
+	std::string _bundle;
 	/* 热更新地址*/
-	std::string _hotUpdateUrl;
+	std::string _packageUrl;
 };
 
 NS_CC_EXT_END

@@ -96,18 +96,23 @@ public:
     /** @brief Gets remote package url.
      */
     const std::string &getPackageUrl() const;
+	/************************************************************************/
+	/* @brief 设置远程热更新地址                                            */
+	/************************************************************************/
+	const void setPackageUrl(const std::string& packageUrl);
 
     /** @brief Gets remote manifest file url.
      */
-    const std::string &getManifestFileUrl() const;
+    const std::string getManifestFileUrl() const;
 
     /** @brief Gets remote version file url.
      */
-    const std::string &getVersionFileUrl() const;
+    const std::string getVersionFileUrl() const;
 
     /** @brief Gets manifest version.
      */
     const std::string &getVersion() const;
+	const std::string &getMd5() const;
 
     /** @brief Get the search paths list related to the Manifest.
      */
@@ -129,7 +134,7 @@ public:
      * @param manifestRoot The root path of the manifest file (It should be local path, so that we can find assets path relative to the root path)
      */
     Manifest(const std::string &content, const std::string &manifestRoot);
-    Manifest(const std::string &content, const std::string &manifestRoot , const std::string &hotUpdateUrl);
+    Manifest(const std::string &content, const std::string &manifestRoot , const std::string &packageUrl);
 
     /** @brief Parse the manifest file information into this manifest
      * @param manifestUrl Url of the local manifest
@@ -153,8 +158,6 @@ public:
      * @param updating Updating or not
      */
     void setUpdating(bool updating);
-
-    void setHotUpdateUrl(const std::string& url);
 
 protected:
     /** @brief Load the json file into local json object
@@ -191,6 +194,8 @@ protected:
      * @return Greater or not
      */
     bool versionGreater(const Manifest *b, const std::function<int(const std::string &versionA, const std::string &versionB)> &handle) const;
+
+	bool equal(const Manifest*b) const;
 
     /** @brief Generate difference between this Manifest and another.
      * @param b   The other manifest
@@ -264,12 +269,6 @@ private:
     //! The remote package url
     std::string _packageUrl;
 
-    //! The remote path of manifest file
-    std::string _remoteManifestUrl;
-
-    //! The remote path of version file [Optional]
-    std::string _remoteVersionUrl;
-
     //! The version of local manifest
     std::string _version;
 
@@ -290,8 +289,12 @@ private:
 
     rapidjson::Document _json;
 
-    //Remote download url , this url will be dynamically changed
-	std::string _hotUpdateUrl;
+    //设置bundle
+	std::string _bundle;
+
+	//md5
+	std::string _md5;
+
 };
 
 NS_CC_EXT_END

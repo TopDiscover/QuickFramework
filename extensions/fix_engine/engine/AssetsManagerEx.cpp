@@ -40,10 +40,10 @@
 
 NS_CC_EXT_BEGIN
 
-#define VERSION_FILENAME       "version.manifest"
-#define TEMP_MANIFEST_FILENAME "project.manifest.temp"
+#define VERSION_FILENAME       "_version.json"
+#define TEMP_MANIFEST_FILENAME "_project.json.temp"
 #define TEMP_PACKAGE_SUFFIX    "_temp"
-#define MANIFEST_FILENAME      "project.manifest"
+#define MANIFEST_FILENAME      "_project.json"
 
 #define BUFFER_SIZE  8192
 #define MAX_FILENAME 512
@@ -93,25 +93,16 @@ void AssetsManagerEx::init(const std::string &manifestUrl, const std::string &st
 	std::string typeString = "type.";
 	auto pos = manifestUrl.find(typeString);
 	if ( pos != std::string::npos) {
-		auto amType = manifestUrl.substr(typeString.size());
-		this->_isUsingAssetsType = true;
-		if (amType == "main") {
-			//主包
-			this->_assetsType = "";
-			_tempVersionPath = _tempStoragePath + VERSION_FILENAME;
-			_cacheManifestPath = _storagePath + MANIFEST_FILENAME;
-			_tempManifestPath = _tempStoragePath + TEMP_MANIFEST_FILENAME;
-		}
-		else {
-			this->_assetsType = amType;
-			_tempVersionPath = _tempStoragePath + amType + VERSION_FILENAME;
-			_cacheManifestPath = _storagePath + amType + MANIFEST_FILENAME;
-			_tempManifestPath = _tempStoragePath + amType + TEMP_MANIFEST_FILENAME;
-		}
+		auto bundle = manifestUrl.substr(typeString.size());
+		this->_isUsingBundle = true;
+		this->_bundle = bundle;
+		_tempVersionPath = _tempStoragePath + bundle + VERSION_FILENAME;
+		_cacheManifestPath = _storagePath + bundle + MANIFEST_FILENAME;
+		_tempManifestPath = _tempStoragePath + bundle + TEMP_MANIFEST_FILENAME;
 	}
 	else {
-		this->_isUsingAssetsType = false;
-		this->_assetsType = "";
+		this->_isUsingBundle = false;
+		this->_bundle = "";
 		_tempVersionPath = _tempStoragePath + VERSION_FILENAME;
 		_cacheManifestPath = _storagePath + MANIFEST_FILENAME;
 		_tempManifestPath = _tempStoragePath + TEMP_MANIFEST_FILENAME;
@@ -143,12 +134,16 @@ AssetsManagerEx *AssetsManagerEx::create(const std::string &manifestUrl, const s
     return ret;
 }
 
+void AssetsManagerEx::reset() {
+	_updateState = State::UNINITED;
+}
+
 void AssetsManagerEx::initManifests() {
     _inited = true;
     // Init and load temporary manifest
     _tempManifest = new (std::nothrow) Manifest();
     if (_tempManifest) {
-        _tempManifest->setHotUpdateUrl(_hotUpdateUrl);
+        _tempManifest->setPackageUrl(_packageUrl);
         _tempManifest->parseFile(_tempManifestPath);
         // Previous update is interrupted
         if (_fileUtils->isFileExist(_tempManifestPath)) {
@@ -213,7 +208,7 @@ bool AssetsManagerEx::loadLocalManifest(Manifest *localManifest, const std::stri
     if (_fileUtils->isFileExist(_cacheManifestPath)) {
         cachedManifest = new (std::nothrow) Manifest();
         if (cachedManifest) {
-            cachedManifest->setHotUpdateUrl(_hotUpdateUrl);
+            cachedManifest->setPackageUrl(_packageUrl);
             cachedManifest->parseFile(_cacheManifestPath);
             if (!cachedManifest->isLoaded()) {
                 _fileUtils->removeFile(_cacheManifestPath);
@@ -266,7 +261,7 @@ bool AssetsManagerEx::loadLocalManifest(const std::string &manifestUrl) {
     if (_fileUtils->isFileExist(_cacheManifestPath)) {
         cachedManifest = new (std::nothrow) Manifest();
         if (cachedManifest) {
-            cachedManifest->setHotUpdateUrl(_hotUpdateUrl);
+            cachedManifest->setPackageUrl(_packageUrl);
             cachedManifest->parseFile(_cacheManifestPath);
             if (!cachedManifest->isLoaded()) {
                 _fileUtils->removeFile(_cacheManifestPath);
@@ -289,7 +284,7 @@ bool AssetsManagerEx::loadLocalManifest(const std::string &manifestUrl) {
         }
         _fileUtils->setSearchPaths(trimmedPaths);
     }
-	_localManifest->setHotUpdateUrl(_hotUpdateUrl);
+	_localManifest->setPackageUrl(_packageUrl);
     // Load local manifest in app package
     _localManifest->parseFile(_manifestUrl);
     if (cachedManifest) {
@@ -608,7 +603,7 @@ void AssetsManagerEx::downloadVersion() {
 void AssetsManagerEx::parseVersion() {
     if (_updateState != State::VERSION_LOADED)
         return;
-	_remoteManifest->setHotUpdateUrl(_hotUpdateUrl);
+	_remoteManifest->setPackageUrl(_packageUrl);
     _remoteManifest->parseVersion(_tempVersionPath);
 
     if (!_remoteManifest->isVersionLoaded()) {
@@ -616,7 +611,7 @@ void AssetsManagerEx::parseVersion() {
         _updateState = State::PREDOWNLOAD_MANIFEST;
         downloadManifest();
     } else {
-        if (_localManifest->versionGreaterOrEquals(_remoteManifest, _versionCompareHandle)) {
+        if (_localManifest->equal(_remoteManifest)) {
             _updateState = State::UP_TO_DATE;
             _fileUtils->removeDirectory(_tempStoragePath);
             dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ALREADY_UP_TO_DATE);
@@ -650,7 +645,7 @@ void AssetsManagerEx::parseManifest() {
     if (_updateState != State::MANIFEST_LOADED)
         return;
 
-	_remoteManifest->setHotUpdateUrl(_hotUpdateUrl);
+	_remoteManifest->setPackageUrl(_packageUrl);
     _remoteManifest->parseFile(_tempManifestPath);
 
     if (!_remoteManifest->isLoaded()) {
@@ -658,7 +653,7 @@ void AssetsManagerEx::parseManifest() {
         dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ERROR_PARSE_MANIFEST);
         _updateState = State::UNCHECKED;
     } else {
-        if (_localManifest->versionGreaterOrEquals(_remoteManifest, _versionCompareHandle)) {
+        if (_localManifest->equal(_remoteManifest)) {
             _updateState = State::UP_TO_DATE;
             _fileUtils->removeDirectory(_tempStoragePath);
             dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ALREADY_UP_TO_DATE);
@@ -779,9 +774,9 @@ void AssetsManagerEx::updateSucceed() {
 
     // Every thing is correctly downloaded, do the following
     // 1. rename temporary manifest to valid manifest
-    if (this->_isUsingAssetsType) {
+    if (this->_isUsingBundle) {
 		if (_fileUtils->isFileExist(_tempManifestPath)) {
-			_fileUtils->renameFile(_tempStoragePath, this->_assetsType + TEMP_MANIFEST_FILENAME, this->_assetsType + MANIFEST_FILENAME);
+			_fileUtils->renameFile(_tempStoragePath, this->_bundle + TEMP_MANIFEST_FILENAME, this->_bundle + MANIFEST_FILENAME);
 		}
 	}else {
 		if (_fileUtils->isFileExist(_tempManifestPath)) {

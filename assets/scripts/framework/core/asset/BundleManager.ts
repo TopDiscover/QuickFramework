@@ -92,7 +92,6 @@ export class BundleManager {
 
    /**@description 检测子游戏更新 */
    private checkUpdate(versionInfo: HotUpdate.BundleConfig, delegate: EntryDelegate) {
-      let self = this;
       Log.d(`检测更新信息:${versionInfo.name}(${versionInfo.bundle})`);
       Manager.dispatcher.remove(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this);
       let bundle: string | undefined = this.curBundle.bundle;
@@ -124,6 +123,11 @@ export class BundleManager {
             //当前正在检测更新
             Log.d(`正在检测更新!!`);
             if (delegate) delegate.onCheckingVersion(versionInfo, code, state);
+         } else if (code == HotUpdate.Code.MAIN_PACK_NEED_UPDATE || code == HotUpdate.Code.PRE_VERSIONS_NOT_FOUND) {
+            //需要重新更新主包
+            Log.d(`需要重新更新主包`);
+            this.isLoading = false;
+            if (delegate) delegate.onRecheckMainUpdate(code,this.curBundle);
          } else {
             this.isLoading = false;
             Log.d(`检测更新当前状态 code : ${code} state : ${state}`);

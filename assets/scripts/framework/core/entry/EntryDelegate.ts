@@ -162,6 +162,19 @@ export class EntryDelegate {
         }
     }
 
+    /**
+     * @description 重新检测主包更新
+     */
+    onRecheckMainUpdate( code : HotUpdate.Code , config : HotUpdate.BundleConfig ){
+        let content = Manager.getLanguage("mainPackVersionIsTooLow") as string;
+        Manager.alert.show({
+            text: content,
+            confirmCb: (isOK) => {
+                dispatch(HotUpdate.Event.MAIN_VERSION_IS_TOO_LOW, code,config);
+            }
+        });
+    }
+
     getEntryConfig(bundle:BUNDLE_TYPE) : HotUpdate.BundleConfig | null {
         return null;
     }

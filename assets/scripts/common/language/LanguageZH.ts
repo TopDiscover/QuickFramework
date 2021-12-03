@@ -28,4 +28,5 @@ export let LanguageZH = {
   quitGame: "您确定要退出游戏？",
   loading_game_resources: "正在加载游戏资源...",
   mainPack: "主包",
+  mainPackVersionIsTooLow : "版本过低，请更新。",
 }

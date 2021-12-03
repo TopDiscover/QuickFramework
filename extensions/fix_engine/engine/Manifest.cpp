@@ -51,6 +51,11 @@
 #define KEY_COMPRESSED_FILE "compressedFile"
 #define KEY_DOWNLOAD_STATE  "downloadState"
 
+#define KEY_BUNDLE			"bundle"
+#define VERSION_FILENAME    "_version.json"
+#define MANIFEST_FILENAME   "_project.json"
+#define MANIFEST_ROOT	    "manifest/"
+
 NS_CC_EXT_BEGIN
 
 static int cmpVersion(const std::string &v1, const std::string &v2) {
@@ -76,11 +81,11 @@ Manifest::Manifest(const std::string &manifestUrl /* = ""*/)
   _loaded(false),
   _updating(false),
   _manifestRoot(""),
-  _remoteManifestUrl(""),
-  _remoteVersionUrl(""),
   _version(""),
   _engineVer(""),
-  _hotUpdateUrl("") {
+  _packageUrl(""),
+  _bundle(""),
+  _md5(""){
     // Init variables
     _fileUtils = FileUtils::getInstance();
     if (manifestUrl.size() > 0)
@@ -92,29 +97,30 @@ Manifest::Manifest(const std::string &content, const std::string &manifestRoot)
   _loaded(false),
   _updating(false),
   _manifestRoot(""),
-  _remoteManifestUrl(""),
-  _remoteVersionUrl(""),
   _version(""),
   _engineVer(""),
-  _hotUpdateUrl("") {
+  _packageUrl(""),
+  _bundle(""),
+  _md5("") {
     // Init variables
     _fileUtils = FileUtils::getInstance();
     if (content.size() > 0)
         parseJSONString(content, manifestRoot);
 }
 
-Manifest::Manifest(const std::string &content, const std::string &manifestRoot, const std::string& hotUpdateUrl)
+Manifest::Manifest(const std::string &content, const std::string &manifestRoot, const std::string& packageUrl)
 : _versionLoaded(false),
   _loaded(false),
   _updating(false),
   _manifestRoot(""),
-  _remoteManifestUrl(""),
-  _remoteVersionUrl(""),
   _version(""),
   _engineVer(""),
-  _hotUpdateUrl(hotUpdateUrl) {
+  _packageUrl(""),
+  _bundle(""),
+  _md5("") {
     // Init variables
     _fileUtils = FileUtils::getInstance();
+	setPackageUrl(packageUrl);
     if (content.size() > 0)
         parseJSONString(content, manifestRoot);
 }
@@ -200,10 +206,6 @@ void Manifest::setUpdating(bool updating) {
     }
 }
 
-void Manifest::setHotUpdateUrl(const std::string& url){
-    _hotUpdateUrl = url;
-}
-
 bool Manifest::versionEquals(const Manifest *b) const {
     // Check manifest version
     if (_version != b->getVersion()) {
@@ -253,6 +255,15 @@ bool Manifest::versionGreater(const Manifest *b, const std::function<int(const s
         greater = cmpVersion(localVersion, bVersion) > 0;
     }
     return greater;
+}
+
+bool Manifest::equal(const Manifest*b) const {
+	auto localMd5 = getMd5();
+	auto bMd5 = b->getMd5();
+	if ( localMd5 == bMd5 ){
+		return true;
+	}
+	return false;
 }
 
 std::unordered_map<std::string, Manifest::AssetDiff> Manifest::genDiff(const Manifest *b) const {
@@ -361,16 +372,29 @@ const std::string &Manifest::getPackageUrl() const {
     return _packageUrl;
 }
 
-const std::string &Manifest::getManifestFileUrl() const {
-    return _remoteManifestUrl;
+const void Manifest::setPackageUrl(const std::string& packageUrl) {
+	_packageUrl = packageUrl;
+	// Append automatically "/"
+	if (_packageUrl.size() > 0 && _packageUrl[_packageUrl.size() - 1] != '/')
+	{
+		_packageUrl.append("/");
+	}
 }
 
-const std::string &Manifest::getVersionFileUrl() const {
-    return _remoteVersionUrl;
+const std::string Manifest::getManifestFileUrl() const {
+    return _packageUrl + MANIFEST_ROOT + _bundle + MANIFEST_FILENAME;
+}
+
+const std::string Manifest::getVersionFileUrl() const {
+    return _packageUrl + MANIFEST_ROOT + _bundle + VERSION_FILENAME;
 }
 
 const std::string &Manifest::getVersion() const {
     return _version;
+}
+
+const std::string &Manifest::getMd5() const {
+	return _md5;
 }
 
 const std::vector<std::string> &Manifest::getGroups() const {
@@ -418,8 +442,6 @@ void Manifest::clear() {
         _groups.clear();
         _groupVer.clear();
 
-        _remoteManifestUrl = "";
-        _remoteVersionUrl = "";
         _version = "";
         _engineVer = "";
 
@@ -465,15 +487,6 @@ Manifest::Asset Manifest::parseAsset(const std::string &path, const rapidjson::V
 }
 
 void Manifest::loadVersion(const rapidjson::Document &json) {
-    // Retrieve remote manifest url
-    if (json.HasMember(KEY_MANIFEST_URL) && json[KEY_MANIFEST_URL].IsString()) {
-        _remoteManifestUrl = json[KEY_MANIFEST_URL].GetString();
-    }
-
-    // Retrieve remote version url
-    if (json.HasMember(KEY_VERSION_URL) && json[KEY_VERSION_URL].IsString()) {
-        _remoteVersionUrl = json[KEY_VERSION_URL].GetString();
-    }
 
     // Retrieve local version
     if (json.HasMember(KEY_VERSION) && json[KEY_VERSION].IsString()) {
@@ -511,29 +524,30 @@ void Manifest::loadVersion(const rapidjson::Document &json) {
 	{
 		_packageUrl = json[KEY_PACKAGE_URL].GetString();
 
-		//这里更换正确的热更新地址
-		if (!_hotUpdateUrl.empty()) {
-			auto originUrl = _packageUrl;
-			_packageUrl = _hotUpdateUrl;
-
-			auto pos = _remoteManifestUrl.find(originUrl);
-			if (pos != std::string::npos) {
-				_remoteManifestUrl.replace(0, pos + originUrl.size(), _hotUpdateUrl.data());
-			}
-			pos = _remoteVersionUrl.find(originUrl);
-			if (pos != std::string::npos) {
-				_remoteVersionUrl.replace(0, pos + originUrl.size(), _hotUpdateUrl.data());
-			}
-		}
-
-
-
 		// Append automatically "/"
 		if (_packageUrl.size() > 0 && _packageUrl[_packageUrl.size() - 1] != '/')
 		{
 			_packageUrl.append("/");
 		}
 	}
+
+	//md5
+	if (json.HasMember(KEY_MD5) && json[KEY_MD5].IsString()) {
+		_md5 = json[KEY_MD5].GetString();
+	}
+	else {
+		_md5 = "";
+	}
+	CCASSERT(_md5 != "", "Md5 is empty!!!!");
+
+	//bundle
+	if (json.HasMember(KEY_BUNDLE) && json[KEY_BUNDLE].IsString()) {
+		_bundle = json[KEY_BUNDLE].GetString();
+	}
+	else {
+		_bundle = "";
+	}
+	CCASSERT(_bundle != "", "Bundle is empty!!!!");
 
     _versionLoaded = true;
 }

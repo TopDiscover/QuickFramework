@@ -1,12 +1,14 @@
 export const HotUpdateDTS = {
     assetsManager : `
 
-    setHotUpdateUrl(url:string):void;
+    setPackageUrl(url:string):void;
+    reset():void;
 
     `,
     manifest :`
 
-    constructor (content: string, manifestRoot: string,hotUpdateUrl:string);
+    constructor (content: string, manifestRoot: string,packageUrl:string);
+    getMd5():string;
     
     `
 }

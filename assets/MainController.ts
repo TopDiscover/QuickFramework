@@ -19,10 +19,15 @@ export default class MainController extends EventComponent {
     protected addEvents() {
         super.addEvents();
         this.addEvent(HotUpdate.Event.DOWNLOAD_MESSAGE, this.onHotupdateMessage);
+        this.addEvent(HotUpdate.Event.MAIN_VERSION_IS_TOO_LOW,this.onMainVersionIsTooLow);
     }
 
     private onHotupdateMessage(data: HotUpdate.MessageData) {
         Manager.onHotupdateMessage(data);
+    }
+
+    private onMainVersionIsTooLow(code : HotUpdate.Code,config:HotUpdate.BundleConfig){
+        Manager.onMainVersionIsTooLow(code,config);
     }
 
     private debugView : Node | null = null!;

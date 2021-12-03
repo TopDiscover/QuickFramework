@@ -71,7 +71,7 @@ export class _Manager extends Framewok implements GameEventInterface {
 
     init() {
         super.init();
-        this.hotupdate.commonHotUpdateUrl = Config.TEST_HOT_UPDATE_URL_ROOT;
+        this.hotupdate.hotUpdateUrl = Config.TEST_HOT_UPDATE_URL_ROOT;
         this.hotupdate.isSkipCheckUpdate = Config.isSkipCheckUpdate;
 
         //初始化自定主entry代理
@@ -130,6 +130,10 @@ export class _Manager extends Framewok implements GameEventInterface {
         } else {
             game.end();
         }
+    }
+
+    onMainVersionIsTooLow(code : HotUpdate.Code ,config:HotUpdate.BundleConfig ){
+        this.entryManager.onCheckUpdate();
     }
 }
 

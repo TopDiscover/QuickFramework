@@ -55,6 +55,8 @@ export namespace HotUpdate {
         DOWNLOAD_PROGRESS = "DOWNLOAD_PROGRESS",
         /**@description 提示下载弹出框事件 */
         DOWNLOAD_MESSAGE = "DOWNLOAD_MESSAGE",
+        /**@description 版本过旧，请重新更新 */
+        MAIN_VERSION_IS_TOO_LOW = "MAIN_VERSION_IS_TOO_LOW",
     }
     export enum Code {
         /**@description 找不到本地mainfest文件*/
@@ -83,6 +85,11 @@ export namespace HotUpdate {
         //以下是js中扩展的字段，上面是引擎中已经有的字段
         /**@description 正检测更新中 */
         CHECKING,
+
+        /**@description 主包版本不匹配，需要升级主包 */
+        MAIN_PACK_NEED_UPDATE,
+        /**@description 预处理版本文件不存在 */
+        PRE_VERSIONS_NOT_FOUND,
     }
     export enum State {
         /**@description 未初始化 */
