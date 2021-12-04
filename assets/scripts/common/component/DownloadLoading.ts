@@ -1,7 +1,6 @@
 import UIView from "../../framework/core/ui/UIView";
 import { find, Label, ProgressBar, tween, _decorator } from "cc";
 import { DEBUG } from "cc/env";
-import { i18n } from "../language/CommonLanguage";
 import { HotUpdate } from "../../framework/core/hotupdate/Hotupdate";
 
 /**@description 下载界面 */
@@ -16,7 +15,7 @@ export default class DownloadLoading extends UIView {
     
     /**@description 下载过程中提示语 */
     private get tips(){
-        return i18n.updatingtips;
+        return Manager.getLanguage("updatingtips");
     }
 
     /**@description 下载进度 */
@@ -80,7 +79,7 @@ export default class DownloadLoading extends UIView {
         } else if (info.code == HotUpdate.Code.ALREADY_UP_TO_DATE) {
             this.progress.progress = 1;
         } else if (info.code == HotUpdate.Code.UPDATE_FINISHED) {
-            Manager.tips.show(String.format(i18n.alreadyRemoteVersion, this.updateName));
+            Manager.tips.show(Manager.getLanguage(["alreadyRemoteVersion", this.updateName]));
             this.close();
         } else if (info.code == HotUpdate.Code.UPDATE_FAILED ||
             info.code == HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
@@ -88,7 +87,7 @@ export default class DownloadLoading extends UIView {
             info.code == HotUpdate.Code.ERROR_PARSE_MANIFEST ||
             info.code == HotUpdate.Code.ERROR_UPDATING ||
             info.code == HotUpdate.Code.ERROR_DECOMPRESS) {
-            Manager.tips.show(String.format(i18n.updateFaild, this.updateName));
+            Manager.tips.show(Manager.getLanguage(["updateFaild", this.updateName]));
             this.close();
         }
     }

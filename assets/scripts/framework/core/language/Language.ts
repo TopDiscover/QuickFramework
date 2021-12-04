@@ -18,8 +18,9 @@ export class Language {
     }
 
     private updateSource(language: string) {
+        this._data.language = language;
         this.delegates.forEach((delegate, index, source) => {
-            this._data = delegate.data(language);
+            this._data = delegate.data(language,this._data);
         });
     }
 
@@ -28,7 +29,7 @@ export class Language {
         if (index != -1) {
             this.delegates.splice(index, 1);
             let data: any = this._data;
-            if (delegate.name != Macro.COMMON_LANGUAGE_NAME && data[delegate.name]) {
+            if (delegate.name != Macro.BUNDLE_RESOURCES && data[delegate.name]) {
                 data[delegate.name] = {};
             }
         }
@@ -47,16 +48,17 @@ export class Language {
             //当前有语言包数据 相同语言包，不再进行设置
             return;
         }
+        this._data.language = language;
         if ( Macro.ENABLE_CHANGE_LANGUAGE ){
             //先更新所有数据
             this.delegates.forEach((delegate, index, source) => {
-                this._data = delegate.data(language);
+                this._data = delegate.data(language,this._data);
             });
             //通知更新
             dispatch(Macro.CHANGE_LANGUAGE, language);
         } else {
             this.delegates.forEach((delegate, index, source) => {
-                this._data = delegate.data(this.getLanguage());
+                this._data = delegate.data(this.getLanguage(),this._data);
             });
         }
         Manager.localStorage.setItem(LANG_KEY, this._data.language);

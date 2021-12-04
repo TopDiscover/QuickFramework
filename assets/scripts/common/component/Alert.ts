@@ -1,7 +1,6 @@
-import { Component,find,instantiate,isValid,Label,Node, Prefab, RichText, SystemEventType, tween, Vec3 } from "cc";
+import { Component,find,instantiate,isValid,Label,Node, Prefab, RichText, SystemEvent, tween, Vec3 } from "cc";
 import { Macro } from "../../framework/defines/Macros";
 import { Config, ViewZOrder } from "../config/Config";
-import { i18n } from "../language/CommonLanguage";
 
 class AlertDialog extends Component {
 
@@ -37,13 +36,13 @@ class AlertDialog extends Component {
 
     public show(config: AlertConfig) {
         if (!config.title) {
-            config.title = i18n.alert_title;
+            config.title = Manager.getLanguage("alert_title");
         }
         if (!config.confirmString) {
-            config.confirmString = i18n.alert_confirm;
+            config.confirmString = Manager.getLanguage("alert_confirm");
         }
         if (!config.cancelString) {
-            config.cancelString = i18n.alert_cancel;
+            config.cancelString = Manager.getLanguage("alert_cancel");
         }
         this._config = config;
         this.writeContent(config)
@@ -109,13 +108,13 @@ class AlertDialog extends Component {
         if (this._confirm && this._cancel && this._closeBtn) {
 
             //关闭按钮
-            this._closeBtn.on( SystemEventType.TOUCH_END, this.close.bind(this));
+            this._closeBtn.on( SystemEvent.EventType.TOUCH_END, this.close.bind(this));
 
             //确定按钮
             if (config.confirmCb) {
                 this._confirm.active = true;
-                this._confirm.on(SystemEventType.TOUCH_END, this.onClick.bind(this, config.confirmCb, true));
-                this._closeBtn.on(SystemEventType.TOUCH_END, this.onClick.bind(this, config.confirmCb, false));
+                this._confirm.on(SystemEvent.EventType.TOUCH_END, this.onClick.bind(this, config.confirmCb, true));
+                this._closeBtn.on(SystemEvent.EventType.TOUCH_END, this.onClick.bind(this, config.confirmCb, false));
             }
             else {
                 this._confirm.active = false;
@@ -124,7 +123,7 @@ class AlertDialog extends Component {
             //取消按钮
             if (config.cancelCb) {
                 this._cancel.active = true;
-                this._cancel.on(SystemEventType.TOUCH_END, this.onClick.bind(this, config.cancelCb, false));
+                this._cancel.on(SystemEvent.EventType.TOUCH_END, this.onClick.bind(this, config.cancelCb, false));
             } else {
                 this._cancel.active = false;
             }

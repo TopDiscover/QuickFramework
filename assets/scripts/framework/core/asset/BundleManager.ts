@@ -12,11 +12,11 @@ export class BundleManager {
    public static Instance() { return this._instance || (this._instance = new BundleManager()); }
    private curBundle: HotUpdate.BundleConfig = null!;
    private isLoading = false;
-   protected isEngineBundle(key : string){
-      if ( key == AssetManager.BuiltinBundleName.MAIN ||
-         key == AssetManager.BuiltinBundleName.RESOURCES || key == AssetManager.BuiltinBundleName.START_SCENE){
-            return true;
-         }
+   protected isEngineBundle(key: string) {
+      if (key == AssetManager.BuiltinBundleName.MAIN ||
+         key == AssetManager.BuiltinBundleName.RESOURCES || key == AssetManager.BuiltinBundleName.START_SCENE) {
+         return true;
+      }
       return false;
    }
    /**@description 删除已经加载的bundle */
@@ -24,10 +24,10 @@ export class BundleManager {
       if (!excludeBundles) {
          excludeBundles = delegate.getPersistBundle();
       }
-      let loaded : string[]= [];
-      assetManager.bundles.forEach((bundle,key)=>{
+      let loaded: string[] = [];
+      assetManager.bundles.forEach((bundle, key) => {
          //引擎内置包不能删除
-         if ( !this.isEngineBundle(key) ){
+         if (!this.isEngineBundle(key)) {
             loaded.push(key);
          }
       });
@@ -38,7 +38,7 @@ export class BundleManager {
             //在排除bundle中找不到，直接删除
             Manager.entryManager.onUnloadBundle(bundle);
             let result = this.getBundle(bundle);
-            if ( result ){
+            if (result) {
                Manager.cacheManager.removeBundle(bundle);
                assetManager.removeBundle(result);
             }
@@ -78,14 +78,60 @@ export class BundleManager {
     */
    public enterBundle(config: HotUpdate.BundleConfig, delegate: EntryDelegate) {
       if (this.isLoading) {
-         if (delegate) delegate.onBundleLoading(config);
+         if (delegate) delegate.showTips("checkingUpdate");
          Log.d("正在更新游戏，请稍等");
          return;
       }
-      this.curBundle = config;
-      this.isLoading = true;
-      Manager.hotupdate.bundlesConfig[this.curBundle.bundle] = config;
+      if (config.bundle == Macro.BUNDLE_RESOURCES) {
+         //进入主包，检测主包更新
+         this.isLoading = true;
+         Manager.hotupdate.loadVersions().then((isOk: boolean) => {
+            if (isOk) {
+               let status = Manager.hotupdate.getStatus(Macro.MAIN_PACK_BUNDLE_NAME);
+               if (status == HotUpdate.Status.UP_TO_DATE) {
+                  Log.d(`${config.name}(${config.bundle}) 已经是最新,直接加载`);
+                  this.setCurrentBundle(config);
+                  this.loadBundle(delegate);
+               } else {
+                  Log.d(`${config.name}(${config.bundle}) 需要下载更新`);
+                  this._enterBundle(config, delegate);
+               }
+            } else {
+               //网络错误造成，提示玩家重试
+               Manager.alert.show({
+                  text: Manager.getLanguage("warnNetBad"),
+                  confirmCb: (isOk) => {
+                     this._enterBundle(config, delegate);
+                  }
+               });
+            }
+         });
+      }else{
+         //bundle 检测更新
+         let status = Manager.hotupdate.getStatus(config.bundle);
+         if ( status == HotUpdate.Status.UP_TO_DATE ){
+            Log.d(`${config.name}(${config.bundle}) 已经是最新，直接加载`);
+            this.setCurrentBundle(config);
+            this.loadBundle(delegate);
+         }else{
+            if ( status == HotUpdate.Status.NEED_DOWNLOAD ){
+               Log.d(`${config.name}(${config.bundle}) 未下载，开始检测下载`);
+            }else{
+               Log.d(`${config.name}(${config.bundle}) 已经下载过，检测更新`);
+            }
+            this._enterBundle(config,delegate);
+         }
+      }
+   }
 
+   private setCurrentBundle(config: HotUpdate.BundleConfig) {
+      this.curBundle = config;
+      Manager.hotupdate.bundlesConfig[this.curBundle.bundle] = config;
+   }
+
+   private _enterBundle(config: HotUpdate.BundleConfig, delegate: EntryDelegate) {
+      this.setCurrentBundle(config);
+      this.isLoading = true;
       let versionInfo = Manager.hotupdate.bundlesConfig[this.curBundle.bundle];
       this.checkUpdate(versionInfo, delegate);
    }
@@ -127,7 +173,7 @@ export class BundleManager {
             //需要重新更新主包
             Log.d(`需要重新更新主包`);
             this.isLoading = false;
-            if (delegate) delegate.onRecheckMainUpdate(code,this.curBundle);
+            if (delegate) delegate.onRecheckMainUpdate(code, this.curBundle);
          } else {
             this.isLoading = false;
             Log.d(`检测更新当前状态 code : ${code} state : ${state}`);
@@ -139,13 +185,14 @@ export class BundleManager {
    public loadBundle(delegate: EntryDelegate) {
       let bundle = this.getBundle(this.curBundle.bundle);
       let versionInfo = Manager.hotupdate.bundlesConfig[this.curBundle.bundle];
-      if ( bundle ){
+      if (bundle) {
          Log.d(`${this.curBundle.bundle}已经加载在缓存中，直接使用`);
          this.isLoading = false;
-         if ( delegate ) delegate.onLoadBundleComplete(versionInfo,bundle);
+         if (delegate) delegate.onLoadBundleComplete(versionInfo, bundle);
          return;
       }
       this.isLoading = true;
+      if ( delegate ) delegate.showLoading("loading");
       Log.d(`loadBundle : ${this.curBundle.bundle}`);
       assetManager.loadBundle(versionInfo.bundle, (err, bundle) => {
          this.isLoading = false;
@@ -163,6 +210,7 @@ export class BundleManager {
       let config = Manager.hotupdate.getBundleName(this.curBundle.bundle);
       if (info.code == HotUpdate.Code.UPDATE_FINISHED) {
          Log.d(`更新${config.name}成功`);
+         this.isLoading = false;
       } else if (info.code == HotUpdate.Code.UPDATE_FAILED ||
          info.code == HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
          info.code == HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST ||
@@ -185,8 +233,8 @@ export class BundleManager {
       isLoading: boolean //是否存在加载bundle过程中
    }>) {
       if (delegate) {
-         let loaded :AssetManager.Bundle[] = [];
-         assetManager.bundles.forEach((bundle,key)=>{
+         let loaded: AssetManager.Bundle[] = [];
+         assetManager.bundles.forEach((bundle, key) => {
             loaded.push(bundle);
          });
          delegate.print({

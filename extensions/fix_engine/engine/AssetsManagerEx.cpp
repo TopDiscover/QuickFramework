@@ -54,6 +54,7 @@ NS_CC_EXT_BEGIN
 
 const std::string AssetsManagerEx::VERSION_ID = "@version";
 const std::string AssetsManagerEx::MANIFEST_ID = "@manifest";
+#define MANIFEST_PATH "manifest/"
 
 // Implementation of AssetsManagerEx
 
@@ -96,9 +97,9 @@ void AssetsManagerEx::init(const std::string &manifestUrl, const std::string &st
 		auto bundle = manifestUrl.substr(typeString.size());
 		this->_isUsingBundle = true;
 		this->_bundle = bundle;
-		_tempVersionPath = _tempStoragePath + bundle + VERSION_FILENAME;
-		_cacheManifestPath = _storagePath + bundle + MANIFEST_FILENAME;
-		_tempManifestPath = _tempStoragePath + bundle + TEMP_MANIFEST_FILENAME;
+		_tempVersionPath = _tempStoragePath + MANIFEST_PATH + bundle + VERSION_FILENAME;
+		_cacheManifestPath = _storagePath + MANIFEST_PATH  + bundle + MANIFEST_FILENAME;
+		_tempManifestPath = _tempStoragePath + MANIFEST_PATH  + bundle + TEMP_MANIFEST_FILENAME;
 	}
 	else {
 		this->_isUsingBundle = false;
@@ -687,6 +688,10 @@ void AssetsManagerEx::prepareUpdate() {
 
     // Temporary manifest exists, previously updating and equals to the remote version, resuming previous download
     if (_tempManifest && _tempManifest->isLoaded() && _tempManifest->isUpdating() && _tempManifest->versionEquals(_remoteManifest)) {
+		auto dir = basename(_tempManifestPath);
+		if (!_fileUtils->isDirectoryExist(dir)) {
+			_fileUtils->createDirectory(dir);
+		}
         _tempManifest->saveToFile(_tempManifestPath);
         _tempManifest->genResumeAssetsList(&_downloadUnits);
         _totalWaitToDownload = _totalToDownload = (int)_downloadUnits.size();
@@ -707,6 +712,7 @@ void AssetsManagerEx::prepareUpdate() {
             CC_SAFE_RELEASE(_tempManifest);
             // Recreate temp storage path and save remote manifest
             _fileUtils->createDirectory(_tempStoragePath);
+			_fileUtils->createDirectory(basename(_tempManifestPath));
             _remoteManifest->saveToFile(_tempManifestPath);
         }
 
@@ -740,6 +746,10 @@ void AssetsManagerEx::prepareUpdate() {
             // Start updating the temp manifest
             _tempManifest->setUpdating(true);
             // Save current download manifest information for resuming
+			auto dir = basename(_tempManifestPath);
+			if (!_fileUtils->isDirectoryExist(dir)) {
+				_fileUtils->createDirectory(dir);
+			}
             _tempManifest->saveToFile(_tempManifestPath);
 
             _totalWaitToDownload = _totalToDownload = (int)_downloadUnits.size();
@@ -776,7 +786,7 @@ void AssetsManagerEx::updateSucceed() {
     // 1. rename temporary manifest to valid manifest
     if (this->_isUsingBundle) {
 		if (_fileUtils->isFileExist(_tempManifestPath)) {
-			_fileUtils->renameFile(_tempStoragePath, this->_bundle + TEMP_MANIFEST_FILENAME, this->_bundle + MANIFEST_FILENAME);
+			_fileUtils->renameFile(basename(_tempManifestPath)+"/", this->_bundle + TEMP_MANIFEST_FILENAME, this->_bundle + MANIFEST_FILENAME);
 		}
 	}else {
 		if (_fileUtils->isFileExist(_tempManifestPath)) {
@@ -1148,6 +1158,10 @@ void AssetsManagerEx::queueDowload() {
     }
     if (_percentByFile / 100 > _nextSavePoint) {
         // Save current download manifest information for resuming
+		auto dir = basename(_tempManifestPath);
+		if (!_fileUtils->isDirectoryExist(dir)) {
+			_fileUtils->createDirectory(dir);
+		}
         _tempManifest->saveToFile(_tempManifestPath);
         _nextSavePoint += SAVE_POINT_INTERVAL;
     }
@@ -1155,6 +1169,10 @@ void AssetsManagerEx::queueDowload() {
 
 void AssetsManagerEx::onDownloadUnitsFinished() {
     // Always save current download manifest information for resuming
+	auto dir = basename(_tempManifestPath);
+	if (!_fileUtils->isDirectoryExist(dir)) {
+		_fileUtils->createDirectory(dir);
+	}
     _tempManifest->saveToFile(_tempManifestPath);
 
     // Finished with error check

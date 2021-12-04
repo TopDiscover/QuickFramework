@@ -4,56 +4,40 @@ import { HotUpdate } from "../hotupdate/Hotupdate";
 
 /**@description entry入口代理 */
 export class EntryDelegate {
-    /**@description 当前有正在加载中的bundle */
-    onBundleLoading(versionInfo: HotUpdate.BundleConfig) {
-        Manager.tips.show(Manager.getLanguage("updating") as string);
+
+    /**@description 显示提示信息 */
+    showTips( param: string | (string | number)[] ){
+        Manager.tips.show(Manager.getLanguage(param));
     }
+
+    /**@description 显示loading */
+    showLoading( param: string | (string | number)[] ){
+        Manager.loading.show(Manager.getLanguage(param));
+    }
+
     /**@description 发现新版本 */
     onNewVersionFund(versionInfo: HotUpdate.BundleConfig, code: HotUpdate.Code, state: HotUpdate.State) {
-        if (versionInfo.isNeedPrompt) {
-            let content = Manager.getLanguage(["newVersionForBundle", versionInfo.name]) as string;
-            Manager.alert.show({
-                text: content,
-                confirmCb: (isOK) => {
-                    let data: HotUpdate.MessageData = {
-                        isOk: isOK,
-                        state: state,
-                        name: versionInfo.name,
-                        bundle: versionInfo.bundle,
-                    }
-                    dispatch(HotUpdate.Event.DOWNLOAD_MESSAGE, data);
-                }
-            });
-        } else {
-            Manager.hotupdate.hotUpdate();
-        }
+        Log.d(`检测到有新版本更新 bundle${versionInfo.bundle} name : ${versionInfo.name}`);
+        Manager.hotupdate.hotUpdate();
     }
 
     /**@description 下载失败 */
     onDownloadFailed(versionInfo: HotUpdate.BundleConfig, code: HotUpdate.Code, state: HotUpdate.State) {
-        if (versionInfo.isNeedPrompt) {
-            let content = Manager.getLanguage(["newVersionForBundle", versionInfo.name]) as string;
-            Manager.alert.show({
-                text: content,
-                confirmCb: (isOK) => {
-                    let data: HotUpdate.MessageData = {
-                        isOk: isOK,
-                        state: state,
-                        name: versionInfo.name,
-                        bundle: versionInfo.bundle,
-                    }
-                    dispatch(HotUpdate.Event.DOWNLOAD_MESSAGE, data);
-                }
-            });
-        } else {
-            Manager.hotupdate.downloadFailedAssets();
-        }
+        let content = Manager.getLanguage("downloadFailed");
+        Manager.alert.show({
+            text: content,
+            confirmCb: (isOK) => {
+                Manager.hotupdate.downloadFailedAssets();
+            }
+        });
     }
 
     /**@description 当前已经是新包，无需更新 */
     onAreadyUpToData(versionInfo: HotUpdate.BundleConfig, code: HotUpdate.Code, state: HotUpdate.State) {
-        Manager.loading.show(Manager.getLanguage("loading_game_resources"))
-        Manager.bundleManager.loadBundle(this);
+        Manager.loading.hide();
+        // 下载完成后不能直接进入，后面如果有多个下载时，会出问题
+        // Manager.loading.show(Manager.getLanguage("loading_game_resources"))
+        // Manager.bundleManager.loadBundle(this);
     }
 
     /**@description 下载版本文件失败 */
@@ -65,6 +49,7 @@ export class EntryDelegate {
             content = Manager.getLanguage("manifestError") as string;
         }
         Manager.tips.show(content);
+        Manager.loading.hide();
     }
 
     /**@description 正在检测更新 */
@@ -89,8 +74,9 @@ export class EntryDelegate {
             dispatch(HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
         } else if (info.code == HotUpdate.Code.UPDATE_FINISHED) {
             newPercent = 1.1;
-            Log.d(`正在加载${config.name}`);
-            Manager.bundleManager.loadBundle(this);
+            // Log.d(`正在加载${config.name}`);
+            //下载完成不能直接进入,否则在多个任务下载时会出错
+            // Manager.bundleManager.loadBundle(this);
             dispatch(HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
         } else if (info.code == HotUpdate.Code.UPDATE_FAILED ||
             info.code == HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
@@ -103,59 +89,58 @@ export class EntryDelegate {
     }
 
     /**@description 加载Bundle错误 */
-    onLoadBundleError(versionInfo: HotUpdate.BundleConfig, err : Error ){
+    onLoadBundleError(versionInfo: HotUpdate.BundleConfig, err: Error) {
         Manager.loading.hide();
         let content = Manager.getLanguage(["updateFaild", versionInfo.name]) as string;
         Manager.tips.show(content);
     }
 
     /**@description 加载bundle完成 */
-    onLoadBundleComplete(versionInfo: HotUpdate.BundleConfig,bundle:AssetManager.Bundle){
-       //通知入口管理进入bundle
-       Manager.loading.hide();
-       Manager.entryManager.onLoadBundleComplete(versionInfo,bundle);
+    onLoadBundleComplete(versionInfo: HotUpdate.BundleConfig, bundle: AssetManager.Bundle) {
+        //通知入口管理进入bundle
+        Manager.loading.hide();
+        Manager.entryManager.onLoadBundleComplete(versionInfo, bundle);
     }
 
 
     /**@description 进入bundle完成 */
-    onEnterGameView( entry : Entry | null , gameView : GameView){
+    onEnterGameView(entry: Entry | null, gameView: GameView) {
         //删除除自己之外的其它bundle
         let excludeBundles = this.getPersistBundle();
-        if ( entry ){
+        if (entry) {
             excludeBundles.push(entry.bundle);
         }
 
         //进入下一场景，关闭掉当前的场景
-        if ( Manager.gameView ){
+        if (Manager.gameView) {
             Manager.gameView.close();
         }
         Manager.gameView = gameView;
 
-        Manager.bundleManager.removeLoadedBundle(this,excludeBundles);
+        Manager.bundleManager.removeLoadedBundle(this, excludeBundles);
     }
 
     onShowGameView(entry: Entry | null, gameView: GameView) {
-        
+
     }
 
     /**@description 主包检测更新 */
-    onCheckUpdate(){
+    onCheckUpdate() {
         let config = new HotUpdate.BundleConfig(
             Manager.getLanguage("mainPack"),
-            Macro.BUNDLE_RESOURCES,
-            true
+            Macro.BUNDLE_RESOURCES
         );
-        Manager.bundleManager.enterBundle(config,this);
+        Manager.bundleManager.enterBundle(config, this);
     }
 
     /**@description 获取常驻于内存不释放的bundle */
-    getPersistBundle(){
+    getPersistBundle() {
         return [Macro.BUNDLE_RESOURCES];
     }
 
-    onQuitGame(mainEntry : Entry | null ){
-        if ( mainEntry ){
-            if ( Manager.gameView ){
+    onQuitGame(mainEntry: Entry | null) {
+        if (mainEntry) {
+            if (Manager.gameView) {
                 Manager.gameView.close();
             }
             mainEntry.onEnter(true);
@@ -165,17 +150,17 @@ export class EntryDelegate {
     /**
      * @description 重新检测主包更新
      */
-    onRecheckMainUpdate( code : HotUpdate.Code , config : HotUpdate.BundleConfig ){
+    onRecheckMainUpdate(code: HotUpdate.Code, config: HotUpdate.BundleConfig) {
         let content = Manager.getLanguage("mainPackVersionIsTooLow") as string;
         Manager.alert.show({
             text: content,
             confirmCb: (isOK) => {
-                dispatch(HotUpdate.Event.MAIN_VERSION_IS_TOO_LOW, code,config);
+                Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
             }
         });
     }
 
-    getEntryConfig(bundle:BUNDLE_TYPE) : HotUpdate.BundleConfig | null {
+    getEntryConfig(bundle: BUNDLE_TYPE): HotUpdate.BundleConfig | null {
         return null;
     }
 }

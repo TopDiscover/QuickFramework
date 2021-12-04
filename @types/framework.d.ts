@@ -254,7 +254,7 @@ declare namespace Language {
 	 **/
 	export interface DataSourceDelegate {
 		name: string;
-		data(language: string): Data;
+		data(language: string,source:any): Data;
 	}
 }
 

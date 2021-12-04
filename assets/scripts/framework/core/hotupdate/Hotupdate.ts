@@ -35,7 +35,9 @@ export namespace HotUpdate {
         /**@description 下载State */
         state: State,
         /**@description 是否需要重启 */
-        needRestart: boolean
+        needRestart: boolean;
+        /**@description bundle */
+        bundle : string;
     }
     /**@description 提示下载弹出框事件数据 */
     export interface MessageData {
@@ -126,28 +128,33 @@ export namespace HotUpdate {
         TRY_DOWNLOAD_FAILED_ASSETS,
     }
 
+    /**
+     * @description 热更新状态，
+     */
+    export enum Status{
+        /**@description 需要下载 */
+        NEED_DOWNLOAD,
+        /**@description 已经是最新版本 */
+        UP_TO_DATE,
+        /**@description 需要下载更新 */
+        NEED_UPDATE,
+    }
+
     export class BundleConfig {
         /**@description Bundle名 如:hall*/
         bundle: string = "";
         /**@description Bundle名 如:大厅  */
         name: string = "";
-        /**@description 是否需要提示弹出框提示升级 */
-        isNeedPrompt: boolean = false;
         /**
          * 
          * @param name bundle名 如：大厅
          * @param bundle Bundle名 如:hall
-         * @param index 游戏index,可根据自己需要决定需不需要
-         * @param event 加载bundle完成后，派发事件
-         * @param isNeedPrompt 是否需要弹出提示升级的弹出框
          */
         constructor(
             name: string,
-            bundle: string,
-            isNeedPrompt: boolean = false) {
+            bundle: string) {
             this.name = name;
             this.bundle = bundle;
-            this.isNeedPrompt = isNeedPrompt;
         }
 
         clone(){
@@ -155,7 +162,7 @@ export namespace HotUpdate {
         }
 
         static clone( config : BundleConfig){
-            let result = new BundleConfig(config.name,config.bundle,config.isNeedPrompt);
+            let result = new BundleConfig(config.name,config.bundle);
             return result;
         }
     }

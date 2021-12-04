@@ -4,12 +4,12 @@
  */
 
 import LoginView from "./view/LoginView";
-import { i18n } from "../common/language/CommonLanguage";
 import { Config, ViewZOrder } from "../common/config/Config";
 import { Macro } from "../framework/defines/Macros";
 import { Entry } from "../framework/core/entry/Entry";
 import { HotUpdate } from "../framework/core/hotupdate/Hotupdate";
 import { Global } from "../common/data/Global";
+import { Resource } from "../framework/core/asset/Resource";
 
 class LoginEntry extends Entry {
     static bundle = Macro.BUNDLE_RESOURCES;
@@ -23,7 +23,16 @@ class LoginEntry extends Entry {
         
     }
     protected loadResources(completeCb: () => void): void {
-        completeCb();
+        this.loader.getLoadResources = ()=>{
+            return [{ preloadView: LoginView, bundle: this.bundle }];
+        };
+        this.loader.onLoadProgress = (err : Resource.LoaderError)=>{
+            if ( err == Resource.LoaderError.LOADING){
+                return;
+            }
+            completeCb();
+        };
+        this.loader.loadResources();
     }
     protected openGameView(): void {
         Manager.uiManager.open({ type: LoginView, zIndex: ViewZOrder.zero, bundle: this.bundle });
@@ -33,8 +42,8 @@ class LoginEntry extends Entry {
         Manager.uiManager.close(LoginView);
     }
     protected initData(): void {
-        Config.ENTRY_CONFIG[Config.BUNDLE_HALL] = new HotUpdate.BundleConfig(i18n.hallText,Config.BUNDLE_HALL,true);
-        Config.ENTRY_CONFIG[Macro.BUNDLE_RESOURCES] = new HotUpdate.BundleConfig(i18n.mainPack,Macro.BUNDLE_RESOURCES,true);
+        Config.ENTRY_CONFIG[Config.BUNDLE_HALL] = new HotUpdate.BundleConfig(Manager.getLanguage("hallText"),Config.BUNDLE_HALL);
+        Config.ENTRY_CONFIG[Macro.BUNDLE_RESOURCES] = new HotUpdate.BundleConfig(Manager.getLanguage("mainPack"),Macro.BUNDLE_RESOURCES);
     }
     protected pauseMessageQueue(): void {
         
@@ -48,9 +57,6 @@ class LoginEntry extends Entry {
     onEnter(isQuitGame : boolean) {
         super.onEnter(isQuitGame);
         Log.d(`--------------onEnterLogin--------------`);
-        if ( !isQuitGame ){
-            Manager.loading.show(i18n.checkingUpdate);
-        }
     }
 
     /**@description 这个位置说明自己GameView 进入onLoad完成 */

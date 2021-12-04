@@ -1,5 +1,5 @@
 
-import { _decorator, Component, Node, find, SystemEventType, setDisplayStats, isDisplayStats, Toggle, js, isValid, sys } from 'cc';
+import { _decorator, Component, Node, find, setDisplayStats, isDisplayStats, Toggle, js, isValid, sys, SystemEvent } from 'cc';
 import { DEBUG } from 'cc/env';
 import { LogLevel } from '../../framework/defines/Enums';
 const { ccclass, property } = _decorator;
@@ -53,7 +53,7 @@ export class DebugView extends Component {
 
         let background = find("background", this.node);
         if (background) {
-            background.on(SystemEventType.TOUCH_END, () => {
+            background.on(SystemEvent.EventType.TOUCH_END, () => {
                 this.node.active = false;
                 if (this.debug) this.debug.active = true;
             });
@@ -63,14 +63,14 @@ export class DebugView extends Component {
     private bindEvent(path : string ,cb:Function){
         let node = find(path,this.content);
         if( node ){
-            node.on(SystemEventType.TOUCH_END,cb,this);
+            node.on(SystemEvent.EventType.TOUCH_END,cb,this);
         }
     }
 
     private initLogView() {
         let background = find("background", this.logView);
         if (background) {
-            background.on(SystemEventType.TOUCH_END, () => {
+            background.on(SystemEvent.EventType.TOUCH_END, () => {
                 this.logView.active = false;
             });
         }

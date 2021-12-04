@@ -1,4 +1,4 @@
-import { Asset, find, Game, game, SystemEvent, systemEvent, SystemEventType, _decorator , Node, DebugMode } from "cc";
+import { Asset, find, Game, game, SystemEvent, systemEvent, _decorator , Node, DebugMode } from "cc";
 import { Config } from "./scripts/common/config/Config";
 import { DebugView } from "./scripts/common/debug/DebugView";
 import EventComponent from "./scripts/framework/componects/EventComponent";
@@ -48,7 +48,7 @@ export default class MainController extends EventComponent {
                     view.debug = debug;
                 }
                 this.debugView.active = false;
-                debug.on(SystemEventType.TOUCH_END,()=>{
+                debug.on(SystemEvent.EventType.TOUCH_END,()=>{
                     if ( debug ) debug.active = false;
                     if ( this.debugView ){
                         this.debugView.active = true;

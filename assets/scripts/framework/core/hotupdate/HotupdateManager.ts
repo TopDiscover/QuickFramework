@@ -1,6 +1,9 @@
 import { HotUpdate } from "./Hotupdate";
-import { game, sys } from "cc";
+import { game, js, resources, sys, tweenUtil } from "cc";
 import { DEBUG, JSB, PREVIEW } from "cc/env";
+import { Macro } from "../../defines/Macros";
+import { HttpPackage } from "../net/http/HttpClient";
+import { Http } from "../net/http/Http";
 
 class AssetsManager {
 
@@ -15,12 +18,14 @@ class AssetsManager {
     /**@description 当前资源管理器的实体 jsb.AssetsManager */
     manager: jsb.AssetsManager = null!;
 
-    reset(){
+    reset() {
         this.manager.reset();
     }
 }
 
-const MAIN_PACK = "main";
+const MAIN_PACK = Macro.MAIN_PACK_BUNDLE_NAME;
+const VERSION_FILENAME = "versions.json";
+type VERSIONS = { [key: string]: string };
 
 /**
  * @description 热更新组件
@@ -63,8 +68,10 @@ export class HotupdateManager {
     /**@description 当前热更新的资源管理器 */
     private currentAssetsManager: AssetsManager = null!;
 
-    /**@description 第一次检测完成主包后，预下载该热更新下对应的所有bundle的版本号配置，如果在进入bundle时，发现与当前主包版本不匹配，则提示玩家退回登录，更新主包 */
-    private versions: any = null;
+    /**@description 本地所有版本信息 */
+    private localVersions: VERSIONS = {};
+    /**@description 远程所有版本信息 */
+    private remoteVersions: VERSIONS = {};
 
     /**@description 获取Bundle名 */
     public getBundleName(bundle: string) {
@@ -220,7 +227,7 @@ export class HotupdateManager {
                 let gameManifest = {
                     version: "0",
                     bundle: bundle,
-                    md5 : "unknown",
+                    md5: "unknown",
                 };
                 let gameManifestContent = JSON.stringify(gameManifest);
                 let jsbGameManifest = new jsb.Manifest(gameManifestContent, this.storagePath, this.hotUpdateUrl);
@@ -251,7 +258,6 @@ export class HotupdateManager {
                 break;
             case HotUpdate.Code.ALREADY_UP_TO_DATE:
                 Log.d(`Already up to date with the latest remote version.`);
-                this.dowloadVsersions(this.hotUpdateUrl, () => { });
                 break;
             case HotUpdate.Code.NEW_VERSION_FOUND:
                 Log.d(`New version found, please try to update.`);
@@ -259,11 +265,13 @@ export class HotupdateManager {
                     //非主包检测更新
                     //有新版本，看下是否与主包版本匹配
                     let md5 = this.currentAssetsManager.manager.getRemoteManifest().getMd5();
-                    if (this.versions) {
-                        // Log.dump(this.versions,this.currentAssetsManager.name);
-                        let preMd5 = this.versions[this.currentAssetsManager.name];
+                    let preMd5 = this.localVersions[this.currentAssetsManager.name];
+                    if (preMd5 == undefined || preMd5 == null) {
+                        Log.e(`预处理版本未存在!!!!`);
+                        code = HotUpdate.Code.PRE_VERSIONS_NOT_FOUND;
+                    } else {
                         //先检查主包是否需要更新
-                        if (preMd5 == md5 ) {
+                        if (preMd5 == md5) {
                             //主包无需要更新
                             Log.d(`将要下载版本 md5 与远程版本 md5 相同，可以下载 md5:${preMd5}`);
                         } else {
@@ -271,9 +279,6 @@ export class HotupdateManager {
                             Log.e(`将要下载版本 md5 :${md5} 与本地版本 md5 :${preMd5} 不一致，需要对主包进行更新后再进入!!!`);
                             code = HotUpdate.Code.MAIN_PACK_NEED_UPDATE;
                         }
-                    } else {
-                        Log.e(`预处理版本未存在!!!!`);
-                        code = HotUpdate.Code.PRE_VERSIONS_NOT_FOUND;
                     }
                 }
                 break;
@@ -311,6 +316,7 @@ export class HotupdateManager {
         Log.d(`--update cb code : ${event.getEventCode()} state : ${this.currentAssetsManager.manager.getState()}`);
         //存储当前的状态，当下载版本文件失败时，state的状态与下载非版本文件是一样的状态
         this.currentAssetsManager.code = event.getEventCode();
+        let bundle = this.currentAssetsManager.name;
         switch (event.getEventCode()) {
             case HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST:
                 Log.d(`No local manifest file found, hot update skipped.`);
@@ -334,7 +340,11 @@ export class HotupdateManager {
             case HotUpdate.Code.ALREADY_UP_TO_DATE:
                 Log.d(`Already up to date with the latest remote version.`);
                 failed = true;
-                this.dowloadVsersions(this.hotUpdateUrl, () => { });
+                //主包更新完成
+                if (bundle == MAIN_PACK) {
+                    Log.d(`主包已经是最新,请求写入远程版本信息到本地`);
+                    this.writeRemoteVersionsToLocal();
+                }
                 break;
             case HotUpdate.Code.UPDATE_FINISHED:
                 Log.d(`Update finished. ${event.getMessage()}`);
@@ -382,11 +392,11 @@ export class HotupdateManager {
                 //下载数量大于0，才有必要进入重启，在如下这种情况下，并不会发生下载
                 //当只提升了版本号，而并未对代码进行修改时，此时的只下载了一个project.manifest文件，
                 //不需要对游戏进行重启的操作
-                this.dowloadVsersions(this.hotUpdateUrl, () => {
-                    if (event.getDownloadedFiles() > 0) {
-                        game.restart();
-                    }
-                });
+                if (event.getDownloadedFiles() > 0) {
+                    game.restart();
+                }
+                Log.d(`主包更新完成，写入远程版本信息到本地`);
+                this.writeRemoteVersionsToLocal();
                 //下载完成 重置热更新管理器，在游戏期间如果有发热更新，可以再次检测
                 this.restAssetsManager(this.currentAssetsManager.name);
             }
@@ -409,6 +419,7 @@ export class HotupdateManager {
             code: event.getEventCode(),
             state: state as any,
             needRestart: isUpdateFinished,
+            bundle: bundle
         };
 
         dispatch(HotUpdate.Event.HOTUPDATE_DOWNLOAD, info)
@@ -417,30 +428,105 @@ export class HotupdateManager {
     }
 
     /**
-     * @description 下载所有当前热更新的版本号，以防止当玩家再进入游戏，停止在如大厅时，此时发更新，玩家要下载的更新文件跟当前版本不匹配情况
-     * @param hotUpdateUrl 主包热更新地方
-     * @param complete 下载完成回调
+     * @description 获取当前bundle的状态
+     * @param bundle bundle名
+     * @returns 
      */
-    private dowloadVsersions(hotUpdateUrl: string, complete: () => void) {
-        let downloader = new jsb.Downloader();
-        let versionsPath = `${hotUpdateUrl}/manifest/versions.json`;
-        Log.d(`下载版本文件:${versionsPath}`)
-        downloader.createDownloadFileTask(versionsPath, `${jsb.fileUtils.getWritablePath()}/versions.json`);
-        downloader.setOnFileTaskSuccess((task) => {
-            Log.d(`下载热更新版本文件成功`);
-            let content = jsb.fileUtils.getStringFromFile(task.storagePath);
-            Log.d(content);
-            this.versions = JSON.parse(content);
-            if (complete) complete();
-        });
+    getStatus(bundle: string) {
+        if (sys.isBrowser) {
+            //浏览器无更新
+            return HotUpdate.Status.UP_TO_DATE;
+        }
+        if (this.isExistBundle(bundle)) {
+            if (this.localVersions[bundle] == this.remoteVersions[bundle]) {
+                return HotUpdate.Status.UP_TO_DATE;
+            } else {
+                return HotUpdate.Status.NEED_UPDATE;
+            }
+        } else {
+            return HotUpdate.Status.NEED_DOWNLOAD;
+        }
+    }
 
-        downloader.setOnTaskError((task, errorCode, errorCodeInternal, errorString) => {
-            Log.e(`下载当前热更新版本文件${versionsPath}失败,errorCode : ${errorCode} errorCodeInternal : ${errorCodeInternal} , errorString : ${errorString}`);
-            if (complete) complete();
-        });
+    private isExistBundle(bundle: string) {
+        if (bundle == Macro.BUNDLE_RESOURCES) {
+            return true;
+        } else {
+            //包内
+            let path = `${this.manifestRoot}${bundle}_project.json`;
+            if (jsb.fileUtils.isFileExist(path)) {
+                return true;
+            }
+            return false;
+        }
+    }
 
-        downloader.setOnTaskProgress((task, bytesReceived, totalBytesReceived, totalBytesExpected) => {
-            Log.d(`下载${versionsPath}中 btyesReceived : ${bytesReceived} , totalBytesReceived : ${totalBytesReceived} , totalBytesExpected : ${totalBytesExpected}`);
+    /**
+     * @description 热更新初始化,先读取本地的所有版本信息，再拉取远程所有的版本信息
+     * */
+    loadVersions() {
+        return new Promise<boolean>((resolove, reject) => {
+            if (sys.isBrowser) {
+                resolove(true);
+                return;
+            }
+            let localString = Manager.getLanguage("local");
+            Manager.loading.show(Manager.getLanguage(["loadVersions", localString]));
+            let path = `${this.manifestRoot}${VERSION_FILENAME}`;
+            if (jsb.fileUtils.isFileExist(path)) {
+                //存在版本控制文件
+                let fullPath = jsb.fileUtils.fullPathForFilename(path);
+                Log.d(`读取本地版本文件:${fullPath}`);
+                let content = jsb.fileUtils.getStringFromFile(fullPath);
+                this.localVersions = JSON.parse(content);
+                Log.dump(this.localVersions, "本地当前所有版本信息:");
+                let remoteString = Manager.getLanguage("remote");
+                Manager.loading.show(Manager.getLanguage(["loadVersions", remoteString]));
+                this.readRemoteVersions((data, err) => {
+                    this.remoteVersions = data;
+                    if (err) {
+                        resolove(false);
+                    } else {
+                        resolove(true);
+                    }
+                });
+            } else {
+                Log.e(`本地不存在${path}`);
+                resolove(false);
+            }
+        });
+    }
+
+    /**@description 读取远程版本文件 */
+    private readRemoteVersions(complete: (data: VERSIONS, err?: Http.Error) => void) {
+        let httpPackage = new HttpPackage;
+        httpPackage.data.url = `${this.hotUpdateUrl}/${this.manifestRoot}${VERSION_FILENAME}`;
+        httpPackage.data.isAutoAttachCurrentTime = true;
+        httpPackage.send((data) => {
+            let obj = JSON.parse(data);
+            Log.dump(obj, "远程所有版本信息为:");
+            complete(obj);
+        }, (err) => {
+            Log.dump(err);
+            complete({}, err);
+        });
+    }
+
+    /**
+     * @description 写入远程版本信息到本地
+     */
+    private writeRemoteVersionsToLocal() {
+        this.readRemoteVersions((data, err) => {
+            if (err) {
+
+            } else {
+                let path = jsb.fileUtils.getWritablePath() + this.manifestRoot + VERSION_FILENAME;
+                Log.d(`远程版本信息写入本地:${path}`);
+                this.localVersions = data;
+                let content = JSON.stringify(data);
+                jsb.fileUtils.writeStringToFile(content, path);
+                this.remoteVersions = JSON.parse(content);
+            }
         });
     }
 }
