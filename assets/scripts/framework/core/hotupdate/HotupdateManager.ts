@@ -1,6 +1,6 @@
 import { HotUpdate } from "./Hotupdate";
-import { game, js, resources, sys, tweenUtil } from "cc";
-import { DEBUG, JSB, PREVIEW } from "cc/env";
+import { game, sys, } from "cc";
+import { JSB, PREVIEW } from "cc/env";
 import { Macro } from "../../defines/Macros";
 import { HttpPackage } from "../net/http/HttpClient";
 import { Http } from "../net/http/Http";

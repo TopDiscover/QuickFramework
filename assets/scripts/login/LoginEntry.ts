@@ -72,8 +72,6 @@ class LoginEntry extends Entry {
         Manager.protoManager.unload();
         //关闭除登录之外的界面
         Manager.uiManager.closeExcept([LoginView]);
-        let data = Manager.dataCenter.get(Global);
-        Log.dump(data as any,"sss");
         //清理所有数据中数据
         Manager.dataCenter.clear();
     }

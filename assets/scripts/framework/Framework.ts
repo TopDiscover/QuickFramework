@@ -65,7 +65,7 @@ export class Framewok {
     get hotupdate() { return getSingleton(HotupdateManager) }
 
     /**@description 常驻资源指定的模拟view */
-    get retainMemory() { return this.uiManager.retainMemory; }
+    get retainMemory() : any { return this.uiManager.retainMemory; }
 
     /**@description 语言包 */
     get language() {

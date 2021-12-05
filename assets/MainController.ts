@@ -1,4 +1,4 @@
-import { Asset, find, Game, game, SystemEvent, systemEvent, _decorator , Node, DebugMode } from "cc";
+import { Asset, find, Game, game, SystemEvent, systemEvent, _decorator , Node, DebugMode, setDisplayStats } from "cc";
 import { Config } from "./scripts/common/config/Config";
 import { DebugView } from "./scripts/common/debug/DebugView";
 import EventComponent from "./scripts/framework/componects/EventComponent";
@@ -41,6 +41,8 @@ export default class MainController extends EventComponent {
         let debug = find("debug", this.node);
         this.debugView = find("debugView",this.node);
         if (debug&&this.debugView) {
+            let isVisibleDebugInfo = Manager.localStorage.getItem(Config.SHOW_DEBUG_INFO_KEY,true);
+            setDisplayStats(isVisibleDebugInfo);
             if ( Config.isShowDebugButton ){
                 debug.active = true;
                 let view = this.debugView.addComponent(DebugView)

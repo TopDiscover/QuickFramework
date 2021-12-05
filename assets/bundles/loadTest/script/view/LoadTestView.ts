@@ -77,7 +77,7 @@ export default class LoadTestView extends GameView {
         this.content.addChild(node);
         node.name = name;
         let sp = node.addComponent(Sprite);
-        sp.loadImage({url:"texture/timg/spriteFrame",view:this});
+        sp.loadImage({url:"texture/timg",view:this});
     }
 
     private onLoadNetImg(){

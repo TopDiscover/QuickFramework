@@ -62,6 +62,7 @@ prototype.loadRemoteImage = function (config: any) {
         } else {
             if (config.defaultSpriteFrame) {
                 if (typeof config.defaultSpriteFrame == "string") {
+                    config.defaultSpriteFrame = config.defaultSpriteFrame + "/spriteFrame";
                     //动态加载了一张图片，把资源通知管理器
                     Manager.cacheManager.getCacheByAsync(config.defaultSpriteFrame, SpriteFrame, defaultBundle).then((spriteFrame) => {
                         setSpriteSpriteFrame(config.view, config.defaultSpriteFrame, me, spriteFrame, config.complete, defaultBundle);
@@ -93,6 +94,7 @@ prototype.loadImage = function (config: any) {
     let complete = config.complete;
     let bundle = getBundle(config);
     if (typeof url == "string") {
+        url = url + "/spriteFrame";
         Manager.cacheManager.getCacheByAsync(url, SpriteFrame, bundle).then((spriteFrame) => {
             setSpriteSpriteFrame(view, url, me, spriteFrame, complete, bundle);
         });
@@ -372,7 +374,7 @@ export function CocosExtentionInit() {
     if (!EDITOR) {
         //对引擎输入框进行修改 
         if (Manager.adaptor.isBrowser) {
-            (<any>EditBox)._EditBoxImpl = WebEditBoxImpl;
+            // (<any>EditBox)._EditBoxImpl = WebEditBoxImpl;
         }
         Log.d("Cocos扩展初始化");
     }

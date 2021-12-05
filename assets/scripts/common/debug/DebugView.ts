@@ -2,6 +2,7 @@
 import { _decorator, Component, Node, find, setDisplayStats, isDisplayStats, Toggle, js, isValid, sys, SystemEvent } from 'cc';
 import { DEBUG } from 'cc/env';
 import { LogLevel } from '../../framework/defines/Enums';
+import { Config } from '../config/Config';
 const { ccclass, property } = _decorator;
 
 @ccclass('DebugView')
@@ -189,6 +190,7 @@ export class DebugView extends Component {
 
     private onShowDebugInfo(){
         setDisplayStats(!isDisplayStats())
+        Manager.localStorage.setItem(Config.SHOW_DEBUG_INFO_KEY,isDisplayStats());
     }
 
     private onShowUI(){

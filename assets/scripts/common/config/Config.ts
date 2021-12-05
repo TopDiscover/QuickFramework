@@ -57,6 +57,8 @@ export namespace Config {
     export const RECONNECT_ALERT_TAG = 100;
 
     export const ENTRY_CONFIG : {[key:string] : HotUpdate.BundleConfig} ={};
+
+    export const SHOW_DEBUG_INFO_KEY = "SHOW_DEBUG_INFO_KEY";
 }
 
 /**
