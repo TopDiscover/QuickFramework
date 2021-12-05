@@ -214,19 +214,6 @@ dragonBones.ArmatureDisplay.prototype.loadDisplay = function(config) {
      });
  }
 
-/**@description 强制label在当前帧进行绘制 */
-prototype.forceDoLayout = function () {
-    //2.2.0
-    if (this._forceUpdateRenderData) {
-        this._forceUpdateRenderData();
-    }
-    //2.2.0以下版本
-    else if (this._updateRenderData) {
-        this._updateRenderData(true);
-    }
-}
-
-
 Reflect.defineProperty(Label.prototype, "language", {
     get: function () {
         return (<any>this)._language;
@@ -292,6 +279,20 @@ if (!EDITOR && Macro.ENABLE_CHANGE_LANGUAGE) {
         __label_onLoad__ && __label_onLoad__.call(this);
     }
 
+}
+
+/**@description 强制label在当前帧进行绘制 */
+prototype.forceDoLayout = function () {
+    //2.2.0
+    if (this._forceUpdateRenderData) {
+        this._forceUpdateRenderData();
+    }
+    //2.2.0以下版本
+    else if (this._updateRenderData) {
+        this._updateRenderData(true);
+    }else if(this.updateRenderData){
+        this.updateRenderData(true);
+    }
 }
 
 /**@description 通过预置体路径创建节点 
