@@ -97,6 +97,7 @@ export class BundleManager {
             }
          } else {
             //网络错误造成，提示玩家重试
+            if ( delegate ) delegate.hideLoading();
             Manager.alert.show({
                text: data.err,
                confirmCb: (isOk) => {

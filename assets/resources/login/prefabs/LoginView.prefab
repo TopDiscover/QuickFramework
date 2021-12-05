@@ -276,7 +276,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 488.875,
+      "x": 526.6800000000001,
       "y": -234.8,
       "z": 0
     },
@@ -315,12 +315,12 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 102.25,
+      "width": 75.61,
       "height": 50.4
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
-      "x": 0.5,
+      "x": 1,
       "y": 0.5
     },
     "_id": ""
@@ -351,8 +351,8 @@
       "b": 255,
       "a": 255
     },
-    "_string": "版本1",
-    "_horizontalAlign": 1,
+    "_string": "",
+    "_horizontalAlign": 2,
     "_verticalAlign": 1,
     "_actualFontSize": 40,
     "_fontSize": 40,
@@ -387,7 +387,7 @@
     "_alignFlags": 36,
     "_target": null,
     "_left": 0,
-    "_right": 100,
+    "_right": 113.32,
     "_top": 0,
     "_bottom": 100,
     "_horizontalCenter": 0,

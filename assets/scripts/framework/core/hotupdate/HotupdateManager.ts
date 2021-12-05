@@ -25,7 +25,7 @@ class AssetsManager {
 
 const MAIN_PACK = Macro.MAIN_PACK_BUNDLE_NAME;
 const VERSION_FILENAME = "versions.json";
-type VERSIONS = { [key: string]: string };
+type VERSIONS = { [key: string]: { md5 : string , version : string} };
 
 /**
  * @description 热更新组件
@@ -269,18 +269,18 @@ export class HotupdateManager {
                     //非主包检测更新
                     //有新版本，看下是否与主包版本匹配
                     let md5 = this.currentAssetsManager.manager.getRemoteManifest().getMd5();
-                    let preMd5 = this.preVersions[bundle];
-                    if (preMd5 == undefined || preMd5 == null) {
+                    let versionInfo = this.preVersions[bundle];
+                    if (versionInfo == undefined || versionInfo == null) {
                         Log.e(`预处理版本未存在!!!!`);
                         code = HotUpdate.Code.PRE_VERSIONS_NOT_FOUND;
                     } else {
                         //先检查主包是否需要更新
-                        if (preMd5 == md5) {
+                        if (versionInfo.md5 == md5) {
                             //主包无需要更新
-                            Log.d(`将要下载版本 md5 与远程版本 md5 相同，可以下载 md5:${preMd5}`);
+                            Log.d(`将要下载版本 md5 与远程版本 md5 相同，可以下载 md5:${versionInfo}`);
                         } else {
                             //主包需要更新
-                            Log.e(`将要下载版本 md5 :${md5} 与本地版本 md5 :${preMd5} 不一致，需要对主包进行更新后再进入!!!`);
+                            Log.e(`将要下载版本 md5 :${md5} 与本地版本 md5 :${versionInfo} 不一致，需要对主包进行更新后再进入!!!`);
                             code = HotUpdate.Code.MAIN_PACK_NEED_UPDATE;
                         }
                     }
@@ -399,6 +399,7 @@ export class HotupdateManager {
                 //当只提升了版本号，而并未对代码进行修改时，此时的只下载了一个project.manifest文件，
                 //不需要对游戏进行重启的操作
                 if (event.getDownloadedFiles() > 0) {
+                    Log.d(`主包更新完成，有下载文件，需要重启更新`);
                     game.restart();
                 } else {
                     Log.d(`主包更新完成，写入远程版本信息到本地`);
@@ -448,9 +449,9 @@ export class HotupdateManager {
             return HotUpdate.Status.UP_TO_DATE;
         }
         bundle = this.convertBundle(bundle);
-        let md5 = this.getBundleMd5(bundle);
-        if ( md5 ){
-            if ( md5 == this.remoteVersions[bundle] ){
+        let versionInfo = this.getVersionInfo(bundle);
+        if ( versionInfo ){
+            if ( versionInfo.md5 == this.remoteVersions[bundle].md5 ){
                 return HotUpdate.Status.UP_TO_DATE;
             }
             return HotUpdate.Status.NEED_UPDATE;
@@ -459,12 +460,41 @@ export class HotupdateManager {
         }
     }
 
-    private getBundleMd5(bundle: string) : string | undefined{
+    /**
+     * @description 获取版本号,此版本号只是显示用，该热更新跟版本号无任何关系
+     * @param bundle 
+     * @param isShortVersion 是否使用简单的版本号
+     */
+    getVersion(bundle:BUNDLE_TYPE,isShortVersion : boolean = true){
+        if ( sys.isBrowser ){
+            return "v1.0";
+        }else{
+            bundle = this.convertBundle(bundle as string);
+            let versionInfo = this.getVersionInfo(bundle);
+            if ( versionInfo ){
+                if( isShortVersion ){
+                    return `v${versionInfo.version}`;
+                }
+                return `v${versionInfo.version}(${versionInfo.md5})`;
+            }else{
+                if ( this.remoteVersions[bundle] ){
+                    if ( isShortVersion ){
+                        return `v${this.remoteVersions[bundle]}`;
+                    }
+                    return `v${this.remoteVersions[bundle]}(${this.remoteVersions[bundle].md5})`;
+                }else{
+                    return `v1.0`;
+                }
+            }
+        }
+    }
+
+    private getVersionInfo(bundle: string) : {md5 : string , version : string} | undefined{
         let path = `${this.manifestRoot}${bundle}_version.json`;
         if (jsb.fileUtils.isFileExist(path)) {
             let content = jsb.fileUtils.getStringFromFile(path);
             let obj = JSON.parse(content);
-            return obj.md5;
+            return obj;
         }
         return undefined;
     }

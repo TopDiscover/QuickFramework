@@ -179,4 +179,12 @@ export default class HallView extends GameView {
             }
         }
     }
+
+    show(args ?: any[] | any){
+        super.show(args)
+        let version = find("version",this.node)?.getComponent(Label);
+        if ( version ){
+            version.string = Manager.hotupdate.getVersion(this.bundle);
+        }
+    }
 }

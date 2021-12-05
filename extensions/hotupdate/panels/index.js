@@ -539,9 +539,7 @@ exports.methods = {
         this.addLog("所有子包:", subBundles);
         let manifest = {
             assets: {},
-            md5 : "",
-            bundle : "main",
-            version : version
+            bundle : "main"
         };
         
         //删除旧的版本控件文件
@@ -564,6 +562,7 @@ exports.methods = {
         let content = JSON.stringify(manifest);
         let md5 = require("crypto").createHash('md5').update(content).digest('hex');
         manifest.md5 = md5;
+        manifest.version = version;
         fs.writeFileSync(projectManifestPath,JSON.stringify(manifest));
         this.addLog(`生成${projectManifestPath}成功`);
 
@@ -574,7 +573,7 @@ exports.methods = {
 
         //生成所有版本控制文件，用来判断当玩家停止在版本1，此时发版本2时，不让进入游戏，返回到登录，重新走完整个更新流程
         let versions = {
-            main : md5,
+            main : {md5: md5,version:version},
         }
 
         //生成各bundles版本文件
@@ -583,9 +582,7 @@ exports.methods = {
             this.addLog(`正在生成:${key}`);
             let manifest = {
                 assets: {},
-                md5:"",
-                bundle:key,
-                version : userCache.bundles[key].version
+                bundle:key
             };
             this.readDir(path.join(buildDir, `assets/${key}`), manifest.assets, buildDir);
             projectManifestPath = path.join(manifestDir, `${key}_project.json`);
@@ -594,11 +591,14 @@ exports.methods = {
             let content = JSON.stringify(manifest);
             let md5 = require("crypto").createHash('md5').update(content).digest('hex');
             manifest.md5 = md5;
+            manifest.version = userCache.bundles[key].version
             fs.writeFileSync(projectManifestPath, JSON.stringify(manifest));
             this.addLog(`生成${projectManifestPath}成功`);
 
             delete manifest.assets;
-            versions[`${key}`] = md5;
+            versions[`${key}`] = {};
+            versions[`${key}`].md5 = md5;
+            versions[`${key}`].version = manifest.version;
             fs.writeFileSync(versionManifestPath, JSON.stringify(manifest));
             this.addLog(`生成${versionManifestPath}成功`);
         }
@@ -704,37 +704,13 @@ exports.methods = {
         this.$.manifestDir.value = this.getManifestDir(userCache.buildDir);
         this.saveUserCache();
     },
-    /**
-     * @description 版本比较 curVersion >= prevVersion 返回ture 
-     * @example (1.0.1 > 1.0)  (1.0.1 <= 1.0.1) (1.0.1 < 1.0.2) (1.0.1 > 1.0.0) 
-     * @param curVersion 当前构建版本
-     * @param prevVersion 之前构建的版本
-     */
-    isVersionPass(curVersion, prevVersion) {
-        if (undefined === curVersion || null === curVersion || undefined === prevVersion || null === prevVersion) return false;
-        let curVersionArr = curVersion.split(".");
-        let prevVersionArr = prevVersion.split(".");
-        let len = curVersionArr.length > prevVersionArr.length ? curVersionArr.length : prevVersionArr.length;
-        for (let i = 0; i < len; i++) {
-            let curValue = curVersionArr[i],
-                genValue = prevVersionArr[i];
-            if (undefined === curValue && undefined !== genValue) return false;
-            if (undefined !== curValue && undefined === genValue) return true;
-            if (curValue && genValue && parseInt(curValue) >= parseInt(genValue)) return true;
-        }
-        return false;
-    },
     /** @description 主版本号输入*/
     onVersionChange(element) {
         if (this.isDoCreate()) return;
         let version = element.value;
-        if (this.isVersionPass(version, userCache.version)) {
-            //有效版本
-            userCache.version = version;
-            this.saveUserCache();
-            return;
-        }
-        this.addLog(`无效版本号,${version} 应大于 ${userCache.version}`);
+        //有效版本
+        userCache.version = version;
+        this.saveUserCache();
     },
     /**
      * @description bundle输入版本号变化
@@ -745,12 +721,8 @@ exports.methods = {
     onBundleVersionChange(element, key) {
         if (this.isDoCreate()) return;
         let version = element.value;
-        if (this.isVersionPass(version, userCache.bundles[key].version)) {
-            userCache.bundles[key].version = version;
-            this.saveUserCache();
-            return;
-        }
-        this.addLog(`${userCache.bundles[key].name}设置版本号无效,${version} 应大于 ${userCache.bundles[key].version}`);
+        userCache.bundles[key].version = version;
+        this.saveUserCache();
     },
     /** 
      * @description 切换历史地址 

@@ -1,4 +1,4 @@
-import { _decorator,find ,Node} from "cc";
+import { _decorator,find ,Node, Label} from "cc";
 import { Config } from "../../../../scripts/common/config/Config";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
 import { EliminateData } from "../data/EliminateData";
@@ -39,6 +39,11 @@ export default class EliminateGameView extends GameView {
             let view = effectsView.addComponent(EliminateEffectsView);
             view.view = this;
             this.effectsView = view;
+        }
+
+        let version = find("version",this.node)?.getComponent(Label);
+        if ( version ){
+            version.string = Manager.hotupdate.getVersion(this.bundle);
         }
 
         this.audioHelper.playMusic("audios/gamescenebgm",this.bundle);

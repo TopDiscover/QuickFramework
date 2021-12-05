@@ -15,6 +15,10 @@ export class EntryDelegate {
         Manager.loading.show(Manager.getLanguage(param));
     }
 
+    hideLoading(){
+        Manager.loading.hide();
+    }
+
     /**@description 发现新版本 */
     onNewVersionFund(versionInfo: HotUpdate.BundleConfig, code: HotUpdate.Code, state: HotUpdate.State) {
         Log.d(`检测到有新版本更新 bundle${versionInfo.bundle} name : ${versionInfo.name}`);
