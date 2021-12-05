@@ -25,7 +25,7 @@ class AssetsManager {
 
 const MAIN_PACK = Macro.MAIN_PACK_BUNDLE_NAME;
 const VERSION_FILENAME = "versions.json";
-type VERSIONS = { [key: string]: { md5 : string , version : string} };
+type VERSIONS = { [key: string]: { md5: string, version: string } };
 
 /**
  * @description 热更新组件
@@ -259,31 +259,14 @@ export class HotupdateManager {
                 break;
             case HotUpdate.Code.ALREADY_UP_TO_DATE:
                 Log.d(`Already up to date with the latest remote version.${bundle}`);
-                if ( bundle == MAIN_PACK ){
+                if (bundle == MAIN_PACK) {
                     this.savePreVersions();
                 }
                 break;
             case HotUpdate.Code.NEW_VERSION_FOUND:
                 Log.d(`New version found, please try to update.`);
                 if (bundle != MAIN_PACK) {
-                    //非主包检测更新
-                    //有新版本，看下是否与主包版本匹配
-                    let md5 = this.currentAssetsManager.manager.getRemoteManifest().getMd5();
-                    let versionInfo = this.preVersions[bundle];
-                    if (versionInfo == undefined || versionInfo == null) {
-                        Log.e(`预处理版本未存在!!!!`);
-                        code = HotUpdate.Code.PRE_VERSIONS_NOT_FOUND;
-                    } else {
-                        //先检查主包是否需要更新
-                        if (versionInfo.md5 == md5) {
-                            //主包无需要更新
-                            Log.d(`将要下载版本 md5 与远程版本 md5 相同，可以下载 md5:${versionInfo}`);
-                        } else {
-                            //主包需要更新
-                            Log.e(`将要下载版本 md5 :${md5} 与本地版本 md5 :${versionInfo} 不一致，需要对主包进行更新后再进入!!!`);
-                            code = HotUpdate.Code.MAIN_PACK_NEED_UPDATE;
-                        }
-                    }
+                    code = this.checkAllowUpdate(bundle,code);
                 }
                 break;
             default:
@@ -296,6 +279,43 @@ export class HotupdateManager {
         if (this.checkCallback && this.currentAssetsManager.manager.getState() != HotUpdate.State.DOWNLOADING_VERSION as any) {
             this.checkCallback(code, this.currentAssetsManager.manager.getState() as any);
             this.checkCallback = null;
+        }
+    }
+
+    private checkAllowUpdate(bundle : string, code : number) {
+        //非主包检测更新
+        //有新版本，看下是否与主包版本匹配
+        let md5 = this.currentAssetsManager.manager.getRemoteManifest().getMd5();
+        let versionInfo = this.preVersions[bundle];
+        if (versionInfo == undefined || versionInfo == null) {
+            Log.e(`预处理版本未存在!!!!`);
+            return HotUpdate.Code.PRE_VERSIONS_NOT_FOUND;
+        } else {
+            //先检查主包是否需要更新
+            if (versionInfo.md5 == md5) {
+                //主包无需要更新
+                Log.d(`将要下载版本 md5 与远程版本 md5 相同，可以下载 version : ${versionInfo.version} md5:${versionInfo.md5}`);
+            } else {
+                if (bundle == Macro.BUNDLE_RESOURCES) {
+                    //如果是大厅更新，只要主包的md5不发生变化，则可以直接更新大厅
+                    Log.d(`${bundle} 更新`);
+                    if (this.isMd5Change(MAIN_PACK)) {
+                        Log.d(`更新${bundle}时，主包有更新，需要先更新主包`);
+                        code = HotUpdate.Code.MAIN_PACK_NEED_UPDATE;
+                    }else{
+                        Log.d(`更新${bundle}时，主包无更新，直接更新进入`);
+                    }
+                } else {
+                    //更新其它子包，只需要大厅的md5及主包md5没有变化，即可直接更新进入bundle
+                    if ( this.isMd5Change(MAIN_PACK) || this.isMd5Change(Macro.BUNDLE_RESOURCES) ){
+                        Log.d(`更新${bundle}时，主包与大厅有更新，下载 md5 :${md5} 与预处理md5不一致，需要对主包先进行更新`);
+                        code = HotUpdate.Code.MAIN_PACK_NEED_UPDATE;
+                    }else{
+                        Log.e(`更新${bundle}时，主包与大厅无更新，可直接下载更新！！`);
+                    }
+                }
+            }
+            return code;
         }
     }
 
@@ -345,14 +365,14 @@ export class HotupdateManager {
             case HotUpdate.Code.ALREADY_UP_TO_DATE:
                 Log.d(`Already up to date with the latest remote version.${bundle}`);
                 failed = true;
-                if ( bundle == MAIN_PACK ){
+                if (bundle == MAIN_PACK) {
                     this.savePreVersions();
                 }
                 break;
             case HotUpdate.Code.UPDATE_FINISHED:
                 Log.d(`Update finished. ${event.getMessage()}`);
                 isUpdateFinished = true;
-                if ( bundle == MAIN_PACK ){
+                if (bundle == MAIN_PACK) {
                     this.savePreVersions();
                 }
                 break;
@@ -430,7 +450,7 @@ export class HotupdateManager {
             state: state as any,
             needRestart: isUpdateFinished,
             bundle: bundle,
-            assetId : event.getAssetId(),
+            assetId: event.getAssetId(),
         };
 
         dispatch(HotUpdate.Event.HOTUPDATE_DOWNLOAD, info)
@@ -450,12 +470,12 @@ export class HotupdateManager {
         }
         bundle = this.convertBundle(bundle);
         let versionInfo = this.getVersionInfo(bundle);
-        if ( versionInfo ){
-            if ( versionInfo.md5 == this.remoteVersions[bundle].md5 ){
+        if (versionInfo) {
+            if (versionInfo.md5 == this.remoteVersions[bundle].md5) {
                 return HotUpdate.Status.UP_TO_DATE;
             }
             return HotUpdate.Status.NEED_UPDATE;
-        }else{
+        } else {
             return HotUpdate.Status.NEED_DOWNLOAD;
         }
     }
@@ -465,31 +485,43 @@ export class HotupdateManager {
      * @param bundle 
      * @param isShortVersion 是否使用简单的版本号
      */
-    getVersion(bundle:BUNDLE_TYPE,isShortVersion : boolean = true){
-        if ( sys.isBrowser ){
+    getVersion(bundle: BUNDLE_TYPE, isShortVersion: boolean = true) {
+        if (sys.isBrowser) {
             return "v1.0";
-        }else{
+        } else {
             bundle = this.convertBundle(bundle as string);
             let versionInfo = this.getVersionInfo(bundle);
-            if ( versionInfo ){
-                if( isShortVersion ){
+            if (versionInfo) {
+                if (isShortVersion) {
                     return `v${versionInfo.version}`;
                 }
                 return `v${versionInfo.version}(${versionInfo.md5})`;
-            }else{
-                if ( this.remoteVersions[bundle] ){
-                    if ( isShortVersion ){
+            } else {
+                if (this.remoteVersions[bundle]) {
+                    if (isShortVersion) {
                         return `v${this.remoteVersions[bundle]}`;
                     }
                     return `v${this.remoteVersions[bundle]}(${this.remoteVersions[bundle].md5})`;
-                }else{
+                } else {
                     return `v1.0`;
                 }
             }
         }
     }
 
-    private getVersionInfo(bundle: string) : {md5 : string , version : string} | undefined{
+    /**
+     * @description md5是否发生变化
+     * @param bundle 
+     */
+    private isMd5Change(bundle: string) {
+        bundle = this.convertBundle(bundle);
+        if (this.preVersions[bundle] && this.remoteVersions[bundle] && this.preVersions[bundle].md5 != this.remoteVersions[bundle].md5) {
+            return true
+        }
+        return false
+    }
+
+    private getVersionInfo(bundle: string): { md5: string, version: string } | undefined {
         let path = `${this.manifestRoot}${bundle}_version.json`;
         if (jsb.fileUtils.isFileExist(path)) {
             let content = jsb.fileUtils.getStringFromFile(path);
@@ -511,7 +543,7 @@ export class HotupdateManager {
 
             Manager.loading.show(Manager.getLanguage("loadVersions"));
             this.readRemoteVersions((data, err) => {
-                
+
                 if (err) {
                     this.remoteVersions = {};
                     resolove({ isOk: false, err: Manager.getLanguage("warnNetBad") });
@@ -555,11 +587,11 @@ export class HotupdateManager {
         });
     }
 
-    private savePreVersions(){
-        this.readRemoteVersions((data,err)=>{
-            if ( err ){
+    private savePreVersions() {
+        this.readRemoteVersions((data, err) => {
+            if (err) {
                 this.preVersions = {};
-            }else{
+            } else {
                 this.preVersions = JSON.parse(data);
             }
         });
