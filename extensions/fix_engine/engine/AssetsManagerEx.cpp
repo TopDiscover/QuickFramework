@@ -786,7 +786,11 @@ void AssetsManagerEx::updateSucceed() {
     // 1. rename temporary manifest to valid manifest
     if (this->_isUsingBundle) {
 		if (_fileUtils->isFileExist(_tempManifestPath)) {
-			_fileUtils->renameFile(basename(_tempManifestPath)+"/", this->_bundle + TEMP_MANIFEST_FILENAME, this->_bundle + MANIFEST_FILENAME);
+			auto rootPath = basename(_tempManifestPath) + "/";
+			_fileUtils->renameFile(rootPath, this->_bundle + TEMP_MANIFEST_FILENAME, this->_bundle + MANIFEST_FILENAME);
+			if (_tempManifest) {
+				_tempManifest->saveVersionToFile(rootPath + this->_bundle + VERSION_FILENAME);
+			}
 		}
 	}else {
 		if (_fileUtils->isFileExist(_tempManifestPath)) {

@@ -30,6 +30,7 @@ export class EntryDelegate {
                 Manager.hotupdate.downloadFailedAssets();
             }
         });
+        Manager.loading.hide();
     }
 
     /**@description 当前已经是新包，无需更新 */
@@ -71,9 +72,11 @@ export class EntryDelegate {
             dispatch(HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
         } else if (info.code == HotUpdate.Code.ALREADY_UP_TO_DATE) {
             newPercent = 1;
+            Manager.loading.hide();
             dispatch(HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
         } else if (info.code == HotUpdate.Code.UPDATE_FINISHED) {
             newPercent = 1.1;
+            Manager.loading.hide();
             // Log.d(`正在加载${config.name}`);
             //下载完成不能直接进入,否则在多个任务下载时会出错
             // Manager.bundleManager.loadBundle(this);
@@ -84,6 +87,7 @@ export class EntryDelegate {
             info.code == HotUpdate.Code.ERROR_PARSE_MANIFEST ||
             info.code == HotUpdate.Code.ERROR_DECOMPRESS) {
             newPercent = -1;
+            Manager.loading.hide();
             dispatch(HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
         }
     }
@@ -151,6 +155,7 @@ export class EntryDelegate {
      * @description 重新检测主包更新
      */
     onRecheckMainUpdate(code: HotUpdate.Code, config: HotUpdate.BundleConfig) {
+        Manager.loading.hide();
         let content = Manager.getLanguage("mainPackVersionIsTooLow") as string;
         Manager.alert.show({
             text: content,

@@ -170,9 +170,9 @@ void Manifest::parseFile(const std::string &manifestUrl) {
 
     if (!_json.HasParseError() && _json.IsObject()) {
         // Register the local manifest root
-        size_t found = manifestUrl.find_last_of("/\\");
+        size_t found = manifestUrl.find(MANIFEST_ROOT);
         if (found != std::string::npos) {
-            _manifestRoot = manifestUrl.substr(0, found + 1);
+            _manifestRoot = manifestUrl.substr(0, found);
         }
         loadManifest(_json);
     }
@@ -591,6 +591,20 @@ void Manifest::saveToFile(const std::string &filepath) {
 
     if (!output.bad())
         output << buffer.GetString() << std::endl;
+}
+
+void Manifest::saveVersionToFile(const std::string& filepath) {
+	rapidjson::StringBuffer buffer;
+	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+	if (_json.HasMember(KEY_ASSETS)) {
+		_json.EraseMember(KEY_ASSETS);
+	}
+	_json.Accept(writer);
+
+	std::ofstream output(FileUtils::getInstance()->getSuitableFOpen(filepath), std::ofstream::out);
+
+	if (!output.bad())
+		output << buffer.GetString() << std::endl;
 }
 
 NS_CC_EXT_END

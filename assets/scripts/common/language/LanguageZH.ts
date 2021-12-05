@@ -28,10 +28,8 @@ export let LanguageZH = {
     loading_game_resources: "正在加载游戏资源...",
     mainPack: "主包",
     mainPackVersionIsTooLow: "版本过低，请更新。",
-    loadVersions: "正在加载{0}版本信息",
-    loadVersionsFailed: "加载{0}版本信息失败",
-    local: "本地",
-    remote: "远程",
+    loadVersions: "正在加载远程版本信息",
+    loadVersionsFailed: "加载远程版本信息失败",
     warnNetBad : "您的网络已断开，请重试!!",
     downloadFailed : "下载文件失败，请重试!!!",
   }

@@ -217,6 +217,8 @@ protected:
 
     void saveToFile(const std::string &filepath);
 
+	void saveVersionToFile(const std::string& filepath);
+
     Asset parseAsset(const std::string &path, const rapidjson::Value &json);
 
     void clear();

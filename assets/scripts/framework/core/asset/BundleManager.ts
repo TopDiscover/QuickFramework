@@ -82,46 +82,29 @@ export class BundleManager {
          Log.d("正在更新游戏，请稍等");
          return;
       }
-      if (config.bundle == Macro.BUNDLE_RESOURCES) {
-         //进入主包，检测主包更新
-         this.isLoading = true;
-         Manager.hotupdate.loadVersions().then((isOk: boolean) => {
-            if (isOk) {
-               let status = Manager.hotupdate.getStatus(Macro.MAIN_PACK_BUNDLE_NAME);
-               if (status == HotUpdate.Status.UP_TO_DATE) {
-                  Log.d(`${config.name}(${config.bundle}) 已经是最新,直接加载`);
-                  this.setCurrentBundle(config);
-                  this.loadBundle(delegate);
-               } else {
-                  Log.d(`${config.name}(${config.bundle}) 需要下载更新`);
+      //进入主包，检测主包更新
+      this.isLoading = true;
+      Manager.hotupdate.loadVersions(config).then((data) => {
+         if (data.isOk) {
+            let status = Manager.hotupdate.getStatus(config.bundle);
+            if (status == HotUpdate.Status.UP_TO_DATE) {
+               Log.d(`${config.name}(${config.bundle}) 已经是最新,直接加载`);
+               this.setCurrentBundle(config);
+               this.loadBundle(delegate);
+            } else {
+               Log.d(`${config.name}(${config.bundle}) 需要下载更新`);
+               this._enterBundle(config, delegate);
+            }
+         } else {
+            //网络错误造成，提示玩家重试
+            Manager.alert.show({
+               text: data.err,
+               confirmCb: (isOk) => {
                   this._enterBundle(config, delegate);
                }
-            } else {
-               //网络错误造成，提示玩家重试
-               Manager.alert.show({
-                  text: Manager.getLanguage("warnNetBad"),
-                  confirmCb: (isOk) => {
-                     this._enterBundle(config, delegate);
-                  }
-               });
-            }
-         });
-      }else{
-         //bundle 检测更新
-         let status = Manager.hotupdate.getStatus(config.bundle);
-         if ( status == HotUpdate.Status.UP_TO_DATE ){
-            Log.d(`${config.name}(${config.bundle}) 已经是最新，直接加载`);
-            this.setCurrentBundle(config);
-            this.loadBundle(delegate);
-         }else{
-            if ( status == HotUpdate.Status.NEED_DOWNLOAD ){
-               Log.d(`${config.name}(${config.bundle}) 未下载，开始检测下载`);
-            }else{
-               Log.d(`${config.name}(${config.bundle}) 已经下载过，检测更新`);
-            }
-            this._enterBundle(config,delegate);
+            });
          }
-      }
+      });
    }
 
    private setCurrentBundle(config: HotUpdate.BundleConfig) {
@@ -192,7 +175,7 @@ export class BundleManager {
          return;
       }
       this.isLoading = true;
-      if ( delegate ) delegate.showLoading("loading");
+      if (delegate) delegate.showLoading("loading");
       Log.d(`loadBundle : ${this.curBundle.bundle}`);
       assetManager.loadBundle(versionInfo.bundle, (err, bundle) => {
          this.isLoading = false;

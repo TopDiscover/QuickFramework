@@ -38,6 +38,8 @@ export namespace HotUpdate {
         needRestart: boolean;
         /**@description bundle */
         bundle : string;
+        /**@description 资源id */
+        assetId : string;
     }
     /**@description 提示下载弹出框事件数据 */
     export interface MessageData {
