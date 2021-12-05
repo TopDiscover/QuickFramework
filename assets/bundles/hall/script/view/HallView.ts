@@ -45,7 +45,7 @@ export default class HallView extends GameView {
             game.userData = this.bundles[keys[i]].bundle;
             cc.find("Background/label", game).getComponent(cc.Label).language = Manager.makeLanguage(`hall_view_game_name.${i}`, this.bundle);
             game.on(cc.Node.EventType.TOUCH_END, this.onClick, this);
-
+            this.updateGameItemStatus(game);
             //计算出所有页
             let page = Math.floor(i / this.PAGE_COUNT);
             this.pageView.getPages()[page].addChild(game);
@@ -73,7 +73,8 @@ export default class HallView extends GameView {
             } else if (lan == cc.sys.LANGUAGE_ENGLISH) {
                 lan = cc.sys.LANGUAGE_CHINESE;
             }
-            Manager.language.change(lan);
+            // Manager.language.change(lan);
+            dispatch(HotUpdate.Event.DOWNLOAD_PROGRESS,{})
         });
 
     }
@@ -95,21 +96,71 @@ export default class HallView extends GameView {
         return null;
     }
 
+    private updateGameItemStatus(item: cc.Node) {
+        let bundle = item.userData;
+        let status = Manager.hotupdate.getStatus(bundle);
+        let updateNode = cc.find("Background/update", item);
+        if (!updateNode) return;
+        if (status == HotUpdate.Status.UP_TO_DATE) {
+            updateNode.active = false;
+            return;
+        } else {
+            updateNode.active = true;
+        }
+        let downloading = cc.find("downloading", updateNode);
+        let down = cc.find("down", updateNode);
+        let update = cc.find("update", updateNode);
+        if (downloading && down && update) {
+            if (status == HotUpdate.Status.NEED_DOWNLOAD) {
+                downloading.active = false;
+                down.active = true;
+                update.active = false;
+            } else {
+                downloading.active = false;
+                down.active = false;
+                update.active = true;
+            }
+        }
+    }
+
     private onDownloadProgess(data: { progress: number, config: HotUpdate.BundleConfig }) {
 
         let node = this.getGameItem(data.config);
         if (node) {
-            let progressBar: cc.ProgressBar = cc.find(`Background/progressBar`, node).getComponent(cc.ProgressBar);
-            let progressLabel: cc.Label = cc.find(`Background/progressBar/progress`, node).getComponent(cc.Label);
-            if (data.progress == -1) {
-                progressBar.node.active = false;
-            } else if (data.progress < 1) {
-                progressBar.node.active = true;
-                progressBar.progress = data.progress;
-                progressLabel.string = "" + Math.floor(data.progress * 100) + "%";
-            } else {
-                progressBar.node.active = false;
+            let updateNode = cc.find("Background/update", node);
+            if (!updateNode) return;
+
+            let downloading = cc.find("downloading", updateNode);
+            let down = cc.find("down", updateNode);
+            let update = cc.find("update", updateNode);
+            if (downloading && down && update) {
+                updateNode.active = true;
+                let progressBar = cc.find(`downloading`, updateNode)?.getComponent(cc.ProgressBar);
+                let progressLabel = cc.find(`downloading/progress`, updateNode)?.getComponent(cc.Label);
+                down.active = false;
+                update.active = false;
+
+                if (progressBar && progressLabel) {
+                    if (data.progress == -1) {
+                        updateNode.active = false;
+                    } else if (data.progress < 1) {
+                        updateNode.active = true;
+                        downloading.active = true;
+                        progressBar.progress = data.progress;
+                        progressLabel.string = "" + Math.floor(data.progress * 100) + "%";
+                    } else {
+                        updateNode.active = false;
+                    }
+                }
             }
+        }
+    }
+
+    show(args ?: any[] | any){
+        super.show(args)
+        let version = cc.find("version",this.node)?.getComponent(cc.Label);
+        if ( version ){
+            version.string = Manager.hotupdate.getVersion(this.bundle);
         }
     }
 }

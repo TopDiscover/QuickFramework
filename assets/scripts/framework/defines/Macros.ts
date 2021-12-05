@@ -5,8 +5,6 @@
 import { Endian } from "../plugin/ByteArray";
 
 export namespace Macro{
-    /**@description 公共语言包数据名 */
-    export const COMMON_LANGUAGE_NAME: string = "COMMON_LANGUAGE_NAME";
     /**@description 网络数据全以大端方式进行处理 */
     export const USING_LITTLE_ENDIAN = Endian.BIG_ENDIAN;
     /**@description 主包bundle名 */
@@ -25,4 +23,6 @@ export namespace Macro{
     export const UNKNOWN = "UNKNOWN"
     /**@description 应该层主动关闭Socket */
     export const ON_CUSTOM_CLOSE = "";
+    /**@description 主包热更新模拟bundle名 */
+    export const MAIN_PACK_BUNDLE_NAME = "main";
 }

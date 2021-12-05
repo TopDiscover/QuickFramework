@@ -466,6 +466,24 @@ static bool js_extension_Manifest_getVersion(se::State& s)
 }
 SE_BIND_FUNC(js_extension_Manifest_getVersion)
 
+static bool js_extension_Manifest_getMd5(se::State& s)
+{
+	cocos2d::extension::Manifest* cobj = (cocos2d::extension::Manifest*)s.nativeThisObject();
+	SE_PRECONDITION2(cobj, false, "js_extension_Manifest_getMd5 : Invalid Native Object");
+	const auto& args = s.args();
+	size_t argc = args.size();
+	CC_UNUSED bool ok = true;
+	if (argc == 0) {
+		const std::string& result = cobj->getMd5();
+		ok &= std_string_to_seval(result, &s.rval());
+		SE_PRECONDITION2(ok, false, "js_extension_Manifest_getMd5 : Error processing arguments");
+		return true;
+	}
+	SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+	return false;
+}
+SE_BIND_FUNC(js_extension_Manifest_getMd5)
+
 static bool js_extension_Manifest_parseJSONString(se::State& s)
 {
     cocos2d::extension::Manifest* cobj = (cocos2d::extension::Manifest*)s.nativeThisObject();
@@ -605,7 +623,8 @@ bool js_register_extension_Manifest(se::Object* obj)
     cls->defineFunction("isLoaded", _SE(js_extension_Manifest_isLoaded));
     cls->defineFunction("getPackageUrl", _SE(js_extension_Manifest_getPackageUrl));
     cls->defineFunction("isUpdating", _SE(js_extension_Manifest_isUpdating));
-    cls->defineFunction("getVersion", _SE(js_extension_Manifest_getVersion));
+	cls->defineFunction("getVersion", _SE(js_extension_Manifest_getVersion));
+	cls->defineFunction("getMd5", _SE(js_extension_Manifest_getMd5));
     cls->defineFunction("parseJSONString", _SE(js_extension_Manifest_parseJSONString));
     cls->defineFunction("getVersionFileUrl", _SE(js_extension_Manifest_getVersionFileUrl));
     cls->defineFunction("getSearchPaths", _SE(js_extension_Manifest_getSearchPaths));
@@ -835,6 +854,21 @@ static bool js_extension_AssetsManagerEx_update(se::State& s)
 }
 SE_BIND_FUNC(js_extension_AssetsManagerEx_update)
 
+static bool js_extension_AssetsManagerEx_reset(se::State& s)
+{
+	cocos2d::extension::AssetsManagerEx* cobj = (cocos2d::extension::AssetsManagerEx*)s.nativeThisObject();
+	SE_PRECONDITION2(cobj, false, "js_extension_AssetsManagerEx_reset : Invalid Native Object");
+	const auto& args = s.args();
+	size_t argc = args.size();
+	if (argc == 0) {
+		cobj->reset();
+		return true;
+	}
+	SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+	return false;
+}
+SE_BIND_FUNC(js_extension_AssetsManagerEx_reset)
+
 static bool js_extension_AssetsManagerEx_setEventCallback(se::State& s)
 {
     cocos2d::extension::AssetsManagerEx* cobj = (cocos2d::extension::AssetsManagerEx*)s.nativeThisObject();
@@ -883,11 +917,11 @@ static bool js_extension_AssetsManagerEx_setEventCallback(se::State& s)
 }
 SE_BIND_FUNC(js_extension_AssetsManagerEx_setEventCallback)
 
-static bool js_extension_AssetsManagerEx_setHotUpdateUrl(se::State& s)
+static bool js_extension_AssetsManagerEx_setPackageUrl(se::State& s)
 {
 	CC_UNUSED bool ok = true;
 	cocos2d::extension::AssetsManagerEx* cobj = (cocos2d::extension::AssetsManagerEx*)s.nativeThisObject();
-	SE_PRECONDITION2(cobj, false, "js_extension_AssetsManagerEx_setHotUpdateUrl : Invalid Native Object");
+	SE_PRECONDITION2(cobj, false, "js_extension_AssetsManagerEx_setPackageUrl : Invalid Native Object");
 	const auto& args = s.args();
 	size_t argc = args.size();
 	do {
@@ -895,15 +929,15 @@ static bool js_extension_AssetsManagerEx_setHotUpdateUrl(se::State& s)
 			std::string arg0;
 			ok &= seval_to_std_string(args[0], &arg0);
 			if (!ok) { ok = true; break; }
-			cobj->setHotUpdateUrl(arg0);
-			SE_PRECONDITION2(ok, false, "js_extension_AssetsManagerEx_setHotUpdateUrl : Error processing arguments");
+			cobj->setPackageUrl(arg0);
+			SE_PRECONDITION2(ok, false, "js_extension_AssetsManagerEx_setPackageUrl : Error processing arguments");
 			return true;
 		}
 	} while (false);
 	SE_REPORT_ERROR("wrong number of arguments: %d", (int)argc);
 	return false;
 }
-SE_BIND_FUNC(js_extension_AssetsManagerEx_setHotUpdateUrl)
+SE_BIND_FUNC(js_extension_AssetsManagerEx_setPackageUrl)
 
 
 static bool js_extension_AssetsManagerEx_setVersionCompareHandle(se::State& s)
@@ -1257,9 +1291,10 @@ bool js_register_extension_AssetsManagerEx(se::Object* obj)
     cls->defineFunction("getTotalBytes", _SE(js_extension_AssetsManagerEx_getTotalBytes));
     cls->defineFunction("setVerifyCallback", _SE(js_extension_AssetsManagerEx_setVerifyCallback));
     cls->defineFunction("getStoragePath", _SE(js_extension_AssetsManagerEx_getStoragePath));
-    cls->defineFunction("update", _SE(js_extension_AssetsManagerEx_update));
+	cls->defineFunction("update", _SE(js_extension_AssetsManagerEx_update));
+	cls->defineFunction("reset", _SE(js_extension_AssetsManagerEx_reset));
 	cls->defineFunction("setEventCallback", _SE(js_extension_AssetsManagerEx_setEventCallback));
-	cls->defineFunction("setHotUpdateUrl", _SE(js_extension_AssetsManagerEx_setHotUpdateUrl));
+	cls->defineFunction("setPackageUrl", _SE(js_extension_AssetsManagerEx_setPackageUrl));
     cls->defineFunction("setVersionCompareHandle", _SE(js_extension_AssetsManagerEx_setVersionCompareHandle));
     cls->defineFunction("setMaxConcurrentTask", _SE(js_extension_AssetsManagerEx_setMaxConcurrentTask));
     cls->defineFunction("getDownloadedBytes", _SE(js_extension_AssetsManagerEx_getDownloadedBytes));

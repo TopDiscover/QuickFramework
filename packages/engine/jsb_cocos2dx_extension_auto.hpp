@@ -37,6 +37,7 @@ SE_DECLARE_FUNC(js_extension_Manifest_isLoaded);
 SE_DECLARE_FUNC(js_extension_Manifest_getPackageUrl);
 SE_DECLARE_FUNC(js_extension_Manifest_isUpdating);
 SE_DECLARE_FUNC(js_extension_Manifest_getVersion);
+SE_DECLARE_FUNC(js_extension_Manifest_getMd5);
 SE_DECLARE_FUNC(js_extension_Manifest_parseJSONString);
 SE_DECLARE_FUNC(js_extension_Manifest_getVersionFileUrl);
 SE_DECLARE_FUNC(js_extension_Manifest_getSearchPaths);
@@ -70,4 +71,6 @@ SE_DECLARE_FUNC(js_extension_AssetsManagerEx_isResuming);
 SE_DECLARE_FUNC(js_extension_AssetsManagerEx_create);
 SE_DECLARE_FUNC(js_extension_AssetsManagerEx_AssetsManagerEx);
 SE_DECLARE_FUNC(js_extension_AssetsManagerEx_cancelUpdate);
+SE_DECLARE_FUNC(js_extension_AssetsManagerEx_setPackageUrl);
+SE_DECLARE_FUNC(js_extension_AssetsManagerEx_reset);
 

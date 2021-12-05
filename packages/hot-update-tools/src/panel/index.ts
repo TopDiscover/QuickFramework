@@ -13,6 +13,13 @@ interface BundleInfo {
   includeApk: boolean;
 }
 
+interface Manifest {
+  assets?: any;
+  bundle?: string;
+  md5?: string;
+  version?: string;
+}
+
 interface Config {
   packageUrl: string;
   forceIncludeAllGameToApk: boolean;
@@ -274,19 +281,14 @@ class _Helper {
     });
 
     //测试环境
-    this.view.remoteUrl.value = this.getShowRemoteString();
-    Object.keys(this.userCache.remoteBundleUrls).forEach((key) => {
-      (<any>this.view)[`${key}remoteUrl`].value = this.getShowRemoteString(key);
+    this.onRefreshMainVersion();
+    Object.keys(this.userCache.bundles).forEach((key) => {
+      this.onRefreshBundleLocalServerVersion(key);
     });
-    this.view.remoteDir.value = this.userCache.remoteDir;
   }
   /**@description 返回远程显示地址+版本号 */
-  getShowRemoteString(bundleName?: string) {
-    if (bundleName) {
-      return `[${this.userCache.bundles[bundleName].version}] : ${this.userCache.remoteBundleUrls[bundleName]}`;
-    } else {
-      return `[${this.userCache.version}] : ${this.userCache.remoteUrl}`;
-    }
+  getShowRemoteString(config: { version: string, md5: string }) {
+    return `[${config.version}] : ${config.md5}`;
   }
   /**@description 初始化数据 */
   initDatas() {
@@ -369,8 +371,8 @@ class _Helper {
     for (let i = 0; i < removeBundles.length; i++) {
       let key = removeBundles[i];
       removeDirs.push(path.join(this.userCache.buildDir, `assets/${key}`));
-      manifests.push(path.join(this.userCache.buildDir, `manifest/${key}_project.manifest`));
-      manifests.push(path.join(this.userCache.buildDir, `manifest/${key}_version.manifest`));
+      manifests.push(path.join(this.userCache.buildDir, `manifest/${key}_project.json`));
+      manifests.push(path.join(this.userCache.buildDir, `manifest/${key}_version.json`));
     }
 
     for (let i = 0; i < removeDirs.length; i++) {
@@ -390,14 +392,13 @@ class _Helper {
   onRefreshMainVersion() {
     if (this.isDoCreate()) return;
     if (this.userCache.remoteDir.length > 0) {
-      let versionManifestPath = path.join(this.userCache.remoteDir, "manifest/version.manifest");
+      let versionManifestPath = path.join(this.userCache.remoteDir, "manifest/main_version.json");
       fs.readFile(versionManifestPath, "utf-8", (err, data) => {
         if (err) {
           this.addLog(`找不到 : ${versionManifestPath}`);
         } else {
-          let versionConfig = JSON.parse(data);
-          this.userCache.remoteUrl = versionConfig.packageUrl;
-          this.view.remoteUrl.value = this.getShowRemoteString();
+          let config = JSON.parse(data);
+          this.view.remoteUrl.value = this.getShowRemoteString(config);
           this.saveUserCache();
         }
       });
@@ -412,14 +413,13 @@ class _Helper {
   onRefreshBundleLocalServerVersion(key: string) {
     if (this.isDoCreate()) return;
     if (this.userCache.remoteDir.length > 0) {
-      let versionManifestPath = path.join(this.userCache.remoteDir, `manifest/${key}_version.manifest`);
+      let versionManifestPath = path.join(this.userCache.remoteDir, `manifest/${key}_version.json`);
       fs.readFile(versionManifestPath, "utf-8", (err, data) => {
         if (err) {
           this.addLog(`找不到 : ${versionManifestPath}`);
         } else {
-          let versionConfig = JSON.parse(data);
-          this.userCache.remoteBundleUrls[key] = versionConfig.packageUrl;
-          (<any>this.view)[`${key}remoteUrl`].value = this.getShowRemoteString(key);
+          let config = JSON.parse(data);
+          (<any>this.view)[`${key}remoteUrl`].value = this.getShowRemoteString(config);
           this.saveUserCache();
         }
       });
@@ -575,21 +575,10 @@ class _Helper {
     this.addLog("热更新地址:", serverUrl);
     let subBundles = Object.keys(this.userCache.bundles);
     this.addLog("所有子包:", subBundles);
-    let manifest = {
-      version: version,
-      packageUrl: serverUrl,
-      remoteManifestUrl: "",
-      remoteVersionUrl: "",
+    let manifest: Manifest = {
       assets: {},
-      searchPaths: [],
+      bundle: "main"
     };
-    if ("/" == serverUrl[serverUrl.length - 1]) {
-      manifest.remoteManifestUrl = serverUrl + "manifest/project.manifest";
-      manifest.remoteVersionUrl = serverUrl + "manifest/version.manifest";
-    } else {
-      manifest.remoteManifestUrl = serverUrl + "/manifest/project.manifest";
-      manifest.remoteVersionUrl = serverUrl + "/manifest/version.manifest";
-    }
 
     //删除旧的版本控件文件
     this.addLog("删除旧的Manifest目录", manifestDir);
@@ -606,46 +595,57 @@ class _Helper {
     }
 
     //生成project.manifest
-    let projectManifestPath = path.join(manifestDir, "project.manifest");
-    let versionManifestPath = path.join(manifestDir, "version.manifest");
-
+    let projectManifestPath = path.join(manifestDir, "main_project.json");
+    let versionManifestPath = path.join(manifestDir, "main_version.json");
+    let content = JSON.stringify(manifest);
+    let md5 = require("crypto").createHash('md5').update(content).digest('hex');
+    manifest.md5 = md5;
+    manifest.version = version;
     fs.writeFileSync(projectManifestPath, JSON.stringify(manifest));
     this.addLog(`生成${projectManifestPath}成功`);
+
     delete (<any>manifest).assets;
-    delete (<any>manifest).searchPaths;
+
     fs.writeFileSync(versionManifestPath, JSON.stringify(manifest));
     this.addLog(`生成${versionManifestPath}成功`);
+
+    //生成所有版本控制文件，用来判断当玩家停止在版本1，此时发版本2时，不让进入游戏，返回到登录，重新走完整个更新流程
+    let versions: any = {
+      main: { md5: md5, version: version },
+    }
 
     //生成各bundles版本文件
     for (let i = 0; i < subBundles.length; i++) {
       let key = subBundles[i];
       this.addLog(`正在生成:${key}`);
-      manifest.version = this.userCache.bundles[key].version;
-      manifest.remoteVersionUrl = "";
-      manifest.remoteManifestUrl = "";
-      manifest.assets = {};
-      manifest.searchPaths = [];
-
-      if ("/" == serverUrl[serverUrl.length - 1]) {
-        manifest.remoteManifestUrl = serverUrl + `manifest/${key}_project.manifest`;
-        manifest.remoteVersionUrl = serverUrl + `manifest/${key}_version.manifest`;
-      } else {
-        manifest.remoteManifestUrl = serverUrl + `/manifest/${key}_project.manifest`;
-        manifest.remoteVersionUrl = serverUrl + `/manifest/${key}_version.manifest`;
-      }
+      let manifest: Manifest = {
+        assets: {},
+        bundle: key
+      };
 
       this.readDir(path.join(buildDir, `assets/${key}`), manifest.assets, buildDir);
-      projectManifestPath = path.join(manifestDir, `${key}_project.manifest`);
-      versionManifestPath = path.join(manifestDir, `${key}_version.manifest`);
+      projectManifestPath = path.join(manifestDir, `${key}_project.json`);
+      versionManifestPath = path.join(manifestDir, `${key}_version.json`);
 
+      let content = JSON.stringify(manifest);
+      let md5 = require("crypto").createHash('md5').update(content).digest('hex');
+      manifest.md5 = md5;
+      manifest.version = this.userCache.bundles[key].version
       fs.writeFileSync(projectManifestPath, JSON.stringify(manifest));
       this.addLog(`生成${projectManifestPath}成功`);
+
       delete (<any>manifest).assets;
-      delete (<any>manifest).searchPaths;
+      versions[`${key}`] = {};
+      versions[`${key}`].md5 = md5;
+      versions[`${key}`].version = manifest.version;
       fs.writeFileSync(versionManifestPath, JSON.stringify(manifest));
       this.addLog(`生成${versionManifestPath}成功`);
     }
-    // this._isDoCreate = false;
+    //写入所有版本
+    let versionsPath = path.join(manifestDir, `versions.json`);
+    fs.writeFileSync(versionsPath, JSON.stringify(versions));
+    this.addLog(`生成versions.json成功`);
+    this._isDoCreate = false;
     this.packageZip(mainIncludes);
   }
   packageDir(dir: string, jszip: JSZIP) {
@@ -666,7 +666,7 @@ class _Helper {
   }
   packageZip(mainIncludes: string[]) {
     this.addLog(`[打包] 开始打包版本...`);
-    let versionManifest = path.join(this.getManifestDir(this.userCache.buildDir), "version.manifest");
+    let versionManifest = path.join(this.getManifestDir(this.userCache.buildDir), "main_version.json");
     let jszip = new JSZIP();
     for (let index = 0; index < mainIncludes.length; index++) {
       const element = mainIncludes[index];
@@ -706,13 +706,13 @@ class _Helper {
     let bundles = this.config.bundles
     for (let index = 0; index < bundles.length; index++) {
       const element = bundles[index];
-      let versionManifest = path.join(this.getManifestDir(this.userCache.buildDir), `${element.dir}_version.manifest`);
+      let versionManifest = path.join(this.getManifestDir(this.userCache.buildDir), `${element.dir}_version.json`);
       let mainVersionManifest = fs.readFileSync(versionManifest, "utf-8");
       let mainVersion = JSON.parse(mainVersionManifest).version;
       let packZipName = `ver_${element.dir}_${(mainVersion = mainVersion.replace(".", "_"))}.zip`;
       let packVersionZipPath = path.join(packZipRootPath, packZipName);
       let jszip = new JSZIP();
-     
+
       let fullPath = path.join(this.userCache.buildDir, `assets/${element.dir}`);
       this.packageDir(fullPath, jszip.folder(`assets/${element.dir}`) as JSZIP);
 
@@ -768,7 +768,7 @@ class _Helper {
   mkdirSync(dir: string) {
     try {
       fs.mkdirSync(dir)
-    } catch (e:any) {
+    } catch (e: any) {
       if ("EEXIST" !== e.code) throw e
     }
   }
@@ -875,37 +875,13 @@ class _Helper {
     this.addLog(`请先构建项目`);
     return false;
   }
-  /**
-   * @description 版本比较 curVersion >= prevVersion 返回ture 
-   * @example (1.0.1 > 1.0)  (1.0.1 <= 1.0.1) (1.0.1 < 1.0.2) (1.0.1 > 1.0.0) 
-   * @param curVersion 当前构建版本
-   * @param prevVersion 之前构建的版本
-   */
-  isVersionPass(curVersion: string, prevVersion: string) {
-    if (undefined === curVersion || null === curVersion || undefined === prevVersion || null === prevVersion) return false;
-    let curVersionArr = curVersion.split(".");
-    let prevVersionArr = prevVersion.split(".");
-    let len = curVersionArr.length > prevVersionArr.length ? curVersionArr.length : prevVersionArr.length;
-    for (let i = 0; i < len; i++) {
-      let curValue = curVersionArr[i],
-        genValue = prevVersionArr[i];
-      if (undefined === curValue && undefined !== genValue) return false;
-      if (undefined !== curValue && undefined === genValue) return true;
-      if (curValue && genValue && parseInt(curValue) >= parseInt(genValue)) return true;
-    }
-    return false;
-  }
   /** @description 主版本号输入*/
   onVersionChange(element: any) {
     if (this.isDoCreate()) return;
     let version = element.value;
-    if (this.isVersionPass(version, this.userCache.version)) {
-      //有效版本
-      this.userCache.version = version;
-      this.saveUserCache();
-      return;
-    }
-    this.addLog(`无效版本号,${version} 应大于 ${this.userCache.version}`);
+    //有效版本
+    this.userCache.version = version;
+    this.saveUserCache();
   }
   /**
    * @description bundle输入版本号变化
@@ -916,12 +892,8 @@ class _Helper {
   onBundleVersionChange(element: any, key: string) {
     if (this.isDoCreate()) return;
     let version = element.value;
-    if (this.isVersionPass(version, this.userCache.bundles[key].version)) {
-      this.userCache.bundles[key].version = version;
-      this.saveUserCache();
-      return;
-    }
-    this.addLog(`${this.userCache.bundles[key].name}设置版本号无效,${version} 应大于 ${this.userCache.bundles[key].version}`);
+    this.userCache.bundles[key].version = version;
+    this.saveUserCache();
   }
   /** 
    * @description 切换历史地址 

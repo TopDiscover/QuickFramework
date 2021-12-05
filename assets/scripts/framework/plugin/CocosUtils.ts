@@ -457,16 +457,19 @@ export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay, config: { a
             addExtraLoadResource(config.view, info);
             Manager.cacheManager.getCacheByAsync(config.atlasUrl, dragonBones.DragonBonesAtlasAsset, bundle).then((atlas) => {
                 if (atlas) {
-                    let info = new Resource.Info;
-                    info.url = config.atlasUrl;
-                    info.type = dragonBones.DragonBonesAtlasAsset;
-                    info.data = atlas;
-                    info.bundle = getBundle(config);
-                    addExtraLoadResource(config.view, info);
+                    if (cc.sys.isBrowser) {
+                        let info = new Resource.Info;
+                        info.url = config.atlasUrl;
+                        info.type = dragonBones.DragonBonesAtlasAsset;
+                        info.data = atlas;
+                        info.bundle = getBundle(config);
+                        addExtraLoadResource(config.view, info);
+                    }
+
                     comp.dragonAsset = asset;
                     comp.dragonAtlasAsset = atlas;
-                    if ( config.complete ){
-                        config.complete(asset,atlas);
+                    if (config.complete) {
+                        config.complete(asset, atlas);
                     }
                 } else {
                     if (config.complete) {

@@ -40,6 +40,11 @@ export default class EliminateGameView extends GameView {
             this.effectsView = view;
         }
 
+        let version = cc.find("version",this.node)?.getComponent(cc.Label);
+        if ( version ){
+            version.string = Manager.hotupdate.getVersion(this.bundle);
+        }
+
         this.audioHelper.playMusic("audios/gamescenebgm",this.bundle);
     }
 

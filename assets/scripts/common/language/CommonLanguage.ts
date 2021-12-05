@@ -4,19 +4,22 @@ import { LanguageZH } from "./LanguageZH";
 import { LanguageEN } from "./LanguageEN";
 import { Macro } from "../../framework/defines/Macros";
 
-export let i18n = LanguageZH;
-
 export class CommonLanguage implements Language.DataSourceDelegate{
-    name = Macro.COMMON_LANGUAGE_NAME;
-    data( language : string ): Language.Data {
-        if( i18n.language == language ){
-            return i18n;
+    name = Macro.BUNDLE_RESOURCES;
+    data( language : string , source : any): Language.Data {
+
+        let data : any = source;
+        if( data[`${this.name}`] && data[`${this.name}`].language == language ){
+            return source;
         }
-        i18n = LanguageZH;
-        if ( language == LanguageEN.language ){
-            i18n = LanguageEN;
+        let lan = LanguageZH;
+        if (language == LanguageEN.language) {
+            lan = LanguageEN;
         }
+        data[`${this.name}`] = {};
+        data[`${this.name}`] = lan.data;
+        data[`${this.name}`].language = lan.language;
         //默认中文
-        return i18n;
+        return source;
     }
 }

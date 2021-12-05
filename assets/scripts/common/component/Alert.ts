@@ -1,6 +1,5 @@
 import { Macro } from "../../framework/defines/Macros";
 import { Config, ViewZOrder } from "../config/Config";
-import { i18n } from "../language/CommonLanguage";
 
 class AlertDialog extends cc.Component {
 
@@ -36,13 +35,13 @@ class AlertDialog extends cc.Component {
 
     public show(config: AlertConfig) {
         if (!config.title) {
-            config.title = i18n.alert_title;
+            config.title = Manager.getLanguage("alert_title");
         }
         if (!config.confirmString) {
-            config.confirmString = i18n.alert_confirm;
+            config.confirmString = Manager.getLanguage("alert_confirm");
         }
         if (!config.cancelString) {
-            config.cancelString = i18n.alert_cancel;
+            config.cancelString = Manager.getLanguage("alert_cancel");
         }
         this._config = config;
         this.writeContent(config)

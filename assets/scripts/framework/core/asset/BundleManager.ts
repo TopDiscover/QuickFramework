@@ -76,21 +76,50 @@ export class BundleManager {
     */
    public enterBundle(config: HotUpdate.BundleConfig, delegate: EntryDelegate) {
       if (this.isLoading) {
-         if (delegate) delegate.onBundleLoading(config);
+         if (delegate) delegate.showTips("checkingUpdate");
          Log.d("正在更新游戏，请稍等");
          return;
       }
-      this.curBundle = config;
+      //进入主包，检测主包更新
       this.isLoading = true;
-      Manager.hotupdate.bundlesConfig[this.curBundle.bundle] = config;
+      Manager.hotupdate.loadVersions(config).then((data) => {
+         if (data.isOk) {
+            let status = Manager.hotupdate.getStatus(config.bundle);
+            if (status == HotUpdate.Status.UP_TO_DATE) {
+               Log.d(`${config.name}(${config.bundle}) 已经是最新,直接加载`);
+               this.setCurrentBundle(config);
+               this.loadBundle(delegate);
+            } else {
+               Log.d(`${config.name}(${config.bundle}) 需要下载更新`);
+               this._enterBundle(config, delegate);
+            }
+         } else {
+            //网络错误造成，提示玩家重试
+            if ( delegate ) delegate.hideLoading();
+            Manager.alert.show({
+               text: data.err,
+               confirmCb: (isOk) => {
+                  this._enterBundle(config, delegate);
+               }
+            });
+         }
+      });
+   }
 
+   private setCurrentBundle(config: HotUpdate.BundleConfig) {
+      this.curBundle = config;
+      Manager.hotupdate.bundlesConfig[this.curBundle.bundle] = config;
+   }
+
+   private _enterBundle(config: HotUpdate.BundleConfig, delegate: EntryDelegate) {
+      this.setCurrentBundle(config);
+      this.isLoading = true;
       let versionInfo = Manager.hotupdate.bundlesConfig[this.curBundle.bundle];
       this.checkUpdate(versionInfo, delegate);
    }
 
    /**@description 检测子游戏更新 */
    private checkUpdate(versionInfo: HotUpdate.BundleConfig, delegate: EntryDelegate) {
-      let self = this;
       Log.d(`检测更新信息:${versionInfo.name}(${versionInfo.bundle})`);
       Manager.dispatcher.remove(HotUpdate.Event.HOTUPDATE_DOWNLOAD, this);
       let bundle: string | undefined = this.curBundle.bundle;
@@ -122,6 +151,11 @@ export class BundleManager {
             //当前正在检测更新
             Log.d(`正在检测更新!!`);
             if (delegate) delegate.onCheckingVersion(versionInfo, code, state);
+         } else if (code == HotUpdate.Code.MAIN_PACK_NEED_UPDATE || code == HotUpdate.Code.PRE_VERSIONS_NOT_FOUND) {
+            //需要重新更新主包
+            Log.d(`需要重新更新主包`);
+            this.isLoading = false;
+            if (delegate) delegate.onRecheckMainUpdate(code, this.curBundle);
          } else {
             this.isLoading = false;
             Log.d(`检测更新当前状态 code : ${code} state : ${state}`);
@@ -133,13 +167,14 @@ export class BundleManager {
    public loadBundle(delegate: EntryDelegate) {
       let bundle = this.getBundle(this.curBundle.bundle);
       let versionInfo = Manager.hotupdate.bundlesConfig[this.curBundle.bundle];
-      if ( bundle ){
+      if (bundle) {
          Log.d(`${this.curBundle.bundle}已经加载在缓存中，直接使用`);
          this.isLoading = false;
-         if ( delegate ) delegate.onLoadBundleComplete(versionInfo,bundle);
+         if (delegate) delegate.onLoadBundleComplete(versionInfo, bundle);
          return;
       }
       this.isLoading = true;
+      if (delegate) delegate.showLoading("loading");
       Log.d(`loadBundle : ${this.curBundle.bundle}`);
       cc.assetManager.loadBundle(versionInfo.bundle, (err, bundle) => {
          this.isLoading = false;
@@ -157,6 +192,7 @@ export class BundleManager {
       let config = Manager.hotupdate.getBundleName(this.curBundle.bundle);
       if (info.code == HotUpdate.Code.UPDATE_FINISHED) {
          Log.d(`更新${config.name}成功`);
+         this.isLoading = false;
       } else if (info.code == HotUpdate.Code.UPDATE_FAILED ||
          info.code == HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
          info.code == HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST ||

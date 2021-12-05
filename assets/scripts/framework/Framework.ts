@@ -65,7 +65,7 @@ export class Framewok {
     get hotupdate() { return getSingleton(HotupdateManager) }
 
     /**@description 常驻资源指定的模拟view */
-    get retainMemory() { return this.uiManager.retainMemory; }
+    get retainMemory() : any { return this.uiManager.retainMemory; }
 
     /**@description 语言包 */
     get language() {
@@ -168,21 +168,16 @@ export class Framewok {
      * 
      */
     getLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE | null = null): any {
+        if ( !bundle ){
+            bundle = Macro.BUNDLE_RESOURCES;
+        }
         let key = "";
         if (typeof param == "string") {
-            if (bundle) {
-                key = `${Macro.USING_LAN_KEY}${bundle}.${param}`;
-            } else {
-                key = `${Macro.USING_LAN_KEY}${param}`;
-            }
+            key = `${Macro.USING_LAN_KEY}${bundle}.${param}`;
             return this.language.get([key]);
         }
         if (typeof param[0] == "string" && param instanceof Array) {
-            if (bundle) {
-                param[0] = `${Macro.USING_LAN_KEY}${bundle}.${param[0]}`;
-            } else {
-                param[0] = `${Macro.USING_LAN_KEY}${param[0]}`;
-            }
+            param[0] = `${Macro.USING_LAN_KEY}${bundle}.${param[0]}`;
             return this.language.get(param);
         }
         Log.e(`传入参数有误`);

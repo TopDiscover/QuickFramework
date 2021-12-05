@@ -224,20 +224,14 @@ var _Helper = /** @class */ (function () {
             _this.view[key + "Version"].value = _this.userCache.bundles[key].version;
         });
         //测试环境
-        this.view.remoteUrl.value = this.getShowRemoteString();
-        Object.keys(this.userCache.remoteBundleUrls).forEach(function (key) {
-            _this.view[key + "remoteUrl"].value = _this.getShowRemoteString(key);
+        this.onRefreshMainVersion();
+        Object.keys(this.userCache.bundles).forEach(function (key) {
+            _this.onRefreshBundleLocalServerVersion(key);
         });
-        this.view.remoteDir.value = this.userCache.remoteDir;
     };
     /**@description 返回远程显示地址+版本号 */
-    _Helper.prototype.getShowRemoteString = function (bundleName) {
-        if (bundleName) {
-            return "[" + this.userCache.bundles[bundleName].version + "] : " + this.userCache.remoteBundleUrls[bundleName];
-        }
-        else {
-            return "[" + this.userCache.version + "] : " + this.userCache.remoteUrl;
-        }
+    _Helper.prototype.getShowRemoteString = function (config) {
+        return "[" + config.version + "] : " + config.md5;
     };
     /**@description 初始化数据 */
     _Helper.prototype.initDatas = function () {
@@ -328,8 +322,8 @@ var _Helper = /** @class */ (function () {
         for (var i = 0; i < removeBundles.length; i++) {
             var key = removeBundles[i];
             removeDirs.push(path.join(this.userCache.buildDir, "assets/" + key));
-            manifests.push(path.join(this.userCache.buildDir, "manifest/" + key + "_project.manifest"));
-            manifests.push(path.join(this.userCache.buildDir, "manifest/" + key + "_version.manifest"));
+            manifests.push(path.join(this.userCache.buildDir, "manifest/" + key + "_project.json"));
+            manifests.push(path.join(this.userCache.buildDir, "manifest/" + key + "_version.json"));
         }
         for (var i = 0; i < removeDirs.length; i++) {
             this.addLog("\u5220\u9664\u76EE\u5F55 : " + removeDirs[i]);
@@ -348,15 +342,14 @@ var _Helper = /** @class */ (function () {
         if (this.isDoCreate())
             return;
         if (this.userCache.remoteDir.length > 0) {
-            var versionManifestPath_1 = path.join(this.userCache.remoteDir, "manifest/version.manifest");
+            var versionManifestPath_1 = path.join(this.userCache.remoteDir, "manifest/main_version.json");
             fs.readFile(versionManifestPath_1, "utf-8", function (err, data) {
                 if (err) {
                     _this.addLog("\u627E\u4E0D\u5230 : " + versionManifestPath_1);
                 }
                 else {
-                    var versionConfig = JSON.parse(data);
-                    _this.userCache.remoteUrl = versionConfig.packageUrl;
-                    _this.view.remoteUrl.value = _this.getShowRemoteString();
+                    var config = JSON.parse(data);
+                    _this.view.remoteUrl.value = _this.getShowRemoteString(config);
                     _this.saveUserCache();
                 }
             });
@@ -374,15 +367,14 @@ var _Helper = /** @class */ (function () {
         if (this.isDoCreate())
             return;
         if (this.userCache.remoteDir.length > 0) {
-            var versionManifestPath_2 = path.join(this.userCache.remoteDir, "manifest/" + key + "_version.manifest");
+            var versionManifestPath_2 = path.join(this.userCache.remoteDir, "manifest/" + key + "_version.json");
             fs.readFile(versionManifestPath_2, "utf-8", function (err, data) {
                 if (err) {
                     _this.addLog("\u627E\u4E0D\u5230 : " + versionManifestPath_2);
                 }
                 else {
-                    var versionConfig = JSON.parse(data);
-                    _this.userCache.remoteBundleUrls[key] = versionConfig.packageUrl;
-                    _this.view[key + "remoteUrl"].value = _this.getShowRemoteString(key);
+                    var config = JSON.parse(data);
+                    _this.view[key + "remoteUrl"].value = _this.getShowRemoteString(config);
                     _this.saveUserCache();
                 }
             });
@@ -538,21 +530,9 @@ var _Helper = /** @class */ (function () {
         var subBundles = Object.keys(this.userCache.bundles);
         this.addLog("所有子包:", subBundles);
         var manifest = {
-            version: version,
-            packageUrl: serverUrl,
-            remoteManifestUrl: "",
-            remoteVersionUrl: "",
             assets: {},
-            searchPaths: [],
+            bundle: "main"
         };
-        if ("/" == serverUrl[serverUrl.length - 1]) {
-            manifest.remoteManifestUrl = serverUrl + "manifest/project.manifest";
-            manifest.remoteVersionUrl = serverUrl + "manifest/version.manifest";
-        }
-        else {
-            manifest.remoteManifestUrl = serverUrl + "/manifest/project.manifest";
-            manifest.remoteVersionUrl = serverUrl + "/manifest/version.manifest";
-        }
         //删除旧的版本控件文件
         this.addLog("删除旧的Manifest目录", manifestDir);
         if (fs.existsSync(manifestDir)) {
@@ -566,42 +546,50 @@ var _Helper = /** @class */ (function () {
             this.readDir(path.join(buildDir, mainIncludes[i]), manifest.assets, buildDir);
         }
         //生成project.manifest
-        var projectManifestPath = path.join(manifestDir, "project.manifest");
-        var versionManifestPath = path.join(manifestDir, "version.manifest");
+        var projectManifestPath = path.join(manifestDir, "main_project.json");
+        var versionManifestPath = path.join(manifestDir, "main_version.json");
+        var content = JSON.stringify(manifest);
+        var md5 = require("crypto").createHash('md5').update(content).digest('hex');
+        manifest.md5 = md5;
+        manifest.version = version;
         fs.writeFileSync(projectManifestPath, JSON.stringify(manifest));
         this.addLog("\u751F\u6210" + projectManifestPath + "\u6210\u529F");
         delete manifest.assets;
-        delete manifest.searchPaths;
         fs.writeFileSync(versionManifestPath, JSON.stringify(manifest));
         this.addLog("\u751F\u6210" + versionManifestPath + "\u6210\u529F");
+        //生成所有版本控制文件，用来判断当玩家停止在版本1，此时发版本2时，不让进入游戏，返回到登录，重新走完整个更新流程
+        var versions = {
+            main: { md5: md5, version: version },
+        };
         //生成各bundles版本文件
         for (var i = 0; i < subBundles.length; i++) {
             var key = subBundles[i];
             this.addLog("\u6B63\u5728\u751F\u6210:" + key);
-            manifest.version = this.userCache.bundles[key].version;
-            manifest.remoteVersionUrl = "";
-            manifest.remoteManifestUrl = "";
-            manifest.assets = {};
-            manifest.searchPaths = [];
-            if ("/" == serverUrl[serverUrl.length - 1]) {
-                manifest.remoteManifestUrl = serverUrl + ("manifest/" + key + "_project.manifest");
-                manifest.remoteVersionUrl = serverUrl + ("manifest/" + key + "_version.manifest");
-            }
-            else {
-                manifest.remoteManifestUrl = serverUrl + ("/manifest/" + key + "_project.manifest");
-                manifest.remoteVersionUrl = serverUrl + ("/manifest/" + key + "_version.manifest");
-            }
-            this.readDir(path.join(buildDir, "assets/" + key), manifest.assets, buildDir);
-            projectManifestPath = path.join(manifestDir, key + "_project.manifest");
-            versionManifestPath = path.join(manifestDir, key + "_version.manifest");
-            fs.writeFileSync(projectManifestPath, JSON.stringify(manifest));
+            var manifest_1 = {
+                assets: {},
+                bundle: key
+            };
+            this.readDir(path.join(buildDir, "assets/" + key), manifest_1.assets, buildDir);
+            projectManifestPath = path.join(manifestDir, key + "_project.json");
+            versionManifestPath = path.join(manifestDir, key + "_version.json");
+            var content_1 = JSON.stringify(manifest_1);
+            var md5_1 = require("crypto").createHash('md5').update(content_1).digest('hex');
+            manifest_1.md5 = md5_1;
+            manifest_1.version = this.userCache.bundles[key].version;
+            fs.writeFileSync(projectManifestPath, JSON.stringify(manifest_1));
             this.addLog("\u751F\u6210" + projectManifestPath + "\u6210\u529F");
-            delete manifest.assets;
-            delete manifest.searchPaths;
-            fs.writeFileSync(versionManifestPath, JSON.stringify(manifest));
+            delete manifest_1.assets;
+            versions["" + key] = {};
+            versions["" + key].md5 = md5_1;
+            versions["" + key].version = manifest_1.version;
+            fs.writeFileSync(versionManifestPath, JSON.stringify(manifest_1));
             this.addLog("\u751F\u6210" + versionManifestPath + "\u6210\u529F");
         }
-        // this._isDoCreate = false;
+        //写入所有版本
+        var versionsPath = path.join(manifestDir, "versions.json");
+        fs.writeFileSync(versionsPath, JSON.stringify(versions));
+        this.addLog("\u751F\u6210versions.json\u6210\u529F");
+        this._isDoCreate = false;
         this.packageZip(mainIncludes);
     };
     _Helper.prototype.packageDir = function (dir, jszip) {
@@ -624,7 +612,7 @@ var _Helper = /** @class */ (function () {
     _Helper.prototype.packageZip = function (mainIncludes) {
         var _this = this;
         this.addLog("[\u6253\u5305] \u5F00\u59CB\u6253\u5305\u7248\u672C...");
-        var versionManifest = path.join(this.getManifestDir(this.userCache.buildDir), "version.manifest");
+        var versionManifest = path.join(this.getManifestDir(this.userCache.buildDir), "main_version.json");
         var jszip = new JSZIP();
         for (var index = 0; index < mainIncludes.length; index++) {
             var element = mainIncludes[index];
@@ -660,7 +648,7 @@ var _Helper = /** @class */ (function () {
         var bundles = this.config.bundles;
         var _loop_1 = function (index) {
             var element = bundles[index];
-            var versionManifest_1 = path.join(this_1.getManifestDir(this_1.userCache.buildDir), element.dir + "_version.manifest");
+            var versionManifest_1 = path.join(this_1.getManifestDir(this_1.userCache.buildDir), element.dir + "_version.json");
             var mainVersionManifest_1 = fs.readFileSync(versionManifest_1, "utf-8");
             var mainVersion_1 = JSON.parse(mainVersionManifest_1).version;
             var packZipName_1 = "ver_" + element.dir + "_" + (mainVersion_1 = mainVersion_1.replace(".", "_")) + ".zip";
@@ -837,41 +825,14 @@ var _Helper = /** @class */ (function () {
         this.addLog("\u8BF7\u5148\u6784\u5EFA\u9879\u76EE");
         return false;
     };
-    /**
-     * @description 版本比较 curVersion >= prevVersion 返回ture
-     * @example (1.0.1 > 1.0)  (1.0.1 <= 1.0.1) (1.0.1 < 1.0.2) (1.0.1 > 1.0.0)
-     * @param curVersion 当前构建版本
-     * @param prevVersion 之前构建的版本
-     */
-    _Helper.prototype.isVersionPass = function (curVersion, prevVersion) {
-        if (undefined === curVersion || null === curVersion || undefined === prevVersion || null === prevVersion)
-            return false;
-        var curVersionArr = curVersion.split(".");
-        var prevVersionArr = prevVersion.split(".");
-        var len = curVersionArr.length > prevVersionArr.length ? curVersionArr.length : prevVersionArr.length;
-        for (var i = 0; i < len; i++) {
-            var curValue = curVersionArr[i], genValue = prevVersionArr[i];
-            if (undefined === curValue && undefined !== genValue)
-                return false;
-            if (undefined !== curValue && undefined === genValue)
-                return true;
-            if (curValue && genValue && parseInt(curValue) >= parseInt(genValue))
-                return true;
-        }
-        return false;
-    };
     /** @description 主版本号输入*/
     _Helper.prototype.onVersionChange = function (element) {
         if (this.isDoCreate())
             return;
         var version = element.value;
-        if (this.isVersionPass(version, this.userCache.version)) {
-            //有效版本
-            this.userCache.version = version;
-            this.saveUserCache();
-            return;
-        }
-        this.addLog("\u65E0\u6548\u7248\u672C\u53F7," + version + " \u5E94\u5927\u4E8E " + this.userCache.version);
+        //有效版本
+        this.userCache.version = version;
+        this.saveUserCache();
     };
     /**
      * @description bundle输入版本号变化
@@ -883,12 +844,8 @@ var _Helper = /** @class */ (function () {
         if (this.isDoCreate())
             return;
         var version = element.value;
-        if (this.isVersionPass(version, this.userCache.bundles[key].version)) {
-            this.userCache.bundles[key].version = version;
-            this.saveUserCache();
-            return;
-        }
-        this.addLog(this.userCache.bundles[key].name + "\u8BBE\u7F6E\u7248\u672C\u53F7\u65E0\u6548," + version + " \u5E94\u5927\u4E8E " + this.userCache.bundles[key].version);
+        this.userCache.bundles[key].version = version;
+        this.saveUserCache();
     };
     /**
      * @description 切换历史地址
@@ -941,7 +898,7 @@ var _Helper = /** @class */ (function () {
                 return;
             }
         }
-        if (/^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/)(([A-Za-z0-9-~]+)\.)+([A-Za-z0-9-~\/])+$/.test(url) == false) {
+        if (/^(https?:\/\/)?([\da-z\.-]+)\.([\da-z\.]{2,6})([\/\w \.-:]*)*\/?$/.test(url) == false) {
             this.addLog(url + "\u4E0D\u662F\u4EE5http://https://\u5F00\u5934\uFF0C\u6216\u8005\u4E0D\u662F\u7F51\u5740");
             return;
         }

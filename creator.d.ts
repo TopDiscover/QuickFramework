@@ -31822,7 +31822,8 @@ declare namespace jsb{
 
     export class Manifest {
 
-    constructor (content: string, manifestRoot: string,hotUpdateUrl:string);
+    constructor (content: string, manifestRoot: string,packageUrl:string);
+    getMd5():string;
     
     constructor (manifestUrl: string);
         constructor (content: string, manifestRoot: string);
@@ -31896,7 +31897,8 @@ declare namespace jsb{
 
     export class AssetsManager {
 
-    setHotUpdateUrl(url:string):void;
+    setPackageUrl(url:string):void;
+    reset():void;
 
     constructor (manifestUrl: string, storagePath: string, versionCompareHandle?: (versionA: string, versionB: string) => number);
         static create (manifestUrl: string, storagePath: string): AssetsManager;

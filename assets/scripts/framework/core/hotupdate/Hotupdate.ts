@@ -35,7 +35,11 @@ export namespace HotUpdate {
         /**@description 下载State */
         state: State,
         /**@description 是否需要重启 */
-        needRestart: boolean
+        needRestart: boolean;
+        /**@description bundle */
+        bundle : string;
+        /**@description 资源id */
+        assetId : string;
     }
     /**@description 提示下载弹出框事件数据 */
     export interface MessageData {
@@ -55,6 +59,8 @@ export namespace HotUpdate {
         DOWNLOAD_PROGRESS = "DOWNLOAD_PROGRESS",
         /**@description 提示下载弹出框事件 */
         DOWNLOAD_MESSAGE = "DOWNLOAD_MESSAGE",
+        /**@description 版本过旧，请重新更新 */
+        MAIN_VERSION_IS_TOO_LOW = "MAIN_VERSION_IS_TOO_LOW",
     }
     export enum Code {
         /**@description 找不到本地mainfest文件*/
@@ -83,6 +89,11 @@ export namespace HotUpdate {
         //以下是js中扩展的字段，上面是引擎中已经有的字段
         /**@description 正检测更新中 */
         CHECKING,
+
+        /**@description 主包版本不匹配，需要升级主包 */
+        MAIN_PACK_NEED_UPDATE,
+        /**@description 预处理版本文件不存在 */
+        PRE_VERSIONS_NOT_FOUND,
     }
     export enum State {
         /**@description 未初始化 */
@@ -119,28 +130,33 @@ export namespace HotUpdate {
         TRY_DOWNLOAD_FAILED_ASSETS,
     }
 
+    /**
+     * @description 热更新状态，
+     */
+    export enum Status{
+        /**@description 需要下载 */
+        NEED_DOWNLOAD,
+        /**@description 已经是最新版本 */
+        UP_TO_DATE,
+        /**@description 需要下载更新 */
+        NEED_UPDATE,
+    }
+
     export class BundleConfig {
         /**@description Bundle名 如:hall*/
         bundle: string = "";
         /**@description Bundle名 如:大厅  */
         name: string = "";
-        /**@description 是否需要提示弹出框提示升级 */
-        isNeedPrompt: boolean = false;
         /**
          * 
          * @param name bundle名 如：大厅
          * @param bundle Bundle名 如:hall
-         * @param index 游戏index,可根据自己需要决定需不需要
-         * @param event 加载bundle完成后，派发事件
-         * @param isNeedPrompt 是否需要弹出提示升级的弹出框
          */
         constructor(
             name: string,
-            bundle: string,
-            isNeedPrompt: boolean = false) {
+            bundle: string) {
             this.name = name;
             this.bundle = bundle;
-            this.isNeedPrompt = isNeedPrompt;
         }
 
         clone(){
@@ -148,7 +164,7 @@ export namespace HotUpdate {
         }
 
         static clone( config : BundleConfig){
-            let result = new BundleConfig(config.name,config.bundle,config.isNeedPrompt);
+            let result = new BundleConfig(config.name,config.bundle);
             return result;
         }
     }

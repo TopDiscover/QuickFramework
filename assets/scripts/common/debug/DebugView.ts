@@ -1,5 +1,6 @@
 
 import { LogLevel } from '../../framework/defines/Enums';
+import { Config } from '../config/Config';
 const { ccclass, property } = cc._decorator;
 
 @ccclass
@@ -37,6 +38,8 @@ export class DebugView extends cc.Component {
         this.bindEvent("netHelper",this.onNetHelper);
         //网络管理器
         this.bindEvent("serviceManager",this.onServiceManager);
+        //热火更新管理
+        this.bindEvent("hotupdate",this.onHotUpdate);
         this.doOther();
     }
     debug: cc.Node = null!;
@@ -185,6 +188,7 @@ export class DebugView extends cc.Component {
 
     private onShowDebugInfo(){
         cc.debug.setDisplayStats(!cc.debug.isDisplayStats())
+        Manager.localStorage.setItem(Config.SHOW_DEBUG_INFO_KEY,cc.debug.isDisplayStats());
     }
 
     private onShowUI(){
@@ -336,6 +340,15 @@ export class DebugView extends cc.Component {
                 Log.d(content);
                 content = `状态信息 , 是否允许连接网络 : ${ service.enabled } 是否连接 : ${service.isConnected} 网络数据类型 : ${service.serviceType}`
                 Log.d(content);
+            }
+        })
+    }
+
+    private onHotUpdate(){
+        Log.d(`-----------热火更新管理器中相关信息------------`);
+        Manager.hotupdate.print({
+            print:(data)=>{
+                Log.dump(data.data,data.name);
             }
         })
     }

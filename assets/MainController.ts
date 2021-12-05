@@ -18,12 +18,16 @@ export default class MainController extends EventComponent {
     protected addEvents() {
         super.addEvents();
         this.addEvent(HotUpdate.Event.DOWNLOAD_MESSAGE, this.onHotupdateMessage);
+        this.addEvent(HotUpdate.Event.MAIN_VERSION_IS_TOO_LOW,this.onMainVersionIsTooLow);
     }
 
     private onHotupdateMessage(data: HotUpdate.MessageData) {
         Manager.onHotupdateMessage(data);
     }
 
+    private onMainVersionIsTooLow(code : HotUpdate.Code,config:HotUpdate.BundleConfig){
+        Manager.onMainVersionIsTooLow(code,config);
+    }
     private debugView : cc.Node | null = null!;
 
     onLoad() {
@@ -35,6 +39,8 @@ export default class MainController extends EventComponent {
         let debug = cc.find("debug", this.node);
         this.debugView = cc.find("debugView",this.node);
         if (debug&&this.debugView) {
+            let isVisibleDebugInfo = Manager.localStorage.getItem(Config.SHOW_DEBUG_INFO_KEY,true);
+            cc.debug.setDisplayStats(isVisibleDebugInfo);
             if ( Config.isShowDebugButton ){
                 debug.active = true;
                 let view = this.debugView.addComponent(DebugView)

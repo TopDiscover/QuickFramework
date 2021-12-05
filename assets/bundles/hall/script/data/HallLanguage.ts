@@ -1,5 +1,4 @@
 /**@description 语言包具体的代码实现 */
-import { i18n } from "../../../../scripts/common/language/CommonLanguage";
 import { HallData } from "./HallData";
 import { HALL_EN } from "./HallLanguageEN";
 import { HALL_ZH } from "./HallLanguageZH";
@@ -7,10 +6,10 @@ import { HALL_ZH } from "./HallLanguageZH";
 
 export class HallLanguage implements Language.DataSourceDelegate{
     name = HallData.bundle;
-    data( language : string ): Language.Data {
-        let data : any = i18n;
+    data( language : string , source : any): Language.Data {
+        let data : any = source;
         if( data[`${this.name}`] && data[`${this.name}`].language == language ){
-            return i18n;
+            return source;
         }
         let lan = HALL_ZH;
         if (language == HALL_EN.language) {
@@ -19,6 +18,6 @@ export class HallLanguage implements Language.DataSourceDelegate{
         data[`${this.name}`] = {};
         data[`${this.name}`] = lan.data;
         data[`${this.name}`].language = lan.language;
-        return i18n;
+        return source;
     }
 }

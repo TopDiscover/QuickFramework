@@ -1,6 +1,5 @@
 import UIView from "../../framework/core/ui/UIView";
 import { Macro } from "../../framework/defines/Macros";
-import { i18n } from "../language/CommonLanguage";
 
 const { ccclass, property } = cc._decorator;
 
@@ -72,7 +71,7 @@ export default class SettingView extends UIView {
         this.close();
         Manager.alert.show({
             immediatelyCallback: true,
-            text: i18n.quitGame,
+            text: Manager.getLanguage("quitGame"),
             confirmCb: (isOk) => {
                 if (isOk) {
                     Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
