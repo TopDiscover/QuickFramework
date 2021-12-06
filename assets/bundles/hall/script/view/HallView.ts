@@ -1,6 +1,6 @@
 import { HallData } from "../data/HallData";
 import SettingView from "../../../../scripts/common/component/SettingView";
-import { Update } from "../../../../scripts/framework/core/hotupdate/Update";
+import { Update } from "../../../../scripts/framework/core/update/Update";
 import { ViewZOrder } from "../../../../scripts/common/config/Config";
 import { Macro } from "../../../../scripts/framework/defines/Macros";
 import GameView from "../../../../scripts/framework/core/ui/GameView";

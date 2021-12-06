@@ -3,7 +3,7 @@
  */
 
 import { Macro } from "../../defines/Macros";
-import { Update } from "../hotupdate/Update";
+import { Update } from "../update/Update";
 
 export class BundleManager {
    private static _instance: BundleManager = null!;

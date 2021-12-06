@@ -1,5 +1,5 @@
 import { EntryDelegate } from "../../framework/core/entry/EntryDelegate";
-import { Update } from "../../framework/core/hotupdate/Update";
+import { Update } from "../../framework/core/update/Update";
 import { Macro } from "../../framework/defines/Macros";
 import { Config } from "../config/Config";
 import { Global } from "../data/Global";

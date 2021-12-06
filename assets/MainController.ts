@@ -1,6 +1,6 @@
 import EventComponent from "./scripts/framework/componects/EventComponent";
 import { Config } from "./scripts/common/config/Config";
-import { Update } from "./scripts/framework/core/hotupdate/Update";
+import { Update } from "./scripts/framework/core/update/Update";
 import { DebugView } from "./scripts/common/debug/DebugView";
 /**
  * @description 主控制器 

@@ -4,7 +4,7 @@ import { LocalStorage } from "./core/storage/LocalStorage";
 import { AssetManager } from "./core/asset/AssetManager";
 import { CacheManager } from "./core/asset/CacheManager";
 import { NodePoolManager } from "./core/nodePool/NodePoolManager";
-import { UpdateManager } from "./core/hotupdate/UpdateManager";
+import { UpdateManager } from "./core/update/UpdateManager";
 import { BundleManager } from "./core/asset/BundleManager";
 import { CocosExtentionInit } from "./plugin/CocosExtention";
 import { Language } from "./core/language/Language";

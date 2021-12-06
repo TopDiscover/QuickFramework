@@ -7,7 +7,7 @@ import LoginView from "./view/LoginView";
 import { Config, ViewZOrder } from "../common/config/Config";
 import { Macro } from "../framework/defines/Macros";
 import { Entry } from "../framework/core/entry/Entry";
-import { Update } from "../framework/core/hotupdate/Update";
+import { Update } from "../framework/core/update/Update";
 import { Resource } from "../framework/core/asset/Resource";
 
 class LoginEntry extends Entry {

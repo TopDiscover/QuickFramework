@@ -1,5 +1,5 @@
 import { Macro } from "../../defines/Macros";
-import { Update } from "../hotupdate/Update";
+import { Update } from "../update/Update";
 
 /**@description entry入口代理 */
 export class EntryDelegate {

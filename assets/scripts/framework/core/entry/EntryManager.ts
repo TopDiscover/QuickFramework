@@ -1,4 +1,4 @@
-import { Update } from "../hotupdate/Update";
+import { Update } from "../update/Update";
 import { EntryDelegate } from "./EntryDelegate";
 
 /**@description 入口管理 */

@@ -1,6 +1,6 @@
 
 import { Config } from "../../../../scripts/common/config/Config";
-import { Update } from "../../../../scripts/framework/core/hotupdate/Update";
+import { Update } from "../../../../scripts/framework/core/update/Update";
 import { GameData } from "../../../../scripts/framework/data/GameData";
 import { Macro } from "../../../../scripts/framework/defines/Macros";
 /**@description 大厅数据 */
