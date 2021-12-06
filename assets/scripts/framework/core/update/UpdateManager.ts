@@ -4,6 +4,7 @@ import { JSB, PREVIEW } from "cc/env";
 import { Macro } from "../../defines/Macros";
 import { HttpPackage } from "../net/http/HttpClient";
 import { Http } from "../net/http/Http";
+import { UpdateItem } from "./UpdateItem";
 
 class AssetsManager {
 
@@ -38,6 +39,11 @@ export class UpdateManager {
     private storagePath = "";
     /**@description 是否在热更新中或检测更新状态 */
     private updating = false;
+
+    /**@description 等待下载项 */
+    private waiting : UpdateItem[] = [];
+    /**@description 正在在下载项 */
+    private downloading : UpdateItem | null = null;
 
     private _hotUpdateUrl = "";
     /**@description 通用的热更新地址，当在子游戏或大厅未指定热更新地址时，都统一使用服务器传回来的默认全局更新地址 */
@@ -158,6 +164,26 @@ export class UpdateManager {
                 this.currentAssetsManager.manager.setEventCallback(this.checkCb.bind(this));
                 this.currentAssetsManager.manager.checkUpdate();
             }
+        }
+    }
+
+    dowonLoad( item : UpdateItem ){
+        if ( this.downloading ){
+            if ( this.downloading.bundle == item.bundle ){
+                Log.d(`将要下载项${this.downloading.bundle}与正在下载项相同`);
+            }else{
+                Log.d(`当前有正在下载项${this.downloading.bundle}，放入下载队列`);
+                this.waiting.push(item);
+            }
+        }else{
+            this.doDownload(item);
+        }
+    }
+
+    private doDownload(item:UpdateItem){
+        this.downloading = item;
+        if ( this.downloading ){
+            // this.checkUpdate()
         }
     }
 
