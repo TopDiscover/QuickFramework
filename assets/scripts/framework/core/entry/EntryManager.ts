@@ -1,4 +1,4 @@
-import { HotUpdate } from "../hotupdate/Hotupdate";
+import { Update } from "../hotupdate/Update";
 import { EntryDelegate } from "./EntryDelegate";
 
 /**@description 入口管理 */
@@ -85,7 +85,7 @@ export class EntryManager {
     }
 
     /**@description 加载bundle完成 */
-    onLoadBundleComplete(versionInfo: HotUpdate.BundleConfig, bundle: cc.AssetManager.Bundle) {
+    onLoadBundleComplete(versionInfo: Update.Config, bundle: cc.AssetManager.Bundle) {
         //通知入口管理进入bundle
         let entry = this.getEntry(versionInfo.bundle);
         if (entry) {

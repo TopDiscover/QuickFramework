@@ -1,6 +1,6 @@
 import EventComponent from "./scripts/framework/componects/EventComponent";
 import { Config } from "./scripts/common/config/Config";
-import { HotUpdate } from "./scripts/framework/core/hotupdate/Hotupdate";
+import { Update } from "./scripts/framework/core/hotupdate/Update";
 import { DebugView } from "./scripts/common/debug/DebugView";
 /**
  * @description 主控制器 
@@ -17,15 +17,10 @@ export default class MainController extends EventComponent {
 
     protected addEvents() {
         super.addEvents();
-        this.addEvent(HotUpdate.Event.DOWNLOAD_MESSAGE, this.onHotupdateMessage);
-        this.addEvent(HotUpdate.Event.MAIN_VERSION_IS_TOO_LOW,this.onMainVersionIsTooLow);
+        this.addEvent(Update.Event.MAIN_VERSION_IS_TOO_LOW,this.onMainVersionIsTooLow);
     }
 
-    private onHotupdateMessage(data: HotUpdate.MessageData) {
-        Manager.onHotupdateMessage(data);
-    }
-
-    private onMainVersionIsTooLow(code : HotUpdate.Code,config:HotUpdate.BundleConfig){
+    private onMainVersionIsTooLow(code : Update.Code,config:Update.Config){
         Manager.onMainVersionIsTooLow(code,config);
     }
     private debugView : cc.Node | null = null!;

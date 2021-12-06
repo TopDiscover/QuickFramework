@@ -346,7 +346,7 @@ export class DebugView extends cc.Component {
 
     private onHotUpdate(){
         Log.d(`-----------热火更新管理器中相关信息------------`);
-        Manager.hotupdate.print({
+        Manager.updateManager.print({
             print:(data)=>{
                 Log.dump(data.data,data.name);
             }

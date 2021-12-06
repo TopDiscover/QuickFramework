@@ -1,5 +1,5 @@
 import { EntryDelegate } from "../../framework/core/entry/EntryDelegate";
-import { HotUpdate } from "../../framework/core/hotupdate/Hotupdate";
+import { Update } from "../../framework/core/hotupdate/Update";
 import { Macro } from "../../framework/defines/Macros";
 import { Config } from "../config/Config";
 import { Global } from "../data/Global";
@@ -22,7 +22,7 @@ export class CmmEntry extends EntryDelegate {
         }
     }
 
-    getEntryConfig(bundle: string): HotUpdate.BundleConfig | null {
+    getEntryConfig(bundle: string): Update.Config | null {
         let config = Config.ENTRY_CONFIG[bundle];
         if (config) {
             return config;

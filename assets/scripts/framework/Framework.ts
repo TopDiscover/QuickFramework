@@ -4,7 +4,7 @@ import { LocalStorage } from "./core/storage/LocalStorage";
 import { AssetManager } from "./core/asset/AssetManager";
 import { CacheManager } from "./core/asset/CacheManager";
 import { NodePoolManager } from "./core/nodePool/NodePoolManager";
-import { HotupdateManager } from "./core/hotupdate/HotupdateManager";
+import { UpdateManager } from "./core/hotupdate/UpdateManager";
 import { BundleManager } from "./core/asset/BundleManager";
 import { CocosExtentionInit } from "./plugin/CocosExtention";
 import { Language } from "./core/language/Language";
@@ -62,7 +62,7 @@ export class Framewok {
     }
 
     /**@description 热更新管理器 */
-    get hotupdate() { return getSingleton(HotupdateManager) }
+    get updateManager() { return getSingleton(UpdateManager) }
 
     /**@description 常驻资源指定的模拟view */
     get retainMemory() : any { return this.uiManager.retainMemory; }

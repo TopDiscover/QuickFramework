@@ -17,7 +17,7 @@ export default class LoginView extends GameView {
         this._login = cc.find("login", this.node);
         let version = cc.find("version",this.node)?.getComponent(cc.Label);
         if ( version ){
-            version.string = Manager.hotupdate.getVersion(this.bundle,false);
+            version.string = Manager.updateManager.getVersion(this.bundle,false);
         }
         this._login.on(cc.Node.EventType.TOUCH_END, () => {
             this.enterBundle(Macro.BUNDLE_HALL);

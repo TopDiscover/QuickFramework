@@ -641,7 +641,6 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_useOriginalSize": false,
     "_string": "温馨提示",
     "_N$string": "温馨提示",
     "_fontSize": 40,
@@ -779,7 +778,6 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_useOriginalSize": false,
     "_string": "这是一个测试数据这是一个测试数据",
     "_N$string": "这是一个测试数据这是一个测试数据",
     "_fontSize": 35,
@@ -941,7 +939,6 @@
     },
     "_skewX": 0,
     "_skewY": 0,
-    "_zIndex": -32768,
     "_is3DNode": false,
     "_groupIndex": 0,
     "groupIndex": 0,
@@ -963,7 +960,6 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_useOriginalSize": true,
     "_string": "Rich",
     "_N$string": "Rich",
     "_fontSize": 35,
@@ -992,7 +988,7 @@
     "asset": {
       "__uuid__": "9b9ab51a-bfbd-4ce0-a76a-6fda961e0ea2"
     },
-    "fileId": "e96VW3Yh9GTZykXwH8ejza",
+    "fileId": "1fc0op9FhM3Z+CS2ARg+vh",
     "sync": false
   },
   {
@@ -1054,7 +1050,6 @@
     },
     "_skewX": 0,
     "_skewY": 0,
-    "_zIndex": -32768,
     "_is3DNode": false,
     "_groupIndex": 0,
     "groupIndex": 0,
@@ -1076,7 +1071,6 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_useOriginalSize": true,
     "_string": "Text",
     "_N$string": "Text",
     "_fontSize": 35,
@@ -1105,7 +1099,7 @@
     "asset": {
       "__uuid__": "9b9ab51a-bfbd-4ce0-a76a-6fda961e0ea2"
     },
-    "fileId": "a6e3KaxHZD7b9/VL+zyDgr",
+    "fileId": "113Wkuk9FN25WlFg+g+AFI",
     "sync": false
   },
   {
@@ -1363,7 +1357,6 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_useOriginalSize": false,
     "_string": "确 定",
     "_N$string": "确 定",
     "_fontSize": 40,
@@ -1794,7 +1787,6 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_useOriginalSize": false,
     "_string": "取 消",
     "_N$string": "取 消",
     "_fontSize": 40,
@@ -2168,7 +2160,7 @@
     "asset": {
       "__uuid__": "9b9ab51a-bfbd-4ce0-a76a-6fda961e0ea2"
     },
-    "fileId": "31VgGhFeFAWr2Temwce7TL",
+    "fileId": "",
     "sync": false
   }
 ]

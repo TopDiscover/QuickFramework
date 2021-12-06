@@ -42,7 +42,7 @@ export default class EliminateGameView extends GameView {
 
         let version = cc.find("version",this.node)?.getComponent(cc.Label);
         if ( version ){
-            version.string = Manager.hotupdate.getVersion(this.bundle);
+            version.string = Manager.updateManager.getVersion(this.bundle);
         }
 
         this.audioHelper.playMusic("audios/gamescenebgm",this.bundle);
