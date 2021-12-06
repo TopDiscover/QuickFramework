@@ -1,5 +1,5 @@
-import { Config } from "../../../../scripts/common/config/Config";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
+import { Macro } from "../../../../scripts/framework/defines/Macros";
 import { EliminateData } from "../data/EliminateData";
 import { EliminateEffect } from "../data/EliminateDefines";
 import EliminateEffectsView from "./EliminateEffectsView";
@@ -49,7 +49,7 @@ export default class EliminateGameView extends GameView {
     }
 
     private onGoBack() {
-        this.enterBundle(Config.BUNDLE_HALL);
+        this.enterBundle(Macro.BUNDLE_HALL);
     }
 
     playClick() {

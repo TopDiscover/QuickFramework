@@ -25,4 +25,6 @@ export namespace Macro{
     export const ON_CUSTOM_CLOSE = "";
     /**@description 主包热更新模拟bundle名 */
     export const MAIN_PACK_BUNDLE_NAME = "main";
+    /**@description 大厅bunlde名 */
+    export const BUNDLE_HALL = "hall";
 }

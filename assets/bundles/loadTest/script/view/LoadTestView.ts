@@ -1,7 +1,7 @@
 
-import { Config } from "../../../../scripts/common/config/Config";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
 import { ButtonSpriteType } from "../../../../scripts/framework/defines/Enums";
+import { Macro } from "../../../../scripts/framework/defines/Macros";
 import { HallData } from "../../../hall/script/data/HallData";
 
 const {ccclass, property} = cc._decorator;
@@ -42,7 +42,7 @@ export default class LoadTestView extends GameView {
     }
 
     private onGoback(){
-        this.enterBundle(Config.BUNDLE_HALL);
+        this.enterBundle(Macro.BUNDLE_HALL);
     }
 
     private onLoadFont( ){

@@ -1,5 +1,5 @@
-import { Config } from "../../../../scripts/common/config/Config";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
+import { Macro } from "../../../../scripts/framework/defines/Macros";
 
 const {ccclass, property} = cc._decorator;
 
@@ -16,7 +16,7 @@ export default class ShaderView extends GameView {
         super.onLoad();
 
         cc.find("goback",this.node).on(cc.Node.EventType.TOUCH_END,()=>{
-            this.enterBundle(Config.BUNDLE_HALL);
+            this.enterBundle(Macro.BUNDLE_HALL);
         },this);
 
         this.prefabs = cc.find("prefabs",this.node);

@@ -1,5 +1,5 @@
-import { Config } from "../../common/config/Config";
 import GameView from "../../framework/core/ui/GameView";
+import { Macro } from "../../framework/defines/Macros";
 
 const { ccclass, property } = cc._decorator;
 
@@ -20,7 +20,7 @@ export default class LoginView extends GameView {
             version.string = Manager.hotupdate.getVersion(this.bundle,false);
         }
         this._login.on(cc.Node.EventType.TOUCH_END, () => {
-            this.enterBundle(Config.BUNDLE_HALL);
+            this.enterBundle(Macro.BUNDLE_HALL);
         });
     }
 }

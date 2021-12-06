@@ -12,6 +12,7 @@ import { ChatSender } from "../net/ChatSender";
 import { GameSender } from "../net/GameSender";
 import { NetTest } from "../data/NetTestData";
 import { Config } from "../../../../scripts/common/config/Config";
+import { Macro } from "../../../../scripts/framework/defines/Macros";
 
 
 const { ccclass, property } = cc._decorator;
@@ -91,7 +92,7 @@ export default class NetTestView extends GameView {
         super.onLoad();
 
         cc.find("goback", this.node).on(cc.Node.EventType.TOUCH_END, () => {
-            this.enterBundle(Config.BUNDLE_HALL);
+            this.enterBundle(Macro.BUNDLE_HALL);
         });
 
         this.netToggleContainer = cc.find("netType", this.node).getComponent(cc.ToggleContainer);

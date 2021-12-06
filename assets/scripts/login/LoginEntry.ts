@@ -41,7 +41,7 @@ class LoginEntry extends Entry {
         Manager.uiManager.close(LoginView);
     }
     protected initData(): void {
-        Config.ENTRY_CONFIG[Config.BUNDLE_HALL] = new HotUpdate.BundleConfig(Manager.getLanguage("hallText"),Config.BUNDLE_HALL);
+        Config.ENTRY_CONFIG[Macro.BUNDLE_HALL] = new HotUpdate.BundleConfig(Manager.getLanguage("hallText"),Macro.BUNDLE_HALL);
         Config.ENTRY_CONFIG[Macro.BUNDLE_RESOURCES] = new HotUpdate.BundleConfig(Manager.getLanguage("mainPack"),Macro.BUNDLE_RESOURCES);
     }
     protected pauseMessageQueue(): void {

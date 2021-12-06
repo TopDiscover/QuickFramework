@@ -2,12 +2,12 @@ import HallView from "./view/HallView";
 import { HallData } from "./data/HallData";
 import { HallLanguage } from "./data/HallLanguage";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
-import { Config } from "../../../scripts/common/config/Config";
 import HallHandler from "./net/HallHandler";
 import { LobbyService } from "../../../scripts/common/net/LobbyService";
+import { Macro } from "../../../scripts/framework/defines/Macros";
 
 class HallEntry extends Entry {
-    static bundle = Config.BUNDLE_HALL;
+    static bundle = Macro.BUNDLE_HALL;
     protected language = new HallLanguage;
 
     private get data(){

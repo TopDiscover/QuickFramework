@@ -1,5 +1,5 @@
-import { Config } from "../../../../scripts/common/config/Config";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
+import { Macro } from "../../../../scripts/framework/defines/Macros";
 
 /**
  * @description 瞄准线视图
@@ -104,7 +104,7 @@ export default class AimLineView extends GameView {
     }
 
     private onGoBack( ){
-        this.enterBundle(Config.BUNDLE_HALL);
+        this.enterBundle(Macro.BUNDLE_HALL);
     }
 
     /**

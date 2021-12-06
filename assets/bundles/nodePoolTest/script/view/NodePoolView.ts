@@ -1,6 +1,6 @@
-import { Config } from "../../../../scripts/common/config/Config";
 import { NodePool } from "../../../../scripts/framework/core/nodePool/NodePoolManager";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
+import { Macro } from "../../../../scripts/framework/defines/Macros";
 const {ccclass, property} = cc._decorator;
 
 @ccclass
@@ -17,7 +17,7 @@ export default class NodePoolView extends GameView {
         super.onLoad();
 
         cc.find("goback", this.node).on(cc.Node.EventType.TOUCH_END, () => {
-            this.enterBundle(Config.BUNDLE_HALL);
+            this.enterBundle(Macro.BUNDLE_HALL);
         });
 
         this.star = cc.find("star",this.node);
