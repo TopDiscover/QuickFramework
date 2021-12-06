@@ -42,9 +42,6 @@ export namespace Config {
      */
     export const LOAD_VIEW_DELAY = 0.1;
 
-    /**@description 大厅bundle名 */
-    export const BUNDLE_HALL = "hall";
-
     /**@description 重连的超时时间 */
     export const RECONNECT_TIME_OUT = 30;
 

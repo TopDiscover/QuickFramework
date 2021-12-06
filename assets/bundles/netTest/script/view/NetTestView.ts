@@ -13,6 +13,7 @@ import { ChatSender } from "../net/ChatSender";
 import { GameSender } from "../net/GameSender";
 import { NetTest } from "../data/NetTestData";
 import { Config } from "../../../../scripts/common/config/Config";
+import { Macro } from "../../../../scripts/framework/defines/Macros";
 
 
 const { ccclass, property } = _decorator;
@@ -113,7 +114,7 @@ export default class NetTestView extends GameView {
 
         //返回
         find("goback", this.node)?.on(Node.EventType.TOUCH_END, () => {
-            this.enterBundle(Config.BUNDLE_HALL);
+            this.enterBundle(Macro.BUNDLE_HALL);
         });
 
         //重连

@@ -8,7 +8,6 @@ import { Config, ViewZOrder } from "../common/config/Config";
 import { Macro } from "../framework/defines/Macros";
 import { Entry } from "../framework/core/entry/Entry";
 import { HotUpdate } from "../framework/core/hotupdate/Hotupdate";
-import { Global } from "../common/data/Global";
 import { Resource } from "../framework/core/asset/Resource";
 
 class LoginEntry extends Entry {
@@ -42,7 +41,7 @@ class LoginEntry extends Entry {
         Manager.uiManager.close(LoginView);
     }
     protected initData(): void {
-        Config.ENTRY_CONFIG[Config.BUNDLE_HALL] = new HotUpdate.BundleConfig(Manager.getLanguage("hallText"),Config.BUNDLE_HALL);
+        Config.ENTRY_CONFIG[Macro.BUNDLE_HALL] = new HotUpdate.BundleConfig(Manager.getLanguage("hallText"),Macro.BUNDLE_HALL);
         Config.ENTRY_CONFIG[Macro.BUNDLE_RESOURCES] = new HotUpdate.BundleConfig(Manager.getLanguage("mainPack"),Macro.BUNDLE_RESOURCES);
     }
     protected pauseMessageQueue(): void {

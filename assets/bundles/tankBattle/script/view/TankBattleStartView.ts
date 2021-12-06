@@ -1,7 +1,7 @@
 import UIView from "../../../../scripts/framework/core/ui/UIView";
 import { _decorator,Node, find, Label, Vec3, EventKeyboard, macro } from "cc";
-import { Config } from "../../../../scripts/common/config/Config";
 import { TankBettle } from "../data/TankBattleConfig";
+import { Macro } from "../../../../scripts/framework/defines/Macros";
 
 const { ccclass, property } = _decorator;
 
@@ -41,7 +41,7 @@ export default class TankBattleStartView extends UIView{
 
     protected onKeyBackUp(ev: EventKeyboard) {
         super.onKeyBackUp(ev);
-        Manager.entryManager.enterBundle(Config.BUNDLE_HALL);
+        Manager.entryManager.enterBundle(Macro.BUNDLE_HALL);
     }
 
     protected onKeyUp(ev: EventKeyboard) {

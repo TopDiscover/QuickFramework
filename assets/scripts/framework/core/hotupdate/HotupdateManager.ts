@@ -296,7 +296,7 @@ export class HotupdateManager {
                 //主包无需要更新
                 Log.d(`将要下载版本 md5 与远程版本 md5 相同，可以下载 version : ${versionInfo.version} md5:${versionInfo.md5}`);
             } else {
-                if (bundle == Macro.BUNDLE_RESOURCES) {
+                if (bundle == Macro.BUNDLE_HALL) {
                     //如果是大厅更新，只要主包的md5不发生变化，则可以直接更新大厅
                     Log.d(`${bundle} 更新`);
                     if (this.isMd5Change(MAIN_PACK)) {
@@ -307,7 +307,7 @@ export class HotupdateManager {
                     }
                 } else {
                     //更新其它子包，只需要大厅的md5及主包md5没有变化，即可直接更新进入bundle
-                    if ( this.isMd5Change(MAIN_PACK) || this.isMd5Change(Macro.BUNDLE_RESOURCES) ){
+                    if ( this.isMd5Change(MAIN_PACK) || this.isMd5Change(Macro.BUNDLE_HALL) ){
                         Log.d(`更新${bundle}时，主包与大厅有更新，下载 md5 :${md5} 与预处理md5不一致，需要对主包先进行更新`);
                         code = HotUpdate.Code.MAIN_PACK_NEED_UPDATE;
                     }else{

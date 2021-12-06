@@ -36,6 +36,6 @@ export class CmmEntry extends EntryDelegate {
 
     /**@description 获取常驻于内存不释放的bundle */
     getPersistBundle() {
-        return [Macro.BUNDLE_RESOURCES, Config.BUNDLE_HALL];
+        return [Macro.BUNDLE_RESOURCES, Macro.BUNDLE_HALL];
     }
 }

@@ -3,7 +3,7 @@ import { _decorator,Node, find,Animation, Label, Sprite, instantiate, Button, Ve
 import { HallData } from "../../../hall/script/data/HallData";
 import { ButtonSpriteType } from "../../../../scripts/framework/defines/Enums";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
-import { Config } from "../../../../scripts/common/config/Config";
+import { Macro } from "../../../../scripts/framework/defines/Macros";
 
 const {ccclass, property} = _decorator;
 
@@ -43,7 +43,7 @@ export default class LoadTestView extends GameView {
     }
 
     private onGoback(){
-        this.enterBundle(Config.BUNDLE_HALL);
+        this.enterBundle(Macro.BUNDLE_HALL);
     }
 
     private onLoadFont( ){

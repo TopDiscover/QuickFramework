@@ -2,9 +2,10 @@
 import { Config } from "../../../../scripts/common/config/Config";
 import { HotUpdate } from "../../../../scripts/framework/core/hotupdate/Hotupdate";
 import { GameData } from "../../../../scripts/framework/data/GameData";
+import { Macro } from "../../../../scripts/framework/defines/Macros";
 /**@description 大厅数据 */
 export class HallData extends GameData {
-    static bundle = Config.BUNDLE_HALL;
+    static bundle = Macro.BUNDLE_HALL;
 
     private _games : {[key:string] : HotUpdate.BundleConfig} = {};
 
