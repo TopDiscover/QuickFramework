@@ -27,7 +27,7 @@
 ### 2,[资源管理](https://gitee.com/top-discover/QuickFramework/tree/3.1.0/assets/scripts/framework/core/asset)
 资源的管理，如加载释放等相关资源管理
 ### 3,[事件管理](https://gitee.com/top-discover/QuickFramework/tree/3.1.0/assets/scripts/framework/core/event)
-### 4,[热更新模块](https://gitee.com/top-discover/QuickFramework/tree/3.1.0/assets/scripts/framework/core/hotupdate)
+### 4,[热更新模块](https://gitee.com/top-discover/QuickFramework/tree/3.1.0/assets/scripts/framework/core/update)
 ### 5,[多语言模块](https://gitee.com/top-discover/QuickFramework/tree/3.1.0/assets/scripts/framework/core/language)
 ### 6,[日志](https://gitee.com/top-discover/QuickFramework/tree/3.1.0/assets/scripts/framework/core/log)
 ### 7,[逻辑处理](https://gitee.com/top-discover/QuickFramework/tree/3.1.0/assets/scripts/framework/core/logic)
