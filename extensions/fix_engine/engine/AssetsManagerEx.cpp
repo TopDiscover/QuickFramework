@@ -220,7 +220,7 @@ bool AssetsManagerEx::loadLocalManifest(Manifest *localManifest, const std::stri
     }
     // Compare with cached manifest to determine which one to use
     if (cachedManifest) {
-        bool localNewer = _localManifest->versionGreater(cachedManifest, _versionCompareHandle);
+        bool localNewer = _localManifest->equal(cachedManifest);
         if (localNewer) {
             // Recreate storage, to empty the content
             _fileUtils->removeDirectory(_storagePath);
@@ -295,7 +295,7 @@ bool AssetsManagerEx::loadLocalManifest(const std::string &manifestUrl) {
     if (_localManifest->isLoaded()) {
         // Compare with cached manifest to determine which one to use
         if (cachedManifest) {
-            bool localNewer = _localManifest->versionGreater(cachedManifest, _versionCompareHandle);
+            bool localNewer = _localManifest->equal(cachedManifest);
             if (localNewer) {
                 // Recreate storage, to empty the content
                 _fileUtils->removeDirectory(_storagePath);
@@ -687,7 +687,7 @@ void AssetsManagerEx::prepareUpdate() {
     _totalEnabled = false;
 
     // Temporary manifest exists, previously updating and equals to the remote version, resuming previous download
-    if (_tempManifest && _tempManifest->isLoaded() && _tempManifest->isUpdating() && _tempManifest->versionEquals(_remoteManifest)) {
+    if (_tempManifest && _tempManifest->isLoaded() && _tempManifest->isUpdating() && _tempManifest->equal(_remoteManifest)) {
 		auto dir = basename(_tempManifestPath);
 		if (!_fileUtils->isDirectoryExist(dir)) {
 			_fileUtils->createDirectory(dir);
