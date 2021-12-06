@@ -1,16 +1,15 @@
 import { game , Node } from "cc";
 import Alert from "./scripts/common/component/Alert";
-import DownloadLoading from "./scripts/common/component/DownloadLoading";
 import GlobalAudio from "./scripts/common/component/GlobalAudio";
 import Loading from "./scripts/common/component/Loading";
 import Tips from "./scripts/common/component/Tips";
 import UILoading from "./scripts/common/component/UILoading";
 import { UIReconnect } from "./scripts/common/component/UIReconnect";
-import { Config, ViewZOrder } from "./scripts/common/config/Config";
+import { Config } from "./scripts/common/config/Config";
 import { CmmEntry } from "./scripts/common/entry/CmmEntry";
 import { CommonLanguage } from "./scripts/common/language/CommonLanguage";
 import { Utils } from "./scripts/common/utils/Utils";
-import { HotUpdate } from "./scripts/framework/core/hotupdate/Hotupdate";
+import { Update } from "./scripts/framework/core/update/Update";
 import { LogLevel } from "./scripts/framework/defines/Enums";
 import { Framewok } from "./scripts/framework/Framework";
 
@@ -71,8 +70,8 @@ export class _Manager extends Framewok implements GameEventInterface {
 
     init() {
         super.init();
-        this.hotupdate.hotUpdateUrl = Config.TEST_HOT_UPDATE_URL_ROOT;
-        this.hotupdate.isSkipCheckUpdate = Config.isSkipCheckUpdate;
+        this.updateManager.hotUpdateUrl = Config.TEST_HOT_UPDATE_URL_ROOT;
+        this.updateManager.isSkipCheckUpdate = Config.isSkipCheckUpdate;
 
         //初始化自定主entry代理
         this.entryManager.delegate = new CmmEntry();
@@ -124,15 +123,7 @@ export class _Manager extends Framewok implements GameEventInterface {
         Manager.serviceManager.onEnterForgeground(inBackgroundTime);
     }
 
-    onHotupdateMessage(data: HotUpdate.MessageData){
-        if (data.isOk) {
-            Manager.uiManager.open({ type: DownloadLoading, zIndex: ViewZOrder.Loading , args: [data.state, data.name, data.bundle] });
-        } else {
-            game.end();
-        }
-    }
-
-    onMainVersionIsTooLow(code : HotUpdate.Code ,config:HotUpdate.BundleConfig ){
+    onMainVersionIsTooLow(code : Update.Code ,config:Update.Config ){
         this.entryManager.onCheckUpdate();
     }
 }

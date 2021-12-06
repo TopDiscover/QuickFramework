@@ -1,21 +1,6 @@
 
 /**@description 热更新相关*/
-export namespace HotUpdate {
-    export interface Manifest {
-        /**@description 大厅版本 */
-        version?: string,
-        /**@description 子游戏版本 大厅的manifest不包含该字段 */
-        subVersion?: string,
-        /**@description 资源服务器地址 */
-        packageUrl?: string,
-        /**@description 远程project.manifest地址 */
-        remoteManifestUrl?: string,
-        /**@description 远程version.manifest地址 */
-        remoteVersionUrl?: string,
-        /**@description 包含资源 */
-        assets?: any,
-        searchPaths?: any
-    }
+export namespace Update {
     /**@description 下载信息 */
     export interface DownLoadInfo {
         /**@description 下载当前数据大小 */
@@ -41,24 +26,12 @@ export namespace HotUpdate {
         /**@description 资源id */
         assetId : string;
     }
-    /**@description 提示下载弹出框事件数据 */
-    export interface MessageData {
-        state: State;
-        /**@description 下载的bundle */
-        bundle: string;
-        /**@description 下载的bundle名，如大厅 */
-        name: string;
-        /**@description 是否点击了确定按钮 true为下载 */
-        isOk: boolean;
-    }
     /**@description 下载事件 */
     export enum Event {
         /**@description 热更新事件*/
         HOTUPDATE_DOWNLOAD = "HOTUPDATE_DOWNLOAD",
         /**@description 下载进度 */
         DOWNLOAD_PROGRESS = "DOWNLOAD_PROGRESS",
-        /**@description 提示下载弹出框事件 */
-        DOWNLOAD_MESSAGE = "DOWNLOAD_MESSAGE",
         /**@description 版本过旧，请重新更新 */
         MAIN_VERSION_IS_TOO_LOW = "MAIN_VERSION_IS_TOO_LOW",
     }
@@ -142,7 +115,7 @@ export namespace HotUpdate {
         NEED_UPDATE,
     }
 
-    export class BundleConfig {
+    export class Config {
         /**@description Bundle名 如:hall*/
         bundle: string = "";
         /**@description Bundle名 如:大厅  */
@@ -160,11 +133,11 @@ export namespace HotUpdate {
         }
 
         clone(){
-            return BundleConfig.clone(this);
+            return Config.clone(this);
         }
 
-        static clone( config : BundleConfig){
-            let result = new BundleConfig(config.name,config.bundle);
+        static clone( config : Config){
+            let result = new Config(config.name,config.bundle);
             return result;
         }
     }

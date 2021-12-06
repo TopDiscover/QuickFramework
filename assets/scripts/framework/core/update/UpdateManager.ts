@@ -1,4 +1,4 @@
-import { HotUpdate } from "./Hotupdate";
+import { Update } from "./Update";
 import { game, sys, } from "cc";
 import { JSB, PREVIEW } from "cc/env";
 import { Macro } from "../../defines/Macros";
@@ -30,9 +30,9 @@ type VERSIONS = { [key: string]: { md5: string, version: string } };
 /**
  * @description 热更新组件
  */
-export class HotupdateManager {
-    private static _instance: HotupdateManager = null!;
-    public static Instance() { return this._instance || (this._instance = new HotupdateManager()); }
+export class UpdateManager {
+    private static _instance: UpdateManager = null!;
+    public static Instance() { return this._instance || (this._instance = new UpdateManager()); }
     private manifestRoot: string = `manifest/`;
     /**@description 本地存储热更新文件的路径 */
     private storagePath = "";
@@ -57,10 +57,10 @@ export class HotupdateManager {
         return `${this.manifestRoot}main_version.json`;
     }
     /**@description 检测更新回调 */
-    public checkCallback: ((code: HotUpdate.Code, state: HotUpdate.State) => void) | null = null;
+    public checkCallback: ((code: Update.Code, state: Update.State) => void) | null = null;
 
     /**@description bundle版本信息 */
-    public bundlesConfig: { [key: string]: HotUpdate.BundleConfig } = {};
+    public bundlesConfig: { [key: string]: Update.Config } = {};
 
     /**@description 资源管理器 */
     private assetsManagers: { [key: string]: AssetsManager } = {};
@@ -103,10 +103,10 @@ export class HotupdateManager {
     /**@description 判断是否需要重新尝试下载之前下载失败的文件 */
     private isTryDownloadFailedAssets() {
         if (this.currentAssetsManager && (
-            this.currentAssetsManager.manager.getState() == HotUpdate.State.FAIL_TO_UPDATE as any ||
-            this.currentAssetsManager.code == HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
-            this.currentAssetsManager.code == HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST ||
-            this.currentAssetsManager.code == HotUpdate.Code.ERROR_PARSE_MANIFEST)
+            this.currentAssetsManager.manager.getState() == Update.State.FAIL_TO_UPDATE as any ||
+            this.currentAssetsManager.code == Update.Code.ERROR_NO_LOCAL_MANIFEST ||
+            this.currentAssetsManager.code == Update.Code.ERROR_DOWNLOAD_MANIFEST ||
+            this.currentAssetsManager.code == Update.Code.ERROR_PARSE_MANIFEST)
         ) {
             return true;
         }
@@ -118,40 +118,40 @@ export class HotupdateManager {
         return sys.platform == sys.Platform.WECHAT_GAME || PREVIEW || sys.isBrowser;
     }
 
-    private isNeedUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
+    private isNeedUpdate(callback: (code: Update.Code, state: Update.State) => void) {
         if (this.isBrowser) {
             //预览及浏览器下，不需要有更新的操作
             this.updating = false;
-            callback(HotUpdate.Code.ALREADY_UP_TO_DATE, HotUpdate.State.UP_TO_DATE);
+            callback(Update.Code.ALREADY_UP_TO_DATE, Update.State.UP_TO_DATE);
             return false;
         } else {
             if (this.isSkipCheckUpdate) {
                 Log.d("跳过热更新，直接使用本地资源代码");
                 this.updating = false;
-                callback(HotUpdate.Code.ALREADY_UP_TO_DATE, HotUpdate.State.UP_TO_DATE);
+                callback(Update.Code.ALREADY_UP_TO_DATE, Update.State.UP_TO_DATE);
             }
             return !this.isSkipCheckUpdate;
         }
     }
 
     /**@description 检测更新 */
-    private _checkUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
+    private _checkUpdate(callback: (code: Update.Code, state: Update.State) => void) {
         if (this.isNeedUpdate(callback)) {
             Log.d(`--checkUpdate--`);
             if (this.updating) {
                 Log.d(`Checking or updating...`);
-                callback(HotUpdate.Code.CHECKING, HotUpdate.State.PREDOWNLOAD_VERSION);
+                callback(Update.Code.CHECKING, Update.State.PREDOWNLOAD_VERSION);
                 return;
             }
             if (!this.currentAssetsManager.manager.getLocalManifest() || !this.currentAssetsManager.manager.getLocalManifest().isLoaded()) {
                 Log.d(`Failed to load local manifest ....`);
-                callback(HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST, HotUpdate.State.FAIL_TO_UPDATE);
+                callback(Update.Code.ERROR_DOWNLOAD_MANIFEST, Update.State.FAIL_TO_UPDATE);
                 return;
             }
             if (this.isTryDownloadFailedAssets()) {
                 //已经更新失败，尝试获取更新下载失败的
                 Log.d(`之前下载资源未完全下载完成，请尝试重新下载`);
-                callback(HotUpdate.Code.UPDATE_FAILED, HotUpdate.State.TRY_DOWNLOAD_FAILED_ASSETS);
+                callback(Update.Code.UPDATE_FAILED, Update.State.TRY_DOWNLOAD_FAILED_ASSETS);
             } else {
                 this.updating = true;
                 this.checkCallback = callback;
@@ -168,7 +168,7 @@ export class HotupdateManager {
     }
 
     /**@description 检查主包是否需要更新 */
-    private checkMainUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
+    private checkMainUpdate(callback: (code: Update.Code, state: Update.State) => void) {
         if (this.isNeedUpdate(callback)) {
             this.currentAssetsManager = this.getAssetsManager();
             this.currentAssetsManager.manager.loadLocalManifest(this.mainVersionMainfest);
@@ -181,7 +181,7 @@ export class HotupdateManager {
      * @param callback 回调
      * @param bundle bundle,如果不传，则为对主包的检测
      */
-    checkUpdate(callback: (code: HotUpdate.Code, state: HotUpdate.State) => void, bundle?: string) {
+    checkUpdate(callback: (code: Update.Code, state: Update.State) => void, bundle?: string) {
         if (typeof bundle == "string") {
             this.checkBundleUpdate(bundle, callback);
         } else {
@@ -203,7 +203,7 @@ export class HotupdateManager {
      * @param bundle 子游戏名
      * @param callback 检测完成回调
      */
-    private checkBundleUpdate(bundle: string, callback: (code: HotUpdate.Code, state: HotUpdate.State) => void) {
+    private checkBundleUpdate(bundle: string, callback: (code: Update.Code, state: Update.State) => void) {
         if (this.isNeedUpdate(callback)) {
             this.currentAssetsManager = this.getAssetsManager(bundle);
             let manifestUrl = this.getBundleManifest(bundle);
@@ -221,7 +221,7 @@ export class HotupdateManager {
                 //不存在版本控制文件 ，生成一个初始版本
                 if (this.updating) {
                     Log.d(`Checking or updating...`);
-                    callback(HotUpdate.Code.CHECKING, HotUpdate.State.PREDOWNLOAD_VERSION);
+                    callback(Update.Code.CHECKING, Update.State.PREDOWNLOAD_VERSION);
                     return;
                 }
                 let gameManifest = {
@@ -250,20 +250,20 @@ export class HotupdateManager {
         let code = event.getEventCode();
         let bundle = this.currentAssetsManager.name;
         switch (event.getEventCode()) {
-            case HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST:
+            case Update.Code.ERROR_NO_LOCAL_MANIFEST:
                 Log.d(`No local manifest file found, hot update skipped.`);
                 break;
-            case HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST:
-            case HotUpdate.Code.ERROR_PARSE_MANIFEST:
+            case Update.Code.ERROR_DOWNLOAD_MANIFEST:
+            case Update.Code.ERROR_PARSE_MANIFEST:
                 Log.d(`Fail to download manifest file, hot update skipped.`);
                 break;
-            case HotUpdate.Code.ALREADY_UP_TO_DATE:
+            case Update.Code.ALREADY_UP_TO_DATE:
                 Log.d(`Already up to date with the latest remote version.${bundle}`);
                 if (bundle == MAIN_PACK) {
                     this.savePreVersions();
                 }
                 break;
-            case HotUpdate.Code.NEW_VERSION_FOUND:
+            case Update.Code.NEW_VERSION_FOUND:
                 Log.d(`New version found, please try to update.`);
                 if (bundle != MAIN_PACK) {
                     code = this.checkAllowUpdate(bundle,code);
@@ -276,7 +276,7 @@ export class HotupdateManager {
         this.updating = false;
 
         //如果正在下载更新文件，先下载更新文件比较完成后，再回调
-        if (this.checkCallback && this.currentAssetsManager.manager.getState() != HotUpdate.State.DOWNLOADING_VERSION as any) {
+        if (this.checkCallback && this.currentAssetsManager.manager.getState() != Update.State.DOWNLOADING_VERSION as any) {
             this.checkCallback(code, this.currentAssetsManager.manager.getState() as any);
             this.checkCallback = null;
         }
@@ -289,7 +289,7 @@ export class HotupdateManager {
         let versionInfo = this.preVersions[bundle];
         if (versionInfo == undefined || versionInfo == null) {
             Log.e(`预处理版本未存在!!!!`);
-            return HotUpdate.Code.PRE_VERSIONS_NOT_FOUND;
+            return Update.Code.PRE_VERSIONS_NOT_FOUND;
         } else {
             //先检查主包是否需要更新
             if (versionInfo.md5 == md5) {
@@ -301,7 +301,7 @@ export class HotupdateManager {
                     Log.d(`${bundle} 更新`);
                     if (this.isMd5Change(MAIN_PACK)) {
                         Log.d(`更新${bundle}时，主包有更新，需要先更新主包`);
-                        code = HotUpdate.Code.MAIN_PACK_NEED_UPDATE;
+                        code = Update.Code.MAIN_PACK_NEED_UPDATE;
                     }else{
                         Log.d(`更新${bundle}时，主包无更新，直接更新进入`);
                     }
@@ -309,7 +309,7 @@ export class HotupdateManager {
                     //更新其它子包，只需要大厅的md5及主包md5没有变化，即可直接更新进入bundle
                     if ( this.isMd5Change(MAIN_PACK) || this.isMd5Change(Macro.BUNDLE_HALL) ){
                         Log.d(`更新${bundle}时，主包与大厅有更新，下载 md5 :${md5} 与预处理md5不一致，需要对主包先进行更新`);
-                        code = HotUpdate.Code.MAIN_PACK_NEED_UPDATE;
+                        code = Update.Code.MAIN_PACK_NEED_UPDATE;
                     }else{
                         Log.e(`更新${bundle}时，主包与大厅无更新，可直接下载更新！！`);
                     }
@@ -342,11 +342,11 @@ export class HotupdateManager {
         this.currentAssetsManager.code = event.getEventCode();
         let bundle = this.currentAssetsManager.name;
         switch (event.getEventCode()) {
-            case HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST:
+            case Update.Code.ERROR_NO_LOCAL_MANIFEST:
                 Log.d(`No local manifest file found, hot update skipped.`);
                 failed = true;
                 break;
-            case HotUpdate.Code.UPDATE_PROGRESSION:
+            case Update.Code.UPDATE_PROGRESSION:
                 Log.d(`${event.getDownloadedBytes()} / ${event.getTotalBytes()}`);
                 Log.d(`${event.getDownloadedFiles()} / ${event.getTotalFiles()}`);
                 Log.d(`percent : ${event.getPercent()}`);
@@ -357,33 +357,33 @@ export class HotupdateManager {
                     Log.d(`Updated file: ${msg}`);
                 }
                 break;
-            case HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST:
-            case HotUpdate.Code.ERROR_PARSE_MANIFEST:
+            case Update.Code.ERROR_DOWNLOAD_MANIFEST:
+            case Update.Code.ERROR_PARSE_MANIFEST:
                 Log.d(`Fail to download manifest file, hot update skipped.`);
                 failed = true;
                 break;
-            case HotUpdate.Code.ALREADY_UP_TO_DATE:
+            case Update.Code.ALREADY_UP_TO_DATE:
                 Log.d(`Already up to date with the latest remote version.${bundle}`);
                 failed = true;
                 if (bundle == MAIN_PACK) {
                     this.savePreVersions();
                 }
                 break;
-            case HotUpdate.Code.UPDATE_FINISHED:
+            case Update.Code.UPDATE_FINISHED:
                 Log.d(`Update finished. ${event.getMessage()}`);
                 isUpdateFinished = true;
                 if (bundle == MAIN_PACK) {
                     this.savePreVersions();
                 }
                 break;
-            case HotUpdate.Code.UPDATE_FAILED:
+            case Update.Code.UPDATE_FAILED:
                 Log.d(`Update failed. ${event.getMessage()}`);
                 this.updating = false;
                 break;
-            case HotUpdate.Code.ERROR_UPDATING:
+            case Update.Code.ERROR_UPDATING:
                 Log.d(`Asset update error: ${event.getAssetId()} , ${event.getMessage()}`);
                 break;
-            case HotUpdate.Code.ERROR_DECOMPRESS:
+            case Update.Code.ERROR_DECOMPRESS:
                 Log.d(`${event.getMessage()}`);
                 break;
             default:
@@ -439,7 +439,7 @@ export class HotupdateManager {
             }
         }
 
-        let info: HotUpdate.DownLoadInfo = {
+        let info: Update.DownLoadInfo = {
             downloadedBytes: event.getDownloadedBytes(),
             totalBytes: event.getTotalBytes(),
             downloadedFiles: event.getDownloadedFiles(),
@@ -453,7 +453,7 @@ export class HotupdateManager {
             assetId: event.getAssetId(),
         };
 
-        dispatch(HotUpdate.Event.HOTUPDATE_DOWNLOAD, info)
+        dispatch(Update.Event.HOTUPDATE_DOWNLOAD, info)
 
         Log.d(`update cb  failed : ${failed}  , need restart : ${isUpdateFinished} , updating : ${this.updating}`);
     }
@@ -466,17 +466,17 @@ export class HotupdateManager {
     getStatus(bundle: string) {
         if (sys.isBrowser) {
             //浏览器无更新
-            return HotUpdate.Status.UP_TO_DATE;
+            return Update.Status.UP_TO_DATE;
         }
         bundle = this.convertBundle(bundle);
         let versionInfo = this.getVersionInfo(bundle);
         if (versionInfo) {
             if (versionInfo.md5 == this.remoteVersions[bundle].md5) {
-                return HotUpdate.Status.UP_TO_DATE;
+                return Update.Status.UP_TO_DATE;
             }
-            return HotUpdate.Status.NEED_UPDATE;
+            return Update.Status.NEED_UPDATE;
         } else {
-            return HotUpdate.Status.NEED_DOWNLOAD;
+            return Update.Status.NEED_DOWNLOAD;
         }
     }
 
@@ -534,7 +534,7 @@ export class HotupdateManager {
     /**
      * @description 热更新初始化,先读取本地的所有版本信息，再拉取远程所有的版本信息
      * */
-    loadVersions(config: HotUpdate.BundleConfig) {
+    loadVersions(config: Update.Config) {
         return new Promise<{ isOk: boolean, err: string }>((resolove, reject) => {
             if (sys.isBrowser) {
                 resolove({ isOk: true, err: "" });
@@ -550,7 +550,7 @@ export class HotupdateManager {
                 } else {
                     this.remoteVersions = JSON.parse(data);
                     let bundle = this.convertBundle(config.bundle);
-                    if (bundle == MAIN_PACK && this.getStatus(bundle) == HotUpdate.Status.UP_TO_DATE) {
+                    if (bundle == MAIN_PACK && this.getStatus(bundle) == Update.Status.UP_TO_DATE) {
                         Log.d(`主包已经是最新，写入远程的版本信息`);
                         this.preVersions = JSON.parse(data);
                         //主包更新完成，清除路径缓存信息

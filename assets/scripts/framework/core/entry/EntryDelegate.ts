@@ -1,6 +1,6 @@
 import { AssetManager } from "cc";
 import { Macro } from "../../defines/Macros";
-import { HotUpdate } from "../hotupdate/Hotupdate";
+import { Update } from "../update/Update";
 
 /**@description entry入口代理 */
 export class EntryDelegate {
@@ -20,25 +20,25 @@ export class EntryDelegate {
     }
 
     /**@description 发现新版本 */
-    onNewVersionFund(versionInfo: HotUpdate.BundleConfig, code: HotUpdate.Code, state: HotUpdate.State) {
+    onNewVersionFund(versionInfo: Update.Config, code: Update.Code, state: Update.State) {
         Log.d(`检测到有新版本更新 bundle${versionInfo.bundle} name : ${versionInfo.name}`);
-        Manager.hotupdate.hotUpdate();
+        Manager.updateManager.hotUpdate();
     }
 
     /**@description 下载失败 */
-    onDownloadFailed(versionInfo: HotUpdate.BundleConfig, code: HotUpdate.Code, state: HotUpdate.State) {
+    onDownloadFailed(versionInfo: Update.Config, code: Update.Code, state: Update.State) {
         let content = Manager.getLanguage("downloadFailed");
         Manager.alert.show({
             text: content,
             confirmCb: (isOK) => {
-                Manager.hotupdate.downloadFailedAssets();
+                Manager.updateManager.downloadFailedAssets();
             }
         });
         Manager.loading.hide();
     }
 
     /**@description 当前已经是新包，无需更新 */
-    onAreadyUpToData(versionInfo: HotUpdate.BundleConfig, code: HotUpdate.Code, state: HotUpdate.State) {
+    onAreadyUpToData(versionInfo: Update.Config, code: Update.Code, state: Update.State) {
         Manager.loading.hide();
         // 下载完成后不能直接进入，后面如果有多个下载时，会出问题
         // Manager.loading.show(Manager.getLanguage("loading_game_resources"))
@@ -46,11 +46,11 @@ export class EntryDelegate {
     }
 
     /**@description 下载版本文件失败 */
-    onDownloadManifestFailed(versionInfo: HotUpdate.BundleConfig, code: HotUpdate.Code, state: HotUpdate.State) {
+    onDownloadManifestFailed(versionInfo: Update.Config, code: Update.Code, state: Update.State) {
         let content = Manager.getLanguage("downloadFailManifest") as string;
-        if (code == HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST) {
+        if (code == Update.Code.ERROR_NO_LOCAL_MANIFEST) {
             content = Manager.getLanguage("noFindManifest") as string;
-        } else if (code == HotUpdate.Code.ERROR_PARSE_MANIFEST) {
+        } else if (code == Update.Code.ERROR_PARSE_MANIFEST) {
             content = Manager.getLanguage("manifestError") as string;
         }
         Manager.tips.show(content);
@@ -58,53 +58,53 @@ export class EntryDelegate {
     }
 
     /**@description 正在检测更新 */
-    onCheckingVersion(versionInfo: HotUpdate.BundleConfig, code: HotUpdate.Code, state: HotUpdate.State) {
+    onCheckingVersion(versionInfo: Update.Config, code: Update.Code, state: Update.State) {
         //do nothing
     }
 
     /**@description 其它错误 */
-    onOtherReason(versionInfo: HotUpdate.BundleConfig, code: HotUpdate.Code, state: HotUpdate.State) {
+    onOtherReason(versionInfo: Update.Config, code: Update.Code, state: Update.State) {
         //do nothing
     }
 
     /**@description 资源下载中 */
-    onDownloading(versionInfo: HotUpdate.BundleConfig, info: HotUpdate.DownLoadInfo) {
+    onDownloading(versionInfo: Update.Config, info: Update.DownLoadInfo) {
         let newPercent = 0;
-        let config = Manager.hotupdate.getBundleName(versionInfo.bundle);
-        if (info.code == HotUpdate.Code.UPDATE_PROGRESSION) {
+        let config = Manager.updateManager.getBundleName(versionInfo.bundle);
+        if (info.code == Update.Code.UPDATE_PROGRESSION) {
             newPercent = info.percent == Number.NaN ? 0 : info.percent;
-            dispatch(HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
-        } else if (info.code == HotUpdate.Code.ALREADY_UP_TO_DATE) {
+            dispatch(Update.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
+        } else if (info.code == Update.Code.ALREADY_UP_TO_DATE) {
             newPercent = 1;
             Manager.loading.hide();
-            dispatch(HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
-        } else if (info.code == HotUpdate.Code.UPDATE_FINISHED) {
+            dispatch(Update.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
+        } else if (info.code == Update.Code.UPDATE_FINISHED) {
             newPercent = 1.1;
             Manager.loading.hide();
             // Log.d(`正在加载${config.name}`);
             //下载完成不能直接进入,否则在多个任务下载时会出错
             // Manager.bundleManager.loadBundle(this);
-            dispatch(HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
-        } else if (info.code == HotUpdate.Code.UPDATE_FAILED ||
-            info.code == HotUpdate.Code.ERROR_NO_LOCAL_MANIFEST ||
-            info.code == HotUpdate.Code.ERROR_DOWNLOAD_MANIFEST ||
-            info.code == HotUpdate.Code.ERROR_PARSE_MANIFEST ||
-            info.code == HotUpdate.Code.ERROR_DECOMPRESS) {
+            dispatch(Update.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
+        } else if (info.code == Update.Code.UPDATE_FAILED ||
+            info.code == Update.Code.ERROR_NO_LOCAL_MANIFEST ||
+            info.code == Update.Code.ERROR_DOWNLOAD_MANIFEST ||
+            info.code == Update.Code.ERROR_PARSE_MANIFEST ||
+            info.code == Update.Code.ERROR_DECOMPRESS) {
             newPercent = -1;
             Manager.loading.hide();
-            dispatch(HotUpdate.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
+            dispatch(Update.Event.DOWNLOAD_PROGRESS, { progress: newPercent, config: config });
         }
     }
 
     /**@description 加载Bundle错误 */
-    onLoadBundleError(versionInfo: HotUpdate.BundleConfig, err: Error) {
+    onLoadBundleError(versionInfo: Update.Config, err: Error) {
         Manager.loading.hide();
         let content = Manager.getLanguage(["updateFaild", versionInfo.name]) as string;
         Manager.tips.show(content);
     }
 
     /**@description 加载bundle完成 */
-    onLoadBundleComplete(versionInfo: HotUpdate.BundleConfig, bundle: AssetManager.Bundle) {
+    onLoadBundleComplete(versionInfo: Update.Config, bundle: AssetManager.Bundle) {
         //通知入口管理进入bundle
         Manager.loading.hide();
         Manager.entryManager.onLoadBundleComplete(versionInfo, bundle);
@@ -134,7 +134,7 @@ export class EntryDelegate {
 
     /**@description 主包检测更新 */
     onCheckUpdate() {
-        let config = new HotUpdate.BundleConfig(
+        let config = new Update.Config(
             Manager.getLanguage("mainPack"),
             Macro.BUNDLE_RESOURCES
         );
@@ -158,7 +158,7 @@ export class EntryDelegate {
     /**
      * @description 重新检测主包更新
      */
-    onRecheckMainUpdate(code: HotUpdate.Code, config: HotUpdate.BundleConfig) {
+    onRecheckMainUpdate(code: Update.Code, config: Update.Config) {
         Manager.loading.hide();
         let content = Manager.getLanguage("mainPackVersionIsTooLow") as string;
         Manager.alert.show({
@@ -169,7 +169,7 @@ export class EntryDelegate {
         });
     }
 
-    getEntryConfig(bundle: BUNDLE_TYPE): HotUpdate.BundleConfig | null {
+    getEntryConfig(bundle: BUNDLE_TYPE): Update.Config | null {
         return null;
     }
 }

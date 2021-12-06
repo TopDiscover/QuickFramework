@@ -1,7 +1,7 @@
 import { HallData } from "../data/HallData";
 import SettingView from "../../../../scripts/common/component/SettingView";
 import { EventTouch, _decorator, Node, PageView, instantiate, find, Label, ProgressBar, sys, PhysicsSystem2D } from "cc";
-import { HotUpdate } from "../../../../scripts/framework/core/hotupdate/Hotupdate";
+import { Update } from "../../../../scripts/framework/core/update/Update";
 import { ViewZOrder } from "../../../../scripts/common/config/Config";
 import { Macro } from "../../../../scripts/framework/defines/Macros";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
@@ -105,10 +105,10 @@ export default class HallView extends GameView {
 
     protected addEvents() {
         super.addEvents();
-        this.addEvent(HotUpdate.Event.DOWNLOAD_PROGRESS, this.onDownloadProgess);
+        this.addEvent(Update.Event.DOWNLOAD_PROGRESS, this.onDownloadProgess);
     }
 
-    private getGameItem(config: HotUpdate.BundleConfig) {
+    private getGameItem(config: Update.Config) {
         let pages = this.pageView.getPages();
         for (let i = 0; i < pages.length; i++) {
             let page = pages[i];
@@ -122,10 +122,10 @@ export default class HallView extends GameView {
 
     private updateGameItemStatus(item: Node) {
         let bundle = item.userData;
-        let status = Manager.hotupdate.getStatus(bundle);
+        let status = Manager.updateManager.getStatus(bundle);
         let updateNode = find("Background/update", item);
         if (!updateNode) return;
-        if (status == HotUpdate.Status.UP_TO_DATE) {
+        if (status == Update.Status.UP_TO_DATE) {
             updateNode.active = false;
             return;
         } else {
@@ -135,7 +135,7 @@ export default class HallView extends GameView {
         let down = find("down", updateNode);
         let update = find("update", updateNode);
         if (downloading && down && update) {
-            if (status == HotUpdate.Status.NEED_DOWNLOAD) {
+            if (status == Update.Status.NEED_DOWNLOAD) {
                 downloading.active = false;
                 down.active = true;
                 update.active = false;
@@ -147,7 +147,7 @@ export default class HallView extends GameView {
         }
     }
 
-    private onDownloadProgess(data: { progress: number, config: HotUpdate.BundleConfig }) {
+    private onDownloadProgess(data: { progress: number, config: Update.Config }) {
 
         let node = this.getGameItem(data.config);
         if (node) {
@@ -184,7 +184,7 @@ export default class HallView extends GameView {
         super.show(args)
         let version = find("version",this.node)?.getComponent(Label);
         if ( version ){
-            version.string = Manager.hotupdate.getVersion(this.bundle);
+            version.string = Manager.updateManager.getVersion(this.bundle);
         }
     }
 }

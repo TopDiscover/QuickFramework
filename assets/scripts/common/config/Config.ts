@@ -1,6 +1,6 @@
 /**@description 全局配置 */
 
-import { HotUpdate } from "../../framework/core/hotupdate/Hotupdate";
+import { Update } from "../../framework/core/update/Update";
 
 export namespace Config {
     /**@description 是否显示调试按钮 */
@@ -53,7 +53,7 @@ export namespace Config {
     /**@description 网络重连弹出框tag */
     export const RECONNECT_ALERT_TAG = 100;
 
-    export const ENTRY_CONFIG : {[key:string] : HotUpdate.BundleConfig} ={};
+    export const ENTRY_CONFIG : {[key:string] : Update.Config} ={};
 
     export const SHOW_DEBUG_INFO_KEY = "SHOW_DEBUG_INFO_KEY";
 }
