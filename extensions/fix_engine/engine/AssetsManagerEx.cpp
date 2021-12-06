@@ -334,7 +334,7 @@ bool AssetsManagerEx::loadRemoteManifest(Manifest *remoteManifest) {
     _remoteManifest = remoteManifest;
     _remoteManifest->retain();
     // Compare manifest version and set state
-    if (_localManifest->versionGreaterOrEquals(_remoteManifest, _versionCompareHandle)) {
+    if (_localManifest->equal(_remoteManifest)) {
         _updateState = State::UP_TO_DATE;
         _fileUtils->removeDirectory(_tempStoragePath);
         dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ALREADY_UP_TO_DATE);
