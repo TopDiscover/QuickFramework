@@ -29,7 +29,6 @@ export let LanguageZH = {
     mainPack: "主包",
     mainPackVersionIsTooLow: "版本过低，请更新。",
     loadVersions: "正在加载远程版本信息",
-    loadVersionsFailed: "加载远程版本信息失败",
     warnNetBad : "您的网络已断开，请重试!!",
     downloadFailed : "下载文件失败，请重试!!!",
   }

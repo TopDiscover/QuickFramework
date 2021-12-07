@@ -74,7 +74,7 @@ export default class SettingView extends UIView {
             text: Manager.getLanguage("quitGame"),
             confirmCb: (isOk) => {
                 if (isOk) {
-                    Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES,true);
+                    Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
                 }
             },
         });

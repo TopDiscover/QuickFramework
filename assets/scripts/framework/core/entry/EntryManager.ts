@@ -2,6 +2,7 @@ import { Update } from "../update/Update";
 import { EntryDelegate } from "./EntryDelegate";
 import { AssetManager, Node } from "cc";
 import { DEBUG } from "cc/env";
+import { Macro } from "../../defines/Macros";
 
 /**@description 入口管理 */
 export class EntryManager {
@@ -72,16 +73,16 @@ export class EntryManager {
     /**
      * @description 进入bundle,默认代理没办法满足需求的情况，可自行定制 
      * @param bundle bundle
-     * @param isQuitGame 是否退出游戏，bundel为主包时有效果
+     * @param userData 用户自定义数据
      **/
-    enterBundle(bundle: BUNDLE_TYPE, isQuitGame: boolean = false) {
+    enterBundle(bundle: BUNDLE_TYPE , userData : any = null) {
         let config = this.delegate.getEntryConfig(bundle);
         if (config) {
-            if (isQuitGame) {
+            if (bundle == Macro.BUNDLE_RESOURCES) {
                 let entry = this.getEntry(bundle);
                 this.delegate.onQuitGame(entry);
             } else {
-                Manager.bundleManager.enterBundle(config, this.delegate);
+                Manager.bundleManager.enterBundle(config);
             }
         }
     }
