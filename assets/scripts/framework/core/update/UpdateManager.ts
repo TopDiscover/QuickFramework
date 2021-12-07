@@ -4,7 +4,7 @@ import { JSB, PREVIEW } from "cc/env";
 import { Macro } from "../../defines/Macros";
 import { HttpPackage } from "../net/http/HttpClient";
 import { Http } from "../net/http/Http";
-import { UpdateItem } from "./UpdateItem";
+import { CheckingStatus, UpdateItem, UpdateItemStatus } from "./UpdateItem";
 
 class AssetsManager {
 
@@ -40,10 +40,12 @@ export class UpdateManager {
     /**@description 是否在热更新中或检测更新状态 */
     private updating = false;
 
-    /**@description 等待下载项 */
-    private waiting : UpdateItem[] = [];
-    /**@description 正在在下载项 */
-    private downloading : UpdateItem | null = null;
+    /**@description 所有下载项 */
+    private items : UpdateItem[] = [];
+    /**@description 当前项 */
+    private current : UpdateItem | null = null;
+    /**@description 当前队列 */
+    private queue : string[] = [];
 
     private _hotUpdateUrl = "";
     /**@description 通用的热更新地址，当在子游戏或大厅未指定热更新地址时，都统一使用服务器传回来的默认全局更新地址 */
@@ -124,29 +126,29 @@ export class UpdateManager {
         return sys.platform == sys.Platform.WECHAT_GAME || PREVIEW || sys.isBrowser;
     }
 
-    private isNeedUpdate(callback: (code: Update.Code, state: Update.State) => void) {
+    private isNeedUpdate(item:UpdateItem) {
         if (this.isBrowser) {
             //预览及浏览器下，不需要有更新的操作
             this.updating = false;
-            callback(Update.Code.ALREADY_UP_TO_DATE, Update.State.UP_TO_DATE);
+            item.handler.onAreadyUpToData(item);
             return false;
         } else {
             if (this.isSkipCheckUpdate) {
                 Log.d("跳过热更新，直接使用本地资源代码");
                 this.updating = false;
-                callback(Update.Code.ALREADY_UP_TO_DATE, Update.State.UP_TO_DATE);
+                item.handler.onAreadyUpToData(item);
             }
             return !this.isSkipCheckUpdate;
         }
     }
 
     /**@description 检测更新 */
-    private _checkUpdate(callback: (code: Update.Code, state: Update.State) => void) {
-        if (this.isNeedUpdate(callback)) {
+    private _checkUpdate(item:UpdateItem) {
+        if (this.isNeedUpdate(item)) {
             Log.d(`--checkUpdate--`);
             if (this.updating) {
                 Log.d(`Checking or updating...`);
-                callback(Update.Code.CHECKING, Update.State.PREDOWNLOAD_VERSION);
+                item.handler.onChecking(item,CheckingStatus.PREDOWNLOAD_VERSION);
                 return;
             }
             if (!this.currentAssetsManager.manager.getLocalManifest() || !this.currentAssetsManager.manager.getLocalManifest().isLoaded()) {
@@ -167,24 +169,40 @@ export class UpdateManager {
         }
     }
 
+    /**@description 下载update项，以最新的为当前操作的对象 */
     dowonLoad( item : UpdateItem ){
-        if ( this.downloading ){
-            if ( this.downloading.bundle == item.bundle ){
-                Log.d(`将要下载项${this.downloading.bundle}与正在下载项相同`);
+        this.current = this.getItem(item);
+        if ( this.current ){
+            if ( this.current.status == UpdateItemStatus.Checking ){
+                this.current.handler.onChecking(this.current);
+                return;
             }else{
-                Log.d(`当前有正在下载项${this.downloading.bundle}，放入下载队列`);
-                this.waiting.push(item);
+
             }
         }else{
-            this.doDownload(item);
+            this.items.push(item);
+            this.current = item;
+            this.current.status = UpdateItemStatus.Checking;
+            this.loadVersions(this.current).then((isOk)=>{
+                if ( isOk ){
+                    let status = this.getStatus(item.bundle);
+                    if ( status == Update.Status.UP_TO_DATE){
+                        item.handler.onAreadyUpToData(item);
+                    }else{
+                        this.checkUpdate(item);
+                    }
+                }
+            });
         }
     }
 
-    private doDownload(item:UpdateItem){
-        this.downloading = item;
-        if ( this.downloading ){
-            // this.checkUpdate()
+    private getItem(item : UpdateItem ){
+        for ( let i = 0 ; i < this.items.length ; i++){
+            if ( item.bundle == this.items[i].bundle){
+                return item;
+            }
         }
+        return null;
     }
 
     downloadFailedAssets() {
@@ -194,11 +212,11 @@ export class UpdateManager {
     }
 
     /**@description 检查主包是否需要更新 */
-    private checkMainUpdate(callback: (code: Update.Code, state: Update.State) => void) {
-        if (this.isNeedUpdate(callback)) {
+    private checkMainUpdate(item:UpdateItem) {
+        if (this.isNeedUpdate(item)) {
             this.currentAssetsManager = this.getAssetsManager();
             this.currentAssetsManager.manager.loadLocalManifest(this.mainVersionMainfest);
-            this._checkUpdate(callback);
+            this._checkUpdate(item);
         }
     }
 
@@ -207,11 +225,13 @@ export class UpdateManager {
      * @param callback 回调
      * @param bundle bundle,如果不传，则为对主包的检测
      */
-    checkUpdate(callback: (code: Update.Code, state: Update.State) => void, bundle?: string) {
-        if (typeof bundle == "string") {
-            this.checkBundleUpdate(bundle, callback);
-        } else {
-            this.checkMainUpdate(callback);
+    checkUpdate(item:UpdateItem) {
+        item.status = UpdateItemStatus.Checking;
+        let bundle = this.convertBundle(item.bundle);
+        if ( bundle == MAIN_PACK ){
+            this.checkMainUpdate(item);
+        }else{
+            this.checkBundleUpdate(item);
         }
     }
 
@@ -560,29 +580,31 @@ export class UpdateManager {
     /**
      * @description 热更新初始化,先读取本地的所有版本信息，再拉取远程所有的版本信息
      * */
-    loadVersions(config: Update.Config) {
-        return new Promise<{ isOk: boolean, err: string }>((resolove, reject) => {
+    loadVersions(item: UpdateItem) {
+        return new Promise<boolean>((resolove, reject) => {
             if (sys.isBrowser) {
-                resolove({ isOk: true, err: "" });
+                resolove(true);
                 return;
             }
-
-            Manager.loading.show(Manager.getLanguage("loadVersions"));
+            item.state = Update.State.DOWNLOADING_VERSION;
+            item.handler.onChecking(item);
             this.readRemoteVersions((data, err) => {
-
                 if (err) {
                     this.remoteVersions = {};
-                    resolove({ isOk: false, err: Manager.getLanguage("warnNetBad") });
+                    item.handler.onChecking(item,CheckingStatus.ApplyRemoteVersionFailed);
+                    //请求远程版本失败，重置标识
+                    item.status = UpdateItemStatus.None;
+                    resolove(false);
                 } else {
                     this.remoteVersions = JSON.parse(data);
-                    let bundle = this.convertBundle(config.bundle);
+                    let bundle = this.convertBundle(item.bundle);
                     if (bundle == MAIN_PACK && this.getStatus(bundle) == Update.Status.UP_TO_DATE) {
                         Log.d(`主包已经是最新，写入远程的版本信息`);
                         this.preVersions = JSON.parse(data);
                         //主包更新完成，清除路径缓存信息
                         jsb.fileUtils.purgeCachedEntries();
                     }
-                    resolove({ isOk: true, err: "" });
+                    resolove(true);
                 }
             });
         });

@@ -67,6 +67,8 @@ export namespace Update {
         MAIN_PACK_NEED_UPDATE,
         /**@description 预处理版本文件不存在 */
         PRE_VERSIONS_NOT_FOUND,
+        /**@description 未初始化 */
+        UNINITED,
     }
     export enum State {
         /**@description 未初始化 */
