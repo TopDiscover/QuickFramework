@@ -220,8 +220,8 @@ bool AssetsManagerEx::loadLocalManifest(Manifest *localManifest, const std::stri
     }
     // Compare with cached manifest to determine which one to use
     if (cachedManifest) {
-        bool localNewer = _localManifest->equal(cachedManifest);
-        if (localNewer) {
+        bool isEqual = _localManifest->equal(cachedManifest);
+        if (!isEqual) {
             // Recreate storage, to empty the content
             _fileUtils->removeDirectory(_storagePath);
             _fileUtils->createDirectory(_storagePath);
@@ -295,8 +295,8 @@ bool AssetsManagerEx::loadLocalManifest(const std::string &manifestUrl) {
     if (_localManifest->isLoaded()) {
         // Compare with cached manifest to determine which one to use
         if (cachedManifest) {
-            bool localNewer = _localManifest->equal(cachedManifest);
-            if (localNewer) {
+            bool isEqual = _localManifest->equal(cachedManifest);
+            if (!isEqual) {
                 // Recreate storage, to empty the content
                 _fileUtils->removeDirectory(_storagePath);
                 _fileUtils->createDirectory(_storagePath);
