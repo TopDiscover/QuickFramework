@@ -117,7 +117,7 @@ export class UpdateItem {
     }
 
     /**@description 是否正在下载或正在检测更新 */
-    isUpdating = true;
+    isUpdating = false;
 
     /**@description 热更新bundle名 */
     get updateName() {
@@ -318,7 +318,7 @@ export class UpdateItem {
         Log.d(`${this.bundle} --update cb code : ${event.getEventCode()} state : ${this.assetsManager.manager.getState()}`);
         //存储当前的状态，当下载版本文件失败时，state的状态与下载非版本文件是一样的状态
         this.assetsManager.code = event.getEventCode();
-        switch (event.getEventCode()) {
+        switch (this.assetsManager.code) {
             case Update.Code.ERROR_NO_LOCAL_MANIFEST:
                 Log.d(`${this.bundle} No local manifest file found, hot update skipped.`);
                 failed = true;
@@ -355,7 +355,6 @@ export class UpdateItem {
                 break;
             case Update.Code.UPDATE_FAILED:
                 Log.d(`${this.bundle} Update failed. ${event.getMessage()}`);
-                this.isUpdating = false;
                 break;
             case Update.Code.ERROR_UPDATING:
                 Log.d(`${this.bundle} Asset update error: ${event.getAssetId()} , ${event.getMessage()}`);
@@ -368,7 +367,6 @@ export class UpdateItem {
         }
         if (failed) {
             this.assetsManager.manager.setEventCallback(null as any);
-            this.isUpdating = false;
         }
 
         if (isUpdateFinished) {
@@ -416,6 +414,11 @@ export class UpdateItem {
                 //下载完成 重置热更新管理器，在游戏期间如果有发热更新，可以再次检测
                 Manager.updateManager.restAssetsManager(this.updateName);
             }
+        }
+
+        if( this.assetsManager.code != Update.Code.UPDATE_PROGRESSION){
+            //不是更新中状态，重置标识
+            this.isUpdating = false;
         }
 
         let info: Update.DownLoadInfo = {
