@@ -77,13 +77,11 @@ export class UpdateManager {
         if (this.isBrowser) {
             //预览及浏览器下，不需要有更新的操作
             item.isUpdating = false;
-            item.handler.onAreadyUpToData(item);
             return false;
         } else {
             if (this.isSkipCheckUpdate) {
                 Log.d("跳过热更新，直接使用本地资源代码");
                 item.isUpdating = false;
-                item.handler.onAreadyUpToData(item);
             }
             return !this.isSkipCheckUpdate;
         }
@@ -92,12 +90,17 @@ export class UpdateManager {
     /**@description 下载update项，以最新的为当前操作的对象 */
     dowonLoad(item: UpdateItem) {
         if (this.isSkipUpdate(item)) {
-            item.handler.onAreadyUpToData(item);
+            item.handler.onLoadBundle(item);
         } else {
             this.current = this.getItem(item);
             if (this.current) {
                 if (this.current.isUpdating) {
-                    this.current.handler.onUpdating(this.current);
+                    this.current.handler.onShowUpdating(this.current);
+                }else{
+                    let status = this.getStatus(item.bundle);
+                    if ( status == Update.Status.UP_TO_DATE){
+                        item.handler.onLoadBundle(item);
+                    }
                 }
             } else {
                 this.items.push(item);
@@ -108,7 +111,7 @@ export class UpdateManager {
                         let status = this.getStatus(item.bundle);
                         if (status == Update.Status.UP_TO_DATE) {
                             item.isUpdating = false;
-                            item.handler.onAreadyUpToData(item);
+                            item.handler.onLoadBundle(item);
                         } else {
                             item.checkUpdate();
                         }
@@ -247,7 +250,7 @@ export class UpdateManager {
                 return;
             }
             item.state = Update.State.DOWNLOADING_VERSION;
-            item.handler.onUpdating(item);
+            item.handler.onShowUpdating(item);
             this.readRemoteVersions((data, err) => {
                 if (err) {
                     this.remoteVersions = {};

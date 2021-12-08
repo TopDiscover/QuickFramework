@@ -36,12 +36,12 @@ export class EntryDelegate {
         return [Macro.BUNDLE_RESOURCES];
     }
 
-    onQuitGame(mainEntry: Entry | null) {
+    onQuitGame(mainEntry: Entry | null , userData ?: any) {
         if (mainEntry) {
             if (Manager.gameView) {
                 Manager.gameView.close();
             }
-            mainEntry.onEnter(true);
+            mainEntry.onEnter(userData);
         }
     }
 

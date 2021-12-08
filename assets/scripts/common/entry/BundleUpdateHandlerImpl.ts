@@ -10,8 +10,14 @@ export class BundleUpdateHandlerImpl implements UpdateHandlerDelegate {
     }
     onUpdateFailed(item: UpdateItem): void {
         Manager.tips.show(Manager.getLanguage(["updateFaild",item.name]));
+        //更新大厅图片状态到可更新,让用户再二次点击
+        Manager.uiManager.getView("HallView").then((view : HallView)=>{
+            if ( view ){
+                view.toUpdateStatus(item);
+            }
+        });
     }
-    onUpdating(item: UpdateItem): void {
+    onShowUpdating(item: UpdateItem): void {
         Manager.tips.show(Manager.getLanguage("checkingUpdate"));
     }
     onNeedUpdateMain(item: UpdateItem): void {
@@ -27,25 +33,33 @@ export class BundleUpdateHandlerImpl implements UpdateHandlerDelegate {
         
     }
     onDownloading(item: UpdateItem, info: Update.DownLoadInfo): void {
-        throw new Error("Method not implemented.");
+        Manager.uiManager.getView("HallView").then((view : HallView)=>{
+            if ( view ){
+                view.onDownloadProgess(info);
+            }
+        });
     }
     onAreadyUpToData(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        Manager.tips.show(Manager.getLanguage(["alreadyRemoteVersion",item.name]));
     }
     onTryDownloadFailedAssets(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        //直接下载失败的更新文件
+        item.downloadFailedAssets();
     }
     onStarCheckUpdate(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        //子游戏更新，不做处理
     }
     onStartLoadBundle(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        //子游戏加载，不做处理
     }
     onLoadBundleError(item: UpdateItem, err: Error | null): void {
-        throw new Error("Method not implemented.");
+        Manager.tips.show(Manager.getLanguage(["loadFailed",item.name]));
     }
     onLoadBundleComplete(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        Manager.entryManager.onLoadBundleComplete(item);
     }
 
+    onLoadBundle(item: UpdateItem): void {
+        Manager.bundleManager.loadBundle(item);
+    }
 }

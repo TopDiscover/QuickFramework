@@ -9,37 +9,50 @@ export class MainUpdateHandlerImpl implements UpdateHandlerDelegate {
         item.doUpdate();
     }
     onUpdateFailed(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        let content = Manager.getLanguage("downloadFailed");
+        Manager.alert.show({
+            text: content,
+            confirmCb: (isOK) => {
+                item.downloadFailedAssets();
+            }
+        });
+        Manager.updateLoading.hide();
     }
-    onUpdating(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+    onShowUpdating(item: UpdateItem): void {
+        Manager.updateLoading.show(Manager.getLanguage("loading"));
     }
     onNeedUpdateMain(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        
     }
     onOther(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        
     }
     onDownloading(item: UpdateItem, info: Update.DownLoadInfo): void {
-        throw new Error("Method not implemented.");
+        Manager.updateLoading.updateProgress(info.progress);
     }
     onAreadyUpToData(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        // Manager.updateLoading.hide();
     }
     onTryDownloadFailedAssets(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        item.downloadFailedAssets();
     }
     onStarCheckUpdate(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        Manager.updateLoading.show(Manager.getLanguage("loading"));
     }
     onStartLoadBundle(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        
     }
     onLoadBundleError(item: UpdateItem, err: Error | null): void {
-        throw new Error("Method not implemented.");
+        //主包原则上说是不可能加载错误的
+        Manager.updateLoading.hide();
+        Manager.tips.show(Manager.getLanguage(["loadFailed",item.name]));
+        Log.dump(err,"onLoadBundleError");
     }
     onLoadBundleComplete(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        Manager.updateLoading.hide();
+        Manager.entryManager.onLoadBundleComplete(item);
     }
-
+    onLoadBundle(item: UpdateItem): void {
+        
+    }
 }

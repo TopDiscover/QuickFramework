@@ -3,6 +3,7 @@ import { EntryDelegate } from "./EntryDelegate";
 import { AssetManager, Node } from "cc";
 import { DEBUG } from "cc/env";
 import { Macro } from "../../defines/Macros";
+import { UpdateItem } from "../update/UpdateItem";
 
 /**@description 入口管理 */
 export class EntryManager {
@@ -75,24 +76,25 @@ export class EntryManager {
      * @param bundle bundle
      * @param userData 用户自定义数据
      **/
-    enterBundle(bundle: BUNDLE_TYPE , userData : any = null) {
+    enterBundle(bundle: BUNDLE_TYPE , userData ?: any) {
         let config = this.delegate.getEntryConfig(bundle);
         if (config) {
             if (bundle == Macro.BUNDLE_RESOURCES) {
                 let entry = this.getEntry(bundle);
-                this.delegate.onQuitGame(entry);
+                this.delegate.onQuitGame(entry,userData);
             } else {
+                config.userData = userData;
                 Manager.bundleManager.enterBundle(config);
             }
         }
     }
 
     /**@description 加载bundle完成 */
-    onLoadBundleComplete(versionInfo: Update.Config, bundle: AssetManager.Bundle) {
+    onLoadBundleComplete(item:UpdateItem) {
         //通知入口管理进入bundle
-        let entry = this.getEntry(versionInfo.bundle);
+        let entry = this.getEntry(item.bundle);
         if (entry) {
-            entry.onEnter();
+            entry.onEnter(item.userData);
         }
     }
 

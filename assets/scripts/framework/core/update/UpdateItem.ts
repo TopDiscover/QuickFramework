@@ -9,7 +9,7 @@ export interface UpdateHandlerDelegate {
     /**@description 更新失败 */
     onUpdateFailed(item: UpdateItem): void;
     /**@description 正在更新或检测更新中 */
-    onUpdating(item: UpdateItem): void;
+    onShowUpdating(item: UpdateItem): void;
     /**@description 需要更新主包 */
     onNeedUpdateMain(item: UpdateItem): void;
     /**@description 其它状态 */
@@ -23,6 +23,8 @@ export interface UpdateHandlerDelegate {
     /**@description 开始测试更新 */
     onStarCheckUpdate(item: UpdateItem): void;
 
+    /**@description 加载bundle */
+    onLoadBundle(item:UpdateItem):void
     /**@description 开始加载bundle */
     onStartLoadBundle(item: UpdateItem): void;
     /**@description 加载bundle错误 */
@@ -41,7 +43,7 @@ export class UpdateHandler implements UpdateHandlerDelegate {
     onUpdateFailed(item: UpdateItem): void {
         if (this.delegate) this.delegate.onUpdateFailed(item);
     }
-    onUpdating(item: UpdateItem): void {
+    onShowUpdating(item: UpdateItem): void {
         if (item.state == Update.State.DOWNLOADING_VERSION) {
             Manager.tips.show(Manager.getLanguage("loadVersions"));
         } else if (item.code == Update.Code.ERROR_DOWNLOAD_MANIFEST) {
@@ -49,7 +51,7 @@ export class UpdateHandler implements UpdateHandlerDelegate {
         } else {
             Manager.tips.show(Manager.getLanguage("checkingUpdate"));
         }
-        if (this.delegate) this.delegate.onUpdating(item);
+        if (this.delegate) this.delegate.onShowUpdating(item);
     }
     onNeedUpdateMain(item: UpdateItem): void {
         if (this.delegate) this.delegate.onNeedUpdateMain(item);
@@ -80,6 +82,10 @@ export class UpdateHandler implements UpdateHandlerDelegate {
     /**@description 加载bundle完成 */
     onLoadBundleComplete(item: UpdateItem): void {
         if (this.delegate) this.delegate.onLoadBundleComplete(item);
+    }
+    /**@description 加载bundle */
+    onLoadBundle(item:UpdateItem):void{
+        if ( this.delegate) this.delegate.onLoadBundle(item);
     }
 }
 
@@ -175,7 +181,7 @@ export class UpdateItem {
             //不存在版本控制文件 ，生成一个初始版本
             if (this.isUpdating) {
                 Log.d(`${this.bundle} Checking or updating...`);
-                this.handler.onUpdating(this);
+                this.handler.onShowUpdating(this);
                 return;
             }
             let gameManifest = {
@@ -203,7 +209,7 @@ export class UpdateItem {
         Log.d(`${this.bundle} --checkUpdate--`);
         if (this.isUpdating) {
             Log.d(`${this.bundle} Checking or updating...`);
-            this.handler.onUpdating(this);
+            this.handler.onShowUpdating(this);
             return;
         }
         if (!this.assetsManager.manager.getLocalManifest() || !this.assetsManager.manager.getLocalManifest().isLoaded()) {

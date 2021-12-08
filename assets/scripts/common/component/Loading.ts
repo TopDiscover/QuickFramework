@@ -30,14 +30,14 @@ export default class Loading {
     }
 
     /**@description 显示的Loading提示内容 */
-    private _content : string[] = [];
+    protected _content : string[] = [];
     private _showContentIndex = 0;
 
     /**@description 超时回调定时器id */
     private _timerId:number = -1;
 
     /**@description 显示的提示 */
-    private _text : Label = null!;
+    protected _text : Label = null!;
 
     public preloadPrefab() {
         this.loadPrefab();

@@ -53,8 +53,8 @@ class LoginEntry extends Entry {
 
     
     /**@description 管理器通知自己进入GameView */
-    onEnter(isQuitGame : boolean) {
-        super.onEnter(isQuitGame);
+    onEnter( userData ?: any) {
+        super.onEnter(userData);
         Log.d(`--------------onEnterLogin--------------`);
     }
 

@@ -33,5 +33,7 @@ export let LanguageEN = {
         loadVersions: "正在加载远程版本信息",
         warnNetBad : "您的网络已断开，请重试!!",
         downloadFailed : "下载文件失败，请重试!!!",
+        loadFailed : "{0}加载失败!!",
+        loadingProgress : "加载资源中({0}%)...",
     }
 }

@@ -1,45 +1,65 @@
 import { Update } from "../../framework/core/update/Update";
 import { UpdateHandlerDelegate, UpdateItem } from "../../framework/core/update/UpdateItem";
+import { Macro } from "../../framework/defines/Macros";
 
 /**@description 大厅更新代理 */
 export class HallUpdateHandlerImpl implements UpdateHandlerDelegate {
     private static _instance: HallUpdateHandlerImpl = null!;
     public static Instance() { return this._instance || (this._instance = new HallUpdateHandlerImpl()); }
     onNewVersionFund(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        item.doUpdate();
     }
     onUpdateFailed(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        let content = Manager.getLanguage("downloadFailed");
+        Manager.alert.show({
+            text: content,
+            confirmCb: (isOK) => {
+                item.downloadFailedAssets();
+            }
+        });
+        Manager.updateLoading.hide();
     }
-    onUpdating(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+    onShowUpdating(item: UpdateItem): void {
+        Manager.updateLoading.show(Manager.getLanguage("loading"));
     }
     onNeedUpdateMain(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        Manager.updateLoading.hide();
+        let content = Manager.getLanguage("mainPackVersionIsTooLow") as string;
+        Manager.alert.show({
+            text: content,
+            confirmCb: (isOK) => {
+                Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
+            }
+        });
     }
     onOther(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        
     }
     onDownloading(item: UpdateItem, info: Update.DownLoadInfo): void {
-        throw new Error("Method not implemented.");
+        Manager.updateLoading.updateProgress(info.progress);
     }
     onAreadyUpToData(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        //大厅更新，直接进入
+        Manager.bundleManager.loadBundle(item);
     }
     onTryDownloadFailedAssets(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        item.downloadFailedAssets();
     }
     onStarCheckUpdate(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        Manager.updateLoading.show(Manager.getLanguage("loading"));
     }
     onStartLoadBundle(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        
     }
     onLoadBundleError(item: UpdateItem, err: Error | null): void {
-        throw new Error("Method not implemented.");
+        Manager.updateLoading.hide();
+        Manager.tips.show(Manager.getLanguage(["loadFailed",item.name]));
     }
     onLoadBundleComplete(item: UpdateItem): void {
-        throw new Error("Method not implemented.");
+        Manager.updateLoading.hide();
+        Manager.entryManager.onLoadBundleComplete(item);
     }
-
+    onLoadBundle(item: UpdateItem): void {
+        Manager.bundleManager.loadBundle(item);
+    }
 }

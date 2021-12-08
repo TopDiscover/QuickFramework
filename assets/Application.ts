@@ -5,6 +5,7 @@ import Loading from "./scripts/common/component/Loading";
 import Tips from "./scripts/common/component/Tips";
 import UILoading from "./scripts/common/component/UILoading";
 import { UIReconnect } from "./scripts/common/component/UIReconnect";
+import UpdateLoading from "./scripts/common/component/UpdateLoading";
 import { Config } from "./scripts/common/config/Config";
 import { CmmEntry } from "./scripts/common/entry/CmmEntry";
 import { CommonLanguage } from "./scripts/common/language/CommonLanguage";
@@ -47,6 +48,10 @@ export class _Manager extends Framewok implements GameEventInterface {
     /**@description 公共loading */
     get loading() {
         return getSingleton(Loading);
+    }
+
+    get updateLoading(){
+        return getSingleton(UpdateLoading);
     }
 
     private _wssCacertUrl = "";
