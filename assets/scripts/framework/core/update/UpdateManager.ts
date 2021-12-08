@@ -97,28 +97,29 @@ export class UpdateManager {
                 if (this.current.isUpdating) {
                     this.current.handler.onShowUpdating(this.current);
                 }else{
-                    let status = this.getStatus(item.bundle);
-                    if ( status == Update.Status.UP_TO_DATE){
-                        item.handler.onLoadBundle(item);
-                    }
+                    this._dowonLoad(item);
                 }
             } else {
                 this.items.push(item);
-                this.current = item;
-                this.current.isUpdating = true;
-                this.loadVersions(this.current).then((isOk) => {
-                    if (isOk) {
-                        item.isUpdating = false;
-                        let status = this.getStatus(item.bundle);
-                        if (status == Update.Status.UP_TO_DATE) {
-                            item.handler.onLoadBundle(item);
-                        } else {
-                            item.checkUpdate();
-                        }
-                    }
-                });
+                this._dowonLoad(item);
             }
         }
+    }
+
+    private _dowonLoad(item:UpdateItem){
+        this.current = item;
+        this.current.isUpdating = true;
+        this.loadVersions(this.current).then((isOk) => {
+            if (isOk) {
+                item.isUpdating = false;
+                let status = this.getStatus(item.bundle);
+                if (status == Update.Status.UP_TO_DATE) {
+                    item.handler.onLoadBundle(item);
+                } else {
+                    item.checkUpdate();
+                }
+            }
+        });
     }
 
     private getItem(item: UpdateItem) {
