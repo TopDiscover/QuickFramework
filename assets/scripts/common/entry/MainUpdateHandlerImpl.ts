@@ -53,6 +53,10 @@ export class MainUpdateHandlerImpl implements UpdateHandlerDelegate {
         Manager.entryManager.onLoadBundleComplete(item);
     }
     onLoadBundle(item: UpdateItem): void {
+        //主包不会释放，直接隐藏loading
+        Manager.updateLoading.hide();
+    }
+    onDownloadComplete(item:UpdateItem):void{
         
     }
 }

@@ -27,6 +27,7 @@ export class EntryDelegate {
 
     /**@description 主包检测更新 */
     onCheckUpdate() {
+        Log.d(`主包检测更新`);
         let config = this.getEntryConfig(Macro.BUNDLE_RESOURCES);
         Manager.bundleManager.enterBundle(config);
     }
@@ -36,7 +37,7 @@ export class EntryDelegate {
         return [Macro.BUNDLE_RESOURCES];
     }
 
-    onQuitGame(mainEntry: Entry | null , userData ?: any) {
+    onEnterMain(mainEntry: Entry | null , userData ?: any) {
         if (mainEntry) {
             if (Manager.gameView) {
                 Manager.gameView.close();

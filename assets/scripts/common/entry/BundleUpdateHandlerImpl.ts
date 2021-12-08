@@ -62,4 +62,8 @@ export class BundleUpdateHandlerImpl implements UpdateHandlerDelegate {
     onLoadBundle(item: UpdateItem): void {
         Manager.bundleManager.loadBundle(item);
     }
+
+    onDownloadComplete(item:UpdateItem):void{
+        //子游戏下载完成，不进入游戏，需要玩家二次点击进入
+    }
 }

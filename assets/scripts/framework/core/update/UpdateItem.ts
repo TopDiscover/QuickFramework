@@ -18,6 +18,8 @@ export interface UpdateHandlerDelegate {
     onDownloading(item: UpdateItem, info: Update.DownLoadInfo): void;
     /**@description 已经是最新版本或跳过热更新 */
     onAreadyUpToData(item: UpdateItem): void;
+    /**@description 下载更新完成 */
+    onDownloadComplete(item:UpdateItem):void;
     /**@description 尝试下载失败的更新 */
     onTryDownloadFailedAssets(item: UpdateItem): void;
     /**@description 开始测试更新 */
@@ -64,6 +66,10 @@ export class UpdateHandler implements UpdateHandlerDelegate {
     }
     onAreadyUpToData(item: UpdateItem): void {
         if (this.delegate) this.delegate.onAreadyUpToData(item);
+    }
+    /**@description 下载更新完成 */
+    onDownloadComplete(item:UpdateItem):void{
+        if ( this.delegate) this.delegate.onDownloadComplete(item);
     }
     onTryDownloadFailedAssets(item: UpdateItem): void {
         if (this.delegate) this.delegate.onTryDownloadFailedAssets(item);
@@ -271,6 +277,7 @@ export class UpdateItem {
                 return;
         }
 
+        this.isUpdating = false;
         if (code == Update.Code.NEW_VERSION_FOUND) {
             this.handler.onNewVersionFund(this);
         } else if (code == Update.Code.ALREADY_UP_TO_DATE) {
@@ -285,7 +292,6 @@ export class UpdateItem {
             this.handler.onOther(this);
         }
 
-        this.isUpdating = false;
     }
 
     /**@description 下载失败的资源 */
@@ -383,6 +389,7 @@ export class UpdateItem {
         }
 
         let state = this.assetsManager.manager.getState();
+        let isRestartApp = false;
         if (this.isMain) {
             if (isUpdateFinished) {
                 this.assetsManager.manager.setEventCallback(null as any);
@@ -392,6 +399,7 @@ export class UpdateItem {
                 if (event.getDownloadedFiles() > 0) {
                     Log.d(`${this.bundle} 主包更新完成，有下载文件，需要重启更新`);
                     game.restart();
+                    isRestartApp = true;
                 } else {
                     Log.d(`${this.bundle} 主包更新完成，写入远程版本信息到本地`);
                     jsb.fileUtils.purgeCachedEntries();
@@ -443,7 +451,12 @@ export class UpdateItem {
             Log.e(`更新${this.name}失败`);
             this.handler.onUpdateFailed(this);
         }
-        Log.d(`${this.bundle}update cb  failed : ${failed}  , need restart : ${isUpdateFinished} , updating : ${this.isUpdating}`);
+        if ( isUpdateFinished ){
+            if ( !isRestartApp ){
+                this.handler.onDownloadComplete(this);
+            }
+        }
+        Log.d(`${this.bundle}update cb  failed : ${failed}  , isRestartApp : ${isRestartApp} isUpdateFinished : ${isUpdateFinished} , updating : ${this.isUpdating}`);
     }
 }
 

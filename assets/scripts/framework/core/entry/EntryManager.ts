@@ -81,7 +81,7 @@ export class EntryManager {
         if (config) {
             if (bundle == Macro.BUNDLE_RESOURCES) {
                 let entry = this.getEntry(bundle);
-                this.delegate.onQuitGame(entry,userData);
+                this.delegate.onEnterMain(entry,userData);
             } else {
                 config.userData = userData;
                 Manager.bundleManager.enterBundle(config);

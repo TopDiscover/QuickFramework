@@ -62,4 +62,7 @@ export class HallUpdateHandlerImpl implements UpdateHandlerDelegate {
     onLoadBundle(item: UpdateItem): void {
         Manager.bundleManager.loadBundle(item);
     }
+    onDownloadComplete(item:UpdateItem):void{
+        this.onLoadBundle(item);
+    }
 }

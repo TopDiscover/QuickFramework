@@ -77,13 +77,13 @@ export class UpdateManager {
         if (this.isBrowser) {
             //预览及浏览器下，不需要有更新的操作
             item.isUpdating = false;
-            return false;
+            return true;
         } else {
             if (this.isSkipCheckUpdate) {
                 Log.d("跳过热更新，直接使用本地资源代码");
                 item.isUpdating = false;
             }
-            return !this.isSkipCheckUpdate;
+            return this.isSkipCheckUpdate;
         }
     }
 
@@ -108,9 +108,9 @@ export class UpdateManager {
                 this.current.isUpdating = true;
                 this.loadVersions(this.current).then((isOk) => {
                     if (isOk) {
+                        item.isUpdating = false;
                         let status = this.getStatus(item.bundle);
                         if (status == Update.Status.UP_TO_DATE) {
-                            item.isUpdating = false;
                             item.handler.onLoadBundle(item);
                         } else {
                             item.checkUpdate();

@@ -73,6 +73,8 @@ export class BundleManager {
    public enterBundle(config: UpdateItem | null) {
       if ( config ){
          Manager.updateManager.dowonLoad(config);
+      }else{
+         Log.e(`无效的入口信息`);
       }
    }
 
