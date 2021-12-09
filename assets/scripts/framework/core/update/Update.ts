@@ -1,6 +1,9 @@
+import { Macro } from "../../defines/Macros";
 
 /**@description 热更新相关*/
 export namespace Update {
+    export const MAIN_PACK = Macro.MAIN_PACK_BUNDLE_NAME;
+    export const MANIFEST_ROOT = "manifest/";
     /**@description 下载信息 */
     export interface DownLoadInfo {
         /**@description 下载当前数据大小 */
@@ -22,9 +25,11 @@ export namespace Update {
         /**@description 是否需要重启 */
         needRestart: boolean;
         /**@description bundle */
-        bundle : string;
+        bundle: string;
         /**@description 资源id */
-        assetId : string;
+        assetId: string;
+        /**@description 总下载进度 0 ~ 1 >1 为下载完成 */
+        progress: number;
     }
     /**@description 下载事件 */
     export enum Event {
@@ -60,13 +65,13 @@ export namespace Update {
         ERROR_DECOMPRESS,
 
         //以下是js中扩展的字段，上面是引擎中已经有的字段
-        /**@description 正检测更新中 */
-        CHECKING,
 
         /**@description 主包版本不匹配，需要升级主包 */
         MAIN_PACK_NEED_UPDATE,
         /**@description 预处理版本文件不存在 */
         PRE_VERSIONS_NOT_FOUND,
+        /**@description 未初始化 */
+        UNINITED,
     }
     export enum State {
         /**@description 未初始化 */
@@ -106,7 +111,7 @@ export namespace Update {
     /**
      * @description 热更新状态，
      */
-    export enum Status{
+    export enum Status {
         /**@description 需要下载 */
         NEED_DOWNLOAD,
         /**@description 已经是最新版本 */
@@ -132,13 +137,26 @@ export namespace Update {
             this.bundle = bundle;
         }
 
-        clone(){
-            return Config.clone(this);
+        clone() {
+            return new Config(this.name, this.bundle);
+        }
+    }
+
+    export class AssetsManager {
+
+        constructor(name: string) {
+            this.name = name;
         }
 
-        static clone( config : Config){
-            let result = new Config(config.name,config.bundle);
-            return result;
+        /**@description  当前资源管理器的状态*/
+        code: any = -1;
+        /**@description 当前资源管理器的名称 */
+        name: string = "";
+        /**@description 当前资源管理器的实体 jsb.AssetsManager */
+        manager: jsb.AssetsManager = null!;
+
+        reset() {
+            this.manager.reset();
         }
     }
 }

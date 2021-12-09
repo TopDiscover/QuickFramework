@@ -31,14 +31,14 @@ export default class Loading {
     }
 
     /**@description 显示的Loading提示内容 */
-    private _content : string[] = [];
+    protected _content : string[] = [];
     private _showContentIndex = 0;
 
     /**@description 超时回调定时器id */
     private _timerId:any = -1;
 
     /**@description 显示的提示 */
-    private _text : cc.Label = null;
+    protected _text : cc.Label = null!;
 
     public preloadPrefab() {
         this.loadPrefab();
@@ -88,7 +88,7 @@ export default class Loading {
         if( this._content.length == 1 ){
             this._text.string = this._content[0];
         }else{
-            cc.Tween.stopAllByTarget(this._text.node);
+            this.stopShowContent();
             cc.tween(this._text.node)
             .call(()=>{
                 this._text.string = this._content[this._showContentIndex];

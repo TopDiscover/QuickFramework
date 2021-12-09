@@ -4,6 +4,7 @@ import { Update } from "../../../../scripts/framework/core/update/Update";
 import { ViewZOrder } from "../../../../scripts/common/config/Config";
 import { Macro } from "../../../../scripts/framework/defines/Macros";
 import GameView from "../../../../scripts/framework/core/ui/GameView";
+import { UpdateItem } from "../../../../scripts/framework/core/update/UpdateItem";
 
 const { ccclass, property } = cc._decorator;
 
@@ -84,11 +85,11 @@ export default class HallView extends GameView {
         this.addEvent(Update.Event.DOWNLOAD_PROGRESS, this.onDownloadProgess);
     }
 
-    private getGameItem(config: Update.Config) {
+    private getGameItem(bundle: string) {
         let pages = this.pageView.getPages();
         for (let i = 0; i < pages.length; i++) {
             let page = pages[i];
-            let item = cc.find(`game_${config.bundle}`, page);
+            let item = cc.find(`game_${bundle}`, page);
             if (item) {
                 return item;
             }
@@ -123,9 +124,9 @@ export default class HallView extends GameView {
         }
     }
 
-    private onDownloadProgess(data: { progress: number, config: Update.Config }) {
+    onDownloadProgess(info: Update.DownLoadInfo) {
 
-        let node = this.getGameItem(data.config);
+        let node = this.getGameItem(info.bundle);
         if (node) {
             let updateNode = cc.find("Background/update", node);
             if (!updateNode) return;
@@ -141,13 +142,13 @@ export default class HallView extends GameView {
                 update.active = false;
 
                 if (progressBar && progressLabel) {
-                    if (data.progress == -1) {
+                    if (info.progress == -1) {
                         updateNode.active = false;
-                    } else if (data.progress < 1) {
+                    } else if (info.progress < 1) {
                         updateNode.active = true;
                         downloading.active = true;
-                        progressBar.progress = data.progress;
-                        progressLabel.string = "" + Math.floor(data.progress * 100) + "%";
+                        progressBar.progress = info.progress;
+                        progressLabel.string = "" + Math.floor(info.progress * 100) + "%";
                     } else {
                         updateNode.active = false;
                     }
@@ -156,7 +157,23 @@ export default class HallView extends GameView {
         }
     }
 
-    show(args ?: any[] | any){
+    toUpdateStatus(item: UpdateItem) {
+        let node = this.getGameItem(item.bundle);
+        if ( !node ) return;
+        let updateNode = cc.find("Background/update", node);
+        if (!updateNode) return;
+
+        let downloading = cc.find("downloading", updateNode);
+        let down = cc.find("down", updateNode);
+        let update = cc.find("update", updateNode);
+        if (downloading && down && update) {
+            downloading.active = false;
+            down.active = false;
+            update.active = true;
+        }
+    }
+
+    show(args?: any[] | any) {
         super.show(args)
         let version = cc.find("version",this.node)?.getComponent(cc.Label);
         if ( version ){

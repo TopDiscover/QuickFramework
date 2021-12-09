@@ -151,22 +151,11 @@ export class DebugView extends cc.Component {
         Log.d(`-------Bundle管理器状态信息-------`);
         Manager.bundleManager.print({
             print: (data) => {
-                Log.d(`是否有加载中Bundle : ${data.isLoading}`);
                 let bundles = [];
                 for (let i = 0; i < data.loaded.length; i++) {
                     bundles.push(data.loaded[i].name);
                 }
                 Log.d(`当前所有加载完成的bundle : ${bundles.toString()}`);
-                if ( cc.sys.isNative ){
-                    Log.dump(data.curBundle,"当前运行bundle:")
-                }else{
-                    Log.d("当前运行bundle:", data.curBundle);
-                }
-                if ( cc.sys.isNative ){
-                    Log.dump(data.areadyLoaded,"加载过保存下的bundle信息：")
-                }else{
-                    Log.d("加载过保存下的bundle信息：", data.areadyLoaded)
-                }
             }
         })
     }

@@ -11,7 +11,7 @@ interface Logger {
 	 * @param object dump的对象
 	 * @param label 标签
 	 */
-	dump(object: Object, label?: string): void;
+	dump(object: unknown, label?: string): void;
 }
 declare let Log: Logger;
 

@@ -130,12 +130,12 @@ export class ReconnectHandler extends Handler {
                     Manager.serviceManager.reconnect(this.service);
                 } else {
                     Log.d(`${this.service?.module} 玩家网络不好，不重连，退回到登录界面`);
-                    Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES, true);
+                    Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
                 }
             },
             cancelCb: () => {
                 Log.d(`${this.service?.module} 玩家网络不好，不重连，退回到登录界面`);
-                Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES, true);
+                Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
             }
         });
     }

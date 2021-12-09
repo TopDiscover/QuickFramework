@@ -1,8 +1,11 @@
 import { EntryDelegate } from "../../framework/core/entry/EntryDelegate";
-import { Update } from "../../framework/core/update/Update";
+import { UpdateItem } from "../../framework/core/update/UpdateItem";
 import { Macro } from "../../framework/defines/Macros";
 import { Config } from "../config/Config";
 import { Global } from "../data/Global";
+import { BundleUpdateHandlerImpl } from "./BundleUpdateHandlerImpl";
+import { HallUpdateHandlerImpl } from "./HallUpdateHandlerImpl";
+import { MainUpdateHandlerImpl } from "./MainUpdateHandlerImpl";
 
 export class CmmEntry extends EntryDelegate {
 
@@ -22,10 +25,18 @@ export class CmmEntry extends EntryDelegate {
         }
     }
 
-    getEntryConfig(bundle: string): Update.Config | null {
+    getEntryConfig(bundle: string): UpdateItem | null {
         let config = Config.ENTRY_CONFIG[bundle];
         if (config) {
-            return config;
+            let item = new UpdateItem(config);
+            if (bundle == Macro.BUNDLE_RESOURCES) {
+                item.handler.delegate = getSingleton(MainUpdateHandlerImpl);
+            } else if (bundle == Macro.BUNDLE_HALL) {
+                item.handler.delegate = getSingleton(HallUpdateHandlerImpl);
+            } else {
+                item.handler.delegate = getSingleton(BundleUpdateHandlerImpl);
+            }
+            return item;
         }
         if( CC_DEBUG ){
             Log.e(`未找到入口配置信息`);
