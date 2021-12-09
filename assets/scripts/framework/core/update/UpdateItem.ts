@@ -262,7 +262,7 @@ export class UpdateItem {
                 break;
             case Update.Code.NEW_VERSION_FOUND:
                 Log.d(`${this.bundle} New version found, please try to update.`);
-                if (this.isMain) {
+                if (!this.isMain) {
                     code = Manager.updateManager.checkAllowUpdate(this, code);
                 }
                 break;
