@@ -141,7 +141,7 @@ export class Adaptor {
 
     private get isSafari() {
         let me = instance();
-        if (me.isBrowser && sys.OS_IOS == sys.os && sys.browserType == sys.BROWSER_TYPE_SAFARI) {
+        if (me.isBrowser && sys.OS.IOS == sys.os && sys.browserType == sys.BrowserType.SAFARI) {
             return true;
         }
         return false;

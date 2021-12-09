@@ -129,12 +129,14 @@ class AudioData {
         this.musicInfos.forEach((info, key, source) => {
             info.volume = volume;
         });
+        this.musicVolume = volume;
     }
 
     public setEffectVolume(volume: number) {
         this.effectInfos.forEach((info, key, source) => {
             info.volume = volume;
         });
+        this.effectVolume = volume;
     }
 
     public setMusicStatus(isOn: boolean) {
@@ -291,6 +293,7 @@ export default class AudioComponent extends EventComponent {
                     if (audioInfo && audioInfo.source) {
                         audioInfo.source.clip = data;
                         audioInfo.source.loop = loop;
+                        audioInfo.volume = this.musicVolume;
                         //如果当前音乐是开的，才播放
                         this.play(audioInfo,true,resolve);
                     }
@@ -338,6 +341,7 @@ export default class AudioComponent extends EventComponent {
                     if (audioInfo && audioInfo.source) {
                         audioInfo.source.clip = data;
                         audioInfo.source.loop = loop;
+                        audioInfo.source.volume = this.musicVolume;
                         this.play(audioInfo,false,resolve);
                     }
                 } else {
