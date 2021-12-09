@@ -46,13 +46,6 @@ export class UpdateHandler implements UpdateHandlerDelegate {
         if (this.delegate) this.delegate.onUpdateFailed(item);
     }
     onShowUpdating(item: UpdateItem): void {
-        if (item.state == Update.State.DOWNLOADING_VERSION) {
-            Manager.tips.show(Manager.getLanguage("loadVersions"));
-        } else if (item.code == Update.Code.ERROR_DOWNLOAD_MANIFEST) {
-            Manager.tips.show(Manager.getLanguage("warnNetBad"));
-        } else {
-            Manager.tips.show(Manager.getLanguage("checkingUpdate"));
-        }
         if (this.delegate) this.delegate.onShowUpdating(item);
     }
     onNeedUpdateMain(item: UpdateItem): void {
