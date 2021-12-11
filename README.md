@@ -18,76 +18,47 @@
 更为详细的文档，[请在本项目的doc中查看](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/doc)，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
 同时也希望有更多的人参与，一起让creator的开发更加的简单。
 
-# 项目框架结构
-## [公共组件](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/componects)
-公共组件基类，声音管理组件，事件组件
-## [框架核心](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core)
-### 1,[适配器](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/adaptor)
-屏幕适配相关
-### 2,[资源管理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/asset)
-资源的管理，如加载释放等相关资源管理
-### 2,[Bundle入口管理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/entry)
-Bundle入口基类实现及bundle管理
-### 3,[事件管理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/event)
-### 4,[热更新模块](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/hotupdate)
-### 5,[多语言模块](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/language)
-### 6,[日志](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/log)
-### 7,[逻辑处理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/logic)
-该模块与模块游戏场景GameView绑定，建立一个MVC的模式
-### 8,[网络](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/net)
-该网络部分已经集成了相关的网络，对网络数据的收发等操作，目前支持市面上主流的几种数据流格式，
-1,json 数据格式
-2,proto 数据格式
-3,BinaryStream 数据格式 (即二进制数据流)
-内部分集成了网络Handler 及 Sender 可参考网络示例代码
-### 9,[对象池](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/nodePool)
-### 10,[本地存储](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/storage)
-### 11,[UI管理](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/core/ui)
-该模块为整个框架最为核心部分，所有界面通过预置跟界面UIView绑定，通过UIManager工厂创建及显示视图
-并关联界面视图的动态加载资源，通知到资源管理器，
-当界面打开时，管理器会拿到绑定预置的预置，加载预置并显示界面
-当界面关闭时，会自动清除，释放UIView中动态加载的所有资源，及UIView本身绑定
-的预置资源的释放工作
-## [框架扩展](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/plugin)
-1，对引擎的接口扩展
-对cocos引擎 cc.Sprite/cc.Button/cc.Label/cc.ParticleSystem/sp.Skeleton组件添加了loadXX接口，实现动态的加载替换组件相关信息
+# 关于QuickFramework
+- **Q : 为什么使用单场景？**
+    - **保证视图在切换场景时正常弹出**
+    * 如下情况，如多场景情况下，A场景->B场景，A场景上请求网络数据希望在B场景上弹出，当收到网络返回时
+    还需要检查当前是否在B场景中，如果不在则压入到显示队列中，等进入B场景，检查当前是否有显示视图队列
+    如果有显示的视图，依次弹出，但如果采用单场景化，无须关心在哪一个场景，收到网络回复直接弹出。
+    - **保护界面状态**
+    * 还是在多场景下，在切换场景时，必定会先把场景上所有视图关闭，清除数据，但若有需要在A场景下显示的
+    界面也希望在B场景下显示，此时场景的过渡，会先关闭界面，进入B场景时显示，但如果场景上有ListView类
+    似的控件，也希望在切换场景时，显示之前玩家操作显示的位置，那么必定会花费额外的工作去保存玩家在A场景
+    上操作界面的相关信息，再进入B场景时，恢复玩家对界面操作的所有状态，但如果只是单场景，可以模拟一个
+    场景的切换动作，直接隐藏掉界面，进入B场景，直接显示，无须保存界面的状态。
 
-如需要加载一个网络图片你只需要使用：
-```ts
-//加载远程资源图片
-let sprite = imageNode.getComponent(cc.Sprite);
-
-sprite.loadRemoteImage({url :"http://tools.itharbors.com/res/logo.png", view : this});
-```
-2，全局扩展函数
-如对String的格式化扩展
-```ts
-declare interface StringConstructor {
-	/**
-	 * @description 格式化字符串
-	 * @example
-	 * String.format("{0}-->{1}-->{2}","one","two","three") | String.format("{0}-->{1}-->{2}",["one","two","three"])
-	 * => "one-->two-->three"
-	 * */
-	format(...args: any[]): string;
-}
-```
-## [数据](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/data)
-数据中心,框架严格来说除各管理器外，禁止使用全局变更及单例，游戏的各种数据都从数据中心中获取
-## [框架类型及常量](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/assets/scripts/framework/defines)
-1,常用检举
-2,常用宏定义
-
-# 强大的插件
-## 1,[热更新插件](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/packages/hot-update-tools)
-项目自己定制了热更新模块，目前还在完善中，并不完美，但基础的热更新逻辑已经实现
-可支持热更新地址动态设置，不同Bundle资源分别放置到不同服务器部署
-## 2,[引擎修正插件](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/packages/fix_engine)
-项目对引擎源码扩展，都放到了这个修正插件上，再你使用本框架时，请务必执行到少一次的热更新插件，如果有新插件版本升级，也需要重新执行插件
-## 3,[bundle资源相互引用检测插件](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/packages/check_resources)
-主要只争对A Bundle 引用 B Bundle这种情况下的检测，相互引用的资源会显示在creator 控制台中
-主要是检测子游戏的预置体是否引用了其它子游戏的资源，当打包apk/ipa包时，下载子游戏A，但子游戏A中引用了子游戏B的资源，从而导致子游戏A无法运行
-当你开发完成子游戏后，要该插件来检测你的资源是否引用正确，如果有错误的引用，请注意查看你的控制台信息，会提示你哪一个资源引用错误
+- **Q : 项目为什么不推荐使用在预置体中直接挂载脚本？**
+    - **方便重构**
+    * 如下情况，当你发现目录结构不合理，或者文件名取名有误时，但此时已经在预置上挂载了过多的组件，还有
+    些项目的子游戏是在不同的svn版本管理下，在开发时，并不会放入全量的代码进入开发，如果如果此时改名或
+    移动目录，可能会造成文件的uuid发生变化，Creator上只会显示该脚本为Misson状态，并不会显示之前挂载
+    的是哪一个脚本，若项目足够大，一个脚本的uuid变化，可能会造成大量预置体重新设置挂载脚本，提高了
+    维护的成本
+- **Q : 为什么项目都采用预置体+UIView组件绑定方式？**
+    - 1，统一化管理，工厂式创建，方便实现统一的动画效果，一个公司的界面显示动画，可能大多数情况下是统一风格，如果我们要实现统一定制化
+    动画，只需要在UIView中统一处理，直接显示通过UIManager.open()方式调用
+    * 2，把内存及资源的管理交到管理器处理，减少开发者对何时释放资源，何时加载资源的烦恼，只关注自己的
+    业务逻辑处理，无须关注资源的加载与释放
+    * 3，接口统一，方便后期对界面的打开次数统计，以提供数据给运营人员，查看该模块的受欢迎程度
+- **Q : 项目主要核心模块为什么都在管理器Manager上？**
+    - 提高可读性，新手上手快，拿到代码只能从Manager上直接了解整个项目的结构模块，尽量避免全局变量满天飞的情况
+    后面框架的使用者也可直接把全局的通过数据直接挂载到Manager中使用，减少全局变量的污染。
+- **Q : 项目为什么推荐万事尽量保留类型？***
+    - 个人观点，项目采用VSCode + Creator + typescript 方式进行开发，而typescript VSCode 都是Microsoft 公司
+    的产品，Microsoft公司在JavaScript 基础上加上了type,就是为了解决弱语言类型无类型化，可读性差，
+    * 1，您可以清楚你的实际来自哪一个类型，跟继承的关系
+    * 2，编辑友好加上VSCode的智能代码提示跟静态语法检查，让你在开发时，减少错误
+    * 3，代码更严谨，可在传入参数中限制传入的类型，类型的检查交给VSCode处理
+    * 4，方便重构，如果当你发现某个文件放置位置不对，可直接在VSCode中拖动到你想要的位置，VSCode会自动的更正你托动
+    代码所有引用的位置，或者对API 类名等修改操作，VSCode也会自动更改所有引用此类型的地方，降低重构的成本
+    * 5，最后说一句，没有人比VSCode 更懂TypeScript ,TypeScript的重点在Type,无论什么情况，尽量保留类型。
+# 框架定位
+本框架主要为轻量级游戏打造的一个基础框架雏形，可适用于休闲类，小游戏类，棋牌类，文字游戏类等轻或中度型游戏的开发，
+功能还在完善中，后面优化及功能的扩展继续进行中
 
 # 分支说明
 ## [2.4.3](https://gitee.com/top-discover/QuickFramework/tree/2.4.3)
@@ -95,5 +66,6 @@ declare interface StringConstructor {
 ## [3.3.1](https://gitee.com/top-discover/QuickFramework/tree/3.3.1)
 3.3.1 分支为 creator 版本在>=3.3.1版本以上使用，为3.x的对外分支
 ## 其它分支为开发中的分支，请不要轻易使用
+
 
 ![欢迎大家进群讨论](https://images.gitee.com/uploads/images/2021/0704/233403_8c07fe63_393413.jpeg "qrcode_1625412690446.jpg")
