@@ -1192,6 +1192,25 @@ static bool js_extension_AssetsManagerEx_reset(se::State& s) // NOLINT(readabili
 }
 SE_BIND_FUNC(js_extension_AssetsManagerEx_reset)
 
+static bool js_extension_AssetsManagerEx_setMainBundles(se::State& s) // NOLINT(readability-identifier-naming)
+{
+	auto* cobj = SE_THIS_OBJECT<cc::extension::AssetsManagerEx>(s);
+	SE_PRECONDITION2(cobj, false, "js_extension_AssetsManagerEx_setMainBundles : Invalid Native Object");
+	const auto& args = s.args();
+	size_t argc = args.size();
+	CC_UNUSED bool ok = true;
+	if (argc == 1) {
+		HolderType<std::vector<std::string>, true> arg0 = {};
+		ok &= sevalue_to_native(args[0], &arg0, s.thisObject());
+		SE_PRECONDITION2(ok, false, "js_extension_AssetsManagerEx_setMainBundles : Error processing arguments");
+		cobj->setMainBundles(arg0.value());
+		return true;
+	}
+	SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+	return false;
+}
+SE_BIND_FUNC(js_extension_AssetsManagerEx_setMainBundles)
+
 static bool js_extension_AssetsManagerEx_create(se::State& s) // NOLINT(readability-identifier-naming)
 {
     const auto& args = s.args();
@@ -1326,6 +1345,7 @@ bool js_register_extension_AssetsManagerEx(se::Object* obj) // NOLINT(readabilit
     cls->defineFunction("setVersionCompareHandle", _SE(js_extension_AssetsManagerEx_setVersionCompareHandle));
 	cls->defineFunction("update", _SE(js_extension_AssetsManagerEx_update));
 	cls->defineFunction("reset", _SE(js_extension_AssetsManagerEx_reset));
+	cls->defineFunction("setMainBundles", _SE(js_extension_AssetsManagerEx_setMainBundles));
     cls->defineStaticFunction("create", _SE(js_extension_AssetsManagerEx_create));
     cls->defineFinalizeFunction(_SE(js_cc_extension_AssetsManagerEx_finalize));
     cls->install();

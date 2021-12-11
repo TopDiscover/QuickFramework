@@ -55,6 +55,8 @@ NS_CC_EXT_BEGIN
 const std::string AssetsManagerEx::VERSION_ID = "@version";
 const std::string AssetsManagerEx::MANIFEST_ID = "@manifest";
 #define MANIFEST_PATH "manifest/"
+#define MAIN_BUNDLE "main"
+#define ASSETS "assets"
 
 // Implementation of AssetsManagerEx
 
@@ -139,6 +141,10 @@ void AssetsManagerEx::reset() {
 	_updateState = State::UNINITED;
 }
 
+void AssetsManagerEx::setMainBundles(const std::vector<std::string>& bundles) {
+	_mainBundles = bundles;
+}
+
 void AssetsManagerEx::initManifests() {
     _inited = true;
     // Init and load temporary manifest
@@ -191,6 +197,7 @@ bool AssetsManagerEx::loadLocalManifest(Manifest *localManifest, const std::stri
         return false;
     }
     _inited = true;
+
     // Reset storage path
     if (storagePath.size() > 0) {
         setStoragePath(storagePath);
@@ -223,8 +230,7 @@ bool AssetsManagerEx::loadLocalManifest(Manifest *localManifest, const std::stri
         bool isEqual = _localManifest->equal(cachedManifest);
         if (!isEqual) {
             // Recreate storage, to empty the content
-            _fileUtils->removeDirectory(_storagePath);
-            _fileUtils->createDirectory(_storagePath);
+			removeCachedDirectory();
             CC_SAFE_RELEASE(cachedManifest);
         } else {
             CC_SAFE_RELEASE(_localManifest);
@@ -298,8 +304,7 @@ bool AssetsManagerEx::loadLocalManifest(const std::string &manifestUrl) {
             bool isEqual = _localManifest->equal(cachedManifest);
             if (!isEqual) {
                 // Recreate storage, to empty the content
-                _fileUtils->removeDirectory(_storagePath);
-                _fileUtils->createDirectory(_storagePath);
+				removeCachedDirectory();
                 CC_SAFE_RELEASE(cachedManifest);
             } else {
                 CC_SAFE_RELEASE(_localManifest);
@@ -318,6 +323,23 @@ bool AssetsManagerEx::loadLocalManifest(const std::string &manifestUrl) {
     initManifests();
     _updateState = State::UNCHECKED;
     return true;
+}
+
+void AssetsManagerEx::removeCachedDirectory() {
+	if (_bundle == MAIN_BUNDLE) {
+		//只删除当前bundle的资源
+		for (auto it = _mainBundles.begin(); it != _mainBundles.end(); ++it) {
+			auto path = _storagePath + ASSETS + "/" + *it + "/";
+			_fileUtils->removeDirectory(path);
+		}
+		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + VERSION_FILENAME);
+		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
+	}
+	else {
+		_fileUtils->removeDirectory(_storagePath + ASSETS + "/" + _bundle + "/");
+		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + VERSION_FILENAME);
+		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
+	}
 }
 
 bool AssetsManagerEx::loadRemoteManifest(Manifest *remoteManifest) {

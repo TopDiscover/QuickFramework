@@ -1,8 +1,7 @@
-import { Asset, find, Game, game, SystemEvent, systemEvent, _decorator , Node, DebugMode, setDisplayStats } from "cc";
+import { Asset, find, Game, game, SystemEvent, systemEvent, _decorator , Node, setDisplayStats } from "cc";
 import { Config } from "./scripts/common/config/Config";
 import { DebugView } from "./scripts/common/debug/DebugView";
 import EventComponent from "./scripts/framework/componects/EventComponent";
-import { Update } from "./scripts/framework/core/update/Update";
 /**
  * @description 主控制器 
  */
@@ -15,15 +14,6 @@ export default class MainController extends EventComponent {
 
     @property(Asset)
     wssCacert: Asset = null!;
-
-    protected addEvents() {
-        super.addEvents();
-        this.addEvent(Update.Event.MAIN_VERSION_IS_TOO_LOW,this.onMainVersionIsTooLow);
-    }
-
-    private onMainVersionIsTooLow(code : Update.Code,config:Update.Config){
-        Manager.onMainVersionIsTooLow(code,config);
-    }
 
     private debugView : Node | null = null!;
 

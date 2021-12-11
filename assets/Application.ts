@@ -1,4 +1,4 @@
-import { game , Node } from "cc";
+import { Node } from "cc";
 import Alert from "./scripts/common/component/Alert";
 import GlobalAudio from "./scripts/common/component/GlobalAudio";
 import Loading from "./scripts/common/component/Loading";
@@ -10,7 +10,6 @@ import { Config } from "./scripts/common/config/Config";
 import { CmmEntry } from "./scripts/common/entry/CmmEntry";
 import { CommonLanguage } from "./scripts/common/language/CommonLanguage";
 import { Utils } from "./scripts/common/utils/Utils";
-import { Update } from "./scripts/framework/core/update/Update";
 import { LogLevel } from "./scripts/framework/defines/Enums";
 import { Framewok } from "./scripts/framework/Framework";
 
@@ -126,10 +125,6 @@ export class _Manager extends Framewok implements GameEventInterface {
         Log.d(`[MainController]`, `onEnterForgeground ${now} background total time : ${inBackgroundTime}`);
         Manager.globalAudio.onEnterForgeground(inBackgroundTime);
         Manager.serviceManager.onEnterForgeground(inBackgroundTime);
-    }
-
-    onMainVersionIsTooLow(code : Update.Code ,config:Update.Config ){
-        this.entryManager.onCheckUpdate();
     }
 }
 

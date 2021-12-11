@@ -16,6 +16,11 @@ export class BundleManager {
       }
       return false;
    }
+
+   get mainBundles(){
+      return [AssetManager.BuiltinBundleName.MAIN,AssetManager.BuiltinBundleName.RESOURCES];
+   }
+
    /**@description 删除已经加载的bundle */
    public removeLoadedBundle(excludeBundles: string[]) {
       let loaded: string[] = [];

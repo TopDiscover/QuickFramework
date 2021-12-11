@@ -104,11 +104,6 @@ export default class HallView extends GameView {
         this.audioHelper.playMusic("audio/background", this.bundle)
     }
 
-    protected addEvents() {
-        super.addEvents();
-        this.addEvent(Update.Event.DOWNLOAD_PROGRESS, this.onDownloadProgess);
-    }
-
     private getGameItem(bundle: string) {
         let pages = this.pageView.getPages();
         for (let i = 0; i < pages.length; i++) {
