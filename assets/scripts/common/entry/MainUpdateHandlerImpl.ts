@@ -18,6 +18,16 @@ export class MainUpdateHandlerImpl implements UpdateHandlerDelegate {
         });
         Manager.updateLoading.hide();
     }
+    onPreVersionFailed(item: UpdateItem): void {
+        let content = Manager.getLanguage("downloadFailed");
+        Manager.alert.show({
+            text: content,
+            confirmCb: (isOK) => {
+                item.checkUpdate();
+            }
+        });
+        Manager.updateLoading.hide();
+    }
     onShowUpdating(item: UpdateItem): void {
         Manager.updateLoading.show(Manager.getLanguage("loading"));
     }

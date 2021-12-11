@@ -15,7 +15,7 @@ export class UpdateManager {
     public static Instance() { return this._instance || (this._instance = new UpdateManager()); }
     /**@description 本地存储热更新文件的路径 */
     get storagePath() {
-        return jsb.fileUtils.getWritablePath();
+        return jsb.fileUtils.getWritablePath() + "caches/";
     }
 
     /**@description 所有下载项 */
@@ -62,6 +62,7 @@ export class UpdateManager {
             this.assetsManagers[name].manager = new jsb.AssetsManager(name == Update.MAIN_PACK ? `type.${Update.MAIN_PACK}` : `type.${name}`, this.storagePath);
             //设置下载并发量
             this.assetsManagers[name].manager.setPackageUrl(this.hotUpdateUrl);
+            this.assetsManagers[name].manager.setMainBundles(Manager.bundleManager.mainBundles);
         }
         return this.assetsManagers[name];
     }
@@ -93,18 +94,21 @@ export class UpdateManager {
             this.current = this.getItem(item);
             if (this.current) {
                 if (this.current.isUpdating) {
+                    Log.d(`${item.bundle} 正在更新中...`);
                     this.current.handler.onShowUpdating(this.current);
-                }else{
+                } else {
+                    Log.d(`${item.bundle} 不在更新状态，进入更新...`);
                     this._dowonLoad(item);
                 }
             } else {
+                Log.d(`${item.bundle} 放入下载队列中...`);
                 this.items.push(item);
                 this._dowonLoad(item);
             }
         }
     }
 
-    private _dowonLoad(item:UpdateItem){
+    private _dowonLoad(item: UpdateItem) {
         this.current = item;
         this.current.isUpdating = true;
         this.loadVersions(this.current).then((isOk) => {
@@ -112,8 +116,16 @@ export class UpdateManager {
                 item.isUpdating = false;
                 let status = this.getStatus(item.bundle);
                 if (status == Update.Status.UP_TO_DATE) {
-                    item.handler.onLoadBundle(item);
+                    if (item.bundle == Macro.BUNDLE_HALL && this.isMd5Change(Update.MAIN_PACK)) {
+                        //大厅已经是最新，需要检测主包是否有更新
+                        Log.d(`进入${item.bundle} 时，需要更新主包`);
+                        item.handler.onNeedUpdateMain(item);
+                    } else {
+                        Log.d(`${item.bundle} 已经是最新，直接进入...`);
+                        item.handler.onLoadBundle(item);
+                    }
                 } else {
+                    Log.d(`${item.bundle} 进入检测更新...`);
                     item.checkUpdate();
                 }
             }
@@ -141,7 +153,7 @@ export class UpdateManager {
             //先检查主包是否需要更新
             if (versionInfo.md5 == md5) {
                 //主包无需要更新
-                Log.d(`将要下载版本 md5 与远程版本 md5 相同，可以下载 version : ${versionInfo.version} md5:${versionInfo.md5}`);
+                Log.d(`${item.bundle} 将要下载版本 md5 与远程版本 md5 相同，可以下载 version : ${versionInfo.version} md5:${versionInfo.md5}`);
             } else {
                 if (item.bundle == Macro.BUNDLE_HALL) {
                     //如果是大厅更新，只要主包的md5不发生变化，则可以直接更新大厅
@@ -164,6 +176,15 @@ export class UpdateManager {
             }
             return code;
         }
+    }
+    /**@description 检测主包md5 */
+    checkMainMd5(item: UpdateItem, code: number) {
+        Log.d(`${item.bundle} 无更新，检测主包md5是否变化，如果变更，需要提示玩家更新主包`);
+        if (this.isMd5Change(Update.MAIN_PACK)) {
+            Log.d(`进入${item.bundle}时，主包有更新，需要先更新主包`);
+            code = Update.Code.MAIN_PACK_NEED_UPDATE;
+        }
+        return code;
     }
 
     /**
@@ -229,10 +250,36 @@ export class UpdateManager {
         return false
     }
 
-    private getVersionInfo(bundle: string): { md5: string, version: string } | undefined {
+    private getString(path:string){
+        //下载缓存中
+        let cachedPath = `${this.storagePath}${path}`;
+        if (jsb.fileUtils.isFileExist(cachedPath)) {
+            return jsb.fileUtils.getStringFromFile(cachedPath);
+        } else {
+            //包内
+            if (jsb.fileUtils.isFileExist(path)) {
+                return jsb.fileUtils.getStringFromFile(path);
+            } else {
+                return undefined;
+            }
+        }
+    }
+
+    private getVersionString(bundle: string) {
+        bundle = this.convertBundle(bundle);
         let path = `${Update.MANIFEST_ROOT}${bundle}_version.json`;
-        if (jsb.fileUtils.isFileExist(path)) {
-            let content = jsb.fileUtils.getStringFromFile(path);
+        return this.getString(path);
+    }
+
+    getProjectString(bundle:string){
+        bundle = this.convertBundle(bundle);
+        let path = `${Update.MANIFEST_ROOT}${bundle}_project.json`;
+        return this.getString(path);
+    }
+
+    private getVersionInfo(bundle: string): { md5: string, version: string } | undefined {
+        let content = this.getVersionString(bundle);
+        if (content) {
             let obj = JSON.parse(content);
             return obj;
         }
@@ -254,9 +301,10 @@ export class UpdateManager {
                 if (err) {
                     this.remoteVersions = {};
                     item.code = Update.Code.PRE_VERSIONS_NOT_FOUND;
-                    item.handler.onUpdateFailed(item);
+                    item.handler.onPreVersionFailed(item);
                     //重新标识
                     item.isUpdating = false;
+                    Log.e(`加载${item.bundle}时，加载远程版本信息失败...`);
                     resolove(false);
                 } else {
                     this.remoteVersions = JSON.parse(data);
@@ -267,6 +315,7 @@ export class UpdateManager {
                         //主包更新完成，清除路径缓存信息
                         jsb.fileUtils.purgeCachedEntries();
                     }
+                    Log.d(`加载${item.bundle}时，加载远程版本信息成功...`);
                     resolove(true);
                 }
             });

@@ -73,4 +73,5 @@ SE_DECLARE_FUNC(js_extension_AssetsManagerEx_AssetsManagerEx);
 SE_DECLARE_FUNC(js_extension_AssetsManagerEx_cancelUpdate);
 SE_DECLARE_FUNC(js_extension_AssetsManagerEx_setPackageUrl);
 SE_DECLARE_FUNC(js_extension_AssetsManagerEx_reset);
+SE_DECLARE_FUNC(js_extension_AssetsManagerEx_setMainBundles);
 

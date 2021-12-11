@@ -859,6 +859,25 @@ static bool js_extension_AssetsManagerEx_reset(se::State& s)
 	cocos2d::extension::AssetsManagerEx* cobj = (cocos2d::extension::AssetsManagerEx*)s.nativeThisObject();
 	SE_PRECONDITION2(cobj, false, "js_extension_AssetsManagerEx_reset : Invalid Native Object");
 	const auto& args = s.args();
+	CC_UNUSED bool ok = true;
+	size_t argc = args.size();
+	if (argc == 1) {
+		std::vector<std::string> arg0;
+		ok &= seval_to_std_vector_string(args[0], &arg0);
+		SE_PRECONDITION2(ok, false, "js_extension_AssetsManagerEx_reset : Error processing arguments");
+		cobj->setMainBundles(arg0);
+		return true;
+	}
+	SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+	return false;
+}
+SE_BIND_FUNC(js_extension_AssetsManagerEx_reset)
+
+static bool js_extension_AssetsManagerEx_setMainBundles(se::State& s)
+{
+	cocos2d::extension::AssetsManagerEx* cobj = (cocos2d::extension::AssetsManagerEx*)s.nativeThisObject();
+	SE_PRECONDITION2(cobj, false, "js_extension_AssetsManagerEx_setMainBundles : Invalid Native Object");
+	const auto& args = s.args();
 	size_t argc = args.size();
 	if (argc == 0) {
 		cobj->reset();
@@ -867,7 +886,7 @@ static bool js_extension_AssetsManagerEx_reset(se::State& s)
 	SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
 	return false;
 }
-SE_BIND_FUNC(js_extension_AssetsManagerEx_reset)
+SE_BIND_FUNC(js_extension_AssetsManagerEx_setMainBundles)
 
 static bool js_extension_AssetsManagerEx_setEventCallback(se::State& s)
 {
@@ -1293,6 +1312,7 @@ bool js_register_extension_AssetsManagerEx(se::Object* obj)
     cls->defineFunction("getStoragePath", _SE(js_extension_AssetsManagerEx_getStoragePath));
 	cls->defineFunction("update", _SE(js_extension_AssetsManagerEx_update));
 	cls->defineFunction("reset", _SE(js_extension_AssetsManagerEx_reset));
+	cls->defineFunction("setMainBundles", _SE(js_extension_AssetsManagerEx_setMainBundles));
 	cls->defineFunction("setEventCallback", _SE(js_extension_AssetsManagerEx_setEventCallback));
 	cls->defineFunction("setPackageUrl", _SE(js_extension_AssetsManagerEx_setPackageUrl));
     cls->defineFunction("setVersionCompareHandle", _SE(js_extension_AssetsManagerEx_setVersionCompareHandle));

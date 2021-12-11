@@ -17,6 +17,9 @@ export class BundleUpdateHandlerImpl implements UpdateHandlerDelegate {
             }
         });
     }
+    onPreVersionFailed(item: UpdateItem): void {
+        this.onUpdateFailed(item);
+    }
     onShowUpdating(item: UpdateItem): void {
         Manager.tips.show(Manager.getLanguage("checkingUpdate"));
     }

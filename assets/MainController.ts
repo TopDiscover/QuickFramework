@@ -1,7 +1,6 @@
-import EventComponent from "./scripts/framework/componects/EventComponent";
 import { Config } from "./scripts/common/config/Config";
-import { Update } from "./scripts/framework/core/update/Update";
 import { DebugView } from "./scripts/common/debug/DebugView";
+import EventComponent from "./scripts/framework/componects/EventComponent";
 /**
  * @description 主控制器 
  */
@@ -15,14 +14,6 @@ export default class MainController extends EventComponent {
     @property(cc.Asset)
     wssCacert: cc.Asset = null;
 
-    protected addEvents() {
-        super.addEvents();
-        this.addEvent(Update.Event.MAIN_VERSION_IS_TOO_LOW,this.onMainVersionIsTooLow);
-    }
-
-    private onMainVersionIsTooLow(code : Update.Code,config:Update.Config){
-        Manager.onMainVersionIsTooLow(code,config);
-    }
     private debugView : cc.Node | null = null!;
 
     onLoad() {

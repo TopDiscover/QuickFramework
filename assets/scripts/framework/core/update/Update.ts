@@ -31,15 +31,6 @@ export namespace Update {
         /**@description 总下载进度 0 ~ 1 >1 为下载完成 */
         progress: number;
     }
-    /**@description 下载事件 */
-    export enum Event {
-        /**@description 热更新事件*/
-        HOTUPDATE_DOWNLOAD = "HOTUPDATE_DOWNLOAD",
-        /**@description 下载进度 */
-        DOWNLOAD_PROGRESS = "DOWNLOAD_PROGRESS",
-        /**@description 版本过旧，请重新更新 */
-        MAIN_VERSION_IS_TOO_LOW = "MAIN_VERSION_IS_TOO_LOW",
-    }
     export enum Code {
         /**@description 找不到本地mainfest文件*/
         ERROR_NO_LOCAL_MANIFEST,

@@ -44,8 +44,8 @@ export class HallData extends GameData {
             this._games["netTest"] = new Update.Config(Manager.getLanguage("hall_view_game_name.2", this.bundle), "netTest");
             this._games["aimLine"] = new Update.Config(Manager.getLanguage("hall_view_game_name.3", this.bundle), "aimLine");
             this._games["nodePoolTest"] = new Update.Config(Manager.getLanguage("hall_view_game_name.4", this.bundle), "nodePoolTest");
-            this._games["shaders"] = new Update.Config(Manager.getLanguage("hall_view_game_name.5", this.bundle), "shaders");
             this._games["eliminate"] = new Update.Config(Manager.getLanguage("hall_view_game_name.6", this.bundle), "eliminate");
+            this._games["shaders"] = new Update.Config(Manager.getLanguage("hall_view_game_name.5", this.bundle), "shaders");
         }
         return this._games;
     }

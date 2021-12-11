@@ -53,7 +53,8 @@ NS_CC_EXT_BEGIN
 const std::string AssetsManagerEx::VERSION_ID = "@version";
 const std::string AssetsManagerEx::MANIFEST_ID = "@manifest";
 #define MANIFEST_PATH "manifest/"
-// Implementation of AssetsManagerEx
+#define MAIN_BUNDLE "main"
+#define ASSETS "assets"
 
 AssetsManagerEx::AssetsManagerEx(const std::string& manifestUrl, const std::string& storagePath)
 : _updateState(State::UNINITED)
@@ -201,6 +202,10 @@ void AssetsManagerEx::reset() {
 	_updateState = State::UNINITED;
 }
 
+void AssetsManagerEx::setMainBundles(const std::vector<std::string>& bundles) {
+	_mainBundles = bundles;
+}
+
 void AssetsManagerEx::initManifests()
 {
     _inited = true;
@@ -306,8 +311,7 @@ bool AssetsManagerEx::loadLocalManifest(Manifest* localManifest, const std::stri
         if (!isEqual)
         {
             // Recreate storage, to empty the content
-            _fileUtils->removeDirectory(_storagePath);
-            _fileUtils->createDirectory(_storagePath);
+			removeCachedDirectory();
             CC_SAFE_RELEASE(cachedManifest);
         }
         else
@@ -400,8 +404,7 @@ bool AssetsManagerEx::loadLocalManifest(const std::string& manifestUrl)
             if (!isEqual)
             {
                 // Recreate storage, to empty the content
-                _fileUtils->removeDirectory(_storagePath);
-                _fileUtils->createDirectory(_storagePath);
+				removeCachedDirectory();
                 CC_SAFE_RELEASE(cachedManifest);
             }
             else
@@ -423,6 +426,23 @@ bool AssetsManagerEx::loadLocalManifest(const std::string& manifestUrl)
     initManifests();
     _updateState = State::UNCHECKED;
     return true;
+}
+
+void AssetsManagerEx::removeCachedDirectory() {
+	if (_bundle == MAIN_BUNDLE) {
+		//只删除当前bundle的资源
+		for (auto it = _mainBundles.begin(); it != _mainBundles.end(); ++it) {
+			auto path = _storagePath + ASSETS + "/" + *it + "/";
+			_fileUtils->removeDirectory(path);
+		}
+		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + VERSION_FILENAME);
+		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
+	}
+	else {
+		_fileUtils->removeDirectory(_storagePath + ASSETS + "/" + _bundle + "/");
+		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + VERSION_FILENAME);
+		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
+	}
 }
 
 bool AssetsManagerEx::loadRemoteManifest(Manifest* remoteManifest)

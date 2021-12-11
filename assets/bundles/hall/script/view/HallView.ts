@@ -44,7 +44,7 @@ export default class HallView extends GameView {
             game.name = `game_${this.bundles[keys[i]].bundle}`;
             game.active = true;
             game.userData = this.bundles[keys[i]].bundle;
-            cc.find("Background/label", game).getComponent(cc.Label).language = Manager.makeLanguage(`hall_view_game_name.${i}`, this.bundle);
+            cc.find("Background/label", game).getComponent(cc.Label).language = this.bundles[keys[i]].name;
             game.on(cc.Node.EventType.TOUCH_END, this.onClick, this);
             this.updateGameItemStatus(game);
             //计算出所有页
@@ -75,14 +75,8 @@ export default class HallView extends GameView {
                 lan = cc.sys.LANGUAGE_CHINESE;
             }
             // Manager.language.change(lan);
-            dispatch(Update.Event.DOWNLOAD_PROGRESS,{})
         });
 
-    }
-
-    protected addEvents() {
-        super.addEvents();
-        this.addEvent(Update.Event.DOWNLOAD_PROGRESS, this.onDownloadProgess);
     }
 
     private getGameItem(bundle: string) {

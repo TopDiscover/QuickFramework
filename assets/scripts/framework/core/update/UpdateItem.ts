@@ -7,6 +7,8 @@ export interface UpdateHandlerDelegate {
     onNewVersionFund(item: UpdateItem): void;
     /**@description 更新失败 */
     onUpdateFailed(item: UpdateItem): void;
+    /**@description 加载远程版本信息失败 */
+    onPreVersionFailed(item: UpdateItem): void;
     /**@description 正在更新或检测更新中 */
     onShowUpdating(item: UpdateItem): void;
     /**@description 需要更新主包 */
@@ -18,14 +20,14 @@ export interface UpdateHandlerDelegate {
     /**@description 已经是最新版本或跳过热更新 */
     onAreadyUpToData(item: UpdateItem): void;
     /**@description 下载更新完成 */
-    onDownloadComplete(item:UpdateItem):void;
+    onDownloadComplete(item: UpdateItem): void;
     /**@description 尝试下载失败的更新 */
     onTryDownloadFailedAssets(item: UpdateItem): void;
     /**@description 开始测试更新 */
     onStarCheckUpdate(item: UpdateItem): void;
 
     /**@description 加载bundle */
-    onLoadBundle(item:UpdateItem):void
+    onLoadBundle(item: UpdateItem): void
     /**@description 开始加载bundle */
     onStartLoadBundle(item: UpdateItem): void;
     /**@description 加载bundle错误 */
@@ -44,6 +46,9 @@ export class UpdateHandler implements UpdateHandlerDelegate {
     onUpdateFailed(item: UpdateItem): void {
         if (this.delegate) this.delegate.onUpdateFailed(item);
     }
+    onPreVersionFailed(item: UpdateItem): void {
+        if (this.delegate) this.delegate.onPreVersionFailed(item);
+    }
     onShowUpdating(item: UpdateItem): void {
         if (this.delegate) this.delegate.onShowUpdating(item);
     }
@@ -60,8 +65,8 @@ export class UpdateHandler implements UpdateHandlerDelegate {
         if (this.delegate) this.delegate.onAreadyUpToData(item);
     }
     /**@description 下载更新完成 */
-    onDownloadComplete(item:UpdateItem):void{
-        if ( this.delegate) this.delegate.onDownloadComplete(item);
+    onDownloadComplete(item: UpdateItem): void {
+        if (this.delegate) this.delegate.onDownloadComplete(item);
     }
     onTryDownloadFailedAssets(item: UpdateItem): void {
         if (this.delegate) this.delegate.onTryDownloadFailedAssets(item);
@@ -82,8 +87,8 @@ export class UpdateHandler implements UpdateHandlerDelegate {
         if (this.delegate) this.delegate.onLoadBundleComplete(item);
     }
     /**@description 加载bundle */
-    onLoadBundle(item:UpdateItem):void{
-        if ( this.delegate) this.delegate.onLoadBundle(item);
+    onLoadBundle(item: UpdateItem): void {
+        if (this.delegate) this.delegate.onLoadBundle(item);
     }
 }
 
@@ -125,24 +130,14 @@ export class UpdateItem {
         return Manager.updateManager.convertBundle(bundle);
     }
 
-    private getManifest() {
-        let bundle = this.convertBundle(this.bundle);
-        if (bundle == Update.MAIN_PACK) {
-            return `${Update.MANIFEST_ROOT}main_version.json`;
-        } else {
-            return `${Update.MANIFEST_ROOT}${bundle}_project.json`;
-        }
+    private getProjectString() {
+        return Manager.updateManager.getProjectString(this.bundle);
     }
 
     /**@description 检测更新 */
     checkUpdate() {
         this.handler.onStarCheckUpdate(this);
-        let bundle = this.convertBundle(this.bundle);
-        if (bundle == Update.MAIN_PACK) {
-            this.checkMainUpdate();
-        } else {
-            this.checkBundleUpdate();
-        }
+        this.checkBundleUpdate();
     }
 
     /**@description 只有assetsManager有值时有效 */
@@ -165,14 +160,13 @@ export class UpdateItem {
     /**@description bundle更新 */
     private checkBundleUpdate() {
         this.assetsManager = Manager.updateManager.getAssetsManager(this);
-        let manifestUrl = this.getManifest();
+        let content = this.getProjectString();
         //先检测本地是否已经存在子游戏版本控制文件 
-        if (jsb.fileUtils.isFileExist(manifestUrl)) {
+        if (content) {
             //存在版本控制文件 
-            let content = jsb.fileUtils.getStringFromFile(manifestUrl);
             let jsbGameManifest = new jsb.Manifest(content, this.storagePath, this.hotUpdateUrl);
             Log.d(`${this.bundle} --存在本地版本控制文件checkUpdate--`);
-            Log.d(`${this.bundle} mainifestUrl : ${manifestUrl}`);
+            // Log.d(`${this.bundle} mainifestUrl : ${content}`);
             this.assetsManager.manager.loadLocalManifest(jsbGameManifest, "");
             this._checkUpdate();
         } else {
@@ -194,13 +188,6 @@ export class UpdateItem {
             this.assetsManager.manager.loadLocalManifest(jsbGameManifest, "");
             this._checkUpdate();
         }
-    }
-
-    /**@description 主包更新 */
-    private checkMainUpdate() {
-        this.assetsManager = Manager.updateManager.getAssetsManager(this);
-        this.assetsManager.manager.loadLocalManifest(this.getManifest());
-        this._checkUpdate();
     }
 
     private _checkUpdate() {
@@ -257,6 +244,9 @@ export class UpdateItem {
                 Log.d(`${this.bundle} Already up to date with the latest remote version.`);
                 if (this.isMain) {
                     Manager.updateManager.savePreVersions();
+                } else if (this.bundle == Macro.BUNDLE_HALL) {
+                    //如果大厅已经没有更新，但此时主包有更新，需要检测升级主包
+                    code = Manager.updateManager.checkMainMd5(this, code);
                 }
                 break;
             case Update.Code.NEW_VERSION_FOUND:
@@ -270,6 +260,7 @@ export class UpdateItem {
         }
 
         this.isUpdating = false;
+        this.assetsManager.code = code;
         if (code == Update.Code.NEW_VERSION_FOUND) {
             this.handler.onNewVersionFund(this);
         } else if (code == Update.Code.ALREADY_UP_TO_DATE) {
@@ -408,7 +399,7 @@ export class UpdateItem {
             }
         }
 
-        if( this.assetsManager.code != Update.Code.UPDATE_PROGRESSION){
+        if (this.assetsManager.code != Update.Code.UPDATE_PROGRESSION) {
             //不是更新中状态，重置标识
             this.isUpdating = false;
         }
@@ -446,8 +437,8 @@ export class UpdateItem {
             Log.e(`更新${this.name}失败`);
             this.handler.onUpdateFailed(this);
         }
-        if ( isUpdateFinished ){
-            if ( !isRestartApp ){
+        if (isUpdateFinished) {
+            if (!isRestartApp) {
                 this.handler.onDownloadComplete(this);
             }
         }

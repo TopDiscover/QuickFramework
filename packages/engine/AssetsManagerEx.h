@@ -201,7 +201,10 @@ public:
 	 * @brief 设置热更新地址,由于热更新地址会动态的发生变化，热更新的地址以下发的地址为准,设置热更新地址后，会自动的替换所有热更新的源地址
 	 */
 	void setPackageUrl(const std::string& url) { _packageUrl = url; };
-
+	/**
+	 * @brief 设置主包包含的bunldes ,用& 隔开，示例 main&resources
+	 */
+	void setMainBundles(const std::vector<std::string>& bundles);
 	void reset();
     
 CC_CONSTRUCTOR_ACCESS:
@@ -293,6 +296,10 @@ protected:
      */
     virtual void onSuccess(const std::string &srcUrl, const std::string &storagePath, const std::string &customId);
     
+	/************************************************************************/
+	/* 删除缓存中下载文件                                                   */
+	/************************************************************************/
+	void removeCachedDirectory();
 private:
     void batchDownload();
 
@@ -416,10 +423,12 @@ private:
     std::unordered_map<std::string, std::shared_ptr<const network::DownloadTask>> _downloadingTask;
     /*是否启用资源下载类型*/
 	bool _isUsingBundle;
-	/*资源类型 ""为大厅 其它为子游戏包名*/
+	/*资源类型 "main"为大厅 其它为子游戏包名*/
 	std::string _bundle;
 	/* 热更新地址*/
 	std::string _packageUrl;
+	/* 主包包含哪些bundle,如 main&resources */
+	std::vector<std::string> _mainBundles;
 };
 
 NS_CC_EXT_END

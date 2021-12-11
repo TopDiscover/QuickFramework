@@ -1,6 +1,7 @@
 import { Update } from "../../framework/core/update/Update";
 import { UpdateHandlerDelegate, UpdateItem } from "../../framework/core/update/UpdateItem";
 import { Macro } from "../../framework/defines/Macros";
+import { Global } from "../data/Global";
 
 /**@description 大厅更新代理 */
 export class HallUpdateHandlerImpl implements UpdateHandlerDelegate {
@@ -19,6 +20,16 @@ export class HallUpdateHandlerImpl implements UpdateHandlerDelegate {
         });
         Manager.updateLoading.hide();
     }
+    onPreVersionFailed(item: UpdateItem): void {
+        let content = Manager.getLanguage("downloadFailed");
+        Manager.alert.show({
+            text: content,
+            confirmCb: (isOK) => {
+                item.checkUpdate();
+            }
+        });
+        Manager.updateLoading.hide();
+    }
     onShowUpdating(item: UpdateItem): void {
         Manager.updateLoading.show(Manager.getLanguage("loading"));
     }
@@ -28,7 +39,13 @@ export class HallUpdateHandlerImpl implements UpdateHandlerDelegate {
         Manager.alert.show({
             text: content,
             confirmCb: (isOK) => {
-                Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
+                let data = Manager.dataCenter.get(Global) as Global;
+                if ( data.where == Macro.BUNDLE_RESOURCES ){
+                    //如果是在登录界面，直接检测更新
+                    Manager.entryManager.onCheckUpdate();
+                }else{
+                    Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
+                }
             }
         });
     }

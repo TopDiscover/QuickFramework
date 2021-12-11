@@ -38,9 +38,7 @@ export class CmmEntry extends EntryDelegate {
             }
             return item;
         }
-        if( CC_DEBUG ){
-            Log.e(`未找到入口配置信息`);
-        }
+        Log.e(`未找到入口配置信息`);
         return null;
     }
 

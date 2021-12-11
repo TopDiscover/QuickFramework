@@ -15,6 +15,11 @@ export class BundleManager {
          }
       return false;
    }
+
+   get mainBundles() : string[]{
+      return [cc.AssetManager.BuiltinBundleName.INTERNAL as any,cc.AssetManager.BuiltinBundleName.MAIN as any,cc.AssetManager.BuiltinBundleName.RESOURCES as any];
+   }
+
    /**@description 删除已经加载的bundle */
    public removeLoadedBundle(excludeBundles: string[]) {
       let loaded: string[] = [];
