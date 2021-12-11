@@ -217,6 +217,7 @@ exports.methods = {
         }, 10);
         this.$.buildDir.value = userCache.buildDir;
         this.$.manifestDir.value = this.getManifestDir(userCache.buildDir);
+        this.$.remoteDir.value = userCache.remoteDir
 
         //bundles 配置
         //`is${gameInfo.dir}includeApp`
@@ -290,7 +291,7 @@ exports.methods = {
         }
         //添加子游戏测试环境版本号
         sourceCode = sourceCode.replace(/(\);)([\s\w\S]*)(const[ ]*importMapJson)/g,templateReplace);
-        console.log(`向${sourcePath}中插入热更新代码`);
+        this.addLog(`向${sourcePath}中插入热更新代码`);
         fs.writeFileSync(sourcePath,sourceCode,{"encoding" : "utf8"});
     },
     //初始化
@@ -448,11 +449,21 @@ exports.methods = {
             count += this.getFileCount(dir);
         }
 
+        //压缩文件数量
+        let zipPath = Editor.Project.path + "/PackageVersion";
+        count += this.getFileCount(zipPath);
+
         this.addLog(`[部署]复制文件个数 : ${count}`);
 
         for (let i = 0; i < copyDirs.length; i++) {
             this.copySourceDirToDesDir(path.join(userCache.buildDir, copyDirs[i]), path.join(userCache.remoteDir, copyDirs[i]));
         }
+
+        let remoteZipPath = path.join(userCache.remoteDir,"zips");
+        this.delDir(remoteZipPath);
+
+        //部署压缩文件
+        this.copySourceDirToDesDir(zipPath,remoteZipPath);
 
     },
     addProgress() {
@@ -607,9 +618,70 @@ exports.methods = {
         let versionsPath = path.join(manifestDir,`versions.json`);
         fs.writeFileSync(versionsPath,JSON.stringify(versions));
         this.addLog(`生成versions.json成功`);
+        this.packageZip(mainIncludes,versions);
+        this.remake()
+    },
+    packageDir(dir, jszip) {
+        if (!fs.existsSync(dir)) {
+          return
+        }
+        let readDirs = fs.readdirSync(dir);
+        for (let i = 0; i < readDirs.length; i++) {
+          let file = readDirs[i];
+          let fullPath = path.join(dir, file);
+          let stat = fs.statSync(fullPath);
+          if (stat.isFile()) {
+            jszip.file(file, fs.readFileSync(fullPath))
+          } else {
+            stat.isDirectory() && this.packageDir(fullPath, jszip.folder(file))
+          }
+        }
+      },
+    packageZip(mainIncludes,versions) {
+        this.addLog(`[打包] 开始打包版本...`);
+        let jszip = new(require("../node_modules/jszip"));
+        for (let index = 0; index < mainIncludes.length; index++) {
+            const element = mainIncludes[index];
+            let fullPath = path.join(userCache.buildDir, element);
+            this.packageDir(fullPath, jszip.folder(element));
+
+        }
+
+        let packZipRootPath = Editor.Project.path + "/PackageVersion";
+        this.delDir(packZipRootPath);
+        this.mkdirSync(packZipRootPath);
+        let packZipName = `main_${versions["main"].md5}.zip`;
+        let packVersionZipPath = path.join(packZipRootPath, packZipName);
+        jszip.generateNodeStream({
+            type: "nodebuffer",
+            streamFiles: !0
+        }).pipe(fs.createWriteStream(packVersionZipPath)).on("finish", () => {
+            this.addLog("[打包] 打包成功: " + packVersionZipPath)
+        }).on("error", (e) => {
+            this.addLog("[打包] 打包失败:" + e.message)
+        })
+
+        //打包子版本
+        let bundles = Object.keys(userCache.bundles);
+        for (let index = 0; index < bundles.length; index++) {
+            const element = userCache.bundles[bundles[index]];
+            let packZipName = `${element.dir}_${versions[element.dir].md5}.zip`;
+            let packVersionZipPath = path.join(packZipRootPath, packZipName);
+            let jszip = new(require("../node_modules/jszip"));
+            let fullPath = path.join(userCache.buildDir, `assets/${element.dir}`);
+            this.packageDir(fullPath, jszip.folder(`assets/${element.dir}`));
+            this.addLog(`[打包] ${element.name} ${element.dir} ...`);
+            jszip.generateNodeStream({
+                type: "nodebuffer",
+                streamFiles: !0
+            }).pipe(fs.createWriteStream(packVersionZipPath)).on("finish", () => {
+                this.addLog("[打包] 打包成功: " + packVersionZipPath)
+            }).on("error", (e) => {
+                this.addLog("[打包] 打包失败:" + e.message)
+            })
+        }
 
         this._isDoCreate = false;
-        this.remake()
     },
     delDir(sourceDir, isRemoveSourceDir = false) {
         let delFile = function (dir) {

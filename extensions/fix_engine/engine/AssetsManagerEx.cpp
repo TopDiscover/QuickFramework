@@ -57,6 +57,7 @@ const std::string AssetsManagerEx::MANIFEST_ID = "@manifest";
 #define MANIFEST_PATH "manifest/"
 #define MAIN_BUNDLE "main"
 #define ASSETS "assets"
+#define MD5_UNKNOWN "UNKNOWN"
 
 // Implementation of AssetsManagerEx
 
@@ -92,6 +93,7 @@ void AssetsManagerEx::init(const std::string &manifestUrl, const std::string &st
         this->onSuccess(task.requestURL, task.storagePath, task.identifier);
     };
     setStoragePath(storagePath);
+	_downloadAagin = 1;
     //这里做一下处理，当传入的是一个特定的格式时，修改当前3个缓存的路径
 	std::string typeString = "type.";
 	auto pos = manifestUrl.find(typeString);
@@ -143,6 +145,16 @@ void AssetsManagerEx::reset() {
 
 void AssetsManagerEx::setMainBundles(const std::vector<std::string>& bundles) {
 	_mainBundles = bundles;
+}
+
+void AssetsManagerEx::setDownloadAgainZip(float percent) {
+	if (percent < 0.0000f) {
+		percent = 1;
+	}
+	if (percent > 1.0000f) {
+		percent = 1;
+	}
+	_downloadAagin = percent;
 }
 
 void AssetsManagerEx::initManifests() {
@@ -340,6 +352,44 @@ void AssetsManagerEx::removeCachedDirectory() {
 		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + VERSION_FILENAME);
 		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
 	}
+}
+
+bool AssetsManagerEx::isNeedDownLoadZip(float download, float total) {
+	//下载总数占比
+	auto percent = download / total;
+	if (percent >= 1.0000f) {
+		return true;
+	}
+	if (percent <= 0.0000f) {
+		return false;
+	}
+	if (percent > _downloadAagin ) {
+		return true;
+	}
+	return false;
+}
+
+void AssetsManagerEx::toDownloadZip() {
+	auto packageUrl = _remoteManifest->getPackageUrl();
+	DownloadUnit unit;
+	unit.customId = _bundle + "_" + _remoteManifest->getMd5() + ".zip";
+	unit.srcUrl = _packageUrl + "/zips/" + unit.customId;
+	unit.storagePath = _tempStoragePath + unit.customId;
+	unit.size = _remoteManifest->getTotalSize();
+	_remoteManifest->updateToZipAsset(unit);
+
+	_downloadUnits.emplace(unit.customId, unit);
+	_tempManifest->setAssetDownloadState(unit.customId, Manifest::DownloadState::UNSTARTED);
+	// Start updating the temp manifest
+	_tempManifest->setUpdating(true);
+	// Save current download manifest information for resuming
+	auto dir = basename(_tempManifestPath);
+	if (!_fileUtils->isDirectoryExist(dir)) {
+		_fileUtils->createDirectory(dir);
+	}
+	_tempManifest->saveToFile(_tempManifestPath);
+
+	_totalWaitToDownload = _totalToDownload = (int)_downloadUnits.size();
 }
 
 bool AssetsManagerEx::loadRemoteManifest(Manifest *remoteManifest) {
@@ -743,39 +793,51 @@ void AssetsManagerEx::prepareUpdate() {
         _tempManifest = _remoteManifest;
 
         // Check difference between local manifest and remote manifest
-        std::unordered_map<std::string, Manifest::AssetDiff> diff_map = _localManifest->genDiff(_remoteManifest);
-        if (diff_map.size() == 0) {
-            updateSucceed();
-            return;
-        } else {
-            // Generate download units for all assets that need to be updated or added
-            std::string packageUrl = _remoteManifest->getPackageUrl();
-            // Preprocessing local files in previous version and creating download folders
-            for (auto it = diff_map.begin(); it != diff_map.end(); ++it) {
-                Manifest::AssetDiff diff = it->second;
-                if (diff.type != Manifest::DiffType::DELETED) {
-                    std::string path = diff.asset.path;
-                    DownloadUnit unit;
-                    unit.customId = it->first;
-                    unit.srcUrl = packageUrl + path + "?md5=" + diff.asset.md5;
-                    unit.storagePath = _tempStoragePath + path;
-                    unit.size = diff.asset.size;
-                    _downloadUnits.emplace(unit.customId, unit);
-                    _tempManifest->setAssetDownloadState(it->first, Manifest::DownloadState::UNSTARTED);
-                    _totalSize += unit.size;
-                }
-            }
-            // Start updating the temp manifest
-            _tempManifest->setUpdating(true);
-            // Save current download manifest information for resuming
-			auto dir = basename(_tempManifestPath);
-			if (!_fileUtils->isDirectoryExist(dir)) {
-				_fileUtils->createDirectory(dir);
+		if (_localManifest->getMd5() == MD5_UNKNOWN) {
+			// 如果第一次未下载 ，直接下载zip包进行解压
+			toDownloadZip();
+		}
+		else {
+			std::unordered_map<std::string, Manifest::AssetDiff> diff_map = _localManifest->genDiff(_remoteManifest);
+			if (diff_map.size() == 0) {
+				updateSucceed();
+				return;
 			}
-            _tempManifest->saveToFile(_tempManifestPath);
+			else {
+				if (this->isNeedDownLoadZip(diff_map.size(),_remoteManifest->getAssets().size())){
+					toDownloadZip();
+				}
+				else {
+					// Generate download units for all assets that need to be updated or added
+					std::string packageUrl = _remoteManifest->getPackageUrl();
+					// Preprocessing local files in previous version and creating download folders
+					for (auto it = diff_map.begin(); it != diff_map.end(); ++it) {
+						Manifest::AssetDiff diff = it->second;
+						if (diff.type != Manifest::DiffType::DELETED) {
+							std::string path = diff.asset.path;
+							DownloadUnit unit;
+							unit.customId = it->first;
+							unit.srcUrl = packageUrl + path + "?md5=" + diff.asset.md5;
+							unit.storagePath = _tempStoragePath + path;
+							unit.size = diff.asset.size;
+							_downloadUnits.emplace(unit.customId, unit);
+							_tempManifest->setAssetDownloadState(it->first, Manifest::DownloadState::UNSTARTED);
+							_totalSize += unit.size;
+						}
+					}
+					// Start updating the temp manifest
+					_tempManifest->setUpdating(true);
+					// Save current download manifest information for resuming
+					auto dir = basename(_tempManifestPath);
+					if (!_fileUtils->isDirectoryExist(dir)) {
+						_fileUtils->createDirectory(dir);
+					}
+					_tempManifest->saveToFile(_tempManifestPath);
 
-            _totalWaitToDownload = _totalToDownload = (int)_downloadUnits.size();
-        }
+					_totalWaitToDownload = _totalToDownload = (int)_downloadUnits.size();
+				}
+			}
+		}
     }
     _updateState = State::READY_TO_UPDATE;
 }

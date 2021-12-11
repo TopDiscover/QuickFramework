@@ -1211,7 +1211,26 @@ static bool js_extension_AssetsManagerEx_setMainBundles(se::State& s) // NOLINT(
 }
 SE_BIND_FUNC(js_extension_AssetsManagerEx_setMainBundles)
 
-static bool js_extension_AssetsManagerEx_create(se::State& s) // NOLINT(readability-identifier-naming)
+static bool js_extension_AssetsManagerEx_setDownloadAgainZip(se::State& s)
+{
+	auto* cobj = SE_THIS_OBJECT<cc::extension::AssetsManagerEx>(s);
+	SE_PRECONDITION2(cobj, false, "js_extension_AssetsManagerEx_setDownloadAgainZip : Invalid Native Object");
+	const auto& args = s.args();
+	size_t argc = args.size();
+	CC_UNUSED bool ok = true;
+	if (argc == 1) {
+		HolderType<float, false> arg0 = {};
+		ok &= sevalue_to_native(args[0], &arg0, s.thisObject());
+		SE_PRECONDITION2(ok, false, "js_extension_AssetsManagerEx_setDownloadAgainZip : Error processing arguments");
+		cobj->setDownloadAgainZip(arg0.value());
+		return true;
+	}
+	SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+	return false;
+}
+SE_BIND_FUNC(js_extension_AssetsManagerEx_setDownloadAgainZip)
+
+static bool js_extension_AssetsManagerEx_create(se::State& s)
 {
     const auto& args = s.args();
     size_t argc = args.size();
@@ -1346,6 +1365,7 @@ bool js_register_extension_AssetsManagerEx(se::Object* obj) // NOLINT(readabilit
 	cls->defineFunction("update", _SE(js_extension_AssetsManagerEx_update));
 	cls->defineFunction("reset", _SE(js_extension_AssetsManagerEx_reset));
 	cls->defineFunction("setMainBundles", _SE(js_extension_AssetsManagerEx_setMainBundles));
+	cls->defineFunction("setDownloadAgainZip", _SE(js_extension_AssetsManagerEx_setDownloadAgainZip));
     cls->defineStaticFunction("create", _SE(js_extension_AssetsManagerEx_create));
     cls->defineFinalizeFunction(_SE(js_cc_extension_AssetsManagerEx_finalize));
     cls->install();

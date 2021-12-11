@@ -221,6 +221,10 @@ public:
 	 * @brief 设置主包包含的bunldes ,用& 隔开，示例 main&resources
 	 */
 	void setMainBundles(const std::vector<std::string>& bundles);
+	/**
+	 * @brief 设置 【将要下载资源总数】超过【总下载资源总数】的percent(取值0-1)，则删除掉本地缓存资源，重新下载bunlde的zip包
+	 */
+	void setDownloadAgainZip(float percent);
 	void reset();
 
 protected:
@@ -307,6 +311,10 @@ protected:
 	/* 删除缓存中下载文件                                                   */
 	/************************************************************************/
 	void removeCachedDirectory();
+
+	bool isNeedDownLoadZip(float download , float total);
+
+	void toDownloadZip();
 
 private:
     void batchDownload();
@@ -432,6 +440,7 @@ private:
 	std::string _packageUrl;
 	/* 主包包含哪些bundle,如 main&resources */
 	std::vector<std::string> _mainBundles;
+	float _downloadAagin;
 };
 
 NS_CC_EXT_END

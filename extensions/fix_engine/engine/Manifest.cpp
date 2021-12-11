@@ -85,7 +85,8 @@ Manifest::Manifest(const std::string &manifestUrl /* = ""*/)
   _engineVer(""),
   _packageUrl(""),
   _bundle(""),
-  _md5(""){
+  _md5(""),
+  _totalSize(0){
     // Init variables
     _fileUtils = FileUtils::getInstance();
     if (manifestUrl.size() > 0)
@@ -101,7 +102,8 @@ Manifest::Manifest(const std::string &content, const std::string &manifestRoot)
   _engineVer(""),
   _packageUrl(""),
   _bundle(""),
-  _md5("") {
+  _md5(""),
+  _totalSize(0) {
     // Init variables
     _fileUtils = FileUtils::getInstance();
     if (content.size() > 0)
@@ -117,7 +119,8 @@ Manifest::Manifest(const std::string &content, const std::string &manifestRoot, 
   _engineVer(""),
   _packageUrl(""),
   _bundle(""),
-  _md5("") {
+  _md5(""),
+  _totalSize(0) {
     // Init variables
     _fileUtils = FileUtils::getInstance();
 	setPackageUrl(packageUrl);
@@ -437,6 +440,31 @@ void Manifest::setAssetDownloadState(const std::string &key, const Manifest::Dow
     }
 }
 
+void Manifest::updateToZipAsset(const DownloadUnit& unit) {
+	Asset asset;
+	asset.compressed = true;
+	asset.md5 = _md5;
+	asset.path = _bundle + "_" + _md5 + ".zip";
+	asset.size = unit.size;
+	// Update json object
+	if (_json.IsObject()) {
+		if (_json.HasMember(KEY_ASSETS)) {
+			rapidjson::Value &assets = _json[KEY_ASSETS];
+			if (assets.IsObject()) {
+				auto key = unit.customId.data();
+				if (!assets.HasMember(key)) {
+					rapidjson::Value value(rapidjson::Type::kObjectType);
+					value.SetObject();
+					rapidjson::Value name(rapidjson::Type::kStringType);
+					name.SetString(key,unit.customId.size(),_json.GetAllocator());
+					assets.AddMember(name, value, _json.GetAllocator());
+				}
+			}
+		}
+	}
+	_assets.emplace(unit.customId, asset);
+}
+
 void Manifest::clear() {
     if (_versionLoaded || _loaded) {
         _groups.clear();
@@ -556,6 +584,7 @@ void Manifest::loadManifest(const rapidjson::Document &json) {
     loadVersion(json);
 
     // Retrieve all assets
+	_totalSize = 0;
     if (json.HasMember(KEY_ASSETS)) {
         const rapidjson::Value &assets = json[KEY_ASSETS];
         if (assets.IsObject()) {
@@ -563,6 +592,7 @@ void Manifest::loadManifest(const rapidjson::Document &json) {
                 std::string key = itr->name.GetString();
                 Asset asset = parseAsset(key, itr->value);
                 _assets.emplace(key, asset);
+				_totalSize += asset.size;
             }
         }
     }

@@ -21,11 +21,19 @@
         }
     },
     "panels": {
-        "default":{
+        "default": {
             "main": "./panels/index.js",
             "type": "dockable",
             "title": "热更新工具",
-            "size" : {"width" : 900 , "height" : 900,"min-width" : 500,"min-height":500}
+            "size": {
+                "width": 900,
+                "height": 900,
+                "min-width": 500,
+                "min-height": 500
+            }
         }
+    },
+    "dependencies": {
+        "jszip": "^3.2.2"
     }
 }
