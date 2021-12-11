@@ -63,6 +63,8 @@ export class UpdateManager {
             //设置下载并发量
             this.assetsManagers[name].manager.setPackageUrl(this.hotUpdateUrl);
             this.assetsManagers[name].manager.setMainBundles(Manager.bundleManager.mainBundles);
+            //设置重新下载的标准
+            this.assetsManagers[name].manager.setDownloadAgainZip(0.8);
         }
         return this.assetsManagers[name];
     }

@@ -892,6 +892,25 @@ static bool js_extension_AssetsManagerEx_setMainBundles(se::State& s)
 }
 SE_BIND_FUNC(js_extension_AssetsManagerEx_setMainBundles)
 
+static bool js_extension_AssetsManagerEx_setDownloadAgainZip(se::State& s)
+{
+	cocos2d::extension::AssetsManagerEx* cobj = (cocos2d::extension::AssetsManagerEx*)s.nativeThisObject();
+	SE_PRECONDITION2(cobj, false, "js_extension_AssetsManagerEx_setDownloadAgainZip : Invalid Native Object");
+	const auto& args = s.args();
+	size_t argc = args.size();
+	CC_UNUSED bool ok = true;
+	if (argc == 1) {
+		float arg0 = 0;
+		ok &= seval_to_float(args[0], &arg0);
+		SE_PRECONDITION2(ok, false, "js_extension_AssetsManagerEx_setDownloadAgainZip : Error processing arguments");
+		cobj->setDownloadAgainZip(arg0);
+		return true;
+	}
+	SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+	return false;
+}
+SE_BIND_FUNC(js_extension_AssetsManagerEx_setDownloadAgainZip)
+
 static bool js_extension_AssetsManagerEx_setEventCallback(se::State& s)
 {
     cocos2d::extension::AssetsManagerEx* cobj = (cocos2d::extension::AssetsManagerEx*)s.nativeThisObject();
@@ -1317,6 +1336,7 @@ bool js_register_extension_AssetsManagerEx(se::Object* obj)
 	cls->defineFunction("update", _SE(js_extension_AssetsManagerEx_update));
 	cls->defineFunction("reset", _SE(js_extension_AssetsManagerEx_reset));
 	cls->defineFunction("setMainBundles", _SE(js_extension_AssetsManagerEx_setMainBundles));
+	cls->defineFunction("setDownloadAgainZip", _SE(js_extension_AssetsManagerEx_setDownloadAgainZip));
 	cls->defineFunction("setEventCallback", _SE(js_extension_AssetsManagerEx_setEventCallback));
 	cls->defineFunction("setPackageUrl", _SE(js_extension_AssetsManagerEx_setPackageUrl));
     cls->defineFunction("setVersionCompareHandle", _SE(js_extension_AssetsManagerEx_setVersionCompareHandle));

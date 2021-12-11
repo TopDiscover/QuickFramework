@@ -247,7 +247,10 @@ protected:
     void setAssetDownloadState(const std::string &key, const DownloadState &state);
     
     void setManifestRoot(const std::string &root) {_manifestRoot = root;};
-    
+
+	double getTotalSize() { return _totalSize; }
+	/* 更新当前资源为zip下载*/
+	void updateToZipAsset(const DownloadUnit& unit);
 private:
     
     //! Indicate whether the version informations have been fully loaded
@@ -294,6 +297,8 @@ private:
 	//md5
 	std::string _md5;
 
+	//下载文件总大小
+	double _totalSize;
 };
 
 NS_CC_EXT_END

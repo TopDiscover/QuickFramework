@@ -215,6 +215,7 @@ var _Helper = /** @class */ (function () {
         }, 10);
         this.view.buildDir.value = this.userCache.buildDir;
         this.view.manifestDir.value = this.getManifestDir(this.userCache.buildDir);
+        this.view.remoteDir.value = this.userCache.remoteDir;
         //bundles 配置
         //`is${gameInfo.dir}includeApp`
         Object.keys(this.userCache.bundles).forEach(function (key) {
@@ -438,10 +439,17 @@ var _Helper = /** @class */ (function () {
             var dir = path.join(this.userCache.buildDir, copyDirs[i]);
             count += this.getFileCount(dir);
         }
+        //压缩文件数量
+        var zipPath = Editor.Project.path + "/PackageVersion";
+        count += this.getFileCount(zipPath);
         this.addLog("[\u90E8\u7F72]\u590D\u5236\u6587\u4EF6\u4E2A\u6570 : " + count);
         for (var i = 0; i < copyDirs.length; i++) {
             this.copySourceDirToDesDir(path.join(this.userCache.buildDir, copyDirs[i]), path.join(this.userCache.remoteDir, copyDirs[i]));
         }
+        var remoteZipPath = path.join(this.userCache.remoteDir, "zips");
+        this.delDir(remoteZipPath);
+        //部署压缩文件
+        this.copySourceDirToDesDir(zipPath, remoteZipPath);
     };
     _Helper.prototype.addProgress = function () {
         var value = this.view.deployProgress.value;
@@ -589,8 +597,7 @@ var _Helper = /** @class */ (function () {
         var versionsPath = path.join(manifestDir, "versions.json");
         fs.writeFileSync(versionsPath, JSON.stringify(versions));
         this.addLog("\u751F\u6210versions.json\u6210\u529F");
-        this._isDoCreate = false;
-        this.packageZip(mainIncludes);
+        this.packageZip(mainIncludes, versions);
     };
     _Helper.prototype.packageDir = function (dir, jszip) {
         if (!fs.existsSync(dir)) {
@@ -609,7 +616,7 @@ var _Helper = /** @class */ (function () {
             }
         }
     };
-    _Helper.prototype.packageZip = function (mainIncludes) {
+    _Helper.prototype.packageZip = function (mainIncludes, versions) {
         var _this = this;
         this.addLog("[\u6253\u5305] \u5F00\u59CB\u6253\u5305\u7248\u672C...");
         var versionManifest = path.join(this.getManifestDir(this.userCache.buildDir), "main_version.json");
@@ -619,23 +626,11 @@ var _Helper = /** @class */ (function () {
             var fullPath = path.join(this.userCache.buildDir, element);
             this.packageDir(fullPath, jszip.folder(element));
         }
-        //打包manifest的版本文件
-        var manifest = path.join(this.userCache.buildDir, "manifest");
-        this.packageDir(manifest, jszip.folder("manifest"));
-        var mainVersionManifest = fs.readFileSync(versionManifest, "utf-8");
-        var mainVersion = JSON.parse(mainVersionManifest).version;
-        if (this.addLog("[打包] 打包版本:" + mainVersion), mainVersion !== this.userCache.version) {
-            this.addLog("[打包] 打包版本和当前填写的版本不一致,出现异常,停止打包!");
-            return;
-        }
-        var packZipName = "ver_main_" + (mainVersion = mainVersion.replace(".", "_")) + ".zip";
+        var packZipName = "main_" + versions["main"].md5 + ".zip";
         var packZipRootPath = Editor.Project.path + "/PackageVersion";
-        fs.existsSync(packZipRootPath) || fs.mkdirSync(packZipRootPath);
         var packVersionZipPath = path.join(packZipRootPath, packZipName);
-        if (fs.existsSync(packVersionZipPath)) {
-            fs.unlinkSync(packVersionZipPath);
-            this.addLog("[打包] 发现该版本的zip, 已经删除!");
-        }
+        this.delDir(packZipRootPath);
+        this.mkdirSync(packZipRootPath);
         jszip.generateNodeStream({
             type: "nodebuffer",
             streamFiles: !0
@@ -648,18 +643,11 @@ var _Helper = /** @class */ (function () {
         var bundles = this.config.bundles;
         var _loop_1 = function (index) {
             var element = bundles[index];
-            var versionManifest_1 = path.join(this_1.getManifestDir(this_1.userCache.buildDir), element.dir + "_version.json");
-            var mainVersionManifest_1 = fs.readFileSync(versionManifest_1, "utf-8");
-            var mainVersion_1 = JSON.parse(mainVersionManifest_1).version;
-            var packZipName_1 = "ver_" + element.dir + "_" + (mainVersion_1 = mainVersion_1.replace(".", "_")) + ".zip";
+            var packZipName_1 = element.dir + "_" + versions[element.dir].md5 + ".zip";
             var packVersionZipPath_1 = path.join(packZipRootPath, packZipName_1);
             var jszip_1 = new JSZIP();
             var fullPath = path.join(this_1.userCache.buildDir, "assets/" + element.dir);
             this_1.packageDir(fullPath, jszip_1.folder("assets/" + element.dir));
-            if (fs.existsSync(packVersionZipPath_1)) {
-                fs.unlinkSync(packVersionZipPath_1);
-                this_1.addLog("[打包] 发现该版本的zip, 已经删除!");
-            }
             this_1.addLog("[\u6253\u5305] " + element.name + " " + element.dir + " ...");
             jszip_1.generateNodeStream({
                 type: "nodebuffer",

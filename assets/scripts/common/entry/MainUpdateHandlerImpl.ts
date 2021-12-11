@@ -41,7 +41,7 @@ export class MainUpdateHandlerImpl implements UpdateHandlerDelegate {
         Manager.updateLoading.updateProgress(info.progress);
     }
     onAreadyUpToData(item: UpdateItem): void {
-        // Manager.updateLoading.hide();
+        Manager.updateLoading.hide();
     }
     onTryDownloadFailedAssets(item: UpdateItem): void {
         item.downloadFailedAssets();
