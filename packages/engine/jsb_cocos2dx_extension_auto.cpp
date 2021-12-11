@@ -879,11 +879,15 @@ static bool js_extension_AssetsManagerEx_setMainBundles(se::State& s)
 	SE_PRECONDITION2(cobj, false, "js_extension_AssetsManagerEx_setMainBundles : Invalid Native Object");
 	const auto& args = s.args();
 	size_t argc = args.size();
-	if (argc == 0) {
-		cobj->reset();
+	CC_UNUSED bool ok = true;
+	if (argc == 1) {
+		std::vector<std::string> arg0;
+		ok &= seval_to_std_vector_string(args[0], &arg0);
+		SE_PRECONDITION2(ok, false, "js_extension_AssetsManagerEx_setMainBundles : Error processing arguments");
+		cobj->setMainBundles(arg0);
 		return true;
 	}
-	SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+	SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
 	return false;
 }
 SE_BIND_FUNC(js_extension_AssetsManagerEx_setMainBundles)
