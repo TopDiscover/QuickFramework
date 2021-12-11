@@ -1,4 +1,3 @@
-import { DEBUG } from "cc/env";
 import { EntryDelegate } from "../../framework/core/entry/EntryDelegate";
 import { UpdateItem } from "../../framework/core/update/UpdateItem";
 import { Macro } from "../../framework/defines/Macros";
@@ -39,9 +38,7 @@ export class CmmEntry extends EntryDelegate {
             }
             return item;
         }
-        if (DEBUG) {
-            Log.e(`未找到入口配置信息`);
-        }
+        Log.e(`未找到入口配置信息`);
         return null;
     }
 
