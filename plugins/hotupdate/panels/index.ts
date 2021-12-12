@@ -593,13 +593,14 @@ class _Helper {
             /**@description 构建目录 */
             buildDir: this.userCache.buildDir,
             /**@description 日志回调 */
-            log: (conent: any) =>{
-                this.addLog(content);
+            log: (data: any) =>{
+                this.addLog(data);
             },
             /**@description 所有bundle的配置信息 */
             bundles: this.config.bundles
         })
         this.remake()
+        this._isDoCreate = false;
     }
     /**
      * @description 本地测试服务器选择确定

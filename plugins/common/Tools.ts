@@ -58,11 +58,12 @@ class _Tools {
         let packVersionZipPath = path.join(packZipRootPath, packZipName);
         this.delDir(packZipRootPath);
         this.mkdirSync(packZipRootPath);
+        config.log(`打包路径: ${packZipRootPath}`);
         jszip.generateNodeStream({
             type: "nodebuffer",
             streamFiles: !0
         }).pipe(fs.createWriteStream(packVersionZipPath)).on("finish", () => {
-            config.log("[打包] 打包成功: " + packVersionZipPath)
+            config.log("[打包] 打包成功: " + packZipName)
         }).on("error", (e: Error) => {
             config.log("[打包] 打包失败:" + e.message)
         })
@@ -81,7 +82,7 @@ class _Tools {
                 type: "nodebuffer",
                 streamFiles: !0
             }).pipe(fs.createWriteStream(packVersionZipPath)).on("finish", () => {
-                config.log("[打包] 打包成功: " + packVersionZipPath)
+                config.log("[打包] 打包成功: " + packZipName)
             }).on("error", (e: Error) => {
                 config.log("[打包] 打包失败:" + e.message)
             })
