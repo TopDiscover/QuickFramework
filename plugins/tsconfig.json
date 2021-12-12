@@ -3,7 +3,8 @@
   "compilerOptions": {
     "target": "es6",
     "module": "CommonJS",
-    "strict": true,
+    "allowJs" : true,
+    "lib" : ["dom","es7"],
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
