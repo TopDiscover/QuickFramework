@@ -42,11 +42,12 @@ declare module Editor {
     };
 
     export namespace Ipc {
-        export function sendToPanel(packageName: string, message: string, params: any);
+        export function sendToPanel(packageName: string, message: string, params?: any);
     }
 
     export namespace Panel {
         export function open(packageName: string, params?: any);
+        export function close(packageName: string);
         export function extend(options:{style:string,template:string,$,ready:()=>void,messages:{}});
     }
 
