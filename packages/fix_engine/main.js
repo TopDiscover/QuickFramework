@@ -1,8 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.messages = exports.unload = exports.load = exports._Helper = void 0;
-const fs = require("fs");
-const path = require("path");
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
 const jsbdts_1 = require("./jsbdts");
 class _Helper {
     constructor() {
@@ -46,14 +65,14 @@ class _Helper {
         if (this._config) {
             return this._config;
         }
-        let source = fs.readFileSync(path.join(__dirname, "../../engine/config.json"), "utf-8");
+        let source = fs.readFileSync(path.join(__dirname, "../engine/config.json"), "utf-8");
         this._config = JSON.parse(source);
         return this._config;
     }
     /**@description 当前目录下的插件版本 */
     get curPluginVersion() {
         if (this._curPluginVersion == -1) {
-            let versionPath = `${path.join(__dirname, "../../engine/version.json")}`;
+            let versionPath = `${path.join(__dirname, "../engine/version.json")}`;
             versionPath = path.normalize(versionPath);
             let data = fs.readFileSync(versionPath, "utf-8");
             let source = JSON.parse(data);
@@ -115,7 +134,7 @@ class _Helper {
                 //直接把版本文件写到creator目录下
                 let destPath = `${this.appPath}/${data.path}`;
                 destPath = path.normalize(destPath);
-                let sourcePath = `${path.join(__dirname, `../../engine/${data.name}`)}`;
+                let sourcePath = `${path.join(__dirname, `../engine/${data.name}`)}`;
                 sourcePath = path.normalize(sourcePath);
                 let sourceData = fs.readFileSync(sourcePath, "utf-8");
                 fs.writeFileSync(destPath, sourceData, { encoding: "utf-8" });
@@ -125,7 +144,7 @@ class _Helper {
                 //更新声明文件
                 let destPath = `${this.engineRoot}/${data.path}`;
                 destPath = path.normalize(destPath);
-                let sourcePath = `${path.join(__dirname, `../../engine/${data.name}`)}`;
+                let sourcePath = `${path.join(__dirname, `../engine/${data.name}`)}`;
                 sourcePath = path.normalize(sourcePath);
                 let sourceData = fs.readFileSync(sourcePath, "utf-8");
                 let destData = fs.readFileSync(destPath, "utf-8");
@@ -155,7 +174,7 @@ class _Helper {
             }
             else {
                 //查看本地是否有文件
-                let sourcePath = `${path.join(__dirname, `../../engine/${data.name}`)}`;
+                let sourcePath = `${path.join(__dirname, `../engine/${data.name}`)}`;
                 sourcePath = path.normalize(sourcePath);
                 let destPath = `${this.engineRoot}/${data.path}`;
                 destPath = path.normalize(destPath);

@@ -52,7 +52,7 @@ export class _Helper {
         if( this._config ){
             return this._config;
         }
-        let source = fs.readFileSync(path.join(__dirname,"../../engine/config.json"),"utf-8");
+        let source = fs.readFileSync(path.join(__dirname,"../engine/config.json"),"utf-8");
         this._config = JSON.parse(source);
         return this._config;
     }
@@ -61,7 +61,7 @@ export class _Helper {
     /**@description 当前目录下的插件版本 */
     private get curPluginVersion(){
         if( this._curPluginVersion == -1 ){
-            let versionPath = `${path.join(__dirname,"../../engine/version.json")}`;
+            let versionPath = `${path.join(__dirname,"../engine/version.json")}`;
             versionPath = path.normalize(versionPath);
             let data = fs.readFileSync(versionPath,"utf-8");
             let source = JSON.parse(data);
@@ -130,7 +130,7 @@ export class _Helper {
                 //直接把版本文件写到creator目录下
                 let destPath = `${this.appPath}/${data.path}`;
                 destPath = path.normalize(destPath);
-                let sourcePath = `${path.join(__dirname,`../../engine/${data.name}`)}`;
+                let sourcePath = `${path.join(__dirname,`../engine/${data.name}`)}`;
                 sourcePath = path.normalize(sourcePath);
                 let sourceData = fs.readFileSync(sourcePath,"utf-8");
                 fs.writeFileSync(destPath,sourceData,{ encoding : "utf-8"});
@@ -139,7 +139,7 @@ export class _Helper {
                 //更新声明文件
                 let destPath = `${this.engineRoot}/${data.path}`;
                 destPath = path.normalize(destPath);
-                let sourcePath = `${path.join(__dirname,`../../engine/${data.name}`)}`;
+                let sourcePath = `${path.join(__dirname,`../engine/${data.name}`)}`;
                 sourcePath = path.normalize(sourcePath);
                 let sourceData = fs.readFileSync(sourcePath,"utf-8");
                 let destData = fs.readFileSync(destPath,"utf-8");
@@ -167,7 +167,7 @@ export class _Helper {
                 console.log(data.desc);
             } else {
                 //查看本地是否有文件
-                let sourcePath = `${path.join(__dirname,`../../engine/${data.name}`)}`;
+                let sourcePath = `${path.join(__dirname,`../engine/${data.name}`)}`;
                 sourcePath = path.normalize(sourcePath);
                 let destPath = `${this.engineRoot}/${data.path}`;
                 destPath = path.normalize(destPath);
