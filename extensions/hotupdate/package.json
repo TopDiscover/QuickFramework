@@ -1,7 +1,7 @@
 {
     "name": "hotupdate",
     "version": "1.0.0",
-    "main": "./browser.js",
+    "main": "main.js",
     "description": "热更新版本文件生成工具",
     "author": "zheng_fasheng",
     "contributions": {
@@ -22,7 +22,7 @@
     },
     "panels": {
         "default": {
-            "main": "./panels/index.js",
+            "main": "panel/index.js",
             "type": "dockable",
             "title": "热更新工具",
             "size": {
