@@ -1,0 +1,23 @@
+{
+    "name": "hotupdate",
+    "version": "1.0.0",
+    "description": "热更新工具",
+    "author": "zheng_fasheng",
+    "main": "main.js",
+    "main-menu": {
+        "项目工具/热更新工具": {
+            "icon": "icon.png",
+            "accelerator": "CmdOrCtrl+u",
+            "message": "hotupdate:showPanel"
+        }
+    },
+    "panel": {
+        "main": "panel/index.js",
+        "type": "dockable",
+        "title": "热更新工具",
+        "width": 900,
+        "height": 900,
+        "min-height": 400,
+        "min-width": 550
+    }
+}

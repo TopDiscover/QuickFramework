@@ -68,4 +68,5 @@ declare module Editor {
     
     export const Builder : CocosBuilder;
 
+    export function require(name:string) : any;
 }
