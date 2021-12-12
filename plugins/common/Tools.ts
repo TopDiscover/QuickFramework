@@ -6,7 +6,7 @@ import JSZip from "jszip";
 import * as path from "path";
 import { ZipVersionsConfig } from "./Defines";
 
-class _Utils {
+class _Tools {
 
     /**@description 获取目录下文件个数 */
     getDirFileCount(dir: string) {
@@ -44,8 +44,8 @@ class _Utils {
     /**
      * @description 打包版本文件
      */
-    zipVersions( config : ZipVersionsConfig ) {
-        let JSZIP : JSZip = require("jszip");
+    zipVersions(config: ZipVersionsConfig) {
+        let JSZIP: JSZip = require("jszip");
         let jszip = new JSZIP();
         for (let index = 0; index < config.mainIncludes.length; index++) {
             const element = config.mainIncludes[index];
@@ -139,5 +139,87 @@ class _Utils {
         }
         return false;
     }
+    /**
+     * @description 复制整个目录
+     * @param source 源
+     * @param dest 目标
+     * @param copyFileCb 复制文件完成回调 
+     */
+    copySourceDirToDesDir(source: string, dest: string,copyFileCb ?: Function) {
+        let self = this;
+        let makeDir = (_source: string, _dest: string, _copyFileCb: (source: string, dest: string) => void) => {
+            fs.exists(_dest, function (isExist) {
+                isExist ? _copyFileCb(_source, _dest) : fs.mkdir(_dest, function () {
+                    if(copyFileCb) copyFileCb(), _copyFileCb(_source, _dest)
+                })
+            })
+        };
+        let copyFile = (_source: string, _dest: string) => {
+            fs.readdir(_source, function (err, files) {
+                if (err) throw err;
+                files.forEach(function (filename) {
+                    let readStream;
+                    let writeStram;
+                    let sourcePath = _source + "/" + filename;
+                    let destPath = _dest + "/" + filename;
+                    fs.stat(sourcePath, function (err, stats) {
+                        if (err) throw err;
+                        if (stats.isFile()) {
+                            readStream = fs.createReadStream(sourcePath);
+                            writeStram = fs.createWriteStream(destPath);
+                            readStream.pipe(writeStram);
+                            if(copyFileCb) copyFileCb()
+                        } else {
+                            stats.isDirectory() && makeDir(sourcePath, destPath, copyFile)
+                        }
+                    })
+                })
+            })
+        };
+        makeDir(source, dest, copyFile)
+    }
+
+    /**
+     * @description 读取目录下的所有文件的md5及大小信息到obj
+     * @param dir 读取目录
+     * @param obj 输出对象
+     * @param source 
+     * @returns 
+     */
+    readDir(dir: string, obj: any, source: string) {
+        var stat = fs.statSync(dir);
+        if (!stat.isDirectory()) {
+            return;
+        }
+        var subpaths = fs.readdirSync(dir),
+            subpath, size, md5, compressed, relative;
+        for (var i = 0; i < subpaths.length; ++i) {
+            if (subpaths[i][0] === '.') {
+                continue;
+            }
+            subpath = path.join(dir, subpaths[i]);
+            stat = fs.statSync(subpath);
+            if (stat.isDirectory()) {
+                this.readDir(subpath, obj, source);
+            } else if (stat.isFile()) {
+                // Size in Bytes
+                size = stat['size'];
+                md5 = require("crypto").createHash('md5').update(fs.readFileSync(subpath)).digest('hex');
+                compressed = path.extname(subpath).toLowerCase() === '.zip';
+                relative = path.relative(source, subpath);
+                relative = relative.replace(/\\/g, '/');
+                relative = encodeURI(relative);
+
+                obj[relative] = {
+                    'size': size,
+                    'md5': md5
+                };
+
+                if (compressed) {
+                    obj[relative].compressed = true;
+                }
+            }
+        }
+    }
 }
-export let Utils = new _Utils();
+export let Tools = new _Tools();

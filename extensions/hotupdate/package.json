@@ -32,8 +32,5 @@
                 "min-height": 500
             }
         }
-    },
-    "dependencies": {
-        "jszip": "^3.2.2"
     }
 }

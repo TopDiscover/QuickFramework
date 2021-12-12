@@ -1,7 +1,7 @@
 {
     "name": "公共处理模块",
     "version": "1.0.0",
-    "description": "Creator 扩展提供接口声明及Node接口声明 为了让Creator不报错声明成一个插件",
+    "description": "公共部分业务处理代码 为了让Creator不报错声明成一个插件",
     "author": "zheng_fasheng",
     "contributions": {
         
