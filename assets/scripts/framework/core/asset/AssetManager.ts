@@ -218,6 +218,13 @@ export class _AssetManager {
             cache.info.bundle = bundle;
             Manager.cacheManager.set(bundle, path, cache);
             console.time(`加载资源 : ${cache.info.url}`);
+
+            //先到释放管理器中查找 
+            let res = Manager.releaseManger.get(bundle,path);
+            if (res) {
+                this._onLoadComplete(cache, onComplete, null, res);
+                return;
+            }
             let _bundle = this.getBundle(bundle);
             if (!_bundle) {
                 //如果bundle不存在
@@ -225,7 +232,7 @@ export class _AssetManager {
                 this._onLoadComplete(cache, onComplete, error, null);
                 return;
             }
-            let res = _bundle.get(path, type);
+            res = _bundle.get(path, type);
             if (res) {
                 this._onLoadComplete(cache, onComplete, null, res);
             } else {
@@ -311,6 +318,13 @@ export class _AssetManager {
             cache.info.bundle = bundle;
             Manager.cacheManager.set(bundle, path, cache);
             console.time(`加载资源 : ${cache.info.url}`);
+
+            let res = Manager.releaseManger.get(bundle,path);
+            if ( res ){
+                this._onLoadComplete(cache,onComplete,null,res);
+                return;
+            }
+
             let _bundle = this.getBundle(bundle);
             if (!_bundle) {
                 //如果bundle不存在
@@ -342,24 +356,9 @@ export class _AssetManager {
                     if (DEBUG) Log.d(`常驻资源 url : ${cache.info.url}`);
                     return;
                 }
-                if (DEBUG) Log.d(`释放资源 : ${info.bundle}.${info.url}`);
 
                 if (Manager.cacheManager.removeWithInfo(info)) {
-                    let bundle = this.getBundle(info.bundle);
-                    if (bundle) {
-                        if (Array.isArray(info.data)) {
-                            for (let i = 0; i < info.data.length; i++) {
-                                let path = `${info.url}/${info.data[i].name}`;
-                                bundle.release(path, info.type);
-                            }
-                            if (DEBUG) Log.d(`成功释放资源目录 : ${info.bundle}.${info.url}`);
-                        } else {
-                            bundle.release(info.url, info.type);
-                            if (DEBUG) Log.d(`成功释放资源 : ${info.bundle}.${info.url}`);
-                        }
-                    } else {
-                        Log.e(`${info.bundle} no found`);
-                    }
+                    Manager.releaseManger.release(info);
                 } else {
                     if (DEBUG) {
                         if (Array.isArray(info.data)) {

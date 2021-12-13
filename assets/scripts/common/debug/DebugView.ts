@@ -42,6 +42,8 @@ export class DebugView extends Component {
         this.bindEvent("serviceManager",this.onServiceManager);
         //热火更新管理
         this.bindEvent("hotupdate",this.onHotUpdate);
+        //内存警告
+        this.bindEvent("lowMemory",this.onLowMemory);
         this.doOther();
     }
     debug: Node = null!;
@@ -342,6 +344,10 @@ export class DebugView extends Component {
                 Log.dump(data.data,data.name);
             }
         })
+    }
+
+    private onLowMemory(){
+        Manager.onLowMemory();
     }
 }
 

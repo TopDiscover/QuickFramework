@@ -50,6 +50,8 @@ export default class MainController extends EventComponent {
         //游戏事件注册
         game.on(Game.EVENT_HIDE, this.onEnterBackground, this);
         game.on(Game.EVENT_SHOW, this.onEnterForgeground, this);
+        //内存警告事件
+        game.on(Game.EVENT_LOW_MEMORY,this.onLowMemory,this);
     }
 
     update() {
@@ -73,5 +75,9 @@ export default class MainController extends EventComponent {
 
     private onEnterForgeground() {
         Manager.onEnterForgeground();
+    }
+
+    private onLowMemory(){
+        Manager.onLowMemory();
     }
 }
