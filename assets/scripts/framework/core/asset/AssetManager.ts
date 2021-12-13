@@ -16,21 +16,21 @@ class RemoteLoader {
                 resolve(null);
                 return;
             }
-            if ( isNeedCache ){
+            if (isNeedCache) {
                 //如果存在缓存 ，直接取出
                 let spCache = Manager.cacheManager.remoteCaches.getSpriteFrame(url);
                 if (spCache && spCache.data) {
                     if (DEBUG) Log.d(this._logTag, `从缓存精灵帧中获取:${url}`);
                     resolve(<SpriteFrame>(spCache.data));
                     return;
-                }else{
+                } else {
                     //错误处理
-                    if (DEBUG) Log.d(this._logTag,`错误资源，删除缓存信息，重新加载:${url}`);
+                    if (DEBUG) Log.d(this._logTag, `错误资源，删除缓存信息，重新加载:${url}`);
                     Manager.cacheManager.remoteCaches.remove(url);
                 }
-            }else{
+            } else {
                 //不需要缓存，先删除之前的,再重新加载
-                if (DEBUG) Log.d(this._logTag,`不需要缓存信息，删除缓存，重新加载${url}`);
+                if (DEBUG) Log.d(this._logTag, `不需要缓存信息，删除缓存，重新加载${url}`);
                 Manager.cacheManager.remoteCaches.remove(url);
             }
             me._loadRemoteRes(url, Texture2D, isNeedCache).then((data: any) => {
@@ -58,6 +58,31 @@ class RemoteLoader {
                 let spineAtlas = `${path}/${name}.atlas`;
                 let spinePng = `${path}/${name}.png`;
                 let spineJson = `${path}/${name}.json`;
+                let res = Manager.releaseManger.getRemote(url);
+                if (res) {
+                    let cache = Manager.cacheManager.remoteCaches.get(url);
+                    if (cache) {
+                        cache.isLoaded = true;
+                        cache.data = res;
+                        cache.info.data = res;
+                        cache.info.url = url;
+                        resolve(<sp.SkeletonData>(cache.data));
+                        cache.doFinish(cache.data);
+                    }else{
+                        cache = new Resource.CacheData();
+                        cache.info.resourceType = Resource.Type.Remote;
+                        cache.info.type = sp.SkeletonData;
+                        cache.info.bundle = Macro.BUNDLE_REMOTE;
+                        cache.isLoaded = true;
+                        cache.data = res;
+                        cache.info.data = res;
+                        cache.info.url = url;
+                        Manager.cacheManager.remoteCaches.set(url, cache);
+                        resolve(<sp.SkeletonData>(cache.data));
+                        cache.doFinish(cache.data);
+                    }
+                    return;
+                }
                 let cache = Manager.cacheManager.remoteCaches.get(url);
                 if (cache) {
                     if (cache.isLoaded) {
@@ -139,7 +164,17 @@ class RemoteLoader {
                 cache.info.resourceType = Resource.Type.Remote;
                 cache.info.type = type;
                 Manager.cacheManager.remoteCaches.set(url, cache);
-                assetManager.loadRemote(url,{cacheAsset : true , reloadAsset : !isNeedCache } ,  (error, data) => {
+                let res = Manager.releaseManger.getRemote(url);
+                if (res) {
+                    cache.isLoaded = true;
+                    cache.data = res;
+                    (<Asset>cache.data).addRef();
+                    //把再加载过程里，双加载同一资源的回调都回调回去
+                    cache.doFinish(res);
+                    resolve(cache.data);
+                    return;
+                }
+                assetManager.loadRemote(url, { cacheAsset: true, reloadAsset: !isNeedCache }, (error, data) => {
                     if (cache) {
                         cache.isLoaded = true;
                         if (data) {
@@ -220,7 +255,7 @@ export class _AssetManager {
             console.time(`加载资源 : ${cache.info.url}`);
 
             //先到释放管理器中查找 
-            let res = Manager.releaseManger.get(bundle,path);
+            let res = Manager.releaseManger.get(bundle, path);
             if (res) {
                 this._onLoadComplete(cache, onComplete, null, res);
                 return;
@@ -319,9 +354,9 @@ export class _AssetManager {
             Manager.cacheManager.set(bundle, path, cache);
             console.time(`加载资源 : ${cache.info.url}`);
 
-            let res = Manager.releaseManger.get(bundle,path);
-            if ( res ){
-                this._onLoadComplete(cache,onComplete,null,res);
+            let res = Manager.releaseManger.get(bundle, path);
+            if (res) {
+                this._onLoadComplete(cache, onComplete, null, res);
                 return;
             }
 
@@ -363,7 +398,7 @@ export class _AssetManager {
                     if (DEBUG) {
                         if (Array.isArray(info.data)) {
                             for (let i = 0; i < info.data.length; i++) {
-                                if( info.data[i].refCount > 0 ){
+                                if (info.data[i].refCount > 0) {
                                     Log.w(`资源bundle : ${info.bundle} url : ${info.url}/${info.data[i].name} 被其它界面引用 refCount : ${info.data[i].refCount}`)
                                 }
                             }

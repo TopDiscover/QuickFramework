@@ -5,7 +5,8 @@
  * Author = zheng_fasheng
  */
 
-import { Asset, assetManager, AssetManager, isValid } from "cc";
+import { Asset, assetManager, AssetManager, isValid, sp } from "cc";
+import { Macro } from "../../defines/Macros";
 import { Resource } from "./Resource";
 
 const LOG_TAG = "[ReleaseManager] : ";
@@ -68,6 +69,16 @@ class LazyInfo {
     onLowMemory() {
         if (this._assets.size > 0) {
             Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载的资源`);
+            if ( this.name == Macro.BUNDLE_REMOTE ){
+                this._assets.forEach((info,key,source)=>{
+                    if ( info.data instanceof Asset){
+                        Log.d(`${LOG_TAG}bundle : ${this.name} 释放远程加载资源${info.url}`);
+                        assetManager.releaseAsset(info.data as Asset);
+                    }
+                });
+                this._assets.clear();
+                return;
+            }
             let bundle = assetManager.getBundle(this.name);
             if (bundle) {
                 this._assets.forEach((info, url, source) => {
@@ -109,6 +120,8 @@ export class ReleaseManager {
     private _lazyInfos: Map<string, LazyInfo> = new Map();
     /**@description 待释放bundle */
     private _bundles: Map<string, boolean> = new Map();
+    /**@description 远程资源 */
+    private _remote : LazyInfo = new LazyInfo(Macro.BUNDLE_REMOTE);
 
     private getBundle(bundle: BUNDLE_TYPE) {
         return Manager.bundleManager.getBundle(bundle);
@@ -199,5 +212,22 @@ export class ReleaseManager {
                 this._bundles.delete(bundle);
             }
         });
+
+        Log.d(`${LOG_TAG}-------------释放无用远程资源-------------`);
+        this._remote.onLowMemory();
+    }
+
+    getRemote(url:string){
+        return this._remote.get(url);
+    }
+
+    releaseRemote( info : Resource.Info ){
+        if ( Manager.isLazyRelease ){
+            this._remote.add(info);
+        }else{
+            if ( info.data instanceof Asset ){
+                assetManager.releaseAsset(info.data as Asset);
+            }
+        }
     }
 }
