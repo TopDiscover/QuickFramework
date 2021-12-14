@@ -44,6 +44,8 @@ export class DebugView extends Component {
         this.bindEvent("hotupdate",this.onHotUpdate);
         //内存警告
         this.bindEvent("lowMemory",this.onLowMemory);
+        //释放管理器
+        this.bindEvent("releaseManager",this.onReleaseManager);
         this.doOther();
     }
     debug: Node = null!;
@@ -348,6 +350,34 @@ export class DebugView extends Component {
 
     private onLowMemory(){
         Manager.onLowMemory();
+    }
+
+    private onReleaseManager(){
+        Manager.releaseManger.print({
+            print:(data)=>{
+                if ( Manager.isLazyRelease ){
+                    if ( data.bundles.length > 0 ){
+                        Log.d(`待释放Bundle : ${data.bundles.toString()}`);
+                    }
+                    if ( data.lazyInfo.size > 0 ){
+                        data.lazyInfo.forEach((value,key,source)=>{
+                            Log.d(`--------------${key}待释放资源--------------`);
+                            value.assets.forEach((info,key,source)=>{
+                                Log.d(`${info.url}`);
+                            })
+                        });
+                    }
+
+                    Log.d(`远程待释放资源`);
+                    data.remote.assets.forEach((info,key,source)=>{
+                        Log.d(`${info.url}`);
+                    });
+
+                }else{
+                    Log.w(`未开户懒释放功能!!!!`);
+                }
+            }
+        })
     }
 }
 

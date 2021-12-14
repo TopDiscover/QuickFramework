@@ -19,21 +19,21 @@ class LazyInfo {
         this.name = name;
     }
 
-    private _assets: Map<string,Resource.Info> = new Map();
+    private _assets: Map<string, Resource.Info> = new Map();
 
     /**@description 放入懒释放资源 */
-    add(info : Resource.Info) {
-        
+    add(info: Resource.Info) {
+
         //管理器引用加1
-        if ( Array.isArray(info.data) ){
+        if (Array.isArray(info.data)) {
             Log.d(`${LOG_TAG}向${this.name}加入待释放目录:${info.url}`);
-            for ( let i = 0 ; i < info.data.length ; i++ ){
-                if ( info.data[i] ){
+            for (let i = 0; i < info.data.length; i++) {
+                if (info.data[i]) {
                     info.data[i].addRef();
                 }
             }
-        }else{
-            if ( info.data ){
+        } else {
+            if (info.data) {
                 Log.d(`${LOG_TAG}向${this.name}加入待释放资源:${info.url}`);
                 info.data.addRef();
             }
@@ -43,17 +43,17 @@ class LazyInfo {
 
     get(url: string): Asset | Asset[] | null {
         let info = this._assets.get(url);
-        let result : Asset | Asset[] | null = null;
+        let result: Asset | Asset[] | null = null;
         if (info) {
-            if ( Array.isArray(info.data) ){
-                for( let i = 0 ; i < info.data.length ; i++ ){
-                    if ( info.data[i] ){
+            if (Array.isArray(info.data)) {
+                for (let i = 0; i < info.data.length; i++) {
+                    if (info.data[i]) {
                         info.data[i].decRef();
                     }
                 }
                 Log.d(`${LOG_TAG}向${this.name}获取待释放目录:${info.url}`);
                 result = info.data;
-            }else{
+            } else {
                 if (isValid(info.data)) {
                     //获取后删除当前管理器的引用
                     info.data.decRef();
@@ -69,9 +69,9 @@ class LazyInfo {
     onLowMemory() {
         if (this._assets.size > 0) {
             Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载的资源`);
-            if ( this.name == Macro.BUNDLE_REMOTE ){
-                this._assets.forEach((info,key,source)=>{
-                    if ( info.data instanceof Asset){
+            if (this.name == Macro.BUNDLE_REMOTE) {
+                this._assets.forEach((info, key, source) => {
+                    if (info.data instanceof Asset) {
                         Log.d(`${LOG_TAG}bundle : ${this.name} 释放远程加载资源${info.url}`);
                         assetManager.releaseAsset(info.data as Asset);
                     }
@@ -82,21 +82,21 @@ class LazyInfo {
             let bundle = assetManager.getBundle(this.name);
             if (bundle) {
                 this._assets.forEach((info, url, source) => {
-                    if ( Array.isArray(info.data) ){
+                    if (Array.isArray(info.data)) {
                         Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载目录${info.url}`);
-                        for( let i = 0 ; i < info.data.length ; i++ ){
-                            if ( info.data[i] ){
+                        for (let i = 0; i < info.data.length; i++) {
+                            if (info.data[i]) {
                                 info.data[i].decRef();
                                 let path = `${info.url}/${info.data[i].name}`;
-                                bundle?.release(path,info.type);
+                                bundle?.release(path, info.type);
                                 Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载资源${path}`);
                             }
                         }
-                    }else{
+                    } else {
                         if (isValid(info.data)) {
                             //获取后删除当前管理器的引用
                             info.data.decRef();
-                            bundle?.release(info.url,info.type);
+                            bundle?.release(info.url, info.type);
                             Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载资源${info.url}`);
                         }
                     }
@@ -107,6 +107,10 @@ class LazyInfo {
                 this._assets.clear();
             }
         }
+    }
+
+    get assets() {
+        return this._assets;
     }
 }
 
@@ -121,7 +125,7 @@ export class ReleaseManager {
     /**@description 待释放bundle */
     private _bundles: Map<string, boolean> = new Map();
     /**@description 远程资源 */
-    private _remote : LazyInfo = new LazyInfo(Macro.BUNDLE_REMOTE);
+    private _remote: LazyInfo = new LazyInfo(Macro.BUNDLE_REMOTE);
 
     private getBundle(bundle: BUNDLE_TYPE) {
         return Manager.bundleManager.getBundle(bundle);
@@ -151,11 +155,11 @@ export class ReleaseManager {
                 if (Array.isArray(info.data)) {
                     for (let i = 0; i < info.data.length; i++) {
                         let path = `${info.url}/${info.data[i].name}`;
-                        bundle.release(path,info.type);
+                        bundle.release(path, info.type);
                     }
                     Log.d(`${LOG_TAG}成功释放资源目录 : ${info.bundle}.${info.url}`);
                 } else {
-                    bundle.release(info.url,info.type);
+                    bundle.release(info.url, info.type);
                     Log.d(`${LOG_TAG}成功释放资源 : ${info.bundle}.${info.url}`);
                 }
             }
@@ -217,17 +221,34 @@ export class ReleaseManager {
         this._remote.onLowMemory();
     }
 
-    getRemote(url:string){
+    getRemote(url: string) {
         return this._remote.get(url);
     }
 
-    releaseRemote( info : Resource.Info ){
-        if ( Manager.isLazyRelease ){
+    releaseRemote(info: Resource.Info) {
+        if (Manager.isLazyRelease) {
             this._remote.add(info);
-        }else{
-            if ( info.data instanceof Asset ){
+        } else {
+            if (info.data instanceof Asset) {
                 assetManager.releaseAsset(info.data as Asset);
             }
         }
+    }
+
+    print(delegate: ManagerPrintDelegate<{
+        lazyInfo: Map<string, LazyInfo>,
+        bundles: string[],
+        remote: LazyInfo
+    }>) {
+
+        let bundles: string[] = [];
+        this._bundles.forEach((data, key, source) => {
+            bundles.push(key);
+        })
+        delegate.print({
+            lazyInfo: this._lazyInfos,
+            bundles: bundles,
+            remote: this._remote
+        });
     }
 }
