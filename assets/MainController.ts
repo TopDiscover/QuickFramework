@@ -65,6 +65,7 @@ export default class MainController extends EventComponent {
         //移除游戏事件注册
         game.off(Game.EVENT_HIDE);
         game.off(Game.EVENT_SHOW);
+        game.off(Game.EVENT_LOW_MEMORY);
         Manager.onDestroy(this.node);
         super.onDestroy();
     }
