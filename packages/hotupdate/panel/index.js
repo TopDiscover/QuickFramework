@@ -27,12 +27,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-// Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const os = __importStar(require("os"));
 const Electron = require("electron");
-const Tools = require(Editor.Project.path + "/packages/common/Tools").Tools;
+const Tools_1 = require("../../common/Tools");
 class _Helper {
     constructor() {
         this.elements = {
@@ -308,11 +308,11 @@ class _Helper {
         }
         for (let i = 0; i < removeDirs.length; i++) {
             this.addLog(`删除目录 : ${removeDirs[i]}`);
-            Tools.delDir(removeDirs[i], true);
+            Tools_1.Tools.delDir(removeDirs[i], true);
         }
         for (let i = 0; i < manifests.length; i++) {
             this.addLog(`删除版本文件 : ${manifests[i]}`);
-            Tools.delFile(manifests[i]);
+            Tools_1.Tools.delFile(manifests[i]);
         }
     }
     /**
@@ -409,29 +409,29 @@ class _Helper {
         this.addLog(`[部署]开始拷贝文件到 : ${this.userCache.remoteDir}`);
         this.view.deployProgress.value = 0;
         this.addLog(`[部署]删除旧目录 : ${this.userCache.remoteDir}`);
-        let count = Tools.getDirFileCount(this.userCache.remoteDir);
+        let count = Tools_1.Tools.getDirFileCount(this.userCache.remoteDir);
         this.addLog(`[部署]删除文件个数:${count}`);
-        Tools.delDir(this.userCache.remoteDir);
+        Tools_1.Tools.delDir(this.userCache.remoteDir);
         count = 0;
         for (let i = 0; i < copyDirs.length; i++) {
             let dir = path.join(this.userCache.buildDir, copyDirs[i]);
-            count += Tools.getDirFileCount(dir);
+            count += Tools_1.Tools.getDirFileCount(dir);
         }
         //压缩文件数量
         let zipPath = Editor.Project.path + "/PackageVersion";
-        count += Tools.getDirFileCount(zipPath);
+        count += Tools_1.Tools.getDirFileCount(zipPath);
         this.addLog(`[部署]复制文件个数 : ${count}`);
         for (let i = 0; i < copyDirs.length; i++) {
             let source = path.join(this.userCache.buildDir, copyDirs[i]);
             let dest = path.join(this.userCache.remoteDir, copyDirs[i]);
-            Tools.copySourceDirToDesDir(source, dest, () => {
+            Tools_1.Tools.copySourceDirToDesDir(source, dest, () => {
                 this.addProgress();
             });
         }
         let remoteZipPath = path.join(this.userCache.remoteDir, "zips");
-        Tools.delDir(remoteZipPath);
+        Tools_1.Tools.delDir(remoteZipPath);
         //部署压缩文件
-        Tools.copySourceDirToDesDir(zipPath, remoteZipPath, () => {
+        Tools_1.Tools.copySourceDirToDesDir(zipPath, remoteZipPath, () => {
             this.addProgress();
         });
     }
@@ -480,13 +480,13 @@ class _Helper {
         this.addLog("删除旧的Manifest目录", manifestDir);
         if (fs.existsSync(manifestDir)) {
             this.addLog("存在旧的，删除掉");
-            Tools.delDir(manifestDir);
+            Tools_1.Tools.delDir(manifestDir);
         }
-        Tools.mkdirSync(manifestDir);
+        Tools_1.Tools.mkdirSync(manifestDir);
         //读出主包资源，生成主包版本
         let mainIncludes = this.getMainBundleIncludes();
         for (let i = 0; i < mainIncludes.length; i++) {
-            Tools.readDir(path.join(buildDir, mainIncludes[i]), manifest.assets, buildDir);
+            Tools_1.Tools.readDir(path.join(buildDir, mainIncludes[i]), manifest.assets, buildDir);
         }
         //生成project.manifest
         let projectManifestPath = path.join(manifestDir, "main_project.json");
@@ -512,7 +512,7 @@ class _Helper {
                 assets: {},
                 bundle: key
             };
-            Tools.readDir(path.join(buildDir, `assets/${key}`), manifest.assets, buildDir);
+            Tools_1.Tools.readDir(path.join(buildDir, `assets/${key}`), manifest.assets, buildDir);
             projectManifestPath = path.join(manifestDir, `${key}_project.json`);
             versionManifestPath = path.join(manifestDir, `${key}_version.json`);
             let content = JSON.stringify(manifest);
@@ -532,7 +532,7 @@ class _Helper {
         let versionsPath = path.join(manifestDir, `versions.json`);
         fs.writeFileSync(versionsPath, JSON.stringify(versions));
         this.addLog(`生成versions.json成功`);
-        Tools.zipVersions({
+        Tools_1.Tools.zipVersions({
             mainIncludes: mainIncludes,
             versions: versions,
             buildDir: this.userCache.buildDir,

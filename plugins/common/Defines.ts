@@ -1,4 +1,3 @@
-import JSZip from "jszip";
 
 /**@description bundle信息 */
 export interface BundleInfo {
@@ -66,49 +65,4 @@ export interface Manifest {
     bundle?: string;
     md5?: string;
     version?: string;
-}
-
-export interface ITools {
-    /**@description 获取目录下文件个数 */
-    getDirFileCount(dir: string): number;
-
-    /**@description 压缩文件到zip */
-    zipDir(dir: string, jszip: JSZip | null): void;
-
-    /**
-     * @description 打包版本文件
-     */
-    zipVersions(config: ZipVersionsConfig): void;
-
-    /**@description 创建目录 */
-    mkdirSync(dir: string): void;
-
-    /**
-     * @description 删除目录
-     * @param sourceDir 源目录
-     * @param isRemoveSourceDir 是否删除源目录本身，默认不删除
-     */
-    delDir(sourceDir: string, isRemoveSourceDir?: boolean): void
-    /**
-     * @description 删除文件
-     * @param filePath 
-     * @returns 
-     */
-    delFile(filePath: string): boolean;
-    /**
-     * @description 复制整个目录
-     * @param source 源
-     * @param dest 目标
-     * @param copyFileCb 复制文件完成回调 
-     */
-    copySourceDirToDesDir(source: string, dest: string, copyFileCb?: Function): void;
-
-    /**
-     * @description 读取目录下的所有文件的md5及大小信息到obj
-     * @param dir 读取目录
-     * @param obj 输出对象
-     * @param source 
-     * @returns 
-     */
-    readDir(dir: string, obj: any, source: string): void;
 }

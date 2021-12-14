@@ -2,8 +2,8 @@ import * as fs from "fs"
 import * as path from "path"
 import * as os from "os"
 const Electron = require("electron")
-const Tools : ITools = require( Editor.Project.path + "/packages/common/Tools").Tools;
-import { HotUpdateConfig, ITools, Manifest, UserCache } from "../../common/Defines";
+import { HotUpdateConfig, Manifest, UserCache } from "../../common/Defines";
+import { Tools } from "../../common/Tools";
 
 interface IHtmlElements {
   /**@description 主包版本号 */
