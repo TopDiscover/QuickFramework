@@ -16,6 +16,7 @@ import { Framewok } from "./scripts/framework/Framework";
 export class _Manager extends Framewok implements GameEventInterface {
 
     get isLazyRelease(){
+        Log.w(`需要使用都自己导出cc.game.EVENT_LOW_MEMORY事件`);
         return true;
     }
 
