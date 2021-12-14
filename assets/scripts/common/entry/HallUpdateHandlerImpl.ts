@@ -80,6 +80,7 @@ export class HallUpdateHandlerImpl implements UpdateHandlerDelegate {
         Manager.bundleManager.loadBundle(item);
     }
     onDownloadComplete(item:UpdateItem):void{
+        Manager.releaseManger.tryRemoveBundle(item.bundle);
         this.onLoadBundle(item);
     }
 }

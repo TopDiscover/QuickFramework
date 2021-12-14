@@ -109,6 +109,13 @@ class LazyInfo {
         }
     }
 
+    tryRemove(bundle:BUNDLE_TYPE){
+        if ( this.name != bundle ){
+            return;
+        }
+        this.onLowMemory();
+    }
+
     get assets() {
         return this._assets;
     }
@@ -219,6 +226,21 @@ export class ReleaseManager {
 
         Log.d(`${LOG_TAG}-------------释放无用远程资源-------------`);
         this._remote.onLowMemory();
+    }
+
+    /**@description 尝试释放指定bundel的资源 */
+    tryRemoveBundle(bundle:BUNDLE_TYPE){
+        Log.d(`${LOG_TAG}--------------尝试释放${bundle}加载资源------------`);
+        this._lazyInfos.forEach((info,key,source)=>{
+            info.tryRemove(bundle);
+        });
+        let name = this.getBundleName(bundle);
+        let temp = assetManager.getBundle(name);
+        if (temp) {
+            Log.d(`释放无用bundle : ${name}`);
+            assetManager.removeBundle(temp);
+            this._bundles.delete(name);
+        }
     }
 
     getRemote(url: string) {

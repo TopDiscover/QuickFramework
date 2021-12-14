@@ -68,5 +68,7 @@ export class BundleUpdateHandlerImpl implements UpdateHandlerDelegate {
 
     onDownloadComplete(item:UpdateItem):void{
         //子游戏下载完成，不进入游戏，需要玩家二次点击进入
+        //尝试先释放掉当前的bundle的资源，重新加载
+        Manager.releaseManger.tryRemoveBundle(item.bundle);
     }
 }
