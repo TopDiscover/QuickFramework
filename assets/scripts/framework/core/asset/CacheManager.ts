@@ -194,7 +194,8 @@ class RemoteCaches {
         if (cache && cache.data instanceof cc.Asset) {
             if (CC_DEBUG) Log.d(`释放加载的本地远程资源:${cache.info.url}`);
             cache.data.decRef();
-            cc.assetManager.releaseAsset(cache.data as cc.Asset);
+            cache.info.data = cache.data;
+            Manager.releaseManger.releaseRemote(cache.info);
         }
         if (CC_DEBUG) Log.d(`remove remote cache url : ${url}`);
         return this._caches.delete(url);

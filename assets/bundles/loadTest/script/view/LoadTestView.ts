@@ -168,7 +168,7 @@ export default class LoadTestView extends GameView {
         let spine = node.addComponent(sp.Skeleton);
         spine.loadRemoteSkeleton({
             view:this,
-            path:"http://192.168.3.104",
+            path:"http://192.168.3.153",
             name:"raptor",
             complete:(data : sp.SkeletonData )=>{
                 if( data ){

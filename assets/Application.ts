@@ -15,6 +15,9 @@ import { Framewok } from "./scripts/framework/Framework";
 /**@description 游戏所有运行单例的管理 */
 export class _Manager extends Framewok implements GameEventInterface {
 
+    get isLazyRelease(){
+        return true;
+    }
 
     get utils(){
         return getSingleton(Utils)

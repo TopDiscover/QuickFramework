@@ -49,6 +49,8 @@ export default class MainController extends EventComponent {
         //游戏事件注册
         cc.game.on(cc.game.EVENT_HIDE, this.onEnterBackground, this);
         cc.game.on(cc.game.EVENT_SHOW, this.onEnterForgeground, this);
+        //内存警告事件//Ts层已经同步，需要自己去导出事件上来
+        // cc.game.on(cc.game.EVENT_LOW_MEMORY,this.onLowMemory,this);
     }
 
     update() {
@@ -71,5 +73,9 @@ export default class MainController extends EventComponent {
 
     private onEnterForgeground() {
         Manager.onEnterForgeground();
+    }
+
+    private onLowMemory(){
+        Manager.onLowMemory();
     }
 }

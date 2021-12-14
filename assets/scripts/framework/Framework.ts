@@ -17,9 +17,20 @@ import { LogicManager } from "./core/logic/LogicManager";
 import { LoggerImpl } from "./core/log/Logger";
 import NetHelper from "./core/net/service/NetHelper";
 import { ServiceManager } from "./core/net/service/ServiceManager";
+import { ReleaseManager } from "./core/asset/ReleaseManager";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
+
+    /**@description 资源是否懒释放，true时，只有收到平台的内存警告才会释放资源，还有在更新时才分释放,否则不会释放资源 */
+    get isLazyRelease(){
+        return false;
+    }
+
+    /**@description 瓷业释放管理 */
+    get releaseManger(){
+        return getSingleton(ReleaseManager);
+    }
 
     /**@description 网络Service管理器 */
     get serviceManager() {
@@ -189,5 +200,9 @@ export class Framewok {
         this.adaptor.initBrowserAdaptor();
         //引擎扩展初始化
         CocosExtentionInit();
+    }
+
+    onLowMemory(){
+        this.releaseManger.onLowMemory();
     }
 }
