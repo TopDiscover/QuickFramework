@@ -9,26 +9,6 @@ export class HallData extends GameData {
 
     private _games : {[key:string] : Update.Config} = {};
 
-    private _backup : {[key:string] : Update.Config} = {};
-    backupConfig(){
-        let keys = Object.keys(Config.ENTRY_CONFIG);
-        this._backup = {};
-        for( let i = 0 ; i < keys.length ; i++){
-            let config : Update.Config = Config.ENTRY_CONFIG[keys[i]];
-            if( config ){
-                this._backup[keys[i]] = config;
-            }
-        }
-    }
-
-    restoreConfig(){
-        (Config.ENTRY_CONFIG as any) = {};
-        let keys = Object.keys(this._backup);
-        for( let i = 0 ; i < keys.length ; i++){
-            Config.ENTRY_CONFIG[`${this._backup[keys[i]].bundle}`] = this._backup[keys[i]].clone();
-        }
-    }
-
     mergeConfig(){
         let keys = Object.keys(this.games);
         for( let i = 0 ; i < keys.length ; i++){
