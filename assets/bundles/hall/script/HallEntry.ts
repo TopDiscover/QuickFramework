@@ -36,7 +36,6 @@ class HallEntry extends Entry {
         //初始化网络
         Manager.serviceManager.get(LobbyService,true);
         //向Config.ENTRY_CONFIG合并配置
-        this.data.backupConfig();
         this.data.mergeConfig();
     }
     protected pauseMessageQueue(): void {
@@ -49,7 +48,6 @@ class HallEntry extends Entry {
     /**@description 卸载bundle,即在自己bundle删除之前最后的一条消息 */
     onUnloadBundle(): void {
         super.onUnloadBundle();
-        this.data.restoreConfig();
     }
 }
 
