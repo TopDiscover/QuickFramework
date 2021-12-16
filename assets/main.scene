@@ -10659,7 +10659,7 @@
     "_id": "72t59k7uNEHJwJgwLQhopt"
   },
   {
-    "__type__": "880296XVShD/6hlc7PrhHP+",
+    "__type__": "f32e31t7khMV4GDh7KIqIvX",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -10667,7 +10667,7 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "_id": "174bfnH8pBj7JcxG5yrdai"
+    "_id": "27kAppT2pCjq/VKVCL5gVu"
   },
   {
     "__type__": "cc.SceneGlobals",

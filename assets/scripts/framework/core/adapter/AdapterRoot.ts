@@ -12,7 +12,7 @@ const { ccclass, property } = _decorator;
  * 
  * @author caizhitao
  * @created 2020-12-27 21:22:43
- * @description
+ * @description 该适配方案出处 https://forum.cocos.org/t/cocos-creator/74001
  *
  * 用法：
  *      1. 将本节点直接挂载到Canvas节点做为根节点的适配
@@ -34,7 +34,7 @@ const { ccclass, property } = _decorator;
     ```
  */
 @ccclass
-export default class RootAdapter extends Adapter {
+export default class AdapterRoot extends Adapter {
 
     onLoad() {
         this._onResize();

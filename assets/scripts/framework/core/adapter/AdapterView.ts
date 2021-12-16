@@ -11,7 +11,7 @@ const { ccclass, property } = _decorator;
  *
  * @author caizhitao
  * @created 2020-12-27 21:22:42
- * @description
+ * @description 该适配方案出处 https://forum.cocos.org/t/cocos-creator/74001
  *
  * 用法：
  *
@@ -23,7 +23,7 @@ const { ccclass, property } = _decorator;
  * 1. 将节点的宽高设置为安全区域的宽高
  */
 @ccclass
-export default class ViewAdapter extends Adapter {
+export default class AdapterView extends Adapter {
     onLoad() {
         this._onResize();
         
@@ -42,19 +42,19 @@ export default class ViewAdapter extends Adapter {
     }
 
     private _onResize() {
-        ViewAdapter.safeArea = null as any;
+        AdapterView.safeArea = null as any;
         if (this.node) {
 
             // 将屏幕尺寸下的安全区域大小，转换为设计分辨率下的大小，重新给节点设置大小
-            this.width = ViewAdapter.safeArea.safeAreaWidth / ViewAdapter.safeArea.designPxToScreenPxRatio;
-            this.height = ViewAdapter.safeArea.safeAreaHeight / ViewAdapter.safeArea.designPxToScreenPxRatio;
+            this.width = AdapterView.safeArea.safeAreaWidth / AdapterView.safeArea.designPxToScreenPxRatio;
+            this.height = AdapterView.safeArea.safeAreaHeight / AdapterView.safeArea.designPxToScreenPxRatio;
 
             // 根据安全区域的 margin 设置节点的偏移，使重置宽高后的节点位置在安全中心
             // 需要将屏幕尺寸下的像素值转换为设计费分辨率下的像素值
             this.node.setPosition(
                 v3(
-                    ViewAdapter.safeArea.safeAreaXOffset / ViewAdapter.safeArea.designPxToScreenPxRatio,
-                    ViewAdapter.safeArea.safeAreaYOffset / ViewAdapter.safeArea.designPxToScreenPxRatio
+                    AdapterView.safeArea.safeAreaXOffset / AdapterView.safeArea.designPxToScreenPxRatio,
+                    AdapterView.safeArea.safeAreaYOffset / AdapterView.safeArea.designPxToScreenPxRatio
                 )
             );
         }

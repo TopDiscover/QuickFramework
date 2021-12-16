@@ -3,7 +3,6 @@ import { _decorator, Component, UITransform } from 'cc';
 const { ccclass, property } = _decorator;
 /**
  * @description 该适配方案出处 https://forum.cocos.org/t/cocos-creator/74001
- * 在些基础上做了优化
  */
 
 /**

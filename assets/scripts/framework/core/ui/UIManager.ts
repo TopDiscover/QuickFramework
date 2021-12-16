@@ -2,7 +2,7 @@ import { isValid, js, Node, Prefab, Widget, instantiate, director, Component, fi
 import { DEBUG } from "cc/env";
 import { ViewStatus } from "../../defines/Enums";
 import { Macro } from "../../defines/Macros";
-import ViewAdapter from "../adapter/ViewAdapter";
+import AdapterView from "../adapter/AdapterView";
 import { Resource } from "../asset/Resource";
 import UIView from "./UIView";
 
@@ -365,7 +365,7 @@ export class UIManager {
                 if (DEBUG) Log.e(`${this._logTag}请不要在根节点挂载cc.Widget组件`);
                 widget.destroy();
             }
-            view.addComponent(ViewAdapter);
+            view.addComponent(AdapterView);
             if (!viewData.isPreload) {
                 this.addView(uiNode, openOption.zIndex,view);
             }
