@@ -2,6 +2,7 @@ import { isValid, js, Node, Prefab, Widget, instantiate, director, Component, fi
 import { DEBUG } from "cc/env";
 import { ViewStatus } from "../../defines/Enums";
 import { Macro } from "../../defines/Macros";
+import ViewAdapter from "../adapter/ViewAdapter";
 import { Resource } from "../asset/Resource";
 import UIView from "./UIView";
 
@@ -361,22 +362,10 @@ export class UIManager {
             //界面显示在屏幕中间
             let widget = view.getComponent(Widget);
             if (widget) {
-                if (DEBUG) Log.w(`${this._logTag}你已经添加了cc.Widget组件，将会更改成居中模块`);
-                widget.isAlignHorizontalCenter = true;
-                widget.horizontalCenter = 0;
-                widget.isAlignVerticalCenter = true;
-                widget.verticalCenter = 0;
+                if (DEBUG) Log.e(`${this._logTag}请不要在根节点挂载cc.Widget组件`);
+                widget.destroy();
             }
-            else {
-                widget = view.addComponent(Widget);
-                if (widget) {
-                    widget.isAlignHorizontalCenter = true;
-                    widget.horizontalCenter = 0;
-                    widget.isAlignVerticalCenter = true;
-                    widget.verticalCenter = 0;
-                }
-            }
-
+            view.addComponent(ViewAdapter);
             if (!viewData.isPreload) {
                 this.addView(uiNode, openOption.zIndex,view);
             }
@@ -457,7 +446,6 @@ export class UIManager {
         this.viewRoot.addChild(node);
         node.zIndex = zOrder;
         (<any>window)["cc"].updateZIndex(this.viewRoot);
-        Manager.adaptor.fullScreenAdapt(node, adpater);
     }
 
     /**@description 添加动态加载的本地资源 */
@@ -629,14 +617,6 @@ export class UIManager {
             if (viewData.view) return viewData.view.node.active;
         }
         return false;
-    }
-
-    public fullScreenAdapt() {
-        this._viewDatas.forEach((data) => {
-            if (data.isLoaded && data.view) {
-                Manager.adaptor.fullScreenAdapt(data.view.node, data.view);
-            }
-        });
     }
 
     /*获取当前canvas的组件 */

@@ -1,4 +1,3 @@
-import WebEditBoxImpl from "./WebEditBoxImpl";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
@@ -373,10 +372,6 @@ Reflect.defineProperty(Node.prototype, "zIndex", {
 
 export function CocosExtentionInit() {
     if (!EDITOR) {
-        //对引擎输入框进行修改 
-        if (Manager.adaptor.isBrowser) {
-            // (<any>EditBox)._EditBoxImpl = WebEditBoxImpl;
-        }
         Log.d("Cocos扩展初始化");
     }
 }

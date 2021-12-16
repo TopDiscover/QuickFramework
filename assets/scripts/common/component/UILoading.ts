@@ -10,12 +10,6 @@ export default class UILoading {
     public static Instance() { return this._instance || (this._instance = new UILoading()); }
     /**@description 当前loading节点 */
     private _node: Node = null!;
-    constructor() {
-        Manager.dispatcher.add(Macro.ADAPT_SCREEN, this.onAdaptScreen, this);
-    }
-    private onAdaptScreen() {
-        Manager.adaptor.fullScreenAdapt(this._node);
-    }
     private _isWaitingHide = false;
     private delay : number = 0;
     private content: Node = null!;

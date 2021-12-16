@@ -89,7 +89,6 @@ export class _Manager extends Framewok implements GameEventInterface {
     }
 
     onLoad(node: Node) {
-        Manager.adaptor.onLoad(node);
         //预先加载下loading预置体
         Manager.tips.preloadPrefab();
         Manager.uiLoading.preloadPrefab();
@@ -110,7 +109,6 @@ export class _Manager extends Framewok implements GameEventInterface {
     }
 
     onDestroy(node: Node) {
-        Manager.adaptor.onDestroy();
         Manager.serviceManager.onDestroy();
         //入口管理器
         Manager.entryManager.onDestroy(node);

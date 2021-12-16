@@ -10,12 +10,6 @@ export default class Loading {
     public static Instance() { return this._instance || (this._instance = new Loading()); }
     /**@description 当前loading节点 */
     protected _node: Node = null!;
-    constructor() {
-        Manager.dispatcher.add(Macro.ADAPT_SCREEN, this.onAdaptScreen, this);
-    }
-    private onAdaptScreen() {
-        Manager.adaptor.fullScreenAdapt(this._node);
-    }
     /**@description 是否等待关闭 */
     protected _isWaitingHide = false;
     /**@description 是否正在加载预置 */

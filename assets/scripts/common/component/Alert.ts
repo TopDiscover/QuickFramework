@@ -190,18 +190,10 @@ export default class Alert {
 
     private prefab: Prefab = null!;
 
-    constructor() {
-        Manager.dispatcher.add(Macro.ADAPT_SCREEN, this.onAdaptScreen, this);
-    }
-
     private _isLoadingPrefab = false;
     private finishLoadCb : any = null;
     public preloadPrefab() {
         this.loadPrefab();
-    }
-
-    private onAdaptScreen() {
-        Manager.adaptor.fullScreenAdapt(this.curPanel);
     }
 
     private getConfig( config : AlertConfig ){

@@ -1,5 +1,5 @@
 
-import { _decorator, Component, Node, find, setDisplayStats, isDisplayStats, Toggle, js, isValid, sys, SystemEvent } from 'cc';
+import { _decorator, Component, Node, find, setDisplayStats, isDisplayStats, Toggle, js, isValid, sys, SystemEvent, view, UITransform, Widget } from 'cc';
 import { DEBUG } from 'cc/env';
 import { LogLevel } from '../../framework/defines/Enums';
 import { Config } from '../config/Config';
@@ -14,43 +14,45 @@ export class DebugView extends Component {
 
         this.content = find("content", this.node) as Node;
         //显示界面信息
-        this.bindEvent("showUI",this.onShowUI);
+        this.bindEvent("showUI", this.onShowUI);
         //显示节点信息
-        this.bindEvent("showNode",this.onShowNode);
+        this.bindEvent("showNode", this.onShowNode);
         //显示资源缓存信息
-        this.bindEvent("showRes",this.onShowRes);
+        this.bindEvent("showRes", this.onShowRes);
         //显示当前组件信息
-        this.bindEvent("showComponent",this.onShowComp);
+        this.bindEvent("showComponent", this.onShowComp);
         //显示调试信息
-        this.bindEvent("showDebugInfo",this.onShowDebugInfo);
-        this.bindEvent("log",this.onLog);
+        this.bindEvent("showDebugInfo", this.onShowDebugInfo);
+        this.bindEvent("log", this.onLog);
         //逻辑管理器信息输出
-        this.bindEvent("logic",this.onLogicManager);
+        this.bindEvent("logic", this.onLogicManager);
         //数据中心
-        this.bindEvent("dataCenter",this.onDataCenter);
+        this.bindEvent("dataCenter", this.onDataCenter);
         //bundle入口管理器
-        this.bindEvent("entry",this.onEntry);
+        this.bindEvent("entry", this.onEntry);
         //proto 信息输出 
-        this.bindEvent("proto",this.onProto);
+        this.bindEvent("proto", this.onProto);
         //bundle管理器
-        this.bindEvent("bundleMgr",this.onBundleMgr);
+        this.bindEvent("bundleMgr", this.onBundleMgr);
         //节点缓存池
-        this.bindEvent("pool",this.onPool);
+        this.bindEvent("pool", this.onPool);
         //网络辅助类
-        this.bindEvent("netHelper",this.onNetHelper);
+        this.bindEvent("netHelper", this.onNetHelper);
         //网络管理器
-        this.bindEvent("serviceManager",this.onServiceManager);
+        this.bindEvent("serviceManager", this.onServiceManager);
         //热火更新管理
-        this.bindEvent("hotupdate",this.onHotUpdate);
+        this.bindEvent("hotupdate", this.onHotUpdate);
         //内存警告
-        this.bindEvent("lowMemory",this.onLowMemory);
+        this.bindEvent("lowMemory", this.onLowMemory);
         //释放管理器
-        this.bindEvent("releaseManager",this.onReleaseManager);
+        this.bindEvent("releaseManager", this.onReleaseManager);
+        //适配器
+        this.bindEvent("adaptor", this.onAdaptor);
         this.doOther();
     }
     debug: Node = null!;
 
-    private doOther(){
+    private doOther() {
         let logView = find("logView", this.node);
         if (logView) {
             logView.active = false;
@@ -67,10 +69,10 @@ export class DebugView extends Component {
         }
     }
 
-    private bindEvent(path : string ,cb:Function){
-        let node = find(path,this.content);
-        if( node ){
-            node.on(SystemEvent.EventType.TOUCH_END,cb,this);
+    private bindEvent(path: string, cb: Function) {
+        let node = find(path, this.content);
+        if (node) {
+            node.on(SystemEvent.EventType.TOUCH_END, cb, this);
         }
     }
 
@@ -144,9 +146,9 @@ export class DebugView extends Component {
         Log.d(`-------Proto文件加载信息,所有proto文件都加载在同一个root下,文件加载完成后，资源文件就会初释放-------`);
         Manager.protoManager.print({
             print: (data) => {
-                if ( sys.isNative ){
+                if (sys.isNative) {
                     Log.dump(data);
-                }else{
+                } else {
                     Log.d(data);
                 }
             }
@@ -166,27 +168,27 @@ export class DebugView extends Component {
         })
     }
 
-    private onPool(){
+    private onPool() {
         Log.d(`-------对象池节点缓存信息-------`);
         Manager.nodePoolManager.print({
-            print:( source )=>{
-                source.forEach((data,key)=>{
+            print: (source) => {
+                source.forEach((data, key) => {
                     Log.d(key);
                 })
             }
         })
     }
 
-    private onLog(){
+    private onLog() {
         this.logView.active = true;
     }
 
-    private onShowDebugInfo(){
+    private onShowDebugInfo() {
         setDisplayStats(!isDisplayStats())
-        Manager.localStorage.setItem(Config.SHOW_DEBUG_INFO_KEY,isDisplayStats());
+        Manager.localStorage.setItem(Config.SHOW_DEBUG_INFO_KEY, isDisplayStats());
     }
 
-    private onShowUI(){
+    private onShowUI() {
         Log.d(`-----------当前所有视图------------`);
         Manager.uiManager.print({
             printViews: (value, key) => {
@@ -195,7 +197,7 @@ export class DebugView extends Component {
         })
     }
 
-    private onShowNode(){
+    private onShowNode() {
         Log.d(`-----------当前所有节点信息------------`);
         Manager.uiManager.print({
             printChildren: (data) => {
@@ -204,7 +206,7 @@ export class DebugView extends Component {
         })
     }
 
-    private onShowRes(){
+    private onShowRes() {
         Manager.cacheManager.print({
             printLocal: (caches, key) => {
                 if (DEBUG) Log.d(`----------------Bundle ${key} 资源缓存信息开始----------------`)
@@ -295,7 +297,7 @@ export class DebugView extends Component {
         })
     }
 
-    private onShowComp(){
+    private onShowComp() {
         Log.d(`-----------当前所有组件信息------------`);
         Manager.uiManager.print({
             printComp: (data) => {
@@ -304,80 +306,100 @@ export class DebugView extends Component {
         })
     }
 
-    private onNetHelper(){
+    private onNetHelper() {
         Log.d(`-----------网络辅助相关信息------------`);
         Log.d(`-----------当前所有Sender------------`);
         Manager.netHelper.print({
-            printSender:(data)=>{
+            printSender: (data) => {
                 Log.d(data.module);
             }
         });
         Log.d(`-----------当前所有Handler------------`);
         Manager.netHelper.print({
-            printHander:(data)=>{
+            printHander: (data) => {
                 Log.d(data.module);
             }
         })
     }
 
-    private onServiceManager(){
+    private onServiceManager() {
         Log.d(`-----------网络管理器中相关网络信息------------`);
         Manager.serviceManager.print({
-            print:(service)=>{
+            print: (service) => {
                 let content = `Module : ${service.module} , 进入后台的最大允许时间 : ${service.maxEnterBackgroundTime} , 优先级 : ${service.priority}`;
                 Log.d(content);
                 content = "重连信息 : "
-                if ( service.reconnectHandler ){
+                if (service.reconnectHandler) {
                     content = `是否允许重连 : ${service.reconnectHandler.enabled}`
-                }else{
+                } else {
                     content += "无重连Handler";
                 }
                 Log.d(content);
-                content = `状态信息 , 是否允许连接网络 : ${ service.enabled } 是否连接 : ${service.isConnected} 网络数据类型 : ${service.serviceType}`
+                content = `状态信息 , 是否允许连接网络 : ${service.enabled} 是否连接 : ${service.isConnected} 网络数据类型 : ${service.serviceType}`
                 Log.d(content);
             }
         })
     }
 
-    private onHotUpdate(){
+    private onHotUpdate() {
         Log.d(`-----------热火更新管理器中相关信息------------`);
         Manager.updateManager.print({
-            print:(data)=>{
-                Log.dump(data.data,data.name);
+            print: (data) => {
+                Log.dump(data.data, data.name);
             }
         })
     }
 
-    private onLowMemory(){
+    private onLowMemory() {
         Manager.onLowMemory();
     }
 
-    private onReleaseManager(){
+    private onReleaseManager() {
         Manager.releaseManger.print({
-            print:(data)=>{
-                if ( Manager.isLazyRelease ){
-                    if ( data.bundles.length > 0 ){
+            print: (data) => {
+                if (Manager.isLazyRelease) {
+                    if (data.bundles.length > 0) {
                         Log.d(`待释放Bundle : ${data.bundles.toString()}`);
                     }
-                    if ( data.lazyInfo.size > 0 ){
-                        data.lazyInfo.forEach((value,key,source)=>{
+                    if (data.lazyInfo.size > 0) {
+                        data.lazyInfo.forEach((value, key, source) => {
                             Log.d(`--------------${key}待释放资源--------------`);
-                            value.assets.forEach((info,key,source)=>{
+                            value.assets.forEach((info, key, source) => {
                                 Log.d(`${info.url}`);
                             })
                         });
                     }
 
                     Log.d(`远程待释放资源`);
-                    data.remote.assets.forEach((info,key,source)=>{
+                    data.remote.assets.forEach((info, key, source) => {
                         Log.d(`${info.url}`);
                     });
 
-                }else{
+                } else {
                     Log.w(`未开户懒释放功能!!!!`);
                 }
             }
         })
+    }
+
+    private onAdaptor() {
+        Log.d(`-----------------------------适配信息-----------------------------------------------`);
+        Log.d(`屏幕分辨率: ${view.getCanvasSize().width} x ${view.getCanvasSize().height}`);
+        Log.d(`视图窗口可见区域分辨率: ${view.getVisibleSize().width} x ${view.getVisibleSize().height}`);
+        Log.d(`视图中边框尺寸: ${view.getFrameSize().width} x ${view.getFrameSize().height}`);
+        Log.d(`设备或浏览器像素比例: ${view.getDevicePixelRatio()}`);
+        Log.d(`返回视图窗口可见区域像素尺寸: ${view.getVisibleSizeInPixel().width} x ${view.getVisibleSizeInPixel().height}`);
+        Log.d(`当前场景设计分辨率: ${view.getDesignResolutionSize().width} x ${view.getDesignResolutionSize().height}`);
+        let viewRate = view.getFrameSize().width/view.getFrameSize().height;
+        let designRate = view.getDesignResolutionSize().width/view.getDesignResolutionSize().height;
+        Log.d(`视图宽高比:${viewRate}`);
+        Log.d(`设置分辨率宽高比:${designRate}`);
+        if (this.node) {
+            let trans = this.node.getComponent(UITransform);
+            if (trans) {
+                Log.d(`节点宽高: ${trans.width} x ${trans.height}`);
+            }
+        }
     }
 }
 
