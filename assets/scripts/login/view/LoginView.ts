@@ -8,7 +8,7 @@ const {ccclass, property} = _decorator;
 export default class LoginView extends GameView {
 
     static getPrefabUrl(){
-        return "login/prefabs/LoginView"
+        return `@LoginView`;
     }
 
     private _login : Node = null!;
@@ -20,6 +20,7 @@ export default class LoginView extends GameView {
         if ( version ){
             version.string = Manager.updateManager.getVersion(this.bundle,false);
         }
+
         this._login.on(Node.EventType.TOUCH_END, () => {
             this.enterBundle(Macro.BUNDLE_HALL);
         });

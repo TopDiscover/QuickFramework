@@ -1,11 +1,11 @@
 /**
  */
 
-import { Canvas, view, _decorator } from "cc";
+import { view, _decorator } from "cc";
 import { DEBUG } from "cc/env";
 import { Adapter } from "./Adapter";
 
-const { ccclass, property } = _decorator;
+const { ccclass, property ,executeInEditMode} = _decorator;
 
 /**
  * 游戏主内容节点自适应所有分辨率的脚本
@@ -34,6 +34,7 @@ const { ccclass, property } = _decorator;
     ```
  */
 @ccclass
+@executeInEditMode(true)
 export default class AdapterRoot extends Adapter {
 
     onLoad() {
@@ -56,26 +57,26 @@ export default class AdapterRoot extends Adapter {
      * 窗口尺寸发生改变时，更新适配节点的宽高
      */
     private _onResize() {
-        if (DEBUG) {
-            Log.d(`-----------------------------适配信息-----------------------------------------------`);
-            Log.d(`屏幕分辨率: ${view.getCanvasSize().width} x ${view.getCanvasSize().height}`);
-            Log.d(`视图窗口可见区域分辨率: ${view.getVisibleSize().width} x ${view.getVisibleSize().height}`);
-            Log.d(`视图中边框尺寸: ${view.getFrameSize().width} x ${view.getFrameSize().height}`);
-            Log.d(`设备或浏览器像素比例: ${view.getDevicePixelRatio()}`);
-            Log.d(`返回视图窗口可见区域像素尺寸: ${view.getVisibleSizeInPixel().width} x ${view.getVisibleSizeInPixel().height}`);
-            Log.d(`当前场景设计分辨率: ${view.getDesignResolutionSize().width} x ${view.getDesignResolutionSize().height}`);
-            let viewRate = view.getFrameSize().width/view.getFrameSize().height;
-            let designRate = view.getDesignResolutionSize().width/view.getDesignResolutionSize().height;
-            Log.d(`视图宽高比:${viewRate}`);
-            Log.d(`设置分辨率宽高比:${designRate}`);
-        }
+        // if (DEBUG) {
+        //     Log.d(`-----------------------------适配信息-----------------------------------------------`);
+        //     Log.d(`屏幕分辨率: ${view.getCanvasSize().width} x ${view.getCanvasSize().height}`);
+        //     Log.d(`视图窗口可见区域分辨率: ${view.getVisibleSize().width} x ${view.getVisibleSize().height}`);
+        //     Log.d(`视图中边框尺寸: ${view.getFrameSize().width} x ${view.getFrameSize().height}`);
+        //     Log.d(`设备或浏览器像素比例: ${view.getDevicePixelRatio()}`);
+        //     Log.d(`返回视图窗口可见区域像素尺寸: ${view.getVisibleSizeInPixel().width} x ${view.getVisibleSizeInPixel().height}`);
+        //     Log.d(`当前场景设计分辨率: ${view.getDesignResolutionSize().width} x ${view.getDesignResolutionSize().height}`);
+        //     let viewRate = view.getFrameSize().width/view.getFrameSize().height;
+        //     let designRate = view.getDesignResolutionSize().width/view.getDesignResolutionSize().height;
+        //     Log.d(`视图宽高比:${viewRate}`);
+        //     Log.d(`设置分辨率宽高比:${designRate}`);
+        // }
 
         // 1. 先找到 SHOW_ALL 模式适配之后，本节点的实际宽高以及初始缩放值
         let canvasSize = view.getCanvasSize();
         let widthRate = canvasSize.width / this.width;
         let heightRate = canvasSize.height / this.height;
         let scaleForShow = Math.min(widthRate,heightRate);
-        console.log('scaleForShow:'+scaleForShow);
+        // Log.d('scaleForShow:'+scaleForShow);
         let realWidth = this.width * scaleForShow;
         let realHeight = this.height * scaleForShow;
 
@@ -88,18 +89,18 @@ export default class AdapterRoot extends Adapter {
         let designWidth = view.getVisibleSize().width;
         let designHeight = view.getVisibleSize().height;
 
-        console.log('designWidth:'+designWidth);
-        console.log('designHeight:'+designHeight);
+        // Log.d('designWidth:'+designWidth);
+        // Log.d('designHeight:'+designHeight);
 
-        console.log('realWidth:'+realWidth);
-        console.log('realHeight:'+realHeight);
-        console.log('scaleForShowAll:'+scaleForShowAll);
+        // Log.d('realWidth:'+realWidth);
+        // Log.d('realHeight:'+realHeight);
+        // Log.d('scaleForShowAll:'+scaleForShowAll);
         // // 2. 根据缩放值，重新设置节点的宽高
 
         this.width = realWidth * scaleForShowAll;
         this.height = realHeight * scaleForShowAll;
-        console.log('width:' + this.width);
-        console.log('height:' + this.height);
-        Log.d(`视图窗口可见区域分辨率: ${view.getVisibleSize().width} x ${view.getVisibleSize().height}`);
+        // Log.d('width:' + this.width);
+        // Log.d('height:' + this.height);
+        // Log.d(`视图窗口可见区域分辨率: ${view.getVisibleSize().width} x ${view.getVisibleSize().height}`);
     }
 }

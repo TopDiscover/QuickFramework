@@ -24,17 +24,17 @@ export default class UpdateLoading extends Loading {
     }
 
     protected startShowContent( ){
-        this._text.string = this._content[0];
+        this.text.string = this._content[0];
     }
 
     public updateProgress(progress: number) {
-        if (this._text) {
+        if (this.text) {
             if (progress == undefined || progress == null || Number.isNaN(progress) || progress < 0) {
                 this.hide();
                 return;
             }
             if (progress >= 0 && progress <= 100) {
-                this._text.string = Manager.getLanguage(["loadingProgress",progress]);
+                this.text.string = Manager.getLanguage(["loadingProgress",progress]);
             }
         }
     }

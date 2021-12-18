@@ -1,4 +1,4 @@
-import { Component,find,instantiate,isValid,Label,Node, Prefab, RichText, SystemEvent, tween, Vec3 } from "cc";
+import { Component, find, instantiate, isValid, Label, Node, Prefab, RichText, SystemEvent, tween, Vec3 } from "cc";
 import { Macro } from "../../framework/defines/Macros";
 import { Config, ViewZOrder } from "../config/Config";
 
@@ -11,13 +11,13 @@ class AlertDialog extends Component {
     /**@description 常规显示文字 */
     private _textContent: Label = null!;
     /**@description 富文本显示文字 */
-    private _richTextContent: RichText  = null!;
+    private _richTextContent: RichText = null!;
     /**@description 标题 */
-    private _title: Label  = null!;
+    private _title: Label = null!;
     /**@description 确定按钮 */
     private _confirm: Node = null!;
     /**@description 取消按钮 */
-    private _cancel: Node  = null!;
+    private _cancel: Node = null!;
     /**@description 配置信息 */
     private _config: AlertConfig = null!;
 
@@ -53,10 +53,10 @@ class AlertDialog extends Component {
     private _show() {
         if (this._content) {
             tween(this._content)
-                .set({ scale: new Vec3(0.2,0.2,0.2) })
-                .to(0.2, { scale: new Vec3(1.1,1.1,1.1) })
+                .set({ scale: new Vec3(0.2, 0.2, 0.2) })
+                .to(0.2, { scale: new Vec3(1.1, 1.1, 1.1) })
                 .delay(0.05)
-                .to(0.1, { scale: new Vec3(1.0,1,1) })
+                .to(0.1, { scale: new Vec3(1.0, 1, 1) })
                 .start();
         }
     }
@@ -90,7 +90,7 @@ class AlertDialog extends Component {
             let title = find("Label", this._confirm);
             if (title) {
                 let lb = title.getComponent(Label);
-                if( lb ) lb.string = config.confirmString;
+                if (lb) lb.string = config.confirmString;
             }
         }
 
@@ -98,7 +98,7 @@ class AlertDialog extends Component {
             let title = find("Label", this._cancel);
             if (title) {
                 let lb = title.getComponent(Label);
-                if(lb)lb.string = config.cancelString;
+                if (lb) lb.string = config.cancelString;
             }
         }
     }
@@ -108,7 +108,7 @@ class AlertDialog extends Component {
         if (this._confirm && this._cancel && this._closeBtn) {
 
             //关闭按钮
-            this._closeBtn.on( SystemEvent.EventType.TOUCH_END, this.close.bind(this));
+            this._closeBtn.on(SystemEvent.EventType.TOUCH_END, this.close.bind(this));
 
             //确定按钮
             if (config.confirmCb) {
@@ -134,13 +134,13 @@ class AlertDialog extends Component {
                     //两个按钮都显示，
                 } else {
                     //只有显示确定
-                    this._confirm.setPosition( new Vec3(0,this._confirm.position.y,this._confirm.position.z));
+                    this._confirm.setPosition(new Vec3(0, this._confirm.position.y, this._confirm.position.z));
                 }
             } else {
                 //确定按钮没有显示
                 if (this._cancel.active) {
                     //只有一个取消按钮
-                    this._confirm.setPosition( new Vec3(0,this._confirm.position.y,this._confirm.position.z));
+                    this._confirm.setPosition(new Vec3(0, this._confirm.position.y, this._confirm.position.z));
                 } else {
                     //无按钮显示，输入警告
                     Log.w("提示框无按钮显示");
@@ -154,12 +154,12 @@ class AlertDialog extends Component {
     private close() {
         this._close(null);
     }
-    private _close(complete: (() => void) | null ) {
+    private _close(complete: (() => void) | null) {
         if (isValid(this._content)) {
             // this._content.stopAllActions();
             tween(this._content)
-                .to(0.2, { scale: new Vec3(1.15,1.15,1.15) })
-                .to(0.1, { scale: new Vec3(0.3,0.3,0.3) })
+                .to(0.2, { scale: new Vec3(1.15, 1.15, 1.15) })
+                .to(0.1, { scale: new Vec3(0.3, 0.3, 0.3) })
                 .call(() => {
                     Manager.alert.finishAlert();
                     if (complete) complete();
@@ -188,38 +188,30 @@ export default class Alert {
     private curPanel: Node = null!;
     private queue: AlertConfig[] = [];
 
-    private prefab: Prefab = null!;
-
-    private _isLoadingPrefab = false;
-    private finishLoadCb : any = null;
-    public preloadPrefab() {
-        this.loadPrefab();
-    }
-
-    private getConfig( config : AlertConfig ){
-        let result : AlertConfig = {};
-        if( config.tag ){
+    private getConfig(config: AlertConfig) {
+        let result: AlertConfig = {};
+        if (config.tag) {
             result.tag = config.tag;
         }
-        if( config.text){
+        if (config.text) {
             result.text = config.text;
         }
-        if( config.title){
+        if (config.title) {
             result.title = config.title;
         }
-        if( config.confirmString){
+        if (config.confirmString) {
             result.confirmString = config.confirmString;
         }
-        if( config.cancelString){
+        if (config.cancelString) {
             result.cancelString = config.cancelString;
         }
-        if( config.richText){
+        if (config.richText) {
             result.richText = config.richText;
         }
-        if( config.immediatelyCallback){
+        if (config.immediatelyCallback) {
             result.immediatelyCallback = config.immediatelyCallback;
         }
-        if( config.isRepeat){
+        if (config.isRepeat) {
             result.isRepeat = config.isRepeat;
         }
         return result;
@@ -252,12 +244,12 @@ export default class Alert {
     }
 
     /**@description 获取当前显示弹出的配置 */
-    public currentShow( tag? : string | number ){
-        if( this.curPanel ){
+    public currentShow(tag?: string | number) {
+        if (this.curPanel) {
             let current = this.curPanel.getComponent(AlertDialog)?.config;
-            if( tag && current && current.tag == tag){
+            if (tag && current && current.tag == tag) {
                 return current;
-            }else{
+            } else {
                 return current;
             }
         }
@@ -325,60 +317,13 @@ export default class Alert {
         return config;
     }
 
-    private async _show(config: AlertConfig) {
-        let finish = await this.loadPrefab();
-        if (finish) {
-            if (!this.curPanel) {
-                this.curPanel = instantiate(this.prefab);
-                let dialog = this.curPanel.addComponent(AlertDialog);
-                Manager.uiManager.addView(this.curPanel,ViewZOrder.Alert);
-                dialog.show(config);
-            }
+    private _show(config: AlertConfig) {
+        if (!this.curPanel) {
+            this.curPanel = instantiate(Manager.uiManager.getScenePrefab("Alert") as Node);
+            let dialog = this.curPanel.addComponent(AlertDialog);
+            Manager.uiManager.addView(this.curPanel, ViewZOrder.Alert);
+            dialog.show(config);
         }
-    }
-
-    private async loadPrefab() {
-        return new Promise<boolean>((resolve, reject) => {
-            //正在加载中
-            if (this._isLoadingPrefab) {
-                this.finishLoadCb = resolve;
-                return;
-            }
-            if (this.prefab) {
-                if (this.finishLoadCb) {
-                    this.finishLoadCb(true);
-                    this.finishLoadCb = null;
-                }
-                resolve(true);
-            }
-            else {
-                this._isLoadingPrefab = true;
-                Manager.assetManager.load(
-                    Macro.BUNDLE_RESOURCES,
-                    Config.CommonPrefabs.alert,
-                    Prefab,
-                    (finish, total, item) => { },
-                    (data) => {
-                        this._isLoadingPrefab = false;
-                        if (data && data.data && data.data instanceof Prefab) {
-                            this.prefab = data.data;
-                            Manager.assetManager.addPersistAsset(Config.CommonPrefabs.alert, data.data, Macro.BUNDLE_RESOURCES);
-                            if (this.finishLoadCb) {
-                                this.finishLoadCb(true);
-                                this.finishLoadCb = null;
-                            }
-                            resolve(true);
-                        }
-                        else {
-                            if (this.finishLoadCb) {
-                                this.finishLoadCb(false);
-                                this.finishLoadCb = null;
-                            }
-                            resolve(false);
-                        }
-                    });
-            }
-        });
     }
 }
 

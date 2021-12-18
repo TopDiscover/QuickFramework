@@ -1,14 +1,15 @@
 import { Enum, Sprite, UITransform, v3, Widget, _decorator } from "cc";
+import { EDITOR } from "cc/env";
 import { Adapter } from "./Adapter";
 
-const { ccclass, property } = _decorator;
+const { ccclass, property , executeInEditMode} = _decorator;
 
 /**
  * 缩放方式
  */
 export enum SpriteScaleType {
     /**
-     * 缩放到填满父节点（图像可能会被裁剪，但父节点有空白）
+     * 缩放到填满父节点（如果父节点有裁剪，图像可能会被裁剪，节点可能会超出父节点）
      */
     FILL,
 
@@ -55,18 +56,44 @@ export enum SpriteAlignType {
  * @created 2020-12-27 21:22:43
  */
 @ccclass
+@executeInEditMode(true)
 export default class AdapterSprite extends Adapter {
     @property({
         type: Enum(SpriteScaleType),
-        tooltip: "缩放类型:\n-FILL: 缩放到填满父节点（图像可能会被裁剪，但父节点有空白）\n-SUIT: 缩放到刚好在父节点内部最大化显示（图像会完整显示，但父节点上下或者左右可能会留空）",
+        tooltip: `缩放类型:
+        -FILL: 缩放到填满父节点（如果父节点有裁剪，图像可能会被裁剪，节点可能会超出父节点）
+        -SUIT: 缩放到刚好在父节点内部最大化显示（图像会完整显示，但父节点上下或者左右可能会留空）`,
     })
-    scaleType: SpriteScaleType = SpriteScaleType.SUIT;
+    get scaleType(){
+        return this._scaleType;
+    }
+    set scaleType(value){
+        this._scaleType = value;
+        if ( EDITOR ){
+            this.updateSprite(this._scaleType,this.alignType);
+        }
+    }
+    private _scaleType: SpriteScaleType = SpriteScaleType.SUIT;
 
     @property({
         type: Enum(SpriteAlignType),
-        tooltip: "对齐方式类型:\n如：\n-LEFT: 缩放后靠左对齐",
+        tooltip: `齐方式类型:
+        -LEFT: 缩放后靠左对齐
+        -TOP: 缩放后靠上对齐
+        -RIGHT: 缩放后靠右对齐
+        -BOTTOM: 缩放后靠下对齐
+        -CENTER: 缩放后居中对齐`,
     })
-    alignType: SpriteAlignType = SpriteAlignType.CENTER;
+    get alignType(){
+        return this._alignType;
+    }
+    set alignType(value){
+        this._alignType = value;
+        if ( EDITOR ){
+            this.updateSprite(this._scaleType,this._alignType);
+        }
+    }
+    private _alignType: SpriteAlignType = SpriteAlignType.CENTER;
 
     private _sprite: Sprite = null!;
 

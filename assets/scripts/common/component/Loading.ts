@@ -1,5 +1,4 @@
-import { find ,instantiate,Label,Node, Prefab, Tween, tween, Vec3} from "cc";
-import { Macro } from "../../framework/defines/Macros";
+import { find, instantiate, Label, Node, Tween, tween, Vec3 } from "cc";
 import { Config, ViewZOrder } from "../config/Config";
 /**
  * @description 加载动画
@@ -9,33 +8,28 @@ export default class Loading {
     protected static _instance: Loading = null!;
     public static Instance() { return this._instance || (this._instance = new Loading()); }
     /**@description 当前loading节点 */
-    protected _node: Node = null!;
-    /**@description 是否等待关闭 */
-    protected _isWaitingHide = false;
-    /**@description 是否正在加载预置 */
-    protected _isLoadingPrefab = false;
-    private _timeOutCb ?: ()=>void;
+    protected node: Node = null!;
+    protected get prefab(){
+        return Manager.uiManager.getScenePrefab("Loading");
+    }
+    private _timeOutCb?: () => void;
     /**@description 显示超时回调 */
-    public set timeOutCb(value){
+    public set timeOutCb(value) {
         this._timeOutCb = value;
     }
-    public get timeOutCb(){
+    public get timeOutCb() {
         return this._timeOutCb;
     }
 
     /**@description 显示的Loading提示内容 */
-    protected _content : string[] = [];
+    protected _content: string[] = [];
     private _showContentIndex = 0;
 
     /**@description 超时回调定时器id */
-    private _timerId:number = -1;
+    private _timerId: any = -1;
 
     /**@description 显示的提示 */
-    protected _text : Label = null!;
-
-    public preloadPrefab() {
-        this.loadPrefab();
-    }
+    protected text: Label = null!;
 
     /**
      * @description 显示Loading
@@ -43,11 +37,11 @@ export default class Loading {
      * @param timeOutCb 超时回调
      * @param timeout 显示超时时间
      */
-    public show( content : string | string[] , timeOutCb?:()=>void,timeout = Config.LOADING_TIME_OUT ) {
+    public show(content: string | string[], timeOutCb?: () => void, timeout = Config.LOADING_TIME_OUT) {
         this._timeOutCb = timeOutCb;
-        if( Array.isArray(content) ){
+        if (Array.isArray(content)) {
             this._content = content;
-        }else{
+        } else {
             this._content = [];
             this._content.push(content);
         }
@@ -55,52 +49,47 @@ export default class Loading {
         return this;
     }
 
-    protected async _show( timeout : number ) {
-        this._isWaitingHide = false;
-        let finish = await this.loadPrefab();
-        if (finish) {
-            this._node.removeFromParent();
-            Manager.uiManager.addView(this._node,ViewZOrder.Loading);
-            this._node.position = Vec3.ZERO;
-            this._text = find("content/text",this._node)?.getComponent(Label) as Label;
-            this._showContentIndex = 0;
-            this.startShowContent();
-            //第一次在预置体没加载好就被隐藏
-            if (this._isWaitingHide) {
-                // cc.error(`sssssssss`);
-                this._isWaitingHide = false;
-                this._node.active = false;
-                return;
-            }
-            this.startTimeOutTimer(timeout);
-            this._node.active = true;
+    protected _show(timeout: number) {
+        if ( !this.prefab ){
+            return;
         }
+        if ( !this.node ){
+            this.node = instantiate(this.prefab);
+        }
+        this.node.removeFromParent();
+        Manager.uiManager.addView(this.node, ViewZOrder.Loading);
+        this.node.position = Vec3.ZERO;
+        this.text = find("content/text", this.node)?.getComponent(Label) as Label;
+        this._showContentIndex = 0;
+        this.startShowContent();
+        this.startTimeOutTimer(timeout);
+        this.node.active = true;
     }
 
-    protected startShowContent( ){
-        if( this._content.length == 1 ){
-            this._text.string = this._content[0];
-        }else{
+    protected startShowContent() {
+        if (this._content.length == 1) {
+            this.text.string = this._content[0];
+        } else {
             this.stopShowContent();
-            tween(this._text.node)
-            .call(()=>{
-                this._text.string = this._content[this._showContentIndex];
-            })
-            .delay(Config.LOADING_CONTENT_CHANGE_INTERVAL)
-            .call(()=>{
-                this._showContentIndex ++;
-                if( this._showContentIndex >= this._content.length ){
-                    this._showContentIndex = 0;
-                }
-                this.startShowContent();
-            })
-            .start();
+            tween(this.text.node)
+                .call(() => {
+                    this.text.string = this._content[this._showContentIndex];
+                })
+                .delay(Config.LOADING_CONTENT_CHANGE_INTERVAL)
+                .call(() => {
+                    this._showContentIndex++;
+                    if (this._showContentIndex >= this._content.length) {
+                        this._showContentIndex = 0;
+                    }
+                    this.startShowContent();
+                })
+                .start();
         }
     }
 
-    private stopShowContent(){
-        if( this._text ){
-            Tween.stopAllByTarget(this._text.node);
+    private stopShowContent() {
+        if (this.text) {
+            Tween.stopAllByTarget(this.text.node);
         }
     }
 
@@ -110,61 +99,19 @@ export default class Loading {
             this._timerId = setTimeout(() => {
                 this._timeOutCb && this._timeOutCb();
                 this.hide();
-                this._isWaitingHide = false;
             }, timeout * 1000);
         }
     }
     /**@description 停止计时 */
-    protected stopTimeOutTimer( ) {
+    protected stopTimeOutTimer() {
         this._timeOutCb = undefined;
         clearTimeout(this._timerId);
         this._timerId = -1;
     }
 
-    /**
-     * @description 加载
-     * @param completeCb 
-     */
-    protected async loadPrefab() {
-        return new Promise<boolean>((resolove, reject) => {
-            //正在加载中
-            if (this._isLoadingPrefab) {
-                Log.w(`正在加载Loading预置体`);
-                return;
-            }
-            if (this._node) {
-                resolove(true);
-                return;
-            }
-            this._isLoadingPrefab = true;
-            Manager.assetManager.load(
-                Macro.BUNDLE_RESOURCES, 
-                Config.CommonPrefabs.loading,
-                Prefab,
-                (finish, total, item)=>{},
-                (data) => {
-                this._isLoadingPrefab = false;
-                if (data && data.data && data.data instanceof Prefab) {
-                    Manager.assetManager.addPersistAsset(Config.CommonPrefabs.loading,data.data,Macro.BUNDLE_RESOURCES)
-                    this._node = instantiate(data.data);
-                    resolove(true);
-                }
-                else {
-                    resolove(false);
-                }
-            });
-        });
-    }
-
     public hide() {
         this.stopShowContent();
         this.stopTimeOutTimer();
-        if (this._node) {
-            this._isWaitingHide = true;
-            this._node.active = false;
-        } else {
-            //没有加载好预置体，置一个标记
-            this._isWaitingHide = true;
-        }
+        if ( this.node ) this.node.active = false;
     }
 }

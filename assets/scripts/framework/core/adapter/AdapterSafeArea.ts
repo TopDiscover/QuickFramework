@@ -2,7 +2,7 @@ import { Widget, _decorator } from "cc";
 import { Adapter } from "./Adapter";
 import AdapterView from "./AdapterView";
 
-const { ccclass, property } = _decorator;
+const { ccclass, property,executeInEditMode } = _decorator;
 
 /**
  * @author zhitaocai
@@ -18,6 +18,7 @@ const { ccclass, property } = _decorator;
  * 1. 根据安全区域范围，修改widget组件属性
  */
 @ccclass
+@executeInEditMode(true)
 export default class AdapterSafeArea extends Adapter {
     @property({
         tooltip: "是否包含安全区域和屏幕上边界之间的缝隙",

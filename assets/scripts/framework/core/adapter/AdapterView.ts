@@ -2,10 +2,10 @@
  */
 
 import { sys, v3, view, _decorator } from "cc";
-import { JSB } from "cc/env";
+import { DEBUG, EDITOR, JSB } from "cc/env";
 import { Adapter, SafeArea } from "./Adapter";
 
-const { ccclass, property } = _decorator;
+const { ccclass, property ,executeInEditMode } = _decorator;
 /**
  * 安全区域适配组件
  *
@@ -16,17 +16,16 @@ const { ccclass, property } = _decorator;
  * 用法：
  *
  * 1. 将本组件挂载在节点上即可（注意该节点不能挂在 Widget 组件）
- * 继承UIView的视图，通过Manager.uiManager.open打开的视图的根节点都会挂载该组件
  *
  * 适配原理：
  *
  * 1. 将节点的宽高设置为安全区域的宽高
  */
 @ccclass
+@executeInEditMode(true)
 export default class AdapterView extends Adapter {
     onLoad() {
         this._onResize();
-        
     }
 
     onEnable() {
@@ -76,6 +75,10 @@ export default class AdapterView extends Adapter {
             // 初始屏幕宽高像素
             let screenWidth = view.getCanvasSize().width;
             let screenHeight = view.getCanvasSize().height;
+            if ( EDITOR ){
+                screenWidth = view.getDesignResolutionSize().width;
+                screenHeight = view.getDesignResolutionSize().height;
+            }
 
             // 安全区域距离屏幕边缘的距离像素
             let safeAreaMarginTop = 0;

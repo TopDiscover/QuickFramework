@@ -409,12 +409,12 @@
     "__prefab": {
       "__id__": 18
     },
-    "_alignFlags": 18,
+    "_alignFlags": 20,
     "_target": null,
     "_left": 20,
     "_right": 0,
     "_top": 0,
-    "_bottom": 0,
+    "_bottom": 34,
     "_horizontalCenter": -398.17,
     "_verticalCenter": 0,
     "_isAbsLeft": true,
@@ -3014,9 +3014,9 @@
     "__prefab": {
       "__id__": 149
     },
-    "_alignFlags": 18,
+    "_alignFlags": 10,
     "_target": null,
-    "_left": 0,
+    "_left": 23,
     "_right": 0,
     "_top": 0,
     "_bottom": 0,
@@ -3149,7 +3149,7 @@
     "__prefab": {
       "__id__": 158
     },
-    "_alignFlags": 17,
+    "_alignFlags": 41,
     "_target": null,
     "_left": 0,
     "_right": 0,
@@ -3163,7 +3163,7 @@
     "_isAbsBottom": true,
     "_isAbsHorizontalCenter": true,
     "_isAbsVerticalCenter": true,
-    "_originalWidth": 0,
+    "_originalWidth": 1280,
     "_originalHeight": 0,
     "_alignMode": 2,
     "_lockFlags": 0,

@@ -90,10 +90,7 @@ export class _Manager extends Framewok implements GameEventInterface {
 
     onLoad(node: Node) {
         //预先加载下loading预置体
-        Manager.tips.preloadPrefab();
-        Manager.uiLoading.preloadPrefab();
-        Manager.loading.preloadPrefab();
-        Manager.alert.preloadPrefab();
+        Manager.uiManager.onLoad(node);
         //Service onLoad
         Manager.serviceManager.onLoad();
         //入口管理器

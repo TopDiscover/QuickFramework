@@ -9,11 +9,11 @@ import { Macro } from "../../defines/Macros";
 const { ccclass, property } = _decorator;
 
 @ccclass
-export default class UIView extends EventComponent implements IFullScreenAdapt {
-    onFullScreenAdapt(): void {
+export default class UIView extends EventComponent {
 
-    }
-
+    /**
+	 *@description 视图prefab 地址 resources目录下如z_panels/WeiZoneLayer,如果是在主场景上的节点，使用Canvas:xx/xx
+	 */
     public static getPrefabUrl(): string {
         Log.e(`请求实现public static getPrefabUrl`);
         return Macro.UNKNOWN;
@@ -49,7 +49,7 @@ export default class UIView extends EventComponent implements IFullScreenAdapt {
         return this._className;
     }
 
-    private _bundle: BUNDLE_TYPE = null!;
+    protected _bundle: BUNDLE_TYPE = null!;
     /**指向当前View打开时的bundle */
     public set bundle(value) {
         this._bundle = value;
