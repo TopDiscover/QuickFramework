@@ -18,15 +18,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
@@ -309,21 +300,19 @@ class _Helper {
         this.saveUserCache();
     }
     /**@description 删除不包含在包内的bundles */
-    onDelBundles() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.isDoCreate())
-                return;
-            const config = {
-                title: '警告',
-                detail: '',
-                buttons: ['取消', '确定'],
-            };
-            const code = yield Editor.Dialog.info('执行此操作将会删除不包含在包内的所有bundles,是否继续？', config);
-            if (code.response == 1) {
-                this.removeNotInApkBundle();
-                this.remake();
-            }
-        });
+    async onDelBundles() {
+        if (this.isDoCreate())
+            return;
+        const config = {
+            title: '警告',
+            detail: '',
+            buttons: ['取消', '确定'],
+        };
+        const code = await Editor.Dialog.info('执行此操作将会删除不包含在包内的所有bundles,是否继续？', config);
+        if (code.response == 1) {
+            this.removeNotInApkBundle();
+            this.remake();
+        }
     }
     /**@description 删除不包含在包内的所有bundles */
     removeNotInApkBundle() {
@@ -869,18 +858,12 @@ exports.methods = {
 //面板上的解发事件
 exports.listeners = {};
 // 当面板渲染成功后触发
-exports.ready = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        this.init();
-    });
+exports.ready = async function () {
+    this.init();
 };
 // 尝试关闭面板的时候触发
-exports.beforeClose = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-    });
+exports.beforeClose = async function () {
 };
 // 当面板实际关闭后触发
-exports.close = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-    });
+exports.close = async function () {
 };
