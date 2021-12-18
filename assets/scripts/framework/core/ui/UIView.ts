@@ -49,7 +49,7 @@ export default class UIView extends EventComponent {
         return this._className;
     }
 
-    protected _bundle: BUNDLE_TYPE = null!;
+    private _bundle: BUNDLE_TYPE = null!;
     /**指向当前View打开时的bundle */
     public set bundle(value) {
         this._bundle = value;
