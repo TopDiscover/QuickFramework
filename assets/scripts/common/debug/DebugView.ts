@@ -394,12 +394,6 @@ export class DebugView extends Component {
         let designRate = view.getDesignResolutionSize().width/view.getDesignResolutionSize().height;
         Log.d(`视图宽高比:${viewRate}`);
         Log.d(`设置分辨率宽高比:${designRate}`);
-        if (this.node) {
-            let trans = this.node.getComponent(UITransform);
-            if (trans) {
-                Log.d(`节点宽高: ${trans.width} x ${trans.height}`);
-            }
-        }
     }
 }
 
