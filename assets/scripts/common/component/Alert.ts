@@ -185,46 +185,34 @@ export default class Alert {
     private curPanel: cc.Node = null;
     private queue: AlertConfig[] = [];
 
-    private prefab: cc.Prefab = null;
-
-    constructor() {
-        Manager.dispatcher.add(Macro.ADAPT_SCREEN, this.onAdaptScreen, this);
+    private get prefab(){
+        return Manager.uiManager.getScenePrefab("Alert");
     }
 
-    private _isLoadingPrefab = false;
-    private finishLoadCb = null;
-    public preloadPrefab() {
-        this.loadPrefab();
-    }
-
-    private onAdaptScreen() {
-        Manager.adaptor.fullScreenAdapt(this.curPanel);
-    }
-
-    private getConfig( config : AlertConfig ){
-        let result : AlertConfig = {};
-        if( config.tag ){
+    private getConfig(config: AlertConfig) {
+        let result: AlertConfig = {};
+        if (config.tag) {
             result.tag = config.tag;
         }
-        if( config.text){
+        if (config.text) {
             result.text = config.text;
         }
-        if( config.title){
+        if (config.title) {
             result.title = config.title;
         }
-        if( config.confirmString){
+        if (config.confirmString) {
             result.confirmString = config.confirmString;
         }
-        if( config.cancelString){
+        if (config.cancelString) {
             result.cancelString = config.cancelString;
         }
-        if( config.richText){
+        if (config.richText) {
             result.richText = config.richText;
         }
-        if( config.immediatelyCallback){
+        if (config.immediatelyCallback) {
             result.immediatelyCallback = config.immediatelyCallback;
         }
-        if( config.isRepeat){
+        if (config.isRepeat) {
             result.isRepeat = config.isRepeat;
         }
         return result;
@@ -257,14 +245,14 @@ export default class Alert {
     }
 
     /**@description 获取当前显示弹出的配置 */
-    public currentShow( tag? : string | number ){
-        if( this.curPanel ){
+    public currentShow(tag?: string | number) {
+        if (this.curPanel) {
             let current = this.curPanel.getComponent(AlertDialog).config;
-            if( tag ){
-                if( current.tag == tag ){
+            if (tag) {
+                if (current.tag == tag) {
                     return current;
                 }
-            }else{
+            } else {
                 return current;
             }
         }
@@ -332,60 +320,13 @@ export default class Alert {
         return config;
     }
 
-    private async _show(config: AlertConfig) {
-        let finish = await this.loadPrefab();
-        if (finish) {
-            if (!this.curPanel) {
-                this.curPanel = cc.instantiate(this.prefab);
-                let dialog = this.curPanel.addComponent(AlertDialog);
-                Manager.uiManager.addView(this.curPanel,ViewZOrder.Alert)
-                dialog.show(config);
-            }
+    private _show(config: AlertConfig) {
+        if (!this.curPanel) {
+            this.curPanel = cc.instantiate(this.prefab);
+            let dialog = this.curPanel.addComponent(AlertDialog);
+            Manager.uiManager.addView(this.curPanel, ViewZOrder.Alert)
+            dialog.show(config);
         }
-    }
-
-    private async loadPrefab() {
-        return new Promise<boolean>((resolve, reject) => {
-            //正在加载中
-            if (this._isLoadingPrefab) {
-                this.finishLoadCb = resolve;
-                return;
-            }
-            if (this.prefab) {
-                if (this.finishLoadCb) {
-                    this.finishLoadCb(true);
-                    this.finishLoadCb = null;
-                }
-                resolve(true);
-            }
-            else {
-                this._isLoadingPrefab = true;
-                Manager.assetManager.load(
-                    Macro.BUNDLE_RESOURCES,
-                    Config.CommonPrefabs.alert,
-                    cc.Prefab,
-                    (finish: number, total: number, item: cc.AssetManager.RequestItem) => { },
-                    (data) => {
-                        this._isLoadingPrefab = false;
-                        if (data && data.data && data.data instanceof cc.Prefab) {
-                            this.prefab = data.data;
-                            Manager.assetManager.addPersistAsset(Config.CommonPrefabs.alert, data.data, Macro.BUNDLE_RESOURCES);
-                            if (this.finishLoadCb) {
-                                this.finishLoadCb(true);
-                                this.finishLoadCb = null;
-                            }
-                            resolve(true);
-                        }
-                        else {
-                            if (this.finishLoadCb) {
-                                this.finishLoadCb(false);
-                                this.finishLoadCb = null;
-                            }
-                            resolve(false);
-                        }
-                    });
-            }
-        });
     }
 }
 

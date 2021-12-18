@@ -52,8 +52,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1280,
-      "height": 720
+      "width": 0,
+      "height": 0
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -76,8 +76,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        640,
-        360,
+        0,
+        0,
         0,
         0,
         0,
@@ -134,8 +134,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1280,
-      "height": 720
+      "width": 0,
+      "height": 0
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -888,7 +888,7 @@
       "__id__": 20
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 22
@@ -988,7 +988,7 @@
     "asset": {
       "__uuid__": "9b9ab51a-bfbd-4ce0-a76a-6fda961e0ea2"
     },
-    "fileId": "1fc0op9FhM3Z+CS2ARg+vh",
+    "fileId": "5aiDehxQVMbaEabmLW29rS",
     "sync": false
   },
   {
@@ -999,7 +999,7 @@
       "__id__": 20
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 25
@@ -1099,7 +1099,7 @@
     "asset": {
       "__uuid__": "9b9ab51a-bfbd-4ce0-a76a-6fda961e0ea2"
     },
-    "fileId": "113Wkuk9FN25WlFg+g+AFI",
+    "fileId": "32hCs678BFx6B8l8BJGaqi",
     "sync": false
   },
   {
@@ -2077,33 +2077,6 @@
     "_id": ""
   },
   {
-    "__type__": "cc.Widget",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 1
-    },
-    "_enabled": true,
-    "alignMode": 1,
-    "_target": null,
-    "_alignFlags": 45,
-    "_left": 0,
-    "_right": 0,
-    "_top": 0,
-    "_bottom": 0,
-    "_verticalCenter": 0,
-    "_horizontalCenter": 0,
-    "_isAbsLeft": true,
-    "_isAbsRight": true,
-    "_isAbsTop": true,
-    "_isAbsBottom": true,
-    "_isAbsHorizontalCenter": true,
-    "_isAbsVerticalCenter": true,
-    "_originalWidth": 1280,
-    "_originalHeight": 720,
-    "_id": ""
-  },
-  {
     "__type__": "cc.Sprite",
     "_name": "",
     "_objFlags": 0,
@@ -2150,6 +2123,16 @@
       }
     ],
     "playOnLoad": true,
+    "_id": ""
+  },
+  {
+    "__type__": "57a69nw4BBLPpDfMJMGRa4F",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
     "_id": ""
   },
   {

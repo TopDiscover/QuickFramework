@@ -8,7 +8,6 @@ import { Config, ViewZOrder } from "../common/config/Config";
 import { Macro } from "../framework/defines/Macros";
 import { Entry } from "../framework/core/entry/Entry";
 import { Update } from "../framework/core/update/Update";
-import { Resource } from "../framework/core/asset/Resource";
 
 class LoginEntry extends Entry {
     static bundle = Macro.BUNDLE_RESOURCES;
@@ -22,16 +21,7 @@ class LoginEntry extends Entry {
         
     }
     protected loadResources(completeCb: () => void): void {
-        this.loader.getLoadResources = ()=>{
-            return [{ preloadView: LoginView, bundle: this.bundle }];
-        };
-        this.loader.onLoadProgress = (err : Resource.LoaderError)=>{
-            if ( err == Resource.LoaderError.LOADING){
-                return;
-            }
-            completeCb();
-        };
-        this.loader.loadResources();
+       completeCb();
     }
     protected openGameView(): void {
         Manager.uiManager.open({ type: LoginView, zIndex: ViewZOrder.zero, bundle: this.bundle });

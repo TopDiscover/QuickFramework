@@ -6,8 +6,8 @@ const { ccclass, property } = cc._decorator;
 @ccclass
 export default class LoginView extends GameView {
 
-    static getPrefabUrl() {
-        return "login/prefabs/LoginView"
+    static getPrefabUrl(){
+        return `@LoginView`;
     }
 
     private _login: cc.Node = null;

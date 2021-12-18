@@ -1,4 +1,3 @@
-import WebEditBoxImpl from "./WebEditBoxImpl";
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
@@ -362,12 +361,6 @@ if( !cc.randomRange ){
 
 export function CocosExtentionInit() {
     if (!CC_EDITOR) {
-
-        //对引擎输入框进行修改 ,原始引擎版本2.1.2
-        if ( Manager.adaptor.isBrowser && !CC_PREVIEW && cc.sys.os != cc.sys.OS_WINDOWS) {
-            if (CC_DEBUG) Log.d(`浏览器`);
-            (<any>cc.EditBox)._ImplClass = WebEditBoxImpl;
-        }
-        Log.d("Cocos引擎扩展初始化");
+        Log.d("Cocos扩展初始化");
     }
 }

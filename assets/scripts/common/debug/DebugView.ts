@@ -44,6 +44,8 @@ export class DebugView extends cc.Component {
         this.bindEvent("lowMemory",this.onLowMemory);
         //释放管理器
         this.bindEvent("releaseManager",this.onReleaseManager);
+        //适配器
+        this.bindEvent("adaptor", this.onAdaptor);
         this.doOther();
     }
     debug: cc.Node = null!;
@@ -376,6 +378,20 @@ export class DebugView extends cc.Component {
                 }
             }
         })
+    }
+
+    private onAdaptor() {
+        Log.d(`-----------------------------适配信息-----------------------------------------------`);
+        Log.d(`屏幕分辨率: ${cc.view.getCanvasSize().width} x ${cc.view.getCanvasSize().height}`);
+        Log.d(`视图窗口可见区域分辨率: ${cc.view.getVisibleSize().width} x ${cc.view.getVisibleSize().height}`);
+        Log.d(`视图中边框尺寸: ${cc.view.getFrameSize().width} x ${cc.view.getFrameSize().height}`);
+        Log.d(`设备或浏览器像素比例: ${cc.view.getDevicePixelRatio()}`);
+        Log.d(`返回视图窗口可见区域像素尺寸: ${cc.view.getVisibleSizeInPixel().width} x ${cc.view.getVisibleSizeInPixel().height}`);
+        Log.d(`当前场景设计分辨率: ${cc.view.getDesignResolutionSize().width} x ${cc.view.getDesignResolutionSize().height}`);
+        let viewRate = cc.view.getFrameSize().width/cc.view.getFrameSize().height;
+        let designRate = cc.view.getDesignResolutionSize().width/cc.view.getDesignResolutionSize().height;
+        Log.d(`视图宽高比:${viewRate}`);
+        Log.d(`设置分辨率宽高比:${designRate}`);
     }
 }
 

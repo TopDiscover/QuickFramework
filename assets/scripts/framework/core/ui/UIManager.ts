@@ -1,5 +1,6 @@
 import { ViewStatus } from "../../defines/Enums";
 import { Macro } from "../../defines/Macros";
+import AdapterView from "../adapter/AdapterView";
 import { Resource } from "../asset/Resource";
 import UIView from "./UIView";
 
@@ -102,12 +103,14 @@ class ViewData {
     getViewCb: ((view: any) => void)[] = [];
     /**是否预加载,不显示出来，但会加到当前场景上 */
     isPreload: boolean = false;
+    /**@description 是否通过预置创建 */
+    isPrefab: boolean = true;
     /**@description 资源信息 */
     info: Resource.Info = null!;
     /**@description 界面的类型 */
-    viewType : UIClass<UIView> = null!;
+    viewType: UIClass<UIView> = null!;
     /**@description bundle */
-    bundle : BUNDLE_TYPE = null!;
+    bundle: BUNDLE_TYPE = null!;
 
     /**@description 界面动态加载的数据 */
     loadData: ViewDynamicLoadData = new ViewDynamicLoadData();
@@ -164,17 +167,17 @@ export class UIManager {
      * @param view 
      * @returns 
      */
-    public getViewType<T extends UIView>( view : UIView ):GameViewClass<T>{
+    public getViewType<T extends UIView>(view: UIView): GameViewClass<T> {
         if ( !cc.isValid(view) ){
             return null as any;
         }
-        
+
         let className = view.className;
         if (!className) return null as any;
         let viewData = this._viewDatas.get(className);
-        if ( viewData ){
+        if (viewData) {
             return viewData.viewType as any;
-        }else{
+        } else {
             return null as any;
         }
     }
@@ -198,23 +201,23 @@ export class UIManager {
     /**@description 驻留内存资源 */
     public retainMemory = new ViewDynamicLoadData(DYNAMIC_LOAD_RETAIN_MEMORY);
 
-    private defaultOpenOption(options : OpenOption ) {
-        let out : DefaultOpenOption = {
-            bundle : Macro.BUNDLE_RESOURCES,
-            delay : options.delay,
-            name : options.name,
-            zIndex : 0,
-            preload : false,
-            type : options.type,
-            args : options.args,
+    private defaultOpenOption(options: OpenOption) {
+        let out: DefaultOpenOption = {
+            bundle: Macro.BUNDLE_RESOURCES,
+            delay: options.delay,
+            name: options.name,
+            zIndex: 0,
+            preload: false,
+            type: options.type,
+            args: options.args,
         };
-        if ( options.bundle != undefined ){
+        if (options.bundle != undefined) {
             out.bundle = options.bundle;
         }
-        if ( options.zIndex != undefined ){
+        if (options.zIndex != undefined) {
             out.zIndex = options.zIndex;
         }
-        if ( options.preload != undefined ){
+        if (options.preload != undefined) {
             out.preload = options.preload;
         }
         return out;
@@ -227,7 +230,15 @@ export class UIManager {
      * @returns 
      */
     public preload<T extends UIView>(uiClass: UIClass<T>, bundle: BUNDLE_TYPE) {
-        return this.open({ type : uiClass,preload:true,bundle:bundle});
+        return this.open({ type: uiClass, preload: true, bundle: bundle });
+    }
+
+    private parsePrefabUrl(url: string): { isPrefab: boolean, url: string } {
+        if (url[0] == "@") {
+            return { isPrefab: false, url: url.substr(1) };
+        } else {
+            return { isPrefab: true, url: url };
+        }
     }
 
     /**
@@ -237,12 +248,12 @@ export class UIManager {
      * @param viewOption 视图显示设置参数，即UIView.show参数
      * @returns 
      */
-    public open<T extends UIView>( openOption: OpenOption): Promise<T> {
+    public open<T extends UIView>(openOption: OpenOption): Promise<T> {
         let _OpenOption = this.defaultOpenOption(openOption);
         return this._open(_OpenOption);
     }
 
-    private _open<T extends UIView>(openOption : DefaultOpenOption) {
+    private _open<T extends UIView>(openOption: DefaultOpenOption) {
         return new Promise<T>((reslove, reject) => {
             if (!openOption.type) {
                 if (CC_DEBUG) Log.d(`${this._logTag}open ui class error`);
@@ -267,7 +278,7 @@ export class UIManager {
                         if (viewData.view && cc.isValid(viewData.node)) {
                             viewData.node.zIndex = openOption.zIndex;
                             if (!viewData.node.parent) {
-                                this.addView(viewData.node, openOption.zIndex,viewData.view);
+                                this.addView(viewData.node, openOption.zIndex);
                             }
                             viewData.view.show(openOption.args);
                         }
@@ -278,7 +289,7 @@ export class UIManager {
                 else {
                     viewData.status = ViewStatus.WAITTING_NONE;
                     if (!openOption.preload) {
-                        Manager.uiLoading.show(openOption.delay,openOption.name);
+                        Manager.uiLoading.show(openOption.delay, openOption.name);
                     }
                     //正在加载中
                     if (CC_DEBUG) Log.w(`${this._logTag}${className} 正在加载中...`);
@@ -290,11 +301,22 @@ export class UIManager {
                 viewData = new ViewData();
                 viewData.loadData.name = className;
                 let prefabUrl = openOption.type.getPrefabUrl();
+                let result = this.parsePrefabUrl(prefabUrl);
                 viewData.isPreload = openOption.preload;
+                viewData.isPrefab = result.isPrefab;
                 viewData.viewType = openOption.type;
                 viewData.bundle = openOption.bundle;
                 this._viewDatas.set(className, viewData);
-
+                if (!result.isPrefab) {
+                    //说明存在于主场景中
+                    viewData.info = new Resource.Info;
+                    viewData.info.url = result.url;
+                    viewData.info.type = cc.Prefab;
+                    viewData.info.data = this.getScenePrefab(result.url) as any;
+                    viewData.info.bundle = openOption.bundle;
+                    this.createNode(viewData, reslove, openOption);
+                    return;
+                }
                 let progressCallback: (completedCount: number, totalCount: number, item: any) => void = null!;
 
                 if (!openOption.preload) {
@@ -359,24 +381,14 @@ export class UIManager {
             //界面显示在屏幕中间
             let widget = view.getComponent(cc.Widget);
             if (widget) {
-                if (CC_DEBUG) Log.w(`${this._logTag}你已经添加了cc.Widget组件，将会更改成居中模块`);
-                widget.isAlignHorizontalCenter = true;
-                widget.horizontalCenter = 0;
-                widget.isAlignVerticalCenter = true;
-                widget.verticalCenter = 0;
+                if (CC_DEBUG) Log.e(`${this._logTag}请不要在根节点挂载cc.Widget组件`);
+                widget.destroy();
             }
-            else {
-                widget = view.addComponent(cc.Widget);
-                if (widget) {
-                    widget.isAlignHorizontalCenter = true;
-                    widget.horizontalCenter = 0;
-                    widget.isAlignVerticalCenter = true;
-                    widget.verticalCenter = 0;
-                }
+            if (!view.getComponent(AdapterView)) {
+                view.addComponent(AdapterView);
             }
-
             if (!viewData.isPreload) {
-                this.addView(uiNode, openOption.zIndex,view);
+                this.addView(uiNode, openOption.zIndex);
             }
             return view;
         }
@@ -385,7 +397,7 @@ export class UIManager {
         }
     }
 
-    private createNode(viewData : ViewData,reslove: any,openOptions : DefaultOpenOption) {
+    private createNode(viewData: ViewData, reslove: any, openOptions: DefaultOpenOption) {
         viewData.isLoaded = true;
         let className = this.getClassName(viewData.viewType);
         if (viewData.status == ViewStatus.WAITTING_CLOSE) {
@@ -399,7 +411,7 @@ export class UIManager {
 
         let uiNode = cc.instantiate(viewData.info.data as cc.Prefab);
         viewData.node = uiNode;
-        let view = this._addComponent(uiNode,viewData,openOptions);
+        let view = this._addComponent(uiNode, viewData, openOptions);
         if (!view) {
             reslove(null);
             return;
@@ -436,25 +448,62 @@ export class UIManager {
         });
     }
 
-    private get canvas(): cc.Node {
-        let rootScene = cc.director.getScene();
-        if (!rootScene) {
-            if (CC_DEBUG) Log.e(`${this._logTag}当前场景为空`);
-            return <any>null;
-        }
+    private _canvas: cc.Node = null!;
 
-        let root: any = rootScene.getChildByName("Canvas");
-        if (!root) {
-            if (CC_DEBUG) Log.e(`${this._logTag}当前场景上找不到 Canvas 节点`);
-            return <any>null;
+    private _viewRoot: cc.Node = null!;
+    private get viewRoot() {
+        if (!this._viewRoot && !cc.isValid(this._viewRoot)) {
+            this._viewRoot = cc.find("viewRoot", this.canvas);
         }
-        return root;
+        return this._viewRoot;
     }
 
-    public addView(node: cc.Node, zOrder: number, adpater?: IFullScreenAdapt) {
+    private _componentRoot: cc.Node = null!;
+    private get componentRoot() {
+        if (!this._componentRoot && !cc.isValid(this._componentRoot)) {
+            this._componentRoot = cc.find("componentRoot", this.canvas);
+        }
+        return this._componentRoot;
+    }
+
+    private _mainController: cc.Component | null = null;
+    /*获取当前canvas的组件 */
+    public get mainController(): cc.Component | null {
+        if (!this._mainController && !cc.isValid(this._mainController)) {
+            return this._mainController;
+        }
+        let canvas = this.canvas;
+        if (canvas) {
+            this._mainController = canvas.getComponent("MainController");
+            return this._mainController;
+        }
+        return null;
+    }
+
+    private _prefabs: cc.Node = null!;
+    private get prefabs() {
+        if (!this._prefabs && !cc.isValid(this._prefabs)) {
+            this._prefabs = cc.find("prefabs", this.canvas);
+        }
+        return this._prefabs;
+    }
+
+    /**@description 获取主场景预置节点 */
+    getScenePrefab(name: string) {
+        return cc.find(name, this.prefabs);
+    }
+
+    onLoad(node: cc.Node) {
+        this._canvas = node;
+    }
+
+    private get canvas(): cc.Node {
+        return this._canvas;
+    }
+
+    public addView(node: cc.Node, zOrder: number) {
         this.viewRoot.addChild(node);
         node.zIndex = zOrder;
-        Manager.adaptor.fullScreenAdapt(node, adpater);
     }
 
     /**@description 添加动态加载的本地资源 */
@@ -467,21 +516,7 @@ export class UIManager {
         }
     }
 
-    private _viewRoot : cc.Node = null!;
-    private get viewRoot(){
-        if ( !this._viewRoot ){
-            this._viewRoot = cc.find("viewRoot",this.canvas);
-        }
-        return this._viewRoot;
-    }
 
-    private _componentRoot : cc.Node = null!;
-    private get componentRoot(){
-        if ( !this._componentRoot ){
-            this._componentRoot = cc.find("componentRoot",this.canvas);
-        }
-        return this._componentRoot;
-    }
 
     /**@description 添加动态加载的远程资源 */
     public addRemote(info: Resource.Info, className: string) {
@@ -500,13 +535,15 @@ export class UIManager {
         let viewData = this.getViewData(data);
         if (viewData) {
             viewData.status = ViewStatus.WAITTING_CLOSE;
+            let className = this.getClassName(data);
             if (viewData.view && cc.isValid(viewData.node)) {
                 viewData.node.removeFromParent();
                 viewData.node.destroy();
             }
             viewData.loadData.clear();
-            let className = this.getClassName(data);
-            Manager.assetManager.releaseAsset(viewData.info);
+            if ( viewData.isPrefab ){
+                Manager.assetManager.releaseAsset(viewData.info);
+            }
             this._viewDatas.delete(className);
             Log.d(`${this._logTag} close view : ${className}`);
         }
@@ -540,10 +577,10 @@ export class UIManager {
     }
 
     /**@description 关闭指定bundle的视图 */
-    public closeBundleView( bundle : BUNDLE_TYPE ){
+    public closeBundleView(bundle: BUNDLE_TYPE) {
         let self = this;
-        this._viewDatas.forEach((viewData,key)=>{
-            if ( viewData.bundle == bundle ){
+        this._viewDatas.forEach((viewData, key) => {
+            if (viewData.bundle == bundle) {
                 self.close(key);
             }
         });
@@ -628,23 +665,6 @@ export class UIManager {
         return false;
     }
 
-    public fullScreenAdapt() {
-        this._viewDatas.forEach((data) => {
-            if (data.isLoaded && data.view) {
-                Manager.adaptor.fullScreenAdapt(data.view.node, data.view);
-            }
-        });
-    }
-
-    /*获取当前canvas的组件 */
-    public getMainController(): cc.Component | null {
-        let canvas = this.canvas;
-        if (canvas) {
-            return canvas.getComponent("MainController");
-        }
-        return null;
-    }
-
     public addComponent<T extends cc.Component>(type: { new(): T }): T;
     public addComponent(className: string): any;
     public addComponent(data: any) {
@@ -678,25 +698,25 @@ export class UIManager {
     }
 
     print( delegate : UIManagerPrintDelegate<ViewData,cc.Node,cc.Component>){
-        if ( delegate ){
-            if ( delegate.printViews ){
-                this._viewDatas.forEach((data,key)=>{
-                    if ( delegate.printViews ){
-                        delegate.printViews(data,key);
+        if (delegate) {
+            if (delegate.printViews) {
+                this._viewDatas.forEach((data, key) => {
+                    if (delegate.printViews) {
+                        delegate.printViews(data, key);
                     }
                 });
             }
 
-            if ( delegate.printChildren ){
+            if (delegate.printChildren) {
                 let root = this.viewRoot;
-                if ( root ){
+                if (root) {
                     let children = root.children;
-                    for ( let i = 0 ; i < children.length ; i++){
+                    for (let i = 0; i < children.length; i++) {
                         delegate.printChildren(children[i]);
                     }
                 }
             }
-            
+
             if (delegate.printComp) {
                 let root: any = this.componentRoot;
                 if (root) {

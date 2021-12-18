@@ -6,14 +6,6 @@ export namespace Config {
     /**@description 是否显示调试按钮 */
     export const isShowDebugButton = true;
 
-    /**@description 公共Prefabs预置路径 */
-    export const CommonPrefabs = {
-        tips: "common/prefabs/Tips",
-        uiLoading: "common/prefabs/UILoading",
-        loading: "common/prefabs/Loading",
-        alert: "common/prefabs/Alert",
-    }
-
     /**@description 公共音效路径 */
     export const audioPath = {
         dialog: "common/audio/dlg_open",

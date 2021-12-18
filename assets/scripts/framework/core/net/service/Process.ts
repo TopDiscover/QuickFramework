@@ -66,7 +66,7 @@ export class Process {
             this._isDoingMessage = false;
         }
         else {
-            Manager.uiManager.getMainController()?.scheduleOnce(() => {
+            Manager.uiManager.mainController?.scheduleOnce(() => {
                 this._isDoingMessage = false;
             }, handleTime);
         }

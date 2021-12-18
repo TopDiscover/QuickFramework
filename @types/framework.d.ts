@@ -63,11 +63,6 @@ declare interface StringConstructor {
 
 declare function md5(data: any): any;
 
-declare interface IFullScreenAdapt {
-	/**@description 全屏幕适配 调用 */
-	onFullScreenAdapt(): void;
-}
-
 /**@description 提示弹出框配置 */
 declare interface AlertConfig {
 	/**@description 用来标识弹出框，后面可指定tag进行关闭所有相同tag的弹出框 */
@@ -129,7 +124,11 @@ declare type UIView = import("../assets/scripts/framework/core/ui/UIView").defau
 declare interface UIClass<T extends UIView> {
 	new(): T;
 	/**
-	 *@description 视图prefab 地址 resources目录下如z_panels/WeiZoneLayer 
+	 *@description 视图prefab 地址 resources目录下如z_panels/WeiZoneLayer,
+	 * 如果是在主场景上的节点
+	 * static getPrefabUrl(){
+     *   return `@LoginView`;
+     * } 
 	 */
 	getPrefabUrl(): string;
 }

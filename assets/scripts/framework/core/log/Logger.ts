@@ -68,6 +68,9 @@ export class LoggerImpl {
         }
         if ( this.isValid(LogLevel.DEBUG) ){
             this.logger.d = console.log;
+            if ( CC_EDITOR ){
+                this.logger.d = cc.log;
+            }
         }else{
             this.logger.d = ()=>{};
         }

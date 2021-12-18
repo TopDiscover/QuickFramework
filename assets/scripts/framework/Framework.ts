@@ -9,7 +9,6 @@ import { BundleManager } from "./core/asset/BundleManager";
 import { CocosExtentionInit } from "./plugin/CocosExtention";
 import { Language } from "./core/language/Language";
 import { Macro } from "./defines/Macros";
-import { Adaptor } from "./core/adaptor/Adaptor";
 import { ProtoManager } from "./core/net/service/ProtoManager";
 import { EntryManager } from "./core/entry/EntryManager";
 import { DataCenter } from "./data/DataCenter";
@@ -108,11 +107,6 @@ export class Framewok {
         return getSingleton(CacheManager);
     }
 
-    /**@description 屏幕适配 */
-    get adaptor() {
-        return getSingleton(Adaptor);
-    }
-
     /**@description 对象池管理器 */
     get nodePoolManager() {
         return getSingleton(NodePoolManager);
@@ -196,8 +190,6 @@ export class Framewok {
     }
 
     init(){
-        //适配
-        this.adaptor.initBrowserAdaptor();
         //引擎扩展初始化
         CocosExtentionInit();
     }
