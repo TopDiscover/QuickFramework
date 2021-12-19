@@ -1,0 +1,15 @@
+:host {
+    padding-left: 10px;
+    padding-right: 10px;
+
+    height: auto;
+}
+
+.container {
+    height: 100%;
+    overflow-y: auto;
+}
+
+ui-box-container {
+    min-height: 50px;
+}

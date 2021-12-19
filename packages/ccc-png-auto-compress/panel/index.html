@@ -1,0 +1,42 @@
+<div class="container">
+    <h2>配置面板</h2>
+    <ui-box-container class="layout vertical">
+        <div>
+            <ui-prop name="启用" type="boolean" v-value="enabled" tooltip="* 项目构建完成后自动压缩 PNG 资源"></ui-prop>
+            <!-- <ui-prop name="配置保存目录" tooltip="· 相对于项目根目录的路径">
+                <ui-select class="flex-1" v-value="configSaveDir">
+                    <option value="local">local（默认不参与 Git 同步）</option>
+                    <option value="settings">settings（默认参与 Git 同步）</option>
+                </ui-select>
+            </ui-prop> -->
+            <hr />
+            <ui-prop name="最低质量（%）" type="number" v-value="minQuality" tooltip="* 最低图像质量"></ui-prop>
+            <ui-prop name="最高质量（%）" type="number" v-value="maxQuality" tooltip="* 最高图像质量"></ui-prop>
+            <!-- <ui-prop name="色彩" type="number" v-value="colors" tooltip="· 图像色彩"></ui-prop> -->
+            <ui-prop slide name="速度" type="number" v-value="speed" min="1" max="10" step="1" precision="0"
+                tooltip="* 压缩速度与质量的权重，默认值为 3。&#10;* 10 档可能会降低 5％ 的质量，但压缩速度比 3 档快 8 倍。">
+            </ui-prop>
+            <hr />
+            <ui-prop name="需要排除的文件夹" tooltip="* 相对于 assets/ 目录的路径&#10;* 多个值之间必须用 ',' 隔开" auto-height>
+                <ui-text-area class="flex-1" type="string" size="big" v-value="excludeFolders"
+                    placeholder="textures/aaa/,&#10;textures/bbb/">
+                </ui-text-area>
+            </ui-prop>
+            <ui-prop name="需要排除的文件" tooltip="* 相对于 assets/ 目录的路径&#10;* 多个值之间必须用 ',' 隔开" auto-height>
+                <ui-text-area class="flex-1" type="string" size="big" v-value="excludeFiles"
+                    placeholder="textures/abc.png,&#10;textures/123.png">
+                </ui-text-area>
+            </ui-prop>
+            <hr />
+            <ui-hint style="line-height: 19px;">
+                💡 小贴士：如果 Spine Skeleton 或 DragonBones 的纹理在压缩后出现透明度丢失的情况，可以参考下面两种解决方案（二选一）：
+                <br>
+                ① 自行勾选 Spine Skeleton 或 DragonBones 纹理的 Premultiply Alpha（预乘）属性
+                <br>
+                ② 在配置面板中配置排除 Spine Skeleton 或 DragonBones 的纹理，不进行压缩
+            </ui-hint>
+            <hr />
+        </div>
+        <ui-button class="button blue big" v-disabled="isProcessing" @click="saveConfig()">保存</ui-button>
+    </ui-box-container>
+</div>
