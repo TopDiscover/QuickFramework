@@ -13,10 +13,13 @@ export class _Helper {
 
     /**@description 是否是Mac平台 */
     private get isMac(){
-        let pos = Editor.argv.$0.indexOf("MacOS");
-        return pos != -1;
+        let ret = this.appPath.match(/[a-zA-Z]:[\\|//]/g);
+        if ( ret && ret.length > 0 ){
+            return false;
+        }
+        return true;
     }
-
+    
     /**@description creator 版本号 */
     private get appVersion(){
         return Editor.versions.CocosCreator;
@@ -28,7 +31,8 @@ export class _Helper {
         if( this._path ){
             return this._path;
         }
-        this._path = Editor.argv.$0;
+        this._path = Editor.App.path;
+        //D:\Creator\Creator\3.1.0\resources\app.asar
         //window : D:\CocosCreator\2.1.2\CocosCreator.exe --path
         //mac : Applications/CocosCreator.app/Contents/MacOS/CocosCreator --path
         let parser = path.parse(this._path);
@@ -41,7 +45,7 @@ export class _Helper {
         if( this._engineRoot ){
             return this._engineRoot;
         }
-        let root = this.appPath + (this.isMac ? "/Resources" : "/resources");
+        let root = this.appPath;
         root = path.normalize(root);
         this._engineRoot = root;
         return this._engineRoot;
@@ -104,6 +108,7 @@ export class _Helper {
     }
 
     run(){
+        this.creatorPluginVersion;
         Editor.log(`Creator Version : ${this.creatorPluginVersion}`);
         Editor.log(`Plugin Version : ${this.curPluginVersion}`);
 
