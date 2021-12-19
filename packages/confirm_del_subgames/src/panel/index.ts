@@ -20,7 +20,7 @@ Editor.Panel.extend({
   
     // method executed when template and styles are successfully loaded and initialized
     ready () {
-      this.$btn.addEventListener('confirm', () => {
+      (<any>this).$btn.addEventListener('confirm', () => {
         Editor.Ipc.sendToPanel("hotupdate", "hotupdate:onConfirmDelBundle");
         //关闭自己
         Editor.Panel.close('confirm_del_subgames');

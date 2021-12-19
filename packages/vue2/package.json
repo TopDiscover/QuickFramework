@@ -1,0 +1,44 @@
+{
+    "package_version": 2,
+    "version": "1.0.0",
+    "name": "vue2",
+    "description": "i18n:vue2.description",
+    "main": "./dist/main.js",
+    "dependencies": {
+        "vue": "^2.6.14",
+        "fs-extra": "^10.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^16.0.1",
+        "@types/fs-extra": "^9.0.5",
+        "typescript": "^4.3.4"
+    },
+    "panel": {
+        "title": "vue2 Default Panel",
+        "type": "dockable",
+        "main": "dist/panels/default/script/index.js",
+        "size": {
+            "min-width": 400,
+            "min-height": 300,
+            "width": 1024,
+            "height": 600
+        }
+    },
+    "main-menu": {
+        "项目工具/vue2": {
+            "icon": "icon.png",
+            "accelerator": "CmdOrCtrl+f",
+            "message": "vue2:open_panel"
+        },
+        "项目工具/vue12": {
+            "icon": "icon.png",
+            "accelerator": "CmdOrCtrl+w",
+            "message": "vue2:send-to-panel"
+        }
+    },
+    "author": "Zheng Fasheng",
+    "scripts": {
+        "build": "tsc -b",
+        "watch": "tsc -w"
+    }
+}
