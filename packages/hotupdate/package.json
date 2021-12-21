@@ -1,9 +1,29 @@
 {
-    "name": "hotupdate",
+    "package_version": 2,
     "version": "1.0.0",
+    "name": "hotupdate",
     "description": "热更新工具",
-    "author": "zheng_fasheng",
-    "main": "main.js",
+    "main": "./dist/main.js",
+    "dependencies": {
+        "vue": "^2.6.14",
+        "fs-extra": "^10.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^16.0.1",
+        "@types/fs-extra": "^9.0.5",
+        "typescript": "^4.3.4"
+    },
+    "panel": {
+        "title": "热更新工具",
+        "type": "dockable",
+        "main": "dist/panels/default/script/index.js",
+        "size": {
+            "min-width": 900,
+            "min-height": 900,
+            "width": 400,
+            "height": 300
+        }
+    },
     "main-menu": {
         "项目工具/热更新工具": {
             "icon": "icon.png",
@@ -11,13 +31,9 @@
             "message": "hotupdate:showPanel"
         }
     },
-    "panel": {
-        "main": "panel/index.js",
-        "type": "dockable",
-        "title": "热更新工具",
-        "width": 900,
-        "height": 900,
-        "min-height": 400,
-        "min-width": 550
+    "author": "Zheng Fasheng",
+    "scripts": {
+        "build": "tsc -b",
+        "watch": "tsc -w"
     }
 }
