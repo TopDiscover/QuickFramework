@@ -1,0 +1,51 @@
+{
+    "package_version": 2,
+    "version": "1.0.0",
+    "name": "check_resources",
+    "description": "Bundle的相互资源引用检测，会排除掉hall资源的检测,如子游戏中，如果A游戏使用了B游戏的资源，假设如果只下载了A游戏，用到B游戏资源的地方，会造成无法加载资源而引起崩溃，注意：插件只能检测各预置体资源的相互引用新关系,代码中的引用需要开发者自己检查",
+    "main": "./dist/main.js",
+    "dependencies": {
+        "vue": "^3.1.4",
+        "fs-extra": "^10.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^16.0.1",
+        "@types/fs-extra": "^9.0.5",
+        "typescript": "^4.3.4"
+    },
+    "panels": {
+        "default": {
+            "title": "资源引用检测工具",
+            "type": "dockable",
+            "main": "dist/panels/default/script",
+            "size": {
+                "min-width": 400,
+                "min-height": 300,
+                "width": 1024,
+                "height": 600
+            }
+        }
+    },
+    "contributions": {
+        "menu": [
+            {
+                "path": "项目工具",
+                "label": "资源引用检测",
+                "message": "open-panel"
+            }
+        ],
+        "messages": {
+            "open-panel": {
+                "methods": [
+                    "open_panel"
+                ]
+            }
+        }
+    },
+    "author": "Zheng Fasheng",
+    "editor": ">=3.3.1",
+    "scripts": {
+        "build": "tsc -b",
+        "watch": "tsc -w"
+    }
+}
