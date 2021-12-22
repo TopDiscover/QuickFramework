@@ -18,13 +18,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.helper = void 0;
 const fs_extra_1 = require("fs-extra");
-const path_1 = __importDefault(require("path"));
+const path_1 = __importStar(require("path"));
 const Tools_1 = require("./Tools");
 const os = __importStar(require("os"));
 const child_process_1 = require("child_process");
@@ -267,10 +264,10 @@ class Helper {
         let version = this.userCache.version;
         this.addLog("主包版本号:", version);
         let buildDir = this.userCache.buildDir;
-        buildDir = buildDir.replace(/\\/g, "/");
+        buildDir = path_1.normalize(buildDir);
         this.addLog("构建目录:", buildDir);
         let manifestDir = this.getManifestDir(buildDir);
-        manifestDir = manifestDir.replace(/\\/g, "/");
+        manifestDir = path_1.normalize(manifestDir);
         this.addLog("构建目录下的Manifest目录:", manifestDir);
         let serverUrl = this.userCache.serverIP;
         this.addLog("热更新地址:", serverUrl);

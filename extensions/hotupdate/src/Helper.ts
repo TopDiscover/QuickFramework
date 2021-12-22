@@ -1,5 +1,5 @@
 import { existsSync, readFile, readFileSync, writeFileSync } from 'fs-extra';
-import path, { join } from 'path';
+import path, { join, normalize } from 'path';
 import { BundleInfo, HotUpdateConfig, Manifest, Tools, UserCache } from './Tools';
 import * as os from "os"
 import { exec } from "child_process";
@@ -251,10 +251,10 @@ class Helper {
         let version = this.userCache.version;
         this.addLog("主包版本号:", version);
         let buildDir = this.userCache.buildDir;
-        buildDir = buildDir.replace(/\\/g, "/");
+        buildDir = normalize(buildDir);
         this.addLog("构建目录:", buildDir);
         let manifestDir = this.getManifestDir(buildDir);
-        manifestDir = manifestDir.replace(/\\/g, "/");
+        manifestDir = normalize(manifestDir);
         this.addLog("构建目录下的Manifest目录:", manifestDir);
         let serverUrl = this.userCache.serverIP;
         this.addLog("热更新地址:", serverUrl);

@@ -1,5 +1,5 @@
 import { createReadStream, createWriteStream, exists, existsSync, mkdir, mkdirSync, readdir, readdirSync, readFileSync, rmdirSync, stat, statSync, unlinkSync } from "fs";
-import path from "path";
+import path, { normalize } from "path";
 
 
 /**@description bundle信息 */
@@ -111,11 +111,13 @@ class _Tools {
         for (let index = 0; index < config.mainIncludes.length; index++) {
             const element = config.mainIncludes[index];
             let fullPath = path.join(config.buildDir, element);
+            fullPath = normalize(fullPath);
             this.zipDir(fullPath, jszip.folder(element));
         }
 
         let packZipName = `main_${config.versions["main"].md5}.zip`;
         let packZipRootPath = Editor.Project.path + "/PackageVersion";
+        packZipRootPath = normalize(packZipRootPath);
         let packVersionZipPath = path.join(packZipRootPath, packZipName);
         this.delDir(packZipRootPath);
         this.mkdirSync(packZipRootPath);
@@ -153,6 +155,7 @@ class _Tools {
     /**@description 创建目录 */
     mkdirSync(dir: string) {
         try {
+            dir = normalize(dir);
             mkdirSync(dir)
         } catch (e: any) {
             if ("EEXIST" !== e.code) throw e
