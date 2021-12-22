@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
-import path, { join } from "path";
+import path, { join, normalize } from "path";
 import { BundleInfo, HotUpdateConfig, Manifest, Tools, UserCache } from "./Tools";
 const Electron = require("electron")
 
@@ -429,6 +429,7 @@ class Helper {
         let copyDirs = ["manifest"].concat(temps);
         for (let i = 0; i < copyDirs.length; i++) {
             let dir = path.join(this.userCache.buildDir, copyDirs[i]);
+            dir = normalize(dir);
             if (!existsSync(dir)) {
                 this.addLog(`${this.userCache.buildDir} [部署]不存在${copyDirs[i]}目录,无法拷贝文件`);
                 return;
@@ -445,11 +446,13 @@ class Helper {
         count = 0;
         for (let i = 0; i < copyDirs.length; i++) {
             let dir = path.join(this.userCache.buildDir, copyDirs[i]);
+            dir = normalize(dir);
             count += Tools.getDirFileCount(dir);
         }
 
         //压缩文件数量
         let zipPath = Editor.Project.path + "/PackageVersion";
+        zipPath = normalize(zipPath);
         count += Tools.getDirFileCount(zipPath);
 
         this.addLog(`[部署]复制文件个数 : ${count}`);
@@ -492,7 +495,9 @@ class Helper {
         if (existsSync(fullPath)) {
             //检测是否存在src / assets目录
             let srcPath = path.join(fullPath, "src");
+            srcPath = normalize(srcPath);
             let assetsPath = path.join(fullPath, "assets");
+            assetsPath = normalize(assetsPath);
             if (existsSync(srcPath) && existsSync(assetsPath)) {
                 return true;
             }
@@ -503,6 +508,7 @@ class Helper {
 
     openDir(dir:string) {
         if (existsSync(dir)) {
+            dir = normalize(dir);
             Electron.shell.showItemInFolder(dir);
             Electron.shell.beep();
         }

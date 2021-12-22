@@ -1,11 +1,27 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.helper = void 0;
 const fs_1 = require("fs");
-const path_1 = __importDefault(require("path"));
+const path_1 = __importStar(require("path"));
 const Tools_1 = require("./Tools");
 const Electron = require("electron");
 class Helper {
@@ -413,6 +429,7 @@ class Helper {
         let copyDirs = ["manifest"].concat(temps);
         for (let i = 0; i < copyDirs.length; i++) {
             let dir = path_1.default.join(this.userCache.buildDir, copyDirs[i]);
+            dir = path_1.normalize(dir);
             if (!fs_1.existsSync(dir)) {
                 this.addLog(`${this.userCache.buildDir} [部署]不存在${copyDirs[i]}目录,无法拷贝文件`);
                 return;
@@ -427,10 +444,12 @@ class Helper {
         count = 0;
         for (let i = 0; i < copyDirs.length; i++) {
             let dir = path_1.default.join(this.userCache.buildDir, copyDirs[i]);
+            dir = path_1.normalize(dir);
             count += Tools_1.Tools.getDirFileCount(dir);
         }
         //压缩文件数量
         let zipPath = Editor.Project.path + "/PackageVersion";
+        zipPath = path_1.normalize(zipPath);
         count += Tools_1.Tools.getDirFileCount(zipPath);
         this.addLog(`[部署]复制文件个数 : ${count}`);
         for (let i = 0; i < copyDirs.length; i++) {
@@ -464,7 +483,9 @@ class Helper {
         if (fs_1.existsSync(fullPath)) {
             //检测是否存在src / assets目录
             let srcPath = path_1.default.join(fullPath, "src");
+            srcPath = path_1.normalize(srcPath);
             let assetsPath = path_1.default.join(fullPath, "assets");
+            assetsPath = path_1.normalize(assetsPath);
             if (fs_1.existsSync(srcPath) && fs_1.existsSync(assetsPath)) {
                 return true;
             }
@@ -474,6 +495,7 @@ class Helper {
     }
     openDir(dir) {
         if (fs_1.existsSync(dir)) {
+            dir = path_1.normalize(dir);
             Electron.shell.showItemInFolder(dir);
             Electron.shell.beep();
         }
