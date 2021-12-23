@@ -101,7 +101,7 @@ class _Helper {
         return false;
     }
     get validVersions() {
-        return ["3.3.1", "3.3.2"];
+        return ["3.3.1", "3.3.2", "3.4.0"];
     }
     run() {
         console.log(`Creator Version : ${this.creatorPluginVersion}`);

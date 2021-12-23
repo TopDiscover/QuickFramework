@@ -6,12 +6,12 @@
     </ui-prop>
     <ui-prop>
         <ui-label slot="label" class="titleColor" tooltip="主包的版本号设置">版本号</ui-label>
-        <ui-input slot="content" class="contentColor" v-on:blur="onInputVersionOver" v-bind:value="version">
+        <ui-input slot="content" class="contentColor" v-on:blur="onInputVersionOver($event.target.value)" v-bind:value="version">
         </ui-input>
     </ui-prop>
     <ui-prop>
         <ui-label slot="label" class="titleColor" tooltip="游戏热更新服务器地址">服务器地址</ui-label>
-        <ui-input slot="content" class="contentColor" v-on:blur="onInputUrlOver" v-bind:value="serverIP"></ui-input>
+        <ui-input slot="content" class="contentColor" v-on:blur="onInputUrlOver($event.target.value)" v-bind:value="serverIP"></ui-input>
         <ui-button slot="content" v-on:confirm="onUserLocalIP" >使用本机IP</ui-button>
     </ui-prop>
     <ui-prop>
