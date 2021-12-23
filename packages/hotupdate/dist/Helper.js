@@ -58,7 +58,7 @@ class Helper {
     get config() {
         if (this._config == null) {
             let configPath = path_1.default.join(Editor.Project.path, "config/bundles.json");
-            this._config = JSON.parse(fs_1.readFileSync(configPath, { encoding: "utf-8" }));
+            this._config = JSON.parse((0, fs_1.readFileSync)(configPath, { encoding: "utf-8" }));
             for (let i = 0; i < this._config.bundles.length; i++) {
                 this.bundles[this._config.bundles[i].dir] = this._config.bundles[i];
             }
@@ -91,6 +91,15 @@ class Helper {
         Object.keys(this.userCache.remoteBundles).forEach((value) => {
             this.userCache.remoteBundles[value].md5 = this.getBundleVersion(value);
         });
+        //需要加的加上
+        Object.keys(this.bundles).forEach((key) => {
+            if (!this.userCache.bundles[key]) {
+                this.userCache.bundles[key] = this.bundles[key];
+                this.userCache.remoteBundles[key] = Object.assign({}, this.bundles[key]);
+                this.userCache.remoteBundles[key].md5 = '-';
+                isRemoved = true;
+            }
+        });
         return isRemoved;
     }
     /**@description 返回远程版本号+md5 */
@@ -107,8 +116,8 @@ class Helper {
     getBundleVersion(key) {
         if (this.userCache.remoteDir.length > 0) {
             let versionManifestPath = path_1.default.join(this.userCache.remoteDir, `manifest/${key}_version.json`);
-            if (fs_1.existsSync(versionManifestPath)) {
-                let data = fs_1.readFileSync(versionManifestPath, { encoding: "utf-8" });
+            if ((0, fs_1.existsSync)(versionManifestPath)) {
+                let data = (0, fs_1.readFileSync)(versionManifestPath, { encoding: "utf-8" });
                 let config = JSON.parse(data);
                 return this.getShowRemoteString(config);
             }
@@ -131,7 +140,7 @@ class Helper {
     /**@description 保存当前用户设置 */
     saveUserCache() {
         let cacheString = JSON.stringify(this.userCache);
-        fs_1.writeFileSync(this.userCachePath, cacheString);
+        (0, fs_1.writeFileSync)(this.userCachePath, cacheString);
         // this.addLog(`写入缓存 :`, this.userCache);
     }
     /**@description 生成默认缓存 */
@@ -149,8 +158,8 @@ class Helper {
     }
     /**@description 读取本地缓存 */
     readCache() {
-        if (fs_1.existsSync(this.userCachePath)) {
-            let data = fs_1.readFileSync(this.userCachePath, "utf-8");
+        if ((0, fs_1.existsSync)(this.userCachePath)) {
+            let data = (0, fs_1.readFileSync)(this.userCachePath, "utf-8");
             this.userCache = JSON.parse(data);
             if (this.checkUserCache()) {
                 this.saveUserCache();
@@ -239,10 +248,10 @@ class Helper {
     //插入热更新代码
     onInsertHotupdate() {
         let codePath = path_1.default.join(Editor.Project.path, "extensions/hotupdate/code/hotupdate.js");
-        let code = fs_1.readFileSync(codePath, "utf8");
+        let code = (0, fs_1.readFileSync)(codePath, "utf8");
         // console.log(code);
         let sourcePath = this.userCache.buildDir + "/main.js";
-        let sourceCode = fs_1.readFileSync(sourcePath, "utf8");
+        let sourceCode = (0, fs_1.readFileSync)(sourcePath, "utf8");
         let templateReplace = function templateReplace() {
             // console.log(arguments);
             return arguments[1] + code + arguments[3];
@@ -250,7 +259,7 @@ class Helper {
         //添加子游戏测试环境版本号
         sourceCode = sourceCode.replace(/(\);)([\s\w\S]*)(const[ ]*importMapJson)/g, templateReplace);
         this.addLog(`向${sourcePath}中插入热更新代码`);
-        fs_1.writeFileSync(sourcePath, sourceCode, { "encoding": "utf8" });
+        (0, fs_1.writeFileSync)(sourcePath, sourceCode, { "encoding": "utf8" });
     }
     /**@description 生成manifest版本文件 */
     onCreateManifest() {
@@ -278,7 +287,7 @@ class Helper {
         };
         //删除旧的版本控件文件
         this.addLog("删除旧的Manifest目录", manifestDir);
-        if (fs_1.existsSync(manifestDir)) {
+        if ((0, fs_1.existsSync)(manifestDir)) {
             this.addLog("存在旧的，删除掉");
             Tools_1.Tools.delDir(manifestDir);
         }
@@ -295,10 +304,10 @@ class Helper {
         let md5 = require("crypto").createHash('md5').update(content).digest('hex');
         manifest.md5 = md5;
         manifest.version = version;
-        fs_1.writeFileSync(projectManifestPath, JSON.stringify(manifest));
+        (0, fs_1.writeFileSync)(projectManifestPath, JSON.stringify(manifest));
         this.addLog(`生成${projectManifestPath}成功`);
         delete manifest.assets;
-        fs_1.writeFileSync(versionManifestPath, JSON.stringify(manifest));
+        (0, fs_1.writeFileSync)(versionManifestPath, JSON.stringify(manifest));
         this.addLog(`生成${versionManifestPath}成功`);
         //生成所有版本控制文件，用来判断当玩家停止在版本1，此时发版本2时，不让进入游戏，返回到登录，重新走完整个更新流程
         let versions = {
@@ -319,18 +328,18 @@ class Helper {
             let md5 = require("crypto").createHash('md5').update(content).digest('hex');
             manifest.md5 = md5;
             manifest.version = this.userCache.bundles[key].version;
-            fs_1.writeFileSync(projectManifestPath, JSON.stringify(manifest));
+            (0, fs_1.writeFileSync)(projectManifestPath, JSON.stringify(manifest));
             this.addLog(`生成${projectManifestPath}成功`);
             delete manifest.assets;
             versions[`${key}`] = {};
             versions[`${key}`].md5 = md5;
             versions[`${key}`].version = manifest.version;
-            fs_1.writeFileSync(versionManifestPath, JSON.stringify(manifest));
+            (0, fs_1.writeFileSync)(versionManifestPath, JSON.stringify(manifest));
             this.addLog(`生成${versionManifestPath}成功`);
         }
         //写入所有版本
         let versionsPath = path_1.default.join(manifestDir, `versions.json`);
-        fs_1.writeFileSync(versionsPath, JSON.stringify(versions));
+        (0, fs_1.writeFileSync)(versionsPath, JSON.stringify(versions));
         this.addLog(`生成versions.json成功`);
         Tools_1.Tools.zipVersions({
             /**@description 主包包含目录 */
@@ -400,11 +409,11 @@ class Helper {
             this.addLog("[部署]请先选择本地服务器目录");
             return;
         }
-        if (!fs_1.existsSync(this.userCache.remoteDir)) {
+        if (!(0, fs_1.existsSync)(this.userCache.remoteDir)) {
             this.addLog(`[部署]本地测试服务器目录不存在 : ${this.userCache.remoteDir}`);
             return;
         }
-        if (!fs_1.existsSync(this.userCache.buildDir)) {
+        if (!(0, fs_1.existsSync)(this.userCache.buildDir)) {
             this.addLog(`[部署]构建目录不存在 : ${this.userCache.buildDir} , 请先构建`);
             return;
         }
@@ -429,8 +438,8 @@ class Helper {
         let copyDirs = ["manifest"].concat(temps);
         for (let i = 0; i < copyDirs.length; i++) {
             let dir = path_1.default.join(this.userCache.buildDir, copyDirs[i]);
-            dir = path_1.normalize(dir);
-            if (!fs_1.existsSync(dir)) {
+            dir = (0, path_1.normalize)(dir);
+            if (!(0, fs_1.existsSync)(dir)) {
                 this.addLog(`${this.userCache.buildDir} [部署]不存在${copyDirs[i]}目录,无法拷贝文件`);
                 return;
             }
@@ -444,12 +453,12 @@ class Helper {
         count = 0;
         for (let i = 0; i < copyDirs.length; i++) {
             let dir = path_1.default.join(this.userCache.buildDir, copyDirs[i]);
-            dir = path_1.normalize(dir);
+            dir = (0, path_1.normalize)(dir);
             count += Tools_1.Tools.getDirFileCount(dir);
         }
         //压缩文件数量
         let zipPath = Editor.Project.path + "/PackageVersion";
-        zipPath = path_1.normalize(zipPath);
+        zipPath = (0, path_1.normalize)(zipPath);
         count += Tools_1.Tools.getDirFileCount(zipPath);
         this.addLog(`[部署]复制文件个数 : ${count}`);
         for (let i = 0; i < copyDirs.length; i++) {
@@ -480,13 +489,13 @@ class Helper {
         this.progressFuc(0);
     }
     checkBuildDir(fullPath) {
-        if (fs_1.existsSync(fullPath)) {
+        if ((0, fs_1.existsSync)(fullPath)) {
             //检测是否存在src / assets目录
             let srcPath = path_1.default.join(fullPath, "src");
-            srcPath = path_1.normalize(srcPath);
+            srcPath = (0, path_1.normalize)(srcPath);
             let assetsPath = path_1.default.join(fullPath, "assets");
-            assetsPath = path_1.normalize(assetsPath);
-            if (fs_1.existsSync(srcPath) && fs_1.existsSync(assetsPath)) {
+            assetsPath = (0, path_1.normalize)(assetsPath);
+            if ((0, fs_1.existsSync)(srcPath) && (0, fs_1.existsSync)(assetsPath)) {
                 return true;
             }
         }
@@ -494,8 +503,8 @@ class Helper {
         return false;
     }
     openDir(dir) {
-        if (fs_1.existsSync(dir)) {
-            dir = path_1.normalize(dir);
+        if ((0, fs_1.existsSync)(dir)) {
+            dir = (0, path_1.normalize)(dir);
             Electron.shell.showItemInFolder(dir);
             Electron.shell.beep();
         }

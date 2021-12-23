@@ -21,7 +21,7 @@ exports.messages = {
         if ("win32" === options.platform || "android" === options.platform || "ios" === options.platform || "mac" === options.platform) {
             let dest = path_1.default.normalize(options.dest);
             let mainJSPath = path_1.default.join(dest, "main.js");
-            fs_1.readFile(mainJSPath, "utf8", (error, content) => {
+            (0, fs_1.readFile)(mainJSPath, "utf8", (error, content) => {
                 if (error)
                     throw error;
                 content = content.replace(/if\s*\(\s*window.jsb\)\s*\{/g, `if (window.jsb) {
@@ -29,7 +29,7 @@ var hotUpdateSearchPaths = localStorage.getItem('HotUpdateSearchPaths');
 if (hotUpdateSearchPaths) {
 jsb.fileUtils.setSearchPaths(JSON.parse(hotUpdateSearchPaths));
 }`);
-                fs_1.writeFile(mainJSPath, content, (error) => {
+                (0, fs_1.writeFile)(mainJSPath, content, (error) => {
                     if (error)
                         throw error;
                     Editor.log("[HotUpdateTools] SearchPath updated in built main.js for hot update");
