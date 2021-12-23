@@ -7,8 +7,8 @@ const Helper_1 = require("../../../Helper");
 Helper_1.helper.init();
 module.exports = Editor.Panel.define({
     listeners: {},
-    template: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
-    style: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
+    template: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
+    style: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
     $: {
         app: '#app',
         logArea: "#logArea",
@@ -16,9 +16,9 @@ module.exports = Editor.Panel.define({
     methods: {},
     ready() {
         if (this.$.app) {
-            const app = vue_1.createApp({});
+            const app = (0, vue_1.createApp)({});
             app.component('view-content', {
-                template: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/template/vue/view.html'), 'utf-8'),
+                template: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/vue/view.html'), 'utf-8'),
                 data() {
                     return {
                         bundles: Helper_1.helper.cache.bundles,
