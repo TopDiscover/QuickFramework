@@ -74,6 +74,16 @@ class Helper {
             this.userCache.remoteBundles[value].md5 = this.getBundleVersion(value);
         });
 
+        //需要加的加上
+        Object.keys(this.bundles).forEach((key) => {
+            if (!this.userCache.bundles[key]){
+                this.userCache.bundles[key]=this.bundles[key]
+                this.userCache.remoteBundles[key] = Object.assign({},this.bundles[key])
+                this.userCache.remoteBundles[key].md5='-'
+                isRemoved=true
+            }
+        });
+
         return isRemoved;
     }
 
