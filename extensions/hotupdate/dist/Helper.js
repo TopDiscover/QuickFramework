@@ -59,7 +59,7 @@ class Helper {
     get config() {
         if (this._config == null) {
             let configPath = path_1.default.join(Editor.Project.path, "config/bundles.json");
-            this._config = JSON.parse((0, fs_extra_1.readFileSync)(configPath, { encoding: "utf-8" }));
+            this._config = JSON.parse(fs_extra_1.readFileSync(configPath, { encoding: "utf-8" }));
             for (let i = 0; i < this._config.bundles.length; i++) {
                 this.bundles[this._config.bundles[i].dir] = this._config.bundles[i];
             }
@@ -117,8 +117,8 @@ class Helper {
     getBundleVersion(key) {
         if (this.userCache.remoteDir.length > 0) {
             let versionManifestPath = path_1.default.join(this.userCache.remoteDir, `manifest/${key}_version.json`);
-            if ((0, fs_extra_1.existsSync)(versionManifestPath)) {
-                let data = (0, fs_extra_1.readFileSync)(versionManifestPath, { encoding: "utf-8" });
+            if (fs_extra_1.existsSync(versionManifestPath)) {
+                let data = fs_extra_1.readFileSync(versionManifestPath, { encoding: "utf-8" });
                 let config = JSON.parse(data);
                 return this.getShowRemoteString(config);
             }
@@ -141,7 +141,7 @@ class Helper {
     /**@description 保存当前用户设置 */
     saveUserCache() {
         let cacheString = JSON.stringify(this.userCache);
-        (0, fs_extra_1.writeFileSync)(this.userCachePath, cacheString);
+        fs_extra_1.writeFileSync(this.userCachePath, cacheString);
         // this.addLog(`写入缓存 :`, this.userCache);
     }
     /**@description 生成默认缓存 */
@@ -159,8 +159,8 @@ class Helper {
     }
     /**@description 读取本地缓存 */
     readCache() {
-        if ((0, fs_extra_1.existsSync)(this.userCachePath)) {
-            let data = (0, fs_extra_1.readFileSync)(this.userCachePath, "utf-8");
+        if (fs_extra_1.existsSync(this.userCachePath)) {
+            let data = fs_extra_1.readFileSync(this.userCachePath, "utf-8");
             this.userCache = JSON.parse(data);
             if (this.checkUserCache()) {
                 this.saveUserCache();
@@ -249,10 +249,10 @@ class Helper {
     //插入热更新代码
     onInsertHotupdate() {
         let codePath = path_1.default.join(Editor.Project.path, "extensions/hotupdate/code/hotupdate.js");
-        let code = (0, fs_extra_1.readFileSync)(codePath, "utf8");
+        let code = fs_extra_1.readFileSync(codePath, "utf8");
         // console.log(code);
         let sourcePath = this.userCache.buildDir + "/main.js";
-        let sourceCode = (0, fs_extra_1.readFileSync)(sourcePath, "utf8");
+        let sourceCode = fs_extra_1.readFileSync(sourcePath, "utf8");
         let templateReplace = function templateReplace() {
             // console.log(arguments);
             return arguments[1] + code + arguments[3];
@@ -260,7 +260,7 @@ class Helper {
         //添加子游戏测试环境版本号
         sourceCode = sourceCode.replace(/(\);)([\s\w\S]*)(const[ ]*importMapJson)/g, templateReplace);
         this.addLog(`向${sourcePath}中插入热更新代码`);
-        (0, fs_extra_1.writeFileSync)(sourcePath, sourceCode, { "encoding": "utf8" });
+        fs_extra_1.writeFileSync(sourcePath, sourceCode, { "encoding": "utf8" });
     }
     /**@description 生成manifest版本文件 */
     onCreateManifest() {
@@ -273,10 +273,10 @@ class Helper {
         let version = this.userCache.version;
         this.addLog("主包版本号:", version);
         let buildDir = this.userCache.buildDir;
-        buildDir = (0, path_1.normalize)(buildDir);
+        buildDir = path_1.normalize(buildDir);
         this.addLog("构建目录:", buildDir);
         let manifestDir = this.getManifestDir(buildDir);
-        manifestDir = (0, path_1.normalize)(manifestDir);
+        manifestDir = path_1.normalize(manifestDir);
         this.addLog("构建目录下的Manifest目录:", manifestDir);
         let serverUrl = this.userCache.serverIP;
         this.addLog("热更新地址:", serverUrl);
@@ -288,7 +288,7 @@ class Helper {
         };
         //删除旧的版本控件文件
         this.addLog("删除旧的Manifest目录", manifestDir);
-        if ((0, fs_extra_1.existsSync)(manifestDir)) {
+        if (fs_extra_1.existsSync(manifestDir)) {
             this.addLog("存在旧的，删除掉");
             Tools_1.Tools.delDir(manifestDir);
         }
@@ -305,10 +305,10 @@ class Helper {
         let md5 = require("crypto").createHash('md5').update(content).digest('hex');
         manifest.md5 = md5;
         manifest.version = version;
-        (0, fs_extra_1.writeFileSync)(projectManifestPath, JSON.stringify(manifest));
+        fs_extra_1.writeFileSync(projectManifestPath, JSON.stringify(manifest));
         this.addLog(`生成${projectManifestPath}成功`);
         delete manifest.assets;
-        (0, fs_extra_1.writeFileSync)(versionManifestPath, JSON.stringify(manifest));
+        fs_extra_1.writeFileSync(versionManifestPath, JSON.stringify(manifest));
         this.addLog(`生成${versionManifestPath}成功`);
         //生成所有版本控制文件，用来判断当玩家停止在版本1，此时发版本2时，不让进入游戏，返回到登录，重新走完整个更新流程
         let versions = {
@@ -329,18 +329,18 @@ class Helper {
             let md5 = require("crypto").createHash('md5').update(content).digest('hex');
             manifest.md5 = md5;
             manifest.version = this.userCache.bundles[key].version;
-            (0, fs_extra_1.writeFileSync)(projectManifestPath, JSON.stringify(manifest));
+            fs_extra_1.writeFileSync(projectManifestPath, JSON.stringify(manifest));
             this.addLog(`生成${projectManifestPath}成功`);
             delete manifest.assets;
             versions[`${key}`] = {};
             versions[`${key}`].md5 = md5;
             versions[`${key}`].version = manifest.version;
-            (0, fs_extra_1.writeFileSync)(versionManifestPath, JSON.stringify(manifest));
+            fs_extra_1.writeFileSync(versionManifestPath, JSON.stringify(manifest));
             this.addLog(`生成${versionManifestPath}成功`);
         }
         //写入所有版本
         let versionsPath = path_1.default.join(manifestDir, `versions.json`);
-        (0, fs_extra_1.writeFileSync)(versionsPath, JSON.stringify(versions));
+        fs_extra_1.writeFileSync(versionsPath, JSON.stringify(versions));
         this.addLog(`生成versions.json成功`);
         Tools_1.Tools.zipVersions({
             /**@description 主包包含目录 */
@@ -376,7 +376,7 @@ class Helper {
         const nativeIosPath = projectPath + "/native/engine/ios";
         const iosProjPath = projectPath + "/build/ios/proj";
         const resPath = projectPath + "/build/ios";
-        if (!(0, fs_extra_1.existsSync)(resPath) || !(0, fs_extra_1.existsSync)(nativeIosPath)) {
+        if (!fs_extra_1.existsSync(resPath) || !fs_extra_1.existsSync(nativeIosPath)) {
             return;
         }
         const prev = path_1.default.resolve(Editor.App.path, "..");
@@ -384,7 +384,7 @@ class Helper {
         console.log(cmake);
         const cmd = cmake + " with -S " + nativeIosPath + " -GXcode -B" + iosProjPath +
             " -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DRES_DIR=" + resPath;
-        (0, child_process_1.exec)(cmd, { encoding: 'utf8' }, function (err, stdout, stderr) {
+        child_process_1.exec(cmd, { encoding: 'utf8' }, function (err, stdout, stderr) {
             if (err) {
                 console.log(err);
             }
@@ -445,11 +445,11 @@ class Helper {
             this.addLog("[部署]请先选择本地服务器目录");
             return;
         }
-        if (!(0, fs_extra_1.existsSync)(this.userCache.remoteDir)) {
+        if (!fs_extra_1.existsSync(this.userCache.remoteDir)) {
             this.addLog(`[部署]本地测试服务器目录不存在 : ${this.userCache.remoteDir}`);
             return;
         }
-        if (!(0, fs_extra_1.existsSync)(this.userCache.buildDir)) {
+        if (!fs_extra_1.existsSync(this.userCache.buildDir)) {
             this.addLog(`[部署]构建目录不存在 : ${this.userCache.buildDir} , 请先构建`);
             return;
         }
@@ -474,7 +474,7 @@ class Helper {
         let copyDirs = ["manifest"].concat(temps);
         for (let i = 0; i < copyDirs.length; i++) {
             let dir = path_1.default.join(this.userCache.buildDir, copyDirs[i]);
-            if (!(0, fs_extra_1.existsSync)(dir)) {
+            if (!fs_extra_1.existsSync(dir)) {
                 this.addLog(`${this.userCache.buildDir} [部署]不存在${copyDirs[i]}目录,无法拷贝文件`);
                 return;
             }
