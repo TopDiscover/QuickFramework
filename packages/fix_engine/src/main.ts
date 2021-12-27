@@ -34,9 +34,10 @@ export class _Helper {
         this._path = Editor.App.path;
         //D:\Creator\Creator\3.1.0\resources\app.asar
         //window : D:\CocosCreator\2.1.2\CocosCreator.exe --path
-        //mac : Applications/CocosCreator.app/Contents/MacOS/CocosCreator --path
+        //mac : Applications/CocosCreator/Creator/2.4.3/CocosCreator.app/Contents/MacOS --path
         let parser = path.parse(this._path);
         this._path = parser.dir;
+        this._path = this._path.replace("/MacOS","");
         return this._path;
     }
 
@@ -46,6 +47,10 @@ export class _Helper {
             return this._engineRoot;
         }
         let root = this.appPath;
+        root = path.normalize(root);
+        if ( this.isMac ){
+            root = "/Resources"
+        }
         root = path.normalize(root);
         this._engineRoot = root;
         return this._engineRoot;
@@ -147,39 +152,53 @@ export class _Helper {
                 let sourcePath = `${path.join(__dirname,`../engine/${data.name}`)}`;
                 sourcePath = path.normalize(sourcePath);
                 let sourceData = fs.readFileSync(sourcePath,"utf-8");
-                let destData = fs.readFileSync(destPath,"utf-8");
-                let replace = function(){
-                    return arguments[1] + sourceData + arguments[3];
+                if ( fs.existsSync(destPath) ){
+                    let destData = fs.readFileSync(destPath,"utf-8");
+                    let replace = function(){
+                        return arguments[1] + sourceData + arguments[3];
+                    }
+                    destData = destData.replace(/(\*\/)([\s\S\n]*)(declare\s*namespace\s*cc\s*\{)/g,replace);
+                    fs.writeFileSync(destPath,destData,{encoding:"utf-8"});
+                    Editor.log(data.desc);
+                }else{
+                    Editor.error(`找不到引擎目录下文件:${destPath}`);
                 }
-                destData = destData.replace(/(\*\/)([\s\S\n]*)(declare\s*namespace\s*cc\s*\{)/g,replace);
-                fs.writeFileSync(destPath,destData,{encoding:"utf-8"});
-                Editor.log(data.desc);
             } else if ( data.name == "jsbdts"){
                 //更新热更新声明文件
                 //(export\s*class\s*Manifest)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string\))
                 let destPath = `${this.engineRoot}/${data.path}`;
                 destPath = path.normalize(destPath);
-                let destData = fs.readFileSync(destPath,"utf-8");
-                let replaceManifest = function(){
-                    return arguments[1] + HotUpdateDTS.manifest + arguments[3];
+                if ( fs.existsSync(destPath) ){
+                    let destData = fs.readFileSync(destPath,"utf-8");
+                    let replaceManifest = function(){
+                        return arguments[1] + HotUpdateDTS.manifest + arguments[3];
+                    }
+                    destData = destData.replace(/(export\s*class\s*Manifest\s*\{)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string\))/g,replaceManifest);
+                    let replaceAssetsManager = function(){
+                        return arguments[1] + HotUpdateDTS.assetsManager + arguments[3];
+                    }
+                    destData = destData.replace(/(export\s*class\s*AssetsManager\s*\{)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string)/g,replaceAssetsManager);
+                    fs.writeFileSync(destPath,destData,{encoding:"utf-8"});
+                    console.log(data.desc);
+                }else{
+                    Editor.error(`找不到引擎目录下文件:${destPath}`);
                 }
-                destData = destData.replace(/(export\s*class\s*Manifest\s*\{)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string\))/g,replaceManifest);
-                let replaceAssetsManager = function(){
-                    return arguments[1] + HotUpdateDTS.assetsManager + arguments[3];
-                }
-                destData = destData.replace(/(export\s*class\s*AssetsManager\s*\{)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string)/g,replaceAssetsManager);
-                fs.writeFileSync(destPath,destData,{encoding:"utf-8"});
-                console.log(data.desc);
             } else {
                 //查看本地是否有文件
                 let sourcePath = `${path.join(__dirname,`../engine/${data.name}`)}`;
                 sourcePath = path.normalize(sourcePath);
                 let destPath = `${this.engineRoot}/${data.path}`;
                 destPath = path.normalize(destPath);
-                if( fs.existsSync(sourcePath) ){
-                    let sourceData = fs.readFileSync(sourcePath,"utf-8");
-                    fs.writeFileSync(destPath,sourceData,{encoding:"utf-8"});
-                    Editor.log(data.desc);
+                if ( fs.existsSync(destPath) ){
+                    if( fs.existsSync(sourcePath) ){
+                        let sourceData = fs.readFileSync(sourcePath,"utf-8");
+                        fs.writeFileSync(destPath,sourceData,{encoding:"utf-8"});
+                        Editor.log(data.desc);
+                    }else{
+                        Editor.error(`找不到源文件:${sourcePath}`);
+                    }
+                }else{
+                    Editor.error(`找不到引擎目录下文件:${destPath}`);
                 }
             }
         }
