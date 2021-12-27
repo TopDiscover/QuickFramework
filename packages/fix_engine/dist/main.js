@@ -25,6 +25,7 @@ const path = __importStar(require("path"));
 const jsbdts_1 = require("./jsbdts");
 class _Helper {
     constructor() {
+        this._isMac = false;
         /**@description creator 安所路径 */
         this._path = null;
         this._engineRoot = null;
@@ -34,11 +35,12 @@ class _Helper {
     }
     /**@description 是否是Mac平台 */
     get isMac() {
-        let ret = this.appPath.match(/[a-zA-Z]:[\\|//]/g);
-        if (ret && ret.length > 0) {
-            return false;
-        }
-        return true;
+        // let ret = this.appPath.match(/[a-zA-Z]:[\\|//]/g);
+        // if ( ret && ret.length > 0 ){
+        //     return false;
+        // }
+        // return true;
+        return this._isMac;
     }
     /**@description creator 版本号 */
     get appVersion() {
@@ -54,6 +56,9 @@ class _Helper {
         //mac : Applications/CocosCreator/Creator/2.4.3/CocosCreator.app/Contents/MacOS --path
         let parser = path.parse(this._path);
         this._path = parser.dir;
+        if (this._path.indexOf("/MacOS") != -1) {
+            this._isMac = true;
+        }
         this._path = this._path.replace("/MacOS", "");
         return this._path;
     }
