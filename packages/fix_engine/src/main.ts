@@ -11,15 +11,13 @@ interface ConfigData{
 }
 export class _Helper {
 
-    private _isMac = false;
     /**@description 是否是Mac平台 */
     private get isMac(){
-        // let ret = this.appPath.match(/[a-zA-Z]:[\\|//]/g);
-        // if ( ret && ret.length > 0 ){
-        //     return false;
-        // }
-        // return true;
-        return this._isMac;
+        let ret = this.appPath.match(/[a-zA-Z]:[\\|//]/g);
+        if ( ret && ret.length > 0 ){
+            return false;
+        }
+        return true;
     }
     
     /**@description creator 版本号 */
@@ -39,9 +37,6 @@ export class _Helper {
         //mac : Applications/CocosCreator/Creator/2.4.3/CocosCreator.app/Contents/MacOS --path
         let parser = path.parse(this._path);
         this._path = parser.dir;
-        if ( this._path.indexOf("/MacOS") != -1 ){
-            this._isMac = true;
-        }
         this._path = this._path.replace("/MacOS","");
         return this._path;
     }
