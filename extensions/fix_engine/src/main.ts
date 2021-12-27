@@ -9,12 +9,6 @@ interface ConfigData{
 }
 export class _Helper {
 
-    private _isMac = false;
-    /**@description 是否是Mac平台 */
-    private get isMac(){
-        return this._isMac;
-    }
-
     /**@description creator 版本号 */
     private get appVersion(){
         return Editor.App.version;
@@ -28,13 +22,9 @@ export class _Helper {
         }
         this._path = Editor.App.path;
         //windows :  D:\Creator\Creator\3.1.0\resources\app.asar
-        //mac : Applications/CocosCreator/Creator/2.4.3/CocosCreator.app/Contents/MacOS --path
+        //mac : /Applications/CocosCreator/Creator/3.3.1/CocosCreator.app/Contents/Resources/app.asar --path
         let parser = path.parse(this._path);
         this._path = parser.dir;
-        if ( this._path.indexOf("/MacOS") != -1 ){
-            this._isMac = true;
-        }
-        this._path = this._path.replace("/MacOS","");
         return this._path;
     }
 
