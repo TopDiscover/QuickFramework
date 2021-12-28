@@ -40,6 +40,11 @@
                 "methods": [
                     "showPanel"
                 ]
+            },
+            "insertHotupdateCode":{
+                "methods": [
+                    "insertHotupdateCode"
+                ]
             }
         }
     },

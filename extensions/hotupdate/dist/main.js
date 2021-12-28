@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.unload = exports.load = exports.methods = void 0;
 //@ts-ignore
 const package_json_1 = __importDefault(require("../package.json"));
+const Helper_1 = require("./Helper");
 /**
  * @en
  * @zh 为扩展的主进程的注册方法
@@ -14,6 +15,9 @@ exports.methods = {
     showPanel() {
         Editor.Panel.open(package_json_1.default.name);
     },
+    insertHotupdateCode(dest) {
+        Helper_1.helper.onInsertHotupdate(dest);
+    }
 };
 /**
  * @en Hooks triggered after extension loading is complete

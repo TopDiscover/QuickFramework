@@ -1,5 +1,6 @@
 //@ts-ignore
 import packageJSON from '../package.json';
+import { helper } from './Helper';
 /**
  * @en 
  * @zh 为扩展的主进程的注册方法
@@ -8,6 +9,9 @@ export const methods: { [key: string]: (...any: any) => any } = {
     showPanel() {
         Editor.Panel.open(packageJSON.name);
     },
+    insertHotupdateCode(dest:string){
+        helper.onInsertHotupdate(dest);
+    }
 };
 
 /**

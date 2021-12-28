@@ -6,7 +6,7 @@ helper.init();
 
 module.exports = Editor.Panel.define({
     listeners: {
-
+        
     },
     template: readFileSync(join(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
     style: readFileSync(join(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
@@ -15,7 +15,7 @@ module.exports = Editor.Panel.define({
         logArea: "#logArea",
     },
     methods: {
-
+        
     },
     ready() {
         if (this.$.app) {
@@ -65,9 +65,6 @@ module.exports = Editor.Panel.define({
                     },
                     onCreateManifest() {
                         helper.onCreateManifest();
-                    },
-                    onInsertHotupdate() {
-                        helper.onInsertHotupdate();
                     },
                     onBuildDirConfirm(url: string) {
                         if (helper.isDoCreate) return;

@@ -235,11 +235,12 @@ class Helper {
         }
     }
     //插入热更新代码
-    onInsertHotupdate() {
+    onInsertHotupdate(dest:string) {
         let codePath = path.join(Editor.Project.path, "extensions/hotupdate/code/hotupdate.js");
         let code = readFileSync(codePath, "utf8");
         // console.log(code);
-        let sourcePath = this.userCache.buildDir + "/main.js";
+        let sourcePath = path.join(dest,"assets/main.js");
+        sourcePath = normalize(sourcePath);
         let sourceCode = readFileSync(sourcePath, "utf8");
         let templateReplace = function templateReplace() {
             // console.log(arguments);
