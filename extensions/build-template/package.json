@@ -4,7 +4,7 @@
     "package_version": 2,
     "version": "1.0.0",
     "author": "Zheng Fasheng",
-    "description": "简单构建模板",
+    "description": "在项目构建完成后，会自动的向插件热更新相关代码",
     "contributions": {
         "builder": "./dist/builder.js"
     },
