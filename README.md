@@ -1,10 +1,10 @@
 # CocosCreator 快速开发轻量级游戏框架
 # 项目说明
-本项目基于 cocos creator 2.4.3版本
+本项目基于 cocos creator 2.4.5版本
 以Asset Bundle为基础的大厅+子游戏示例
 提供一个轻量级的游戏开发框架,让你的开发更加简单
 # cocos creator 升级
-引擎修正插件可直接对 2.4.3 ~ 2.4.6版本，可自行升级
+引擎修正插件可直接对 2.4.5 ~ 2.4.7版本，可自行升级
 项目中示例工程可自行按自己项目进行裁剪
 
 升级步骤
@@ -15,7 +15,7 @@
 
 3，重新构建项目
 # 详细文档
-更为详细的文档，[请在本项目的doc中查看](https://gitee.com/top-discover/QuickFramework/tree/2.4.3/doc)，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
+更为详细的文档，[请在本项目的doc中查看](https://gitee.com/top-discover/QuickFramework/tree/2.4.5/doc)，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
 同时也希望有更多的人参与，一起让creator的开发更加的简单。
 
 # 关于QuickFramework
