@@ -63,7 +63,9 @@ function onAfterCompressSettings(options, result) {
 exports.onAfterCompressSettings = onAfterCompressSettings;
 function onAfterBuild(options, result) {
     return __awaiter(this, void 0, void 0, function* () {
-        Editor.Message.send("hotupdate", "insertHotupdateCode", result.dest);
+        if (options.platform == "android" || options.platform == "ios" || options.platform == "mac" || options.platform == "windows") {
+            Editor.Message.send("hotupdate", "insertHotupdateCode", result.dest);
+        }
         console.log(`[${PACKAGE_NAME}] =====>> onAfterBuild`);
     });
 }
