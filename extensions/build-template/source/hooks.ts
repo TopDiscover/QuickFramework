@@ -14,6 +14,7 @@ export function unload() {
 
 export async function onBeforeBuild(options: IBuildTaskOption, result: IBuildResult) {
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeBuild`);
+    Editor.Message.send("png-auto-compress","onBeforeBuild",options,result);
 }
 export async function onBeforeInit(options: IBuildTaskOption, result: IBuildResult) {
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeInit`);
@@ -37,5 +38,6 @@ export async function onAfterBuild(options: IBuildTaskOption, result: IBuildResu
     if ( options.platform == "android" || options.platform == "ios" || options.platform == "mac" || options.platform == "windows"){
         Editor.Message.send("hotupdate","insertHotupdateCode",result.dest);
     }
+    Editor.Message.send("png-auto-compress","onAfterBuild",options,result);
     console.log(`[${PACKAGE_NAME}] =====>> onAfterBuild`);
 }

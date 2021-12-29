@@ -22,6 +22,7 @@ exports.unload = unload;
 function onBeforeBuild(options, result) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log(`[${PACKAGE_NAME}] =====>> onBeforeBuild`);
+        Editor.Message.send("png-auto-compress", "onBeforeBuild", options, result);
     });
 }
 exports.onBeforeBuild = onBeforeBuild;
@@ -66,6 +67,7 @@ function onAfterBuild(options, result) {
         if (options.platform == "android" || options.platform == "ios" || options.platform == "mac" || options.platform == "windows") {
             Editor.Message.send("hotupdate", "insertHotupdateCode", result.dest);
         }
+        Editor.Message.send("png-auto-compress", "onAfterBuild", options, result);
         console.log(`[${PACKAGE_NAME}] =====>> onAfterBuild`);
     });
 }

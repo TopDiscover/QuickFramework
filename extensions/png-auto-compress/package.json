@@ -1,0 +1,61 @@
+{
+    "package_version": 2,
+    "version": "1.0.0",
+    "name": "png-auto-compress",
+    "description": "项目构建完成之后自动压缩 PNG 资源",
+    "main": "./dist/main.js",
+    "dependencies": {
+        "vue": "^3.1.4",
+        "fs-extra": "^10.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^16.0.1",
+        "@types/fs-extra": "^9.0.5",
+        "typescript": "^4.3.4"
+    },
+    "panels": {
+        "default": {
+            "title": "自动压缩 PNG 资源",
+            "type": "dockable",
+            "main": "dist/panels/default/script",
+            "size": {
+                "min-width": 500,
+                "min-height": 520,
+                "width": 500,
+                "height": 520
+            }
+        }
+    },
+    "contributions": {
+        "menu": [
+            {
+                "path": "项目工具",
+                "label": "自动压缩PNG资源",
+                "message": "open-panel"
+            }
+        ],
+        "messages": {
+            "open-panel": {
+                "methods": [
+                    "open_panel"
+                ]
+            },
+            "onBeforeBuild": {
+                "methods": [
+                    "onBeforeBuild"
+                ]
+            },
+            "onAfterBuild": {
+                "methods": [
+                    "onAfterBuild"
+                ]
+            }
+        }
+    },
+    "author": "Zheng Fasheng",
+    "editor": ">=3.3.1",
+    "scripts": {
+        "build": "tsc -b",
+        "watch": "tsc -w"
+    }
+}
