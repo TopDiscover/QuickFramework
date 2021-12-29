@@ -63,10 +63,6 @@ class _Helper {
         }
         let root = this.appPath;
         root = path.normalize(root);
-        if (this.isMac) {
-            root = "/Resources";
-        }
-        root = path.normalize(root);
         this._engineRoot = root;
         return this._engineRoot;
     }
