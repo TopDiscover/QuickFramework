@@ -37,7 +37,6 @@ export class _Helper {
         //mac : Applications/CocosCreator/Creator/2.4.3/CocosCreator.app/Contents/MacOS --path
         let parser = path.parse(this._path);
         this._path = parser.dir;
-        this._path = this._path.replace("/MacOS","");
         return this._path;
     }
 
