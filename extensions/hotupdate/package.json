@@ -40,13 +40,9 @@
                 "methods": [
                     "showPanel"
                 ]
-            },
-            "insertHotupdateCode":{
-                "methods": [
-                    "insertHotupdateCode"
-                ]
             }
-        }
+        },
+        "builder":"./dist/Builder.js"
     },
     "author": "Zheng Fasheng",
     "editor": ">=3.3.1",

@@ -9,6 +9,6 @@ function unload() {
 exports.unload = unload;
 exports.configs = {
     '*': {
-        hooks: 'hooks',
+        hooks: 'Hooks',
     },
 };

@@ -1,9 +1,7 @@
+import { IBuildResult, IBuildTaskOption } from "../@types/packages/builder/@types";
+import { helper } from "./Helper";
 
-import { IBuildTaskOption } from '../@types';
-import { IBuildResult } from '../@types';
-
-const PACKAGE_NAME = 'build-template';
-
+const PACKAGE_NAME = 'hotupdate'; 
 export function load() {
     console.log(`[${PACKAGE_NAME}] Load in builder.`);
 }
@@ -14,7 +12,6 @@ export function unload() {
 
 export async function onBeforeBuild(options: IBuildTaskOption, result: IBuildResult) {
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeBuild`);
-    Editor.Message.send("png-auto-compress","onBeforeBuild",options,result);
 }
 export async function onBeforeInit(options: IBuildTaskOption, result: IBuildResult) {
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeInit`);
@@ -35,9 +32,8 @@ export async function onAfterCompressSettings(options: IBuildTaskOption, result:
     console.log(`[${PACKAGE_NAME}] =====>> onAfterCompressSettings`);
 }
 export async function onAfterBuild(options: IBuildTaskOption, result: IBuildResult) {
-    if ( options.platform == "android" || options.platform == "ios" || options.platform == "mac" || options.platform == "windows"){
-        Editor.Message.send("hotupdate","insertHotupdateCode",result.dest);
+    if (options.platform == "android" || options.platform == "ios" || options.platform == "mac" || options.platform == "windows") {
+        helper.onInsertHotupdate(result.dest);
     }
-    Editor.Message.send("png-auto-compress","onAfterBuild",options,result);
     console.log(`[${PACKAGE_NAME}] =====>> onAfterBuild`);
 }
