@@ -3,6 +3,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { HotUpdateDTS } from "./jsbdts";
+import * as os from "os";
 
 interface ConfigData{
     path:string,
@@ -13,11 +14,10 @@ export class _Helper {
 
     /**@description 是否是Mac平台 */
     private get isMac(){
-        let ret = this.appPath.match(/[a-zA-Z]:[\\|//]/g);
-        if ( ret && ret.length > 0 ){
-            return false;
+        if ( os.platform() == "darwin" ){
+            return true;
         }
-        return true;
+        return false;
     }
     
     /**@description creator 版本号 */

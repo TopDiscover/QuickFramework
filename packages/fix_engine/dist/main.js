@@ -23,6 +23,7 @@ exports.messages = exports.unload = exports.load = exports._Helper = void 0;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const jsbdts_1 = require("./jsbdts");
+const os = __importStar(require("os"));
 class _Helper {
     constructor() {
         /**@description creator 安所路径 */
@@ -34,11 +35,10 @@ class _Helper {
     }
     /**@description 是否是Mac平台 */
     get isMac() {
-        let ret = this.appPath.match(/[a-zA-Z]:[\\|//]/g);
-        if (ret && ret.length > 0) {
-            return false;
+        if (os.platform() == "darwin") {
+            return true;
         }
-        return true;
+        return false;
     }
     /**@description creator 版本号 */
     get appVersion() {
