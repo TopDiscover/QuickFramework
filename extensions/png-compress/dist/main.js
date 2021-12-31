@@ -8,7 +8,7 @@ const Helper_1 = require("./Helper");
  */
 exports.methods = {
     open_panel() {
-        Editor.Panel.open("png-auto-compress");
+        Editor.Panel.open("png-compress");
     },
     log() {
         let args = [].concat(...arguments);

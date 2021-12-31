@@ -1,7 +1,6 @@
 import { IBuildResult, IBuildTaskOption } from "../@types/packages/builder/@types";
-import { helper } from "./Helper";
 
-const PACKAGE_NAME = 'png-auto-compress'; 
+const PACKAGE_NAME = 'png-compress'; 
 export function load() {
     console.log(`[${PACKAGE_NAME}] Load in builder.`);
 }

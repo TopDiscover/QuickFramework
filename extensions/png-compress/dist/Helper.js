@@ -24,7 +24,7 @@ const fs_1 = require("fs");
 const path_1 = __importStar(require("path"));
 const os = __importStar(require("os"));
 const child_process_1 = require("child_process");
-const PACKAGE_NAME = 'png-auto-compress';
+const PACKAGE_NAME = 'png-compress';
 const LOG_NAME = "[图片压缩]:";
 class Helper {
     constructor() {
@@ -54,7 +54,7 @@ class Helper {
     }
     /**@description 配置存储路径 */
     get configPath() {
-        let savePath = `${path_1.default.join(Editor.Project.path, "/local/png-auto-compress.json")}`;
+        let savePath = `${path_1.default.join(Editor.Project.path, "/local/png-compress.json")}`;
         savePath = path_1.normalize(savePath);
         return savePath;
     }

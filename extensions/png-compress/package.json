@@ -1,8 +1,8 @@
 {
     "package_version": 2,
     "version": "1.0.0",
-    "name": "png-auto-compress",
-    "description": "项目构建完成之后自动压缩 PNG 资源",
+    "name": "png-compress",
+    "description": "图片压缩工具，提供两种模式，如果项目的资源比较多，建议不要勾选启用构建完成后自动压缩图片，不然会造成构建完成后，压缩图片资源时间过长",
     "main": "./dist/main.js",
     "dependencies": {
         "vue": "^3.1.4",
@@ -15,7 +15,7 @@
     },
     "panels": {
         "default": {
-            "title": "自动压缩 PNG 资源",
+            "title": "图片压缩",
             "type": "dockable",
             "main": "dist/panels/default/script",
             "size": {
@@ -30,7 +30,7 @@
         "menu": [
             {
                 "path": "项目工具",
-                "label": "自动压缩PNG资源",
+                "label": "图片压缩",
                 "message": "open-panel"
             }
         ],

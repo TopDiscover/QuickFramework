@@ -21,7 +21,7 @@ interface Logger {
     failedInfo: string,
 }
 
-const PACKAGE_NAME = 'png-auto-compress';
+const PACKAGE_NAME = 'png-compress';
 const LOG_NAME = "[图片压缩]:";
 
 export interface MyView {
@@ -56,7 +56,7 @@ class Helper {
 
     /**@description 配置存储路径 */
     private get configPath() {
-        let savePath = `${path.join(Editor.Project.path, "/local/png-auto-compress.json")}`;
+        let savePath = `${path.join(Editor.Project.path, "/local/png-compress.json")}`;
         savePath = normalize(savePath);
         return savePath;
     }

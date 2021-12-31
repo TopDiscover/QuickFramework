@@ -7,7 +7,7 @@ import { helper } from './Helper';
  */
 export const methods: { [key: string]: (...any: any) => any } = {
     open_panel() {
-        Editor.Panel.open("png-auto-compress");
+        Editor.Panel.open("png-compress");
     },
     log() {
         let args = [].concat(...arguments);

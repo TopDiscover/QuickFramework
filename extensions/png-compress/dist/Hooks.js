@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.onAfterBuild = exports.onAfterCompressSettings = exports.onBeforeCompressSettings = exports.onAfterBuildAssets = exports.onBeforeBuildAssets = exports.onAfterInit = exports.onBeforeInit = exports.onBeforeBuild = exports.unload = exports.load = void 0;
-const PACKAGE_NAME = 'png-auto-compress';
+const PACKAGE_NAME = 'png-compress';
 function load() {
     console.log(`[${PACKAGE_NAME}] Load in builder.`);
 }
