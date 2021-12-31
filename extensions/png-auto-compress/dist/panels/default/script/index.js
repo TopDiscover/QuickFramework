@@ -4,6 +4,7 @@ const fs_extra_1 = require("fs-extra");
 const path_1 = require("path");
 const vue_1 = require("vue");
 const Helper_1 = require("../../../Helper");
+let view = null;
 module.exports = Editor.Panel.define({
     listeners: {},
     template: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
@@ -11,9 +12,33 @@ module.exports = Editor.Panel.define({
     $: {
         app: "#app"
     },
-    methods: {},
+    methods: {
+        //更新进度
+        updateProgess(progress) {
+            if (view) {
+                view.progress = progress;
+                if (progress >= 100) {
+                    view.isProcessing = false;
+                }
+            }
+        },
+        //压缩开始
+        onStartCompress() {
+            if (view) {
+                view.isProcessing = true;
+                view.progress = 0;
+            }
+        },
+        //构建目录
+        onSetBuildDir(dir) {
+            if (view) {
+                view.buildAssetsDir = dir;
+            }
+        }
+    },
     ready() {
         if (this.$.app) {
+            let sourcePath = path_1.join(Editor.Project.path, "assets");
             const app = vue_1.createApp({});
             app.component("view-content", {
                 template: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/template/vue/view.html'), 'utf-8'),
@@ -26,6 +51,9 @@ module.exports = Editor.Panel.define({
                         excludeFolders: Helper_1.helper.config.excludeFolders,
                         excludeFiles: Helper_1.helper.config.excludeFiles,
                         isProcessing: false,
+                        progress: 0,
+                        buildAssetsDir: "",
+                        sourceAssetsDir: sourcePath,
                     };
                 },
                 methods: {
@@ -56,7 +84,13 @@ module.exports = Editor.Panel.define({
                     /**@description 保存配置 */
                     onSaveConfig() {
                         Helper_1.helper.saveConfig();
+                    },
+                    onStartCompress() {
+                        console.log("开始压缩");
                     }
+                },
+                created() {
+                    view = this;
                 }
             });
             app.mount(this.$.app);

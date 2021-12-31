@@ -19,10 +19,10 @@
             "type": "dockable",
             "main": "dist/panels/default/script",
             "size": {
-                "min-width": 500,
-                "min-height": 520,
-                "width": 500,
-                "height": 520
+                "min-width": 700,
+                "min-height": 700,
+                "width": 600,
+                "height": 600
             }
         }
     },
@@ -58,6 +58,21 @@
             "onAfterBuild":{
                 "methods": [
                     "onAfterBuild"
+                ]
+            },
+            "updateProgess":{
+                "methods": [
+                    "default.updateProgess"
+                ]
+            },
+            "onStartCompress":{
+                "methods": [
+                    "default.onStartCompress"
+                ]
+            },
+            "onSetBuildDir":{
+                "methods": [
+                    "default.onSetBuildDir"
                 ]
             }
         },

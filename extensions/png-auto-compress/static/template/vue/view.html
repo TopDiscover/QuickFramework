@@ -1,33 +1,64 @@
-<ui-section header="配置面板" expand>
-    <ui-prop>
-        <ui-label slot="label" tooltip="* 项目构建完成后自动压缩 PNG 资源">启用</ui-label>
-        <ui-checkbox slot="content" v-bind:value="enabled" @confirm="onChangeEnabled($event.target.value)"></ui-checkbox>
-    </ui-prop>
+<ui-section header="公共配置" expand>
     <ui-prop>
         <ui-label slot="label" tooltip="* 最低图像质量">最低质量（%）</ui-label>
-        <ui-slider slot="content" @confirm="onChangeMinQuality($event.target.value)" min="0" max="100" v-bind:value="minQuality"></ui-slider>
+        <ui-slider slot="content" @confirm="onChangeMinQuality($event.target.value)" min="0" max="100"
+            v-bind:value="minQuality"></ui-slider>
     </ui-prop>
     <ui-prop>
         <ui-label slot="label" tooltip="* 最高图像质量">最高质量（%）</ui-label>
-        <ui-slider slot="content" @confirm="onChangeMaxQuality($event.target.value)" v-bind:value="maxQuality" min="0" max="100"></ui-slider>
+        <ui-slider slot="content" @confirm="onChangeMaxQuality($event.target.value)" v-bind:value="maxQuality" min="0"
+            max="100"></ui-slider>
     </ui-prop>
     <ui-prop>
         <ui-label slot="label" tooltip="* 压缩速度与质量的权重，默认值为 3。&#10;* 10 档可能会降低 5％ 的质量，但压缩速度比 3 档快 8 倍。">速度</ui-label>
-        <ui-slider slot="content" @confirm="onChangeSpeed($event.target.value)" v-bind:value="speed" min="1" max="10"></ui-slider>
+        <ui-slider slot="content" @confirm="onChangeSpeed($event.target.value)" v-bind:value="speed" min="1" max="10">
+        </ui-slider>
+    </ui-prop>
+    <ui-prop>
+        <ui-label slot="label">压缩进度</ui-label>
+        <ui-progress slot="content" v-bind:value="progress"></ui-progress>
+    </ui-prop>
+    <ui-button v-bind:disabled="isProcessing" @click="onSaveConfig">保存</ui-button>
+</ui-section>
+<ui-section header="构建完成设置" expand>
+    <ui-label class="tips">说明：构建完成自动压缩资源，只争构建输出目录资源进行压缩，不改变源项目内资源的品质
+        <br>
+        注意：如果项目比较大，建议直接压缩项目资源目录，防止构建后压缩资源时间过长
+    </ui-label>
+    <ui-prop>
+        <ui-label slot="label">构建资源目录</ui-label>
+        <ui-file slot="content" v-bind:value="buildAssetsDir" readonly></ui-file>
+    </ui-prop>
+
+    <ui-prop>
+        <ui-label slot="label" tooltip="* 项目构建完成后自动压缩 PNG 资源">启用</ui-label>
+        <ui-checkbox slot="content" v-bind:value="enabled" @confirm="onChangeEnabled($event.target.value)">
+        </ui-checkbox>
+    </ui-prop>
+</ui-section>
+<ui-section header="项目资源压缩配置" expand>
+    <ui-label class="tips">说明：相对项目资源assets目录，即项目源文件的图片进行压缩</ui-label>
+    <ui-prop>
+        <ui-label slot="label">项目资源目录</ui-label>
+        <ui-file slot="content" v-bind:value="sourceAssetsDir" readonly></ui-file>
     </ui-prop>
     <ui-prop>
         <ui-label slot="label" tooltip="* 相对于 assets/ 目录的路径&#10;* 多个值之间必须用 ',' 隔开">需要排除的文件夹</ui-label>
-        <ui-textarea slot="content" v-on:blur="onInputExcludeFoldersOver($event.target.value)" v-bind:value="excludeFolders" placeholder="textures/aaa/,&#10;textures/bbb/"></ui-textarea>
+        <ui-textarea slot="content" v-on:blur="onInputExcludeFoldersOver($event.target.value)"
+            v-bind:value="excludeFolders" placeholder="textures/aaa/,&#10;textures/bbb/"></ui-textarea>
     </ui-prop>
     <ui-prop>
         <ui-label slot="label" tooltip="* 相对于 assets/ 目录的路径&#10;* 多个值之间必须用 ',' 隔开">需要排除的文件</ui-label>
-        <ui-textarea slot="content" v-on:blur="onInputExcludeFilesOver($event.target.value)" v-bind:value="excludeFiles" placeholder="textures/abc.png,&#10;textures/123.png"></ui-textarea>
+        <ui-textarea slot="content" v-on:blur="onInputExcludeFilesOver($event.target.value)" v-bind:value="excludeFiles"
+            placeholder="textures/abc.png,&#10;textures/123.png"></ui-textarea>
     </ui-prop>
+    <ui-button v-bind:disabled="isProcessing" @click="onStartCompress">开始压缩</ui-button>
+</ui-section>
+<ui-section header="常见问题" expand>
     <ui-label class="tips">💡 小贴士：如果 Spine Skeleton 或 DragonBones 的纹理在压缩后出现透明度丢失的情况，可以参考下面两种解决方案（二选一）：
         <br>
         ① 自行勾选 Spine Skeleton 或 DragonBones 纹理的 Premultiply Alpha（预乘）属性
         <br>
         ② 在配置面板中配置排除 Spine Skeleton 或 DragonBones 的纹理，不进行压缩
     </ui-label>
-    <ui-button v-bind:disabled="isProcessing" @click="onSaveConfig">保存</ui-button>
 </ui-section>

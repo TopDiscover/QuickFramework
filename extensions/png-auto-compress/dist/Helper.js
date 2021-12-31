@@ -109,7 +109,8 @@ class Helper {
         this.readDir(srcPath, files);
         let totalCount = files.length;
         let curCount = 0;
-        console.log(LOG_NAME, `正在压缩(0%)...`);
+        console.log(LOG_NAME, `正在压缩,进度信息请打开【项目工具】->【自动压缩PNG资源】查看`);
+        Editor.Message.send(PACKAGE_NAME, "onStartCompress");
         files.forEach((info) => {
             this.compressTasks.push(new Promise(res => {
                 const sizeBefore = info.size;
@@ -118,7 +119,9 @@ class Helper {
                     curCount++;
                     let percent = curCount / totalCount;
                     percent *= 100;
-                    console.log(`${LOG_NAME}正在压缩(%d%)...`, percent.toFixed(2));
+                    percent = parseFloat(percent.toFixed(2));
+                    Editor.Message.send(PACKAGE_NAME, "onSetBuildDir", srcPath);
+                    Editor.Message.send(PACKAGE_NAME, "updateProgess", percent);
                     this.recordResult(error, sizeBefore, info.path);
                     res(null);
                 });
@@ -273,16 +276,11 @@ class Helper {
             this.compressTasks = [];
             console.log(LOG_NAME, `构建输出目录:${dest}`);
             //遍历项目资源
-            const list = ["assets/assets"];
-            for (let i = 0; i < list.length; i++) {
-                const resPath = path_1.default.join(dest, list[i]);
-                if (fs_1.existsSync(resPath)) {
-                    console.log(LOG_NAME, `压缩资源路径:${resPath}`);
-                    this.compress(resPath, compressOptions);
-                }
-                else {
-                    continue;
-                }
+            const resPath = path_1.default.join(dest, "assets/assets");
+            Editor.Message.send(PACKAGE_NAME, "onSetBuildDir", resPath);
+            if (fs_1.existsSync(resPath)) {
+                console.log(LOG_NAME, `压缩资源路径:${resPath}`);
+                this.compress(resPath, compressOptions);
             }
             //开始压缩并等待压缩完成
             await Promise.all(this.compressTasks);

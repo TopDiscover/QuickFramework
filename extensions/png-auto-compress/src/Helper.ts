@@ -24,7 +24,13 @@ interface Logger {
 const PACKAGE_NAME = 'png-auto-compress';
 const LOG_NAME = "[图片压缩]:";
 
-type FILE_INFO = {size:number,path:string}
+export interface MyView{
+    isProcessing : boolean;
+    progress : number;
+    buildAssetsDir : string;
+}
+
+type FILE_INFO = { size: number, path: string }
 
 class Helper {
     /** 默认配置 */
@@ -109,20 +115,23 @@ class Helper {
      * @param compressOptions 压缩设置
      */
     private compress(srcPath: string, compressOptions: string) {
-        let files : FILE_INFO[] = [];
-        this.readDir(srcPath,files);
+        let files: FILE_INFO[] = [];
+        this.readDir(srcPath, files);
         let totalCount = files.length;
         let curCount = 0;
-        console.log(LOG_NAME,`正在压缩(0%)...`);
-        files.forEach((info)=>{
+        console.log(LOG_NAME, `正在压缩,进度信息请打开【项目工具】->【自动压缩PNG资源】查看`);
+        Editor.Message.send(PACKAGE_NAME,"onStartCompress");
+        files.forEach((info) => {
             this.compressTasks.push(new Promise(res => {
                 const sizeBefore = info.size;
                 const command = `"${this.pngquantPath}" ${compressOptions} -- "${info.path}"`;
                 exec(command, (error, stdout, stderr) => {
                     curCount++;
-                    let percent = curCount/totalCount;
+                    let percent = curCount / totalCount;
                     percent *= 100;
-                    console.log(`${LOG_NAME}正在压缩(%d%)...`,percent.toFixed(2));
+                    percent = parseFloat(percent.toFixed(2));
+                    Editor.Message.send(PACKAGE_NAME,"onSetBuildDir",srcPath);
+                    Editor.Message.send(PACKAGE_NAME,"updateProgess",percent)
                     this.recordResult(error, sizeBefore, info.path)
                     res(null);
                 })
@@ -185,7 +194,7 @@ class Helper {
      * @param outFiles 输出对象
      * @returns 
      */
-    private readDir(dir: string, outFiles: FILE_INFO[] ) {
+    private readDir(dir: string, outFiles: FILE_INFO[]) {
         let stat = statSync(dir);
         if (!stat.isDirectory()) {
             return;
@@ -199,10 +208,10 @@ class Helper {
             subpath = path.join(dir, subpaths[i]);
             stat = statSync(subpath);
             if (stat.isDirectory()) {
-                this.readDir(subpath,outFiles);
+                this.readDir(subpath, outFiles);
             } else if (stat.isFile()) {
-                if ( this.testFilePath(subpath) ){
-                    outFiles.push({size:stat.size/1024,path:subpath});
+                if (this.testFilePath(subpath)) {
+                    outFiles.push({ size: stat.size / 1024, path: subpath });
                 }
             }
         }
@@ -250,6 +259,7 @@ class Helper {
 
     async onAfterBuild(dest: string) {
         if (this.config.enabled) {
+
             console.log(LOG_NAME, "准备压缩 PNG 资源...");
             let pngquant = this.pngquantPath;
             if (pngquant == null) {
@@ -292,15 +302,11 @@ class Helper {
             this.compressTasks = [];
             console.log(LOG_NAME, `构建输出目录:${dest}`);
             //遍历项目资源
-            const list = ["assets/assets"];
-            for (let i = 0; i < list.length; i++) {
-                const resPath = path.join(dest, list[i]);
-                if (existsSync(resPath)) {
-                    console.log(LOG_NAME, `压缩资源路径:${resPath}`);
-                    this.compress(resPath, compressOptions);
-                } else {
-                    continue;
-                }
+            const resPath = path.join(dest, "assets/assets");
+            Editor.Message.send(PACKAGE_NAME,"onSetBuildDir",resPath);
+            if (existsSync(resPath)) {
+                console.log(LOG_NAME, `压缩资源路径:${resPath}`);
+                this.compress(resPath, compressOptions);
             }
 
             //开始压缩并等待压缩完成
