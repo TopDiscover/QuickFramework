@@ -40,17 +40,28 @@
                     "open_panel"
                 ]
             },
-            "onBeforeBuild": {
+            "log":{
                 "methods": [
-                    "onBeforeBuild"
+                    "log"
                 ]
             },
-            "onAfterBuild": {
+            "warn":{
+                "methods": [
+                    "warn"
+                ]
+            },
+            "error":{
+                "methods": [
+                    "error"
+                ]
+            },
+            "onAfterBuild":{
                 "methods": [
                     "onAfterBuild"
                 ]
             }
-        }
+        },
+        "builder":"./dist/Builder.js"
     },
     "author": "Zheng Fasheng",
     "editor": ">=3.3.1",

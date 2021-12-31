@@ -10,18 +10,20 @@ exports.methods = {
     open_panel() {
         Editor.Panel.open("png-auto-compress");
     },
-    /**@description 开始构建 */
-    onBeforeBuild(options, result) {
-        console.log(`=====onBeforeBuild=====>>${Helper_1.helper.config.enabled}`);
-        if (Helper_1.helper.config.enabled) {
-            console.log(`将在构建完成后自动压缩 PNG 资源`);
-        }
+    log() {
+        let args = [].concat(...arguments);
+        console.log("[图片压缩]:", ...args);
     },
-    onAfterBuild(options, result) {
-        console.log(`=====onAfterBuild=====>>${Helper_1.helper.config.enabled}`);
-        if (Helper_1.helper.config.enabled) {
-            console.warn("开始压缩 PNG 资源，请勿进行其他操作！");
-        }
+    warn() {
+        let args = [].concat(...arguments);
+        console.warn("[图片压缩]:", ...args);
+    },
+    error() {
+        let args = [].concat(...arguments);
+        console.error("[图片压缩]:", ...args);
+    },
+    onAfterBuild(dest) {
+        Helper_1.helper.onAfterBuild(dest);
     }
 };
 /**
