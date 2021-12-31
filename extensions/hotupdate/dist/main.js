@@ -1,18 +1,19 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.unload = exports.load = exports.methods = void 0;
-//@ts-ignore
-const package_json_1 = __importDefault(require("../package.json"));
+const Helper_1 = require("./Helper");
 /**
  * @en
  * @zh 为扩展的主进程的注册方法
  */
 exports.methods = {
     showPanel() {
-        Editor.Panel.open(package_json_1.default.name);
+        Editor.Panel.open("hotupdate");
+    },
+    onAfterBuild(dest, platform) {
+        if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+            Helper_1.helper.onInsertHotupdate(dest);
+        }
     }
 };
 /**

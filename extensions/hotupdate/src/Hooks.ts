@@ -32,8 +32,6 @@ export async function onAfterCompressSettings(options: IBuildTaskOption, result:
     console.log(`[${PACKAGE_NAME}] =====>> onAfterCompressSettings`);
 }
 export async function onAfterBuild(options: IBuildTaskOption, result: IBuildResult) {
-    if (options.platform == "android" || options.platform == "ios" || options.platform == "mac" || options.platform == "windows") {
-        helper.onInsertHotupdate(result.dest);
-    }
+    Editor.Message.send(PACKAGE_NAME,"onAfterBuild",result.dest,options.platform);
     console.log(`[${PACKAGE_NAME}] =====>> onAfterBuild`);
 }

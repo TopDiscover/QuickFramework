@@ -40,6 +40,11 @@
                 "methods": [
                     "showPanel"
                 ]
+            },
+            "onAfterBuild":{
+                "methods": [
+                    "onAfterBuild"
+                ]
             }
         },
         "builder":"./dist/Builder.js"

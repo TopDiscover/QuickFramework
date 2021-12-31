@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.onAfterBuild = exports.onAfterCompressSettings = exports.onBeforeCompressSettings = exports.onAfterBuildAssets = exports.onBeforeBuildAssets = exports.onAfterInit = exports.onBeforeInit = exports.onBeforeBuild = exports.unload = exports.load = void 0;
-const Helper_1 = require("./Helper");
 const PACKAGE_NAME = 'hotupdate';
 function load() {
     console.log(`[${PACKAGE_NAME}] Load in builder.`);
@@ -40,9 +39,7 @@ async function onAfterCompressSettings(options, result) {
 }
 exports.onAfterCompressSettings = onAfterCompressSettings;
 async function onAfterBuild(options, result) {
-    if (options.platform == "android" || options.platform == "ios" || options.platform == "mac" || options.platform == "windows") {
-        Helper_1.helper.onInsertHotupdate(result.dest);
-    }
+    Editor.Message.send(PACKAGE_NAME, "onAfterBuild", result.dest, options.platform);
     console.log(`[${PACKAGE_NAME}] =====>> onAfterBuild`);
 }
 exports.onAfterBuild = onAfterBuild;
