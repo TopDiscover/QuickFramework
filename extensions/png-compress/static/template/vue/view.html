@@ -45,12 +45,12 @@
     <ui-prop>
         <ui-label slot="label" tooltip="* 相对于 assets/ 目录的路径&#10;* 多个值之间必须用 ',' 隔开">需要排除的文件夹</ui-label>
         <ui-textarea slot="content" v-on:blur="onInputExcludeFoldersOver($event.target.value)"
-            v-bind:value="excludeFolders" placeholder="textures/aaa/,&#10;textures/bbb/"></ui-textarea>
+            v-bind:value="excludeFolders" placeholder="resources/common/,&#10;resources/login/"></ui-textarea>
     </ui-prop>
     <ui-prop>
         <ui-label slot="label" tooltip="* 相对于 assets/ 目录的路径&#10;* 多个值之间必须用 ',' 隔开">需要排除的文件</ui-label>
         <ui-textarea slot="content" v-on:blur="onInputExcludeFilesOver($event.target.value)" v-bind:value="excludeFiles"
-            placeholder="textures/abc.png,&#10;textures/123.png"></ui-textarea>
+            placeholder="bundles/eliminate/texture/450/kai_450_xin_0.png,&#10;bundles/eliminate/texture/450/kai_450_xin_1.png"></ui-textarea>
     </ui-prop>
     <ui-button v-bind:disabled="isProcessing" @click="onStartCompress">开始压缩</ui-button>
 </ui-section>
