@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, PathLike, readdirSync, readFileSync, rmdirSync, Stats, statSync, unlinkSync, writeFileSync } from "fs";
-import path, { normalize } from "path";
+import path, { join, normalize } from "path";
 import * as os from "os"
 import { exec, ExecException } from "child_process";
 
@@ -24,10 +24,10 @@ interface Logger {
 const PACKAGE_NAME = 'png-auto-compress';
 const LOG_NAME = "[图片压缩]:";
 
-export interface MyView{
-    isProcessing : boolean;
-    progress : number;
-    buildAssetsDir : string;
+export interface MyView {
+    isProcessing: boolean;
+    progress: number;
+    buildAssetsDir: string;
 }
 
 type FILE_INFO = { size: number, path: string }
@@ -100,12 +100,6 @@ class Helper {
     //日志
     private logger: Logger = null!;
 
-    /**@description 需要排除的文件夹 */
-    private excludeFolders: string[] = [];
-
-    /**@description 需要排除的文件 */
-    private excludeFiles: string[] = [];
-
     /**@description 压缩队列 */
     private compressTasks: any[] = [];
 
@@ -114,13 +108,16 @@ class Helper {
      * @param srcPath 文件路径
      * @param compressOptions 压缩设置
      */
-    private compress(srcPath: string, compressOptions: string) {
+    private compress(srcPath: string, compressOptions: string, isCompress: (filePath: string) => boolean, isAutoCompress: boolean) {
         let files: FILE_INFO[] = [];
-        this.readDir(srcPath, files);
+        this.readDir(srcPath, files, isCompress);
         let totalCount = files.length;
         let curCount = 0;
         console.log(LOG_NAME, `正在压缩,进度信息请打开【项目工具】->【自动压缩PNG资源】查看`);
-        Editor.Message.send(PACKAGE_NAME,"onStartCompress");
+        Editor.Message.send(PACKAGE_NAME, "onStartCompress");
+        if (isAutoCompress) {
+            Editor.Message.send(PACKAGE_NAME, "onSetBuildDir", srcPath);
+        }
         files.forEach((info) => {
             this.compressTasks.push(new Promise(res => {
                 const sizeBefore = info.size;
@@ -130,8 +127,10 @@ class Helper {
                     let percent = curCount / totalCount;
                     percent *= 100;
                     percent = parseFloat(percent.toFixed(2));
-                    Editor.Message.send(PACKAGE_NAME,"onSetBuildDir",srcPath);
-                    Editor.Message.send(PACKAGE_NAME,"updateProgess",percent)
+                    if (isAutoCompress) {
+                        Editor.Message.send(PACKAGE_NAME, "onSetBuildDir", srcPath);
+                    }
+                    Editor.Message.send(PACKAGE_NAME, "updateProgess", percent)
                     this.recordResult(error, sizeBefore, info.path)
                     res(null);
                 })
@@ -142,59 +141,13 @@ class Helper {
     /**@description 引擎内置资源 */
     private enginPath = path.normalize("main");
 
-
-    /**
-     * @description 获取资源源路径
-     * @param sourcePath 
-     */
-    private getAssetPath(sourcePath: string) {
-        const basename = path.basename(sourcePath);
-        const uuid = basename.slice(0, basename.indexOf('.'));
-        const abPath = Editor.Utils.UUID.decompressUUID(uuid);
-        if (!abPath) {
-            // 图集资源
-            // 暂时还没有找到办法处理
-            return null;
-        }
-        // 资源根目录
-        const assetsPath = path.join(Editor.Project.path, 'assets/');
-        return path.relative(assetsPath, abPath);
-    }
-
-    /**
-     * @description 判断资源是否可以进行压缩
-     * @param sourcePath 路径
-     */
-    private testFilePath(sourcePath: string) {
-        // 排除非 png 资源和内置资源
-        if (path.extname(sourcePath) !== '.png' || sourcePath.includes(this.enginPath)) {
-            return false;
-        }
-        // 排除指定文件夹和文件
-        const assetPath = this.getAssetPath(sourcePath);
-        if (assetPath) {
-            for (let i = 0; i < this.excludeFolders.length; i++) {
-                if (assetPath.startsWith(this.excludeFolders[i])) {
-                    return false;
-                }
-            }
-            for (let i = 0; i < this.excludeFiles.length; i++) {
-                if (assetPath.startsWith(this.excludeFiles[i])) {
-                    return false;
-                }
-            }
-        }
-        // 测试通过
-        return true;
-    }
-
     /**
      * @description 读取目录下的所有文件的md5及大小信息到obj
      * @param dir 读取目录
      * @param outFiles 输出对象
      * @returns 
      */
-    private readDir(dir: string, outFiles: FILE_INFO[]) {
+    private readDir(dir: string, outFiles: FILE_INFO[], isCompress: (filePath: string) => boolean) {
         let stat = statSync(dir);
         if (!stat.isDirectory()) {
             return;
@@ -208,9 +161,9 @@ class Helper {
             subpath = path.join(dir, subpaths[i]);
             stat = statSync(subpath);
             if (stat.isDirectory()) {
-                this.readDir(subpath, outFiles);
+                this.readDir(subpath, outFiles, isCompress);
             } else if (stat.isFile()) {
-                if (this.testFilePath(subpath)) {
+                if (isCompress(subpath)) {
                     outFiles.push({ size: stat.size / 1024, path: subpath });
                 }
             }
@@ -257,65 +210,123 @@ class Helper {
         }
     }
 
+    /**@description 开始压缩资源 */
+    private async startCompress(dir: string, isCompress: (filePath: string) => boolean, isAutoCompress: boolean = true) {
+        console.log(LOG_NAME, "准备压缩 PNG 资源...");
+        let pngquant = this.pngquantPath;
+        if (pngquant == null) {
+            console.error(LOG_NAME, "压缩引擎不支持当前系统平台！");
+            return;
+        }
+        console.log(LOG_NAME, `压缩工具路径:${pngquant}`);
+
+        // 设置压缩命令
+        const qualityParam = `--quality ${this.config.minQuality}-${this.config.maxQuality}`;
+        const speedParam = `--speed ${this.config.speed}`;
+        const skipParam = '--skip-if-larger';
+        const outputParam = '--ext=.png';
+        const writeParam = '--force';
+        const compressOptions = `${qualityParam} ${speedParam} ${skipParam} ${outputParam} ${writeParam}`;
+
+        //日志重置
+        this.logger = {
+            succeedCount: 0,
+            failedCount: 0,
+            successInfo: "",
+            failedInfo: ""
+        }
+
+        //开始压缩
+        console.warn(LOG_NAME, "开始压缩 PNG 资源，请勿进行其他操作！");
+
+        // 初始化队列
+        this.compressTasks = [];
+        //遍历项目资源
+        if (existsSync(dir)) {
+            console.log(LOG_NAME, `压缩资源路径:${dir}`);
+            this.compress(dir, compressOptions, isCompress, isAutoCompress);
+        }
+
+        //开始压缩并等待压缩完成
+        await Promise.all(this.compressTasks);
+        //清空队列
+        this.compressTasks = [];
+        //打印压缩结果 
+        this.printResults();
+    }
+
     async onAfterBuild(dest: string) {
         if (this.config.enabled) {
-
-            console.log(LOG_NAME, "准备压缩 PNG 资源...");
-            let pngquant = this.pngquantPath;
-            if (pngquant == null) {
-                console.error(LOG_NAME, "压缩引擎不支持当前系统平台！");
-                return;
-            }
-            console.log(LOG_NAME, `压缩工具路径:${pngquant}`);
-
-            // 设置压缩命令
-            const qualityParam = `--quality ${this.config.minQuality}-${this.config.maxQuality}`;
-            const speedParam = `--speed ${this.config.speed}`;
-            const skipParam = '--skip-if-larger';
-            const outputParam = '--ext=.png';
-            const writeParam = '--force';
-            // const colorsParam = config.colors;
-            // const compressOptions = `${qualityParam} ${speedParam} ${skipParam} ${outputParam} ${writeParam} ${colorsParam}`;
-            const compressOptions = `${qualityParam} ${speedParam} ${skipParam} ${outputParam} ${writeParam} --verbose`;
-
-            //日志重置
-            this.logger = {
-                succeedCount: 0,
-                failedCount: 0,
-                successInfo: "",
-                failedInfo: ""
-            }
-
-            // 需要排除的文件夹
-
-            let excludeFolders = this.config.excludeFolders.split(",").map(value => value.trim());
-            let excludeFiles = this.config.excludeFiles.split(",").map(value => value.trim());
-
-            this.excludeFolders = excludeFolders ? excludeFolders.map(value => normalize(value)) : [];
-            // 需要排除的文件
-            this.excludeFiles = excludeFiles ? excludeFiles.map(value => normalize(value)) : [];
-
-            //开始压缩
-            console.warn(LOG_NAME, "开始压缩 PNG 资源，请勿进行其他操作！");
-
-            // 初始化队列
-            this.compressTasks = [];
             console.log(LOG_NAME, `构建输出目录:${dest}`);
-            //遍历项目资源
             const resPath = path.join(dest, "assets/assets");
-            Editor.Message.send(PACKAGE_NAME,"onSetBuildDir",resPath);
-            if (existsSync(resPath)) {
-                console.log(LOG_NAME, `压缩资源路径:${resPath}`);
-                this.compress(resPath, compressOptions);
+            this.startCompress(resPath, (filePath) => {
+                // 排除非 png 资源和内置资源
+                if (path.extname(filePath) !== '.png' || filePath.includes(this.enginPath)) {
+                    return false;
+                }
+                return true
+            }, true)
+        }
+    }
+
+    /**@description 对项目资源目录进度图片压缩 */
+    onStartCompress(sourceAssetsDir: any) {
+
+        // 需要排除的文件夹
+        let excludeFolders = this.config.excludeFolders.split(",").map(value => value.trim());
+        //去除空的
+        let i = excludeFolders.length;
+        while (i--) {
+            if (!!!excludeFolders[i]) {
+                excludeFolders.splice(i);
+            }
+        }
+        excludeFolders = excludeFolders.map(value => normalize(value));
+        // 需要排除的文件
+        let excludeFiles = this.config.excludeFiles.split(",").map(value => value.trim());
+        //去除空的
+        i = excludeFiles.length;
+        while (i--) {
+            if (!!!excludeFiles[i]) {
+                excludeFiles.splice(i);
+            }
+        }
+        excludeFiles = excludeFiles.map(value => normalize(value));
+
+        if (excludeFolders.length > 0) {
+            console.log(`需要排除目录:`, excludeFolders);
+        }
+        if (excludeFiles.length > 0) {
+            console.log(`需要排除文件:`, excludeFiles);
+        }
+
+        this.startCompress(sourceAssetsDir, (filePath: string) => {
+            // 排除非 png 资源和内置资源
+            if (path.extname(filePath) !== '.png' || filePath.includes(this.enginPath)) {
+                return false;
             }
 
-            //开始压缩并等待压缩完成
-            await Promise.all(this.compressTasks);
-            //清空队列
-            this.compressTasks = [];
-            //打印压缩结果 
-            this.printResults();
-        }
+            //排除指定
+            for (let i = 0; i < excludeFolders.length; i++) {
+                let tempPath = join(sourceAssetsDir, excludeFolders[i]);
+                if (filePath.startsWith(tempPath)) {
+                    // console.log(`需要排除目录:${excludeFolders[i]}`);
+                    return false;
+                }
+            }
+
+            //排除指定文件
+            for (let i = 0; i < excludeFiles.length; i++) {
+                let tempPath = join(sourceAssetsDir, excludeFiles[i]);
+                if (filePath.startsWith(tempPath)) {
+                    // console.log(`需要排除文件:${excludeFiles[i]}`);
+                    return false;
+                }
+            }
+
+            return true
+        }, false);
+
     }
 }
 

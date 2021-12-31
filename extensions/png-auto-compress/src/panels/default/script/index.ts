@@ -3,7 +3,7 @@ import { join } from 'path';
 import { createApp } from 'vue';
 import { helper, MyView } from '../../../Helper';
 
-let view : MyView = null!;
+let view: MyView = null!;
 module.exports = Editor.Panel.define({
     listeners: {
 
@@ -15,31 +15,31 @@ module.exports = Editor.Panel.define({
     },
     methods: {
         //更新进度
-        updateProgess(progress:number){
-            if ( view ){
+        updateProgess(progress: number) {
+            if (view) {
                 view.progress = progress;
-                if ( progress >= 100 ){
+                if (progress >= 100) {
                     view.isProcessing = false;
                 }
             }
         },
         //压缩开始
-        onStartCompress(){
-            if ( view ){
+        onStartCompress() {
+            if (view) {
                 view.isProcessing = true;
                 view.progress = 0;
             }
         },
         //构建目录
-        onSetBuildDir(dir:string){
-            if ( view ){
+        onSetBuildDir(dir: string) {
+            if (view) {
                 view.buildAssetsDir = dir;
             }
         }
     },
     ready() {
         if (this.$.app) {
-            let sourcePath = join(Editor.Project.path,"assets");
+            let sourcePath = join(Editor.Project.path, "assets");
             const app = createApp({});
             app.component("view-content", {
                 template: readFileSync(join(__dirname, '../../../../static/template/vue/view.html'), 'utf-8'),
@@ -55,45 +55,45 @@ module.exports = Editor.Panel.define({
                         excludeFiles: helper.config.excludeFiles,
 
                         isProcessing: false,//开始及保存按钮操作状态
-                        progress : 0,//压缩进度
-                        buildAssetsDir :"",//构建资源目录
-                        sourceAssetsDir : sourcePath,
+                        progress: 0,//压缩进度
+                        buildAssetsDir: "",//构建资源目录
+                        sourceAssetsDir: sourcePath,
                     }
                 },
-                methods:{
-                    onChangeEnabled(enabled:boolean){
+                methods: {
+                    onChangeEnabled(enabled: boolean) {
                         // console.log("enabled",enabled);
                         helper.config.enabled = enabled;
                     },
-                    onChangeMinQuality(value:number){
+                    onChangeMinQuality(value: number) {
                         // console.log("minQuality",value);
                         helper.config.minQuality = value;
                     },
-                    onChangeMaxQuality(value:number){
+                    onChangeMaxQuality(value: number) {
                         // console.log("maxQuality",value)
                         helper.config.maxQuality = value;
                     },
-                    onChangeSpeed(value:number){
+                    onChangeSpeed(value: number) {
                         // console.log("speed",value);
                         helper.config.speed = value;
                     },
-                    onInputExcludeFoldersOver(value:string){
+                    onInputExcludeFoldersOver(value: string) {
                         // console.log("excludeFolders",value);
                         helper.config.excludeFolders = value;
                     },
-                    onInputExcludeFilesOver(value:string){
+                    onInputExcludeFilesOver(value: string) {
                         // console.log(`excludeFiles`,value);
                         helper.config.excludeFiles = value;
                     },
                     /**@description 保存配置 */
-                    onSaveConfig(){
+                    onSaveConfig() {
                         helper.saveConfig();
                     },
-                    onStartCompress(){
-                        console.log("开始压缩");
+                    onStartCompress() {
+                        helper.onStartCompress(this.sourceAssetsDir);
                     }
                 },
-                created(){
+                created() {
                     view = this;
                 }
             });

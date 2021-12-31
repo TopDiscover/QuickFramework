@@ -86,7 +86,7 @@ module.exports = Editor.Panel.define({
                         Helper_1.helper.saveConfig();
                     },
                     onStartCompress() {
-                        console.log("开始压缩");
+                        Helper_1.helper.onStartCompress(this.sourceAssetsDir);
                     }
                 },
                 created() {
