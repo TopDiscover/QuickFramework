@@ -686,6 +686,7 @@ interface AssetInfo {
 declare module Editor.App {
 
     export const version: string;
+    export const path : string;
 
 }
 
@@ -1119,4 +1120,12 @@ declare module Editor.Utils {
 
     }
 
+}
+
+declare module Editor.Dialog{
+    export function openFile(options : {
+        title: string,
+        defaultPath: string,
+        properties: string[]
+    })
 }
