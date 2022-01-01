@@ -27,7 +27,13 @@
                 "methods": [
                     "fixEngine"
                 ]
+            },
+            "onBeforeBuild":{
+                "methods": [
+                    "onBeforeBuild"
+                ]
             }
-        }
+        },
+        "builder": "./dist/Builder.js"
     }
 }

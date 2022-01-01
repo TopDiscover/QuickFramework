@@ -66,28 +66,24 @@ class _Helper {
     }
     /**@description 当前目录下的插件版本 */
     get curPluginVersion() {
-        if (this._curPluginVersion == -1) {
-            let versionPath = `${path.join(__dirname, "../engine/version.json")}`;
-            versionPath = path.normalize(versionPath);
-            let data = fs.readFileSync(versionPath, "utf-8");
-            let source = JSON.parse(data);
-            this._curPluginVersion = source.version;
-        }
+        let versionPath = `${path.join(__dirname, "../engine/version.json")}`;
+        versionPath = path.normalize(versionPath);
+        let data = fs.readFileSync(versionPath, "utf-8");
+        let source = JSON.parse(data);
+        this._curPluginVersion = source.version;
         return this._curPluginVersion;
     }
     /**@description 当前Creator目录下的引擎修正插件版本 */
     get creatorPluginVersion() {
-        if (this._creatorPluginVersion -= -1) {
-            let versionPath = `${this.appPath}/version.json`;
-            versionPath = path.normalize(versionPath);
-            if (fs.existsSync(versionPath)) {
-                let data = fs.readFileSync(versionPath, "utf-8");
-                let source = JSON.parse(data);
-                this._creatorPluginVersion = source.version;
-            }
-            else {
-                this._creatorPluginVersion = 0;
-            }
+        let versionPath = `${this.appPath}/version.json`;
+        versionPath = path.normalize(versionPath);
+        if (fs.existsSync(versionPath)) {
+            let data = fs.readFileSync(versionPath, "utf-8");
+            let source = JSON.parse(data);
+            this._creatorPluginVersion = source.version;
+        }
+        else {
+            this._creatorPluginVersion = 0;
         }
         return this._creatorPluginVersion;
     }
@@ -208,6 +204,11 @@ const Helper = new _Helper();
 exports.methods = {
     fixEngine() {
         Helper.run();
+    },
+    onBeforeBuild() {
+        if (Helper.isNeedUpdateVersion) {
+            console.error(`请先执行【项目工具】->【引擎修正】同步对引擎的修改，再构建!!!`);
+        }
     }
 };
 /**

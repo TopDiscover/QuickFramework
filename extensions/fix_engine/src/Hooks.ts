@@ -1,6 +1,6 @@
 import { IBuildResult, IBuildTaskOption } from "../@types/packages/builder/@types";
 
-const PACKAGE_NAME = 'hotupdate'; 
+const PACKAGE_NAME = 'fix_engine'; 
 export function load() {
     console.log(`[${PACKAGE_NAME}] Load in builder.`);
 }
@@ -11,6 +11,7 @@ export function unload() {
 
 export async function onBeforeBuild(options: IBuildTaskOption, result: IBuildResult) {
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeBuild`);
+    Editor.Message.send(PACKAGE_NAME,"onBeforeBuild");
 }
 export async function onBeforeInit(options: IBuildTaskOption, result: IBuildResult) {
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeInit`);
@@ -31,6 +32,5 @@ export async function onAfterCompressSettings(options: IBuildTaskOption, result:
     console.log(`[${PACKAGE_NAME}] =====>> onAfterCompressSettings`);
 }
 export async function onAfterBuild(options: IBuildTaskOption, result: IBuildResult) {
-    Editor.Message.send(PACKAGE_NAME,"onAfterBuild",result.dest,options.platform);
     console.log(`[${PACKAGE_NAME}] =====>> onAfterBuild`);
 }
