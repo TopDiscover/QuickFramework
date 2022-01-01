@@ -20,28 +20,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.helper = void 0;
-const child_process_1 = require("child_process");
 const fs_1 = require("fs");
 const path_1 = __importStar(require("path"));
 const LOG_NAME = "[Gulp压缩]:";
 class Helper {
     constructor() {
-        this.defaultConfig = {
-            enabled: false,
-            buildDir: "",
-            nodejs: ""
-        };
-        this._config = null;
-    }
-    get config() {
-        if (!this._config) {
-            this.readConfig();
-        }
-        return this._config;
+        this._config = { platform: "", dest: "" };
     }
     /**@description 配置存储路径 */
     get configPath() {
-        let savePath = `${path_1.default.join(Editor.Project.path, "/local/gulp-compress.json")}`;
+        let savePath = `${path_1.default.join(__dirname, "../../../local/gulp-compress.json")}`;
         savePath = path_1.normalize(savePath);
         return savePath;
     }
@@ -51,38 +39,39 @@ class Helper {
             this._config = JSON.parse(fs_1.readFileSync(tempPath, { encoding: "utf-8" }));
         }
         else {
-            this._config = this.defaultConfig;
+            this._config = { platform: "", dest: "" };
         }
     }
-    saveConfig() {
+    saveConfig(dest, platform) {
         let savePath = this.configPath;
-        console.log("保存配置如下：");
-        console.log(this.config);
-        fs_1.writeFileSync(savePath, JSON.stringify(this.config), { encoding: "utf-8" });
+        this._config.dest = dest;
+        this._config.platform = platform;
+        console.log(`保存构建信息:`, this._config);
+        fs_1.writeFileSync(savePath, JSON.stringify(this._config), { encoding: "utf-8" });
     }
     onBeforeBuild(platform) {
-        this.readConfig();
-        console.log(LOG_NAME, `是否启用自动压缩:${this.config.enabled},开始构建,构建平台:${platform}`);
+        console.log(LOG_NAME, `开始构建,构建平台:${platform}`);
     }
     onAfterBuild(dest, platform) {
-        this.readConfig();
-        console.log(LOG_NAME, `是否启用自动压缩:${this.config.enabled},构建完成,构建目录:${dest},构建平台:${platform}`);
-        if (this.config.enabled) {
-        }
+        console.log(LOG_NAME, `构建完成,构建目录:${dest},构建平台:${platform}`);
+        this.saveConfig(dest, platform);
+        let tempPath = path_1.join(__dirname, "../");
+        tempPath = path_1.normalize(tempPath);
+        console.warn(LOG_NAME, `如果需要对构建的JS脚本进行资源压缩，请到${tempPath}目录下执行 gulp 进行JS压缩`);
     }
-    /**@description 手动压缩 */
-    onStartCompress() {
-        let nodeJs = this.config.nodejs;
-        let gulpPath = path_1.join(__dirname, "../node_modules/gulp/bin/gulp.js");
-        gulpPath = path_1.normalize(gulpPath);
-        let command = `${nodeJs} ${gulpPath} copy`;
-        command = command.replace(/\\/g, "/");
-        console.log(command);
-        child_process_1.exec(command, (err, stdout, stderr) => {
-            console.log("err", err);
-            console.log("stdout", stdout);
-            console.log("stderr", stderr);
-        });
+    get dest() {
+        this.readConfig();
+        if (!!!this._config.dest || !!!this._config.platform) {
+            console.error(`构建信息有误`);
+            return "";
+        }
+        let platform = this._config.platform;
+        let dest = this._config.dest;
+        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac") {
+            dest = path_1.join(dest, "assets");
+        }
+        console.log(`构建资源目录为:${dest}`);
+        return dest;
     }
 }
 exports.helper = new Helper();

@@ -2,11 +2,11 @@
 let gulp = require('gulp')
 // 获取 uglify 模块（用于压缩 JS）
 let uglify = require('gulp-uglify')
-let minimist = require('minimist');
 //装载del
 const del = require('del');
+const helper = require("./dist/Helper")
 
-const dest = "F:/workspace/QuickFramework331/build/android/assets";
+const dest = helper.helper.dest;
 
 // 压缩 js 文件
 gulp.task("tomin", (done) => {

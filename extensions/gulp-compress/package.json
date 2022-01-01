@@ -2,48 +2,19 @@
     "package_version": 2,
     "version": "1.0.0",
     "name": "gulp-compress",
-    "description": "Gulp 对js进行压缩,可打开面板设置是否构建完成后自动进行js压缩，在调试模式下无效",
+    "description": "Gulp 对js进行压缩,构建完成后会自动生成gulpfile.js的配置，请手动到extensions/gulp-compress目录下执行gulp命令",
     "main": "./dist/main.js",
     "dependencies": {
         "del": "^6.0.0",
-        "fs-extra": "^10.0.0",
         "gulp": "^4.0.2",
-        "gulp-uglify": "^3.0.2",
-        "minimist": "^1.2.5",
-        "vue": "^3.1.4"
+        "gulp-uglify": "^3.0.2"
     },
     "devDependencies": {
         "@types/node": "^16.0.1",
-        "@types/fs-extra": "^9.0.5",
         "typescript": "^4.3.4"
     },
-    "panels": {
-        "default": {
-            "title": "Gulp js压缩配置",
-            "type": "dockable",
-            "main": "dist/panels/default/script",
-            "size": {
-                "min-width": 450,
-                "min-height": 400,
-                "width": 450,
-                "height": 400
-            }
-        }
-    },
     "contributions": {
-        "menu": [
-            {
-                "path": "项目工具",
-                "label": "Gulp JS压缩",
-                "message": "open-panel"
-            }
-        ],
         "messages": {
-            "open-panel": {
-                "methods": [
-                    "open_panel"
-                ]
-            },
             "onAfterBuild": {
                 "methods": [
                     "onAfterBuild"
@@ -52,21 +23,6 @@
             "onBeforeBuild": {
                 "methods": [
                     "onBeforeBuild"
-                ]
-            },
-            "updateProgess": {
-                "methods": [
-                    "default.updateProgess"
-                ]
-            },
-            "onStartCompress": {
-                "methods": [
-                    "default.onStartCompress"
-                ]
-            },
-            "onSetBuildDir": {
-                "methods": [
-                    "default.onSetBuildDir"
                 ]
             }
         },
