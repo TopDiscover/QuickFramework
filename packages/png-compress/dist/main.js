@@ -9,12 +9,14 @@ exports.messages = {
 };
 const LOG_NAME = "[图片压缩]:";
 function onBuildStart(options, callback) {
+    Editor.log(`${LOG_NAME} 开始构建`);
     if (Helper_1.helper.config.enabled) {
         Editor.log(LOG_NAME, "将在构建完成后自动压缩 PNG 资源");
     }
     callback();
 }
 function onBuildFinished(options, callback) {
+    Editor.log(`${LOG_NAME} 构建完成`);
     Helper_1.helper.onAfterBuild(options.dest).then(() => {
         callback();
     });

@@ -7,6 +7,7 @@ export const messages = {
 }
 const LOG_NAME = "[图片压缩]:";
 function onBuildStart(options:BuildOptions,callback:Function){
+    Editor.log(`${LOG_NAME} 开始构建`);
     if ( helper.config.enabled ){
         Editor.log(LOG_NAME,"将在构建完成后自动压缩 PNG 资源");
     }
@@ -14,6 +15,7 @@ function onBuildStart(options:BuildOptions,callback:Function){
 }
 
 function onBuildFinished(options:BuildOptions,callback:Function){
+    Editor.log(`${LOG_NAME} 构建完成`);
     helper.onAfterBuild(options.dest).then(()=>{
         callback();
     })

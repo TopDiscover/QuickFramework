@@ -138,7 +138,7 @@ class Helper {
     }
 
     /**@description 引擎内置资源 */
-    private enginPath = path.normalize("main");
+    private enginPath = path.normalize("internal");
 
     /**
      * @description 读取目录下的所有文件的md5及大小信息到obj
@@ -257,7 +257,7 @@ class Helper {
     async onAfterBuild(dest: string) {
         if (this.config.enabled) {
             Editor.log(LOG_NAME, `构建输出目录:${dest}`);
-            const resPath = path.join(dest, "assets/assets");
+            const resPath = path.join(dest, "assets");
             this.startCompress(resPath, (filePath) => {
                 // 排除非 png 资源和内置资源
                 if (path.extname(filePath) !== '.png' || filePath.includes(this.enginPath)) {

@@ -44,7 +44,7 @@ class Helper {
         /**@description 压缩队列 */
         this.compressTasks = [];
         /**@description 引擎内置资源 */
-        this.enginPath = path_1.default.normalize("main");
+        this.enginPath = path_1.default.normalize("internal");
     }
     get config() {
         if (!this._config) {
@@ -238,7 +238,7 @@ class Helper {
     async onAfterBuild(dest) {
         if (this.config.enabled) {
             Editor.log(LOG_NAME, `构建输出目录:${dest}`);
-            const resPath = path_1.default.join(dest, "assets/assets");
+            const resPath = path_1.default.join(dest, "assets");
             this.startCompress(resPath, (filePath) => {
                 // 排除非 png 资源和内置资源
                 if (path_1.default.extname(filePath) !== '.png' || filePath.includes(this.enginPath)) {
