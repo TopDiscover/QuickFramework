@@ -1,6 +1,6 @@
 <div class="container">
-    <div class="header">主包Manifest配置</div>
     <ui-section>
+        <div class="header">主包Manifest配置</div>
         <ui-box-container>
             <div class="layout vertical start-justified">
                 <ui-prop name="版本号">
@@ -49,8 +49,8 @@
         </ui-box-container>
     </ui-section>
 
-    <div class="header">Bundles Manifest配置</div>
     <ui-section>
+        <div class="header">Bundles Manifest配置</div>
         <ui-box-container>
             <ui-prop v-for="bundle in bundles" name='{{ bundle.name + "(" + bundle.dir + ")" }}'>
                 <div class="flex-1 layout horizontal center">
@@ -63,8 +63,8 @@
         </ui-box-container>
     </ui-section>
 
-    <div class="header">测试环境</div>
     <ui-section>
+        <div class="header">测试环境</div>
         <ui-box-container>
             <ui-prop name="主包版本">
                 <div class="flex-1 layout horizontal center">
