@@ -1,5 +1,5 @@
 //@ts-ignore
-import { IBuildResult, IBuildTaskOption } from '../@types/packages/builder/@types';
+import { IBuildResult, IBuildTaskOption, Platform } from '../@types/packages/builder/@types';
 import { helper } from './Helper';
 /**
  * @en 
@@ -21,8 +21,8 @@ export const methods: { [key: string]: (...any: any) => any } = {
         let args = [].concat(...arguments);
         console.error("[图片压缩]:",...args);
     },
-    onAfterBuild(dest:string){
-        helper.onAfterBuild(dest);
+    onAfterBuild(dest:string,platform:Platform){
+        helper.onAfterBuild(dest,platform);
     }
 };
 

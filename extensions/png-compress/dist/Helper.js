@@ -236,13 +236,23 @@ class Helper {
         //打印压缩结果 
         this.printResults();
     }
-    async onAfterBuild(dest) {
+    getPlatformAssetDir(platform) {
+        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac") {
+            return "assets/assets";
+        }
+        else {
+            return "assets";
+        }
+    }
+    async onAfterBuild(dest, platform) {
         //重新加载配置
         this.readConfig();
         console.log(`${LOG_NAME} 构建完成后是否自动压缩资源:${this.config.enabled}`);
+        console.log(`${LOG_NAME} 构建平台:${platform}`);
         if (this.config.enabled) {
-            console.log(LOG_NAME, `构建输出目录:${dest}`);
-            const resPath = path_1.default.join(dest, "assets/assets");
+            console.log(LOG_NAME, `构建目录:${dest}`);
+            const resPath = path_1.default.join(dest, this.getPlatformAssetDir(platform));
+            console.log(LOG_NAME, `构建资源目录:${resPath}`);
             this.startCompress(resPath, (filePath) => {
                 // 排除非 png 资源和内置资源
                 if (path_1.default.extname(filePath) !== '.png' || filePath.includes(this.enginPath)) {

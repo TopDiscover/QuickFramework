@@ -11,7 +11,7 @@ function unload() {
 }
 exports.unload = unload;
 async function onBeforeBuild(options, result) {
-    Editor.Message.send(PACKAGE_NAME, "log", "开始构建");
+    Editor.Message.send(PACKAGE_NAME, "log", `开始构建,构建平台:${options.platform}`);
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeBuild`);
 }
 exports.onBeforeBuild = onBeforeBuild;
@@ -41,6 +41,6 @@ async function onAfterCompressSettings(options, result) {
 exports.onAfterCompressSettings = onAfterCompressSettings;
 async function onAfterBuild(options, result) {
     console.log(`[${PACKAGE_NAME}] =====>> onAfterBuild`);
-    Editor.Message.send(PACKAGE_NAME, "onAfterBuild", result.dest);
+    Editor.Message.send(PACKAGE_NAME, "onAfterBuild", result.dest, options.platform);
 }
 exports.onAfterBuild = onAfterBuild;

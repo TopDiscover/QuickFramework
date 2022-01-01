@@ -22,8 +22,8 @@ exports.methods = {
         let args = [].concat(...arguments);
         console.error("[图片压缩]:", ...args);
     },
-    onAfterBuild(dest) {
-        Helper_1.helper.onAfterBuild(dest);
+    onAfterBuild(dest, platform) {
+        Helper_1.helper.onAfterBuild(dest, platform);
     }
 };
 /**

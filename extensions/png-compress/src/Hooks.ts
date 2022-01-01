@@ -10,7 +10,7 @@ export function unload() {
 }
 
 export async function onBeforeBuild(options: IBuildTaskOption, result: IBuildResult) {
-    Editor.Message.send(PACKAGE_NAME,"log","开始构建");
+    Editor.Message.send(PACKAGE_NAME,"log",`开始构建,构建平台:${options.platform}`);
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeBuild`);
 }
 export async function onBeforeInit(options: IBuildTaskOption, result: IBuildResult) {
@@ -33,5 +33,5 @@ export async function onAfterCompressSettings(options: IBuildTaskOption, result:
 }
 export async function onAfterBuild(options: IBuildTaskOption, result: IBuildResult) {
     console.log(`[${PACKAGE_NAME}] =====>> onAfterBuild`);
-    Editor.Message.send(PACKAGE_NAME,"onAfterBuild",result.dest);
+    Editor.Message.send(PACKAGE_NAME,"onAfterBuild",result.dest,options.platform);
 }

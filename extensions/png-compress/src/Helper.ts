@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, PathLike, readdirSync, readFileSync, rmdirSync, 
 import path, { join, normalize } from "path";
 import * as os from "os"
 import { exec, ExecException } from "child_process";
+import { Platform } from "../@types/packages/builder/@types";
 
 export interface Config {
     enabled: boolean,
@@ -255,13 +256,23 @@ class Helper {
         this.printResults();
     }
 
-    async onAfterBuild(dest: string) {
+    private getPlatformAssetDir(platform:Platform){
+        if ( platform == "android" || platform == "windows" || platform == "ios" || platform == "mac"){
+            return "assets/assets";
+        }else{
+            return "assets";
+        }
+    }
+
+    async onAfterBuild(dest: string,platform:Platform) {
         //重新加载配置
         this.readConfig();
         console.log(`${LOG_NAME} 构建完成后是否自动压缩资源:${this.config.enabled}`);
+        console.log(`${LOG_NAME} 构建平台:${platform}`)
         if (this.config.enabled) {
-            console.log(LOG_NAME, `构建输出目录:${dest}`);
-            const resPath = path.join(dest, "assets/assets");
+            console.log(LOG_NAME, `构建目录:${dest}`);
+            const resPath = path.join(dest, this.getPlatformAssetDir(platform));
+            console.log(LOG_NAME,`构建资源目录:${resPath}`);
             this.startCompress(resPath, (filePath) => {
                 // 排除非 png 资源和内置资源
                 if (path.extname(filePath) !== '.png' || filePath.includes(this.enginPath)) {
