@@ -72,6 +72,10 @@ class Helper {
             this._config = this.defaultConfig;
         }
     }
+    /**@description 重新加载配置 */
+    reloadConfig() {
+        this.readConfig();
+    }
     get pngquantPath() {
         let outPath = null;
         //获取压缩引擎路径
