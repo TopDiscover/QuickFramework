@@ -105,7 +105,7 @@ class Helper {
         this.readDir(srcPath, files, isCompress);
         let totalCount = files.length;
         let curCount = 0;
-        console.log(LOG_NAME, `正在压缩,进度信息请打开【项目工具】->【自动压缩PNG资源】查看`);
+        console.log(LOG_NAME, `正在压缩,进度信息请打开【项目工具】->【图片压缩】查看`);
         Editor.Message.send(PACKAGE_NAME, "onStartCompress");
         if (isAutoCompress) {
             Editor.Message.send(PACKAGE_NAME, "onSetBuildDir", srcPath);
@@ -237,6 +237,9 @@ class Helper {
         this.printResults();
     }
     async onAfterBuild(dest) {
+        //重新加载配置
+        this.readConfig();
+        console.log(`${LOG_NAME} 构建完成后是否自动压缩资源:${this.config.enabled}`);
         if (this.config.enabled) {
             console.log(LOG_NAME, `构建输出目录:${dest}`);
             const resPath = path_1.default.join(dest, "assets/assets");

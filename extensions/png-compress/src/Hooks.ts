@@ -10,7 +10,7 @@ export function unload() {
 }
 
 export async function onBeforeBuild(options: IBuildTaskOption, result: IBuildResult) {
-    Editor.Message.send(PACKAGE_NAME,"log","将在构建完成后自动压缩 PNG 资源");
+    Editor.Message.send(PACKAGE_NAME,"log","开始构建");
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeBuild`);
 }
 export async function onBeforeInit(options: IBuildTaskOption, result: IBuildResult) {
