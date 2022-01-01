@@ -1,0 +1,32 @@
+<ui-section header="Gulp配置" expand>
+    <ui-prop>
+        <ui-label slot="label">自动JS压缩启用</ui-label>
+        <ui-checkbox slot="content" v-bind:value="enabled" @confirm="onAutoComplete($event.target.value)"></ui-checkbox>
+    </ui-prop>
+    <ui-prop>
+        <ui-label slot="label">构建目录</ui-label>
+        <ui-file slot="content" type="directory" v-bind:disabled="isProcessing" v-bind:value="buildDir" @confirm="onSelectBuildDir($event.target.value)"></ui-file>
+    </ui-prop>
+    <ui-prop>
+        <ui-label slot="label">NodeJS执行文件目录</ui-label>
+        <ui-file slot="content" type="file" v-bind:disabled="isProcessing" v-bind:value="nodejs" @confirm="onSelectNodeJs($event.target.value)"></ui-file>
+    </ui-prop>
+    <ui-prop>
+        <ui-label slot="label">压缩进度</ui-label>
+        <ui-progress slot="content" v-bind:value="progress"></ui-progress>
+    </ui-prop>
+    <ui-prop>
+        <ui-button slot="content" v-bind:disabled="isProcessing" @confirm="onCompress($event.target.value)">手动压缩</ui-button>
+        <ui-button slot="content" v-bind:disabled="isProcessing" @confirm="onSaveConfig($event.target.value)">保存配置</ui-button>
+    </ui-prop>
+</ui-section>
+<ui-section header="常见问题" expand>
+    <ui-label class="tips">💡 小贴士：自动压缩资源启用，在调试状态下，不会调用自动压缩
+        <br>
+        如果没有启用，但后面希望压缩，可以自己选择压缩目录进行手动压缩
+        <br>
+        在启用状态下，构建过程中请不要操作些界面，以免出现意外错误
+        <br>
+        NodeJS执行文件目录 如：C:\Program Files\nodejs\node.exe
+    </ui-label>
+</ui-section>
