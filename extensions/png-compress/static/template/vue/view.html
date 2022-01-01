@@ -21,7 +21,7 @@
     <ui-button v-bind:disabled="isProcessing" @click="onSaveConfig">保存</ui-button>
 </ui-section>
 <ui-section header="构建完成设置" expand>
-    <ui-label class="tips">说明：构建完成自动压缩资源，只争构建输出目录资源进行压缩，不改变源项目内资源的品质
+    <ui-label class="tips">说明：构建完成自动压缩资源，只针对构建输出目录资源进行压缩，不改变源项目内资源的品质
         <br>
         注意：如果项目比较大，建议直接压缩项目资源目录，防止构建后压缩资源时间过长
     </ui-label>
