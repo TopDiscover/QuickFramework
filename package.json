@@ -2,9 +2,5 @@
   "name": "QuickFramework",
   "type": "3d",
   "uuid": "1d7956ee-c217-452d-8e65-33eede5cffec",
-  "version": "3.3.1",
-  "devDependencies": {
-    "@types/node": "^15.12.4",
-    "nodejs-websocket": "^1.7.2"
-  }
+  "version": "3.3.1"
 }

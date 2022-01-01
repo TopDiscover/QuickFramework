@@ -1,0 +1,36 @@
+{
+    "package_version": 2,
+    "version": "1.0.0",
+    "name": "test-server",
+    "description": "本地Websocket服务器",
+    "main": "./dist/main.js",
+    "dependencies": {
+        "nodejs-websocket": "^1.7.2"
+    },
+    "devDependencies": {
+        "@types/node": "^16.0.1",
+        "typescript": "^4.3.4"
+    },
+    "contributions": {
+        "menu": [
+            {
+                "path": "项目工具",
+                "label": "本地Websocket服务器",
+                "message": "startServer"
+            }
+        ],
+        "messages": {
+            "startServer": {
+                "methods": [
+                    "startServer"
+                ]
+            }
+        }
+    },
+    "author": "Zheng Fasheng",
+    "editor": ">=3.3.1",
+    "scripts": {
+        "build": "tsc -b",
+        "watch": "tsc -w"
+    }
+}
