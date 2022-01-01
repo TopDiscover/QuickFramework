@@ -20,8 +20,8 @@
         "size": {
             "min-width": 900,
             "min-height": 900,
-            "width": 400,
-            "height": 300
+            "width": 600,
+            "height": 600
         }
     },
     "main-menu": {
