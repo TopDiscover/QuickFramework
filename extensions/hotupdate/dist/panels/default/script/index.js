@@ -17,6 +17,8 @@ module.exports = Editor.Panel.define({
     ready() {
         if (this.$.app) {
             const app = vue_1.createApp({});
+            //指定Vue3 自己定义控件跳过解析
+            app.config.compilerOptions.isCustomElement = tag => tag.startsWith("ui-");
             app.component('view-content', {
                 template: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/template/vue/view.html'), 'utf-8'),
                 data() {

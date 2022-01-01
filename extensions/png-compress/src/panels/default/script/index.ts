@@ -41,6 +41,8 @@ module.exports = Editor.Panel.define({
         if (this.$.app) {
             let sourcePath = join(Editor.Project.path, "assets");
             const app = createApp({});
+            //指定Vue3 自己定义控件跳过解析
+            app.config.compilerOptions.isCustomElement = tag => tag.startsWith("ui-")
             app.component("view-content", {
                 template: readFileSync(join(__dirname, '../../../../static/template/vue/view.html'), 'utf-8'),
                 data() {
