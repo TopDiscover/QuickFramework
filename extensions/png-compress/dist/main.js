@@ -10,17 +10,8 @@ exports.methods = {
     open_panel() {
         Editor.Panel.open("png-compress");
     },
-    log() {
-        let args = [].concat(...arguments);
-        console.log("[图片压缩]:", ...args);
-    },
-    warn() {
-        let args = [].concat(...arguments);
-        console.warn("[图片压缩]:", ...args);
-    },
-    error() {
-        let args = [].concat(...arguments);
-        console.error("[图片压缩]:", ...args);
+    onBeforeBuild(platform) {
+        console.log("[图片压缩]:", `开始构建,构建平台:${platform}`);
     },
     onAfterBuild(dest, platform) {
         Helper_1.helper.onAfterBuild(dest, platform);

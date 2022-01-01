@@ -40,19 +40,9 @@
                     "open_panel"
                 ]
             },
-            "log":{
+            "onBeforeBuild":{
                 "methods": [
-                    "log"
-                ]
-            },
-            "warn":{
-                "methods": [
-                    "warn"
-                ]
-            },
-            "error":{
-                "methods": [
-                    "error"
+                    "onBeforeBuild"
                 ]
             },
             "onAfterBuild":{

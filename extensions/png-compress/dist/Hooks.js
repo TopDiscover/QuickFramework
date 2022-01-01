@@ -11,7 +11,7 @@ function unload() {
 }
 exports.unload = unload;
 async function onBeforeBuild(options, result) {
-    Editor.Message.send(PACKAGE_NAME, "log", `开始构建,构建平台:${options.platform}`);
+    Editor.Message.send(PACKAGE_NAME, "onBeforeBuild", options.platform);
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeBuild`);
 }
 exports.onBeforeBuild = onBeforeBuild;

@@ -10,7 +10,7 @@ export function unload() {
 }
 
 export async function onBeforeBuild(options: IBuildTaskOption, result: IBuildResult) {
-    Editor.Message.send(PACKAGE_NAME,"log",`开始构建,构建平台:${options.platform}`);
+    Editor.Message.send(PACKAGE_NAME,"onBeforeBuild",options.platform);
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeBuild`);
 }
 export async function onBeforeInit(options: IBuildTaskOption, result: IBuildResult) {
