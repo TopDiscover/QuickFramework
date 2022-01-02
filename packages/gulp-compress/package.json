@@ -1,0 +1,23 @@
+{
+    "package_version": 2,
+    "version": "1.0.0",
+    "name": "gulp-compress",
+    "description": "Gulp 对js进行压缩,构建完成后会自动生成gulpfile.js的配置，请手动到extensions/gulp-compress目录下执行gulp命令",
+    "main": "./dist/main.js",
+    "dependencies": {
+        "del": "^6.0.0",
+        "gulp": "^4.0.2",
+        "gulp-clean-css": "^4.3.0",
+        "gulp-file-inline": "^2.2.3",
+        "gulp-htmlmin": "^5.0.1",
+        "gulp-javascript-obfuscator": "^1.1.6",
+        "gulp-uglify": "^3.0.2",
+        "minimist": "^1.2.5"
+    },
+    "devDependencies": {
+        "@types/node": "^16.0.1",
+        "typescript": "^4.3.4"
+    },
+    "author": "Zheng Fasheng",
+    "editor": ">=2.4.5"
+}
