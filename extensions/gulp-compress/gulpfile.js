@@ -66,41 +66,23 @@ gulp.task("tomin", (done) => {
             stringArrayThreshold: 0.75,//您可以使用此设置来调整将字符串文字插入到stringArray
             unicodeEscapeSequence: false//允许启用/禁用字符串转换为 unicode 转义序列
         }))
-        .pipe(gulp.dest(`${dest}_min`))
+        .pipe(gulp.dest(`${dest}`))
         .on("end", () => {
-            console.log(`压缩JS到缓存目录:${dest}_min完成`)
+            console.log(`压缩JS:${dest}完成`)
             done();
         })
     }else{
         console.log("非代码混淆分支处理");
         gulp.src(`${dest}/**/*.js`)
         .pipe(uglify())
-        .pipe(gulp.dest(`${dest}_min`))
+        .pipe(gulp.dest(`${dest}`))
         .on("end", () => {
-            console.log(`压缩JS到缓存目录:${dest}_min完成`)
+            console.log(`压缩JS:${dest}完成`)
             done();
         });
     }
 });
 
-gulp.task("tosource", (done) => {
-    gulp.src(`${dest}_min/**/*.js`)
-        .pipe(gulp.dest(dest))
-        .on("end", () => {
-            console.log(`复制压缩文件到构建目录${dest}`);
-            done();
-        });
-});
-
-gulp.task("delete", (done) => {
-    del(`${dest}_min`, { force: true }).then(() => {
-        console.log(`删除压缩缓存目录:${dest}_min`);
-        done();
-    }, () => {
-        console.error(`删除压缩缓存目录失败:${dest}_min`);
-        done();
-    });
-})
 
 gulp.task("complete", (done) => {
     console.log(`恭喜您,压缩完成!!!!`);
@@ -114,7 +96,7 @@ gulp.task("start", (done) => {
 
 //web平台压缩 html
 gulp.task("tomin-html", (done) => {
-    gulp.src(`${dest}/**/*.html`)
+    gulp.src(`${dest}/*.html`)
         // .pipe(fileInline())
         .pipe(htmlmin({
             collapseWhitespace: true,//压缩HTML
@@ -125,43 +107,25 @@ gulp.task("tomin-html", (done) => {
             minifyJS: true,  //压缩页面JS
             minifyCSS: true //压缩页面CSS
         }))
-        .pipe(gulp.dest(`${dest}_min`))
+        .pipe(gulp.dest(`${dest}`))
         .on("end", () => {
-            console.log(`压缩html到缓存目录:${dest}_min完成`)
-            done();
-        });
-});
-
-gulp.task("tosource-html", (done) => {
-    gulp.src(`${dest}_min/**/*.html`)
-        .pipe(gulp.dest(dest))
-        .on("end", () => {
-            console.log(`复制压缩文件html到构建目录${dest}`);
+            console.log(`压缩html:${dest}完成`)
             done();
         });
 });
 
 gulp.task("tomin-css", (done) => {
-    gulp.src(`${dest}/**/*.css`)
+    gulp.src(`${dest}/*.css`)
         .pipe(cleanCSS())
-        .pipe(gulp.dest(`${dest}_min`))
+        .pipe(gulp.dest(`${dest}`))
         .on("end", () => {
-            console.log(`压缩css到缓存目录:${dest}_min完成`)
-            done();
-        });
-});
-
-gulp.task("tosource-css", (done) => {
-    gulp.src(`${dest}_min/**/*.css`)
-        .pipe(gulp.dest(dest))
-        .on("end", () => {
-            console.log(`复制压缩文件css到构建目录${dest}`);
+            console.log(`压缩css:${dest}完成`)
             done();
         });
 });
 
 if (isWeb) {
-    gulp.task("default", gulp.series("start", "tomin", "tomin-html", "tomin-css", "tosource", "tosource-html", "tosource-css", "delete", "complete"));
+    gulp.task("default", gulp.series("start", "tomin", "tomin-html", "tomin-css", "complete"));
 } else {
-    gulp.task("default", gulp.series("start", "tomin", "tosource", "delete", "complete"));
+    gulp.task("default", gulp.series("start", "tomin", "complete"));
 }
