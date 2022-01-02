@@ -31,10 +31,12 @@ class Helper {
         /** 默认配置 */
         this.defaultConfig = {
             enabled: false,
+            enabledNoFound: true,
             minQuality: 40,
             maxQuality: 80,
             colors: 256,
             speed: 3,
+            isProcessing: false,
             excludeFolders: "",
             excludeFiles: "",
         };
@@ -286,8 +288,6 @@ class Helper {
         return excludeFiles;
     }
     async onAfterBuild(options) {
-        //重新加载配置
-        this.readConfig();
         console.log(`${LOG_NAME} 构建完成后是否自动压缩资源:${this.config.enabled}`);
         console.log(`${LOG_NAME} 构建平台:${options.platform}`);
         if (this.config.enabled) {
@@ -327,9 +327,9 @@ class Helper {
                     for (let i = 0; i < excludeFolders.length; i++) {
                         let tempPath = path_1.join(sourceAssetsDir, excludeFolders[i]);
                         if (sourcePath.startsWith(tempPath)) {
-                            console.log(`需要排除目录:${excludeFolders[i]}`);
-                            console.log(`构建目录文件路径:${filePath}`);
-                            console.log(`源文件路径:${sourcePath}`);
+                            // console.log(`需要排除目录:${excludeFolders[i]}`);
+                            // console.log(`构建目录文件路径:${filePath}`);
+                            // console.log(`源文件路径:${sourcePath}`);
                             return false;
                         }
                     }
@@ -337,16 +337,21 @@ class Helper {
                     for (let i = 0; i < excludeFiles.length; i++) {
                         let tempPath = path_1.join(sourceAssetsDir, excludeFiles[i]);
                         if (sourcePath.startsWith(tempPath)) {
-                            console.log(`需要排除文件:${excludeFiles[i]}`);
-                            console.log(`构建目录文件路径:${filePath}`);
-                            console.log(`源文件路径:${sourcePath}`);
+                            // console.log(`需要排除文件:${excludeFiles[i]}`);
+                            // console.log(`构建目录文件路径:${filePath}`);
+                            // console.log(`源文件路径:${sourcePath}`);
                             return false;
                         }
                     }
                 }
                 else {
-                    console.warn(`图片在源资源目录无法找到:${filePath},可能是自动图集,不再进行压缩`);
-                    return false;
+                    if (this.config.enabledNoFound) {
+                        return true;
+                    }
+                    else {
+                        console.warn(`反向查找该文件无法找:${filePath},未开启反向无法找到资源强行压缩，路过压缩处理`);
+                        return false;
+                    }
                 }
                 return true;
             }, true);
@@ -373,7 +378,7 @@ class Helper {
             for (let i = 0; i < excludeFolders.length; i++) {
                 let tempPath = path_1.join(sourceAssetsDir, excludeFolders[i]);
                 if (filePath.startsWith(tempPath)) {
-                    console.log(`需要排除目录:${excludeFolders[i]}`);
+                    // console.log(`需要排除目录:${excludeFolders[i]}`);
                     return false;
                 }
             }
@@ -381,7 +386,7 @@ class Helper {
             for (let i = 0; i < excludeFiles.length; i++) {
                 let tempPath = path_1.join(sourceAssetsDir, excludeFiles[i]);
                 if (filePath.startsWith(tempPath)) {
-                    console.log(`需要排除文件:${excludeFiles[i]}`);
+                    // console.log(`需要排除文件:${excludeFiles[i]}`);
                     return false;
                 }
             }

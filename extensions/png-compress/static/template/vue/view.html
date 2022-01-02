@@ -34,15 +34,23 @@
     <ui-label class="tips">说明：构建完成自动压缩资源，只针对构建输出目录资源进行压缩，不改变源项目内资源的品质
         <br>
         注意：如果项目比较大，建议直接压缩项目资源目录，防止构建后压缩资源时间过长
+        <br>
+        自动图集，在生成后无法反向查找回该资源
     </ui-label>
     <ui-prop>
         <ui-label slot="label">构建资源目录</ui-label>
         <ui-file slot="content" v-bind:value="buildAssetsDir" readonly></ui-file>
     </ui-prop>
-
     <ui-prop>
-        <ui-label slot="label" tooltip="* 项目构建完成后自动压缩 PNG 资源">启用</ui-label>
-        <ui-checkbox slot="content" v-bind:value="enabled" @confirm="onChangeEnabled($event.target.value)">
+        <ui-label slot="label">启用</ui-label>
+        <ui-checkbox slot="content" v-bind:value="enabledNoFound" @confirm="onChangeEnabledNoFound($event.target.value)">
+            构建完成反向查找不能查找到该资源，是否强行进行压缩,建议开启
+        </ui-checkbox>
+    </ui-prop>
+    <ui-prop>
+        <ui-label slot="label">启用</ui-label>
+        <ui-checkbox slot="content" v-bind:value="enabled" @confirm="onChangeEnabled($event.target.value)">项目构建完成后自动压缩
+            PNG 资源
         </ui-checkbox>
     </ui-prop>
 </ui-section>
