@@ -47,7 +47,8 @@ class Helper {
         this.saveConfig(dest,platform);
         let tempPath = join(__dirname,"../");
         tempPath = normalize(tempPath);
-        console.warn(LOG_NAME,`如果需要对构建的JS脚本进行资源压缩，请到${tempPath}目录下执行 gulp 进行JS压缩`);
+        console.warn(LOG_NAME,`如果需要对构建的JS脚本进行资源压缩，请到${tempPath}目录下`);
+        console.warn(LOG_NAME,`执行 gulp 命令 提示：gulp --compex true 可执行代码混淆，默认不开启`);
     }
 
     get dest(){
@@ -63,6 +64,30 @@ class Helper {
         }
         console.log(`构建资源目录为:${dest}`)
         return dest;
+    }
+
+    /**@description 判断是否是web */
+    get isWeb(){
+        this.readConfig();
+        if ( !!!this._config.dest || !!!this._config.platform ){
+            console.error(`构建信息有误`);
+            return true;
+        }
+        let platform : Platform = this._config.platform as any;
+        if ( platform == "android" || platform == "windows" || platform == "ios" || platform == "mac"){
+            return false;
+        }
+        console.log(`构建平台:${platform}`)
+        return true;
+    }
+
+    get platform(){
+        this.readConfig();
+        if ( !!!this._config.dest || !!!this._config.platform ){
+            console.error(`构建信息有误`);
+            return "";
+        }
+        return this._config.platform;
     }
 }
 
