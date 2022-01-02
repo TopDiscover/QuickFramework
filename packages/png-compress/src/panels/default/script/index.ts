@@ -23,6 +23,8 @@ module.exports = Editor.Panel.extend({
                 view.progress = progress;
                 if (progress >= 100) {
                     view.isProcessing = false;
+                    helper.config.isProcessing = false;
+                    helper.saveConfig();
                 }
             }
         },
@@ -47,6 +49,7 @@ module.exports = Editor.Panel.extend({
             data() {
                 return {
                     enabled: helper.config.enabled,
+                    enabledNoFound : helper.config.enabledNoFound,
 
                     minQuality: helper.config.minQuality,
                     maxQuality: helper.config.maxQuality,
@@ -55,7 +58,7 @@ module.exports = Editor.Panel.extend({
                     excludeFolders: helper.config.excludeFolders,
                     excludeFiles: helper.config.excludeFiles,
 
-                    isProcessing: false,//开始及保存按钮操作状态
+                    isProcessing: helper.config.isProcessing,//开始及保存按钮操作状态
                     progress: 0,//压缩进度
                     buildAssetsDir: "",//构建资源目录
                     sourceAssetsDir: sourcePath,
@@ -65,6 +68,9 @@ module.exports = Editor.Panel.extend({
                 onChangeEnabled(enabled: boolean) {
                     // console.log("enabled",enabled);
                     helper.config.enabled = enabled;
+                },
+                onChangeEnabledNoFound(enabled:boolean){
+                    helper.config.enabledNoFound = enabled;
                 },
                 onChangeMinQuality(value: number) {
                     // console.log("minQuality",value);

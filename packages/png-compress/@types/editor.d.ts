@@ -942,7 +942,7 @@ declare interface BuildOptions {
     appBundle: boolean;
     buildPath: string;
     buildScriptsOnly: boolean;
-    debug: string;
+    debug: boolean;
     dest: string;
     embedWebDebugger: boolean;
     encryptJs: boolean;

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.unload = exports.load = exports.messages = void 0;
 const Helper_1 = require("./Helper");
+const PACKAGE_NAME = "png-compress";
 exports.messages = {
     open_panel() {
         Editor.Panel.open("png-compress");
@@ -9,17 +10,37 @@ exports.messages = {
 };
 const LOG_NAME = "[图片压缩]:";
 function onBuildStart(options, callback) {
-    Helper_1.helper.reloadConfig();
-    Editor.log(`${LOG_NAME} 开始构建,是否构建后自动压缩:${Helper_1.helper.config.enabled}`);
+    Helper_1.helper.readConfig();
     if (Helper_1.helper.config.enabled) {
-        Editor.log(LOG_NAME, "将在构建完成后自动压缩 PNG 资源");
+        Helper_1.helper.config.isProcessing = true;
+        Helper_1.helper.saveConfig();
+        Editor.Ipc.sendToPanel(PACKAGE_NAME, "onStartCompress");
     }
+    else {
+        Helper_1.helper.config.isProcessing = false;
+        Helper_1.helper.saveConfig();
+    }
+    Editor.log("[图片压缩]:", `开始构建,构建平台:${options.platform}`);
     callback();
 }
 function onBuildFinished(options, callback) {
-    Helper_1.helper.reloadConfig();
+    Helper_1.helper.readConfig();
+    if (Helper_1.helper.config.enabled) {
+        Helper_1.helper.config.isProcessing = true;
+        Helper_1.helper.saveConfig();
+        Editor.Panel.open("png-compress");
+    }
+    else {
+        Helper_1.helper.config.isProcessing = false;
+        Helper_1.helper.saveConfig();
+    }
     Editor.log(`${LOG_NAME} 构建完成,是否构建后自动压缩:${Helper_1.helper.config.enabled}`);
-    Helper_1.helper.onAfterBuild(options.dest).then(() => {
+    Helper_1.helper.onAfterBuild({
+        platform: options.platform,
+        md5Cache: options.md5Cache,
+        dest: options.dest,
+        debug: options.debug
+    }).then(() => {
         callback();
     });
 }

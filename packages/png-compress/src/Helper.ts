@@ -4,6 +4,7 @@ import * as os from "os"
 import { exec, ExecException } from "child_process";
 
 export interface Config {
+    enabledNoFound: boolean;
     enabled: boolean,
 
     minQuality: number,
@@ -12,6 +13,7 @@ export interface Config {
     colors: number
     excludeFolders: string,
     excludeFiles: string,
+    isProcessing : boolean,
 }
 
 interface Logger {
@@ -19,6 +21,13 @@ interface Logger {
     failedCount: number,
     successInfo: string,
     failedInfo: string,
+}
+
+export interface BuilderOptions {
+    md5Cache: boolean;
+    dest: string;
+    platform: string;
+    debug: boolean;
 }
 
 const PACKAGE_NAME = 'png-compress';
@@ -36,11 +45,13 @@ class Helper {
     /** 默认配置 */
     private defaultConfig: Config = {
         enabled: false,
+        enabledNoFound: true,
 
         minQuality: 40,
         maxQuality: 80,
         colors: 256,
         speed: 3,
+        isProcessing : false,
 
         excludeFolders: "",
         excludeFiles: "",
@@ -63,22 +74,18 @@ class Helper {
 
     saveConfig() {
         let savePath = this.configPath;
-        Editor.log("保存配置：",this.config);
+        Editor.log("保存配置如下：")
+        Editor.log(this.config);
         writeFileSync(savePath, JSON.stringify(this.config), { encoding: "utf-8" });
     }
 
-    private readConfig() {
+    readConfig() {
         let tempPath = this.configPath;
         if (existsSync(tempPath)) {
             this._config = JSON.parse(readFileSync(tempPath, { encoding: "utf-8" }));
         } else {
             this._config = this.defaultConfig;
         }
-    }
-
-    /**@description 重新加载配置 */
-    reloadConfig(){
-        this.readConfig();
     }
 
     private get pngquantPath() {
@@ -259,24 +266,31 @@ class Helper {
         this.printResults();
     }
 
-    async onAfterBuild(dest: string) {
-        if (this.config.enabled) {
-            Editor.log(LOG_NAME, `构建输出目录:${dest}`);
-            const resPath = path.join(dest, "assets");
-            this.startCompress(resPath, (filePath) => {
-                // 排除非 png 资源和内置资源
-                if (path.extname(filePath) !== '.png' || filePath.includes(this.enginPath)) {
-                    return false;
-                }
-                return true
-            }, true)
+    private getPlatformAssetDir(platform: string) {
+        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac") {
+            return "assets/assets";
+        } else {
+            return "assets";
         }
     }
 
-    /**@description 对项目资源目录进度图片压缩 */
-    onStartCompress(sourceAssetsDir: any) {
+    private getUUID(filePath: string, md5Cache: boolean) {
+        let ret = path.parse(filePath);
+        if (md5Cache) {
+            //如果加了md5,需要在取一次，才能取到uuid
+            ret = path.parse(ret.name);
+            return ret.name;
+        } else {
+            return ret.name;
+        }
+    }
+
+    /**@description 需要排除的文件目录 */
+    private get excludeFolders() {
+
+        let content = this.config.excludeFolders.replace(/\n/g, ",")
         // 需要排除的文件夹
-        let excludeFolders = this.config.excludeFolders.split(",").map(value => value.trim());
+        let excludeFolders = content.split(",").map(value => value.trim());
         //去除空的
         let i = excludeFolders.length;
         while (i--) {
@@ -285,16 +299,115 @@ class Helper {
             }
         }
         excludeFolders = excludeFolders.map(value => normalize(value));
+        return excludeFolders;
+    }
+
+    /**@description 需要排除的文件 */
+    private get excludeFiles() {
+        let content = this.config.excludeFiles.replace(/\n/g, ",");
         // 需要排除的文件
-        let excludeFiles = this.config.excludeFiles.split(",").map(value => value.trim());
+        let excludeFiles = content.split(",").map(value => value.trim());
         //去除空的
-        i = excludeFiles.length;
+        let i = excludeFiles.length;
         while (i--) {
             if (!!!excludeFiles[i]) {
                 excludeFiles.splice(i);
             }
         }
         excludeFiles = excludeFiles.map(value => normalize(value));
+        return excludeFiles;
+    }
+
+    private getAssets(){
+        return new Promise<AssetInfo[]>((reslove)=>{
+            
+        })
+    }
+
+    async onAfterBuild(options: BuilderOptions) {
+        Editor.log(`${LOG_NAME} 构建完成后是否自动压缩资源:${this.config.enabled}`);
+        Editor.log(`${LOG_NAME} 构建平台:${options.platform}`)
+        if (this.config.enabled) {
+            Editor.log(LOG_NAME, `构建目录:${options.dest}`);
+            const resPath = path.join(options.dest, this.getPlatformAssetDir(options.platform));
+            Editor.log(LOG_NAME, `构建资源目录:${resPath}`);
+
+            //先拿到资源
+            let allAssets = await this.getAssets();
+
+            //找出所有图片
+            let allImages: { [key: string]: AssetInfo } = {} as any;
+
+            allAssets.forEach((info) => {
+                //排除图片资源 
+                if (info.type == "cc.ImageAsset" || info.type == "cc.SpriteAtlas") {
+                    allImages[info.uuid as any] = info;
+                }
+            });
+
+            // 需要排除的文件夹
+            let excludeFolders = this.excludeFolders;
+            let excludeFiles = this.excludeFiles;
+
+            if (excludeFolders.length > 0) {
+                Editor.log(`需要排除目录:`, excludeFolders);
+            }
+            if (excludeFiles.length > 0) {
+                Editor.log(`需要排除文件:`, excludeFiles);
+            }
+            let sourceAssetsDir = join(Editor.Project.path, "assets");
+            this.startCompress(resPath, (filePath) => {
+                // 排除非 png 资源和内置资源
+                if (path.extname(filePath) !== '.png' || filePath.includes(this.enginPath)) {
+                    return false;
+                }
+                let uuid = this.getUUID(filePath, options.md5Cache);
+                let info = allImages[uuid];
+                if (info) {
+                    let sourcePath = info.path as any;
+                    //排除指定
+                    for (let i = 0; i < excludeFolders.length; i++) {
+                        let tempPath = join(sourceAssetsDir, excludeFolders[i]);
+                        if (sourcePath.startsWith(tempPath)) {
+                            // Editor.log(`需要排除目录:${excludeFolders[i]}`);
+                            // Editor.log(`构建目录文件路径:${filePath}`);
+                            // Editor.log(`源文件路径:${sourcePath}`);
+                            return false;
+                        }
+                    }
+
+                    //排除指定文件
+                    for (let i = 0; i < excludeFiles.length; i++) {
+                        let tempPath = join(sourceAssetsDir, excludeFiles[i]);
+                        if (sourcePath.startsWith(tempPath)) {
+                            // Editor.log(`需要排除文件:${excludeFiles[i]}`);
+                            // Editor.log(`构建目录文件路径:${filePath}`);
+                            // Editor.log(`源文件路径:${sourcePath}`);
+                            return false;
+                        }
+                    }
+                } else {
+                    if (this.config.enabledNoFound) {
+                        return true;
+                    } else {
+                        Editor.warn(`反向查找该文件无法找:${filePath},未开启反向无法找到资源强行压缩，路过压缩处理`);
+                        return false;
+                    }
+
+                }
+
+                return true
+            }, true)
+        }
+    }
+
+    /**@description 对项目资源目录进度图片压缩 */
+    onStartCompress(sourceAssetsDir: any) {
+
+        // 需要排除的文件夹
+        let excludeFolders = this.excludeFolders;
+        // 需要排除的文件
+        let excludeFiles = this.excludeFiles;
 
         if (excludeFolders.length > 0) {
             Editor.log(`需要排除目录:`, excludeFolders);

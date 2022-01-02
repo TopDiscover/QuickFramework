@@ -15,6 +15,8 @@ module.exports = Editor.Panel.extend({
                 view.progress = progress;
                 if (progress >= 100) {
                     view.isProcessing = false;
+                    Helper_1.helper.config.isProcessing = false;
+                    Helper_1.helper.saveConfig();
                 }
             }
         },
@@ -39,12 +41,13 @@ module.exports = Editor.Panel.extend({
             data() {
                 return {
                     enabled: Helper_1.helper.config.enabled,
+                    enabledNoFound: Helper_1.helper.config.enabledNoFound,
                     minQuality: Helper_1.helper.config.minQuality,
                     maxQuality: Helper_1.helper.config.maxQuality,
                     speed: Helper_1.helper.config.speed,
                     excludeFolders: Helper_1.helper.config.excludeFolders,
                     excludeFiles: Helper_1.helper.config.excludeFiles,
-                    isProcessing: false,
+                    isProcessing: Helper_1.helper.config.isProcessing,
                     progress: 0,
                     buildAssetsDir: "",
                     sourceAssetsDir: sourcePath,
@@ -54,6 +57,9 @@ module.exports = Editor.Panel.extend({
                 onChangeEnabled(enabled) {
                     // console.log("enabled",enabled);
                     Helper_1.helper.config.enabled = enabled;
+                },
+                onChangeEnabledNoFound(enabled) {
+                    Helper_1.helper.config.enabledNoFound = enabled;
                 },
                 onChangeMinQuality(value) {
                     // console.log("minQuality",value);
