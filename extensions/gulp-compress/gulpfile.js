@@ -10,8 +10,17 @@ const htmlmin = require("gulp-htmlmin");
 // 装载file-inline
 // const fileInline = require("gulp-file-inline");
 
+//装载imagemin
+const imagemin = require("gulp-imagemin");
+
+//装载pngquant
+const pngquant = require('imagemin-pngquant')
+
 //css 压缩
 const cleanCSS = require('gulp-clean-css');
+
+//cache
+const cache = require('gulp-cache')
 
 // JS混淆
 const javascriptObfuscator = require("gulp-javascript-obfuscator");
@@ -124,8 +133,31 @@ gulp.task("tomin-css", (done) => {
         });
 });
 
+//压缩图片任务 3版本一下语法  3版本以上语法不一样
+gulp.task("tomin-images", (done) => {
+    //png,jpg,gif,ico结尾文件
+    console.log(dest);
+    gulp.src([`${dest}/*.{png,gif,ico,jpg}`])
+        .pipe(cache(imagemin({
+            interlaced: true,//gif压缩
+            progressive: true,//jpeg压缩
+            optimizationLevel: 5,//png压缩
+            svgoPlugins: [//svg压缩
+                {
+                    removeViewBox: true
+                }
+            ],
+            use: [pngquant()]
+        })))
+        .pipe(gulp.dest(dest))
+        .on("end", () => {
+            console.log(`压缩图片完成:${dest}`);
+            done();
+        });
+})
+
 if (isWeb) {
-    gulp.task("default", gulp.series("start", "tomin", "tomin-html", "tomin-css", "complete"));
+    gulp.task("default", gulp.series("start", "tomin", "tomin-html","tomin-images","tomin-css", "complete"));
 } else {
     gulp.task("default", gulp.series("start", "tomin", "complete"));
 }
