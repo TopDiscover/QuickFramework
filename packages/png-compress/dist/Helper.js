@@ -239,12 +239,7 @@ class Helper {
         this.printResults();
     }
     getPlatformAssetDir(platform) {
-        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac") {
-            return "assets/assets";
-        }
-        else {
-            return "assets";
-        }
+        return "assets";
     }
     getUUID(filePath, md5Cache) {
         let ret = path_1.default.parse(filePath);
@@ -332,9 +327,9 @@ class Helper {
                     for (let i = 0; i < excludeFolders.length; i++) {
                         let tempPath = path_1.join(sourceAssetsDir, excludeFolders[i]);
                         if (sourcePath.startsWith(tempPath)) {
-                            Editor.log(`需要排除目录:${excludeFolders[i]}`);
-                            Editor.log(`构建目录文件路径:${filePath}`);
-                            Editor.log(`源文件路径:${sourcePath}`);
+                            // Editor.log(`需要排除目录:${excludeFolders[i]}`);
+                            // Editor.log(`构建目录文件路径:${filePath}`);
+                            // Editor.log(`源文件路径:${sourcePath}`);
                             return false;
                         }
                     }
@@ -342,9 +337,9 @@ class Helper {
                     for (let i = 0; i < excludeFiles.length; i++) {
                         let tempPath = path_1.join(sourceAssetsDir, excludeFiles[i]);
                         if (sourcePath.startsWith(tempPath)) {
-                            Editor.log(`需要排除文件:${excludeFiles[i]}`);
-                            Editor.log(`构建目录文件路径:${filePath}`);
-                            Editor.log(`源文件路径:${sourcePath}`);
+                            // Editor.log(`需要排除文件:${excludeFiles[i]}`);
+                            // Editor.log(`构建目录文件路径:${filePath}`);
+                            // Editor.log(`源文件路径:${sourcePath}`);
                             return false;
                         }
                     }
@@ -383,7 +378,7 @@ class Helper {
             for (let i = 0; i < excludeFolders.length; i++) {
                 let tempPath = path_1.join(sourceAssetsDir, excludeFolders[i]);
                 if (filePath.startsWith(tempPath)) {
-                    Editor.log(`需要排除目录:${excludeFolders[i]},排除文件:${filePath}`);
+                    // Editor.log(`需要排除目录:${excludeFolders[i]},排除文件:${filePath}`);
                     return false;
                 }
             }
@@ -391,7 +386,7 @@ class Helper {
             for (let i = 0; i < excludeFiles.length; i++) {
                 let tempPath = path_1.join(sourceAssetsDir, excludeFiles[i]);
                 if (filePath.startsWith(tempPath)) {
-                    Editor.log(`需要排除文件:${excludeFiles[i]},排除文件:${filePath}`);
+                    // Editor.log(`需要排除文件:${excludeFiles[i]},排除文件:${filePath}`);
                     return false;
                 }
             }
