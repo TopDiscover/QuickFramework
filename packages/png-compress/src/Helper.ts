@@ -13,7 +13,7 @@ export interface Config {
     colors: number
     excludeFolders: string,
     excludeFiles: string,
-    isProcessing : boolean,
+    isProcessing: boolean,
 }
 
 interface Logger {
@@ -51,7 +51,7 @@ class Helper {
         maxQuality: 80,
         colors: 256,
         speed: 3,
-        isProcessing : false,
+        isProcessing: false,
 
         excludeFolders: "",
         excludeFiles: "",
@@ -318,9 +318,17 @@ class Helper {
         return excludeFiles;
     }
 
-    private getAssets(){
-        return new Promise<AssetInfo[]>((reslove)=>{
-            
+    private getAssets() {
+        return new Promise<{[key:string]:AssetInfo}>((reslove) => {
+            let allRes : {[key:string]:AssetInfo} = {};
+            Editor.assetdb.queryAssets(`db://**/*`, [], (err, results) => {
+                results.forEach((info: AssetInfo) => {
+                    if ( info.type == "texture" && info.uuid ){
+                        allRes[info.uuid ] = info;
+                    }
+                })
+                reslove(allRes);
+            });
         })
     }
 
@@ -332,18 +340,8 @@ class Helper {
             const resPath = path.join(options.dest, this.getPlatformAssetDir(options.platform));
             Editor.log(LOG_NAME, `构建资源目录:${resPath}`);
 
-            //先拿到资源
-            let allAssets = await this.getAssets();
-
             //找出所有图片
-            let allImages: { [key: string]: AssetInfo } = {} as any;
-
-            allAssets.forEach((info) => {
-                //排除图片资源 
-                if (info.type == "cc.ImageAsset" || info.type == "cc.SpriteAtlas") {
-                    allImages[info.uuid as any] = info;
-                }
-            });
+            let allImages = await this.getAssets();
 
             // 需要排除的文件夹
             let excludeFolders = this.excludeFolders;
@@ -369,9 +367,9 @@ class Helper {
                     for (let i = 0; i < excludeFolders.length; i++) {
                         let tempPath = join(sourceAssetsDir, excludeFolders[i]);
                         if (sourcePath.startsWith(tempPath)) {
-                            // Editor.log(`需要排除目录:${excludeFolders[i]}`);
-                            // Editor.log(`构建目录文件路径:${filePath}`);
-                            // Editor.log(`源文件路径:${sourcePath}`);
+                            Editor.log(`需要排除目录:${excludeFolders[i]}`);
+                            Editor.log(`构建目录文件路径:${filePath}`);
+                            Editor.log(`源文件路径:${sourcePath}`);
                             return false;
                         }
                     }
@@ -380,9 +378,9 @@ class Helper {
                     for (let i = 0; i < excludeFiles.length; i++) {
                         let tempPath = join(sourceAssetsDir, excludeFiles[i]);
                         if (sourcePath.startsWith(tempPath)) {
-                            // Editor.log(`需要排除文件:${excludeFiles[i]}`);
-                            // Editor.log(`构建目录文件路径:${filePath}`);
-                            // Editor.log(`源文件路径:${sourcePath}`);
+                            Editor.log(`需要排除文件:${excludeFiles[i]}`);
+                            Editor.log(`构建目录文件路径:${filePath}`);
+                            Editor.log(`源文件路径:${sourcePath}`);
                             return false;
                         }
                     }
@@ -426,7 +424,7 @@ class Helper {
             for (let i = 0; i < excludeFolders.length; i++) {
                 let tempPath = join(sourceAssetsDir, excludeFolders[i]);
                 if (filePath.startsWith(tempPath)) {
-                    // Editor.log(`需要排除目录:${excludeFolders[i]}`);
+                    Editor.log(`需要排除目录:${excludeFolders[i]}`);
                     return false;
                 }
             }
@@ -435,7 +433,7 @@ class Helper {
             for (let i = 0; i < excludeFiles.length; i++) {
                 let tempPath = join(sourceAssetsDir, excludeFiles[i]);
                 if (filePath.startsWith(tempPath)) {
-                    // Editor.log(`需要排除文件:${excludeFiles[i]}`);
+                    Editor.log(`需要排除文件:${excludeFiles[i]}`);
                     return false;
                 }
             }
