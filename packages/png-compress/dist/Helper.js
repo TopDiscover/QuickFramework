@@ -63,7 +63,7 @@ class Helper {
     saveConfig() {
         let savePath = this.configPath;
         Editor.log("保存配置如下：");
-        Editor.log(this.config);
+        Editor.log(JSON.stringify(this._config));
         fs_1.writeFileSync(savePath, JSON.stringify(this.config), { encoding: "utf-8" });
     }
     readConfig() {
@@ -383,7 +383,7 @@ class Helper {
             for (let i = 0; i < excludeFolders.length; i++) {
                 let tempPath = path_1.join(sourceAssetsDir, excludeFolders[i]);
                 if (filePath.startsWith(tempPath)) {
-                    Editor.log(`需要排除目录:${excludeFolders[i]}`);
+                    Editor.log(`需要排除目录:${excludeFolders[i]},排除文件:${filePath}`);
                     return false;
                 }
             }
@@ -391,7 +391,7 @@ class Helper {
             for (let i = 0; i < excludeFiles.length; i++) {
                 let tempPath = path_1.join(sourceAssetsDir, excludeFiles[i]);
                 if (filePath.startsWith(tempPath)) {
-                    Editor.log(`需要排除文件:${excludeFiles[i]}`);
+                    Editor.log(`需要排除文件:${excludeFiles[i]},排除文件:${filePath}`);
                     return false;
                 }
             }

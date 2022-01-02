@@ -14,7 +14,7 @@ module.exports = Editor.Panel.extend({
     template: readFileSync(join(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
     style: readFileSync(join(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
     $: {
-
+        
     },
     messages: {
         //更新进度
@@ -94,10 +94,19 @@ module.exports = Editor.Panel.extend({
                 },
                 /**@description 保存配置 */
                 onSaveConfig() {
+                    if ( helper.config.isProcessing ){
+                        Editor.warn(`处理过程中，请不要操作`);
+                        return;
+                    }
                     helper.saveConfig();
                 },
                 onStartCompress() {
+                    if ( helper.config.isProcessing ){
+                        Editor.warn(`处理过程中，请不要操作`);
+                        return;
+                    }
                     let view = this as any as MyView;
+                    helper.config.isProcessing = true;
                     helper.onStartCompress(view.sourceAssetsDir);
                 },
                 onOpenBulidOutDir() {

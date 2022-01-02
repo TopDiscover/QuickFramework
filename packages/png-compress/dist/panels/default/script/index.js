@@ -83,10 +83,19 @@ module.exports = Editor.Panel.extend({
                 },
                 /**@description 保存配置 */
                 onSaveConfig() {
+                    if (Helper_1.helper.config.isProcessing) {
+                        Editor.warn(`处理过程中，请不要操作`);
+                        return;
+                    }
                     Helper_1.helper.saveConfig();
                 },
                 onStartCompress() {
+                    if (Helper_1.helper.config.isProcessing) {
+                        Editor.warn(`处理过程中，请不要操作`);
+                        return;
+                    }
                     let view = this;
+                    Helper_1.helper.config.isProcessing = true;
                     Helper_1.helper.onStartCompress(view.sourceAssetsDir);
                 },
                 onOpenBulidOutDir() {

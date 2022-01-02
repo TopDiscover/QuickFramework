@@ -75,7 +75,7 @@ class Helper {
     saveConfig() {
         let savePath = this.configPath;
         Editor.log("保存配置如下：")
-        Editor.log(this.config);
+        Editor.log(JSON.stringify(this._config));
         writeFileSync(savePath, JSON.stringify(this.config), { encoding: "utf-8" });
     }
 
@@ -401,7 +401,6 @@ class Helper {
 
     /**@description 对项目资源目录进度图片压缩 */
     onStartCompress(sourceAssetsDir: any) {
-
         // 需要排除的文件夹
         let excludeFolders = this.excludeFolders;
         // 需要排除的文件
@@ -424,7 +423,7 @@ class Helper {
             for (let i = 0; i < excludeFolders.length; i++) {
                 let tempPath = join(sourceAssetsDir, excludeFolders[i]);
                 if (filePath.startsWith(tempPath)) {
-                    Editor.log(`需要排除目录:${excludeFolders[i]}`);
+                    Editor.log(`需要排除目录:${excludeFolders[i]},排除文件:${filePath}`);
                     return false;
                 }
             }
@@ -433,7 +432,7 @@ class Helper {
             for (let i = 0; i < excludeFiles.length; i++) {
                 let tempPath = join(sourceAssetsDir, excludeFiles[i]);
                 if (filePath.startsWith(tempPath)) {
-                    Editor.log(`需要排除文件:${excludeFiles[i]}`);
+                    Editor.log(`需要排除文件:${excludeFiles[i]},排除文件:${filePath}`);
                     return false;
                 }
             }
