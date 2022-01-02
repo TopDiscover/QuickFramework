@@ -149,6 +149,11 @@ export class _Helper {
                         return arguments[1] + sourceData + arguments[3];
                     }
                     destData = destData.replace(/(\*\/)([\s\S\n]*)(declare\s*namespace\s*cc\s*\{)/g, replace);
+                    //(decRef\s*\()([autoRelease\?:boolean]*)(\)\s*:\s*cc.Asset)
+                    let replaceDecRef = function(){
+                        return arguments[1] + "autoRelease?:boolean" + arguments[3];
+                    }
+                    destData = destData.replace(/(decRef\s*\()([autoRelease\?:boolean]*)(\)\s*:\s*cc.Asset)/g,replaceDecRef);
                     fs.writeFileSync(destPath, destData, { encoding: "utf-8" });
                     Editor.log(data.desc);
                 } else {

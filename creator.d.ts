@@ -6654,7 +6654,7 @@ declare namespace cc {
 		!#zh
 		减少资源的引用并尝试进行自动释放。 
 		*/
-		decRef(): cc.Asset;	
+		decRef(autoRelease?:boolean): cc.Asset;	
 	}	
 	/** Predefined constants */
 	export class macro {		
