@@ -16,3 +16,7 @@ npm run build
 ```
 
 ## 用法
+
+如果安装出错，请修改hosts文件
+windows : C:\Windows\System32\drivers\etc\hosts
+199.232.28.133 raw.githubusercontent.com
