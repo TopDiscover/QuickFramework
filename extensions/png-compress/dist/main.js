@@ -13,8 +13,8 @@ exports.methods = {
     onBeforeBuild(platform) {
         console.log("[图片压缩]:", `开始构建,构建平台:${platform}`);
     },
-    onAfterBuild(dest, platform) {
-        Helper_1.helper.onAfterBuild(dest, platform);
+    onAfterBuild(op) {
+        Helper_1.helper.onAfterBuild(op);
     }
 };
 /**

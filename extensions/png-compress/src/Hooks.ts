@@ -1,4 +1,5 @@
 import { IBuildResult, IBuildTaskOption } from "../@types/packages/builder/@types";
+import { BuilderOptions } from "./Helper";
 
 const PACKAGE_NAME = 'png-compress'; 
 export function load() {
@@ -33,5 +34,11 @@ export async function onAfterCompressSettings(options: IBuildTaskOption, result:
 }
 export async function onAfterBuild(options: IBuildTaskOption, result: IBuildResult) {
     console.log(`[${PACKAGE_NAME}] =====>> onAfterBuild`);
-    Editor.Message.send(PACKAGE_NAME,"onAfterBuild",result.dest,options.platform);
+    let op : BuilderOptions = {
+        md5Cache : options.md5Cache,
+        dest : result.dest,
+        debug : options.debug,
+        platform : options.platform,
+    }
+    Editor.Message.send(PACKAGE_NAME,"onAfterBuild",op);
 }

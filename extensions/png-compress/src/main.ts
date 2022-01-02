@@ -1,6 +1,6 @@
 //@ts-ignore
 import { IBuildResult, IBuildTaskOption, Platform } from '../@types/packages/builder/@types';
-import { helper } from './Helper';
+import { BuilderOptions, helper } from './Helper';
 /**
  * @en 
  * @zh 为扩展的主进程的注册方法
@@ -12,8 +12,8 @@ export const methods: { [key: string]: (...any: any) => any } = {
     onBeforeBuild(platform:Platform) {
         console.log("[图片压缩]:",`开始构建,构建平台:${platform}`);
     },
-    onAfterBuild(dest:string,platform:Platform){
-        helper.onAfterBuild(dest,platform);
+    onAfterBuild(op:BuilderOptions){
+        helper.onAfterBuild(op);
     }
 };
 

@@ -15,6 +15,16 @@
         </ui-slider>
     </ui-prop>
     <ui-prop>
+        <ui-label slot="label" tooltip="* 相对于 assets/ 目录的路径&#10;* 多个值之间必须用换行隔开">需要排除的文件夹</ui-label>
+        <ui-textarea slot="content" v-on:blur="onInputExcludeFoldersOver($event.target.value)"
+            v-bind:value="excludeFolders" placeholder="相对于assets目录，多个值时，直接回车换行"></ui-textarea>
+    </ui-prop>
+    <ui-prop>
+        <ui-label slot="label" tooltip="* 相对于 assets/ 目录的路径&#10;* 多个值之间必须用换行隔开">需要排除的文件</ui-label>
+        <ui-textarea slot="content" v-on:blur="onInputExcludeFilesOver($event.target.value)" v-bind:value="excludeFiles"
+            placeholder="相对于assets目录，多个值时，直接回车换行"></ui-textarea>
+    </ui-prop>
+    <ui-prop>
         <ui-label slot="label">压缩进度</ui-label>
         <ui-progress slot="content" v-bind:value="progress"></ui-progress>
     </ui-prop>
@@ -41,16 +51,6 @@
     <ui-prop>
         <ui-label slot="label">项目资源目录</ui-label>
         <ui-file slot="content" v-bind:value="sourceAssetsDir" readonly></ui-file>
-    </ui-prop>
-    <ui-prop>
-        <ui-label slot="label" tooltip="* 相对于 assets/ 目录的路径&#10;* 多个值之间必须用 ',' 隔开">需要排除的文件夹</ui-label>
-        <ui-textarea slot="content" v-on:blur="onInputExcludeFoldersOver($event.target.value)"
-            v-bind:value="excludeFolders" placeholder="resources/common/,&#10;resources/login/"></ui-textarea>
-    </ui-prop>
-    <ui-prop>
-        <ui-label slot="label" tooltip="* 相对于 assets/ 目录的路径&#10;* 多个值之间必须用 ',' 隔开">需要排除的文件</ui-label>
-        <ui-textarea slot="content" v-on:blur="onInputExcludeFilesOver($event.target.value)" v-bind:value="excludeFiles"
-            placeholder="bundles/eliminate/texture/450/kai_450_xin_0.png,&#10;bundles/eliminate/texture/450/kai_450_xin_1.png"></ui-textarea>
     </ui-prop>
     <ui-button v-bind:disabled="isProcessing" @click="onStartCompress">开始压缩</ui-button>
 </ui-section>

@@ -41,6 +41,12 @@ async function onAfterCompressSettings(options, result) {
 exports.onAfterCompressSettings = onAfterCompressSettings;
 async function onAfterBuild(options, result) {
     console.log(`[${PACKAGE_NAME}] =====>> onAfterBuild`);
-    Editor.Message.send(PACKAGE_NAME, "onAfterBuild", result.dest, options.platform);
+    let op = {
+        md5Cache: options.md5Cache,
+        dest: result.dest,
+        debug: options.debug,
+        platform: options.platform,
+    };
+    Editor.Message.send(PACKAGE_NAME, "onAfterBuild", op);
 }
 exports.onAfterBuild = onAfterBuild;
