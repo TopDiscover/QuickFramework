@@ -211,7 +211,7 @@ gulp.task("tomin-images", (done) => {
 
 if (isWeb) {
     // 2.4.x 版本，web版本已经进行了js压缩
-    gulp.task("default", gulp.series("start", "tomin", "tomin-html", "tomin-css", "tomin-images", "delete-useless", "complete"));
+    gulp.task("default", gulp.series("start", "tomin", "tomin-html", "tomin-images", "delete-useless", "complete"));
 } else {
     gulp.task("default", gulp.series("start", "tomin", "complete"));
 }
