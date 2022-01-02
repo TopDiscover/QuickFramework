@@ -48,7 +48,7 @@ class LazyInfo {
             if (Array.isArray(info.data)) {
                 for (let i = 0; i < info.data.length; i++) {
                     if (info.data[i]) {
-                        info.data[i].decRef();
+                        info.data[i].decRef(false);
                     }
                 }
                 Log.d(`${LOG_TAG}向${this.name}获取待释放目录:${info.url}`);
@@ -56,7 +56,7 @@ class LazyInfo {
             } else {
                 if (isValid(info.data)) {
                     //获取后删除当前管理器的引用
-                    info.data.decRef();
+                    info.data.decRef(false);
                     Log.d(`${LOG_TAG}向${this.name}获取待释放资源:${info.url}`);
                     result = info.data;
                 }
@@ -86,7 +86,7 @@ class LazyInfo {
                         Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载目录${info.url}`);
                         for (let i = 0; i < info.data.length; i++) {
                             if (info.data[i]) {
-                                info.data[i].decRef();
+                                info.data[i].decRef(false);
                                 let path = `${info.url}/${info.data[i].name}`;
                                 bundle?.release(path, info.type);
                                 Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载资源${path}`);
@@ -95,7 +95,7 @@ class LazyInfo {
                     } else {
                         if (isValid(info.data)) {
                             //获取后删除当前管理器的引用
-                            info.data.decRef();
+                            info.data.decRef(false);
                             bundle?.release(info.url, info.type);
                             Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载资源${info.url}`);
                         }

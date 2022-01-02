@@ -185,7 +185,7 @@ class RemoteCaches {
         //先删除精灵帧
         if (this._spriteFrameCaches.has(url)) {
             //先释放引用计数
-            (<Asset>(this._spriteFrameCaches.get(url) as Resource.CacheData).data).decRef();
+            (<Asset>(this._spriteFrameCaches.get(url) as Resource.CacheData).data).decRef(false);
             this._spriteFrameCaches.delete(url);
             if (DEBUG) Log.d(`remove remote sprite frames resource url : ${url}`);
         }
@@ -199,7 +199,7 @@ class RemoteCaches {
         }
         if (cache && cache.data instanceof Asset) {
             if (DEBUG) Log.d(`释放加载的本地远程资源:${cache.info.url}`);
-            cache.data.decRef();
+            cache.data.decRef(false);
             cache.info.data = cache.data;
             Manager.releaseManger.releaseRemote(cache.info);
         }
@@ -274,7 +274,7 @@ export class CacheManager {
                 if (Array.isArray(info.data)) {
                     let isAllDelete = true;
                     for (let i = 0; i < info.data.length; i++) {
-                        info.data[i].decRef();
+                        info.data[i].decRef(false);
                         if (info.data[i].refCount != 0) {
                             isAllDelete = false;
                         }
@@ -284,7 +284,7 @@ export class CacheManager {
                         return true;
                     }
                 } else {
-                    info.data.decRef();
+                    info.data.decRef(false);
                     if (info.data.refCount == 0) {
                         this.remove(info.bundle, info.url);
                         return true;
