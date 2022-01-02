@@ -75,28 +75,24 @@ class _Helper {
     }
     /**@description 当前目录下的插件版本 */
     get curPluginVersion() {
-        if (this._curPluginVersion == -1) {
-            let versionPath = `${path.join(__dirname, "../engine/version.json")}`;
-            versionPath = path.normalize(versionPath);
-            let data = fs.readFileSync(versionPath, "utf-8");
-            let source = JSON.parse(data);
-            this._curPluginVersion = source.version;
-        }
+        let versionPath = `${path.join(__dirname, "../engine/version.json")}`;
+        versionPath = path.normalize(versionPath);
+        let data = fs.readFileSync(versionPath, "utf-8");
+        let source = JSON.parse(data);
+        this._curPluginVersion = source.version;
         return this._curPluginVersion;
     }
     /**@description 当前Creator目录下的引擎修正插件版本 */
     get creatorPluginVersion() {
-        if (this._creatorPluginVersion -= -1) {
-            let versionPath = `${this.appPath}/version.json`;
-            versionPath = path.normalize(versionPath);
-            if (fs.existsSync(versionPath)) {
-                let data = fs.readFileSync(versionPath, "utf-8");
-                let source = JSON.parse(data);
-                this._creatorPluginVersion = source.version;
-            }
-            else {
-                this._creatorPluginVersion = 0;
-            }
+        let versionPath = `${this.appPath}/version.json`;
+        versionPath = path.normalize(versionPath);
+        if (fs.existsSync(versionPath)) {
+            let data = fs.readFileSync(versionPath, "utf-8");
+            let source = JSON.parse(data);
+            this._creatorPluginVersion = source.version;
+        }
+        else {
+            this._creatorPluginVersion = 0;
         }
         return this._creatorPluginVersion;
     }
@@ -241,11 +237,24 @@ class _Helper {
 }
 exports._Helper = _Helper;
 const Helper = new _Helper();
+function onBuildStart(options, callback) {
+    if (Helper.isNeedUpdateVersion) {
+        Editor.error(`请先执行【项目工具】->【引擎修正】同步对引擎的修改，再构建!!!`);
+    }
+    callback();
+}
+function onBuildFinished(options, callback) {
+    callback();
+}
 function load() {
+    Editor.Builder.on('build-start', onBuildStart);
+    Editor.Builder.on('build-finished', onBuildFinished);
     Helper.generateEnv();
 }
 exports.load = load;
 function unload() {
+    Editor.Builder.removeListener('build-start', onBuildStart);
+    Editor.Builder.removeListener('build-finished', onBuildFinished);
 }
 exports.unload = unload;
 exports.messages = {
