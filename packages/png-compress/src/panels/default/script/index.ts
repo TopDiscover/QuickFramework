@@ -7,14 +7,23 @@ interface MyView {
     sourceAssetsDir: string;
     buildAssetsDir: string;
     progress : number;
-    isProcessing : boolean;
 }
 let view : MyView = null!;
+
+interface MYPanel{
+    shadowRoot : any;
+    $startCompressBtn : HTMLButtonElement;
+    $saveBtn : HTMLButtonElement;
+}
+
+let panel : MYPanel = null!;
+
 module.exports = Editor.Panel.extend({
     template: readFileSync(join(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
     style: readFileSync(join(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
     $: {
-        
+        startCompressBtn : "#startCompressBtn",
+        saveBtn : "#saveBtn"
     },
     messages: {
         //更新进度
@@ -22,7 +31,8 @@ module.exports = Editor.Panel.extend({
             if (view) {
                 view.progress = progress;
                 if (progress >= 100) {
-                    view.isProcessing = false;
+                    panel.$saveBtn.disabled = false;
+                    panel.$startCompressBtn.disabled = false;
                     helper.config.isProcessing = false;
                     helper.saveConfig();
                 }
@@ -31,7 +41,8 @@ module.exports = Editor.Panel.extend({
         //压缩开始
         onStartCompress() {
             if (view) {
-                view.isProcessing = true;
+                panel.$saveBtn.disabled = true;
+                panel.$startCompressBtn.disabled = true;
                 view.progress = 0;
             }
         },
@@ -43,7 +54,7 @@ module.exports = Editor.Panel.extend({
         }
     },
     ready() {
-        let self = this as any;
+        panel = this as any;
         let sourcePath = join(Editor.Project.path, "assets");
         const vm = new window.Vue({
             data() {
@@ -58,7 +69,6 @@ module.exports = Editor.Panel.extend({
                     excludeFolders: helper.config.excludeFolders,
                     excludeFiles: helper.config.excludeFiles,
 
-                    isProcessing: helper.config.isProcessing,//开始及保存按钮操作状态
                     progress: 0,//压缩进度
                     buildAssetsDir: "",//构建资源目录
                     sourceAssetsDir: sourcePath,
@@ -136,11 +146,13 @@ module.exports = Editor.Panel.extend({
             },
             created: function () {
                 view = this as any;
+                panel.$saveBtn.disabled = helper.config.isProcessing;
+                panel.$startCompressBtn.disabled = helper.config.isProcessing;
             },
             mounted: function () {
 
             },
-            el: self.shadowRoot
+            el: panel.shadowRoot
         });
     },
     beforeClose() { },

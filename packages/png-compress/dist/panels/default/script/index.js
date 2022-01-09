@@ -4,17 +4,22 @@ const fs_extra_1 = require("fs-extra");
 const path_1 = require("path");
 const Helper_1 = require("../../../Helper");
 let view = null;
+let panel = null;
 module.exports = Editor.Panel.extend({
     template: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
     style: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
-    $: {},
+    $: {
+        startCompressBtn: "#startCompressBtn",
+        saveBtn: "#saveBtn"
+    },
     messages: {
         //更新进度
         updateProgess(sender, progress) {
             if (view) {
                 view.progress = progress;
                 if (progress >= 100) {
-                    view.isProcessing = false;
+                    panel.$saveBtn.disabled = false;
+                    panel.$startCompressBtn.disabled = false;
                     Helper_1.helper.config.isProcessing = false;
                     Helper_1.helper.saveConfig();
                 }
@@ -23,7 +28,8 @@ module.exports = Editor.Panel.extend({
         //压缩开始
         onStartCompress() {
             if (view) {
-                view.isProcessing = true;
+                panel.$saveBtn.disabled = true;
+                panel.$startCompressBtn.disabled = true;
                 view.progress = 0;
             }
         },
@@ -35,7 +41,7 @@ module.exports = Editor.Panel.extend({
         }
     },
     ready() {
-        let self = this;
+        panel = this;
         let sourcePath = path_1.join(Editor.Project.path, "assets");
         const vm = new window.Vue({
             data() {
@@ -47,7 +53,6 @@ module.exports = Editor.Panel.extend({
                     speed: Helper_1.helper.config.speed,
                     excludeFolders: Helper_1.helper.config.excludeFolders,
                     excludeFiles: Helper_1.helper.config.excludeFiles,
-                    isProcessing: Helper_1.helper.config.isProcessing,
                     progress: 0,
                     buildAssetsDir: "",
                     sourceAssetsDir: sourcePath,
@@ -125,10 +130,12 @@ module.exports = Editor.Panel.extend({
             },
             created: function () {
                 view = this;
+                panel.$saveBtn.disabled = Helper_1.helper.config.isProcessing;
+                panel.$startCompressBtn.disabled = Helper_1.helper.config.isProcessing;
             },
             mounted: function () {
             },
-            el: self.shadowRoot
+            el: panel.shadowRoot
         });
     },
     beforeClose() { },

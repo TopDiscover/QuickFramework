@@ -27,7 +27,7 @@
         <ui-prop name="压缩进度">
             <ui-progress class="flex-1" v-bind:value="progress"></ui-progress>
         </ui-prop>
-        <ui-button v-bind:disabled="isProcessing" @click="onSaveConfig">保存</ui-button>
+        <ui-button id = "saveBtn" @click="onSaveConfig">保存</ui-button>
     </ui-box-container>
     <h2>构建完成设置</h2>
     <ui-box-container class="layout vertical">
@@ -62,7 +62,7 @@
             </ui-input>
             <ui-button @confirm="onOpenSourceAssetsDir"><i class="icon-doc-text"></i></ui-button>
         </ui-prop>
-        <ui-button v-bind:disabled="isProcessing" @click="onStartCompress">开始压缩</ui-button>
+        <ui-button id = "startCompressBtn" @click="onStartCompress">开始压缩</ui-button>
     </ui-box-container>
     <ui-hint>💡 小贴士：如果 Spine Skeleton 或 DragonBones 的纹理在压缩后出现透明度丢失的情况，可以参考下面两种解决方案（二选一）：
         <br>
