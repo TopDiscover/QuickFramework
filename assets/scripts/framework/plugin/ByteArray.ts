@@ -910,9 +910,9 @@
          * @platform Web,Native
          * @language zh_CN
          */
-        public writeUTFBytes(value: string): void {
-            this.encodeUTF8(value);
-            this._writeUint8Array(this.encodeUTF8(value));
+        public writeUTFBytes(value: string,byteSize:number | undefined): void {
+            // this.encodeUTF8(value);
+            this._writeUint8Array(this.encodeUTF8(value,byteSize));
         }
 
        
@@ -977,7 +977,7 @@
          * @private
          * UTF-8 Encoding/Decoding
          */
-        private encodeUTF8(str: string): Uint8Array {
+        private encodeUTF8(str: string,byteSize?:number|undefined): Uint8Array {
             let pos: number = 0;
             let codePoints = this.stringToCodePoints(str);
             let outputBytes = [];
@@ -989,7 +989,16 @@
                     this.encoderError(code_point);
                 }
                 else if (this.inRange(code_point, 0x0000, 0x007f)) {
-                    outputBytes.push(code_point);
+                    if( byteSize == undefined ){
+                        outputBytes.push(code_point);
+                    }else{
+                        //定长字节数处理
+                        if ( outputBytes.length +1 < byteSize ){
+                            outputBytes.push(code_point);
+                        }else{
+                            break;
+                        }
+                    }
                 } else {
                     let count = 0 , offset = 0;
                     if (this.inRange(code_point, 0x0080, 0x07FF)) {
@@ -1003,12 +1012,39 @@
                         offset = 0xF0;
                     }
 
-                    outputBytes.push(this.div(code_point, Math.pow(64, count)) + offset);
+                    if ( byteSize == undefined ){
+                        outputBytes.push(this.div(code_point, Math.pow(64, count)) + offset);
 
-                    while (count > 0) {
-                        let temp = this.div(code_point, Math.pow(64, count - 1));
-                        outputBytes.push(0x80 + (temp % 64));
-                        count -= 1;
+                        while (count > 0) {
+                            let temp = this.div(code_point, Math.pow(64, count - 1));
+                            outputBytes.push(0x80 + (temp % 64));
+                            count -= 1;
+                        }
+                    }else{
+                        let pushCount = 0;
+                        outputBytes.push(this.div(code_point, Math.pow(64, count)) + offset);
+                        pushCount++;
+                        while (count > 0) {
+                            let temp = this.div(code_point, Math.pow(64, count - 1));
+                            outputBytes.push(0x80 + (temp % 64));
+                            count -= 1;
+                            pushCount++;
+                        }
+                        if ( outputBytes.length > byteSize ){
+                            outputBytes.splice(outputBytes.length-pushCount,pushCount);
+                            break;
+                        }
+                    }
+                    
+                }
+            }
+            if ( byteSize != undefined ){
+                if( outputBytes.length < byteSize ){
+                    //不足字节，补足字节数
+                    let count = byteSize - outputBytes.length;
+                    while(count>0){
+                        outputBytes.push(0x00);
+                        count--;
                     }
                 }
             }
