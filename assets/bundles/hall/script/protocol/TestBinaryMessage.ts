@@ -62,6 +62,9 @@ export class TestBinaryMessage extends BinaryStreamMessage {
     @serialize("vHello",STRING)
     vHello : string = "您好，我是Binary消息！"
 
+    @serialize("vLimitString",STRING,12)
+    vLimitString : string = "这是一个定长字节数字符串的测试";
+
     constructor(){
         super();
         this.vMap.set("keyy_1",1);

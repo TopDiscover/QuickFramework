@@ -13,9 +13,16 @@ type NumberValueConstructor = typeof NumberValue;
 type STRINGConstructor = typeof STRING;
 type BOOLConstructor = typeof BOOL;
 
+/**
+ * 
+ * @param key 序列化的Key
+ * @param type 序列化的类型
+ * @param byteSize 序列化指定字节长度，只有STRING有效
+ */
 export function serialize(
     key: string,
-    type: BinaryStreamConstructor | NumberValueConstructor | STRINGConstructor | BOOLConstructor
+    type: BinaryStreamConstructor | NumberValueConstructor | STRINGConstructor | BOOLConstructor,
+    byteSize ?: number
 ): Function;
 export function serialize(
     key: string,
@@ -91,6 +98,8 @@ export class BOOL extends StreamValue<boolean>{
 /**@description 字符串类型 */
 export class STRING extends StreamValue<string> {
     data = "";
+    /**@description 定长字节数大小,注意不是字符串的个数 */
+    byteSize : number | undefined = undefined;
     read(byteArray: ByteArray) {
         //先读取字符串长度
         let size = byteArray.readUnsignedInt();
@@ -99,7 +108,7 @@ export class STRING extends StreamValue<string> {
 
     write(byteArray: ByteArray) {
         let buffer = new ByteArray();
-        buffer.writeUTFBytes(this.data);
+        buffer.writeUTFBytes(this.data,this.byteSize);
         byteArray.writeUnsignedInt(buffer.length);
         byteArray.writeBytes(buffer);
     }
@@ -235,7 +244,7 @@ export abstract class BinaryStream extends Message {
         } else if( this.isBoolValue(valueType) ){
             this.serializeBoolValue(value,valueType);
         } else if (this.isStringValue(valueType)) {
-            this.serializeStringStreamValue(value, valueType);
+            this.serializeStringStreamValue(value, valueType,arrTypeOrMapKeyType);
         } else if (value instanceof Array) {
             this.serializeArray(value, memberName, valueType, arrTypeOrMapKeyType, mapValueType);
         } else if (value instanceof Map) {
@@ -260,8 +269,9 @@ export abstract class BinaryStream extends Message {
         type.write(this.byteArray);
     }
 
-    private serializeStringStreamValue(value: string, valueType: typeof STRING) {
+    private serializeStringStreamValue(value: string, valueType: typeof STRING,byteSize:number|undefined) {
         let type = new valueType();
+        type.byteSize = byteSize;
         type.data = (value === undefined || value === null) ? "" : value;
         type.write(this.byteArray);
     }
