@@ -34,7 +34,7 @@ export class UpdateManager {
     }
 
     /**@description 是否路过热更新 */
-    public isSkipCheckUpdate = true;
+    public isSkipCheckUpdate = false;
 
     /**@description 资源管理器 */
     private assetsManagers: { [key: string]: Update.AssetsManager } = {};
@@ -52,6 +52,16 @@ export class UpdateManager {
         }
     }
 
+    private get mainBundles(){
+        return [
+            "src", //这个里面会包含工程的插件脚本，如该工程的protobuf.js CryptoJS.js,如果考虑后面会升级，加入到里面
+            "jsb-adapter", //这个东西一般不会变，不用加载到版本控制中
+            "assets/main",
+            "assets/resources",
+            "assets/internal"
+        ];
+    }
+
     /**@description 获取资源管理器，默认为hall 大厅的资源管理器 */
     getAssetsManager(item: UpdateItem) {
         //初始化资源管理器
@@ -62,7 +72,7 @@ export class UpdateManager {
             this.assetsManagers[name].manager = new jsb.AssetsManager(name == Update.MAIN_PACK ? `type.${Update.MAIN_PACK}` : `type.${name}`, this.storagePath);
             //设置下载并发量
             this.assetsManagers[name].manager.setPackageUrl(this.hotUpdateUrl);
-            this.assetsManagers[name].manager.setMainBundles(Manager.bundleManager.mainBundles);
+            this.assetsManagers[name].manager.setMainBundles(this.mainBundles);
             //设置重新下载的标准
             this.assetsManagers[name].manager.setDownloadAgainZip(0.8);
         }

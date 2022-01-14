@@ -359,10 +359,11 @@ class Helper {
     /**@description 返回需要添加到主包版本的文件目录 */
     private getMainBundleIncludes() {
         return [
-            // "src", //这个里面会包含工程的插件脚本，如该工程的protobuf.js CryptoJS.js,如果考虑后面会升级，加入到里面
-            // "jsb-adapter", //这个东西一般不会变，不用加载到版本控制中
+            "src", //这个里面会包含工程的插件脚本，如该工程的protobuf.js CryptoJS.js,如果考虑后面会升级，加入到里面
+            "jsb-adapter", //这个东西一般不会变，不用加载到版本控制中
             "assets/main",
             "assets/resources",
+            "assets/internal"
         ];
     }
     /**@description 删除不包含在包内的bundles */

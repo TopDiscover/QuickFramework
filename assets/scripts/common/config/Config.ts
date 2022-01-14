@@ -16,7 +16,7 @@ export namespace Config {
     export const isSkipCheckUpdate = false;
 
     /**@description 测试热更新服务器地址 */
-    export const TEST_HOT_UPDATE_URL_ROOT = "http://172.20.11.233/hotupdate";//"http://192.168.0.104:9945/hotupdate";
+    export const TEST_HOT_UPDATE_URL_ROOT = "http://192.168.3.153/hotupdate";//"http://192.168.0.104:9945/hotupdate";
 
     /**@description Loading动画显示超时回调默认超时时间 */
     export const LOADING_TIME_OUT = 30;
