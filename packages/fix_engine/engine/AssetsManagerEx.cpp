@@ -233,7 +233,8 @@ void AssetsManagerEx::initManifests()
             // Manifest parse failed, remove all temp files
             if (!_tempManifest->isLoaded())
             {
-                _fileUtils->removeDirectory(_tempStoragePath);
+                //_fileUtils->removeDirectory(_tempStoragePath);
+				removeTempDirectory();
                 CC_SAFE_RELEASE(_tempManifest);
                 _tempManifest = nullptr;
             }
@@ -439,21 +440,31 @@ bool AssetsManagerEx::loadLocalManifest(const std::string& manifestUrl)
     return true;
 }
 
-void AssetsManagerEx::removeCachedDirectory() {
+void AssetsManagerEx::removeBundleDirectory(const std::string& path) {
 	if (_bundle == MAIN_BUNDLE) {
 		//只删除当前bundle的资源
 		for (auto it = _mainBundles.begin(); it != _mainBundles.end(); ++it) {
-			auto path = _storagePath + ASSETS + "/" + *it + "/";
-			_fileUtils->removeDirectory(path);
+			auto dir = path + ASSETS + "/" + *it + "/";
+			_fileUtils->removeDirectory(dir);
 		}
-		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + VERSION_FILENAME);
-		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
+		_fileUtils->removeFile(path + MANIFEST_PATH + _bundle + VERSION_FILENAME);
+		_fileUtils->removeFile(path + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
+		_fileUtils->removeFile(path + MANIFEST_PATH + _bundle + TEMP_MANIFEST_FILENAME);
 	}
 	else {
-		_fileUtils->removeDirectory(_storagePath + ASSETS + "/" + _bundle + "/");
-		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + VERSION_FILENAME);
-		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
+		_fileUtils->removeDirectory(path + ASSETS + "/" + _bundle + "/");
+		_fileUtils->removeFile(path + MANIFEST_PATH + _bundle + VERSION_FILENAME);
+		_fileUtils->removeFile(path + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
+		_fileUtils->removeFile(path + MANIFEST_PATH + _bundle + TEMP_MANIFEST_FILENAME);
 	}
+}
+
+void AssetsManagerEx::removeCachedDirectory() {
+	removeBundleDirectory(_storagePath);
+}
+
+void AssetsManagerEx::removeTempDirectory() {
+	removeBundleDirectory(_tempStoragePath);
 }
 
 bool AssetsManagerEx::isNeedDownLoadZip(float download, float total) {
@@ -516,7 +527,8 @@ bool AssetsManagerEx::loadRemoteManifest(Manifest* remoteManifest)
     if (_localManifest->equal(_remoteManifest))
     {
         _updateState = State::UP_TO_DATE;
-        _fileUtils->removeDirectory(_tempStoragePath);
+        //_fileUtils->removeDirectory(_tempStoragePath);
+		removeTempDirectory();
         dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ALREADY_UP_TO_DATE);
     }
     else
@@ -842,7 +854,8 @@ void AssetsManagerEx::parseVersion()
         if (_localManifest->equal(_remoteManifest))
         {
             _updateState = State::UP_TO_DATE;
-            _fileUtils->removeDirectory(_tempStoragePath);
+            //_fileUtils->removeDirectory(_tempStoragePath);
+			removeTempDirectory();
             dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ALREADY_UP_TO_DATE);
         }
         else
@@ -894,7 +907,8 @@ void AssetsManagerEx::parseManifest()
         if (_localManifest->equal(_remoteManifest))
         {
             _updateState = State::UP_TO_DATE;
-            _fileUtils->removeDirectory(_tempStoragePath);
+            //_fileUtils->removeDirectory(_tempStoragePath);
+			removeTempDirectory();
             dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ALREADY_UP_TO_DATE);
         }
         else
@@ -958,7 +972,8 @@ void AssetsManagerEx::prepareUpdate()
         if (_tempManifest)
         {
             // Remove all temp files
-            _fileUtils->removeDirectory(_tempStoragePath);
+            //_fileUtils->removeDirectory(_tempStoragePath);
+			removeTempDirectory();
             CC_SAFE_RELEASE(_tempManifest);
             // Recreate temp storage path and save remote manifest
             _fileUtils->createDirectory(_tempStoragePath);
@@ -1135,7 +1150,8 @@ void AssetsManagerEx::updateSucceed()
     // 7. Notify finished event
     dispatchUpdateEvent(EventAssetsManagerEx::EventCode::UPDATE_FINISHED);
     // 8. Remove temp storage path
-    _fileUtils->removeDirectory(_tempStoragePath);
+	removeTempDirectory();
+    //_fileUtils->removeDirectory(_tempStoragePath);
 }
 
 void AssetsManagerEx::checkUpdate()
@@ -1491,8 +1507,8 @@ void AssetsManagerEx::onSuccess(const std::string &/*srcUrl*/, const std::string
 
 void AssetsManagerEx::destroyDownloadedVersion()
 {
-    _fileUtils->removeDirectory(_storagePath);
-    _fileUtils->removeDirectory(_tempStoragePath);
+    removeCachedDirectory();
+	removeTempDirectory();
 }
 
 void AssetsManagerEx::batchDownload()

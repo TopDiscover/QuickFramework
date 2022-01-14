@@ -1,5 +1,5 @@
 @echo off
-set COCOS_CREATOR_ROOT="D:/Creator/Creator/2.4.5/resources"
+set COCOS_CREATOR_ROOT="C:/CocosDashboard/resources/.editors/Creator/2.4.5Quick/resources"
 
 set SETX=setx
 

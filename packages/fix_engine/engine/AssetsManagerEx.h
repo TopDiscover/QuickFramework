@@ -304,6 +304,8 @@ protected:
 	/* 删除缓存中下载文件                                                   */
 	/************************************************************************/
 	void removeCachedDirectory();
+	void removeTempDirectory();
+	void removeBundleDirectory(const std::string& path);
 
 	bool isNeedDownLoadZip(float download, float total);
 
