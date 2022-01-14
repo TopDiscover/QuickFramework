@@ -478,6 +478,7 @@ void AssetsManagerEx::toDownloadZip() {
 	unit.srcUrl = _packageUrl + "/zips/" + unit.customId;
 	unit.storagePath = _tempStoragePath + unit.customId;
 	unit.size = _remoteManifest->getTotalSize();
+	unit.compressed = true;
 	_remoteManifest->updateToZipAsset(unit);
 
 	_downloadUnits.emplace(unit.customId, unit);
@@ -1001,6 +1002,7 @@ void AssetsManagerEx::prepareUpdate()
 							unit.srcUrl = packageUrl + path + "?md5=" + diff.asset.md5;
 							unit.storagePath = _tempStoragePath + path;
 							unit.size = diff.asset.size;
+							unit.compressed = diff.asset.compressed;
 							_downloadUnits.emplace(unit.customId, unit);
 							_tempManifest->setAssetDownloadState(it->first, Manifest::DownloadState::UNSTARTED);
 							_totalSize += unit.size;
@@ -1457,13 +1459,26 @@ void AssetsManagerEx::onSuccess(const std::string &/*srcUrl*/, const std::string
 
         if (ok)
         {
-            bool compressed = assetIt != assets.end() ? assetIt->second.compressed : false;
+			auto isCompressed = [&]( )->bool{
+				if (assetIt != assets.end()) {
+					return assetIt->second.compressed;
+				}
+				else {
+					auto unitIt = _downloadUnits.find(customId);
+					if (unitIt != _downloadUnits.end()){
+						return unitIt->second.compressed;
+					}
+				}
+				return false;
+			};
+			bool compressed = isCompressed();//assetIt != assets.end() ? assetIt->second.compressed : false;
             if (compressed)
             {
                 decompressDownloadedZip(customId, storagePath);
             }
             else
             {
+				
                 fileSuccess(customId, storagePath);
             }
         }

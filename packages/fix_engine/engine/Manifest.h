@@ -46,6 +46,7 @@ struct DownloadUnit
     std::string storagePath;
     std::string customId;
     float       size;
+	bool compressed;
 };
 
 struct ManifestAsset {
