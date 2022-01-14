@@ -441,19 +441,30 @@ bool AssetsManagerEx::loadLocalManifest(const std::string& manifestUrl)
 }
 
 void AssetsManagerEx::removeBundleDirectory(const std::string& path) {
+
+	auto saveRemoveDirectory = [=]( const std::string& dir ) {
+		if (_fileUtils->isDirectoryExist(dir)) {
+			_fileUtils->removeDirectory(dir);
+		}
+	};
+	auto saveRemoveFile = [=](const std::string& fullPath) {
+		if (_fileUtils->isFileExist(fullPath)) {
+			_fileUtils->removeFile(fullPath);
+		}
+	};
+
 	if (_bundle == MAIN_BUNDLE) {
 		//只删除当前bundle的资源
 		for (auto it = _mainBundles.begin(); it != _mainBundles.end(); ++it) {
-			auto dir = path + *it + "/";
-			_fileUtils->removeDirectory(dir);
+			saveRemoveDirectory(path + *it + "/");
 		}
-		_fileUtils->removeFile(path + MANIFEST_PATH + _bundle + VERSION_FILENAME);
-		_fileUtils->removeFile(path + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
+		saveRemoveFile(path + MANIFEST_PATH + _bundle + VERSION_FILENAME);
+		saveRemoveFile(path + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
 	}
 	else {
-		_fileUtils->removeDirectory(path + ASSETS + "/" + _bundle + "/");
-		_fileUtils->removeFile(path + MANIFEST_PATH + _bundle + VERSION_FILENAME);
-		_fileUtils->removeFile(path + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
+		saveRemoveDirectory(path + ASSETS + "/" + _bundle + "/");
+		saveRemoveFile(path + MANIFEST_PATH + _bundle + VERSION_FILENAME);
+		saveRemoveFile(path + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
 	}
 }
 
