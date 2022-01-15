@@ -600,7 +600,11 @@ class Helper {
     }
     onBuildStart(options: BuildOptions, callback: Function) {
         this.config.buildDir = options.dest;
-        Editor.Panel.open("hotupdate");
+        if ("win32" === options.platform || "android" === options.platform || "ios" === options.platform || "mac" === options.platform){
+            Editor.warn(`如果热更新勾选了【自动生成】或【自动部署】请不要关闭此界面`);
+            Editor.Panel.open("hotupdate");
+        }
+        
         this.saveConfig();
         this.resetProgress();
         this.resetCreateProgress();
