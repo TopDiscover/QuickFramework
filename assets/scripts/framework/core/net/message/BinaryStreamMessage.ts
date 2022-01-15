@@ -109,7 +109,10 @@ export class STRING extends StreamValue<string> {
     write(byteArray: ByteArray) {
         let buffer = new ByteArray();
         buffer.writeUTFBytes(this.data,this.byteSize);
-        byteArray.writeUnsignedInt(buffer.length);
+        if ( this.byteSize == undefined){
+            //不定长处理
+            byteArray.writeUnsignedInt(buffer.length);
+        }
         byteArray.writeBytes(buffer);
     }
 }
