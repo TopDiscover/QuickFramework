@@ -29,7 +29,7 @@ class Helper {
     }
     /**@description 配置存储路径 */
     get configPath() {
-        let savePath = `${path_1.default.join(Editor.Project.path, "config/gulp-compress.json")}`;
+        let savePath = `${path_1.default.join(__dirname, "../../../local/gulp-compress.json")}`;
         savePath = path_1.normalize(savePath);
         return savePath;
     }
