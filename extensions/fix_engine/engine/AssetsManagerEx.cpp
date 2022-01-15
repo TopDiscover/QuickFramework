@@ -168,7 +168,7 @@ void AssetsManagerEx::initManifests() {
         if (_fileUtils->isFileExist(_tempManifestPath)) {
             // Manifest parse failed, remove all temp files
             if (!_tempManifest->isLoaded()) {
-                _fileUtils->removeDirectory(_tempStoragePath);
+                removeTempDirectory();
                 CC_SAFE_RELEASE(_tempManifest);
                 _tempManifest = nullptr;
             }
@@ -337,21 +337,40 @@ bool AssetsManagerEx::loadLocalManifest(const std::string &manifestUrl) {
     return true;
 }
 
-void AssetsManagerEx::removeCachedDirectory() {
+void AssetsManagerEx::removeBundleDirectory(const std::string& path) {
+
+	auto saveRemoveDirectory = [=]( const std::string& dir ) {
+		if (_fileUtils->isDirectoryExist(dir)) {
+			_fileUtils->removeDirectory(dir);
+		}
+	};
+	auto saveRemoveFile = [=](const std::string& fullPath) {
+		if (_fileUtils->isFileExist(fullPath)) {
+			_fileUtils->removeFile(fullPath);
+		}
+	};
+
 	if (_bundle == MAIN_BUNDLE) {
 		//只删除当前bundle的资源
 		for (auto it = _mainBundles.begin(); it != _mainBundles.end(); ++it) {
-			auto path = _storagePath + ASSETS + "/" + *it + "/";
-			_fileUtils->removeDirectory(path);
+			saveRemoveDirectory(path + *it + "/");
 		}
-		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + VERSION_FILENAME);
-		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
+		saveRemoveFile(path + MANIFEST_PATH + _bundle + VERSION_FILENAME);
+		saveRemoveFile(path + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
 	}
 	else {
-		_fileUtils->removeDirectory(_storagePath + ASSETS + "/" + _bundle + "/");
-		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + VERSION_FILENAME);
-		_fileUtils->removeFile(_storagePath + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
+		saveRemoveDirectory(path + ASSETS + "/" + _bundle + "/");
+		saveRemoveFile(path + MANIFEST_PATH + _bundle + VERSION_FILENAME);
+		saveRemoveFile(path + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
 	}
+}
+
+void AssetsManagerEx::removeCachedDirectory() {
+	removeBundleDirectory(_storagePath);
+}
+
+void AssetsManagerEx::removeTempDirectory() {
+	removeBundleDirectory(_tempStoragePath);
 }
 
 bool AssetsManagerEx::isNeedDownLoadZip(float download, float total) {
@@ -376,6 +395,7 @@ void AssetsManagerEx::toDownloadZip() {
 	unit.srcUrl = _packageUrl + "/zips/" + unit.customId;
 	unit.storagePath = _tempStoragePath + unit.customId;
 	unit.size = _remoteManifest->getTotalSize();
+	unit.compressed = true;
 	_remoteManifest->updateToZipAsset(unit);
 
 	_downloadUnits.emplace(unit.customId, unit);
@@ -408,7 +428,7 @@ bool AssetsManagerEx::loadRemoteManifest(Manifest *remoteManifest) {
     // Compare manifest version and set state
     if (_localManifest->equal(_remoteManifest)) {
         _updateState = State::UP_TO_DATE;
-        _fileUtils->removeDirectory(_tempStoragePath);
+        removeTempDirectory();
         dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ALREADY_UP_TO_DATE);
     } else {
         _updateState = State::NEED_UPDATE;
@@ -686,7 +706,7 @@ void AssetsManagerEx::parseVersion() {
     } else {
         if (_localManifest->equal(_remoteManifest)) {
             _updateState = State::UP_TO_DATE;
-            _fileUtils->removeDirectory(_tempStoragePath);
+            removeTempDirectory();
             dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ALREADY_UP_TO_DATE);
         } else {
             _updateState = State::PREDOWNLOAD_MANIFEST;
@@ -728,7 +748,7 @@ void AssetsManagerEx::parseManifest() {
     } else {
         if (_localManifest->equal(_remoteManifest)) {
             _updateState = State::UP_TO_DATE;
-            _fileUtils->removeDirectory(_tempStoragePath);
+            removeTempDirectory();
             dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ALREADY_UP_TO_DATE);
         } else {
             _updateState = State::NEED_UPDATE;
@@ -780,7 +800,7 @@ void AssetsManagerEx::prepareUpdate() {
         // Temporary manifest exists, but can't be parsed or version doesn't equals remote manifest (out of date)
         if (_tempManifest) {
             // Remove all temp files
-            _fileUtils->removeDirectory(_tempStoragePath);
+            removeTempDirectory();
             CC_SAFE_RELEASE(_tempManifest);
             // Recreate temp storage path and save remote manifest
             _fileUtils->createDirectory(_tempStoragePath);
@@ -820,6 +840,7 @@ void AssetsManagerEx::prepareUpdate() {
 							unit.srcUrl = packageUrl + path + "?md5=" + diff.asset.md5;
 							unit.storagePath = _tempStoragePath + path;
 							unit.size = diff.asset.size;
+							unit.compressed = diff.asset.compressed;
 							_downloadUnits.emplace(unit.customId, unit);
 							_tempManifest->setAssetDownloadState(it->first, Manifest::DownloadState::UNSTARTED);
 							_totalSize += unit.size;
@@ -885,45 +906,21 @@ void AssetsManagerEx::updateSucceed() {
     // 2. Get the delete files
     std::unordered_map<std::string, Manifest::AssetDiff> diff_map = _localManifest->genDiff(_remoteManifest);
 
-    // 3. merge temporary storage path to storage path so that temporary version turns to cached version
-    if (_fileUtils->isDirectoryExist(_tempStoragePath)) {
-        // Merging all files in temp storage path to storage path
-        std::vector<std::string> files;
-        _fileUtils->listFilesRecursively(_tempStoragePath, &files);
-        int baseOffset = (int)_tempStoragePath.length();
-        std::string relativePath, dstPath;
-        for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); ++it) {
-            relativePath.assign((*it).substr(baseOffset));
-            dstPath.assign(_storagePath + relativePath);
-            // Create directory
-            if (relativePath.back() == '/') {
-                _fileUtils->createDirectory(dstPath);
-            }
-            // Copy file
-            else {
-                if (_fileUtils->isFileExist(dstPath)) {
-                    _fileUtils->removeFile(dstPath);
-                }
-                _fileUtils->renameFile(*it, dstPath);
-            }
-
-            // Remove from delete list for safe, although this is not the case in general.
-            auto diff_itr = diff_map.find(relativePath);
-            if (diff_itr != diff_map.end()) {
-                diff_map.erase(diff_itr);
-            }
-        }
-
-        // Preprocessing local files in previous version and creating download folders
-        for (auto it = diff_map.begin(); it != diff_map.end(); ++it) {
-            Manifest::AssetDiff diff = it->second;
-            if (diff.type == Manifest::DiffType::DELETED) {
-                // TODO: Do this when download finish, it don’t matter delete or not.
-                std::string exsitedPath = _storagePath + diff.asset.path;
-                _fileUtils->removeFile(exsitedPath);
-            }
-        }
-    }
+	if (this->_isUsingBundle) {
+		if (_bundle == MAIN_BUNDLE) {
+			for (auto i = 0; i < _mainBundles.size(); i++) {
+				auto path = _mainBundles[i] + "/";
+				moveTempToCached(_tempStoragePath + path, path, diff_map, i + 1 == _mainBundles.size());
+			}
+		}
+		else {
+			auto path = ASSETS + std::string("/") + _bundle + "/";
+			moveTempToCached(_tempStoragePath + path, path, diff_map);
+		}
+	}
+	else {
+		moveTempToCached(_tempStoragePath, "", diff_map);
+	}
 
     // 4. swap the localManifest
     CC_SAFE_RELEASE(_localManifest);
@@ -937,7 +934,107 @@ void AssetsManagerEx::updateSucceed() {
     // 7. Notify finished event
     dispatchUpdateEvent(EventAssetsManagerEx::EventCode::UPDATE_FINISHED);
     // 8. Remove temp storage path
-    _fileUtils->removeDirectory(_tempStoragePath);
+    removeTempDirectory();
+}
+
+void AssetsManagerEx::moveTempToCached(const std::string& root, const std::string& path, std::unordered_map<std::string, Manifest::AssetDiff>& diff_map, bool isComplete) {
+
+	// 3. merge temporary storage path to storage path so that temporary version turns to cached version
+	if (_fileUtils->isDirectoryExist(root)) {
+		// Merging all files in temp storage path to storage path
+		std::vector<std::string> files;
+		_fileUtils->listFilesRecursively(root, &files);
+		int baseOffset = (int)_tempStoragePath.length();
+		
+		//字符串分割函数
+		auto split = [](std::string str, std::string pattern = "/")
+		{
+			std::string::size_type pos;
+			std::vector<std::string> result;
+			str += pattern;//扩展字符串以方便操作
+			int size = str.size();
+			for (int i = 0; i < size; i++)
+			{
+				pos = str.find(pattern, i);
+				if (pos < size)
+				{
+					std::string s = str.substr(i, pos - i);
+					if (s.size() > 0) {
+						result.push_back(s);
+					}
+					i = pos + pattern.size() - 1;
+				}
+			}
+			return result;
+		};
+
+		auto paths = split(path);
+		auto tempDstPath = _storagePath;
+		for (auto it = paths.begin(); it != paths.end(); ++it) {
+			tempDstPath += *it + "/";
+			if (!_fileUtils->isDirectoryExist(tempDstPath)) {
+				_fileUtils->createDirectory(tempDstPath);
+			}
+		}
+		std::string relativePath, dstPath;
+		for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); ++it) {
+			relativePath.assign((*it).substr(baseOffset));
+			dstPath.assign(_storagePath + relativePath);
+			// Create directory
+			if (relativePath.back() == '/') {
+				_fileUtils->createDirectory(dstPath);
+			}
+			// Copy file
+			else {
+				if (_fileUtils->isFileExist(dstPath)) {
+					_fileUtils->removeFile(dstPath);
+				}
+				_fileUtils->renameFile(*it, dstPath);
+			}
+
+			// Remove from delete list for safe, although this is not the case in general.
+			auto diff_itr = diff_map.find(relativePath);
+			if (diff_itr != diff_map.end()) {
+				diff_map.erase(diff_itr);
+			}
+		}
+
+		// Preprocessing local files in previous version and creating download folders
+		for (auto it = diff_map.begin(); it != diff_map.end(); ++it) {
+			Manifest::AssetDiff diff = it->second;
+			if (diff.type == Manifest::DiffType::DELETED) {
+				// TODO: Do this when download finish, it don’t matter delete or not.
+				std::string exsitedPath = _storagePath + diff.asset.path;
+				_fileUtils->removeFile(exsitedPath);
+			}
+		}
+
+		//完成后复制版本文件
+		if (isComplete) {
+			auto tempDstRoot = _storagePath + MANIFEST_PATH;
+			if (!_fileUtils->isDirectoryExist(tempDstRoot)) {
+				_fileUtils->createDirectory(tempDstRoot);
+			}
+
+			auto versionDstPath = tempDstRoot + _bundle + VERSION_FILENAME;
+			if (_fileUtils->isFileExist(versionDstPath))
+			{
+				_fileUtils->removeFile(versionDstPath);
+			}
+
+			auto projectDstPath = tempDstRoot + _bundle + MANIFEST_FILENAME;
+			if (_fileUtils->isFileExist(projectDstPath)) {
+				_fileUtils->removeFile(projectDstPath);
+			}
+
+			auto tempSrcRoot = _tempStoragePath + MANIFEST_PATH;
+			auto versionSrcPath = tempSrcRoot + _bundle + VERSION_FILENAME;
+			auto projectSrcPath = tempSrcRoot + _bundle + MANIFEST_FILENAME;
+
+			_fileUtils->renameFile(versionSrcPath, versionDstPath);
+			_fileUtils->renameFile(projectSrcPath, projectDstPath);
+		}
+	}
 }
 
 void AssetsManagerEx::checkUpdate() {
@@ -1191,7 +1288,19 @@ void AssetsManagerEx::onSuccess(const std::string & /*srcUrl*/, const std::strin
         }
 
         if (ok) {
-            bool compressed = assetIt != assets.end() ? assetIt->second.compressed : false;
+			auto isCompressed = [&]()->bool {
+				if (assetIt != assets.end()) {
+					return assetIt->second.compressed;
+				}
+				else {
+					auto unitIt = _downloadUnits.find(customId);
+					if (unitIt != _downloadUnits.end()) {
+						return unitIt->second.compressed;
+					}
+				}
+				return false;
+			};
+			bool compressed = isCompressed();//assetIt != assets.end() ? assetIt->second.compressed : false;
             if (compressed) {
                 decompressDownloadedZip(customId, storagePath);
             } else {
@@ -1204,8 +1313,8 @@ void AssetsManagerEx::onSuccess(const std::string & /*srcUrl*/, const std::strin
 }
 
 void AssetsManagerEx::destroyDownloadedVersion() {
-    _fileUtils->removeDirectory(_storagePath);
-    _fileUtils->removeDirectory(_tempStoragePath);
+    removeCachedDirectory();
+	removeTempDirectory();
 }
 
 void AssetsManagerEx::batchDownload() {

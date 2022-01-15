@@ -326,7 +326,13 @@ void Manifest::genResumeAssetsList(DownloadUnits *units) const {
         if (asset.downloadState != DownloadState::SUCCESSED && asset.downloadState != DownloadState::UNMARKED) {
             DownloadUnit unit;
             unit.customId = it->first;
-            unit.srcUrl = _packageUrl + asset.path;
+			if (asset.compressed) {
+				unit.srcUrl = _packageUrl + "/zips/" + asset.path;
+			}
+			else {
+				unit.srcUrl = _packageUrl + asset.path;
+			}
+            
             unit.storagePath = _manifestRoot + asset.path;
             unit.size = asset.size;
             units->emplace(unit.customId, unit);
@@ -442,7 +448,7 @@ void Manifest::setAssetDownloadState(const std::string &key, const Manifest::Dow
 
 void Manifest::updateToZipAsset(const DownloadUnit& unit) {
 	Asset asset;
-	asset.compressed = true;
+	asset.compressed = unit.compressed;
 	asset.md5 = _md5;
 	asset.path = _bundle + "_" + _md5 + ".zip";
 	asset.size = unit.size;
@@ -458,6 +464,9 @@ void Manifest::updateToZipAsset(const DownloadUnit& unit) {
 					rapidjson::Value name(rapidjson::Type::kStringType);
 					name.SetString(key,unit.customId.size(),_json.GetAllocator());
 					assets.AddMember(name, value, _json.GetAllocator());
+					
+					rapidjson::Value &entry = assets[unit.customId.c_str()];
+					entry.AddMember<bool>(KEY_COMPRESSED, (int)asset.compressed, _json.GetAllocator());
 				}
 			}
 		}

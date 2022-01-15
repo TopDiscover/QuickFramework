@@ -311,6 +311,9 @@ protected:
 	/* 删除缓存中下载文件                                                   */
 	/************************************************************************/
 	void removeCachedDirectory();
+	void removeTempDirectory();
+	void removeBundleDirectory(const std::string& path);
+	void moveTempToCached(const std::string& root, const std::string& path, std::unordered_map<std::string, Manifest::AssetDiff>& diff_map, bool isComplete = true);
 
 	bool isNeedDownLoadZip(float download , float total);
 
