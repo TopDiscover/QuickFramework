@@ -11,6 +11,7 @@ export function unload() {
 
 export async function onBeforeBuild(options: IBuildTaskOption, result: IBuildResult) {
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeBuild`);
+    Editor.Message.send(PACKAGE_NAME,"onBeforeBuild",options.platform);
 }
 export async function onBeforeInit(options: IBuildTaskOption, result: IBuildResult) {
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeInit`);

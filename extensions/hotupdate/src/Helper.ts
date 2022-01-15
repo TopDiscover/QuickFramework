@@ -1,25 +1,25 @@
 import { existsSync, readFile, readFileSync, writeFileSync } from 'fs-extra';
 import path, { join, normalize } from 'path';
-import { BundleInfo, HotUpdateConfig, Manifest, Tools, UserCache } from './Tools';
+import { Tools } from './Tools';
 import * as os from "os"
 import { exec } from "child_process";
+
+const PACKAGE_NAME = "hotupdate";
 class Helper {
 
-    init() {
-        this.config;
-        this.readCache();
+    private get configPath() {
+        return path.join(Editor.Project.path, "config/hotupdate.json");
     }
 
-    private _config: HotUpdateConfig = null!;
-    private get config() {
-        if (this._config == null) {
-            let configPath = path.join(Editor.Project.path, "config/bundles.json");
-            this._config = JSON.parse(readFileSync(configPath, { encoding: "utf-8" }));
-            for (let i = 0; i < this._config.bundles.length; i++) {
-                this.bundles[this._config.bundles[i].dir] = this._config.bundles[i];
-            }
+    private _config: HotupdateConfig = null!
+    get config() {
+        if (!this._config) {
+            this.readConfig();
         }
         return this._config;
+    }
+    set config(v) {
+        this._config = v;
     }
 
     private bundles: { [key: string]: BundleInfo } = {};
@@ -28,70 +28,44 @@ class Helper {
         return path.join(Editor.Project.path, "local/userCache.json");
     }
 
-    private userCache: UserCache = {
-        /**@description 主包版本号 */
-        version: "",
-        /**@description 当前服务器地址 */
-        serverIP: "",
-        /**@description 服务器历史地址 */
-        historyIps: [],
-        /**@description 构建项目目录 */
-        buildDir: "",
-        /**@description 各bundle的版本配置 */
-        bundles: {},
-        /**@description 远程服务器地址 */
-        remoteVersion: "",
-        /**@description 远程各bundle的版本配置 */
-        remoteBundles: {},
-        /**@description 远程服务器所在目录 */
-        remoteDir: "",
-    }
     /**@description 检证数据 */
-    private checkUserCache() {
-        //把不存在的bundle信息删除
-
-        let notExist: string[] = [];
-        Object.keys(this.userCache.bundles).forEach((value) => {
-            if (this.bundles[value] == undefined || this.bundles[value] == null) {
-                notExist.push(value);
+    private checkConfig() {
+        //当前所有bundle
+        let bundles = Tools.bundles;
+        let isChange = false;
+        //删除处理
+        Object.keys(this.config.bundles).forEach((value) => {
+            if (!bundles.includes(value)) {
+                delete this.config.bundles[value];
+                console.log(`删除不存在Bundle:${value}`);
+                isChange = true;
             }
         });
-        let isRemoved = false;
-        for (let i = 0; i < notExist.length; i++) {
-            delete this.userCache.bundles[notExist[i]];
-            isRemoved = true;
+
+        //新增处理
+        let curBundles = Object.keys(this.config.bundles);
+        for (let i = 0; i < bundles.length; i++) {
+            if (!curBundles.includes(bundles[i])) {
+                let bundleInfo: BundleInfo = {
+                    version: "1.0",
+                    dir: bundles[i],
+                    name: bundles[i],
+                    includeApk: true,
+                    md5: "-",
+                }
+                this.config.bundles[bundleInfo.dir] = bundleInfo;
+                console.log(`添加Bundle:${bundles[i]}`);
+                isChange = true;
+            }
         }
-
-        notExist = [];
-        this.userCache.remoteBundles = {};
-        Object.keys(this.bundles).forEach((value) => {
-            this.userCache.remoteBundles[value] = JSON.parse(JSON.stringify(this.bundles[value]));
-        });
-
-        this.userCache.remoteVersion = this.remoteVersion;
-
-        Object.keys(this.userCache.remoteBundles).forEach((value) => {
-            this.userCache.remoteBundles[value].md5 = this.getBundleVersion(value);
-        });
-
-        //需要加的加上
-        Object.keys(this.bundles).forEach((key) => {
-            if (!this.userCache.bundles[key]){
-                this.userCache.bundles[key]=this.bundles[key]
-                this.userCache.remoteBundles[key] = Object.assign({},this.bundles[key])
-                this.userCache.remoteBundles[key].md5='-'
-                isRemoved=true
-            }
-        });
-
-        return isRemoved;
+        return isChange;
     }
 
     /**@description 返回远程版本号+md5 */
     private getShowRemoteString(config: { md5: string, version: string }) {
         return `[${config.version}] : ${config.md5}`;
     }
-    private get remoteVersion() {
+    get remoteVersion() {
         return this.getBundleVersion("main");
     }
 
@@ -99,65 +73,101 @@ class Helper {
      * @description 刷新测试环境子包信息
      * @param {*} key 
      */
-     private getBundleVersion(key: string) {
-        if (this.userCache.remoteDir.length > 0) {
-            let versionManifestPath = path.join(this.userCache.remoteDir, `manifest/${key}_version.json`);
+    private getBundleVersion(key: string) {
+        if (this.config.remoteDir.length > 0) {
+            let versionManifestPath = path.join(this.config.remoteDir, `manifest/${key}_version.json`);
             if (existsSync(versionManifestPath)) {
                 let data = readFileSync(versionManifestPath, { encoding: "utf-8" });
                 let config = JSON.parse(data);
                 return this.getShowRemoteString(config);
-            }else{
-                this.addLog(versionManifestPath+"不存在")
+            } else {
+                this.log(versionManifestPath + "不存在")
             }
-        } 
+        }
         return "-";
     }
 
-    onRefreshVersion(dir?:string){
-        console.log(dir);
-        if ( dir ){
-            this.userCache.remoteBundles[dir].md5 = this.getBundleVersion(dir);
-        }else{
-            this.userCache.remoteVersion = this.remoteVersion;
+    onRefreshVersion(dir?: string) {
+        if (dir) {
+            return this.getBundleVersion(dir);
+        } else {
+            return this.remoteVersion;
         }
-        this.saveUserCache();
     }
 
     /**@description 保存当前用户设置 */
-    saveUserCache() {
-        let cacheString = JSON.stringify(this.userCache);
+    saveConfig() {
+        let cacheString = JSON.stringify(this.config);
         writeFileSync(this.userCachePath, cacheString);
         // this.addLog(`写入缓存 :`, this.userCache);
     }
 
-    /**@description 生成默认缓存 */
-    private generateDefaultUseCache() {
-        this.userCache.version = this.config.version;
-        this.userCache.historyIps = [];
-        this.userCache.buildDir = "";
-        this.userCache.bundles = this.bundles;
-        this.userCache.remoteVersion = "-";
-        this.userCache.remoteBundles = JSON.parse(JSON.stringify(this.bundles));
+    private _remoteBundles: { [key: string]: BundleInfo } = null!;
+    get remoteBundles() {
+        if (this._remoteBundles) {
+            return this._remoteBundles;
+        }
+        this.reloadRemoteBundles();
+        return this._remoteBundles;
+    }
+
+    private reloadRemoteBundles() {
+        this._remoteBundles = JSON.parse(JSON.stringify(this.config.bundles));
         Object.keys(this.bundles).forEach((key) => {
-            this.userCache.remoteBundles[key].md5 = "-";
+            this._remoteBundles[key].md5 = this.getBundleVersion(key);
         });
-        this.userCache.remoteDir = "";
+    }
+
+    /**@description 生成默认缓存 */
+    private get defaultConfig() {
+        let config: HotupdateConfig = {
+            version: "1.0",
+            serverIP: "",
+            historyIps: [],
+            buildDir: "",
+            bundles: {},
+            remoteDir: "",
+            includes: {},
+            autoCreate: true,
+            autoDeploy: false
+        }
+        config.includes["src"] = { name: "src", include: true, isLock: false };
+        config.includes["jsb-adapter"] = { name: "jsb-adapter", include: true, isLock: false };
+        config.includes["assets/resources"] = { name: "assets/resources", include: true, isLock: true };
+        config.includes["assets/main"] = { name: "assets/main", include: true, isLock: true };
+        config.autoCreate = true;
+        config.autoDeploy = false;
+        config.remoteDir = "";
+
+        let bundles = Tools.bundles;
+        for (let i = 0; i < bundles.length; i++) {
+            let bundleInfo: BundleInfo = {
+                version: "1.0",
+                dir: bundles[i],
+                name: bundles[i],
+                includeApk: true,
+                md5: "-",
+            }
+            config.bundles[bundleInfo.dir] = bundleInfo;
+        }
+
+        return config;
     }
 
     /**@description 读取本地缓存 */
-    private readCache() {
+    readConfig() {
         if (existsSync(this.userCachePath)) {
             let data = readFileSync(this.userCachePath, "utf-8")
-            this.userCache = JSON.parse(data);
-            if (this.checkUserCache()) {
-                this.saveUserCache();
+            this.config = JSON.parse(data);
+            if (this.checkConfig()) {
+                this.saveConfig();
             }
             // this.addLog(`存在缓存 : ${this.userCachePath}`, this.userCache);
         } else {
-            this.addLog(`不存在缓存 : ${this.userCachePath}`);
-            this.generateDefaultUseCache();
-            this.addLog(`生存默认缓存 : `, this.userCache);
-            this.saveUserCache();
+            this.log(`不存在缓存 : ${this.userCachePath}`);
+            this.config = this.defaultConfig;
+            this.log(`生存默认缓存 : `, this.config);
+            this.saveConfig();
         }
     }
 
@@ -167,7 +177,7 @@ class Helper {
      * @param {*} obj 
      * @returns 
      */
-    addLog(message: any, obj: any = null) {
+    log(message: any, obj: any = null) {
         if (typeof obj == "function") {
             return;
         }
@@ -176,38 +186,12 @@ class Helper {
         } else {
             console.log(message);
         }
-        if (!this.logArea) {
-            return;
-        }
-        let text = "";
-        if (obj == null) {
-            text = message;
-        } else if (typeof obj == "object") {
-            text = message + JSON.stringify(obj);
-        } else {
-            text = message + obj.toString();
-        }
-        let temp = this.logArea.value;
-        if (temp.length > 0) {
-            this.logArea.value = temp + "\n" + text;
-        } else {
-            this.logArea.value = text;
-        }
-        setTimeout(() => {
-            this.logArea.scrollTop = this.logArea.scrollHeight;
-        }, 10)
-    }
-
-    logArea: HTMLTextAreaElement = null!;
-
-    get cache() {
-        return this.userCache;
     }
 
     private _isDoCreate = false;
     get isDoCreate() {
         if (this._isDoCreate) {
-            this.addLog(`正在执行生成操作，请勿操作`);
+            this.log(`正在执行生成操作，请勿操作`);
         }
         return this._isDoCreate;
     }
@@ -220,9 +204,9 @@ class Helper {
      * @param url
      * */
     addHotAddress(url: string) {
-        if (this.userCache.historyIps.indexOf(url) == -1) {
-            this.userCache.historyIps.push(url);
-            this.addLog(`添加历史记录 :${url} 成功`);
+        if (this.config.historyIps.indexOf(url) == -1) {
+            this.config.historyIps.push(url);
+            this.log(`添加历史记录 :${url} 成功`);
             return true;
         }
         return false;
@@ -235,11 +219,11 @@ class Helper {
         }
     }
     //插入热更新代码
-    onInsertHotupdate(dest:string) {
+    private onInsertHotupdate(dest: string) {
         let codePath = path.join(Editor.Project.path, "extensions/hotupdate/code/hotupdate.js");
         let code = readFileSync(codePath, "utf8");
         // console.log(code);
-        let sourcePath = path.join(dest,"assets/main.js");
+        let sourcePath = path.join(dest, "assets/main.js");
         sourcePath = normalize(sourcePath);
         let sourceCode = readFileSync(sourcePath, "utf8");
         let templateReplace = function templateReplace() {
@@ -248,44 +232,52 @@ class Helper {
         }
         //添加子游戏测试环境版本号
         sourceCode = sourceCode.replace(/(\);)([\s\w\S]*)(const[ ]*importMapJson)/g, templateReplace);
-        this.addLog(`向${sourcePath}中插入热更新代码`);
+        this.log(`向${sourcePath}中插入热更新代码`);
         writeFileSync(sourcePath, sourceCode, { "encoding": "utf8" });
     }
 
     /**@description 生成manifest版本文件 */
-    onCreateManifest() {
+    onCreateManifest(callbak?: Function) {
         if (this.isDoCreate) return;
         this._isDoCreate = true;
-        this.saveUserCache();
-        this.addLog(`当前用户配置为 : `, this.userCache);
-        this.addLog("开始生成Manifest配置文件...");
-        let version = this.userCache.version;
-        this.addLog("主包版本号:", version);
-        let buildDir = this.userCache.buildDir;
+        this.saveConfig();
+        this.log(`当前用户配置为 : `, this.config);
+        this.log("开始生成Manifest配置文件...");
+        let version = this.config.version;
+        this.log("主包版本号:", version);
+        let buildDir = this.config.buildDir;
         buildDir = normalize(buildDir);
-        this.addLog("构建目录:", buildDir);
+        this.log("构建目录:", buildDir);
         let manifestDir = this.getManifestDir(buildDir);
         manifestDir = normalize(manifestDir);
-        this.addLog("构建目录下的Manifest目录:", manifestDir);
-        let serverUrl = this.userCache.serverIP;
-        this.addLog("热更新地址:", serverUrl);
-        let subBundles = Object.keys(this.userCache.bundles);
-        this.addLog("所有子包:", subBundles);
+        this.log("构建目录下的Manifest目录:", manifestDir);
+        let serverUrl = this.config.serverIP;
+        this.log("热更新地址:", serverUrl);
+        let subBundles = Object.keys(this.config.bundles);
+        this.log("所有子包:", subBundles);
         let manifest: Manifest = {
             assets: {},
             bundle: "main"
         };
 
+        this.resetCreateProgress();
+        //文件数量
+        this.total = (subBundles.length + 1) * 2;
+        //压缩包数量
+        this.total += (subBundles.length + 1);
+        //所有版本文件
+        this.total++;
+
         //删除旧的版本控件文件
-        this.addLog("删除旧的Manifest目录", manifestDir);
+        this.log("删除旧的Manifest目录", manifestDir);
         if (existsSync(manifestDir)) {
-            this.addLog("存在旧的，删除掉");
+            this.log("存在旧的，删除掉");
             Tools.delDir(manifestDir);
         }
         Tools.mkdirSync(manifestDir);
 
         //读出主包资源，生成主包版本
-        let mainIncludes = this.getMainBundleIncludes();
+        let mainIncludes = this.mainBundleIncludes;
         for (let i = 0; i < mainIncludes.length; i++) {
             Tools.readDir(path.join(buildDir, mainIncludes[i]), manifest.assets, buildDir);
         }
@@ -298,12 +290,14 @@ class Helper {
         manifest.md5 = md5;
         manifest.version = version;
         writeFileSync(projectManifestPath, JSON.stringify(manifest));
-        this.addLog(`生成${projectManifestPath}成功`);
+        this.log(`生成${projectManifestPath}成功`);
+        this.addCreateProgress();
 
         delete manifest.assets;
 
         writeFileSync(versionManifestPath, JSON.stringify(manifest));
-        this.addLog(`生成${versionManifestPath}成功`);
+        this.log(`生成${versionManifestPath}成功`);
+        this.addCreateProgress();
 
         //生成所有版本控制文件，用来判断当玩家停止在版本1，此时发版本2时，不让进入游戏，返回到登录，重新走完整个更新流程
         let versions: { [key: string]: { md5: string, version: string } } = {
@@ -313,7 +307,7 @@ class Helper {
         //生成各bundles版本文件
         for (let i = 0; i < subBundles.length; i++) {
             let key = subBundles[i];
-            this.addLog(`正在生成:${key}`);
+            this.log(`正在生成:${key}`);
             let manifest: Manifest = {
                 assets: {},
                 bundle: key
@@ -325,47 +319,66 @@ class Helper {
             let content = JSON.stringify(manifest);
             let md5 = require("crypto").createHash('md5').update(content).digest('hex');
             manifest.md5 = md5;
-            manifest.version = this.userCache.bundles[key].version
+            manifest.version = this.config.bundles[key].version
             writeFileSync(projectManifestPath, JSON.stringify(manifest));
-            this.addLog(`生成${projectManifestPath}成功`);
+            this.log(`生成${projectManifestPath}成功`);
+            this.addCreateProgress();
 
             delete manifest.assets;
             versions[`${key}`] = {} as any;
             versions[`${key}`].md5 = md5;
             versions[`${key}`].version = manifest.version;
             writeFileSync(versionManifestPath, JSON.stringify(manifest));
-            this.addLog(`生成${versionManifestPath}成功`);
+            this.log(`生成${versionManifestPath}成功`);
+            this.addCreateProgress();
         }
 
         //写入所有版本
         let versionsPath = path.join(manifestDir, `versions.json`);
         writeFileSync(versionsPath, JSON.stringify(versions));
-        this.addLog(`生成versions.json成功`);
+        this.log(`生成versions.json成功`);
+        this.addCreateProgress();
         Tools.zipVersions({
             /**@description 主包包含目录 */
             mainIncludes: mainIncludes,
             /**@description 所有版本信息 */
             versions: versions,
             /**@description 构建目录 */
-            buildDir: this.userCache.buildDir,
+            buildDir: this.config.buildDir,
             /**@description 日志回调 */
             log: (data: any) => {
-                this.addLog(data);
+                this.log(data);
             },
             /**@description 所有bundle的配置信息 */
-            bundles: this.config.bundles
+            bundles: this.config.bundles,
+            handler: (isComplete: boolean) => {
+                this.addCreateProgress();
+                if (isComplete) {
+                    setTimeout(() => {
+                        this.log(`生成完成`);
+                        if (callbak) callbak();
+                    }, 500);
+                }
+            }
         })
         this.remake()
         this._isDoCreate = false;
     }
+
+    private _createProgress = 0;
+    private resetCreateProgress() {
+        this._createProgress = 0;
+        Editor.Message.send(PACKAGE_NAME, "updateCreateProgress", 0);
+    }
+    private addCreateProgress() {
+        this._createProgress++;
+        let value = (this._createProgress / this.total) * 100;
+        Editor.Message.send(PACKAGE_NAME, "updateCreateProgress", value);
+    }
+
     /**@description 返回需要添加到主包版本的文件目录 */
-    private getMainBundleIncludes() {
-        return [
-            // "src", //这个里面会包含工程的插件脚本，如该工程的protobuf.js CryptoJS.js,如果考虑后面会升级，加入到里面
-            // "jsb-adapter", //这个东西一般不会变，不用加载到版本控制中
-            "assets/main",
-            "assets/resources",
-        ];
+    private get mainBundleIncludes() {
+        return Object.keys(this.config.includes);
     }
     private remake() {
         if (os.type() !== 'Darwin') {//判断mac os平台
@@ -409,10 +422,10 @@ class Helper {
     }
     /**@description 删除不包含在包内的所有bundles */
     private removeNotInApkBundle() {
-        let keys = Object.keys(this.userCache.bundles);
+        let keys = Object.keys(this.config.bundles);
         let removeBundles: string[] = [];
         keys.forEach((key) => {
-            if (!this.userCache.bundles[key].includeApk) {
+            if (!this.config.bundles[key].includeApk) {
                 removeBundles.push(key);
             }
         });
@@ -420,40 +433,40 @@ class Helper {
         let removeDirs = [];
         for (let i = 0; i < removeBundles.length; i++) {
             let key = removeBundles[i];
-            removeDirs.push(path.join(this.userCache.buildDir, `assets/${key}`));
-            manifests.push(path.join(this.userCache.buildDir, `manifest/${key}_project.json`));
-            manifests.push(path.join(this.userCache.buildDir, `manifest/${key}_version.json`));
+            removeDirs.push(path.join(this.config.buildDir, `assets/${key}`));
+            manifests.push(path.join(this.config.buildDir, `manifest/${key}_project.json`));
+            manifests.push(path.join(this.config.buildDir, `manifest/${key}_version.json`));
         }
 
         for (let i = 0; i < removeDirs.length; i++) {
-            this.addLog(`删除目录 : ${removeDirs[i]}`);
+            this.log(`删除目录 : ${removeDirs[i]}`);
             Tools.delDir(removeDirs[i], true);
         }
 
         for (let i = 0; i < manifests.length; i++) {
-            this.addLog(`删除版本文件 : ${manifests[i]}`);
+            this.log(`删除版本文件 : ${manifests[i]}`);
             Tools.delFile(manifests[i]);
         }
     }
     /**
      * @description 部署
      */
-     onDeployToRemote() {
+    onDeployToRemote() {
         if (this.isDoCreate) return;
-        if (this.userCache.remoteDir.length <= 0) {
-            this.addLog("[部署]请先选择本地服务器目录");
+        if (this.config.remoteDir.length <= 0) {
+            this.log("[部署]请先选择本地服务器目录");
             return;
         }
-        if (!existsSync(this.userCache.remoteDir)) {
-            this.addLog(`[部署]本地测试服务器目录不存在 : ${this.userCache.remoteDir}`);
+        if (!existsSync(this.config.remoteDir)) {
+            this.log(`[部署]本地测试服务器目录不存在 : ${this.config.remoteDir}`);
             return;
         }
-        if (!existsSync(this.userCache.buildDir)) {
-            this.addLog(`[部署]构建目录不存在 : ${this.userCache.buildDir} , 请先构建`);
+        if (!existsSync(this.config.buildDir)) {
+            this.log(`[部署]构建目录不存在 : ${this.config.buildDir} , 请先构建`);
             return;
         }
 
-        let includes = this.getMainBundleIncludes();
+        let includes = this.mainBundleIncludes;
 
         let temps = [];
         for (let i = 0; i < includes.length; i++) {
@@ -474,23 +487,23 @@ class Helper {
 
         let copyDirs = ["manifest"].concat(temps);
         for (let i = 0; i < copyDirs.length; i++) {
-            let dir = path.join(this.userCache.buildDir, copyDirs[i]);
+            let dir = path.join(this.config.buildDir, copyDirs[i]);
             if (!existsSync(dir)) {
-                this.addLog(`${this.userCache.buildDir} [部署]不存在${copyDirs[i]}目录,无法拷贝文件`);
+                this.log(`${this.config.buildDir} [部署]不存在${copyDirs[i]}目录,无法拷贝文件`);
                 return;
             }
         }
 
-        this.addLog(`[部署]开始拷贝文件到 : ${this.userCache.remoteDir}`);
+        this.log(`[部署]开始拷贝文件到 : ${this.config.remoteDir}`);
         this.resetProgress();
-        this.addLog(`[部署]删除旧目录 : ${this.userCache.remoteDir}`);
-        let count = Tools.getDirFileCount(this.userCache.remoteDir);
-        this.addLog(`[部署]删除文件个数:${count}`);
-        Tools.delDir(this.userCache.remoteDir);
+        this.log(`[部署]删除旧目录 : ${this.config.remoteDir}`);
+        let count = Tools.getDirFileCount(this.config.remoteDir);
+        this.log(`[部署]删除文件个数:${count}`);
+        Tools.delDir(this.config.remoteDir);
 
         count = 0;
         for (let i = 0; i < copyDirs.length; i++) {
-            let dir = path.join(this.userCache.buildDir, copyDirs[i]);
+            let dir = path.join(this.config.buildDir, copyDirs[i]);
             count += Tools.getDirFileCount(dir);
         }
 
@@ -498,40 +511,95 @@ class Helper {
         let zipPath = Editor.Project.path + "/PackageVersion";
         count += Tools.getDirFileCount(zipPath);
 
-        this.addLog(`[部署]复制文件个数 : ${count}`);
+        this.log(`[部署]复制文件个数 : ${count}`);
 
         for (let i = 0; i < copyDirs.length; i++) {
-            let source = path.join(this.userCache.buildDir, copyDirs[i]);
-            let dest = path.join(this.userCache.remoteDir, copyDirs[i]);
-            this.addLog(`[部署]复制${source} => ${dest}`);
+            let source = path.join(this.config.buildDir, copyDirs[i]);
+            let dest = path.join(this.config.remoteDir, copyDirs[i]);
+            this.log(`[部署]复制${source} => ${dest}`);
             Tools.copySourceDirToDesDir(source, dest, () => {
                 this.addProgress();
             });
         }
 
-        let remoteZipPath = path.join(this.userCache.remoteDir, "zips");
+        let remoteZipPath = path.join(this.config.remoteDir, "zips");
         Tools.delDir(remoteZipPath);
 
         //部署压缩文件
-        this.addLog(`[部署]复制${zipPath} => ${remoteZipPath}`);
+        this.log(`[部署]复制${zipPath} => ${remoteZipPath}`);
         Tools.copySourceDirToDesDir(zipPath, remoteZipPath, () => {
             this.addProgress();
         });
 
     }
 
-    progressFuc : (data:number)=>void = null!;
-    getProgressFunc :()=>number = null!;
+    /**@description 进度总数 */
+    private total = 1;
     private addProgress() {
-        let value = Number(this.getProgressFunc());
-        value = value + 1;
-        if (value > 100) {
-            value = 100;
-        }
-        this.progressFuc(value);
+        this._progress++;
+        let value = (this._progress / this.total) * 100;
+        Editor.Message.send(PACKAGE_NAME, "updateDeployProgress", value);
     }
-    private resetProgress(){
-        this.progressFuc(0);
+    private _progress = 0;
+    private resetProgress() {
+        this._progress = 0;
+        Editor.Message.send(PACKAGE_NAME, "updateDeployProgress", 0);
+    }
+
+    updateToConfigTS() {
+        let configTSPath = join(Editor.Project.path, "assets/scripts/common/config/Config.ts");
+        if (existsSync(configTSPath)) {
+            //更新热更新地址
+            let content = readFileSync(configTSPath, "utf-8");
+            let serverID = this.config.serverIP;
+            let self = this;
+            let replace = function () {
+                self.log(`更新热更新地址为:${serverID}`);
+                return arguments[1] + serverID + arguments[3];
+            };
+            content = content.replace(/(export\s*const\s*HOT_UPDATE_URL\s*=\s*")([\w:/.-]*)(")/g, replace);
+
+            let bundles: string[] = [];
+            for (let bundle in this.config.includes) {
+                let info = this.config.includes[bundle];
+                if (info.include) {
+                    bundles.push(info.name);
+                }
+            }
+
+            let bundlesString = JSON.stringify(bundles);
+            let replaceIncludes = function () {
+                self.log(`更新主包包含目录为:${bundlesString}`);
+                return arguments[1] + bundlesString + arguments[3];
+            }
+            content = content.replace(/(export\s*const\s*MIAN_PACK_INCLUDE\s*:\s*string\s*\[\s*\]\s*=\s*)([\[\]"\w,-/]*)(;)/g, replaceIncludes);
+            // Editor.log(content);
+            writeFileSync(configTSPath, content, "utf-8");
+            let dbPath = "db://assets/scripts/common/config/Config.ts";
+            Editor.Message.send("asset-db", "refresh-asset", dbPath);
+        } else {
+            console.error(`${configTSPath}不存在，无法刷新配置到代码`);
+        }
+    }
+
+    onBeforeBuild() {
+        this.resetProgress();
+        this.resetCreateProgress();
+    }
+
+    onAfterBuild(dest: string) {
+        this.onInsertHotupdate(dest);
+        this.readConfig();
+        this.config.buildDir = normalize(join(dest,"assets"));
+        Editor.Message.send(PACKAGE_NAME,"onSetBuildDir",this.config.buildDir);
+        this.saveConfig();
+        if (this.config.autoCreate) {
+            this.onCreateManifest(() => {
+                if (this.config.autoDeploy && this.config.remoteDir.length > 0 ){
+                    this.onDeployToRemote();
+                }
+            })
+        }
     }
 }
 

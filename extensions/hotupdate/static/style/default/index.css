@@ -1,8 +1,4 @@
 
-.greenColor {
-    color: #11ff00;
-}
-
 /*标题颜色*/
 .titleColor{
     color: darkgrey;
@@ -11,12 +7,6 @@
 /*内容颜色*/
 .contentColor{
     color: #fb942d;
-}
-
-/*日志*/
-.log{
-    width: 100%; height: 120px; background: #252525;	
-    color: #fd942b;	border-color: #fd942b;
 }
 
 .view {

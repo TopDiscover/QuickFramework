@@ -11,7 +11,12 @@ export const methods: { [key: string]: (...any: any) => any } = {
     },
     onAfterBuild(dest: string, platform: Platform) {
         if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
-            helper.onInsertHotupdate(dest);
+            helper.onAfterBuild(dest);
+        }
+    },
+    onBeforeBuild(platform:Platform){
+        if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+            helper.onBeforeBuild();
         }
     }
 };

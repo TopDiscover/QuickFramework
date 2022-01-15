@@ -12,7 +12,12 @@ exports.methods = {
     },
     onAfterBuild(dest, platform) {
         if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
-            Helper_1.helper.onInsertHotupdate(dest);
+            Helper_1.helper.onAfterBuild(dest);
+        }
+    },
+    onBeforeBuild(platform) {
+        if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+            Helper_1.helper.onBeforeBuild();
         }
     }
 };

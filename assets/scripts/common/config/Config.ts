@@ -19,7 +19,7 @@ export namespace Config {
     export const HOT_UPDATE_URL = "http://192.168.3.153/hotupdate";
 
     /**@description 主包包含目录 */
-    export const MIAN_PACK_INCLUDE: string[] = ["src","jsb-adapter","assets/resources","assets/main","assets/internal"];
+    export const MIAN_PACK_INCLUDE: string[] = ["src","jsb-adapter","assets/resources","assets/main"];
 
     /**@description Loading动画显示超时回调默认超时时间 */
     export const LOADING_TIME_OUT = 30;

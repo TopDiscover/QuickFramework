@@ -12,6 +12,7 @@ function unload() {
 exports.unload = unload;
 async function onBeforeBuild(options, result) {
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeBuild`);
+    Editor.Message.send(PACKAGE_NAME, "onBeforeBuild", options.platform);
 }
 exports.onBeforeBuild = onBeforeBuild;
 async function onBeforeInit(options, result) {

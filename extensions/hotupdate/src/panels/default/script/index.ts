@@ -2,22 +2,37 @@ import { readFileSync } from 'fs-extra';
 import { join } from 'path';
 import { createApp } from 'vue';
 import { helper } from '../../../Helper';
-helper.init();
+
+let view : {
+    progress : number;
+    createProgress : number;
+    buildDir : string;
+    buildOutDir : string;
+};
 
 module.exports = Editor.Panel.define({
     listeners: {
-        
+
     },
     template: readFileSync(join(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
     style: readFileSync(join(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
     $: {
-        app: '#app',
-        logArea: "#logArea",
+        app: '#app'
     },
     methods: {
-        
+        updateCreateProgress(progress:number){
+            view.createProgress = progress;
+        },
+        updateDeployProgress(progress:number){
+            view.progress = progress;
+        },
+        onSetBuildDir(dest:string){
+            view.buildDir = dest;
+            view.buildOutDir = helper.getManifestDir(dest)
+        }
     },
     ready() {
+        helper.readConfig();
         if (this.$.app) {
             const app = createApp({});
             //指定Vue3 自己定义控件跳过解析
@@ -26,41 +41,60 @@ module.exports = Editor.Panel.define({
                 template: readFileSync(join(__dirname, '../../../../static/template/vue/view.html'), 'utf-8'),
                 data() {
                     return {
-                        bundles: helper.cache.bundles,
-                        version: helper.cache.version,
-                        serverIP: helper.cache.serverIP,
-                        hotupdateUrls: helper.cache.historyIps,
-                        buildDir: helper.cache.buildDir,
-                        buildOutDir: helper.getManifestDir(helper.cache.buildDir),
-                        remoteVersion: helper.cache.remoteVersion,
-                        remoteDir: helper.cache.remoteDir,
-                        remoteBundles: helper.cache.remoteBundles,
+                        bundles: helper.config.bundles,
+                        version: helper.config.version,
+                        serverIP: helper.config.serverIP,
+                        hotupdateUrls: helper.config.historyIps,
+                        buildDir: helper.config.buildDir,
+                        buildOutDir: helper.getManifestDir(helper.config.buildDir),
+                        remoteVersion: helper.remoteVersion,
+                        remoteDir: helper.config.remoteDir,
+                        remoteBundles: helper.remoteBundles,
+                        includes: helper.config.includes,
+                        autoCreate: helper.config.autoCreate,
+                        autoDeploy: helper.config.autoDeploy,
                         progress: 0,
+                        createProgress: 0,
                     };
                 },
                 methods: {
+                    onChangeIncludes(value:boolean,key:string){
+                        if ( helper.config.includes[key].isLock ){
+                            console.warn(`${key}已经被锁定，修改无效`);
+                            return;
+                        }
+                        helper.config.includes[key].include = value;
+                        helper.saveConfig();
+                        helper.updateToConfigTS();
+                    },
+                    onChangeAutoCreateManifest(value:boolean){
+                        helper.config.autoCreate = value;
+                        helper.saveConfig();
+                    },
+                    onChangeAutoDeploy(value:boolean){
+                        helper.config.autoDeploy = value;
+                        helper.saveConfig();
+                    },
                     onRefreshMainVersion() {
-                        helper.onRefreshVersion();
-                        this.remoteVersion = helper.cache.remoteVersion;
+                        this.remoteVersion = helper.onRefreshVersion();
                     },
                     onRefreshVersion(dir: string) {
-                        helper.onRefreshVersion(dir);
-                        this.remoteBundles[dir].md5 = helper.cache.remoteBundles[dir].md5
+                        this.remoteBundles[dir].md5 = helper.onRefreshVersion(dir);
                     },
                     onDeployToRemote() {
                         helper.onDeployToRemote();
                     },
                     onRemoteDirConfirm(dir: string) {
-                        helper.cache.remoteDir = dir;
-                        helper.saveUserCache();
+                        helper.config.remoteDir = dir;
+                        helper.saveConfig();
                     },
                     onChangeBundleVersion(version: string, dir: string) {
-                        helper.cache.bundles[dir].version = version;
-                        helper.saveUserCache();
+                        helper.config.bundles[dir].version = version;
+                        helper.saveConfig();
                     },
                     onChangeIncludeApk(value: boolean, dir: string) {
-                        helper.cache.bundles[dir].includeApk = value;
-                        helper.saveUserCache();
+                        helper.config.bundles[dir].includeApk = value;
+                        helper.saveConfig();
                     },
                     onDelBunles() {
                         helper.onDelBundles();
@@ -70,17 +104,17 @@ module.exports = Editor.Panel.define({
                     },
                     onBuildDirConfirm(url: string) {
                         if (helper.isDoCreate) return;
-                        helper.cache.buildDir = url;
-                        this.buildOutDir = helper.getManifestDir(helper.cache.buildDir);
-                        helper.saveUserCache();
+                        helper.config.buildDir = url;
+                        this.buildOutDir = helper.getManifestDir(helper.config.buildDir);
+                        helper.saveConfig();
                     },
                     onInputVersionOver(version: string) {
                         if (helper.isDoCreate) {
                             return;
                         }
                         this.version = version;
-                        helper.cache.version = this.version;
-                        helper.saveUserCache();
+                        helper.config.version = this.version;
+                        helper.saveConfig();
                     },
                     onInputUrlOver(inputUrl: string) {
                         if (helper.isDoCreate) {
@@ -89,16 +123,17 @@ module.exports = Editor.Panel.define({
                         let url = inputUrl;
 
                         if (/^(https?:\/\/)?([\da-z\.-]+)\.([\da-z\.]{2,6})([\/\w \.-:]*)*\/?$/.test(url) == false) {
-                            helper.addLog(url + `不是以http://https://开头，或者不是网址`);
+                            helper.log(url + `不是以http://https://开头，或者不是网址`);
                             return;
                         }
 
-                        helper.cache.serverIP = url;
+                        helper.config.serverIP = url;
                         this.serverIP = url;
                         if (helper.addHotAddress(url)) {
-                            this.hotupdateUrls = helper.cache.historyIps;
+                            this.hotupdateUrls = helper.config.historyIps;
                         }
-                        helper.saveUserCache();
+                        helper.saveConfig();
+                        helper.updateToConfigTS();
                     },
                     onChangeHotupdateUrls(event: { target: HTMLSelectElement }) {
                         this.onInputUrlOver(event.target.value);
@@ -122,21 +157,13 @@ module.exports = Editor.Panel.define({
 
                 },
                 created: function () {
-                    helper.progressFuc = (data) => {
-                        this.progress = data;
-                    }
-                    helper.getProgressFunc = () => {
-                        return this.progress;
-                    }
+                    view = this;
                 },
                 mounted: function () {
 
                 }
             });
             app.mount(this.$.app);
-        }
-        if (this.$.logArea) {
-            helper.logArea = this.$.logArea as any;
         }
     },
     beforeClose() { },

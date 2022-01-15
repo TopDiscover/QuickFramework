@@ -45,6 +45,26 @@
                 "methods": [
                     "onAfterBuild"
                 ]
+            },
+            "onBeforeBuild":{
+                "methods": [
+                    "onBeforeBuild"
+                ]
+            },
+            "updateCreateProgress":{
+                "methods": [
+                    "default.updateCreateProgress"
+                ]
+            },
+            "updateDeployProgress":{
+                "methods": [
+                    "default.updateDeployProgress"
+                ]
+            },
+            "onSetBuildDir":{
+                "methods": [
+                    "default.onSetBuildDir"
+                ]
             }
         },
         "builder":"./dist/Builder.js"
