@@ -67,6 +67,9 @@ class _Tools {
             fullPath = path_1.normalize(fullPath);
             this.zipDir(fullPath, jszip.folder(element));
         }
+        let bundles = Object.keys(config.bundles);
+        let count = 0;
+        let total = bundles.length;
         let packZipName = `main_${config.versions["main"].md5}.zip`;
         let packZipRootPath = Editor.Project.path + "/PackageVersion";
         packZipRootPath = path_1.normalize(packZipRootPath);
@@ -80,13 +83,16 @@ class _Tools {
             streamFiles: !0
         }).pipe(fs_1.createWriteStream(packVersionZipPath)).on("finish", () => {
             config.log("[打包] 打包成功: " + packZipName);
+            count++;
+            config.handler(count == total);
         }).on("error", (e) => {
             config.log("[打包] 打包失败:" + e.message);
+            count++;
+            config.handler(count == total);
         });
         //打包子版本
-        let bundles = config.bundles;
         for (let index = 0; index < bundles.length; index++) {
-            const element = bundles[index];
+            const element = config.bundles[bundles[index]];
             let packZipName = `${element.dir}_${config.versions[element.dir].md5}.zip`;
             let packVersionZipPath = path_1.default.join(packZipRootPath, packZipName);
             let jszip = new JSZIP();
@@ -98,8 +104,12 @@ class _Tools {
                 streamFiles: !0
             }).pipe(fs_1.createWriteStream(packVersionZipPath)).on("finish", () => {
                 config.log("[打包] 打包成功: " + packZipName);
+                count++;
+                config.handler(count == total);
             }).on("error", (e) => {
                 config.log("[打包] 打包失败:" + e.message);
+                count++;
+                config.handler(count == total);
             });
         }
     }
@@ -241,6 +251,27 @@ class _Tools {
                 }
             }
         }
+    }
+    get bundles() {
+        let dir = path_1.join(Editor.Project.path, "assets/bundles");
+        let stat = fs_1.statSync(dir);
+        let result = [];
+        if (!stat.isDirectory()) {
+            return result;
+        }
+        let subpaths = fs_1.readdirSync(dir);
+        let subpath = "";
+        for (let i = 0; i < subpaths.length; ++i) {
+            if (subpaths[i][0] === '.') {
+                continue;
+            }
+            subpath = path_1.default.join(dir, subpaths[i]);
+            stat = fs_1.statSync(subpath);
+            if (stat.isDirectory()) {
+                result.push(path_1.default.relative(dir, subpath));
+            }
+        }
+        return result;
     }
 }
 exports.Tools = new _Tools();

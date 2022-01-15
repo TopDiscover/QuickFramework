@@ -16,7 +16,10 @@ export namespace Config {
     export const isSkipCheckUpdate = false;
 
     /**@description 测试热更新服务器地址 */
-    export const TEST_HOT_UPDATE_URL_ROOT = "http://192.168.3.153/hotupdate";//"http://192.168.0.104:9945/hotupdate";
+    export const HOT_UPDATE_URL = "http://192.168.3.153/hotupdate";
+
+    /**@description 主包包含目录 */
+    export const MIAN_PACK_INCLUDE: string[] = ["src","jsb-adapter","assets/resources","assets/main","assets/internal"];
 
     /**@description Loading动画显示超时回调默认超时时间 */
     export const LOADING_TIME_OUT = 30;
@@ -45,7 +48,7 @@ export namespace Config {
     /**@description 网络重连弹出框tag */
     export const RECONNECT_ALERT_TAG = 100;
 
-    export const ENTRY_CONFIG : {[key:string] : Update.Config} ={};
+    export const ENTRY_CONFIG: { [key: string]: Update.Config } = {};
 
     export const SHOW_DEBUG_INFO_KEY = "SHOW_DEBUG_INFO_KEY";
 }
@@ -80,7 +83,7 @@ export namespace ViewZOrder {
 }
 
 /**@description 网络优先级,值越大，优化级越高 */
-export enum NetPriority{
+export enum NetPriority {
     Game,
     Chat,
     Lobby,

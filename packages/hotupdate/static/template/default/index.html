@@ -41,10 +41,21 @@
                         <ui-button @confirm="onOpenBulidOutDir"><i class="icon-doc-text"></i></ui-button>
                     </div>
                 </ui-prop>
-                <div class="self-end">
+                <ui-prop name='主包包含目录' tooltip="相对于【build项目资源文件目录】">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-checkbox v-for="info in includes" v-bind:value="info.include"
+                            @confirm="onChangeIncludes($event.target.value,info.name)">{{info.name}}</ui-checkbox>
+                    </div>
+                </ui-prop>
+                <ui-prop name="版本生成进度">
+                    <ui-progress class="flex-2" v-bind:value="createProgress"></ui-progress>
+                </ui-prop>
+                <ui-prop name='操作'>
+                    <ui-checkbox v-bind:value="autoCreate" @confirm="onChangeAutoCreateManifest($event.target.value)" tooltip="当构建完成后，自动生成版本控制文件" >是否自动创建版本文件</ui-checkbox>
+                    <ui-checkbox v-bind:value="autoDeploy" @confirm="onChangeAutoDeploy($event.target.value)" tooltip="当构建完成后，且自动生成版本文件打开,生成成功后自动部署" >是否自动部署</ui-checkbox>
                     <ui-button class="self-end red" @confirm="onDelBunles">执行Bundle剔除</ui-button>
                     <ui-button class="self-end green" @confirm="onCreateManifest">生成</ui-button>
-                </div>
+                </ui-prop>
             </div>
         </ui-box-container>
     </ui-section>
@@ -98,9 +109,4 @@
             </ui-prop>
         </ui-box-container>
     </ui-section>
-    <div>
-        <hr>
-        <h2>日志:</h2>
-        <textarea class="log" id="logArea" placeholder="日志输出..." v-model="logView"></textarea>
-    </div>
 </div>

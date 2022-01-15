@@ -77,7 +77,8 @@ export class _Manager extends Framewok implements GameEventInterface {
 
     init() {
         super.init();
-        this.updateManager.hotUpdateUrl = Config.TEST_HOT_UPDATE_URL_ROOT;
+        this.updateManager.hotUpdateUrl = Config.HOT_UPDATE_URL;
+        this.updateManager.mainBundles = Config.MIAN_PACK_INCLUDE;
         this.updateManager.isSkipCheckUpdate = Config.isSkipCheckUpdate;
 
         //初始化自定主entry代理

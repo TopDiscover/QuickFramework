@@ -10,12 +10,12 @@ class Helper {
         this.root = `${Editor.Project.path}/assets/bundles`;
     }
     init() {
-        let bundleConfigPath = `${Editor.Project.path}/config/bundles.json`;
+        let bundleConfigPath = `${Editor.Project.path}/config/hotupdate.json`;
         let config = fs_1.readFileSync(bundleConfigPath, { encoding: "utf-8" });
         let configObj = JSON.parse(config);
-        let bundles = configObj.bundles;
+        let bundles = Object.keys(configObj.bundles);
         for (let i = 0; i < bundles.length; i++) {
-            let info = bundles[i];
+            let info = configObj.bundles[bundles[i]];
             if (info.dir == "hall") {
                 Editor.log(`${info.name}(${info.dir})不参考检测`);
             }

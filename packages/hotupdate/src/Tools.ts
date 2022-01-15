@@ -1,71 +1,5 @@
 import { createReadStream, createWriteStream, exists, existsSync, mkdir, mkdirSync, readdir, readdirSync, readFileSync, rmdirSync, stat, statSync, unlinkSync } from "fs";
-import path, { normalize } from "path";
-
-
-/**@description bundle信息 */
-export interface BundleInfo {
-    /**@description bundle名，如大厅 */
-    name: string;
-    /**@description bundle对应目录 */
-    dir: string;
-    /**@description bundle版本号 */
-    version: string;
-    /**@description 是否包含在主包内 */
-    includeApk: boolean;
-    md5?:string;
-}
-
-/**
- * @description 压缩版本文件配置
- */
- export interface ZipVersionsConfig {
-    /**@description 主包包含目录 */
-    mainIncludes: string[];
-    /**@description 所有版本信息 */
-    versions: { [key: string]: { md5: string, version: string } };
-    /**@description 构建目录 */
-    buildDir: string;
-    /**@description 日志回调 */
-    log: (conent: any) => void;
-    /**@description 所有bundle的配置信息 */
-    bundles: BundleInfo[];
-}
-
-export interface UserCache {
-    /**@description 主包版本号 */
-    version: string,
-    /**@description 当前服务器地址 */
-    serverIP: string,
-    /**@description 服务器历史地址 */
-    historyIps: string[],
-    /**@description 构建项目目录 */
-    buildDir: string,
-
-    /**@description 各bundle的版本配置 */
-    bundles: { [key: string]: BundleInfo },
-
-    /**@description 远程服务器地址 */
-    remoteVersion: string,
-    /**@description 远程各bundle的版本配置 */
-    remoteBundles: {[key:string]:BundleInfo},
-    /**@description 远程服务器所在目录 */
-    remoteDir: string,
-}
-
-/**
- * @description 热火更新配置
- */
- export interface HotUpdateConfig {
-    version: string;
-    bundles: BundleInfo[];
-}
-
-export interface Manifest {
-    assets?: any;
-    bundle?: string;
-    md5?: string;
-    version?: string;
-}
+import path, { join, normalize } from "path";
 
 class _Tools {
 
@@ -114,7 +48,10 @@ class _Tools {
             fullPath = normalize(fullPath);
             this.zipDir(fullPath, jszip.folder(element));
         }
-
+        
+        let bundles = Object.keys(config.bundles)
+        let count = 0;
+        let total = bundles.length;
         let packZipName = `main_${config.versions["main"].md5}.zip`;
         let packZipRootPath = Editor.Project.path + "/PackageVersion";
         packZipRootPath = normalize(packZipRootPath);
@@ -128,14 +65,19 @@ class _Tools {
             streamFiles: !0
         }).pipe(createWriteStream(packVersionZipPath)).on("finish", () => {
             config.log("[打包] 打包成功: " + packZipName)
+            count++;
+            config.handler(count == total);
         }).on("error", (e: Error) => {
             config.log("[打包] 打包失败:" + e.message)
+            count++;
+            config.handler(count == total);
         })
 
+
         //打包子版本
-        let bundles = config.bundles
+        
         for (let index = 0; index < bundles.length; index++) {
-            const element = bundles[index];
+            const element = config.bundles[bundles[index]];
             let packZipName = `${element.dir}_${config.versions[element.dir].md5}.zip`;
             let packVersionZipPath = path.join(packZipRootPath, packZipName);
             let jszip = new JSZIP();
@@ -147,8 +89,12 @@ class _Tools {
                 streamFiles: !0
             }).pipe(createWriteStream(packVersionZipPath)).on("finish", () => {
                 config.log("[打包] 打包成功: " + packZipName)
+                count++;
+                config.handler(count == total);
             }).on("error", (e: Error) => {
                 config.log("[打包] 打包失败:" + e.message)
+                count++;
+                config.handler(count == total);
             })
         }
     }
@@ -210,12 +156,12 @@ class _Tools {
      * @param dest 目标
      * @param copyFileCb 复制文件完成回调 
      */
-    copySourceDirToDesDir(source: string, dest: string,copyFileCb ?: Function) {
+    copySourceDirToDesDir(source: string, dest: string, copyFileCb?: Function) {
         let self = this;
         let makeDir = (_source: string, _dest: string, _copyFileCb: (source: string, dest: string) => void) => {
             exists(_dest, function (isExist) {
                 isExist ? _copyFileCb(_source, _dest) : mkdir(_dest, function () {
-                    if(copyFileCb) copyFileCb(), _copyFileCb(_source, _dest)
+                    if (copyFileCb) copyFileCb(), _copyFileCb(_source, _dest)
                 })
             })
         };
@@ -233,7 +179,7 @@ class _Tools {
                             readStream = createReadStream(sourcePath);
                             writeStram = createWriteStream(destPath);
                             readStream.pipe(writeStram);
-                            if(copyFileCb) copyFileCb()
+                            if (copyFileCb) copyFileCb()
                         } else {
                             stats.isDirectory() && makeDir(sourcePath, destPath, copyFile)
                         }
@@ -285,6 +231,28 @@ class _Tools {
                 }
             }
         }
+    }
+
+    get bundles() {
+        let dir = join(Editor.Project.path, "assets/bundles");
+        let stat = statSync(dir);
+        let result: string[] = [];
+        if (!stat.isDirectory()) {
+            return result;
+        }
+        let subpaths = readdirSync(dir);
+        let subpath = "";
+        for (let i = 0; i < subpaths.length; ++i) {
+            if (subpaths[i][0] === '.') {
+                continue;
+            }
+            subpath = path.join(dir, subpaths[i]);
+            stat = statSync(subpath);
+            if (stat.isDirectory()) {
+                result.push(path.relative(dir,subpath));
+            }
+        }
+        return result;
     }
 }
 export let Tools = new _Tools();
