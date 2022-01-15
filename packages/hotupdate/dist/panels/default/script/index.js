@@ -22,6 +22,14 @@ module.exports = Editor.Panel.extend({
         "hotupdate:updateCreateProgress"(sender, value) {
             vueView.createProgress = value;
         },
+        onPngCompressComplete(sender, info) {
+            let dest = info.dest;
+            let platform = info.platform;
+            console.log(`[热更新]png图片压缩完成,构建平台:`, dest, platform);
+            if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+                Helper_1.helper.onPngCompressComplete();
+            }
+        }
     },
     ready() {
         Helper_1.helper.readConfig();

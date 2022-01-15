@@ -30,30 +30,38 @@ interface MyVue {
     /**@description 进度 */
     progress: number;
     /**@description 创建进度 */
-    createProgress : number;
+    createProgress: number;
     onInputUrlOver(event: { target: HTMLInputElement } | string): void;
 }
-let vueView : MyVue = null!;
+let vueView: MyVue = null!;
 module.exports = Editor.Panel.extend({
     template: readFileSync(join(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
     style: readFileSync(join(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
     $: {
-        
+
     },
     messages: {
         'hotupdate:onConfirmDelBundle'() {
             helper.removeNotInApkBundle();
         },
-        "hotupdate:updateDeployProgress"(sender:any,value:number){
+        "hotupdate:updateDeployProgress"(sender: any, value: number) {
             vueView.progress = value;
         },
-        "hotupdate:setBuildDir"(sender:any,dest:string){
+        "hotupdate:setBuildDir"(sender: any, dest: string) {
             vueView.buildDir = dest;
             vueView.buildOutDir = helper.getManifestDir(dest)
         },
-        "hotupdate:updateCreateProgress"(sender:any,value:number){
+        "hotupdate:updateCreateProgress"(sender: any, value: number) {
             vueView.createProgress = value;
         },
+        onPngCompressComplete(sender: any, info: { dest: string, platform: string }) {
+            let dest = info.dest;
+            let platform = info.platform;
+            console.log(`[热更新]png图片压缩完成,构建平台:`, dest, platform);
+            if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+                helper.onPngCompressComplete();
+            }
+        }
     },
     ready() {
         helper.readConfig();
@@ -70,16 +78,16 @@ module.exports = Editor.Panel.extend({
                     remoteVersion: helper.remoteVersion,
                     remoteDir: helper.config.remoteDir,
                     remoteBundles: helper.remoteBundles,
-                    includes : helper.config.includes,
-                    autoCreate : helper.config.autoCreate,
-                    autoDeploy : helper.config.autoDeploy,
+                    includes: helper.config.includes,
+                    autoCreate: helper.config.autoCreate,
+                    autoDeploy: helper.config.autoDeploy,
                     progress: 0,
-                    createProgress : 0,
+                    createProgress: 0,
                 };
             },
             methods: {
-                onChangeIncludes(value:boolean,key:string){
-                    if ( helper.config.includes[key].isLock ){
+                onChangeIncludes(value: boolean, key: string) {
+                    if (helper.config.includes[key].isLock) {
                         Editor.warn(`${key}已经被锁定，修改无效`);
                         return;
                     }
@@ -87,11 +95,11 @@ module.exports = Editor.Panel.extend({
                     helper.saveConfig();
                     helper.updateToConfigTS();
                 },
-                onChangeAutoCreateManifest(value:boolean){
+                onChangeAutoCreateManifest(value: boolean) {
                     helper.config.autoCreate = value;
                     helper.saveConfig();
                 },
-                onChangeAutoDeploy(value:boolean){
+                onChangeAutoDeploy(value: boolean) {
                     helper.config.autoDeploy = value;
                     helper.saveConfig();
                 },
@@ -113,16 +121,16 @@ module.exports = Editor.Panel.extend({
                         title: "选择本地测试服务器路径",
                         defaultPath: Editor.Project.path,
                         properties: ["openDirectory"]
-                      });
-                      if (-1 !== result) {
+                    });
+                    if (-1 !== result) {
                         let fullPath = result[0];
                         let view: MyVue = this as any;
                         helper.config.remoteDir = fullPath;
                         view.remoteDir = fullPath;
                         helper.saveConfig();
-                      }
+                    }
                 },
-                onOpenRemoteDir(){
+                onOpenRemoteDir() {
                     let view: MyVue = this as any;
                     helper.openDir(view.remoteDir);
                 },
@@ -161,7 +169,7 @@ module.exports = Editor.Panel.extend({
                         }
                     }
                 },
-                onInputVersionOver(version:string) {
+                onInputVersionOver(version: string) {
                     if (helper.isDoCreate) {
                         return;
                     }
@@ -170,7 +178,7 @@ module.exports = Editor.Panel.extend({
                     helper.config.version = view.version;
                     helper.saveConfig();
                 },
-                onInputUrlOver(inputUrl:string) {
+                onInputUrlOver(inputUrl: string) {
                     if (helper.isDoCreate) {
                         return;
                     }
@@ -189,7 +197,7 @@ module.exports = Editor.Panel.extend({
                     helper.saveConfig();
                     helper.updateToConfigTS();
                 },
-                onChangeHotupdateUrls(url:string) {
+                onChangeHotupdateUrls(url: string) {
                     let view: MyVue = this as any;
                     view.onInputUrlOver(url);
                 },

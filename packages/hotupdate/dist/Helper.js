@@ -576,29 +576,26 @@ class Helper {
     }
     onBuildFinished(options, callback) {
         this.onInsertHotupdateCode(options);
-        this.readConfig();
-        if (this.config.autoCreate) {
-            this.onCreateManifest(() => {
-                if (this.config.autoDeploy && this.config.remoteDir.length > 0) {
-                    this.onDeployToRemote();
-                    callback();
-                }
-                else {
-                    callback();
-                }
-            });
-        }
-        else {
-            callback();
-        }
+        callback();
     }
     onBuildStart(options, callback) {
         this.config.buildDir = options.dest;
+        Editor.Panel.open("hotupdate");
         this.saveConfig();
         this.resetProgress();
         this.resetCreateProgress();
         Editor.Ipc.sendToPanel("hotupdate", "hotupdate:setBuildDir", options.dest);
         callback();
+    }
+    onPngCompressComplete() {
+        this.readConfig();
+        if (this.config.autoCreate) {
+            this.onCreateManifest(() => {
+                if (this.config.autoDeploy && this.config.remoteDir.length > 0) {
+                    this.onDeployToRemote();
+                }
+            });
+        }
     }
 }
 exports.helper = new Helper();
