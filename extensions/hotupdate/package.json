@@ -51,6 +51,11 @@
                     "onBeforeBuild"
                 ]
             },
+            "onPngCompressComplete":{
+                "methods": [
+                    "onPngCompressComplete"
+                ]
+            },
             "updateCreateProgress":{
                 "methods": [
                     "default.updateCreateProgress"
@@ -64,6 +69,11 @@
             "onSetBuildDir":{
                 "methods": [
                     "default.onSetBuildDir"
+                ]
+            },
+            "onSetProcess":{
+                "methods": [
+                    "default.onSetProcess"
                 ]
             }
         },

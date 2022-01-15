@@ -15,8 +15,16 @@ export const methods: { [key: string]: (...any: any) => any } = {
         }
     },
     onBeforeBuild(platform:Platform){
+        console.log(`[热更新]开始构建，构建平台:${platform}`);
         if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
             helper.onBeforeBuild();
+        }
+    },
+    /**@description png图片压缩完成 */
+    onPngCompressComplete(dest: string, platform: Platform){
+        console.log(`[热更新]png图片压缩完成,构建平台:${platform}`);
+        if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+            helper.onPngCompressComplete();
         }
     }
 };

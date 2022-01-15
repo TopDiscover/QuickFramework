@@ -7,25 +7,25 @@
     <ui-prop>
         <ui-label slot="label" class="titleColor" tooltip="主包的版本号设置">版本号</ui-label>
         <ui-input slot="content" class="contentColor" v-on:blur="onInputVersionOver($event.target.value)"
-            v-bind:value="version">
+            v-bind:value="version" v-bind:disabled="isProcessing">
         </ui-input>
     </ui-prop>
     <ui-prop>
         <ui-label slot="label" class="titleColor" tooltip="游戏热更新服务器地址">服务器地址</ui-label>
-        <ui-input slot="content" class="contentColor" v-on:blur="onInputUrlOver($event.target.value)"
+        <ui-input slot="content" v-bind:disabled="isProcessing" class="contentColor" v-on:blur="onInputUrlOver($event.target.value)"
             v-bind:value="serverIP"></ui-input>
-        <ui-button slot="content" v-on:confirm="onUserLocalIP">使用本机IP</ui-button>
+        <ui-button slot="content" v-bind:disabled="isProcessing" v-on:confirm="onUserLocalIP">使用本机IP</ui-button>
     </ui-prop>
     <ui-prop>
         <ui-label slot="label" class="titleColor" tooltip="游戏热更新历史配置服务器地址">服务器历史地址</ui-label>
-        <ui-select title="服务器历史地址" slot="content" v-on:change="onChangeHotupdateUrls" v-bind:value="serverIP">
+        <ui-select v-bind:disabled="isProcessing" title="服务器历史地址" slot="content" v-on:change="onChangeHotupdateUrls" v-bind:value="serverIP">
             <option v-for="url in hotupdateUrls" :value="url">{{url}}</option>
         </ui-select>
     </ui-prop>
     <ui-prop>
         <ui-label slot="label" class="titleColor"
             tooltip="该目录指向构建生成的bulid/(android|windows)/assets目录，manifest文件将会生成在这个目录下">构建目录</ui-label>
-        <ui-file v-bind:value="buildDir" @confirm="onBuildDirConfirm($event.target.value)" slot="content"
+        <ui-file v-bind:disabled="isProcessing" v-bind:value="buildDir" @confirm="onBuildDirConfirm($event.target.value)" slot="content"
             type="directory"></ui-file>
     </ui-prop>
     <ui-prop>
@@ -34,7 +34,7 @@
     </ui-prop>
     <ui-prop>
         <ui-label slot="label" class="titleColor" tooltip="相对于【构建目录】">主包包含目录</ui-label>
-        <ui-checkbox slot="content" v-for="info in includes" v-bind:value="info.include"
+        <ui-checkbox v-bind:disabled="isProcessing" slot="content" v-for="info in includes" v-bind:value="info.include"
             @confirm="onChangeIncludes($event.target.value,info.name)">{{info.name}}</ui-checkbox>
     </ui-prop>
     <ui-prop>
@@ -43,20 +43,20 @@
     </ui-prop>
     <ui-prop>
         <ui-label slot="label" class="titleColor">操作</ui-label>
-        <ui-checkbox slot="content" v-bind:value="autoCreate" @confirm="onChangeAutoCreateManifest($event.target.value)"
+        <ui-checkbox slot="content" v-bind:disabled="isProcessing" v-bind:value="autoCreate" @confirm="onChangeAutoCreateManifest($event.target.value)"
             tooltip="当构建完成后，自动生成版本控制文件">是否自动创建版本文件</ui-checkbox>
-        <ui-checkbox slot="content" v-bind:value="autoDeploy" @confirm="onChangeAutoDeploy($event.target.value)"
+        <ui-checkbox slot="content" v-bind:disabled="isProcessing" v-bind:value="autoDeploy" @confirm="onChangeAutoDeploy($event.target.value)"
             tooltip="当构建完成后，且自动生成版本文件打开,生成成功后自动部署">是否自动部署</ui-checkbox>
-        <ui-button @confirm="onDelBunles" slot="content" class="red">执行Bundle剔除</ui-button>
-        <ui-button @confirm="onCreateManifest" slot="content" class="green">生成</ui-button>
+        <ui-button @confirm="onDelBunles" v-bind:disabled="isProcessing" slot="content" class="red">执行Bundle剔除</ui-button>
+        <ui-button @confirm="onCreateManifest" v-bind:disabled="isProcessing" slot="content" class="green">生成</ui-button>
     </ui-prop>
 </ui-section>
 <ui-section header="Bundles Manifest配置" expand>
     <ui-prop v-for="bundle in bundles">
         <ui-label slot="label" class="titleColor">{{ bundle.name + "(" + bundle.dir + ")" }}</ui-label>
-        <ui-checkbox slot="content" class="contentColor" v-bind:value="bundle.includeApk"
+        <ui-checkbox v-bind:disabled="isProcessing" slot="content" class="contentColor" v-bind:value="bundle.includeApk"
             @confirm="onChangeIncludeApk($event.target.value,bundle.dir)">是否包含在原始包内</ui-checkbox>
-        <ui-input slot="content" class="contentColor" v-bind:value="bundle.version"
+        <ui-input v-bind:disabled="isProcessing" slot="content" class="contentColor" v-bind:value="bundle.version"
             @confirm="onChangeBundleVersion($event.target.value,bundle.dir)"></ui-input>
     </ui-prop>
 </ui-section>
@@ -84,6 +84,6 @@
         <ui-progress v-bind:value="progress" style="width: 100%;"></ui-progress>
     </ui-prop>
     <ui-prop>
-        <ui-button @confirm="onDeployToRemote">部署</ui-button>
+        <ui-button v-bind:disabled="isProcessing" @confirm="onDeployToRemote">部署</ui-button>
     </ui-prop>
 </ui-section>

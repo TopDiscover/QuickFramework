@@ -8,6 +8,7 @@ let view : {
     createProgress : number;
     buildDir : string;
     buildOutDir : string;
+    isProcessing : boolean;
 };
 
 module.exports = Editor.Panel.define({
@@ -29,6 +30,9 @@ module.exports = Editor.Panel.define({
         onSetBuildDir(dest:string){
             view.buildDir = dest;
             view.buildOutDir = helper.getManifestDir(dest)
+        },
+        onSetProcess(isProcess:boolean){
+            view.isProcessing = isProcess;
         }
     },
     ready() {
@@ -55,6 +59,7 @@ module.exports = Editor.Panel.define({
                         autoDeploy: helper.config.autoDeploy,
                         progress: 0,
                         createProgress: 0,
+                        isProcessing : false,
                     };
                 },
                 methods: {
@@ -103,30 +108,21 @@ module.exports = Editor.Panel.define({
                         helper.onCreateManifest();
                     },
                     onBuildDirConfirm(url: string) {
-                        if (helper.isDoCreate) return;
                         helper.config.buildDir = url;
                         this.buildOutDir = helper.getManifestDir(helper.config.buildDir);
                         helper.saveConfig();
                     },
                     onInputVersionOver(version: string) {
-                        if (helper.isDoCreate) {
-                            return;
-                        }
                         this.version = version;
                         helper.config.version = this.version;
                         helper.saveConfig();
                     },
                     onInputUrlOver(inputUrl: string) {
-                        if (helper.isDoCreate) {
-                            return;
-                        }
                         let url = inputUrl;
-
                         if (/^(https?:\/\/)?([\da-z\.-]+)\.([\da-z\.]{2,6})([\/\w \.-:]*)*\/?$/.test(url) == false) {
                             helper.log(url + `不是以http://https://开头，或者不是网址`);
                             return;
                         }
-
                         helper.config.serverIP = url;
                         this.serverIP = url;
                         if (helper.addHotAddress(url)) {
@@ -139,7 +135,6 @@ module.exports = Editor.Panel.define({
                         this.onInputUrlOver(event.target.value);
                     },
                     onUserLocalIP() {
-                        if (helper.isDoCreate) return;
                         let network = require("os").networkInterfaces();
                         let url = "";
                         Object.keys(network).forEach((key) => {

@@ -266,6 +266,7 @@ class Helper {
         this.compressTasks = [];
         //打印压缩结果 
         this.printResults();
+        Editor.Message.send("hotupdate","onPngCompressComplete",this.dest,this.platfrom);
     }
 
     private getPlatformAssetDir(platform: Platform) {
@@ -320,9 +321,13 @@ class Helper {
         return excludeFiles;
     }
 
+    private dest : string = null!;
+    private platfrom : Platform = null!;
     async onAfterBuild(options: BuilderOptions) {
         console.log(`${LOG_NAME} 构建完成后是否自动压缩资源:${this.config.enabled}`);
         console.log(`${LOG_NAME} 构建平台:${options.platform}`)
+        this.dest = options.dest;
+        this.platfrom = options.platform;
         if (this.config.enabled) {
             console.log(LOG_NAME, `构建目录:${options.dest}`);
             const resPath = path.join(options.dest, this.getPlatformAssetDir(options.platform));
@@ -394,6 +399,8 @@ class Helper {
 
                 return true
             }, true)
+        }else{
+            Editor.Message.send("hotupdate","onPngCompressComplete",options.dest,options.platform);
         }
     }
 

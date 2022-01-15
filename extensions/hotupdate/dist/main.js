@@ -16,8 +16,16 @@ exports.methods = {
         }
     },
     onBeforeBuild(platform) {
+        console.log(`[热更新]开始构建，构建平台:${platform}`);
         if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
             Helper_1.helper.onBeforeBuild();
+        }
+    },
+    /**@description png图片压缩完成 */
+    onPngCompressComplete(dest, platform) {
+        console.log(`[热更新]png图片压缩完成,构建平台:${platform}`);
+        if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+            Helper_1.helper.onPngCompressComplete();
         }
     }
 };

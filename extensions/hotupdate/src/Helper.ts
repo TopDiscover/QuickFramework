@@ -188,17 +188,6 @@ class Helper {
         }
     }
 
-    private _isDoCreate = false;
-    get isDoCreate() {
-        if (this._isDoCreate) {
-            this.log(`正在执行生成操作，请勿操作`);
-        }
-        return this._isDoCreate;
-    }
-    set isDoCreate(v) {
-        this._isDoCreate = v;
-    }
-
     /**
      * @description 添加历史地址 
      * @param url
@@ -238,8 +227,7 @@ class Helper {
 
     /**@description 生成manifest版本文件 */
     onCreateManifest(callbak?: Function) {
-        if (this.isDoCreate) return;
-        this._isDoCreate = true;
+        Editor.Message.send(PACKAGE_NAME,"onSetProcess",true);
         this.saveConfig();
         this.log(`当前用户配置为 : `, this.config);
         this.log("开始生成Manifest配置文件...");
@@ -356,13 +344,13 @@ class Helper {
                 if (isComplete) {
                     setTimeout(() => {
                         this.log(`生成完成`);
+                        Editor.Message.send(PACKAGE_NAME,"onSetProcess",false);
                         if (callbak) callbak();
                     }, 500);
                 }
             }
         })
         this.remake()
-        this._isDoCreate = false;
     }
 
     private _createProgress = 0;
@@ -408,7 +396,6 @@ class Helper {
     }
     /**@description 删除不包含在包内的bundles */
     async onDelBundles() {
-        if (this.isDoCreate) return;
         const config = {
             title: '警告',
             detail: '',
@@ -422,6 +409,7 @@ class Helper {
     }
     /**@description 删除不包含在包内的所有bundles */
     private removeNotInApkBundle() {
+        Editor.Message.send(PACKAGE_NAME,"onSetProcess",true);
         let keys = Object.keys(this.config.bundles);
         let removeBundles: string[] = [];
         keys.forEach((key) => {
@@ -447,12 +435,13 @@ class Helper {
             this.log(`删除版本文件 : ${manifests[i]}`);
             Tools.delFile(manifests[i]);
         }
+        Editor.Message.send(PACKAGE_NAME,"onSetProcess",false);
     }
     /**
      * @description 部署
      */
     onDeployToRemote() {
-        if (this.isDoCreate) return;
+        
         if (this.config.remoteDir.length <= 0) {
             this.log("[部署]请先选择本地服务器目录");
             return;
@@ -465,7 +454,7 @@ class Helper {
             this.log(`[部署]构建目录不存在 : ${this.config.buildDir} , 请先构建`);
             return;
         }
-
+        Editor.Message.send(PACKAGE_NAME,"onSetProcess",true);
         let includes = this.mainBundleIncludes;
 
         let temps = [];
@@ -538,6 +527,9 @@ class Helper {
     private addProgress() {
         this._progress++;
         let value = (this._progress / this.total) * 100;
+        if ( value >= 100 ){
+            Editor.Message.send(PACKAGE_NAME,"onSetProcess",false);
+        }
         Editor.Message.send(PACKAGE_NAME, "updateDeployProgress", value);
     }
     private _progress = 0;
@@ -585,6 +577,7 @@ class Helper {
     onBeforeBuild() {
         this.resetProgress();
         this.resetCreateProgress();
+        Editor.Message.send(PACKAGE_NAME,"onSetProcess",true);
     }
 
     onAfterBuild(dest: string) {
@@ -593,12 +586,20 @@ class Helper {
         this.config.buildDir = normalize(join(dest,"assets"));
         Editor.Message.send(PACKAGE_NAME,"onSetBuildDir",this.config.buildDir);
         this.saveConfig();
+    }
+
+    onPngCompressComplete(){
+        this.readConfig();
         if (this.config.autoCreate) {
             this.onCreateManifest(() => {
                 if (this.config.autoDeploy && this.config.remoteDir.length > 0 ){
                     this.onDeployToRemote();
+                }else{
+                    Editor.Message.send(PACKAGE_NAME,"onSetProcess",false);
                 }
             })
+        }else{
+            Editor.Message.send(PACKAGE_NAME,"onSetProcess",false);
         }
     }
 }

@@ -22,6 +22,9 @@ module.exports = Editor.Panel.define({
         onSetBuildDir(dest) {
             view.buildDir = dest;
             view.buildOutDir = Helper_1.helper.getManifestDir(dest);
+        },
+        onSetProcess(isProcess) {
+            view.isProcessing = isProcess;
         }
     },
     ready() {
@@ -48,6 +51,7 @@ module.exports = Editor.Panel.define({
                         autoDeploy: Helper_1.helper.config.autoDeploy,
                         progress: 0,
                         createProgress: 0,
+                        isProcessing: false,
                     };
                 },
                 methods: {
@@ -96,24 +100,16 @@ module.exports = Editor.Panel.define({
                         Helper_1.helper.onCreateManifest();
                     },
                     onBuildDirConfirm(url) {
-                        if (Helper_1.helper.isDoCreate)
-                            return;
                         Helper_1.helper.config.buildDir = url;
                         this.buildOutDir = Helper_1.helper.getManifestDir(Helper_1.helper.config.buildDir);
                         Helper_1.helper.saveConfig();
                     },
                     onInputVersionOver(version) {
-                        if (Helper_1.helper.isDoCreate) {
-                            return;
-                        }
                         this.version = version;
                         Helper_1.helper.config.version = this.version;
                         Helper_1.helper.saveConfig();
                     },
                     onInputUrlOver(inputUrl) {
-                        if (Helper_1.helper.isDoCreate) {
-                            return;
-                        }
                         let url = inputUrl;
                         if (/^(https?:\/\/)?([\da-z\.-]+)\.([\da-z\.]{2,6})([\/\w \.-:]*)*\/?$/.test(url) == false) {
                             Helper_1.helper.log(url + `不是以http://https://开头，或者不是网址`);
@@ -131,8 +127,6 @@ module.exports = Editor.Panel.define({
                         this.onInputUrlOver(event.target.value);
                     },
                     onUserLocalIP() {
-                        if (Helper_1.helper.isDoCreate)
-                            return;
                         let network = require("os").networkInterfaces();
                         let url = "";
                         Object.keys(network).forEach((key) => {

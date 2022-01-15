@@ -47,6 +47,8 @@ class Helper {
         this.compressTasks = [];
         /**@description 引擎内置资源 */
         this.enginPath = path_1.default.normalize("main");
+        this.dest = null;
+        this.platfrom = null;
     }
     get config() {
         if (!this._config) {
@@ -237,6 +239,7 @@ class Helper {
         this.compressTasks = [];
         //打印压缩结果 
         this.printResults();
+        Editor.Message.send("hotupdate", "onPngCompressComplete", this.dest, this.platfrom);
     }
     getPlatformAssetDir(platform) {
         if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac") {
@@ -290,6 +293,8 @@ class Helper {
     async onAfterBuild(options) {
         console.log(`${LOG_NAME} 构建完成后是否自动压缩资源:${this.config.enabled}`);
         console.log(`${LOG_NAME} 构建平台:${options.platform}`);
+        this.dest = options.dest;
+        this.platfrom = options.platform;
         if (this.config.enabled) {
             console.log(LOG_NAME, `构建目录:${options.dest}`);
             const resPath = path_1.default.join(options.dest, this.getPlatformAssetDir(options.platform));
@@ -355,6 +360,9 @@ class Helper {
                 }
                 return true;
             }, true);
+        }
+        else {
+            Editor.Message.send("hotupdate", "onPngCompressComplete", options.dest, options.platform);
         }
     }
     /**@description 对项目资源目录进度图片压缩 */
