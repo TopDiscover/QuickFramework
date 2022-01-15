@@ -102,7 +102,11 @@ export class STRING extends StreamValue<string> {
     byteSize : number | undefined = undefined;
     read(byteArray: ByteArray) {
         //先读取字符串长度
-        let size = byteArray.readUnsignedInt();
+        let size = this.byteSize;
+        if ( this.byteSize == undefined ){
+            //不定长处理
+            size = byteArray.readUnsignedInt();
+        }
         this.data = byteArray.readUTFBytes(size);
     }
 
