@@ -54,14 +54,8 @@ export class UpdateManager {
         }
     }
 
-    private get mainBundles(){
-        return [
-            "src", //这个里面会包含工程的插件脚本，如该工程的protobuf.js CryptoJS.js,如果考虑后面会升级，加入到里面
-            "jsb-adapter", //这个东西一般不会变，不用加载到版本控制中
-            "assets/main",
-            "assets/resources"
-        ];
-    }
+    /**@description 主包包含资源目录 */
+    mainBundles : string[] = [];
 
     /**@description 获取资源管理器，默认为hall 大厅的资源管理器 */
     getAssetsManager(item: UpdateItem) {

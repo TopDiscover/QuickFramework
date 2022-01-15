@@ -69,7 +69,7 @@ class Helper {
 
     /**@description 配置存储路径 */
     private get configPath() {
-        let savePath = `${path.join(Editor.Project.path, "/local/png-compress.json")}`;
+        let savePath = `${path.join(Editor.Project.path, "config/png-compress.json")}`;
         savePath = normalize(savePath);
         return savePath;
     }
