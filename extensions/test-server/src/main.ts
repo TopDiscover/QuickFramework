@@ -1,4 +1,3 @@
-let ws = require("nodejs-websocket");
 
 /**
  * @en 
@@ -6,6 +5,7 @@ let ws = require("nodejs-websocket");
  */
 export const methods: { [key: string]: (...any: any) => any } = {
     startServer() {
+        let ws = require("nodejs-websocket");
         let server = ws.createServer((socket:any)=> {
             // 事件名称为text(读取字符串时，就叫做text)，读取客户端传来的字符串
             let count = 1;
