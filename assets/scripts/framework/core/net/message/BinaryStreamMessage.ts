@@ -379,6 +379,7 @@ export abstract class BinaryStream extends Message {
 
     private deserializeStringStreamValue(memberName: any, memberType: typeof STRING, arrTypeOrMapKeyType: number) {
         let value = new memberType();
+        value.byteSize = arrTypeOrMapKeyType;
         value.read(this.byteArray);
         return value.data;
     }
