@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.messages = exports.unload = exports.load = void 0;
-let ws = require("nodejs-websocket");
 function load() {
 }
 exports.load = load;
@@ -10,6 +9,7 @@ function unload() {
 exports.unload = unload;
 exports.messages = {
     startServer: () => {
+        let ws = require("nodejs-websocket");
         let server = ws.createServer((socket) => {
             // 事件名称为text(读取字符串时，就叫做text)，读取客户端传来的字符串
             let count = 1;
