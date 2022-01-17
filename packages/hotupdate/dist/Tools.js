@@ -27,11 +27,11 @@ class _Tools {
     getDirFileCount(dir) {
         let count = 0;
         let counter = (dir) => {
-            let readdir = fs_1.readdirSync(dir);
+            let readdir = (0, fs_1.readdirSync)(dir);
             for (let i in readdir) {
                 count++;
                 let fullPath = path_1.default.join(dir, readdir[i]);
-                fs_1.statSync(fullPath).isDirectory() && counter(fullPath);
+                (0, fs_1.statSync)(fullPath).isDirectory() && counter(fullPath);
             }
         };
         counter(dir);
@@ -39,16 +39,16 @@ class _Tools {
     }
     /**@description 压缩文件到zip */
     zipDir(dir, jszip) {
-        if (!fs_1.existsSync(dir) || !jszip) {
+        if (!(0, fs_1.existsSync)(dir) || !jszip) {
             return;
         }
-        let readDirs = fs_1.readdirSync(dir);
+        let readDirs = (0, fs_1.readdirSync)(dir);
         for (let i = 0; i < readDirs.length; i++) {
             let file = readDirs[i];
             let fullPath = path_1.default.join(dir, file);
-            let stat = fs_1.statSync(fullPath);
+            let stat = (0, fs_1.statSync)(fullPath);
             if (stat.isFile()) {
-                jszip.file(file, fs_1.readFileSync(fullPath));
+                jszip.file(file, (0, fs_1.readFileSync)(fullPath));
             }
             else {
                 stat.isDirectory() && this.zipDir(fullPath, jszip.folder(file));
@@ -64,7 +64,7 @@ class _Tools {
         for (let index = 0; index < config.mainIncludes.length; index++) {
             const element = config.mainIncludes[index];
             let fullPath = path_1.default.join(config.buildDir, element);
-            fullPath = path_1.normalize(fullPath);
+            fullPath = (0, path_1.normalize)(fullPath);
             this.zipDir(fullPath, jszip.folder(element));
         }
         let bundles = Object.keys(config.bundles);
@@ -72,16 +72,16 @@ class _Tools {
         let total = bundles.length;
         let packZipName = `main_${config.versions["main"].md5}.zip`;
         let packZipRootPath = Editor.Project.path + "/PackageVersion";
-        packZipRootPath = path_1.normalize(packZipRootPath);
+        packZipRootPath = (0, path_1.normalize)(packZipRootPath);
         let packVersionZipPath = path_1.default.join(packZipRootPath, packZipName);
-        packVersionZipPath = path_1.normalize(packVersionZipPath);
+        packVersionZipPath = (0, path_1.normalize)(packVersionZipPath);
         this.delDir(packZipRootPath);
         this.mkdirSync(packZipRootPath);
         config.log(`打包路径: ${packZipRootPath}`);
         jszip.generateNodeStream({
             type: "nodebuffer",
             streamFiles: !0
-        }).pipe(fs_1.createWriteStream(packVersionZipPath)).on("finish", () => {
+        }).pipe((0, fs_1.createWriteStream)(packVersionZipPath)).on("finish", () => {
             config.log("[打包] 打包成功: " + packZipName);
             count++;
             config.handler(count == total);
@@ -102,7 +102,7 @@ class _Tools {
             jszip.generateNodeStream({
                 type: "nodebuffer",
                 streamFiles: !0
-            }).pipe(fs_1.createWriteStream(packVersionZipPath)).on("finish", () => {
+            }).pipe((0, fs_1.createWriteStream)(packVersionZipPath)).on("finish", () => {
                 config.log("[打包] 打包成功: " + packZipName);
                 count++;
                 config.handler(count == total);
@@ -116,7 +116,7 @@ class _Tools {
     /**@description 创建目录 */
     mkdirSync(dir) {
         try {
-            fs_1.mkdirSync(dir);
+            (0, fs_1.mkdirSync)(dir);
         }
         catch (e) {
             if ("EEXIST" !== e.code)
@@ -130,27 +130,27 @@ class _Tools {
      */
     delDir(sourceDir, isRemoveSourceDir = false) {
         let delFile = (dir) => {
-            if (!fs_1.existsSync(dir))
+            if (!(0, fs_1.existsSync)(dir))
                 return;
-            let readDir = fs_1.readdirSync(dir);
+            let readDir = (0, fs_1.readdirSync)(dir);
             for (let i in readDir) {
                 let fullPath = path_1.default.join(dir, readDir[i]);
-                fs_1.statSync(fullPath).isDirectory() ? delFile(fullPath) : fs_1.unlinkSync(fullPath);
+                (0, fs_1.statSync)(fullPath).isDirectory() ? delFile(fullPath) : (0, fs_1.unlinkSync)(fullPath);
             }
         };
         let delDir = (dir) => {
-            if (!fs_1.existsSync(dir))
+            if (!(0, fs_1.existsSync)(dir))
                 return;
-            let readDir = fs_1.readdirSync(dir);
+            let readDir = (0, fs_1.readdirSync)(dir);
             if (readDir.length > 0) {
                 for (let i in readDir) {
                     let fullPath = path_1.default.join(dir, readDir[i]);
                     delDir(fullPath);
                 }
-                (dir !== sourceDir || isRemoveSourceDir) && fs_1.rmdirSync(dir);
+                (dir !== sourceDir || isRemoveSourceDir) && (0, fs_1.rmdirSync)(dir);
             }
             else {
-                (dir !== sourceDir || isRemoveSourceDir) && fs_1.rmdirSync(dir);
+                (dir !== sourceDir || isRemoveSourceDir) && (0, fs_1.rmdirSync)(dir);
             }
         };
         delFile(sourceDir);
@@ -162,8 +162,8 @@ class _Tools {
      * @returns
      */
     delFile(filePath) {
-        if (fs_1.existsSync(filePath)) {
-            fs_1.unlinkSync(filePath);
+        if ((0, fs_1.existsSync)(filePath)) {
+            (0, fs_1.unlinkSync)(filePath);
             return true;
         }
         return false;
@@ -177,15 +177,15 @@ class _Tools {
     copySourceDirToDesDir(source, dest, copyFileCb) {
         let self = this;
         let makeDir = (_source, _dest, _copyFileCb) => {
-            fs_1.exists(_dest, function (isExist) {
-                isExist ? _copyFileCb(_source, _dest) : fs_1.mkdir(_dest, function () {
+            (0, fs_1.exists)(_dest, function (isExist) {
+                isExist ? _copyFileCb(_source, _dest) : (0, fs_1.mkdir)(_dest, function () {
                     if (copyFileCb)
                         copyFileCb(), _copyFileCb(_source, _dest);
                 });
             });
         };
         let copyFile = (_source, _dest) => {
-            fs_1.readdir(_source, function (err, files) {
+            (0, fs_1.readdir)(_source, function (err, files) {
                 if (err)
                     throw err;
                 files.forEach(function (filename) {
@@ -193,12 +193,12 @@ class _Tools {
                     let writeStram;
                     let sourcePath = _source + "/" + filename;
                     let destPath = _dest + "/" + filename;
-                    fs_1.stat(sourcePath, function (err, stats) {
+                    (0, fs_1.stat)(sourcePath, function (err, stats) {
                         if (err)
                             throw err;
                         if (stats.isFile()) {
-                            readStream = fs_1.createReadStream(sourcePath);
-                            writeStram = fs_1.createWriteStream(destPath);
+                            readStream = (0, fs_1.createReadStream)(sourcePath);
+                            writeStram = (0, fs_1.createWriteStream)(destPath);
                             readStream.pipe(writeStram);
                             if (copyFileCb)
                                 copyFileCb();
@@ -220,25 +220,47 @@ class _Tools {
      * @returns
      */
     readDir(dir, obj, source) {
-        var stat = fs_1.statSync(dir);
+        var stat = (0, fs_1.statSync)(dir);
         if (!stat.isDirectory()) {
             return;
         }
-        var subpaths = fs_1.readdirSync(dir), subpath, size, md5, compressed, relative;
+        var subpaths = (0, fs_1.readdirSync)(dir), subpath, size, md5, compressed, relative;
         for (var i = 0; i < subpaths.length; ++i) {
             if (subpaths[i][0] === '.') {
                 continue;
             }
             subpath = path_1.default.join(dir, subpaths[i]);
-            stat = fs_1.statSync(subpath);
+            stat = (0, fs_1.statSync)(subpath);
             if (stat.isDirectory()) {
                 this.readDir(subpath, obj, source);
             }
             else if (stat.isFile()) {
                 // Size in Bytes
                 size = stat['size'];
-                md5 = require("crypto").createHash('md5').update(fs_1.readFileSync(subpath)).digest('hex');
-                compressed = path_1.default.extname(subpath).toLowerCase() === '.zip';
+                //这里需要处理下,在只修改主包或都其它bundle时，会引起md5的变更config.json
+                if (subpath.includes("config.json")) {
+                    try {
+                        let content = (0, fs_1.readFileSync)(subpath, "utf-8");
+                        let config = JSON.parse(content);
+                        if (config && config.uuids && Array.isArray(config.uuids)) {
+                            delete config.redirect;
+                            config.uuids.sort();
+                            md5 = require("crypto").createHash('md5').update(JSON.stringify(config)).digest('hex');
+                        }
+                        else {
+                            Editor.warn(`${subpath}找不到uuids字段`);
+                            md5 = require("crypto").createHash('md5').update((0, fs_1.readFileSync)(subpath)).digest('hex');
+                        }
+                    }
+                    catch (err) {
+                        Editor.error(err);
+                        md5 = require("crypto").createHash('md5').update((0, fs_1.readFileSync)(subpath)).digest('hex');
+                    }
+                }
+                else {
+                    md5 = require("crypto").createHash('md5').update((0, fs_1.readFileSync)(subpath)).digest('hex');
+                    compressed = path_1.default.extname(subpath).toLowerCase() === '.zip';
+                }
                 relative = path_1.default.relative(source, subpath);
                 relative = relative.replace(/\\/g, '/');
                 relative = encodeURI(relative);
@@ -253,20 +275,20 @@ class _Tools {
         }
     }
     get bundles() {
-        let dir = path_1.join(Editor.Project.path, "assets/bundles");
-        let stat = fs_1.statSync(dir);
+        let dir = (0, path_1.join)(Editor.Project.path, "assets/bundles");
+        let stat = (0, fs_1.statSync)(dir);
         let result = [];
         if (!stat.isDirectory()) {
             return result;
         }
-        let subpaths = fs_1.readdirSync(dir);
+        let subpaths = (0, fs_1.readdirSync)(dir);
         let subpath = "";
         for (let i = 0; i < subpaths.length; ++i) {
             if (subpaths[i][0] === '.') {
                 continue;
             }
             subpath = path_1.default.join(dir, subpaths[i]);
-            stat = fs_1.statSync(subpath);
+            stat = (0, fs_1.statSync)(subpath);
             if (stat.isDirectory()) {
                 result.push(path_1.default.relative(dir, subpath));
             }

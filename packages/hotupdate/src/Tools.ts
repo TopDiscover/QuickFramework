@@ -215,8 +215,27 @@ class _Tools {
             } else if (stat.isFile()) {
                 // Size in Bytes
                 size = stat['size'];
-                md5 = require("crypto").createHash('md5').update(readFileSync(subpath)).digest('hex');
-                compressed = path.extname(subpath).toLowerCase() === '.zip';
+                //这里需要处理下,在只修改主包或都其它bundle时，会引起md5的变更config.json
+                if (subpath.includes("config.json")) {
+                    try {
+                        let content = readFileSync(subpath, "utf-8");
+                        let config = JSON.parse(content);
+                        if (config && config.uuids && Array.isArray(config.uuids)) {
+                            delete config.redirect;
+                            config.uuids.sort();
+                            md5 = require("crypto").createHash('md5').update(JSON.stringify(config)).digest('hex');
+                        }else{
+                            Editor.warn(`${subpath}找不到uuids字段`);
+                            md5 = require("crypto").createHash('md5').update(readFileSync(subpath)).digest('hex');
+                        }
+                    } catch (err) {
+                        Editor.error(err);
+                        md5 = require("crypto").createHash('md5').update(readFileSync(subpath)).digest('hex');
+                    }
+                } else {
+                    md5 = require("crypto").createHash('md5').update(readFileSync(subpath)).digest('hex');
+                    compressed = path.extname(subpath).toLowerCase() === '.zip';
+                }
                 relative = path.relative(source, subpath);
                 relative = relative.replace(/\\/g, '/');
                 relative = encodeURI(relative);

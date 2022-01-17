@@ -5,8 +5,8 @@ const path_1 = require("path");
 const Helper_1 = require("../../../Helper");
 let vueView = null;
 module.exports = Editor.Panel.extend({
-    template: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
-    style: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
+    template: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
+    style: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
     $: {},
     messages: {
         'hotupdate:onConfirmDelBundle'() {
