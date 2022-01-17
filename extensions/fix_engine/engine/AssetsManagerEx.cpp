@@ -1008,32 +1008,31 @@ void AssetsManagerEx::moveTempToCached(const std::string& root, const std::strin
 				_fileUtils->removeFile(exsitedPath);
 			}
 		}
-
-		//完成后复制版本文件
-		if (isComplete) {
-			auto tempDstRoot = _storagePath + MANIFEST_PATH;
-			if (!_fileUtils->isDirectoryExist(tempDstRoot)) {
-				_fileUtils->createDirectory(tempDstRoot);
-			}
-
-			auto versionDstPath = tempDstRoot + _bundle + VERSION_FILENAME;
-			if (_fileUtils->isFileExist(versionDstPath))
-			{
-				_fileUtils->removeFile(versionDstPath);
-			}
-
-			auto projectDstPath = tempDstRoot + _bundle + MANIFEST_FILENAME;
-			if (_fileUtils->isFileExist(projectDstPath)) {
-				_fileUtils->removeFile(projectDstPath);
-			}
-
-			auto tempSrcRoot = _tempStoragePath + MANIFEST_PATH;
-			auto versionSrcPath = tempSrcRoot + _bundle + VERSION_FILENAME;
-			auto projectSrcPath = tempSrcRoot + _bundle + MANIFEST_FILENAME;
-
-			_fileUtils->renameFile(versionSrcPath, versionDstPath);
-			_fileUtils->renameFile(projectSrcPath, projectDstPath);
+	}
+	//完成后复制版本文件
+	if (isComplete) {
+		auto tempDstRoot = _storagePath + MANIFEST_PATH;
+		if (!_fileUtils->isDirectoryExist(tempDstRoot)) {
+			_fileUtils->createDirectory(tempDstRoot);
 		}
+	
+		auto versionDstPath = tempDstRoot + _bundle + VERSION_FILENAME;
+		if (_fileUtils->isFileExist(versionDstPath))
+		{
+			_fileUtils->removeFile(versionDstPath);
+		}
+	
+		auto projectDstPath = tempDstRoot + _bundle + MANIFEST_FILENAME;
+		if (_fileUtils->isFileExist(projectDstPath)) {
+			_fileUtils->removeFile(projectDstPath);
+		}
+	
+		auto tempSrcRoot = _tempStoragePath + MANIFEST_PATH;
+		auto versionSrcPath = tempSrcRoot + _bundle + VERSION_FILENAME;
+		auto projectSrcPath = tempSrcRoot + _bundle + MANIFEST_FILENAME;
+	
+		_fileUtils->renameFile(versionSrcPath, versionDstPath);
+		_fileUtils->renameFile(projectSrcPath, projectDstPath);
 	}
 }
 
