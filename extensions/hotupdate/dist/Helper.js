@@ -96,8 +96,8 @@ class Helper {
     getBundleVersion(key) {
         if (this.config.remoteDir.length > 0) {
             let versionManifestPath = path_1.default.join(this.config.remoteDir, `manifest/${key}_version.json`);
-            if (fs_extra_1.existsSync(versionManifestPath)) {
-                let data = fs_extra_1.readFileSync(versionManifestPath, { encoding: "utf-8" });
+            if ((0, fs_extra_1.existsSync)(versionManifestPath)) {
+                let data = (0, fs_extra_1.readFileSync)(versionManifestPath, { encoding: "utf-8" });
                 let config = JSON.parse(data);
                 return this.getShowRemoteString(config);
             }
@@ -118,7 +118,7 @@ class Helper {
     /**@description 保存当前用户设置 */
     saveConfig() {
         let cacheString = JSON.stringify(this.config);
-        fs_extra_1.writeFileSync(this.userCachePath, cacheString);
+        (0, fs_extra_1.writeFileSync)(this.userCachePath, cacheString);
         // this.addLog(`写入缓存 :`, this.userCache);
     }
     get remoteBundles() {
@@ -169,8 +169,8 @@ class Helper {
     }
     /**@description 读取本地缓存 */
     readConfig() {
-        if (fs_extra_1.existsSync(this.userCachePath)) {
-            let data = fs_extra_1.readFileSync(this.userCachePath, "utf-8");
+        if ((0, fs_extra_1.existsSync)(this.userCachePath)) {
+            let data = (0, fs_extra_1.readFileSync)(this.userCachePath, "utf-8");
             this.config = JSON.parse(data);
             if (this.checkConfig()) {
                 this.saveConfig();
@@ -224,11 +224,11 @@ class Helper {
     //插入热更新代码
     onInsertHotupdate(dest) {
         let codePath = path_1.default.join(Editor.Project.path, "extensions/hotupdate/code/hotupdate.js");
-        let code = fs_extra_1.readFileSync(codePath, "utf8");
+        let code = (0, fs_extra_1.readFileSync)(codePath, "utf8");
         // console.log(code);
         let sourcePath = path_1.default.join(dest, "assets/main.js");
-        sourcePath = path_1.normalize(sourcePath);
-        let sourceCode = fs_extra_1.readFileSync(sourcePath, "utf8");
+        sourcePath = (0, path_1.normalize)(sourcePath);
+        let sourceCode = (0, fs_extra_1.readFileSync)(sourcePath, "utf8");
         let templateReplace = function templateReplace() {
             // console.log(arguments);
             return arguments[1] + code + arguments[3];
@@ -236,7 +236,7 @@ class Helper {
         //添加子游戏测试环境版本号
         sourceCode = sourceCode.replace(/(\);)([\s\w\S]*)(const[ ]*importMapJson)/g, templateReplace);
         this.log(`向${sourcePath}中插入热更新代码`);
-        fs_extra_1.writeFileSync(sourcePath, sourceCode, { "encoding": "utf8" });
+        (0, fs_extra_1.writeFileSync)(sourcePath, sourceCode, { "encoding": "utf8" });
     }
     /**@description 生成manifest版本文件 */
     onCreateManifest(callbak) {
@@ -247,10 +247,10 @@ class Helper {
         let version = this.config.version;
         this.log("主包版本号:", version);
         let buildDir = this.config.buildDir;
-        buildDir = path_1.normalize(buildDir);
+        buildDir = (0, path_1.normalize)(buildDir);
         this.log("构建目录:", buildDir);
         let manifestDir = this.getManifestDir(buildDir);
-        manifestDir = path_1.normalize(manifestDir);
+        manifestDir = (0, path_1.normalize)(manifestDir);
         this.log("构建目录下的Manifest目录:", manifestDir);
         let serverUrl = this.config.serverIP;
         this.log("热更新地址:", serverUrl);
@@ -269,7 +269,7 @@ class Helper {
         this.total++;
         //删除旧的版本控件文件
         this.log("删除旧的Manifest目录", manifestDir);
-        if (fs_extra_1.existsSync(manifestDir)) {
+        if ((0, fs_extra_1.existsSync)(manifestDir)) {
             this.log("存在旧的，删除掉");
             Tools_1.Tools.delDir(manifestDir);
         }
@@ -286,11 +286,11 @@ class Helper {
         let md5 = require("crypto").createHash('md5').update(content).digest('hex');
         manifest.md5 = md5;
         manifest.version = version;
-        fs_extra_1.writeFileSync(projectManifestPath, JSON.stringify(manifest));
+        (0, fs_extra_1.writeFileSync)(projectManifestPath, JSON.stringify(manifest));
         this.log(`生成${projectManifestPath}成功`);
         this.addCreateProgress();
         delete manifest.assets;
-        fs_extra_1.writeFileSync(versionManifestPath, JSON.stringify(manifest));
+        (0, fs_extra_1.writeFileSync)(versionManifestPath, JSON.stringify(manifest));
         this.log(`生成${versionManifestPath}成功`);
         this.addCreateProgress();
         //生成所有版本控制文件，用来判断当玩家停止在版本1，此时发版本2时，不让进入游戏，返回到登录，重新走完整个更新流程
@@ -312,20 +312,20 @@ class Helper {
             let md5 = require("crypto").createHash('md5').update(content).digest('hex');
             manifest.md5 = md5;
             manifest.version = this.config.bundles[key].version;
-            fs_extra_1.writeFileSync(projectManifestPath, JSON.stringify(manifest));
+            (0, fs_extra_1.writeFileSync)(projectManifestPath, JSON.stringify(manifest));
             this.log(`生成${projectManifestPath}成功`);
             this.addCreateProgress();
             delete manifest.assets;
             versions[`${key}`] = {};
             versions[`${key}`].md5 = md5;
             versions[`${key}`].version = manifest.version;
-            fs_extra_1.writeFileSync(versionManifestPath, JSON.stringify(manifest));
+            (0, fs_extra_1.writeFileSync)(versionManifestPath, JSON.stringify(manifest));
             this.log(`生成${versionManifestPath}成功`);
             this.addCreateProgress();
         }
         //写入所有版本
         let versionsPath = path_1.default.join(manifestDir, `versions.json`);
-        fs_extra_1.writeFileSync(versionsPath, JSON.stringify(versions));
+        (0, fs_extra_1.writeFileSync)(versionsPath, JSON.stringify(versions));
         this.log(`生成versions.json成功`);
         this.addCreateProgress();
         Tools_1.Tools.zipVersions({
@@ -376,7 +376,7 @@ class Helper {
         const nativeIosPath = projectPath + "/native/engine/ios";
         const iosProjPath = projectPath + "/build/ios/proj";
         const resPath = projectPath + "/build/ios";
-        if (!fs_extra_1.existsSync(resPath) || !fs_extra_1.existsSync(nativeIosPath)) {
+        if (!(0, fs_extra_1.existsSync)(resPath) || !(0, fs_extra_1.existsSync)(nativeIosPath)) {
             return;
         }
         const prev = path_1.default.resolve(Editor.App.path, "..");
@@ -384,7 +384,7 @@ class Helper {
         console.log(cmake);
         const cmd = cmake + " with -S " + nativeIosPath + " -GXcode -B" + iosProjPath +
             " -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DRES_DIR=" + resPath;
-        child_process_1.exec(cmd, { encoding: 'utf8' }, function (err, stdout, stderr) {
+        (0, child_process_1.exec)(cmd, { encoding: 'utf8' }, function (err, stdout, stderr) {
             if (err) {
                 console.log(err);
             }
@@ -443,11 +443,11 @@ class Helper {
             this.log("[部署]请先选择本地服务器目录");
             return;
         }
-        if (!fs_extra_1.existsSync(this.config.remoteDir)) {
+        if (!(0, fs_extra_1.existsSync)(this.config.remoteDir)) {
             this.log(`[部署]本地测试服务器目录不存在 : ${this.config.remoteDir}`);
             return;
         }
-        if (!fs_extra_1.existsSync(this.config.buildDir)) {
+        if (!(0, fs_extra_1.existsSync)(this.config.buildDir)) {
             this.log(`[部署]构建目录不存在 : ${this.config.buildDir} , 请先构建`);
             return;
         }
@@ -473,7 +473,7 @@ class Helper {
         let copyDirs = ["manifest"].concat(temps);
         for (let i = 0; i < copyDirs.length; i++) {
             let dir = path_1.default.join(this.config.buildDir, copyDirs[i]);
-            if (!fs_extra_1.existsSync(dir)) {
+            if (!(0, fs_extra_1.existsSync)(dir)) {
                 this.log(`${this.config.buildDir} [部署]不存在${copyDirs[i]}目录,无法拷贝文件`);
                 return;
             }
@@ -522,10 +522,10 @@ class Helper {
         Editor.Message.send(PACKAGE_NAME, "updateDeployProgress", 0);
     }
     updateToConfigTS() {
-        let configTSPath = path_1.join(Editor.Project.path, "assets/scripts/common/config/Config.ts");
-        if (fs_extra_1.existsSync(configTSPath)) {
+        let configTSPath = (0, path_1.join)(Editor.Project.path, "assets/scripts/common/config/Config.ts");
+        if ((0, fs_extra_1.existsSync)(configTSPath)) {
             //更新热更新地址
-            let content = fs_extra_1.readFileSync(configTSPath, "utf-8");
+            let content = (0, fs_extra_1.readFileSync)(configTSPath, "utf-8");
             let serverID = this.config.serverIP;
             let self = this;
             let replace = function () {
@@ -547,7 +547,7 @@ class Helper {
             };
             content = content.replace(/(export\s*const\s*MIAN_PACK_INCLUDE\s*:\s*string\s*\[\s*\]\s*=\s*)([\[\]"\w,-/]*)(;)/g, replaceIncludes);
             // Editor.log(content);
-            fs_extra_1.writeFileSync(configTSPath, content, "utf-8");
+            (0, fs_extra_1.writeFileSync)(configTSPath, content, "utf-8");
             let dbPath = "db://assets/scripts/common/config/Config.ts";
             Editor.Message.send("asset-db", "refresh-asset", dbPath);
         }
@@ -563,7 +563,7 @@ class Helper {
     onAfterBuild(dest) {
         this.onInsertHotupdate(dest);
         this.readConfig();
-        this.config.buildDir = path_1.normalize(path_1.join(dest, "assets"));
+        this.config.buildDir = (0, path_1.normalize)((0, path_1.join)(dest, "assets"));
         Editor.Message.send(PACKAGE_NAME, "onSetBuildDir", this.config.buildDir);
         this.saveConfig();
     }
