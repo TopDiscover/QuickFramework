@@ -116,9 +116,9 @@ export default class LoadTestView extends GameView {
         let btn = button.getComponent(Button) as Button;
         button.active = true;
         btn.loadButton({
-            normalSprite : "texture/btn_b/spriteFrame",
-            pressedSprite: "texture/btn_y/spriteFrame",
-            hoverSprite:"texture/btnbg/spriteFrame",
+            normalSprite : "texture/btn_b",
+            pressedSprite: "texture/btn_y",
+            hoverSprite:"texture/btnbg",
             view: this,
             bundle : HallData.bundle,
             complete:(type,spriteFrame)=>{

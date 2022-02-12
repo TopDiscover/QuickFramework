@@ -199,8 +199,9 @@ function _setButtonWithType(
 ) {
     if (url) {
         if (typeof url == "string") {
+            url = url + "/spriteFrame";
             Manager.cacheManager.getCacheByAsync(url, SpriteFrame, bundle as BUNDLE_TYPE).then((spriteFrame) => {
-                _setButtonSpriteFrame(button, memberName, view, url, spriteFrame, complete as any, bundle as BUNDLE_TYPE);
+                _setButtonSpriteFrame(button, memberName, view, url as string, spriteFrame, complete as any, bundle as BUNDLE_TYPE);
             });
         } else {
             //在纹理图集中查找
