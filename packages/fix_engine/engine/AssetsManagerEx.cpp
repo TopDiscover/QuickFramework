@@ -170,7 +170,11 @@ void AssetsManagerEx::init(const std::string& manifestUrl, const std::string& st
 		}
 	}
 
-    
+    //manifest 目录
+    auto dir = basename(_tempStoragePath + MANIFEST_PATH);
+	if (!_fileUtils->isDirectoryExist(dir)) {
+		_fileUtils->createDirectory(dir);
+	}
 }
 
 AssetsManagerEx::~AssetsManagerEx()
