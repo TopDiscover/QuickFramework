@@ -1,5 +1,3 @@
-import { _decorator, Component, Node } from "cc";
-const { ccclass, property } = _decorator;
 
 enum EventName {
     GREETING = 'greeting',
@@ -14,6 +12,7 @@ enum EventName {
     SHOW_TALK = 'show-talk',
     SHOW_GUIDE = 'show-guide',
     UPDATE_PROGRESS = 'update-progress',
+    MAIN_CAR_INI_SUCCUSS = "MAIN_CAR_INI_SUCCUSS",
 }
 
 enum CustomerState {
@@ -23,7 +22,7 @@ enum CustomerState {
 }
 
 enum AudioSource {
-    BACKGROUND = 'background',
+    BACKGROUND = 'audio/music/background',
     CLICK = 'click',
     CRASH = 'crash',
     GETMONEY = 'getMoney',
@@ -42,7 +41,6 @@ enum CarGroup {
     OTHER_CAR = 1 << 2,
 }
 
-@ccclass("TaxiConstants")
 export class TaxiConstants {
     public static EventName = EventName;
     public static CustomerState = CustomerState;
@@ -61,5 +59,5 @@ export class TaxiConstants {
 
     public static GameConfigID = 'TAXI_GAME_CACHE';
     public static PlayerConfigID = 'playerInfo';
-    public static MaxLevel = 20;
+    public static MaxLevel = 18;
 }

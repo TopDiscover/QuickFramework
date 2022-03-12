@@ -7,20 +7,21 @@ const { ccclass, property } = _decorator;
 
 @ccclass("TaxiCarMgr")
 export class TaxiCarMgr extends Component {
-    @property({
-        type: TaxiCar
-    })
     public mainCar: TaxiCar = null!;
-    @property({
-        type: Node
-    })
-    public camera: Node = null!;
-
-    @property
-    cameraPos = new Vec3(0, 8, 8);
-
-    @property
-    cameraRotation = -45;
+    private _camera : Node = null!;
+    public get camera(){
+        if ( !this._camera ){
+            let origin = Manager.uiManager.camera3d.node;
+            origin.active = false;
+            this._camera = instantiate(Manager.uiManager.camera3d.node);
+            this._camera.active = true;
+        }
+        return this._camera;
+    };
+    
+    private cameraPos = new Vec3(0, 8, 8);
+    
+    private cameraRotation = -45;
 
     private _currPath: Node[] = [];
     private _aiCars: TaxiCar[] = [];
@@ -30,7 +31,7 @@ export class TaxiCarMgr extends Component {
         Manager.dispatcher.add(TaxiConstants.EventName.GAME_OVER, this._gameOver, this);
     }
 
-    public reset(points: Node[]){
+    public reset(points: Node[]) {
         if (points.length <= 0) {
             console.warn('There is no points in this map');
             return;
@@ -39,32 +40,9 @@ export class TaxiCarMgr extends Component {
         this._recycleAllAICar();
         this._currPath = points;
         this._createMainCar(points[0]);
-
-        // loadRes({
-        //     bundle : "taxi",
-        //     url : `prefabs/car/car101`,
-        //     type : Prefab,
-        //     view : Manager.gameView as UIView,
-        //     onComplete : (data)=>{
-        //         if ( data.data && data.data instanceof Prefab ){
-        //             // this.mapMgr.buildMap(data.data,()=>{
-
-        //             // })
-        //             let node = instantiate(data.data);
-        //             Manager.uiManager.root3D.addChild(node)
-        //             let car = node.getComponent(TaxiCar);
-        //             if ( car ){
-        //                 car.setEntry()
-        //             }
-        //         }
-        //     },
-        //     onProgress : (finish,total,item)=>{
-
-        //     }
-        // })
     }
 
-    public controlMoving(isRunning = true){
+    public controlMoving(isRunning = true) {
         if (isRunning) {
             dispatch(TaxiConstants.EventName.SHOW_GUIDE, false);
             this.mainCar.startRunning();
@@ -73,18 +51,39 @@ export class TaxiCarMgr extends Component {
         }
     }
 
-    private _createMainCar(point: Node){
-        this.mainCar.setEntry(point, true);
-        this.mainCar.setCamera(this.camera, this.cameraPos, this.cameraRotation);
+    private _createMainCar(point: Node) {
+        loadRes({
+            bundle: "taxi",
+            url: `prefabs/car/car101`,
+            type: Prefab,
+            view: Manager.gameView as UIView,
+            onComplete: (data) => {
+                if (data.data && data.data instanceof Prefab) {
+                    let node = instantiate(data.data);
+                    Manager.uiManager.root3D.addChild(node)
+                    let car = node.getComponent(TaxiCar);
+                    if (car) {
+                        this.mainCar = car;
+                        this.mainCar.setEntry(point, true);
+                        this.mainCar.setCamera(this.camera, this.cameraPos, this.cameraRotation);
+
+                        dispatch(TaxiConstants.EventName.MAIN_CAR_INI_SUCCUSS)
+                    }
+                }
+            },
+            onProgress: (finish, total, item) => {
+
+            }
+        })
     }
 
-    private _gameStart(){
+    private _gameStart() {
         this.mainCar.startWithMinSpeed();
         this.schedule(this._checkCarIsCloser, 0.2, macro.REPEAT_FOREVER);
         this._startSchedule();
     }
 
-    private _gameOver(){
+    private _gameOver() {
         this._stopSchedule();
         this.camera.setParent(this.node.parent, true);
         for (let i = 0; i < this._aiCars.length; i++) {
@@ -95,7 +94,7 @@ export class TaxiCarMgr extends Component {
         this.unschedule(this._checkCarIsCloser);
     }
 
-    private _checkCarIsCloser(){
+    private _checkCarIsCloser() {
         const mainCarPos = this.mainCar.node.worldPosition;
         for (let i = 0; i < this._aiCars.length; i++) {
             const aiCar = this._aiCars[i];
@@ -107,7 +106,7 @@ export class TaxiCarMgr extends Component {
         }
     }
 
-    private _startSchedule(){
+    private _startSchedule() {
         for (let i = 1; i < this._currPath.length; i++) {
             const node = this._currPath[i];
             const roadPoint = node.getComponent(TaxiRoadPoint)!;
@@ -115,7 +114,7 @@ export class TaxiCarMgr extends Component {
         }
     }
 
-    private _stopSchedule(){
+    private _stopSchedule() {
         for (let i = 1; i < this._currPath.length; i++) {
             const node = this._currPath[i];
             const roadPoint = node.getComponent(TaxiRoadPoint)!;
@@ -123,33 +122,42 @@ export class TaxiCarMgr extends Component {
         }
     }
 
-    private _createEnemy(road: TaxiRoadPoint, carID: string){
+    private _createEnemy(road: TaxiRoadPoint, carID: string) {
         const self = this;
-        loader.loadRes(`car/car${carID}`, Prefab, (err, prefab)=>{
-            if(err){
-                console.warn(err);
-                return;
-            }
+        loadRes({
+            bundle: "taxi",
+            url: `prefabs/car/car${carID}`,
+            type: Prefab,
+            view: Manager.gameView as UIView,
+            onComplete: (data) => {
+                if (data.data && data.data instanceof Prefab) {
+                    let node = instantiate(data.data);
+                    Manager.uiManager.root3D.addChild(node)
+                    let car = node.getComponent(TaxiCar);
+                    if (car) {
+                        this._aiCars.push(car);
+                        car.setEntry(road.node);
+                        car.maxSpeed = road.speed;
+                        car.startRunning();
+                        car.moveAfterFinished(this._recycleAICar.bind(this));
+                    }
+                }
+            },
+            onProgress: (finish, total, item) => {
 
-            const car = TaxiPoolManager.getNode(prefab!, self.node);
-            const carComp = car.getComponent(TaxiCar)!;
-            this._aiCars.push(carComp);
-            carComp.setEntry(road.node);
-            carComp.maxSpeed = road.speed;
-            carComp.startRunning();
-            carComp.moveAfterFinished(this._recycleAICar.bind(this));
-        });
+            }
+        })
     }
 
-    private _recycleAICar(car: TaxiCar){
+    private _recycleAICar(car: TaxiCar) {
         const index = this._aiCars.indexOf(car);
-        if(index >=0 ){
+        if (index >= 0) {
             TaxiPoolManager.setNode(car.node);
             this._aiCars.splice(index, 1);
         }
     }
 
-    private _recycleAllAICar(){
+    private _recycleAllAICar() {
         for (let i = 0; i < this._aiCars.length; i++) {
             const car = this._aiCars[i];
             TaxiPoolManager.setNode(car.node);

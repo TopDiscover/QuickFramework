@@ -1,9 +1,7 @@
-import { EventTouch, instantiate, Prefab, UITransform } from "cc";
-import { ViewZOrder } from "../../../../scripts/common/config/Config";
+import { EventTouch, instantiate, Prefab, tween, UITransform } from "cc";
 import { Logic } from "../../../../scripts/framework/core/logic/Logic";
-import { TaxiConfig } from "../data/TaxiConfig";
-import { PlayerData, RunTimeData } from "../data/TaxiData";
-import { TaxiLoading } from "../view/TaxiLoading";
+import { TaxiConstants } from "../data/TaxiConstants";
+import { TaxiData } from "../data/TaxiData";
 import { TaxiCarMgr } from "./TaxiCarMgr";
 import { TaxiMapMgr } from "./TaxiMapMgr";
 
@@ -13,55 +11,53 @@ export class TaxiLogic extends Logic{
     private mapMgr : TaxiMapMgr = null!;
     private carMgr : TaxiCarMgr = null!;
 
-    private _runtimeData: RunTimeData = null!;
-    private _lastMapID = 0;
-    private _init = false;
+    get data(){
+        return Manager.dataCenter.get(TaxiData) as TaxiData;
+    }
+
+    get view(){
+        return this.gameView as TaxiGameView
+    }
     
     onLoad(gameview:GameView){
         super.onLoad(gameview);
+        Manager.dispatcher.add(TaxiConstants.EventName.MAIN_CAR_INI_SUCCUSS,this.onMainCarInitSuccess,this);
+        this.data.init();
+        this.view.init();
+        this.mapMgr = this.view.addComponent(TaxiMapMgr) as TaxiMapMgr;
+        this.carMgr = this.view.addComponent(TaxiCarMgr) as TaxiCarMgr;
+        this._loadMap(this.data.level);
 
-        this.mapMgr = this.gameView.addComponent(TaxiMapMgr) as TaxiMapMgr;
-        this.carMgr = this.gameView.addComponent(TaxiCarMgr) as TaxiCarMgr;
-        this._runtimeData = RunTimeData.instance();
-        TaxiConfig.instance().init();
-        PlayerData.instance().loadFromCache();
-        // Manager.uiManager.open({
-        //     type : TaxiLoading,
-        //     bundle : this.bundle,
-        //     zIndex : ViewZOrder.UI
-        // })
+        
+    }
 
-        this._lastMapID = this._runtimeData.currLevel;
-        this._loadMap(this._lastMapID);
+    onDestroy(){
+        Manager.dispatcher.remove(TaxiConstants.EventName.MAIN_CAR_INI_SUCCUSS,this);
+        super.onDestroy();
+    }
 
+    private onMainCarInitSuccess(){
+        this.start();
     }
 
     playSound( name : string ){
         const path = `resources/audio/sound/${name}`;
-        this.gameView.audioHelper.playEffect(path,this.bundle)
+        this.view.audioHelper.playEffect(path,this.bundle)
     }
 
-    playMusic( ){
-        this.gameView.audioHelper.playMusic(`resources/audio/music/background`,this.bundle)
-    }
-
-    public start(){
-        // UIManager.showDialog(Constants.UIPage.mainUI);
-        // this.node.on(Node.EventType.TOUCH_START, this._touchStart, this);
-        // this.node.on(Node.EventType.TOUCH_END, this._touchEnd, this);
+    private start(){
+       this.view.showMain();
         // CustomEventListener.on(Constants.EventName.GAME_START, this._gameStart, this);
         // CustomEventListener.on(Constants.EventName.GAME_OVER, this._gameOver, this);
         // CustomEventListener.on(Constants.EventName.NEW_LEVEL, this._newLevel, this);
-
-        // AudioManager.playMusic(Constants.AudioSource.BACKGROUND);
     }
 
-    private _touchStart(touch: Touch, event: EventTouch) {
-        // this.carManager.controlMoving();
+    onTouchStart() {
+        this.carMgr.controlMoving();
     }
 
-    private _touchEnd(touch: Touch, event: EventTouch) {
-        // this.carManager.controlMoving(false);
+    onTouchEnd() {
+        this.carMgr.controlMoving(false);
     }
 
     private _gameStart(){
@@ -89,12 +85,8 @@ export class TaxiLogic extends Logic{
     }
 
     private _reset(){
-        this.mapMgr.resetMap();
+        this.data.reset(this.mapMgr.maxProgress);
         this.carMgr.reset(this.mapMgr.currPath);
-        // const runtimeData = this._runtimeData;
-        // runtimeData.currProgress = 0;
-        // runtimeData.maxProgress = this.mapManager.maxProgress;
-        // runtimeData.money = 0;
     }
 
     private _loadMap(level: number){
@@ -103,39 +95,13 @@ export class TaxiLogic extends Logic{
             level = 1;
         }
 
-        let mapID = 100 + level;        
-        loadRes({
-            bundle : this.bundle,
-            url : `prefabs/map/map${mapID}`,
-            type : Prefab,
-            view : this.gameView,
-            onComplete : (data)=>{
-                if ( data.data && data.data instanceof Prefab ){
-                    // this.mapMgr.buildMap(data.data,()=>{
-
-                    // })
-                    let node = instantiate(data.data);
-                    Manager.uiManager.root3D.addChild(node)
-                    this._reset();
-                }
-            },
-            onProgress : (finish,total,item)=>{
-
+        let mapID = 100 + level;     
+        this.mapMgr.loadMap(mapID,(data)=>{
+            if ( data ){
+                this._reset();
             }
-        })
-
-        // ResUtil.getMap(level, (err: any, asset: JsonAsset)=>{
-        //     if(err){
-        //         console.warn(err);
-        //         return;
-        //     }
-
-        //     CustomEventListener.dispatchEvent(Constants.EventName.UPDATE_PROGRESS, 30, 'Start building a city...');
-        //     this.mapMgr.buildMap(asset, () => {
-        //         CustomEventListener.dispatchEvent(Constants.EventName.UPDATE_PROGRESS, 20, 'End building a city...');
-        //         this._reset();
-        //         this.loadingUI.finishLoading();
-        //     });
-        // });
+        },(finish,total)=>{
+            this.view.updateLoadingProgress(finish,total);
+        });
     }
 }

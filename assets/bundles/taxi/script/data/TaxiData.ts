@@ -1,60 +1,47 @@
-import { _decorator, Component, Node } from "cc";
-import { TaxiConfig } from "./TaxiConfig";
+import { GameData } from "../../../../scripts/framework/data/GameData";
 import { TaxiConstants } from "./TaxiConstants";
-const { ccclass, property } = _decorator;
-
-@ccclass("RunTimeData")
-export class RunTimeData {
-    public playerData: PlayerData = null!;
-    static _instance: RunTimeData = null!;
-    public static instance() {
-        if (!this._instance) {
-            this._instance = new RunTimeData();
-        }
-
-        return this._instance;
-    }
-
-    constructor() {
-        this.playerData = PlayerData.instance();
-    }
-
-    public currProgress = 0;
-    public maxProgress = 0;
-    public isTakeOver = true;
-    public money = 0;
-    get currLevel() {
-        return this.playerData.playerInfo.level;
-    }
-
-    get totalMoney() {
-        return this.playerData.playerInfo.money;
-    }
-}
 
 interface IPlayerInfo {
     money: number,
     level: number,
 }
 
-@ccclass("PlayerData")
-export class PlayerData {
-    public playerInfo: IPlayerInfo = { money: 0, level: 1 };
+/**@description 大厅数据 */
+export class TaxiData extends GameData {
+    
+    static bundle = "taxi";
 
-    static _instance: PlayerData = null!;
-    public static instance() {
-        if (!this._instance) {
-            this._instance = new PlayerData();
-        }
+    /**@description 玩家信息 */
+    private playerInfo: IPlayerInfo = { money: 0, level: 1 };
 
-        return this._instance;
+    curProgress = 0;
+    maxProgress = 0;
+    isTakeOver = true;
+    
+    get level(){
+        return this.playerInfo.level;
+    }
+    set level(v){
+        this.playerInfo.level = v;
+    }
+    get money(){
+        return this.playerInfo.money;
+    }
+    set money(v){
+        this.playerInfo.money = v;
     }
 
-    public loadFromCache(){
-        const info = TaxiConfig.instance().getConfigData(TaxiConstants.PlayerConfigID);
-        if(info){
+    init() {
+        const info = Manager.localStorage.getItem(TaxiConstants.PlayerConfigID);
+        if ( info ){
             this.playerInfo = JSON.parse(info);
         }
+    }
+
+    reset(maxProgress: number) {
+        this.curProgress = 0;
+        this.money = 0;
+        this.maxProgress = maxProgress;
     }
 
     public passLevel(rewardMoney: number){
@@ -65,6 +52,6 @@ export class PlayerData {
 
     public savePlayerInfoToCache(){
         const data = JSON.stringify(this.playerInfo);
-        TaxiConfig.instance().setConfigData(TaxiConstants.PlayerConfigID, data);
+       Manager.localStorage.setItem(TaxiConstants.PlayerConfigID, data);
     }
 }
