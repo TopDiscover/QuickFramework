@@ -1,4 +1,4 @@
-import { isValid, js, Node, Prefab, Widget, instantiate, director, Component, find, View } from "cc";
+import { isValid, js, Node, Prefab, Widget, instantiate, director, Component, find, View, Camera } from "cc";
 import { DEBUG } from "cc/env";
 import { ViewStatus } from "../../defines/Enums";
 import { Macro } from "../../defines/Macros";
@@ -488,6 +488,17 @@ export class UIManager {
             this._prefabs = find("prefabs", this.canvas) as Node;
         }
         return this._prefabs;
+    }
+
+    private _root3D = null;
+    /**@description 3d根节点 */
+    public get root3D(){
+        return find("3d",this.canvas.parent as Node) as Node;
+    }
+
+    /**@description 3d相机 */
+    public get camera3d(){
+        return find("Camera3D",this.canvas.parent as Node)?.getComponent(Camera) as Camera;
     }
 
     /**@description 获取主场景预置节点 */
