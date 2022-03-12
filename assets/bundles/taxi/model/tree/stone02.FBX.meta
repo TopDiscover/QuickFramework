@@ -1,0 +1,125 @@
+{
+  "ver": "2.1.4",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "79a67e73-19fa-4efa-a5f2-a29f53bc7319",
+  "files": [],
+  "subMetas": {
+    "7c176": {
+      "ver": "1.1.0",
+      "importer": "gltf-mesh",
+      "uuid": "79a67e73-19fa-4efa-a5f2-a29f53bc7319@7c176",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {},
+      "userData": {
+        "gltfIndex": 0
+      },
+      "displayName": "",
+      "id": "7c176",
+      "name": "CJ_PoLinKuang_01.mesh"
+    },
+    "982d8": {
+      "importer": "gltf-embeded-image",
+      "uuid": "79a67e73-19fa-4efa-a5f2-a29f53bc7319@982d8",
+      "displayName": "",
+      "id": "982d8",
+      "name": "stone02.png.image",
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".png",
+        ".json"
+      ],
+      "subMetas": {},
+      "userData": {
+        "gltfIndex": 0
+      }
+    },
+    "1175b": {
+      "importer": "texture",
+      "uuid": "79a67e73-19fa-4efa-a5f2-a29f53bc7319@1175b",
+      "displayName": "",
+      "id": "1175b",
+      "name": "stone02.texture",
+      "ver": "1.0.21",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {},
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "premultiplyAlpha": false,
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "79a67e73-19fa-4efa-a5f2-a29f53bc7319@982d8"
+      }
+    },
+    "8bfd5": {
+      "importer": "gltf-material",
+      "uuid": "79a67e73-19fa-4efa-a5f2-a29f53bc7319@8bfd5",
+      "displayName": "",
+      "id": "8bfd5",
+      "name": "stone02.material",
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {},
+      "userData": {
+        "gltfIndex": 0
+      }
+    },
+    "6bfe5": {
+      "importer": "gltf-scene",
+      "uuid": "79a67e73-19fa-4efa-a5f2-a29f53bc7319@6bfe5",
+      "displayName": "",
+      "id": "6bfe5",
+      "name": "stone02.prefab",
+      "ver": "1.0.12",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {},
+      "userData": {
+        "gltfIndex": 0
+      }
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "stone02.png",
+        "uri": "79a67e73-19fa-4efa-a5f2-a29f53bc7319@982d8"
+      }
+    ],
+    "redirect": "79a67e73-19fa-4efa-a5f2-a29f53bc7319@6bfe5",
+    "assetFinder": {
+      "meshes": [
+        "79a67e73-19fa-4efa-a5f2-a29f53bc7319@7c176"
+      ],
+      "skeletons": [],
+      "textures": [
+        "79a67e73-19fa-4efa-a5f2-a29f53bc7319@1175b"
+      ],
+      "materials": [
+        "79a67e73-19fa-4efa-a5f2-a29f53bc7319@8bfd5"
+      ],
+      "scenes": [
+        "79a67e73-19fa-4efa-a5f2-a29f53bc7319@6bfe5"
+      ]
+    },
+    "dumpMaterials": false,
+    "legacyFbxImporter": true
+  }
+}

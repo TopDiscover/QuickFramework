@@ -12,6 +12,7 @@ CITY`,
             "Aim Line",
             "Node Pool",
             "三消",
+            "快上车"
         ],
         hall_view_broadcast_content: '[broadcast] congratulations!',
         hall_view_nogame_notice: '【{0}】developing!!!',

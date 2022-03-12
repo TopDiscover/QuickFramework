@@ -19,13 +19,41 @@ export class HallData extends GameData {
     get games(){
         let keys = Object.keys(this._games);
         if( keys.length <= 0 ){
-            this._games["tankBattle"] = new Update.Config(Manager.getLanguage("hall_view_game_name.0", this.bundle), "tankBattle");
-            this._games["loadTest"] = new Update.Config(Manager.getLanguage("hall_view_game_name.1", this.bundle), "loadTest");
-            this._games["netTest"] = new Update.Config(Manager.getLanguage("hall_view_game_name.2", this.bundle), "netTest");
-            this._games["aimLine"] = new Update.Config(Manager.getLanguage("hall_view_game_name.3", this.bundle), "aimLine");
-            this._games["nodePoolTest"] = new Update.Config(Manager.getLanguage("hall_view_game_name.4", this.bundle), "nodePoolTest");
-            this._games["eliminate"] = new Update.Config(Manager.getLanguage("hall_view_game_name.5", this.bundle), "eliminate");
+
+            let name = "taxi";
+            this._games[name] = new Update.Config(Manager.getLanguage(`hall_view_game_name.${this.getLanIndex(name)}`, this.bundle), name);
+            
+            name = "eliminate";
+            this._games[name] = new Update.Config(Manager.getLanguage(`hall_view_game_name.${this.getLanIndex(name)}`, this.bundle), name);
+
+            name = "tankBattle";
+            this._games[name] = new Update.Config(Manager.getLanguage(`hall_view_game_name.${this.getLanIndex(name)}`, this.bundle), name);
+
+            name = "loadTest";
+            this._games[name] = new Update.Config(Manager.getLanguage(`hall_view_game_name.${this.getLanIndex(name)}`, this.bundle), name);
+
+            name = "netTest";
+            this._games[name] = new Update.Config(Manager.getLanguage(`hall_view_game_name.${this.getLanIndex(name)}`, this.bundle), name);
+
+            name = "aimLine";
+            this._games[name] = new Update.Config(Manager.getLanguage(`hall_view_game_name.${this.getLanIndex(name)}`, this.bundle), name);
+
+            name = "nodePoolTest";
+            this._games[name] = new Update.Config(Manager.getLanguage(`hall_view_game_name.${this.getLanIndex(name)}`, this.bundle), name);
         }
         return this._games;
+    }
+
+    getLanIndex( bundle : string ){
+        let datas : { [key:string] : number} = {
+            tankBattle : 0,
+            loadTest : 1,
+            netTest : 2,
+            aimLine : 4,
+            nodePoolTest : 4,
+            eliminate : 5,
+            taxi : 6,
+        }
+        return datas[bundle];
     }
 }

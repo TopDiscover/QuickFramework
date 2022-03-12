@@ -1,0 +1,41 @@
+{
+  "ver": "1.0.21",
+  "importer": "image",
+  "imported": true,
+  "uuid": "c59ff725-adc8-430e-b9e5-c39288a4a13e",
+  "files": [
+    ".jpg",
+    ".json"
+  ],
+  "subMetas": {
+    "6c48a": {
+      "ver": "1.0.21",
+      "importer": "texture",
+      "uuid": "c59ff725-adc8-430e-b9e5-c39288a4a13e@6c48a",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {},
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "premultiplyAlpha": false,
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "c59ff725-adc8-430e-b9e5-c39288a4a13e"
+      },
+      "displayName": "truck02Pink",
+      "id": "6c48a",
+      "name": "texture"
+    }
+  },
+  "userData": {
+    "type": "texture",
+    "redirect": "c59ff725-adc8-430e-b9e5-c39288a4a13e@6c48a",
+    "hasAlpha": false
+  }
+}

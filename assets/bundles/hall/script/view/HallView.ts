@@ -41,8 +41,11 @@ export default class HallView extends GameView {
     private readonly PAGE_COUNT = 6;
 
     private get bundles() {
-        let data = Manager.dataCenter.get(HallData) as HallData;
-        return data.games;
+        return this.data.games;
+    }
+
+    private get data() {
+        return Manager.dataCenter.get(HallData) as HallData;
     }
 
     private createPage() {
@@ -65,7 +68,7 @@ export default class HallView extends GameView {
             if (labelNode) {
                 let label = labelNode.getComponent(Label);
                 if (label) {
-                    label.language = Manager.makeLanguage(`hall_view_game_name.${i}`, this.bundle);
+                    label.language = Manager.makeLanguage(`hall_view_game_name.${this.data.getLanIndex(keys[i])}`, this.bundle);
                 }
             }
             game.on(Node.EventType.TOUCH_END, this.onClick, this);
