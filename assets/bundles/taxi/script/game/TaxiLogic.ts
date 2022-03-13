@@ -1,3 +1,4 @@
+import { physics, PhysicsSystem } from "cc";
 import { Logic } from "../../../../scripts/framework/core/logic/Logic";
 import { TaxiConstants } from "../data/TaxiConstants";
 import { TaxiData } from "../data/TaxiData";
@@ -31,6 +32,7 @@ export class TaxiLogic extends Logic {
 
     onLoad(gameview: GameView) {
         super.onLoad(gameview);
+        PhysicsSystem.instance.enable = true;
         this.data.init();
         this.view.init();
         this.mapMgr = this.view.addComponent(TaxiMapMgr) as TaxiMapMgr;

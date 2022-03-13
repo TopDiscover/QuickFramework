@@ -12,7 +12,7 @@ export class TaxiCustomerMgr extends EventComponent {
     
     private customers: Node[] = [];
     
-    private walkTime = 2;
+    private walkTime = 0.5;
 
     private get data(){
         return Manager.dataCenter.get(TaxiData) as TaxiData;

@@ -310,7 +310,7 @@ export class TaxiCar extends Component {
 
     private _onCollisionEnter(event: ICollisionEvent) {
         const otherCollider = event.otherCollider;
-        if(otherCollider.node.name === 'group'){
+        if(otherCollider.node.name === 'ground'){
             return;
         }
 

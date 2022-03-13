@@ -25,7 +25,7 @@ export default class HallView extends GameView {
                     Manager.tips.show("该功能请把2D物理引擎切换到Box2D");
                     return;
                 }
-            } else if (config.bundle == "tankBattle") {
+            } else if (config.bundle == "tankBattle" || config.bundle == "taxi") {
                 if (!PhysicsSystem2D.PHYSICS_BUILTIN) {
                     Manager.tips.show("该功能请把2D物理引擎切换到内置");
                     return;
