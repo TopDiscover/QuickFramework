@@ -1,4 +1,4 @@
-import { physics, PhysicsSystem } from "cc";
+import { instantiate, physics, PhysicsSystem, Prefab } from "cc";
 import { Logic } from "../../../../scripts/framework/core/logic/Logic";
 import { TaxiConstants } from "../data/TaxiConstants";
 import { TaxiData } from "../data/TaxiData";
@@ -35,10 +35,19 @@ export class TaxiLogic extends Logic {
         PhysicsSystem.instance.enable = true;
         this.data.init();
         this.view.init();
+        this.createGround();
         this.mapMgr = this.view.addComponent(TaxiMapMgr) as TaxiMapMgr;
         this.carMgr = this.view.addComponent(TaxiCarMgr) as TaxiCarMgr;
         this.customerMgr = this.view.addComponent(TaxiCustomerMgr) as TaxiCustomerMgr;
         this.loadMap(this.data.level);
+    }
+
+    private createGround(){
+        let data = Manager.cacheManager.get(this.bundle,"prefabs/map/ground");
+        if ( data && data.data instanceof Prefab ){
+            let node = instantiate(data.data);
+            Manager.uiManager.root3D.addChild(node);
+        }
     }
 
     onDestroy() {

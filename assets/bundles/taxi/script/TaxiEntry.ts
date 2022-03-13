@@ -18,6 +18,7 @@ class TaxiEntry extends Entry {
                 { preloadView: TaxiGameView, bundle: this.bundle },
                 { url : "prefabs/customer/customer01" , bundle : this.bundle , type : Prefab},
                 { url : "prefabs/customer/customer02" , bundle : this.bundle , type : Prefab},
+                { url : "prefabs/map/ground" , bundle : this.bundle , type : Prefab}
 
             ];
             return res;
