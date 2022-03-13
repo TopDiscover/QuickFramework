@@ -166,7 +166,8 @@
     },
     "_materials": [
       {
-        "__uuid__": "703e5a77-8543-44e1-b0f6-30ce15ff004d"
+        "__uuid__": "703e5a77-8543-44e1-b0f6-30ce15ff004d",
+        "__expectedType__": "cc.Material"
       }
     ],
     "_visFlags": 0,
@@ -174,7 +175,8 @@
       "__id__": 6
     },
     "_mesh": {
-      "__uuid__": "c2857ca9-e016-4fae-ba6f-8f711458072c@5d0b5"
+      "__uuid__": "c2857ca9-e016-4fae-ba6f-8f711458072c@5d0b5",
+      "__expectedType__": "cc.Mesh"
     },
     "_shadowCastingMode": 0,
     "_shadowReceivingMode": 1,
@@ -282,7 +284,7 @@
     "__prefab": {
       "__id__": 14
     },
-    "_group": 4,
+    "_group": 4096,
     "_type": 1,
     "_mass": 10,
     "_allowSleep": true,

@@ -3,10 +3,11 @@ import { TaxiCar } from "./TaxiCar";
 import { TaxiRoadPoint } from "./TaxiRoadPoint";
 import { TaxiPoolManager } from "../data/TaxiPoolManager";
 import { TaxiConstants } from "../data/TaxiConstants";
+import EventComponent from "../../../../scripts/framework/componects/EventComponent";
 const { ccclass, property } = _decorator;
 
 @ccclass("TaxiCarMgr")
-export class TaxiCarMgr extends Component {
+export class TaxiCarMgr extends EventComponent {
     public mainCar: TaxiCar = null!;
     private _camera : Node = null!;
     public get camera(){
@@ -26,9 +27,10 @@ export class TaxiCarMgr extends Component {
     private _currPath: Node[] = [];
     private _aiCars: TaxiCar[] = [];
 
-    public start() {
-        Manager.dispatcher.add(TaxiConstants.EventName.GAME_START, this._gameStart, this);
-        Manager.dispatcher.add(TaxiConstants.EventName.GAME_OVER, this._gameOver, this);
+    protected addEvents(){
+        super.addEvents();
+        this.addEvent(TaxiConstants.EventName.GAME_START,this._gameStart);
+        this.addEvent(TaxiConstants.EventName.GAME_OVER,this._gameOver);
     }
 
     public reset(points: Node[]) {

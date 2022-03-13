@@ -1,4 +1,5 @@
 
+import { Prefab } from "cc";
 import { Resource } from "../../../scripts/framework/core/asset/Resource";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
 import { TaxiGameView } from "./view/TaxiGameView";
@@ -13,7 +14,12 @@ class TaxiEntry extends Entry {
     }
     protected loadResources(completeCb: () => void): void {
         this.loader.getLoadResources = () => {
-            let res: Resource.Data[] = [{ preloadView: TaxiGameView, bundle: this.bundle }];
+            let res: Resource.Data[] = [
+                { preloadView: TaxiGameView, bundle: this.bundle },
+                { url : "prefabs/customer/customer01" , bundle : this.bundle , type : Prefab},
+                { url : "prefabs/customer/customer02" , bundle : this.bundle , type : Prefab},
+
+            ];
             return res;
         };
         this.loader.onLoadComplete = (err) => {

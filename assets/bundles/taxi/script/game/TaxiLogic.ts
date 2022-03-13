@@ -1,55 +1,57 @@
-import { EventTouch, instantiate, Prefab, tween, UITransform } from "cc";
 import { Logic } from "../../../../scripts/framework/core/logic/Logic";
 import { TaxiConstants } from "../data/TaxiConstants";
 import { TaxiData } from "../data/TaxiData";
 import { TaxiCarMgr } from "./TaxiCarMgr";
+import { TaxiCustomerMgr } from "./TaxiCustomerMgr";
 import { TaxiMapMgr } from "./TaxiMapMgr";
 
-export class TaxiLogic extends Logic{
+export class TaxiLogic extends Logic {
 
 
-    private mapMgr : TaxiMapMgr = null!;
-    private carMgr : TaxiCarMgr = null!;
+    private mapMgr: TaxiMapMgr = null!;
+    private carMgr: TaxiCarMgr = null!;
+    private customerMgr : TaxiCustomerMgr = null!;
 
-    get data(){
+    get data() {
         return Manager.dataCenter.get(TaxiData) as TaxiData;
     }
 
-    get view(){
+    get view() {
         return this.gameView as TaxiGameView
     }
-    
-    onLoad(gameview:GameView){
+
+    protected addEvents() {
+        super.addEvents();
+        this.addEvent(TaxiConstants.EventName.MAIN_CAR_INI_SUCCUSS, this.onMainCarInitSuccess);
+        this.addEvent(TaxiConstants.EventName.GAME_START, this.onGameStart);
+        this.addEvent(TaxiConstants.EventName.PLAY_SOUND,this.onPlaySound);
+        this.addEvent(TaxiConstants.EventName.GAME_OVER,this.onGameOver);
+        this.addEvent(TaxiConstants.EventName.NEW_LEVEL,this.onNewLevel);
+    }
+
+    onLoad(gameview: GameView) {
         super.onLoad(gameview);
-        Manager.dispatcher.add(TaxiConstants.EventName.MAIN_CAR_INI_SUCCUSS,this.onMainCarInitSuccess,this);
         this.data.init();
         this.view.init();
         this.mapMgr = this.view.addComponent(TaxiMapMgr) as TaxiMapMgr;
         this.carMgr = this.view.addComponent(TaxiCarMgr) as TaxiCarMgr;
-        this._loadMap(this.data.level);
-
-        
+        this.customerMgr = this.view.addComponent(TaxiCustomerMgr) as TaxiCustomerMgr;
+        this.loadMap(this.data.level);
     }
 
-    onDestroy(){
-        Manager.dispatcher.remove(TaxiConstants.EventName.MAIN_CAR_INI_SUCCUSS,this);
+    onDestroy() {
+        //删除动画加载的3d节点
+        Manager.uiManager.root3D.removeAllChildren();
         super.onDestroy();
     }
 
-    private onMainCarInitSuccess(){
-        this.start();
+    private onMainCarInitSuccess() {
+        this.view.showMain();
     }
 
-    playSound( name : string ){
-        const path = `resources/audio/sound/${name}`;
-        this.view.audioHelper.playEffect(path,this.bundle)
-    }
-
-    private start(){
-       this.view.showMain();
-        // CustomEventListener.on(Constants.EventName.GAME_START, this._gameStart, this);
-        // CustomEventListener.on(Constants.EventName.GAME_OVER, this._gameOver, this);
-        // CustomEventListener.on(Constants.EventName.NEW_LEVEL, this._newLevel, this);
+    private onPlaySound(name: string) {
+        const path = `audio/sound/${name}`;
+        this.view.audioHelper.playEffect(path, this.bundle)
     }
 
     onTouchStart() {
@@ -60,48 +62,45 @@ export class TaxiLogic extends Logic{
         this.carMgr.controlMoving(false);
     }
 
-    private _gameStart(){
-        // UIManager.hideDialog(Constants.UIPage.mainUI);
-        // UIManager.showDialog(Constants.UIPage.gameUI);
+    private onGameStart() {
+        this.view.showGameUI();
     }
 
-    private _gameOver(){
-        // UIManager.hideDialog(Constants.UIPage.gameUI);
-        // UIManager.showDialog(Constants.UIPage.resultUI);
+    private onGameOver() {
+        this.view.showResult();
     }
 
-    private _newLevel(){
-        // UIManager.hideDialog(Constants.UIPage.resultUI);
-        // UIManager.showDialog(Constants.UIPage.mainUI);
-        // if (this._lastMapID === this._runtimeData.currLevel) {
-        //     this._reset();
-        //     return;
-        // }
-
-        // this.mapManager.recycle();
-        // this.loadingUI.show();
-        // this._lastMapID = this._runtimeData.currLevel;
-        // this._loadMap(this._lastMapID);
+    private onNewLevel() {
+        this.view.hideResult();
+        if ( this.data.level == this.data.curLevel ){
+            this.reset();
+            return;
+        }
+        this.mapMgr.recycle();
+        this.view.showLoading();
+        this.data.curLevel = this.data.level;
+        this.loadMap(this.data.curLevel);
     }
 
-    private _reset(){
+    reset() {
         this.data.reset(this.mapMgr.maxProgress);
         this.carMgr.reset(this.mapMgr.currPath);
+        this.view.updateData();
     }
 
-    private _loadMap(level: number){
+    private loadMap(level: number) {
 
-        if ( level <  1 || level > 18 ){
+        if (level < 1 || level > 18) {
             level = 1;
         }
 
-        let mapID = 100 + level;     
-        this.mapMgr.loadMap(mapID,(data)=>{
-            if ( data ){
-                this._reset();
+        let mapID = 100 + level;
+        this.mapMgr.loadMap(mapID, (data) => {
+            if (data) {
+                this.reset();
             }
-        },(finish,total)=>{
-            this.view.updateLoadingProgress(finish,total);
+        }, (finish, total) => {
+            this.view.updateLoadingProgress(finish, total);
         });
     }
 }

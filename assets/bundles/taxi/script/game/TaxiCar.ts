@@ -1,8 +1,7 @@
 import { _decorator, Component, Node, Vec3, ParticleSystem, BoxCollider, RigidBody, ICollisionEvent } from "cc";
 import { TaxiRoadPoint } from "./TaxiRoadPoint";
 import { TaxiConstants } from "../data/TaxiConstants";
-import { RunTimeData } from "../data/TaxiData";
-import { TaxiLogic } from "./TaxiLogic";
+import { TaxiData } from "../data/TaxiData";
 const { ccclass, property } = _decorator;
 
 const _tempVec = new Vec3();
@@ -23,8 +22,8 @@ export class TaxiCar extends Component {
     @property
     minSpeed = 0.02;
 
-    private get logic(){
-        return Manager.logicManager.get(TaxiLogic);
+    private get data(){
+        return Manager.dataCenter.get(TaxiData) as TaxiData;
     }
 
     private _currRoadPoint: TaxiRoadPoint = null!;
@@ -213,7 +212,7 @@ export class TaxiCar extends Component {
         this._acceleration = -0.3;
         dispatch(EventName.START_BRAKING, this.node);
         this._isBraking = true;
-        this.logic?.playSound(TaxiConstants.AudioSource.STOP)
+        dispatch(EventName.PLAY_SOUND,TaxiConstants.AudioSource.STOP);
         // this._isMoving = false;
     }
 
@@ -233,7 +232,7 @@ export class TaxiCar extends Component {
 
         this._tootingCoolTime = TOOTING_COOL_TIME;
         const audioSource = Math.floor(Math.random() * 2) < 1?TaxiConstants.AudioSource.TOOTING1: TaxiConstants.AudioSource.TOOTING2;
-        this.logic?.playSound(audioSource);
+        dispatch(EventName.PLAY_SOUND,audioSource);
     }
 
     public startWithMinSpeed(){
@@ -260,7 +259,7 @@ export class TaxiCar extends Component {
                 } else if (this._currRoadPoint!.type === TaxiRoadPoint.RoadPointType.GOODBYE) {
                     this._takingCustomer();
                 } else if (this._currRoadPoint!.type === TaxiRoadPoint.RoadPointType.END) {
-                    this.logic?.playSound(TaxiConstants.AudioSource.WIN);
+                    dispatch(EventName.PLAY_SOUND,TaxiConstants.AudioSource.WIN);
                     this._runState = RunState.OVER;
                     this._minSpeed = this._maxSpeed = 0.2;
                     this._currSpeed = this._minSpeed;
@@ -324,13 +323,12 @@ export class TaxiCar extends Component {
         const rigidBody = this.node.getComponent(RigidBody)!;
         rigidBody.useGravity = true;
         this._runState = RunState.CRASH;
-        this.logic?.playSound(TaxiConstants.AudioSource.CRASH);
+        dispatch(EventName.PLAY_SOUND,TaxiConstants.AudioSource.CRASH);
         dispatch(EventName.GAME_OVER);
     }
 
     private _greetingCustomer(){
-        const runtimeData = RunTimeData.instance();
-        runtimeData.isTakeOver = false;
+        this.data.isTakeOver = false;
         this._runState = RunState.INORDER;
         this._currSpeed = 0;
         this._isMoving = false;
@@ -339,9 +337,8 @@ export class TaxiCar extends Component {
     }
 
     private _takingCustomer(){
-        const runtimeData = RunTimeData.instance();
-        runtimeData.isTakeOver = true;
-        runtimeData.currProgress ++;
+        this.data.isTakeOver = true;
+        this.data.curProgress++;
         this._runState = RunState.INORDER;
         this._currSpeed = 0;
         this._isMoving = false;

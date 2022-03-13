@@ -17,6 +17,8 @@ export class TaxiData extends GameData {
     curProgress = 0;
     maxProgress = 0;
     isTakeOver = true;
+    /**@description 当前所有等级 */
+    curLevel = 0;
     
     get level(){
         return this.playerInfo.level;
@@ -36,11 +38,11 @@ export class TaxiData extends GameData {
         if ( info ){
             this.playerInfo = JSON.parse(info);
         }
+        this.curLevel = this.level;
     }
 
     reset(maxProgress: number) {
         this.curProgress = 0;
-        this.money = 0;
         this.maxProgress = maxProgress;
     }
 

@@ -13,6 +13,7 @@ enum EventName {
     SHOW_GUIDE = 'show-guide',
     UPDATE_PROGRESS = 'update-progress',
     MAIN_CAR_INI_SUCCUSS = "MAIN_CAR_INI_SUCCUSS",
+    PLAY_SOUND = "PLAY_SOUND",
 }
 
 enum CustomerState {
@@ -37,8 +38,8 @@ enum AudioSource {
 
 enum CarGroup {
     NORMAL = 1 << 0,
-    MAIN_CAR = 1 << 1,
-    OTHER_CAR = 1 << 2,
+    MAIN_CAR = 1 << 11,
+    OTHER_CAR = 1 << 12,
 }
 
 export class TaxiConstants {
