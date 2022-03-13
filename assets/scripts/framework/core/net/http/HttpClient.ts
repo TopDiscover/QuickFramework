@@ -83,7 +83,7 @@ export class HttpPackage {
 
 export class HttpClient {
 
-    private static _instance: HttpClient = null!;
+    protected static _instance: HttpClient = null!;
     public static Instance() {
         return this._instance || (this._instance = new HttpClient());
     }
