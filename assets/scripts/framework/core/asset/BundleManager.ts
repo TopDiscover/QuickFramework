@@ -34,7 +34,7 @@ export class BundleManager {
             Manager.entryManager.onUnloadBundle(bundle);
             let result = this.getBundle(bundle);
             if (result) {
-               Manager.cacheManager.removeBundle(bundle);
+               Manager.cache.removeBundle(bundle);
                Manager.releaseManger.removeBundle(result);
             }
          }

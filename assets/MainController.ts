@@ -26,7 +26,7 @@ export default class MainController extends EventComponent {
         let debug = find("debug", this.node);
         this.debugView = find("debugView",this.node);
         if (debug&&this.debugView) {
-            let isVisibleDebugInfo = Manager.localStorage.getItem(Config.SHOW_DEBUG_INFO_KEY,true);
+            let isVisibleDebugInfo = Manager.storage.getItem(Config.SHOW_DEBUG_INFO_KEY,true);
             setDisplayStats(isVisibleDebugInfo);
             if ( Config.isShowDebugButton ){
                 debug.active = true;

@@ -39,14 +39,14 @@ export default class NodePoolView extends GameView {
     }
 
     private onCreate( ){
-        this.pool = Manager.nodePoolManager.createPool("Star");
+        this.pool = Manager.pool.createPool("Star");
         if ( this.pool) {
             this.pool.cloneNode = instantiate(this.star);
         }
     }
 
     private onDelete(){
-        Manager.nodePoolManager.deletePool(this.pool);
+        Manager.pool.deletePool(this.pool);
         this.pool = null;
     }
 

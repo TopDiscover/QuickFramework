@@ -27,7 +27,7 @@ export class ViewDynamicLoadData {
             }
             if (DEBUG) Manager.uiManager.checkView(info.url, className);
             if (!this.local.has(info.url)) {
-                Manager.assetManager.retainAsset(info);
+                Manager.asset.retainAsset(info);
                 this.local.set(info.url, info);
             }
         }
@@ -40,7 +40,7 @@ export class ViewDynamicLoadData {
                 Log.e(`找不到资源持有者 : ${info.url}`);
             }
             if (DEBUG) Manager.uiManager.checkView(info.url, className);
-            Manager.cacheManager.remoteCaches.retainAsset(info);
+            Manager.cache.remoteCaches.retainAsset(info);
             this.remote.set(info.url, info);
         }
     }
@@ -74,13 +74,13 @@ export class ViewDynamicLoadData {
             //先清除当前资源的引用关系
             if (this.local) {
                 this.local.forEach((info) => {
-                    Manager.assetManager.releaseAsset(info);
+                    Manager.asset.releaseAsset(info);
                 });
                 this.local.clear();
             }
             if (this.remote) {
                 this.remote.forEach((info, url) => {
-                    Manager.cacheManager.remoteCaches.releaseAsset(info);
+                    Manager.cache.remoteCaches.releaseAsset(info);
                 });
                 this.remote.clear();
             }
@@ -336,7 +336,7 @@ export class UIManager {
                         viewData.info.type = Prefab;
                         viewData.info.data = prefab;
                         viewData.info.bundle = openOption.bundle;
-                        Manager.assetManager.retainAsset(viewData.info);
+                        Manager.asset.retainAsset(viewData.info);
                         this.createNode(viewData, reslove, openOption);
                         Manager.uiLoading.hide();
                     }).catch((reason) => {
@@ -439,7 +439,7 @@ export class UIManager {
 
     private loadPrefab(bundle: BUNDLE_TYPE, url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
         return new Promise<Prefab>((resolove, reject) => {
-            Manager.assetManager.load(bundle, url, Prefab, progressCallback, (data) => {
+            Manager.asset.load(bundle, url, Prefab, progressCallback, (data) => {
                 if (data && data.data && data.data instanceof Prefab) {
                     resolove(data.data);
                 }
@@ -556,7 +556,7 @@ export class UIManager {
             }
             viewData.loadData.clear();
             if ( viewData.isPrefab ){
-                Manager.assetManager.releaseAsset(viewData.info);
+                Manager.asset.releaseAsset(viewData.info);
             }
             this._viewDatas.delete(className);
             Log.d(`${this._logTag} close view : ${className}`);

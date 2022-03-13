@@ -92,23 +92,55 @@ export class Framewok {
         return getSingleton(UIManager);
     }
 
-    /**@description 本地仓库 */
+    /**
+     * @description 本地仓库 
+     * @deprecated 该接口已经弃用，请用使用storage替换
+     * */
     get localStorage() {
         return getSingleton(LocalStorage);
     }
 
-    /**@description 资源管理器 */
+    /**@description 本地仓库 */
+    get storage() {
+        return getSingleton(LocalStorage);
+    }
+
+    /**
+     * @description 资源管理器 
+     * @deprecated 该接口已经弃用，请用使用asset替换
+     * */
     get assetManager() {
         return getSingleton(_AssetManager);
     }
 
-    /**@description 资源缓存管理器 */
+    /**@description 资源管理器 */
+    get asset() {
+        return getSingleton(_AssetManager);
+    }
+
+    /**
+     * @description 资源缓存管理器
+     * @deprecated 该接口已经弃用，请用使用cache替换
+     * */
     get cacheManager() {
         return getSingleton(CacheManager);
     }
 
-    /**@description 对象池管理器 */
+    /**@description 资源缓存管理器 */
+    get cache() {
+        return getSingleton(CacheManager);
+    }
+
+    /**
+     * @description 对象池管理器 
+     * @deprecated 该接口已经弃用，请用使用pool替换
+     * */
     get nodePoolManager() {
+        return this.pool;
+    }
+
+    /**@description 对象池管理器 */
+    get pool(){
         return getSingleton(NodePoolManager);
     }
 

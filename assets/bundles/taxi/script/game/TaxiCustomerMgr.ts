@@ -22,7 +22,7 @@ export class TaxiCustomerMgr extends EventComponent {
         let root = Manager.uiManager.root3D;
         for ( let i = 1 ; i <=2 ; i++ ){
             let url = `prefabs/customer/customer0${i}`;
-            let data = Manager.cacheManager.get(this.data.bundle,url);
+            let data = Manager.cache.get(this.data.bundle,url);
             if ( data && data.data instanceof Prefab ){
                 let node = instantiate(data.data);
                 root.addChild(node);

@@ -61,7 +61,7 @@ export class Language {
                 this._data = delegate.data(this.getLanguage(),this._data);
             });
         }
-        Manager.localStorage.setItem(LANG_KEY, this._data.language);
+        Manager.storage.setItem(LANG_KEY, this._data.language);
     }
 
     public get(args: (string | number)[]) {
@@ -119,6 +119,6 @@ export class Language {
 
     /**@description 获取语言包名 */
     public getLanguage() {
-        return Manager.localStorage.getItem(LANG_KEY, sys.Language.CHINESE);
+        return Manager.storage.getItem(LANG_KEY, sys.Language.CHINESE);
     }
 }

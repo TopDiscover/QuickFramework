@@ -21,7 +21,7 @@ export default class EliminateEffectsView extends Component {
             .call(()=>{
                 let node : Node = null!;
                 let animation : Animation | null = null;
-                let cache = Manager.cacheManager.get(this.view.bundle,(<any>EFFECTS_CONFIG)[cmd.action].url);
+                let cache = Manager.cache.get(this.view.bundle,(<any>EFFECTS_CONFIG)[cmd.action].url);
                 if(　!cache ){
                     return;
                 }

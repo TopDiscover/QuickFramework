@@ -55,7 +55,7 @@ prototype.loadRemoteImage = function (config: any) {
         isRetain = true;
     }
     let defaultBundle = getBundle({ bundle: config.defaultBundle, view: config.view })
-    Manager.assetManager.remote.loadImage(config.url, config.isNeedCache).then((data) => {
+    Manager.asset.remote.loadImage(config.url, config.isNeedCache).then((data) => {
         if (data) {
             setSpriteSpriteFrame(config.view, config.url, me, data, config.complete, Macro.BUNDLE_REMOTE, Resource.Type.Remote, isRetain);
         } else {
@@ -63,7 +63,7 @@ prototype.loadRemoteImage = function (config: any) {
                 if (typeof config.defaultSpriteFrame == "string") {
                     config.defaultSpriteFrame = config.defaultSpriteFrame + "/spriteFrame";
                     //动态加载了一张图片，把资源通知管理器
-                    Manager.cacheManager.getCacheByAsync(config.defaultSpriteFrame, SpriteFrame, defaultBundle).then((spriteFrame) => {
+                    Manager.cache.getCacheByAsync(config.defaultSpriteFrame, SpriteFrame, defaultBundle).then((spriteFrame) => {
                         setSpriteSpriteFrame(config.view, config.defaultSpriteFrame, me, spriteFrame, config.complete, defaultBundle);
                     });
                 }
@@ -94,12 +94,12 @@ prototype.loadImage = function (config: any) {
     let bundle = getBundle(config);
     if (typeof url == "string") {
         url = url + "/spriteFrame";
-        Manager.cacheManager.getCacheByAsync(url, SpriteFrame, bundle).then((spriteFrame) => {
+        Manager.cache.getCacheByAsync(url, SpriteFrame, bundle).then((spriteFrame) => {
             setSpriteSpriteFrame(view, url, me, spriteFrame, complete, bundle);
         });
     } else {
         //在纹理图集中查找
-        Manager.cacheManager.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle).then((data) => {
+        Manager.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle).then((data) => {
             if (data && data.isTryReload) {
                 //来到这里面程序已经崩溃了，无意义在处理了
             } else {
@@ -135,7 +135,7 @@ prototype.loadRemoteSkeleton = function (config: any) {
     if (config.isNeedCache == undefined || config.isNeedCache == null) {
         config.isNeedCache = true;
     }
-    Manager.assetManager.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then((data) => {
+    Manager.asset.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then((data) => {
         setSkeletonSkeletonData(me, config, data as sp.SkeletonData, Resource.Type.Remote);
     });
 }
@@ -155,7 +155,7 @@ prototype.loadSkeleton = function (config: any) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
-    Manager.cacheManager.getCacheByAsync(url, sp.SkeletonData, bundle).then((data) => {
+    Manager.cache.getCacheByAsync(url, sp.SkeletonData, bundle).then((data) => {
         setSkeletonSkeletonData(me, config, data);
     });
 }
@@ -183,7 +183,7 @@ prototype.loadFont = function (config: any) {
     let font = config.font;
     let me = this;
     let bundle = getBundle(config);
-    Manager.cacheManager.getCacheByAsync(font, Font, bundle).then((data) => {
+    Manager.cache.getCacheByAsync(font, Font, bundle).then((data) => {
         setLabelFont(me, config, data);
     });
 }
@@ -208,7 +208,7 @@ dragonBones.ArmatureDisplay.prototype.loadDisplay = function(config) {
      let me = this;
      let url = config.url;
      let bundle = getBundle(config);
-     Manager.cacheManager.getCacheByAsync(url, ParticleAsset, bundle).then((data) => {
+     Manager.cache.getCacheByAsync(url, ParticleAsset, bundle).then((data) => {
          setParticleSystemFile(me, config, data);
      });
  }

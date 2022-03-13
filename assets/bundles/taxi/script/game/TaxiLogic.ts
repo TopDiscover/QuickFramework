@@ -6,6 +6,7 @@ import { TaxiConstants } from "../data/TaxiConstants";
 import { TaxiData } from "../data/TaxiData";
 import { TaxiCarMgr } from "./TaxiCarMgr";
 import { TaxiCustomerMgr } from "./TaxiCustomerMgr";
+import { TaxiEffectMgr } from "./TaxiEffectMgr";
 import { TaxiMapMgr } from "./TaxiMapMgr";
 
 export class TaxiLogic extends Logic {
@@ -14,6 +15,7 @@ export class TaxiLogic extends Logic {
     private mapMgr: TaxiMapMgr = null!;
     private carMgr: TaxiCarMgr = null!;
     private customerMgr : TaxiCustomerMgr = null!;
+    private effectMgr : TaxiEffectMgr = null!;
 
     get data() {
         return Manager.dataCenter.get(TaxiData) as TaxiData;
@@ -43,6 +45,7 @@ export class TaxiLogic extends Logic {
         this.mapMgr = this.view.addComponent(TaxiMapMgr) as TaxiMapMgr;
         this.carMgr = this.view.addComponent(TaxiCarMgr) as TaxiCarMgr;
         this.customerMgr = this.view.addComponent(TaxiCustomerMgr) as TaxiCustomerMgr;
+        this.effectMgr = this.view.addComponent(TaxiEffectMgr) as TaxiEffectMgr;
         this.loadResources(this.data.level);
     }
 
@@ -56,12 +59,15 @@ export class TaxiLogic extends Logic {
                 { url : "prefabs/car/car202" , bundle : this.bundle , type : Prefab},
                 { url : "prefabs/car/car203" , bundle : this.bundle , type : Prefab},
                 { url : "prefabs/car/car204" , bundle : this.bundle , type : Prefab},
+                { url : "prefabs/effect/brakeTrail" , bundle : this.bundle , type : Prefab},
+                { url : "prefabs/effect/coin" , bundle : this.bundle , type : Prefab},
             ];
             return res;
         };
         this.loader.onLoadComplete = (err) => {
             if (err = Resource.LoaderError.SUCCESS) {
                 this.customerMgr.init();
+                this.effectMgr.init();
                 this.loadMap(mapId);
             }
         };
@@ -73,7 +79,7 @@ export class TaxiLogic extends Logic {
     }
 
     private createGround(){
-        let data = Manager.cacheManager.get(this.bundle,"prefabs/map/ground");
+        let data = Manager.cache.get(this.bundle,"prefabs/map/ground");
         if ( data && data.data instanceof Prefab ){
             let node = instantiate(data.data);
             Manager.uiManager.root3D.addChild(node);
@@ -87,6 +93,7 @@ export class TaxiLogic extends Logic {
         this.loader.unLoadResources();
         //清除缓存
         this.carMgr.clear();
+        this.effectMgr.clear();
         super.onDestroy();
     }
 

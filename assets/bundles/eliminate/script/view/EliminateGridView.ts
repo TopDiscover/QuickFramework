@@ -104,7 +104,7 @@ export default class EliminateGridView extends Component {
             if (!viewInfo) {
                 let prefabUrl = model.prefabUrl as string;
                 // cc.log(`create prefabUrl : ${prefabUrl}`);
-                let cache = Manager.cacheManager.get(this.view.bundle, prefabUrl);
+                let cache = Manager.cache.get(this.view.bundle, prefabUrl);
                 if( cache ){
                     let node = instantiate(<Prefab>cache.data)
                     this.node.addChild(node);

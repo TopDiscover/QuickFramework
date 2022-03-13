@@ -400,7 +400,7 @@ export class CacheManager {
                     resolve(data);
                 } else {
                     //加载资源
-                    Manager.assetManager.load(args.bundle, args.url, args.type, <any>null, (cache) => {
+                    Manager.asset.load(args.bundle, args.url, args.type, <any>null, (cache) => {
                         args = args as { url: string, type: typeof Asset, bundle: BUNDLE_TYPE };
                         if (cache && cache.data && cache.data instanceof args.type) {
                             resolve(cache.data);
@@ -434,7 +434,7 @@ export class CacheManager {
                             } else {
                                 //来到这里面，其实程序已经崩溃了，已经没什么意思，也不知道写这个有啥用，尽量安慰,哈哈哈
                                 Log.e(`精灵帧被释放，释放当前无法的图集资源 url ：${url} key : ${key}`);
-                                Manager.assetManager.releaseAsset(info);
+                                Manager.asset.releaseAsset(info);
                                 resolve({ url: url, spriteFrame: null, isTryReload: true });
                             }
                         } else {

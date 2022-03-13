@@ -34,7 +34,7 @@ export class TaxiData extends GameData {
     }
 
     init() {
-        const info = Manager.localStorage.getItem(TaxiConstants.PlayerConfigID);
+        const info = Manager.storage.getItem(TaxiConstants.PlayerConfigID);
         if ( info ){
             this.playerInfo = JSON.parse(info);
         }
@@ -54,6 +54,6 @@ export class TaxiData extends GameData {
 
     public savePlayerInfoToCache(){
         const data = JSON.stringify(this.playerInfo);
-       Manager.localStorage.setItem(TaxiConstants.PlayerConfigID, data);
+       Manager.storage.setItem(TaxiConstants.PlayerConfigID, data);
     }
 }

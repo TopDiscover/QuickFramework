@@ -170,7 +170,7 @@ export class DebugView extends Component {
 
     private onPool() {
         Log.d(`-------对象池节点缓存信息-------`);
-        Manager.nodePoolManager.print({
+        Manager.pool.print({
             print: (source) => {
                 source.forEach((data, key) => {
                     Log.d(key);
@@ -185,7 +185,7 @@ export class DebugView extends Component {
 
     private onShowDebugInfo() {
         setDisplayStats(!isDisplayStats())
-        Manager.localStorage.setItem(Config.SHOW_DEBUG_INFO_KEY, isDisplayStats());
+        Manager.storage.setItem(Config.SHOW_DEBUG_INFO_KEY, isDisplayStats());
     }
 
     private onShowUI() {
@@ -207,7 +207,7 @@ export class DebugView extends Component {
     }
 
     private onShowRes() {
-        Manager.cacheManager.print({
+        Manager.cache.print({
             printLocal: (caches, key) => {
                 if (DEBUG) Log.d(`----------------Bundle ${key} 资源缓存信息开始----------------`)
                 let content: any[] = [];

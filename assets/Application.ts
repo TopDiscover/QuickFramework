@@ -103,7 +103,7 @@ export class _Manager extends Framewok implements GameEventInterface {
         Manager.serviceManager.update();
 
         //远程资源下载任务调度
-        Manager.assetManager.remote.update();
+        Manager.asset.remote.update();
     }
 
     onDestroy(node: Node) {

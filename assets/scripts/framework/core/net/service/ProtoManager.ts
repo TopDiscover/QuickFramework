@@ -31,7 +31,7 @@ export class ProtoManager {
                 return;
             }
             this._loadDir[`${bundle}/${path}`] = false;
-            Manager.assetManager.loadDir(bundle, path, TextAsset, (finish, total, item) => { }, (cacheData) => {
+            Manager.asset.loadDir(bundle, path, TextAsset, (finish, total, item) => { }, (cacheData) => {
                 if (cacheData && cacheData.data && Array.isArray(cacheData.data)) {
 
                     //解析proto文件
@@ -46,7 +46,7 @@ export class ProtoManager {
                     info.type = TextAsset;
                     info.data = cacheData.data;
                     info.bundle = bundle;
-                    Manager.assetManager.releaseAsset(info);
+                    Manager.asset.releaseAsset(info);
                     this._loadDir[`${bundle}/${path}`] = true;
                     resolove(true);
                 } else {

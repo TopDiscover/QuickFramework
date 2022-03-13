@@ -92,22 +92,22 @@ class AudioData {
     private init() {
 
         //音量开关读取
-        this.isMusicOn = Manager.localStorage.getItem(this._storeMusicKey, this.isMusicOn);
-        this.isEffectOn = Manager.localStorage.getItem(this._storeEffectKey, this.isEffectOn);
+        this.isMusicOn = Manager.storage.getItem(this._storeMusicKey, this.isMusicOn);
+        this.isEffectOn = Manager.storage.getItem(this._storeEffectKey, this.isEffectOn);
 
         //音量读取
-        this.musicVolume = Manager.localStorage.getItem(this._storeMusicVolumeKey, this.musicVolume);
-        this.effectVolume = Manager.localStorage.getItem(this._storeEffectVolumeKey, this.effectVolume);
+        this.musicVolume = Manager.storage.getItem(this._storeMusicVolumeKey, this.musicVolume);
+        this.effectVolume = Manager.storage.getItem(this._storeEffectVolumeKey, this.effectVolume);
     }
 
     /**@description 存储 */
     public save() {
         try {
-            Manager.localStorage.setItem(this._storeMusicKey, this.isMusicOn);
-            Manager.localStorage.setItem(this._storeMusicVolumeKey, this.musicVolume);
+            Manager.storage.setItem(this._storeMusicKey, this.isMusicOn);
+            Manager.storage.setItem(this._storeMusicVolumeKey, this.musicVolume);
 
-            Manager.localStorage.setItem(this._storeEffectKey, this.isEffectOn);
-            Manager.localStorage.setItem(this._storeEffectVolumeKey, this.effectVolume);
+            Manager.storage.setItem(this._storeEffectKey, this.isEffectOn);
+            Manager.storage.setItem(this._storeEffectVolumeKey, this.effectVolume);
         } catch (error) {
         }
     }
@@ -275,7 +275,7 @@ export default class AudioComponent extends EventComponent {
                 this.audioData.musicInfos.set(key, audioInfo);
             }
             this.audioData.curMusic = audioInfo;
-            Manager.cacheManager.getCacheByAsync(url, AudioClip, bundle).then((data) => {
+            Manager.cache.getCacheByAsync(url, AudioClip, bundle).then((data) => {
                 if (data) {
                     let info = new Resource.Info;
                     info.url = url;
@@ -326,7 +326,7 @@ export default class AudioComponent extends EventComponent {
                 audioInfo.source.playOnAwake = true;
                 this.audioData.effectInfos.set(key, audioInfo);
             }
-            Manager.cacheManager.getCacheByAsync(url, AudioClip, bundle).then((data) => {
+            Manager.cache.getCacheByAsync(url, AudioClip, bundle).then((data) => {
                 if (data) {
                     let info = new Resource.Info;
                     info.url = url;

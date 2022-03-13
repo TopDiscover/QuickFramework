@@ -51,8 +51,9 @@ export class TaxiCarMgr extends EventComponent {
 
     public clear(){
         this.pools.forEach(v=>{
-            v.clear();
+            Manager.pool.deletePool(v);
         })
+        this.pools.clear();
     }
 
     public controlMoving(isRunning = true) {
@@ -67,8 +68,8 @@ export class TaxiCarMgr extends EventComponent {
     private _createMainCar(point: Node) {
         let name = MAIN_CAR;
         if ( !this.pools.has(name) ){
-            let pool = Manager.nodePoolManager.createPool(name) as NodePool;
-            let data = Manager.cacheManager.get(TaxiData.bundle,`prefabs/car/${name}`)?.data;
+            let pool = Manager.pool.createPool(name) as NodePool;
+            let data = Manager.cache.get(TaxiData.bundle,`prefabs/car/${name}`)?.data;
             if ( data instanceof Prefab ){
                 let node = instantiate(data);
                 pool.cloneNode = node;
@@ -136,8 +137,8 @@ export class TaxiCarMgr extends EventComponent {
     private _createEnemy(road: TaxiRoadPoint, carID: string) {
         let name = `car${carID}`;
         if ( !this.pools.has(name) ){
-            let pool = Manager.nodePoolManager.createPool(name) as NodePool;
-            let data = Manager.cacheManager.get(TaxiData.bundle,`prefabs/car/${name}`)?.data;
+            let pool = Manager.pool.createPool(name) as NodePool;
+            let data = Manager.cache.get(TaxiData.bundle,`prefabs/car/${name}`)?.data;
             if ( data instanceof Prefab ){
                 let node = instantiate(data);
                 pool.cloneNode = node;
