@@ -278,7 +278,7 @@ export class TaxiGameView extends GameView {
 
     showResult(){
         this.result.tips.string = `您完成了${this.logic.data.curProgress}个订单`;
-        this.result.money.string = `${this.logic.data.money}`
+        this.result.money.string = `${this.logic.data.curMoney}`
         this.result.node.active = true;
     }
 
@@ -288,7 +288,7 @@ export class TaxiGameView extends GameView {
 
     private onContinue(){
         if ( this.logic.data.curProgress == this.logic.data.maxProgress ){
-            this.logic.data.passLevel(this.logic.data.money);
+            this.logic.data.passLevel(this.logic.data.curMoney);
         }
         this.updateMoney(this.logic.data.money);
         dispatch(TaxiConstants.EventName.NEW_LEVEL);

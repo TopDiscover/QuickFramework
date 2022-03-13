@@ -43,9 +43,9 @@ export class TaxiEffectMgr extends EventComponent {
     }
 
     private _startBraking(...args:any[]) {
-        const follow = this._followTarget = args[0];
+        const follow = this._followTarget = args[0] as Node;
         this._currBraking = this._trailPool.get() as Node;
-        this._currBraking.setWorldPosition(follow);
+        this._currBraking.setWorldPosition(follow.worldPosition);
         Manager.uiManager.root3D.addChild(this._currBraking);
         ParticleUtils.play(this._currBraking);
     }

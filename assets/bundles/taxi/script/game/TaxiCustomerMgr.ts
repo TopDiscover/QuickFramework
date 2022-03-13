@@ -124,7 +124,7 @@ export class TaxiCustomerMgr extends EventComponent {
         this._currCustomer!.setWorldPosition(this._startPos);
         this._currCustomer!.active = true;
         const money = Math.floor(30 + (this.data.level / 2) + (Math.random() * 10));
-        this.data.money += money;
+        this.data.curMoney += money;
 
         if (direction.x !== 0) {
             if (direction.x > 0) {
