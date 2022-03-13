@@ -5,8 +5,8 @@ const ZH = {
     language: sys.Language.CHINESE,
     data : {
         tips : [
-            'Please hurry up.\n I have a plane to catch',
-            'The most beautiful day \nis not the rainy day',
+            '请快一点，我要起飞机',
+            '最美的一天不是下雨天',
         ],
         loadingRes : "正在加载游戏资源...",
         loadingMap : "正在加载游戏地图..."
@@ -17,8 +17,8 @@ const EN = {
     language: sys.Language.ENGLISH,
     data : {
         tips : [
-            '请快一点，我要起飞机',
-            '最美的一天不是下雨天',
+            'Please hurry up.\n I have a plane to catch',
+            'The most beautiful day \nis not the rainy day',
         ],
         loadingRes : "正在加载游戏资源...",
         loadingMap : "正在加载游戏地图..."
