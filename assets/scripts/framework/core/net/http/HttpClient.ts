@@ -3,6 +3,7 @@ import { Http } from "./Http";
 /**
  * @description http网络请求
  */
+
 class HttpPackageData {
     data: any = null;
     url: string = null!;
@@ -10,6 +11,8 @@ class HttpPackageData {
     timeout: number = 10000;
     /**@description 请求类型 默认为GET请求*/
     type: Http.Type = Http.Type.GET;
+    /**@description 是否同步 */
+    async : boolean = true;
     requestHeader: { name: string, value: string }[] | { name: string, value: string } | null = null;
     /**@description 发送接口时，默认为false 仅浏览器端生效
      * 自动附加当前时间的参数字段
@@ -71,15 +74,19 @@ export class HttpPackage {
      * @param errorcb 
      */
     public send(cb?: (data: any) => void, errorcb?: (errorData: Http.Error) => void) {
-        HttpClient.request(this, cb, errorcb);
+        Manager.http.request(this, cb, errorcb);
     }
 }
 
-class HttpClient {
+export class HttpClient {
 
-    static crossProxy(url: string): string {
+    private static _instance: HttpClient = null!;
+    public static Instance() {
+        return this._instance || (this._instance = new HttpClient());
+    }
+    protected crossProxy(url: string): string {
         //浏览器，非调试模式下
-        if (cc.sys.isBrowser && !CC_PREVIEW && HttpPackage.crossProxy ) {
+        if (cc.sys.isBrowser && !CC_PREVIEW && HttpPackage.crossProxy) {
             let config = HttpPackage.crossProxy;
             let location = HttpPackage.location;
             let keys = Object.keys(config);
@@ -104,7 +111,7 @@ class HttpClient {
         }
     }
 
-    private static convertParams(url: string, params: Object): string {
+    protected convertParams(url: string, params: Object): string {
         if (params == null || params == undefined) {
             return url;
         }
@@ -124,7 +131,11 @@ class HttpClient {
         return result;
     }
 
-    static request(httpPackage: HttpPackage, cb?: (data: any) => void, errorcb?: (errorData: Http.Error) => void) {
+    protected convertData( data : any ){
+        return data;
+    }
+
+    request(httpPackage: HttpPackage, cb?: (data: any) => void, errorcb?: (errorData: Http.Error) => void) {
 
         let url = httpPackage.data.url;
         if (!url) {
@@ -161,7 +172,7 @@ class HttpClient {
         xhr.timeout = httpPackage.data.timeout;
         xhr.ontimeout = () => {
             xhr.abort();//网络超时，断开连接
-            if ( CC_DEBUG ) Log.w(`request timeout : ${url}`);
+            if ( CC_DEBUG) Log.w(`request timeout : ${url}`);
             if (errorcb) errorcb({ type: Http.ErrorType.TimeOut, reason: "连接超时" });
         };
 
@@ -190,7 +201,7 @@ class HttpClient {
         }
 
         if (httpPackage.data.type === Http.Type.POST) {
-            xhr.open(Http.Type.POST, url);
+            xhr.open(Http.Type.POST, url,httpPackage.data.async);
             if (httpPackage.data.requestHeader) {
                 if( httpPackage.data.requestHeader instanceof Array ){
                     httpPackage.data.requestHeader.forEach((header)=>{
@@ -204,10 +215,10 @@ class HttpClient {
             else {
                 xhr.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
             }
-            xhr.send( httpPackage.data.data );
+            xhr.send( this.convertData(httpPackage.data.data) );
         }
         else {
-            xhr.open(Http.Type.GET, url, true);
+            xhr.open(Http.Type.GET, url, httpPackage.data.async);
             if( httpPackage.data.requestHeader ){
                 if( httpPackage.data.requestHeader instanceof Array ){
                     httpPackage.data.requestHeader.forEach((header)=>{
