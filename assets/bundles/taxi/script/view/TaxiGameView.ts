@@ -82,9 +82,10 @@ export class TaxiGameView extends GameView {
     }
 
     /**@description 加载 */
-    private loading: { node: Node, progress: Label } = {
+    private loading: { node: Node, progress: Label , txt : Label } = {
         node: null!,
-        progress: null!
+        progress: null!,
+        txt : null!,
     }
 
     protected get logic() {
@@ -123,6 +124,7 @@ export class TaxiGameView extends GameView {
 
 
         this.loading.progress = find("content/progress", this.loading.node)?.getComponent(Label) as Label;
+        this.loading.txt = find("content/txt",this.loading.node)?.getComponent(Label) as Label;
 
         this.main.money = find("gold/txt", this.main.node)?.getComponent(Label) as Label;
 
@@ -165,7 +167,7 @@ export class TaxiGameView extends GameView {
     }
 
     private onTalking(customerID:number) {
-        const table = TaxiConstants.talkTable;
+        const table = Manager.getLanguage("tips",this.bundle)
         const index = Math.floor(Math.random() * table.length);
         const str = table[index];
         this.game.talk.txt.string = str;
@@ -197,6 +199,9 @@ export class TaxiGameView extends GameView {
         this.loading.node.active = true;
     }
 
+    updateLoadingText( txt : string ){
+        this.loading.txt.string = txt;
+    }
     updateLoadingProgress(finish: number, total: number) {
         let percent = (finish / total) * 100;
         let str = percent.toFixed(2) + "%";

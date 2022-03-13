@@ -18,8 +18,7 @@ export class TaxiCustomerMgr extends EventComponent {
         return Manager.dataCenter.get(TaxiData) as TaxiData;
     }
 
-    onLoad(){
-        super.onLoad();
+    init(){
         let root = Manager.uiManager.root3D;
         for ( let i = 1 ; i <=2 ; i++ ){
             let url = `prefabs/customer/customer0${i}`;

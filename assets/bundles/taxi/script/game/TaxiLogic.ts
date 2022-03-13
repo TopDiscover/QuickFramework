@@ -1,4 +1,6 @@
 import { instantiate, physics, PhysicsSystem, Prefab } from "cc";
+import { Resource } from "../../../../scripts/framework/core/asset/Resource";
+import ResourceLoader from "../../../../scripts/framework/core/asset/ResourceLoader";
 import { Logic } from "../../../../scripts/framework/core/logic/Logic";
 import { TaxiConstants } from "../data/TaxiConstants";
 import { TaxiData } from "../data/TaxiData";
@@ -21,6 +23,8 @@ export class TaxiLogic extends Logic {
         return this.gameView as TaxiGameView
     }
 
+    private loader = new ResourceLoader;
+
     protected addEvents() {
         super.addEvents();
         this.addEvent(TaxiConstants.EventName.MAIN_CAR_INI_SUCCUSS, this.onMainCarInitSuccess);
@@ -39,7 +43,34 @@ export class TaxiLogic extends Logic {
         this.mapMgr = this.view.addComponent(TaxiMapMgr) as TaxiMapMgr;
         this.carMgr = this.view.addComponent(TaxiCarMgr) as TaxiCarMgr;
         this.customerMgr = this.view.addComponent(TaxiCustomerMgr) as TaxiCustomerMgr;
-        this.loadMap(this.data.level);
+        this.loadResources(this.data.level);
+    }
+
+    private loadResources(mapId : number ){
+        this.loader.getLoadResources = () => {
+            let res: Resource.Data[] = [
+                { url : "prefabs/customer/customer01" , bundle : this.bundle , type : Prefab},
+                { url : "prefabs/customer/customer02" , bundle : this.bundle , type : Prefab},
+                { url : "prefabs/map/ground" , bundle : this.bundle , type : Prefab},
+                { url : "prefabs/car/car101" , bundle : this.bundle , type : Prefab},
+                { url : "prefabs/car/car201" , bundle : this.bundle , type : Prefab},
+                { url : "prefabs/car/car202" , bundle : this.bundle , type : Prefab},
+                { url : "prefabs/car/car203" , bundle : this.bundle , type : Prefab},
+                { url : "prefabs/car/car204" , bundle : this.bundle , type : Prefab},
+            ];
+            return res;
+        };
+        this.loader.onLoadComplete = (err) => {
+            if (err = Resource.LoaderError.SUCCESS) {
+                this.customerMgr.init();
+                this.loadMap(mapId);
+            }
+        };
+        this.loader.onLoadProgress = ( loaded , total )=>{
+            this.view.updateLoadingProgress(loaded,total);
+        }
+        this.view.updateLoadingText(Manager.getLanguage("loadingRes",this.bundle));
+        this.loader.loadResources();
     }
 
     private createGround(){
@@ -53,6 +84,7 @@ export class TaxiLogic extends Logic {
     onDestroy() {
         //删除动画加载的3d节点
         Manager.uiManager.root3D.removeAllChildren();
+        this.loader.unLoadResources();
         super.onDestroy();
     }
 
@@ -106,6 +138,7 @@ export class TaxiLogic extends Logic {
         }
 
         let mapID = 100 + level;
+        this.view.updateLoadingText(Manager.getLanguage("loadingMap",this.bundle))
         this.mapMgr.loadMap(mapID, (data) => {
             if (data) {
                 this.reset();

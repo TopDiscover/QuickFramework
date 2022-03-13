@@ -47,11 +47,6 @@ export class TaxiConstants {
     public static CustomerState = CustomerState;
     public static AudioSource = AudioSource;
     public static CarGroup = CarGroup;
-    public static talkTable = [
-        'Please hurry up.\n I have a plane to catch',
-        'The most beautiful day \nis not the rainy day',
-    ];
-
     public static UIPage = {
         mainUI: 'mainUI',
         gameUI: 'gameUI',

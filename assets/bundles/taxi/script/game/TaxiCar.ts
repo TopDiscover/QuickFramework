@@ -164,7 +164,7 @@ export class TaxiCar extends Component {
         if (this._isMain) {
             const gasNode = this.node.getChildByName('gas')!;
             this._gas = gasNode.getComponent(ParticleSystem);
-            this._gas!.play();
+            this._gas?.play();
 
             collider.on('onCollisionEnter', this._onCollisionEnter, this);
             // collider.setGroup(TaxiConstants.CarGroup.MAIN_CAR);
@@ -332,7 +332,7 @@ export class TaxiCar extends Component {
         this._runState = RunState.INORDER;
         this._currSpeed = 0;
         this._isMoving = false;
-        this._gas!.stop();
+        this._gas?.stop();
         dispatch(EventName.GREETING, this.node.worldPosition, this._currRoadPoint!.direction);
     }
 
@@ -342,7 +342,7 @@ export class TaxiCar extends Component {
         this._runState = RunState.INORDER;
         this._currSpeed = 0;
         this._isMoving = false;
-        this._gas!.stop();
+        this._gas?.stop();
         dispatch(EventName.GOODBYE, this.node.worldPosition, this._currRoadPoint!.direction);
         dispatch(EventName.SHOW_COIN, this.node.worldPosition);
     }
@@ -350,7 +350,7 @@ export class TaxiCar extends Component {
     private _finishedWalk(){
         if(this._isMain){
             this._runState = RunState.NORMAL;
-            this._gas!.play();
+            this._gas?.play();
         }
     }
 

@@ -166,5 +166,10 @@ export class TaxiCarMgr extends EventComponent {
         }
 
         this._aiCars.length = 0;
+        if ( this.mainCar ){
+            this.mainCar.node.removeFromParent();
+            this.mainCar.node.destroy();
+            this.mainCar =null as any;
+        }
     }
 }

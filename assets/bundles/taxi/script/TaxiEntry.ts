@@ -2,10 +2,12 @@
 import { Prefab } from "cc";
 import { Resource } from "../../../scripts/framework/core/asset/Resource";
 import { Entry } from "../../../scripts/framework/core/entry/Entry";
+import { TaxiLanguage } from "./data/TaxiLanguage";
 import { TaxiGameView } from "./view/TaxiGameView";
 
 class TaxiEntry extends Entry {
     static bundle = "taxi";
+    protected language = new TaxiLanguage;
     protected addNetHandler(): void {
 
     }
@@ -16,10 +18,6 @@ class TaxiEntry extends Entry {
         this.loader.getLoadResources = () => {
             let res: Resource.Data[] = [
                 { preloadView: TaxiGameView, bundle: this.bundle },
-                { url : "prefabs/customer/customer01" , bundle : this.bundle , type : Prefab},
-                { url : "prefabs/customer/customer02" , bundle : this.bundle , type : Prefab},
-                { url : "prefabs/map/ground" , bundle : this.bundle , type : Prefab}
-
             ];
             return res;
         };
