@@ -92,6 +92,8 @@ export class TaxiGameView extends GameView {
         return this._logic as TaxiLogic;
     }
 
+    private isWaitShowResult = false;
+
     init() {
 
         this.game.node = find("game", this.node) as Node;
@@ -178,8 +180,15 @@ export class TaxiGameView extends GameView {
             view : this
         })
         this.scheduleOnce(()=>{
-            this.game.talk.node.active = false;
+            this.onTalkingEnd();
         },3)
+    }
+
+    private onTalkingEnd(){
+        this.game.talk.node.active = false;
+        if ( this.isWaitShowResult ){
+            this._showResult();
+        }
     }
 
     private onShowGuide(isShow : boolean) {
@@ -216,12 +225,12 @@ export class TaxiGameView extends GameView {
     }
 
     private onTouchStart() {
-        Log.d("onTouchStart")
+        // Log.d("onTouchStart")
         this.logic.onTouchStart();
     }
 
     private onTouchEnd() {
-        Log.d("onTouchEnd")
+        // Log.d("onTouchEnd")
         this.logic.onTouchEnd();
     }
 
@@ -277,6 +286,15 @@ export class TaxiGameView extends GameView {
     }
 
     showResult(){
+        this.isWaitShowResult = false;
+        if ( this.game.node.active && this.game.talk.node.active ){
+           this.isWaitShowResult = true;
+        }else{
+            this._showResult();
+        }
+        
+    }
+    private _showResult(){
         this.result.tips.string = `您完成了${this.logic.data.curProgress}个订单`;
         this.result.money.string = `${this.logic.data.curMoney}`
         this.result.node.active = true;
