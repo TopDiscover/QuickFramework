@@ -298,6 +298,7 @@ export class TaxiGameView extends GameView {
         this.result.tips.string = `您完成了${this.logic.data.curProgress}个订单`;
         this.result.money.string = `${this.logic.data.curMoney}`
         this.result.node.active = true;
+        this.isWaitShowResult = false;
     }
 
     hideResult(){
