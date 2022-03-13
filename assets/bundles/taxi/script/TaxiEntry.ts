@@ -18,6 +18,7 @@ class TaxiEntry extends Entry {
         this.loader.getLoadResources = () => {
             let res: Resource.Data[] = [
                 { preloadView: TaxiGameView, bundle: this.bundle },
+                { url : "prefabs/map/ground" , bundle : this.bundle , type : Prefab},
             ];
             return res;
         };

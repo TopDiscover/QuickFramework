@@ -51,7 +51,6 @@ export class TaxiLogic extends Logic {
             let res: Resource.Data[] = [
                 { url : "prefabs/customer/customer01" , bundle : this.bundle , type : Prefab},
                 { url : "prefabs/customer/customer02" , bundle : this.bundle , type : Prefab},
-                { url : "prefabs/map/ground" , bundle : this.bundle , type : Prefab},
                 { url : "prefabs/car/car101" , bundle : this.bundle , type : Prefab},
                 { url : "prefabs/car/car201" , bundle : this.bundle , type : Prefab},
                 { url : "prefabs/car/car202" , bundle : this.bundle , type : Prefab},
