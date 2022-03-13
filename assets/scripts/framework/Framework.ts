@@ -17,6 +17,7 @@ import { LoggerImpl } from "./core/log/Logger";
 import NetHelper from "./core/net/service/NetHelper";
 import { ServiceManager } from "./core/net/service/ServiceManager";
 import { ReleaseManager } from "./core/asset/ReleaseManager";
+import { HttpClient } from "./core/net/http/HttpClient";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
@@ -142,6 +143,10 @@ export class Framewok {
     /**@description 对象池管理器 */
     get pool(){
         return getSingleton(NodePoolManager);
+    }
+
+    get http(){
+        return getSingleton(HttpClient);
     }
 
     /**@description 小提示 */
