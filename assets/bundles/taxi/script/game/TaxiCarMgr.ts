@@ -1,10 +1,13 @@
 import { _decorator, Component, Node, loader, Prefab, Vec3, macro, instantiate } from "cc";
 import { TaxiCar } from "./TaxiCar";
 import { TaxiRoadPoint } from "./TaxiRoadPoint";
-import { TaxiPoolManager } from "../data/TaxiPoolManager";
 import { TaxiConstants } from "../data/TaxiConstants";
 import EventComponent from "../../../../scripts/framework/componects/EventComponent";
+import { NodePool } from "../../../../scripts/framework/core/nodePool/NodePoolManager";
+import { TaxiData } from "../data/TaxiData";
 const { ccclass, property } = _decorator;
+
+const MAIN_CAR = "car101";
 
 @ccclass("TaxiCarMgr")
 export class TaxiCarMgr extends EventComponent {
@@ -26,6 +29,8 @@ export class TaxiCarMgr extends EventComponent {
 
     private _currPath: Node[] = [];
     private _aiCars: TaxiCar[] = [];
+    
+    private pools : Map<string,NodePool> = new Map();
 
     protected addEvents(){
         super.addEvents();
@@ -44,6 +49,12 @@ export class TaxiCarMgr extends EventComponent {
         this._createMainCar(points[0]);
     }
 
+    public clear(){
+        this.pools.forEach(v=>{
+            v.clear();
+        })
+    }
+
     public controlMoving(isRunning = true) {
         if (isRunning) {
             dispatch(TaxiConstants.EventName.SHOW_GUIDE, false);
@@ -54,29 +65,27 @@ export class TaxiCarMgr extends EventComponent {
     }
 
     private _createMainCar(point: Node) {
-        loadRes({
-            bundle: "taxi",
-            url: `prefabs/car/car101`,
-            type: Prefab,
-            view: Manager.gameView as UIView,
-            onComplete: (data) => {
-                if (data.data && data.data instanceof Prefab) {
-                    let node = instantiate(data.data);
-                    Manager.uiManager.root3D.addChild(node)
-                    let car = node.getComponent(TaxiCar);
-                    if (car) {
-                        this.mainCar = car;
-                        this.mainCar.setEntry(point, true);
-                        this.mainCar.setCamera(this.camera, this.cameraPos, this.cameraRotation);
-
-                        dispatch(TaxiConstants.EventName.MAIN_CAR_INI_SUCCUSS)
-                    }
-                }
-            },
-            onProgress: (finish, total, item) => {
-
+        let name = MAIN_CAR;
+        if ( !this.pools.has(name) ){
+            let pool = Manager.nodePoolManager.createPool(name) as NodePool;
+            let data = Manager.cacheManager.get(TaxiData.bundle,`prefabs/car/${name}`)?.data;
+            if ( data instanceof Prefab ){
+                let node = instantiate(data);
+                pool.cloneNode = node;
             }
-        })
+            this.pools.set(name,pool)
+        }
+
+        let node = this.pools.get(name)?.get();
+        if ( !node ) return
+        Manager.uiManager.root3D.addChild(node)
+        let car = node.getComponent(TaxiCar);
+        if (car) {
+            this.mainCar = car;
+            this.mainCar.setEntry(point, true);
+            this.mainCar.setCamera(this.camera, this.cameraPos, this.cameraRotation);
+            dispatch(TaxiConstants.EventName.MAIN_CAR_INI_SUCCUSS)
+        }
     }
 
     private _gameStart() {
@@ -125,36 +134,36 @@ export class TaxiCarMgr extends EventComponent {
     }
 
     private _createEnemy(road: TaxiRoadPoint, carID: string) {
-        const self = this;
-        loadRes({
-            bundle: "taxi",
-            url: `prefabs/car/car${carID}`,
-            type: Prefab,
-            view: Manager.gameView as UIView,
-            onComplete: (data) => {
-                if (data.data && data.data instanceof Prefab) {
-                    let node = instantiate(data.data);
-                    Manager.uiManager.root3D.addChild(node)
-                    let car = node.getComponent(TaxiCar);
-                    if (car) {
-                        this._aiCars.push(car);
-                        car.setEntry(road.node);
-                        car.maxSpeed = road.speed;
-                        car.startRunning();
-                        car.moveAfterFinished(this._recycleAICar.bind(this));
-                    }
-                }
-            },
-            onProgress: (finish, total, item) => {
-
+        let name = `car${carID}`;
+        if ( !this.pools.has(name) ){
+            let pool = Manager.nodePoolManager.createPool(name) as NodePool;
+            let data = Manager.cacheManager.get(TaxiData.bundle,`prefabs/car/${name}`)?.data;
+            if ( data instanceof Prefab ){
+                let node = instantiate(data);
+                pool.cloneNode = node;
             }
-        })
+            this.pools.set(name,pool)
+        }
+
+        let node = this.pools.get(name)?.get();
+        if ( !node ) return
+        Manager.uiManager.root3D.addChild(node)
+        let car = node.getComponent(TaxiCar);
+        if (car) {
+            this._aiCars.push(car);
+            car.setEntry(road.node);
+            car.maxSpeed = road.speed;
+            car.startRunning();
+            car.moveAfterFinished(this._recycleAICar.bind(this));
+        }
     }
 
     private _recycleAICar(car: TaxiCar) {
         const index = this._aiCars.indexOf(car);
         if (index >= 0) {
-            TaxiPoolManager.setNode(car.node);
+            if ( this.pools.has(car.node.name) ){
+                this.pools.get(car.node.name)?.put(car.node);
+            }
             this._aiCars.splice(index, 1);
         }
     }
@@ -162,14 +171,15 @@ export class TaxiCarMgr extends EventComponent {
     private _recycleAllAICar() {
         for (let i = 0; i < this._aiCars.length; i++) {
             const car = this._aiCars[i];
-            TaxiPoolManager.setNode(car.node);
+            if ( this.pools.has(car.node.name) ){
+                this.pools.get(car.node.name)?.put(car.node);
+            }
         }
-
-        this._aiCars.length = 0;
-        if ( this.mainCar ){
-            this.mainCar.node.removeFromParent();
-            this.mainCar.node.destroy();
-            this.mainCar =null as any;
+        this._aiCars = [];
+        
+        if ( this.mainCar && this.pools.has(MAIN_CAR) ){
+            this.pools.get(MAIN_CAR)?.put(this.mainCar.node);
+            this.mainCar = null as any;
         }
     }
 }

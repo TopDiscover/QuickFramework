@@ -84,7 +84,10 @@ export class TaxiLogic extends Logic {
     onDestroy() {
         //删除动画加载的3d节点
         Manager.uiManager.root3D.removeAllChildren();
+        //卸载资源
         this.loader.unLoadResources();
+        //清除缓存
+        this.carMgr.clear();
         super.onDestroy();
     }
 
