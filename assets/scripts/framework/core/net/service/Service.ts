@@ -87,14 +87,21 @@ export abstract class Service extends ServerConnector {
             Log.e(`decode header error`);
             return;
         }
-        super.onMessage(data);
+
         if (this.isHeartBeat(header)) {
             //心跳消息，路过处理，应该不会有人注册心跳吧
+            this.onRecvHeartBeat();
             return;
         }
+        super.onMessage(data);
         this._Process.onMessage(header)
     }
 
+    /**@description 收到心跳 */
+    protected onRecvHeartBeat(){
+
+    }
+    
     /**
   * @description 添加服务器数据监听
   * @param handleType 处理类型，指你用哪一个类来进行解析数据
