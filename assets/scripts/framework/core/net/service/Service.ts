@@ -88,12 +88,19 @@ export abstract class Service extends ServerConnector {
             Log.e(`decode header error`);
             return;
         }
-        super.onMessage(data);
+        
         if (this.isHeartBeat(header)) {
             //心跳消息，路过处理，应该不会有人注册心跳吧
+            this.onRecvHeartBeat();
             return;
         }
+        super.onMessage(data);
         this._Process.onMessage(header)
+    }
+
+    /**@description 收到心跳 */
+    protected onRecvHeartBeat(){
+
     }
 
     /**
