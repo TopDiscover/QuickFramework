@@ -14,7 +14,9 @@
 2，重新构建项目
 
 # 示例拉取
+
 win32 运行git_bundles.bat 拉取示例代码
+
 其它平台可运行 git_bundles.py 脚本
 
 # 详细文档
