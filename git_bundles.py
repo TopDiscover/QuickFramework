@@ -105,7 +105,7 @@ class GitBundles :
         if sys.platform == "win32" :
             cmdPath = os.path.join(self.curPath,"linkBundles.cmd")
             print ( u"生成{0}".format(cmdPath).encode("gbk"))
-            cmd = "mklink /j .\\\\assets\\\\bundles ..\\\\{0}\\\\bundles ".format(self.bundlesName)
+            cmd = "mklink /j .\\\\assets\\\\bundles ..\\\\{0}\\\\bundles".format(self.bundlesName)
             file = open(cmdPath,"w+")
             file.write(cmd)
         else:
