@@ -3,6 +3,7 @@
 import os
 import sys
 import subprocess
+import re
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
@@ -45,7 +46,11 @@ class GitBundles :
                 v = v[1:]
                 msg = u"找到当前分支为:".encode("gbk") + v
                 print(msg)
-                self.curBranch = v
+
+                robj = re.match(r'\d+\.\d+\.\d+',v,re.S)
+                if robj :
+                    self.curBranch = robj.group()
+                    print(u"应拉取的Bundles 分支为:".encode("gbk") + self.curBranch)
                 return
         
     # 获取当项目保存的名字
@@ -76,7 +81,6 @@ class GitBundles :
             # 进入Bundles分支目录
             os.chdir("./" + self.bundlesName)
             cmd = "git pull".format(bundlesPath)
-            print(cmd)
             self.runCommand(cmd,True)
             self.gitBundlesBranch()
         else :
@@ -102,7 +106,6 @@ class GitBundles :
 
         # 进入Bundle目录，拉取跟项目同样分支的代码
         self.gitBundlesBranch()
-
 
 gitBundles = GitBundles()
 gitBundles.run()
