@@ -74,3 +74,4 @@ quick_gen_project_*_autogen.sh.meta
 .vscode/
 PackageVersion/
 linkBundles.cmd
+assets/bundles/
