@@ -22,6 +22,8 @@ class GitBundles :
         self.curProjectName = None
         # 当前Bundles 保存目录名
         self.bundlesName = None
+        # 当前项目路径
+        self.curPath = None
 
     # 执行命令
     def runCommand(self,cmd, isNeedLog = False):
@@ -56,6 +58,7 @@ class GitBundles :
     # 获取当项目保存的名字
     def getCurProjectDirName(self):
         fullpath = os.getcwd()
+        self.curPath = fullpath
         self.curProjectDir = os.path.dirname(fullpath)
         self.curProjectName = os.path.basename(fullpath)
         msg = u"当前项目本地存储名为:".encode("gbk") + self.curProjectName
@@ -94,6 +97,21 @@ class GitBundles :
             os.chdir("./" + self.bundlesName)
             self.gitBundlesBranch()
 
+    def makeLink(self):
+        cmd = "cd {0}".format(self.curPath)
+        # 进入当前项目路径
+        self.runCommand(cmd,True)
+        # 生成目录连接
+        if sys.platform == "win32" :
+            cmdPath = os.path.join(self.curPath,"linkBundles.cmd")
+            print ( u"生成{0}".format(cmdPath).encode("gbk"))
+            cmd = "mklink /j .\\\\assets\\\\bundles ..\\\\{0}\\\\bundles ".format(self.bundlesName)
+            file = open(cmdPath,"w+")
+            file.write(cmd)
+        else:
+            print( sys.platform + u"不支持目录连接:mklink".encode("gbk"))
+            print( u"请求手动复制".encode("gbk") + os.path.join(self.curProjectDir,self.bundlesName) + "/bundles =>" + self.curPath + "/assets/bundles")
+
     def run(self):
         # 获取当前项目的路径信息
         self.getCurProjectDirName()
@@ -106,6 +124,9 @@ class GitBundles :
 
         # 进入Bundle目录，拉取跟项目同样分支的代码
         self.gitBundlesBranch()
+
+        # 生成bundles目录连接到开发项目
+        self.makeLink()
 
 gitBundles = GitBundles()
 gitBundles.run()
