@@ -1,9 +1,11 @@
 {
-  "ver": "1.2.1",
+  "ver": "1.2.5",
   "uuid": "ab6d1b06-35a4-422a-9e0e-725e6c5c215c",
+  "importer": "auto-atlas",
   "maxWidth": 1024,
   "maxHeight": 1024,
   "padding": 2,
+  "compressionLevel": 6,
   "allowRotation": true,
   "forceSquared": false,
   "powerOfTwo": false,
