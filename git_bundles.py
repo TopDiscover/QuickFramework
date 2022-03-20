@@ -12,16 +12,16 @@ class GitBundles :
     def __init__(self):
         # 远程git bundles仓库地址
         self.gitUrl = "https://gitee.com/top-discover/QuickFrameworkBundles"
-        # 保存本地后辍名
-        self.suffix = "Bundles"
+        # Bundles目录名
+        self.bundlesName = "Bundles"
+        # Bundles路径
+        self.bundlesPath = None
         # 当前分支
         self.curBranch = None
         # 当前项目路径
         self.curProjectDir = None
         # 当前项目保存目录名
         self.curProjectName = None
-        # 当前Bundles 保存目录名
-        self.bundlesName = None
         # 当前项目路径
         self.curPath = None
 
@@ -61,6 +61,7 @@ class GitBundles :
         self.curPath = fullpath
         self.curProjectDir = os.path.dirname(fullpath)
         self.curProjectName = os.path.basename(fullpath)
+        self.bundlesPath = os.path.join(self.curPath,self.bundlesName)
         msg = u"当前项目本地存储名为:".encode("gbk") + self.curProjectName
         print(msg)
 
@@ -75,42 +76,30 @@ class GitBundles :
         dirname = self.curProjectDir
         basename = self.curProjectName
         # 检测是否已经存在，如果已经存在，直接摘取更新
-        self.bundlesName = basename + self.suffix
-        bundlesPath = os.path.join(dirname , self.bundlesName) 
-        if os.path.exists(bundlesPath) :
-            print(u"已经存在:".encode("gbk") + bundlesPath)
+        if os.path.exists(self.bundlesPath) :
+            print(u"已经存在:".encode("gbk") + self.bundlesPath)
             #项目已经存在，更新项目
-            os.chdir("..")
             # 进入Bundles分支目录
             os.chdir("./" + self.bundlesName)
-            cmd = "git pull".format(bundlesPath)
+            cmd = "git pull"
             self.runCommand(cmd,True)
             self.gitBundlesBranch()
         else :
-            print(u"不存在:".encode("gbk") + bundlesPath)
+            print(u"不存在:".encode("gbk") + self.bundlesPath)
             #返回到上一层目录接口bunldes
-            os.chdir("..")
             cmd = "git clone {0}.git {1}".format(self.gitUrl,self.bundlesName)
             print(u"执行克隆摘取Bundles代码:".encode("gbk") + cmd)
             self.runCommand(cmd,True)
             # 进入Bundles分支目录
             os.chdir("./" + self.bundlesName)
             self.gitBundlesBranch()
-
-    def makeLink(self):
-        cmd = "cd {0}".format(self.curPath)
-        # 进入当前项目路径
+    
+    def syncCode(self):
+        tsrpcPath = os.path.join(self.curPath,"tsrpc")
+        # 进入tsrpc 目录，创建代码连接
+        os.chdir(tsrpcPath)
+        cmd = "npm run sync"
         self.runCommand(cmd,True)
-        # 生成目录连接
-        if sys.platform == "win32" :
-            cmdPath = os.path.join(self.curPath,"linkBundles.cmd")
-            print ( u"生成{0}".format(cmdPath).encode("gbk"))
-            cmd = "mklink /j .\\\\assets\\\\bundles ..\\\\{0}\\\\bundles".format(self.bundlesName)
-            file = open(cmdPath,"w+")
-            file.write(cmd)
-        else:
-            print( sys.platform + u"不支持目录连接:mklink".encode("gbk"))
-            print( u"请求手动复制".encode("gbk") + os.path.join(self.curProjectDir,self.bundlesName) + "/bundles =>" + self.curPath + "/assets/bundles")
 
     def run(self):
         # 获取当前项目的路径信息
@@ -125,8 +114,9 @@ class GitBundles :
         # 进入Bundle目录，拉取跟项目同样分支的代码
         self.gitBundlesBranch()
 
-        # 生成bundles目录连接到开发项目
-        self.makeLink()
+        # 代码连接
+        self.syncCode()
+
 
 gitBundles = GitBundles()
 gitBundles.run()

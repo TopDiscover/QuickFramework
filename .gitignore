@@ -23,6 +23,5 @@ node_modules/
 .idea/
 native/
 PackageVersion/
-linkBundles.cmd
-assets/bundles/
 package-lock.json
+assets/bundles
