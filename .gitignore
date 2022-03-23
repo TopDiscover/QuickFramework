@@ -74,3 +74,9 @@ quick_gen_project_*_autogen.sh.meta
 .vscode/
 PackageVersion/
 assets/bundles
+packages/check_resources/package-lock.json
+packages/fix_engine/package-lock.json
+packages/hotupdate/package-lock.json
+packages/png-compress/package-lock.json
+packages/test-server/package-lock.json
+tsrpc/package-lock.json
