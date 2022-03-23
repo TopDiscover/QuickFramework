@@ -179,7 +179,7 @@ export class UpdateItem {
             }
             let gameManifest = {
                 version: "0",
-                bundle: this.bundle,
+                bundle: this.convertBundle(this.bundle),
                 md5: Macro.UNKNOWN,
             };
             let gameManifestContent = JSON.stringify(gameManifest);
