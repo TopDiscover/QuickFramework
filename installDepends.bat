@@ -1,0 +1,2 @@
+python installDepends.py
+pause
