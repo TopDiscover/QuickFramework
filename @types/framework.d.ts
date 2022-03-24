@@ -10,8 +10,9 @@ interface Logger {
 	 * @description dump 对象数据
 	 * @param object dump的对象
 	 * @param label 标签
+	 * @param deep 深度
 	 */
-	dump(object: unknown, label?: string): void;
+	dump(object: unknown, label?: string,deep?:number): void;
 }
 declare let Log: Logger;
 
