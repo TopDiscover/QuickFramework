@@ -41,43 +41,43 @@
                     "showPanel"
                 ]
             },
-            "onAfterBuild":{
+            "onAfterBuild": {
                 "methods": [
                     "onAfterBuild"
                 ]
             },
-            "onBeforeBuild":{
+            "onBeforeBuild": {
                 "methods": [
                     "onBeforeBuild"
                 ]
             },
-            "onPngCompressComplete":{
+            "onPngCompressComplete": {
                 "methods": [
                     "onPngCompressComplete"
                 ]
             },
-            "updateCreateProgress":{
+            "updateCreateProgress": {
                 "methods": [
                     "default.updateCreateProgress"
                 ]
             },
-            "updateDeployProgress":{
+            "updateDeployProgress": {
                 "methods": [
                     "default.updateDeployProgress"
                 ]
             },
-            "onSetBuildDir":{
+            "onSetBuildDir": {
                 "methods": [
                     "default.onSetBuildDir"
                 ]
             },
-            "onSetProcess":{
+            "onSetProcess": {
                 "methods": [
                     "default.onSetProcess"
                 ]
             }
         },
-        "builder":"./dist/Builder.js"
+        "builder": "./dist/Builder.js"
     },
     "author": "Zheng Fasheng",
     "editor": ">=3.3.1",

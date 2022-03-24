@@ -28,7 +28,7 @@
                     "fixEngine"
                 ]
             },
-            "onBeforeBuild":{
+            "onBeforeBuild": {
                 "methods": [
                     "onBeforeBuild"
                 ]

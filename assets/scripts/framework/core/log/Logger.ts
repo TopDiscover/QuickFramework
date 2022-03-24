@@ -81,89 +81,139 @@ export class LoggerImpl {
 
     private dump() {
         if (this.isValid(LogLevel.DUMP)) {
-            let ret = this._dump(arguments[0], arguments[1], arguments[2], arguments[4]);
+            let deep = arguments[2];
+            if ( deep == undefined ){
+                deep = 5;
+            }
+            if ( Number.isNaN(deep) ){
+                deep = 10;
+            }
+            if ( deep > 10 ){
+                deep = 10;
+            }
+            if ( deep <= 0 ){
+                deep = 1;
+                return;
+            }
+
+            //protobuf 数据特殊处理
+            let data = arguments[0];
+            if ( data.toJSON && typeof data.toJSON == "function"){
+                data = data.toJSON();
+            }
+
+            let ret = this._dump(data, arguments[1],deep,0);
             this.logger.d(ret);
         }
     }
 
-    private _dump(data: any, name: string = "unkown", level: number = 10, deep: number = 0): string {
-        if (level < 0) {
-            return "..."
-        }
-        deep = deep + 3;
-        let self = this;
-        let do_boolean = function (v: boolean) {
-            return 'Boolean(1) ' + (v ? 'TRUE' : 'FALSE');
-        };
-        let do_number = function (v: number) {
-            return v;
-        };
-        let do_string = function (v: string) {
-            return '"' + v + '"';
-        };
-        let do_object = function (v: any) {
-            if (v === null) {
-                return "NULL(0)";
-            }
-            let out = '';
-            let num_elem = 0;
-            let indent = '';
+    private convertName(name : string,flag:string = "="){
+        let out = name.length > 0 ? `${name} ${flag} ` : ` `;
+        return out;
+    }
 
-            if (v instanceof Array) {
-                num_elem = v.length;
-                for (let d = 0; d < deep; ++d) {
-                    indent += ' ';
-                }
-                out = "Array(" + num_elem + ") " + (indent.length === 0 ? '' : '') + "[";
-                for (let i = 0; i < num_elem; ++i) {
-                    out += "\n" + (indent.length === 0 ? '' : '' + indent) + "   [" + i + "] = " + self._dump(v[i], '', level-1, deep);
-                }
-                out += "\n" + (indent.length === 0 ? '' : '' + indent + '') + "]";
-                return out;
-            } else if (v instanceof Object) {
-                for (let d = 0; d < deep; ++d) {
-                    indent += ' ';
-                }
-                out = "{";
-                for (let p in v) {
-                    out += "\n" + (indent.length === 0 ? '' : '' + indent) + "   [" + p + "] = " + self._dump(v[p], '', level-1, deep);
-                }
-                out += "\n" + (indent.length === 0 ? '' : '' + indent + '') + "}";
-                return out;
-            } else {
-                return 'Unknown Object Type!';
+    private toBoolean( name : string, v : boolean){
+        return `${this.convertName(name)}${v};`
+    }
+
+    private toNumber( name : string, v:number){
+        return `${this.convertName(name)}${v}`;
+    }
+
+    private toString(name : string,v:string){
+        return `${this.convertName(name)}"${v}"`;
+    }
+
+    private toOther(name : string , v : any ){
+        return `${this.convertName(name)}${typeof v}`;
+    }
+
+    private toUnknown(name : string ){
+        let out = name.length > 0 ? `${name} ` : ` `;
+        return `${out}is unknown type!`
+    }
+
+    /**@description 缩进 */
+    private get indentFormat(){
+        return "    ";
+    }
+
+    /**@description 一半缩进 */
+    private get halfIndentFormat(){
+        return "   "
+    }
+
+    private toArray(name : string , v : any[] ,deep:number,curDeep : number): string{
+        let out = ""
+        let num_elem = 0;
+        let indent = '';
+        num_elem = v.length;
+        let keyName = this.convertName(name,"");
+        for (let d = 0; d < curDeep; ++d) {
+            indent += ' ';
+        }
+
+        out =  keyName + "[";
+        for (let i = 0; i < num_elem; ++i) {
+            out += "\n" + (indent.length === 0 ? '' : '' + indent) + `${this.indentFormat}[${i}]:` + this._dump(v[i], '', deep,curDeep+1);
+        }
+        out += "\n" + (indent.length === 0 ? '' : '' + indent + this.halfIndentFormat) + "]";
+        return out;
+    }
+
+    private toObject(name : string,v:Object,deep:number,curDeep : number): string{
+        let out = ""
+        if (v === null) {
+            out = "null";
+            return out;
+        }
+        let indent = '';
+        if (v instanceof Object) {
+            for (let d = 0; d < curDeep; ++d) {
+                indent += ' ';
             }
-        };
+            out = "{";
+            for (let p in v) {
+                out += "\n" + (indent.length === 0 ? '' : '' + indent) + `${this.indentFormat}${p}:` + this._dump((v as any)[p], '', deep,curDeep+1);
+            }
+            out += "\n" + (indent.length === 0 ? '' : '' + indent + this.halfIndentFormat) + "}";
+            return out;
+        } else {
+            out = "Unknown Object Type!";
+            return out;
+        }
+    }
+
+    private _dump(data: any, name: string = "unkown", deep: number,curDeep:number): string {
+        if (curDeep > deep) {
+            return "...";
+        }
         name = typeof name === 'undefined' ? '' : name;
         let out = '';
         let v_name = '';
         switch (typeof data) {
             case "boolean":
-                v_name = name.length > 0 ? name + ' = ' : '';
-                out += v_name + do_boolean(data);
+                out +=  this.toBoolean(v_name,data);
                 break;
             case "number":
-                v_name = name.length > 0 ? name + ' = ' : '';
-                out += v_name + do_number(data);
+                out +=  this.toNumber(v_name,data);
                 break;
             case "string":
-                v_name = name.length > 0 ? name + ' = ' : '';
-                out += v_name + do_string(data);
+                out += this.toString(v_name,data);
                 break;
             case "object":
-                v_name = name.length > 0 ? name + ' => ' : '';
-                out += v_name + do_object(data);
+                if (Array.isArray(data)){
+                    out += this.toArray(name,data,deep,curDeep);
+                }else{
+                    out += this.toObject(name,data,deep,curDeep);
+                }
                 break;
             case "function":
-                v_name = name.length > 0 ? name + ' = ' : '';
-                out += v_name + "Function";
-                break;
             case "undefined":
-                v_name = name.length > 0 ? name + ' = ' : '';
-                out += v_name + "Undefined";
+                out += this.toOther(name,data);
                 break;
             default:
-                out += v_name + ' is unknown type!';
+                out += this.toUnknown(name);
         }
         return out;
     }

@@ -40,33 +40,33 @@
                     "open_panel"
                 ]
             },
-            "onBeforeBuild":{
+            "onBeforeBuild": {
                 "methods": [
                     "onBeforeBuild"
                 ]
             },
-            "onAfterBuild":{
+            "onAfterBuild": {
                 "methods": [
                     "onAfterBuild"
                 ]
             },
-            "updateProgess":{
+            "updateProgess": {
                 "methods": [
                     "default.updateProgess"
                 ]
             },
-            "onStartCompress":{
+            "onStartCompress": {
                 "methods": [
                     "default.onStartCompress"
                 ]
             },
-            "onSetBuildDir":{
+            "onSetBuildDir": {
                 "methods": [
                     "default.onSetBuildDir"
                 ]
             }
         },
-        "builder":"./dist/Builder.js"
+        "builder": "./dist/Builder.js"
     },
     "author": "Zheng Fasheng",
     "editor": ">=3.3.1",
