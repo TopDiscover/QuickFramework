@@ -222,7 +222,7 @@ class Helper {
     }
     getManifestDir(buildDir) {
         if (buildDir && buildDir.length > 0) {
-            return buildDir + "\\manifest";
+            return path_1.default.join(buildDir, "manifest");
         }
         else {
             return "";
