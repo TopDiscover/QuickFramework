@@ -113,7 +113,7 @@ export class STRING extends StreamValue<string> {
             //不定长处理
             size = byteArray.readUnsignedInt();
         }
-        this.data = byteArray.readUTFBytes(size);
+        this.data = byteArray.readUTFBytes(size as number);
     }
 
     write(byteArray: ByteArray) {
@@ -314,7 +314,7 @@ export abstract class BinaryStream extends Message {
                 //多维的数组
                 this.serializeArray(value[i], `${memberName}[${i}]`, valueType, arrType, byteSize, dimension - 1);
             } else {
-                this.serializeMember(value[i], `${memberName}[${i}]`, arrType, byteSize, null);
+                this.serializeMember(value[i], `${memberName}[${i}]`, arrType, byteSize, undefined);
             }
         }
     }
@@ -393,7 +393,7 @@ export abstract class BinaryStream extends Message {
         return value.data;
     }
 
-    private _deserializeArray(originValue: Array<any>, memberName: any, memberType: any, arrTypeOrByteSize: any, byteSize?: number, dimension?: number) {
+    private _deserializeArray(originValue: Array<any>, memberName: any, memberType: any, arrTypeOrByteSize: any, byteSize?: number, dimension: number = 1) {
         if (dimension <= 0) {
             return;
         }
