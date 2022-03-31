@@ -14,7 +14,7 @@ class Install :
         self.curPath = os.getcwd()
         print(u"当前位置:".encode("gbk") + self.curPath)
         # 当前项目路径
-        self.projPath = os.getcwd()
+        self.projPath = os.path.join(self.curPath,"proj")
         print(u"当前工程位置:".encode("gbk") + self.projPath)
         # 需要安装目录记录
         self.extensions = ["check_resources","fix_engine","hotupdate","png-compress","test-server"]
@@ -48,7 +48,7 @@ class Install :
             self.runCommand(cmd,True)
 
         # 安装tsrpc
-        fullpath = os.path.join(self.projPath,"tsrpc")
+        fullpath = os.path.join(self.curPath,"tools/tsrpc")
         print(u"安装依赖库:".encode("gbk") + "tsrpc")
         os.chdir(fullpath)
         print(u"当前目录:" + os.getcwd())
