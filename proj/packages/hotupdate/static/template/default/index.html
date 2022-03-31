@@ -1,0 +1,112 @@
+<div class="container">
+    <ui-section>
+        <div class="header">主包Manifest配置</div>
+        <ui-box-container>
+            <div class="layout vertical start-justified">
+                <ui-prop name="版本号">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-input @confirm="onInputVersionOver($event.target.value)" class="flex-1"
+                            v-bind:value="version">
+                        </ui-input>
+                    </div>
+                </ui-prop>
+                <ui-prop name="资源服务器url" tooltip="游戏热更新服务器的url">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-input v-on:blur="onInputUrlOver($event.target.value)" v-bind:value="serverIP"
+                            class="flex-2">
+                        </ui-input>
+                        <ui-button v-on:confirm="onUserLocalIP">使用本机IP</ui-button>
+                    </div>
+                </ui-prop>
+                <ui-prop name="资源服务器url配置历史">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-select v-on:change="onChangeHotupdateUrls($event.target.value)" v-bind:value="serverIP"
+                            class="flex-2">
+                            <option v-for="url in hotupdateUrls" :value="url">{{url}}</option>
+                        </ui-select>
+                    </div>
+                </ui-prop>
+                <ui-prop name="build项目资源文件目录">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-input v-bind:value="buildDir" class="flex-2" readonly="readonly" disabled="disabled">
+                        </ui-input>
+                        <ui-button @confirm="onBuildDirConfirm($event.target.value)">选择</ui-button>
+                        <ui-button @confirm="onOpenBulidDir"><i class="icon-doc-text"></i></ui-button>
+                    </div>
+                </ui-prop>
+                <ui-prop name="manifest存储目录">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-input v-bind:value="buildOutDir" class="flex-2" readonly="readonly" disabled="disabled">
+                        </ui-input>
+                        <ui-button @confirm="onOpenBulidOutDir"><i class="icon-doc-text"></i></ui-button>
+                    </div>
+                </ui-prop>
+                <ui-prop name='主包包含目录' tooltip="相对于【build项目资源文件目录】">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-checkbox v-for="info in includes" v-bind:value="info.include"
+                            @confirm="onChangeIncludes($event.target.value,info.name)">{{info.name}}</ui-checkbox>
+                    </div>
+                </ui-prop>
+                <ui-prop name="版本生成进度">
+                    <ui-progress class="flex-2" v-bind:value="createProgress"></ui-progress>
+                </ui-prop>
+                <ui-prop name='操作'>
+                    <ui-checkbox v-bind:value="autoCreate" @confirm="onChangeAutoCreateManifest($event.target.value)" tooltip="当构建完成后，自动生成版本控制文件" >是否自动创建版本文件</ui-checkbox>
+                    <ui-checkbox v-bind:value="autoDeploy" @confirm="onChangeAutoDeploy($event.target.value)" tooltip="当构建完成后，且自动生成版本文件打开,生成成功后自动部署" >是否自动部署</ui-checkbox>
+                    <ui-button class="self-end red" @confirm="onDelBunles">执行Bundle剔除</ui-button>
+                    <ui-button class="self-end green" @confirm="onCreateManifest">生成</ui-button>
+                </ui-prop>
+            </div>
+        </ui-box-container>
+    </ui-section>
+
+    <ui-section>
+        <div class="header">Bundles Manifest配置</div>
+        <ui-box-container>
+            <ui-prop v-for="bundle in bundles" name='{{ bundle.name + "(" + bundle.dir + ")" }}'>
+                <div class="flex-1 layout horizontal center">
+                    <ui-checkbox v-bind:value="bundle.includeApk"
+                        @confirm="onChangeIncludeApk($event.target.value,bundle.dir)"> 是否包含在原始包内 </ui-checkbox>
+                    <ui-input class="flex-1" v-bind:value="bundle.version"
+                        @confirm="onChangeBundleVersion($event.target.value,bundle.dir)"></ui-input>
+                </div>
+            </ui-prop>
+        </ui-box-container>
+    </ui-section>
+
+    <ui-section>
+        <div class="header">测试环境</div>
+        <ui-box-container>
+            <ui-prop name="主包版本">
+                <div class="flex-1 layout horizontal center">
+                    <ui-input disabled="disabled" class="flex-2" v-bind:value="remoteVersion"></ui-input>
+                    <ui-button class="end-justified" @confirm="onRefreshMainVersion"><i class="icon-arrows-cw"></i>
+                    </ui-button>
+                </div>
+            </ui-prop>
+            <ui-prop v-for="bundle in remoteBundles" name='{{ bundle.name + "(" + bundle.dir + ")" }}'>
+                <div class="flex-1 layout horizontal center">
+                    <ui-input disabled="disabled" v-bind:value="bundle.md5" class="flex-2"></ui-input>
+                    <ui-button class="end-justified" @confirm="onRefreshVersion(bundle.dir)"><i
+                            class="icon-arrows-cw"></i></ui-button>
+                </div>
+            </ui-prop>
+            <ui-prop name="本机server物理路径">
+                <div class="flex-1 layout horizontal center">
+                    <ui-input v-bind:value="remoteDir" class="flex-2" disabled="disabled"></ui-input>
+                    <ui-button @confirm="onRemoteDirConfirm">选择</ui-button>
+                    <ui-button @confirm="onOpenRemoteDir"><i class="icon-doc-text"></i></ui-button>
+                </div>
+            </ui-prop>
+            <ui-prop name="部署进度">
+                <ui-progress class="flex-2" v-bind:value="progress"></ui-progress>
+            </ui-prop>
+            <ui-prop name="操作">
+                <div class="flex-1 layout horizontal center">
+                    <h3 class="flex-2"></h3>
+                    <ui-button @confirm="onDeployToRemote" class="end-justified green">部署</ui-button>
+                </div>
+            </ui-prop>
+        </ui-box-container>
+    </ui-section>
+</div>

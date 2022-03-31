@@ -1,0 +1,82 @@
+{
+    "libcocos2d.vcxproj.filters" : {
+        "path" : "cocos2d-x/build/libcocos2d.vcxproj.filters",
+        "name" : "libcocos2d.vcxproj.filters",
+        "desc" : "修正筛选器显示错误"
+    },
+    "fix_engine_version":{
+        "path" : "version.json",
+        "name" : "version.json",
+        "desc" : "引擎修复版本文件，用于校验是否执行过对应版本修复"
+    },
+    "AssetsManagerEx.h":{
+        "path" : "cocos2d-x/extensions/assets-manager/AssetsManagerEx.h",
+        "name" : "AssetsManagerEx.h",
+        "desc" : "执更新修改,AssetsManagerEx.h"
+    },
+    "AssetsManagerEx.cpp":{
+        "path" : "cocos2d-x/extensions/assets-manager/AssetsManagerEx.cpp",
+        "name" : "AssetsManagerEx.cpp",
+        "desc" : "执更新修改,AssetsManagerEx.cpp"
+    },
+    "Manifest.h":{
+        "path" : "cocos2d-x/extensions/assets-manager/Manifest.h",
+        "name" : "Manifest.h",
+        "desc" : "执更新修改,Manifest.h"
+    },
+    "Manifest.cpp":{
+        "path" : "cocos2d-x/extensions/assets-manager/Manifest.cpp",
+        "name" : "Manifest.cpp",
+        "desc" : "执更新修改,Manifest.cpp"
+    },
+    "jsb_cocos2dx_extension_auto.cpp":{
+        "path" : "cocos2d-x/cocos/scripting/js-bindings/auto/jsb_cocos2dx_extension_auto.cpp",
+        "name" : "jsb_cocos2dx_extension_auto.cpp",
+        "desc" : "执更新修改,jsb_cocos2dx_extension_auto.cpp"
+    },
+    "jsb_cocos2dx_extension_auto.hpp":{
+        "path" : "cocos2d-x/cocos/scripting/js-bindings/auto/jsb_cocos2dx_extension_auto.hpp",
+        "name" : "jsb_cocos2dx_extension_auto.hpp",
+        "desc" : "执更新修改,jsb_cocos2dx_extension_auto.hpp"
+    },
+    "jsb_default_settings.gradle":{
+        "path" : "cocos2d-x/templates/js-template-default/frameworks/runtime-src/proj.android-studio/settings.gradle",
+        "name" : "jsb-default/settings.gradle",
+        "desc" : "执更新修改,修改include ':libcocos2dx',':game', ':instantapp' --> include ':libcocos2dx' "
+    },
+    "jsb_link_settings.gradle":{
+        "path" : "cocos2d-x/templates/js-template-link/frameworks/runtime-src/proj.android-studio/settings.gradle",
+        "name" : "jsb-link/settings.gradle",
+        "desc" : "执更新修改,修改include ':libcocos2dx',':game', ':instantapp' --> include ':libcocos2dx'"
+    },
+    "jsb_default_HelloJavascript.vcxproj":{
+        "path" : "cocos2d-x/templates/js-template-default/frameworks/runtime-src/proj.win32/HelloJavascript.vcxproj",
+        "name" : "jsb-default/HelloJavascript.vcxproj",
+        "desc" : "执更新修改,添加win32 jsb-default 工程复制版本控制文件生成事件"
+    },
+    "jsb_link_HelloJavascript.vcxproj":{
+        "path" : "cocos2d-x/templates/js-template-link/frameworks/runtime-src/proj.win32/HelloJavascript.vcxproj",
+        "name" : "jsb-link/HelloJavascript.vcxproj",
+        "desc" : "执更新修改,添加win32 jsb-link 工程复制版本控制文件生成事件"
+    },
+    "jsb_default_build.gradle":{
+        "path" : "cocos2d-x/templates/js-template-default/frameworks/runtime-src/proj.android-studio/app/build.gradle",
+        "name" : "jsb-default/build.gradle",
+        "desc" : "执更新修改,添加jsb-default build.gradle对版本控制文件的复制脚本"
+    },
+    "jsb_link_build.gradle":{
+        "path" : "cocos2d-x/templates/js-template-link/frameworks/runtime-src/proj.android-studio/app/build.gradle",
+        "name" : "jsb-link/build.gradle",
+        "desc" : "执更新修改,删除jsb-link build.gradle对版本控制文件的复制脚本"
+    },
+    "ccdts":{
+        "path" : "utils/api/creator.d.ts",
+        "name" : "ccdts",
+        "desc" : "执行更新添加对自定义引擎扩展接口声明"
+    },
+    "jsbdts":{
+        "path" : "utils/api/creator.d.ts",
+        "name" : "jsbdts",
+        "desc" : "执行更新添加对自定义引擎扩展热更新接口声明"
+    }
+}

@@ -1,0 +1,24 @@
+<div id="view" class="scroll">
+    <div class="section" style>
+        <h2 class="flex-1 layout horizontal center">该插件只能检测预置之前的资源引用关系,不是所有资源类型都支持</h2>
+        <h2 class="flex-1 layout horizontal center">目前支持类型:cc.Sprite,cc.Button,cc.Label,cc.ParticleSystem,sp.Skeleton,cc.Animation</h2>
+        <ui-section>
+            <div class="header greenColor">Bundles</div>
+            <div class="layout vertical">
+                <ui-prop name="Bundles目录地址">
+                    <div class="flex-1 layout horizontal center">
+                        <ui-input class="flex-2" readonly="readonly" disabled="disabled" v-value="gameRoot"></ui-input>
+                        <ui-button v-on:confirm="onSelectGameRoot" disabled="disabled" >选择</ui-button>
+                        <ui-button v-on:confirm="onOpenGameRoot"><i class="icon-doc-text"></i></ui-button>
+                    </div>
+                </ui-prop>
+                <ui-prop v-for="bundle in bundles" name='{{ bundle.name + "(" + bundle.dir + ")" }}'>
+                    <div class="flex-1 layout horizontal center">
+                        <h4 class="flex-2">{{bundle.db}}</h4>
+                        <ui-button class="end-justified" @confirm="onCheckSubGame(bundle.dir)">检测</ui-button>
+                    </div>
+                </ui-prop>
+            </div>
+        </ui-section>
+    </div>
+</div>

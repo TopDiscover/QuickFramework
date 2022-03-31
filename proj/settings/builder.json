@@ -1,0 +1,76 @@
+{
+  "android-instant": {
+    "REMOTE_SERVER_ROOT": "http://192.168.3.104:7456/preview-android-instant/",
+    "host": "",
+    "packageName": "org.cocos2d.examplecases",
+    "pathPattern": "",
+    "recordPath": "",
+    "scheme": "https",
+    "skipRecord": false
+  },
+  "appBundle": false,
+  "baidugame": {
+    "REMOTE_SERVER_ROOT": "",
+    "appid": "testappid",
+    "orientation": "portrait",
+    "subContext": ""
+  },
+  "encryptJs": false,
+  "excludeScenes": [],
+  "fb-instant-games": {
+    "hide": false
+  },
+  "includeSDKBox": false,
+  "inlineSpriteFrames": true,
+  "inlineSpriteFrames_native": false,
+  "md5Cache": true,
+  "mergeStartScene": false,
+  "optimizeHotUpdate": true,
+  "orientation": {
+    "landscapeLeft": true,
+    "landscapeRight": true,
+    "portrait": false,
+    "upsideDown": false
+  },
+  "packageName": "org.cocos2d.examplecases",
+  "qqplay": {
+    "orientation": "portrait"
+  },
+  "startScene": "6cbf4d9e-d30d-41d7-9f21-4351a92bcac6",
+  "title": "Quick",
+  "webOrientation": "landscape",
+  "wechatgame": {
+    "REMOTE_SERVER_ROOT": "http://192.168.199.175:8080",
+    "appid": "wx6ac3f5090a6b99c5",
+    "isSubdomain": false,
+    "orientation": "landscapeRight",
+    "subContext": ""
+  },
+  "xxteaKey": "de565b49-7232-43",
+  "zipCompressJs": true,
+  "android": {
+    "REMOTE_SERVER_ROOT": "",
+    "packageName": "org.cocos2d.Quick"
+  },
+  "ios": {
+    "REMOTE_SERVER_ROOT": "",
+    "packageName": "org.cocos2d.examplecases",
+    "ios_enable_jit": true
+  },
+  "mac": {
+    "REMOTE_SERVER_ROOT": "",
+    "height": 720,
+    "packageName": "org.cocos2d.examplecases",
+    "width": 1280
+  },
+  "win32": {
+    "REMOTE_SERVER_ROOT": "",
+    "height": 720,
+    "width": 1280
+  },
+  "includeAnySDK": null,
+  "mainCompressionType": "default",
+  "mainIsRemote": false,
+  "nativeMd5Cache": false,
+  "agreements": {}
+}
