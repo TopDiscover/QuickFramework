@@ -13,15 +13,13 @@ class GitBundles :
         # 远程git bundles仓库地址
         self.gitUrl = "https://gitee.com/top-discover/QuickFrameworkBundles"
         # Bundles目录名
-        self.bundlesName = "Bundles"
-        # Bundles路径
-        self.bundlesPath = None
+        self.bundlesName = "bundles"
         # 当前分支
         self.curBranch = None
         # 当前项目路径
         self.curProjectDir = None
         # 当前项目保存目录名
-        self.curProjectName = None
+        self.curProjectName = "proj"
         # 当前项目路径
         self.curPath = None
 
@@ -52,16 +50,14 @@ class GitBundles :
                 robj = re.match(r'\d+\.\d+\.\d+',v,re.S)
                 if robj :
                     self.curBranch = robj.group()
-                    print(u"应拉取的Bundles 分支为:".encode("gbk") + self.curBranch)
+                    print(u"应拉取的bundles 分支为:".encode("gbk") + self.curBranch)
                 return
         
     # 获取当项目保存的名字
     def getCurProjectDirName(self):
         fullpath = os.getcwd()
         self.curPath = fullpath
-        self.curProjectDir = os.path.dirname(fullpath)
-        self.curProjectName = os.path.basename(fullpath)
-        self.bundlesPath = os.path.join(self.curPath,self.bundlesName)
+        self.curProjectDir = os.path.join(fullpath,self.curProjectName)
         msg = u"当前项目本地存储名为:".encode("gbk") + self.curProjectName
         print(msg)
 
@@ -73,11 +69,10 @@ class GitBundles :
 
     # 摘取Bundles
     def gitBundles(self ):
-        dirname = self.curProjectDir
-        basename = self.curProjectName
+        bundlesPath = os.path.join(self.curPath,self.bundlesName)
         # 检测是否已经存在，如果已经存在，直接摘取更新
-        if os.path.exists(self.bundlesPath) :
-            print(u"已经存在:".encode("gbk") + self.bundlesPath)
+        if os.path.exists(bundlesPath) :
+            print(u"已经存在:".encode("gbk") + bundlesPath)
             #项目已经存在，更新项目
             # 进入Bundles分支目录
             os.chdir("./" + self.bundlesName)
@@ -85,7 +80,7 @@ class GitBundles :
             self.runCommand(cmd,True)
             self.gitBundlesBranch()
         else :
-            print(u"不存在:".encode("gbk") + self.bundlesPath)
+            print(u"不存在:".encode("gbk") + bundlesPath)
             #返回到上一层目录接口bunldes
             cmd = "git clone {0}.git {1}".format(self.gitUrl,self.bundlesName)
             print(u"执行克隆摘取Bundles代码:".encode("gbk") + cmd)
@@ -95,7 +90,7 @@ class GitBundles :
             self.gitBundlesBranch()
     
     def syncCode(self):
-        tsrpcPath = os.path.join(self.curPath,"tsrpc")
+        tsrpcPath = os.path.join(self.curPath,"tools/tsrpc")
         # 进入tsrpc 目录，创建代码连接
         os.chdir(tsrpcPath)
         cmd = "npm run sync"
@@ -110,9 +105,6 @@ class GitBundles :
 
         # 拉取Bundles
         self.gitBundles()
-
-        # 进入Bundle目录，拉取跟项目同样分支的代码
-        self.gitBundlesBranch()
 
         # 代码连接
         self.syncCode()
