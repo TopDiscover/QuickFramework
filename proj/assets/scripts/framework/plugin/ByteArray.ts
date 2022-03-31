@@ -910,7 +910,7 @@
          * @platform Web,Native
          * @language zh_CN
          */
-        public writeUTFBytes(value: string,byteSize:number | undefined): void {
+        public writeUTFBytes(value: string,byteSize?:number): void {
             // this.encodeUTF8(value);
             this._writeUint8Array(this.encodeUTF8(value,byteSize));
         }

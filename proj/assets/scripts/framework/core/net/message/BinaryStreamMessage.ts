@@ -7,33 +7,39 @@ import { ByteArray } from "../../../plugin/ByteArray";
 import { Net } from "../Net";
 import { Message } from "./Message";
 
-
 type BinaryStreamConstructor = typeof BinaryStream;
 type NumberValueConstructor = typeof NumberValue;
 type STRINGConstructor = typeof STRING;
 type BOOLConstructor = typeof BOOL;
 
 /**
- * 
+ * @description 基础数据类型装饰器
  * @param key 序列化的Key
  * @param type 序列化的类型
- * @param byteSize 序列化指定字节长度，只有STRING有效
+ * @param byteSize 序列化指定字节长度，只有 STRING 有效
  */
 export function serialize(
     key: string,
     type: BinaryStreamConstructor | NumberValueConstructor | STRINGConstructor | BOOLConstructor,
-    byteSize ?: number
+    byteSize?: number
 ): Function;
+
+/**
+ * @description 数组装饰器
+ * @param key 序列化的Key
+ * @param type 序列化的类型
+ * @param arrayType 数组元素类型
+ * @param byteSize 序列化字符串指定字节长度，当元素类型为 STRING 时且需要指定长度时有效，否则填 undefined 
+ * @param dimension 数组维数指定,不传传默认按一维数组进行解析
+ * @example @ser
+ */
 export function serialize(
     key: string,
     type: ArrayConstructor,
-    arrayType: BinaryStreamConstructor | NumberValueConstructor | STRINGConstructor): Function;
-export function serialize(
-    key: string,
-    type: MapConstructor,
-    mapKeyType: NumberConstructor | StringConstructor,
-    mapValueType: BinaryStreamConstructor | NumberValueConstructor | STRINGConstructor): Function;
-export function serialize(key: string, type: any, arrTypeOrMapKeyType?: any, mapValueType?: any) {
+    arrayType: BinaryStreamConstructor | NumberValueConstructor | STRINGConstructor,
+    byteSize?: number,
+    dimension?: number): Function;
+export function serialize(key: string, type: any, arrTypeOrByteSize?: any, byteSize?: any, dimension?: number) {
     return function (target: any, memberName: any) {
         if (Reflect.getOwnPropertyDescriptor(target, '__serialize__') === undefined) {
             let selfSerializeInfo: any = {};
@@ -54,7 +60,7 @@ export function serialize(key: string, type: any, arrTypeOrMapKeyType?: any, map
         if (target['__serialize__'][key]) {
             throw `SerializeKey has already been declared:${key}`;
         }
-        target['__serialize__'][key] = [memberName, type, arrTypeOrMapKeyType, mapValueType];
+        target['__serialize__'][key] = [memberName, type, arrTypeOrByteSize, byteSize, dimension];
     }
 }
 
@@ -69,8 +75,8 @@ interface IStreamValue {
 /**@description 数据流基类 */
 class StreamValue<T> implements IStreamValue {
     data: T = null!;
-    read(byteArray: ByteArray): void {}
-    write(byteArray: ByteArray): void {}
+    read(byteArray: ByteArray): void { }
+    write(byteArray: ByteArray): void { }
     /**@description 网络数据全以大端方式进行处理 */
     get littleEndian() {
         return Macro.USING_LITTLE_ENDIAN;
@@ -99,11 +105,11 @@ export class BOOL extends StreamValue<boolean>{
 export class STRING extends StreamValue<string> {
     data = "";
     /**@description 定长字节数大小,注意不是字符串的个数 */
-    byteSize : number | undefined = undefined;
+    byteSize: number | undefined = undefined;
     read(byteArray: ByteArray) {
         //先读取字符串长度
         let size = this.byteSize;
-        if ( this.byteSize == undefined ){
+        if (this.byteSize == undefined) {
             //不定长处理
             size = byteArray.readUnsignedInt();
         }
@@ -112,8 +118,8 @@ export class STRING extends StreamValue<string> {
 
     write(byteArray: ByteArray) {
         let buffer = new ByteArray();
-        buffer.writeUTFBytes(this.data,this.byteSize);
-        if ( this.byteSize == undefined){
+        buffer.writeUTFBytes(this.data, this.byteSize);
+        if (this.byteSize == undefined) {
             //不定长处理
             byteArray.writeUnsignedInt(buffer.length);
         }
@@ -220,13 +226,13 @@ export abstract class BinaryStream extends Message {
             valueType == UBYTE || valueType == USHORT || valueType == UINT;
     }
 
-    private isBoolValue( valueType:any){
+    private isBoolValue(valueType: any) {
         return valueType == BOOL;
     }
 
     /**@description 是否是字符串类型 */
     private isStringValue(valueType: any) {
-        return valueType == STRING ;
+        return valueType == STRING;
     }
 
     /**@description 序列化 */
@@ -236,8 +242,8 @@ export abstract class BinaryStream extends Message {
         let serializeKeyList = Object.keys(__serialize__);
         for (let len = serializeKeyList.length, i = 0; i < len; i++) {
             let serializeKey = serializeKeyList[i];
-            let [memberName, type, arrTypeOrMapKeyType, mapValueType] = __serialize__[serializeKey];
-            this.serializeMember((<any>this)[memberName], memberName, type, arrTypeOrMapKeyType, mapValueType);
+            let [memberName, valueType, arrTypeOrByteSize, byteSize, dimension] = __serialize__[serializeKey];
+            this.serializeMember((<any>this)[memberName], memberName, valueType, arrTypeOrByteSize, byteSize, dimension);
         }
     }
 
@@ -245,17 +251,15 @@ export abstract class BinaryStream extends Message {
      * @description 序列化成员变量
      * @param value 该成员变量的值
      * */
-    private serializeMember(value: any, memberName: string, valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
+    private serializeMember(value: any, memberName: string, valueType: any, arrTypeOrByteSize?: any, byteSize?: number, dimension?: number) {
         if (this.isNumberValue(valueType)) {
             this.serializeNumberStreamValue(value, valueType);
-        } else if( this.isBoolValue(valueType) ){
-            this.serializeBoolValue(value,valueType);
+        } else if (this.isBoolValue(valueType)) {
+            this.serializeBoolValue(value, valueType);
         } else if (this.isStringValue(valueType)) {
-            this.serializeStringStreamValue(value, valueType,arrTypeOrMapKeyType);
+            this.serializeStringStreamValue(value, valueType, arrTypeOrByteSize);
         } else if (value instanceof Array) {
-            this.serializeArray(value, memberName, valueType, arrTypeOrMapKeyType, mapValueType);
-        } else if (value instanceof Map) {
-            this.serializeMap(value, memberName, valueType, arrTypeOrMapKeyType, mapValueType);
+            this.serializeArray(value, memberName, valueType, arrTypeOrByteSize, byteSize, dimension);
         } else if (value instanceof BinaryStream) {
             value.byteArray = this.byteArray;
             value.serialize();
@@ -272,40 +276,47 @@ export abstract class BinaryStream extends Message {
 
     private serializeBoolValue(value: boolean, valueType: typeof BOOL) {
         let type = new valueType();
-        type.data = (value === undefined || value === null ) ? false : value;
+        type.data = (value === undefined || value === null) ? false : value;
         type.write(this.byteArray);
     }
 
-    private serializeStringStreamValue(value: string, valueType: typeof STRING,byteSize:number|undefined) {
+    private serializeStringStreamValue(value: string, valueType: typeof STRING, byteSize: number | undefined) {
         let type = new valueType();
         type.byteSize = byteSize;
         type.data = (value === undefined || value === null) ? "" : value;
         type.write(this.byteArray);
     }
 
-    private serializeArray(value: Array<any>, memberName: string, valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
-        //先写入数组的大小
-        this.byteArray.writeUnsignedInt(value.length);
-        for (let i = 0; i < value.length; i++) {
-            this.serializeMember(value[i], `${memberName}[${i}]`, arrTypeOrMapKeyType, null, null);
-        }
+    /**@description 检测当前数组的维度是否有效 */
+    private checkArrayDimension(value: Array<any>, dimension: number) {
+        let count = 0;
+        let temp = value;
+        do {
+            count++;
+            temp = temp[0];
+        } while (temp && Array.isArray(temp) && temp.length > 0)
+        return count == dimension;
     }
 
-    private serializeMap(value: Map<any, any>, memberName: string, valueType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
-        //先写入字典的大小
-        this.byteArray.writeUnsignedInt(value.size);
-        value.forEach((dataValue, dataKey) => {
-            //写入key
-            if (arrTypeOrMapKeyType == String) {
-                let keyValue = new STRING();
-                keyValue.data = dataKey;
-                keyValue.write(this.byteArray);
+    private serializeArray(value: Array<any>, memberName: string, valueType: any, arrType: any, byteSize?: number, dimension?: number) {
+        //先写入数组的大小
+        if (dimension == undefined) {
+            dimension = 1;
+        }
+        if (!this.checkArrayDimension(value, dimension)) {
+            Log.e(`${memberName} 定义数组跟序列化的数组维度不一致`)
+            return;
+        }
+
+        this.byteArray.writeUnsignedInt(value.length);
+        for (let i = 0; i < value.length; i++) {
+            if (value[i] instanceof Array) {
+                //多维的数组
+                this.serializeArray(value[i], `${memberName}[${i}]`, valueType, arrType, byteSize, dimension - 1);
             } else {
-                this.byteArray.writeUnsignedInt(dataKey);
+                this.serializeMember(value[i], `${memberName}[${i}]`, arrType, byteSize, null);
             }
-            //写值
-            this.serializeMember(dataValue, `${memberName}.${dataKey}`, mapValueType, null, null);
-        });
+        }
     }
 
     /**@description 从二进制数据中取数据 */
@@ -327,8 +338,8 @@ export abstract class BinaryStream extends Message {
         let serializeKeyList = Object.keys(__serializeInfo);
         for (let len = serializeKeyList.length, i = 0; i < len; i++) {
             let serializeKey = serializeKeyList[i];
-            let [memberName, type, arrTypeOrMapKeyType, mapValueType] = __serializeInfo[serializeKey];
-            this.deserializeMember(memberName, type, arrTypeOrMapKeyType, mapValueType);
+            let [memberName, valueType, arrTypeOrByteSize, byteSize, dimension] = __serializeInfo[serializeKey];
+            this.deserializeMember(memberName, valueType, arrTypeOrByteSize, byteSize, dimension);
         }
     }
 
@@ -336,30 +347,28 @@ export abstract class BinaryStream extends Message {
      * @description 反序列化成
      * @param memberName 成员变量名
      * @param memberType 成员变量类型
-     * @param arrTypeOrMapKeyType 数组值类型/Map的key类型
-     * @param mapValueType Map的值类型
+     * @param arrTypeOrByteSize 数组值类型/Map的key类型
+     * @param byteSize Map的值类型
      * @param value json压缩对象
      */
-    private deserializeMember(memberName: any, memberType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
+    private deserializeMember(memberName: any, memberType: any, arrTypeOrByteSize: any, byteSize?: number, dimension?: number) {
         try {
             let originValue = (<any>this)[memberName];
             if (this.isNumberValue(memberType)) {
                 (<any>this)[memberName] = this.deserializeNumberStreamValue(memberName, memberType);
-            } else if (this.isBoolValue(memberType)){
+            } else if (this.isBoolValue(memberType)) {
                 (<any>this)[memberName] = this.deserializeBoolValue(memberName, memberType);
             } else if (this.isStringValue(memberType)) {
-                (<any>this)[memberName] = this.deserializeStringStreamValue(memberName, memberType, arrTypeOrMapKeyType);
+                (<any>this)[memberName] = this.deserializeStringStreamValue(memberName, memberType, arrTypeOrByteSize);
             } else if (originValue instanceof Array) {
-                this.deserializeArray(memberName, memberType, arrTypeOrMapKeyType, mapValueType);
-            } else if (originValue instanceof Map) {
-                this.deserializeMap(memberName, memberType, arrTypeOrMapKeyType, mapValueType);
+                this.deserializeArray(memberName, memberType, arrTypeOrByteSize, byteSize, dimension);
             } else if (originValue instanceof BinaryStream) {
                 originValue.byteArray = this.byteArray;
                 originValue.deserialize();
             } else {
                 Log.e(`deserializeMember ${memberName} error!!!`);
             }
-        } catch (err:any) {
+        } catch (err: any) {
             Log.w(err.message);
             Log.e(`deserializeMember ${memberName} error!!!`);
         }
@@ -384,52 +393,50 @@ export abstract class BinaryStream extends Message {
         return value.data;
     }
 
-    private deserializeArray(memberName: any, memberType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
-        //重新解析，初始化时可能已经赋值，需要先清空对象
-        (<any>this)[memberName] = [];
+    private _deserializeArray(originValue: Array<any>, memberName: any, memberType: any, arrTypeOrByteSize: any, byteSize?: number, dimension?: number) {
+        if (dimension <= 0) {
+            return;
+        }
         //先读数组大小
         let size = this.byteArray.readUnsignedInt();
+        let index = 0;
         for (let i = 0; i < size; i++) {
-            let type = new arrTypeOrMapKeyType();
-            if (type instanceof BinaryStream) {
-                type.byteArray = this.byteArray;
-                (<any>this)[memberName][i] = type.deserialize();
+            if (dimension > 1) {
+                originValue.push([]);
+                this._deserializeArray(originValue[index], `${memberName}[${index}]`, memberType, arrTypeOrByteSize, byteSize, dimension - 1);
+                index++;
             } else {
-                type.read(this.byteArray);
-                (<any>this)[memberName][i] = type.data;
+                let type = new arrTypeOrByteSize();
+                if (type instanceof BinaryStream) {
+                    type.byteArray = this.byteArray;
+                    originValue[i] = type.deserialize();
+                } else if (type instanceof STRING) {
+                    type.byteSize = byteSize;
+                    type.read(this.byteArray);
+                    originValue[i] = type.data;
+                } else {
+                    type.read(this.byteArray);
+                    originValue[i] = type.data;
+                }
             }
         }
     }
 
-    private deserializeMap(memberName: any, memberType: any, arrTypeOrMapKeyType: any, mapValueType: any) {
+    private deserializeArray(memberName: any, memberType: any, arrTypeOrByteSize: any, byteSize?: number, dimension?: number) {
+        //重新解析，初始化时可能已经赋值，需要先清空对象
+        (<any>this)[memberName] = [];
 
-        (<any>this)[memberName] = new Map;
-        //先读入数组大小
-        let size = this.byteArray.readUnsignedInt();
-        for (let i = 0; i < size; i++) {
-            let key = null;
-            //写入key
-            if (arrTypeOrMapKeyType == String) {
-                let keyValue = new STRING();
-                keyValue.read(this.byteArray);
-                key = keyValue.data;
-            } else {
-                key = this.byteArray.readUnsignedInt();
-            }
-            //写值
-            let data = new mapValueType();
-            if (mapValueType instanceof BinaryStream) {
-                (data as BinaryStream).byteArray = this.byteArray;
-                data.deserialize();
-            } else {
-                data.read(this.byteArray);
-                data = data.data;
-            }
-            (<any>this)[memberName].set(key, data);
+        //用初始化类型数据来判断是否是多维数组
+        //先取取数组大小
+        if (dimension == undefined) {
+            //未指定维度，按一维处理
+            dimension = 1;
         }
+
+        this._deserializeArray((<any>this)[memberName], memberName, memberType, arrTypeOrByteSize, byteSize, dimension);
     }
 }
 
-export abstract class BinaryStreamHeartbeat extends BinaryStream{
+export abstract class BinaryStreamHeartbeat extends BinaryStream {
     static type = Net.ServiceType.BinaryStream;
 }
