@@ -335,6 +335,7 @@ void Manifest::genResumeAssetsList(DownloadUnits *units) const {
             
             unit.storagePath = _manifestRoot + asset.path;
             unit.size = asset.size;
+            unit.compressed = asset.compressed;
             units->emplace(unit.customId, unit);
         }
     }
