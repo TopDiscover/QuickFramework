@@ -155,7 +155,7 @@ class AudioData {
     }
 
     public setEffectStatus(isOn: boolean) {
-        if (this.isEffectOn = isOn) {
+        if (this.isEffectOn == isOn) {
             return;
         }
         this.isEffectOn = isOn;
@@ -341,7 +341,7 @@ export default class AudioComponent extends EventComponent {
                     if (audioInfo && audioInfo.source) {
                         audioInfo.source.clip = data;
                         audioInfo.source.loop = loop;
-                        audioInfo.source.volume = this.musicVolume;
+                        audioInfo.source.volume = this.effectVolume;
                         this.play(audioInfo,false,resolve);
                     }
                 } else {
