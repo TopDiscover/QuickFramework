@@ -22,8 +22,6 @@ class Helper {
         this._config = v;
     }
 
-    private bundles: { [key: string]: BundleInfo } = {};
-
     private get userCachePath() {
         return path.join(Editor.Project.path, "local/userCache.json");
     }
@@ -113,7 +111,7 @@ class Helper {
 
     private reloadRemoteBundles() {
         this._remoteBundles = JSON.parse(JSON.stringify(this.config.bundles));
-        Object.keys(this.bundles).forEach((key) => {
+        Object.keys(this._remoteBundles).forEach((key) => {
             this._remoteBundles[key].md5 = this.getBundleVersion(key);
         });
     }

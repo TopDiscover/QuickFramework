@@ -29,7 +29,6 @@ const PACKAGE_NAME = "hotupdate";
 class Helper {
     constructor() {
         this._config = null;
-        this.bundles = {};
         this._remoteBundles = null;
         this._createProgress = 0;
         /**@description 进度总数 */
@@ -130,7 +129,7 @@ class Helper {
     }
     reloadRemoteBundles() {
         this._remoteBundles = JSON.parse(JSON.stringify(this.config.bundles));
-        Object.keys(this.bundles).forEach((key) => {
+        Object.keys(this._remoteBundles).forEach((key) => {
             this._remoteBundles[key].md5 = this.getBundleVersion(key);
         });
     }
