@@ -4,7 +4,6 @@ import { Tools } from "./Tools";
 const Electron = require("electron")
 
 class Helper {
-    private bundles: { [key: string]: BundleInfo } = {};
 
     private get configPath() {
         return path.join(Editor.Project.path, "config/hotupdate.json");
@@ -106,7 +105,7 @@ class Helper {
 
     private reloadRemoteBundles() {
         this._remoteBundles = JSON.parse(JSON.stringify(this.config.bundles));
-        Object.keys(this.bundles).forEach((key) => {
+        Object.keys(this._remoteBundles).forEach((key) => {
             this._remoteBundles[key].md5 = this.getBundleVersion(key);
         });
     }

@@ -26,7 +26,6 @@ const Tools_1 = require("./Tools");
 const Electron = require("electron");
 class Helper {
     constructor() {
-        this.bundles = {};
         this._config = null;
         this._remoteBundles = null;
         this._isDoCreate = false;
@@ -127,7 +126,7 @@ class Helper {
     }
     reloadRemoteBundles() {
         this._remoteBundles = JSON.parse(JSON.stringify(this.config.bundles));
-        Object.keys(this.bundles).forEach((key) => {
+        Object.keys(this._remoteBundles).forEach((key) => {
             this._remoteBundles[key].md5 = this.getBundleVersion(key);
         });
     }
