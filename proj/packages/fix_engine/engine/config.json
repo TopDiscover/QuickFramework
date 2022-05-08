@@ -39,16 +39,6 @@
         "name" : "jsb_cocos2dx_extension_auto.hpp",
         "desc" : "执更新修改,jsb_cocos2dx_extension_auto.hpp"
     },
-    "jsb_default_settings.gradle":{
-        "path" : "cocos2d-x/templates/js-template-default/frameworks/runtime-src/proj.android-studio/settings.gradle",
-        "name" : "jsb-default/settings.gradle",
-        "desc" : "执更新修改,修改include ':libcocos2dx',':game', ':instantapp' --> include ':libcocos2dx' "
-    },
-    "jsb_link_settings.gradle":{
-        "path" : "cocos2d-x/templates/js-template-link/frameworks/runtime-src/proj.android-studio/settings.gradle",
-        "name" : "jsb-link/settings.gradle",
-        "desc" : "执更新修改,修改include ':libcocos2dx',':game', ':instantapp' --> include ':libcocos2dx'"
-    },
     "jsb_default_HelloJavascript.vcxproj":{
         "path" : "cocos2d-x/templates/js-template-default/frameworks/runtime-src/proj.win32/HelloJavascript.vcxproj",
         "name" : "jsb-default/HelloJavascript.vcxproj",
