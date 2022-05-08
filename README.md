@@ -67,8 +67,8 @@ win32 运行git_bundles.bat 拉取示例代码
 功能还在完善中，后面优化及功能的扩展继续进行中
 
 # 分支说明
-## [2.4.3](https://gitee.com/top-discover/QuickFramework/tree/2.4.3)
-2.4.3 分支为 creator 版本在>=2.4.3版本以上使用，为2.4.x的对外分支
+## [2.4.7](https://gitee.com/top-discover/QuickFramework/tree/2.4.7)
+2.4.7 分支为 creator 版本在>=2.4.7版本以上使用，为2.4.x的对外分支
 ## [3.3.1](https://gitee.com/top-discover/QuickFramework/tree/3.3.1)
 3.3.1 分支为 creator 版本在>=3.3.1版本以上使用，为3.x的对外分支
 ## 其它分支为开发中的分支，请不要轻易使用
