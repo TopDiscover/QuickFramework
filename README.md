@@ -1,6 +1,6 @@
 # CocosCreator 快速开发轻量级游戏框架
 # 项目说明
-本项目基于 cocos creator 2.4.5版本
+本项目基于 cocos creator 2.4.7版本
 以Asset Bundle为基础的大厅+子游戏示例
 提供一个轻量级的游戏开发框架,让你的开发更加简单
 # cocos creator 升级
@@ -22,7 +22,7 @@ win32 运行git_bundles.bat 拉取示例代码
 其它平台可运行 git_bundles.py 脚本
 
 # 详细文档
-更为详细的文档，[请在本项目的doc中查看](https://gitee.com/top-discover/QuickFramework/tree/2.4.5/doc)，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
+更为详细的文档，[请在本项目的doc中查看](https://gitee.com/top-discover/QuickFramework/tree/2.4.7/doc)，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
 同时也希望有更多的人参与，一起让creator的开发更加的简单。
 
 # 关于QuickFramework
@@ -68,8 +68,8 @@ win32 运行git_bundles.bat 拉取示例代码
 功能还在完善中，后面优化及功能的扩展继续进行中
 
 # 分支说明
-## [2.4.5](https://gitee.com/top-discover/QuickFramework/tree/2.4.5)
-2.4.5 分支为 creator 版本在>=2.4.5版本以上使用，为2.4.x的对外分支
+## [2.4.7](https://gitee.com/top-discover/QuickFramework/tree/2.4.7)
+2.4.7 分支为 creator 版本在>=2.4.7版本以上使用，为2.4.x的对外分支
 ## [3.3.1](https://gitee.com/top-discover/QuickFramework/tree/3.3.1)
 3.3.1 分支为 creator 版本在>=3.3.1版本以上使用，为3.x的对外分支
 ## 其它分支为开发中的分支，请不要轻易使用
