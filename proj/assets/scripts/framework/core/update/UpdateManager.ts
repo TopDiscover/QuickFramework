@@ -200,7 +200,7 @@ export class UpdateManager {
      * @returns 
      */
     getStatus(bundle: string) {
-        if (sys.isBrowser) {
+        if (sys.isBrowser || this.isSkipCheckUpdate) {
             //浏览器无更新
             return Update.Status.UP_TO_DATE;
         }
