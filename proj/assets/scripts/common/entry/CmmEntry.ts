@@ -30,11 +30,11 @@ export class CmmEntry extends EntryDelegate {
         if (config) {
             let item = new UpdateItem(config);
             if (bundle == Macro.BUNDLE_RESOURCES) {
-                item.handler.delegate = getSingleton(MainUpdateHandlerImpl);
+                item.handler = getSingleton(MainUpdateHandlerImpl);
             } else if (bundle == Macro.BUNDLE_HALL) {
-                item.handler.delegate = getSingleton(HallUpdateHandlerImpl);
+                item.handler = getSingleton(HallUpdateHandlerImpl);
             } else {
-                item.handler.delegate = getSingleton(BundleUpdateHandlerImpl);
+                item.handler = getSingleton(BundleUpdateHandlerImpl);
             }
             return item;
         }
