@@ -37,69 +37,13 @@ export interface UpdateHandlerDelegate {
     onLoadBundleComplete(item: UpdateItem): void;
 }
 
-/**@description 更新项处理者 */
-export class UpdateHandler implements UpdateHandlerDelegate {
-
-    delegate: UpdateHandlerDelegate | null = null;
-    onNewVersionFund(item: UpdateItem): void {
-        if (this.delegate) this.delegate.onNewVersionFund(item);
-    }
-    onUpdateFailed(item: UpdateItem): void {
-        if (this.delegate) this.delegate.onUpdateFailed(item);
-    }
-    onPreVersionFailed(item: UpdateItem): void {
-        if (this.delegate) this.delegate.onPreVersionFailed(item);
-    }
-    onShowUpdating(item: UpdateItem): void {
-        if (this.delegate) this.delegate.onShowUpdating(item);
-    }
-    onNeedUpdateMain(item: UpdateItem): void {
-        if (this.delegate) this.delegate.onNeedUpdateMain(item);
-    }
-    onOther(item: UpdateItem): void {
-        if (this.delegate) this.delegate.onOther(item);
-    }
-    onDownloading(item: UpdateItem, info: Update.DownLoadInfo): void {
-        if (this.delegate) this.delegate.onDownloading(item, info);
-    }
-    onAreadyUpToData(item: UpdateItem): void {
-        if (this.delegate) this.delegate.onAreadyUpToData(item);
-    }
-    /**@description 下载更新完成 */
-    onDownloadComplete(item: UpdateItem): void {
-        if (this.delegate) this.delegate.onDownloadComplete(item);
-    }
-    onTryDownloadFailedAssets(item: UpdateItem): void {
-        if (this.delegate) this.delegate.onTryDownloadFailedAssets(item);
-    }
-    onStarCheckUpdate(item: UpdateItem): void {
-        if (this.delegate) this.delegate.onStarCheckUpdate(item);
-    }
-    /**@description 开始加载bundle */
-    onStartLoadBundle(item: UpdateItem): void {
-        if (this.delegate) this.delegate.onStarCheckUpdate(item);
-    }
-    /**@description 加载bundle错误 */
-    onLoadBundleError(item: UpdateItem, err: Error | null): void {
-        if (this.delegate) this.delegate.onLoadBundleError(item, err);
-    }
-    /**@description 加载bundle完成 */
-    onLoadBundleComplete(item: UpdateItem): void {
-        if (this.delegate) this.delegate.onLoadBundleComplete(item);
-    }
-    /**@description 加载bundle */
-    onLoadBundle(item: UpdateItem): void {
-        if (this.delegate) this.delegate.onLoadBundle(item);
-    }
-}
-
 export class UpdateItem {
     /**@description 更新项名字,如果大厅 */
     name: string = "";
     /**@description 更新项bundle名 */
     bundle: string = "";
     /**@description 处理者,统一指定，具体实现由内部的代理来处理 */
-    handler: UpdateHandler = new UpdateHandler();
+    handler: UpdateHandlerDelegate = null!;
     /**@description 更新用户自定义数据,多次点击，以最新数据为主 */
     userData: any = null;
 
