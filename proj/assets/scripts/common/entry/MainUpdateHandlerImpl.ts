@@ -2,9 +2,10 @@ import { Update } from "../../framework/core/update/Update";
 import { UpdateHandlerDelegate, UpdateItem } from "../../framework/core/update/UpdateItem";
 
 /**@description 主包更新代理 */
-export class MainUpdateHandlerImpl implements UpdateHandlerDelegate {
-    private static _instance: MainUpdateHandlerImpl = null!;
-    public static Instance() { return this._instance || (this._instance = new MainUpdateHandlerImpl()); }
+export class MainUpdateHandlerImpl implements UpdateHandlerDelegate , ISingleton{
+    static module: string = "【主包热更新】";
+    module: string = null!;
+    isResident = true;
     onNewVersionFund(item: UpdateItem): void {
         item.doUpdate();
     }

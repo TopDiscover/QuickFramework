@@ -88,11 +88,10 @@ class ToastItem extends Component {
     }
 }
 
-export default class Tips {
-
-    private static _instance: Tips = null!;
-    public static Instance() { return this._instance || (this._instance = new Tips()); }
-
+export default class Tips implements ISingleton{
+    static module: string = "【Tips】";
+    module: string = null!;
+    isResident = true;
     private _queue: Node[] = [];
 
     private readonly MAX_NUM = 3; // 最多可以同时显示多少个toast

@@ -5,20 +5,20 @@ import { LanguageEN } from "./LanguageEN";
 import { Macro } from "../../framework/defines/Macros";
 
 export class CommonLanguage implements Language.DataSourceDelegate{
-    name = Macro.BUNDLE_RESOURCES;
+    bundle = Macro.BUNDLE_RESOURCES;
     data( language : string , source : any): Language.Data {
 
         let data : any = source;
-        if( data[`${this.name}`] && data[`${this.name}`].language == language ){
+        if( data[`${this.bundle}`] && data[`${this.bundle}`].language == language ){
             return source;
         }
         let lan = LanguageZH;
         if (language == LanguageEN.language) {
             lan = LanguageEN;
         }
-        data[`${this.name}`] = {};
-        data[`${this.name}`] = lan.data;
-        data[`${this.name}`].language = lan.language;
+        data[`${this.bundle}`] = {};
+        data[`${this.bundle}`] = lan.data;
+        data[`${this.bundle}`].language = lan.language;
         //默认中文
         return source;
     }

@@ -12,9 +12,11 @@ type VERSIONS = { [key: string]: { md5: string, version: string } };
 /**
  * @description 热更新组件
  */
-export class UpdateManager {
-    private static _instance: UpdateManager = null!;
-    public static Instance() { return this._instance || (this._instance = new UpdateManager()); }
+export class UpdateManager implements ISingleton{
+    isResident?: boolean = true;
+    static module: string = "【更新管理器】";
+    module: string = null!;
+    
     /**@description 本地存储热更新文件的路径 */
     get storagePath() {
         return jsb.fileUtils.getWritablePath() + "caches/";
@@ -364,8 +366,9 @@ export class UpdateManager {
         });
     }
 
-    print(delegate: ManagerPrintDelegate<any>) {
-        delegate.print({ name: "预处理版本信息", data: this.preVersions });
-        delegate.print({ name: "远程版本信息", data: this.remoteVersions });
+    debug(){
+        Log.d(`-----------热火更新管理器中相关信息------------`);
+        Log.dump({ name: "预处理版本信息", data: this.preVersions });
+        Log.dump({ name: "远程版本信息", data: this.remoteVersions });
     }
 }

@@ -81,12 +81,9 @@ export class HttpPackage {
     }
 }
 
-export class HttpClient {
-
-    protected static _instance: HttpClient = null!;
-    public static Instance() {
-        return this._instance || (this._instance = new HttpClient());
-    }
+export class HttpClient implements ISingleton{
+    static module: string = "【Http管理器】";
+    module: string = null!;
     protected crossProxy(url: string): string {
         //浏览器，非调试模式下
         if (sys.isBrowser && !PREVIEW && HttpPackage.crossProxy) {

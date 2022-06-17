@@ -9,13 +9,19 @@ interface IEvent {
     callback: Function;//事件回调
 }
 
-export class Dispatcher {
+export class Dispatcher implements ISingleton {
 
-    private static _instance: Dispatcher = null!;
-    public static Instance() { return this._instance || (this._instance = new Dispatcher()); }
+    protected static _instance: Dispatcher = null!;
+    public static get instance() { return this._instance || (this._instance = new Dispatcher()); }
     private _eventCaches: { [key: string]: Array<IEvent> } = null!;
     constructor() {
         this._eventCaches = {};
+    }
+    isResident?: boolean = true;
+    static module: string = "【事件管理器】";
+    module: string = null!;
+    destory(){
+        Dispatcher._instance = null as any;
     }
     /**
      * @description 添加事件
@@ -96,5 +102,9 @@ export class Dispatcher {
 
 window.dispatch = function () {
     //向自己封闭的管理器中也分发
-    Reflect.apply(Dispatcher.Instance().dispatch,Dispatcher.Instance(),arguments);
+    if ( Manager ){
+        Reflect.apply(Manager.dispatcher.dispatch,Manager.dispatcher,arguments);
+    }else{
+        Reflect.apply(Dispatcher.instance.dispatch,Dispatcher.instance,arguments);
+    }
 }

@@ -3,11 +3,10 @@ import Loading from "./Loading";
 /**
  * @description 重连专用提示UI
  */
-export class UIReconnect  extends Loading{
-    protected static _instance: UIReconnect = null!;
-    public static Instance() { return this._instance || (this._instance = new UIReconnect()); }
-    
-
+export class UIReconnect  extends Loading implements ISingleton{
+    static module: string = "【重连提示】";
+    module: string = null!;
+    isResident = true;
     protected startTimeOutTimer(timeout: number){
         //do nothing
     }

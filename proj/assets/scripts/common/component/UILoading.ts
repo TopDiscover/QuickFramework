@@ -1,13 +1,13 @@
 import { find, instantiate, Label, Node, Prefab, Tween, tween, UIOpacity, Vec3 } from "cc";
-import { Macro } from "../../framework/defines/Macros";
 import { Config, ViewZOrder } from "../config/Config";
 /**
  * @description 加载动画
  */
 
-export default class UILoading {
-    private static _instance: UILoading = null!;
-    public static Instance() { return this._instance || (this._instance = new UILoading()); }
+export default class UILoading implements ISingleton{
+    static module: string = "【UILoading】";
+    module: string = null!;
+    isResident = true;
     /**@description 当前loading节点 */
     private node: Node = null!;
     private get prefab(){

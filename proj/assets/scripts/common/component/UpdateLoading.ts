@@ -4,9 +4,8 @@ import Loading from "./Loading";
  */
 
 export default class UpdateLoading extends Loading {
-    protected static _instance: UpdateLoading = null!;
-    public static Instance() { return this._instance || (this._instance = new UpdateLoading()); }
-
+    static module = "【UpdateLoading】";
+    module: string = null!;
     /**
      * @description 显示Loading
      * @param content 提示内容

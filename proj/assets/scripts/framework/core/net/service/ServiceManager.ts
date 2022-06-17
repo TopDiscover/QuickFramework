@@ -4,10 +4,9 @@
 
 import { Macro } from "../../../defines/Macros";
 
-export class ServiceManager implements GameEventInterface {
-
-    private static _instance: ServiceManager = null!;
-    public static Instance() { return this._instance || (this._instance = new ServiceManager()); }
+export class ServiceManager implements GameEventInterface , ISingleton {
+    static module: string = "【Service管理器】";
+    module: string = null!;
 
     /**@description 所有的网络 */
     protected services: Service[] = [];
@@ -40,16 +39,21 @@ export class ServiceManager implements GameEventInterface {
     }
 
     /**@description 销毁Service */
-    destory<T extends Service>(classOrName: ServiceClass<T> | string) {
-        let name = this.getModule(classOrName);
-        let i = this.services.length;
-        while (i--) {
-            if (this.services[i].module == name) {
-                //销毁前先关闭网络
-                this.services[i].close();
-                this.services.splice(i, 1);
+    destory<T extends Service>(classOrName?: ServiceClass<T> | string) {
+        if (classOrName) {
+            let name = this.getModule(classOrName);
+            let i = this.services.length;
+            while (i--) {
+                if (this.services[i].module == name) {
+                    //销毁前先关闭网络
+                    this.services[i].close();
+                    this.services.splice(i, 1);
+                }
             }
+        }else{
+            this.clear();
         }
+       
     }
 
     /**@description 清除Service */
@@ -83,12 +87,6 @@ export class ServiceManager implements GameEventInterface {
             name = classOrModule.module;
         }
         return name;
-    }
-
-    print(delegate: ManagerPrintDelegate<Service>) {
-        this.services.forEach((data) => {
-            delegate.print(data);
-        });
     }
 
     onDestroy() {
@@ -310,5 +308,22 @@ export class ServiceManager implements GameEventInterface {
             return true;
         }
         return false;
+    }
+
+    debug() {
+        Log.d(`-----------网络管理器中相关网络信息------------`);
+        this.services.forEach((service) => {
+            let content = `Module : ${service.module} , 进入后台的最大允许时间 : ${service.maxEnterBackgroundTime} , 优先级 : ${service.priority}`;
+            Log.d(content);
+            content = "重连信息 : "
+            if (service.reconnectHandler) {
+                content = `是否允许重连 : ${service.reconnectHandler.enabled}`
+            } else {
+                content += "无重连Handler";
+            }
+            Log.d(content);
+            content = `状态信息 , 是否允许连接网络 : ${service.enabled} 是否连接 : ${service.isConnected} 网络数据类型 : ${service.serviceType}`
+            Log.d(content);
+        });
     }
 }

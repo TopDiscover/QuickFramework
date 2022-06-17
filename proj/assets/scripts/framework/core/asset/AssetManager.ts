@@ -6,8 +6,6 @@ import { Resource } from "./Resource";
 class RemoteLoader {
 
     private _logTag = `[RemoteLoader] `;
-    private static _instance: RemoteLoader = null!;
-    public static Instance() { return this._instance || (this._instance = new RemoteLoader()); }
 
     public loadImage(url: string, isNeedCache: boolean) {
         let me = this;
@@ -201,13 +199,10 @@ class RemoteLoader {
 }
 
 
-export class _AssetManager {
-    private logTag = `[AssetManager]: `;
-    private static _instance: _AssetManager = null!;
-    public static Instance() {
-        return this._instance || (this._instance = new _AssetManager());
-    }
-
+export class _AssetManager implements ISingleton{
+    isResident?: boolean = true;
+    static module: string = "【AssetManager】";
+    module: string = null!;
     private _remote = new RemoteLoader();
     public get remote() { return this._remote; }
     /**
@@ -233,13 +228,13 @@ export class _AssetManager {
             if (cache.isLoaded) {
                 //已经加载完成
                 if (DEBUG && cache.status == Resource.CacheStatus.WAITTING_FOR_RELEASE) {
-                    Log.w(this.logTag, `资源:${path} 等待释放，但资源已经加载完成，此时有人又重新加载，不进行释放处理`);
+                    Log.w(this.module, `资源:${path} 等待释放，但资源已经加载完成，此时有人又重新加载，不进行释放处理`);
                 }
                 //加载完成
                 onComplete(cache);
             } else {
                 if (DEBUG && cache.status == Resource.CacheStatus.WAITTING_FOR_RELEASE) {
-                    Log.w(this.logTag, `资源:${path}等待释放，但资源处理加载过程中，此时有人又重新加载，不进行释放处理`);
+                    Log.w(this.module, `资源:${path}等待释放，但资源处理加载过程中，此时有人又重新加载，不进行释放处理`);
                 }
                 cache.finishCb.push(onComplete);
             }
@@ -263,7 +258,7 @@ export class _AssetManager {
             let _bundle = this.getBundle(bundle);
             if (!_bundle) {
                 //如果bundle不存在
-                let error = new Error(`${this.logTag} ${bundle} 没有加载，请先加载`);
+                let error = new Error(`${this.module} ${bundle} 没有加载，请先加载`);
                 this._onLoadComplete(cache, onComplete, error, null);
                 return;
             }
@@ -285,14 +280,14 @@ export class _AssetManager {
         //添加引用关系
         let tempCache = cache;
         if (err) {
-            Log.e(`${this.logTag}加载资源失败:${cache.info.url} 原因:${err.message ? err.message : "未知"}`);
+            Log.e(`${this.module}加载资源失败:${cache.info.url} 原因:${err.message ? err.message : "未知"}`);
             cache.data = null;
             tempCache.data = null;
             Manager.cache.remove(cache.info.bundle, cache.info.url);
             complete(cache);
         }
         else {
-            if (DEBUG) Log.d(`${this.logTag}加载资源成功:${cache.info.url}`);
+            if (DEBUG) Log.d(`${this.module}加载资源成功:${cache.info.url}`);
             cache.data = data;
             tempCache.data = data;
             complete(cache);
@@ -303,7 +298,7 @@ export class _AssetManager {
         cache.doGet(tempCache.data);
 
         if (cache.status == Resource.CacheStatus.WAITTING_FOR_RELEASE) {
-            if (DEBUG) Log.w(this.logTag, `资源:${cache.info.url}加载完成，但缓存状态为等待销毁，销毁资源`);
+            if (DEBUG) Log.w(this.module, `资源:${cache.info.url}加载完成，但缓存状态为等待销毁，销毁资源`);
             if (cache.data) {
                 cache.status = Resource.CacheStatus.NONE;
                 let info = new Resource.Info;
@@ -333,13 +328,13 @@ export class _AssetManager {
             if (cache.isLoaded) {
                 //已经加载完成
                 if (DEBUG && cache.status == Resource.CacheStatus.WAITTING_FOR_RELEASE) {
-                    Log.w(this.logTag, `资源:${path} 等待释放，但资源已经加载完成，此时有人又重新加载，不进行释放处理`);
+                    Log.w(this.module, `资源:${path} 等待释放，但资源已经加载完成，此时有人又重新加载，不进行释放处理`);
                 }
                 //加载完成
                 onComplete(cache);
             } else {
                 if (DEBUG && cache.status == Resource.CacheStatus.WAITTING_FOR_RELEASE) {
-                    Log.w(this.logTag, `资源:${path}等待释放，但资源处理加载过程中，此时有人又重新加载，不进行释放处理`);
+                    Log.w(this.module, `资源:${path}等待释放，但资源处理加载过程中，此时有人又重新加载，不进行释放处理`);
                 }
                 cache.finishCb.push(onComplete);
             }
@@ -363,7 +358,7 @@ export class _AssetManager {
             let _bundle = this.getBundle(bundle);
             if (!_bundle) {
                 //如果bundle不存在
-                let error = new Error(`${this.logTag} ${bundle} 没有加载，请先加载`);
+                let error = new Error(`${this.module} ${bundle} 没有加载，请先加载`);
                 this._onLoadComplete(cache, onComplete, error, null);
                 return;
             }

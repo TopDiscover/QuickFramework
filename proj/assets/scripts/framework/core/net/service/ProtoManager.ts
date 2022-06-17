@@ -1,18 +1,22 @@
-import { TextAsset } from "cc";
+import { sys, TextAsset } from "cc";
 import { DEBUG } from "cc/env";
 import { Resource } from "../../asset/Resource";
 import { Net } from "../Net";
 
-export class ProtoManager {
-    private static _instance: ProtoManager = null!;
-    public static Instance() { return this._instance || (this._instance = new ProtoManager()); }
-    private tag = "[ProtoManager] : "
+export class ProtoManager implements ISingleton{
+    
     /**@description 记录已经加载过的目录，加载过的proto将不会重新加载 */
     private _loadDir : {[key : string] : boolean} = {};
 
     private _root: protobuf.Root = null!;
     constructor() {
         this._root = new protobuf.Root();
+    }
+    static module: string = "【Protobuf协议管理器】";
+    module: string = null!;
+
+    destory(){
+        this.unload();
     }
 
     /**
@@ -25,7 +29,7 @@ export class ProtoManager {
         return new Promise<boolean>((resolove, reject) => {
             if( this._loadDir[`${bundle}/${path}`] ){
                 if ( DEBUG ){
-                    Log.w(this.tag,`${bundle}/${path}目录下所有proto文件已经存在，无需加载`);
+                    Log.w(this.module,`${bundle}/${path}目录下所有proto文件已经存在，无需加载`);
                 }
                 resolove(true);
                 return;
@@ -81,9 +85,12 @@ export class ProtoManager {
         return null;
     }
 
-    print( delegate : ManagerPrintDelegate<{[key : string] : boolean}>){
-        if( delegate ){
-            delegate.print(this._loadDir);
+    debug(){
+        Log.d(`-------Proto文件加载信息,所有proto文件都加载在同一个root下,文件加载完成后，资源文件就会初释放-------`);
+        if (sys.isNative) {
+            Log.dump(this._loadDir);
+        } else {
+            Log.d(this._loadDir);
         }
     }
 }

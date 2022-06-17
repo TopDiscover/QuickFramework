@@ -4,9 +4,11 @@ import { Macro } from "../../framework/defines/Macros";
 import { Global } from "../data/Global";
 
 /**@description 大厅更新代理 */
-export class HallUpdateHandlerImpl implements UpdateHandlerDelegate {
-    private static _instance: HallUpdateHandlerImpl = null!;
-    public static Instance() { return this._instance || (this._instance = new HallUpdateHandlerImpl()); }
+export class HallUpdateHandlerImpl implements UpdateHandlerDelegate , ISingleton{
+    static module = "【大厅热更新】"
+    module: string = null!;
+    isResident = true;
+    
     onNewVersionFund(item: UpdateItem): void {
         item.doUpdate();
     }

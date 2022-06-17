@@ -1,12 +1,9 @@
 import UIView from "../ui/UIView";
 import { DEBUG } from "cc/env";
-import { Asset, assetManager, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D, ImageAsset } from "cc";
+import { Asset, assetManager, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D, ImageAsset, ISocketData } from "cc";
 import { Resource } from "./Resource";
 import { Macro } from "../../defines/Macros";
 class ResourceCache {
-    print( delegate : CacheManagerPrintDelegate<Map<string,Resource.CacheData>,Map<string, CacheInfo>>) {
-        delegate.printLocal(this._caches,this.name);
-    }
 
     private _caches = new Map<string, Resource.CacheData>();
     private name = Macro.UNKNOWN;
@@ -60,6 +57,40 @@ class ResourceCache {
 
     public get size() {
         return this._caches.size;
+    }
+
+    debug(){
+        let key = this.name;
+        let caches = this._caches;
+        if (DEBUG) Log.d(`----------------Bundle ${key} 资源缓存信息开始----------------`)
+        let content: any[] = [];
+        let invalidContent: any[] = [];
+        caches.forEach((data, key, source) => {
+            let itemContent = {
+                url: data.info.url,
+                isLoaded: data.isLoaded,
+                isValid: isValid(data.data),
+                assetType: js.getClassName(data.info.type),
+                data: data.data ? js.getClassName(data.data) : null,
+                status: data.status
+            }
+            let item = { url: key, data: itemContent };
+
+            if (data.isLoaded && data.data && !isValid(data.data)) {
+                invalidContent.push(item);
+            } else {
+                content.push(item);
+            }
+        });
+        if (content.length > 0) {
+            Log.d(`----------- 有效缓存信息 -----------`);
+            Log.d(JSON.stringify(content));
+        }
+        if (invalidContent.length > 0) {
+            Log.d(`----------- 无效缓存信息 -----------`);
+            Log.d(JSON.stringify(invalidContent));
+        }
+        if (DEBUG) Log.d(`----------------Bundle ${key} 资源缓存信息结束----------------`)
     }
 }
 
@@ -207,18 +238,70 @@ class RemoteCaches {
         return this._caches.delete(url);
     }
 
-    print(delegate : CacheManagerPrintDelegate<Map<string,Resource.CacheData>,Map<string, CacheInfo>>) {
-        delegate.printRemote(this._spriteFrameCaches,this._caches,this._resMap);
+    debug(){
+        let spCaches = this._spriteFrameCaches;
+        let caches = this._caches;
+        let infos = this._resMap;
+        Log.d(`---- 远程加载资源缓存信息 ----`);
+
+        let content: any[] = [];
+        let invalidContent: any[] = [];
+        spCaches.forEach((data, key, source) => {
+            let itemContent = { url: data.info.url, isLoaded: data.isLoaded, isValid: isValid(data.data), assetType: js.getClassName(data.info.type), data: data.data ? js.getClassName(data.data) : null, status: data.status };
+            let item = { url: key, data: itemContent };
+            if (data.isLoaded && ((data.data && !isValid(data.data)) || !data.data)) {
+                invalidContent.push(item);
+            } else {
+                content.push(item);
+            }
+        });
+
+        if (content.length > 0) {
+            Log.d(`----------------有效 spriteFrame 缓存信息------------------`);
+            Log.d(JSON.stringify(content));
+        }
+        if (invalidContent.length > 0) {
+            Log.d(`----------------无效 spriteFrame 缓存信息------------------`);
+            Log.d(JSON.stringify(invalidContent));
+        }
+
+
+        content = [];
+        invalidContent = [];
+        caches.forEach((data, key, source) => {
+            let itemContent = { url: data.info.url, isLoaded: data.isLoaded, isValid: isValid(data.data), assetType: js.getClassName(data.info.type), data: data.data ? js.getClassName(data.data) : null, status: data.status }
+            let item = { url: key, data: itemContent };
+            if (data.isLoaded && data.data && !isValid(data.data)) {
+                invalidContent.push(item);
+            } else {
+                content.push(item);
+            }
+        });
+        if (content.length > 0) {
+            Log.d(`----------------有效缓存信息------------------`);
+            Log.d(JSON.stringify(content));
+        }
+        if (invalidContent.length > 0) {
+            Log.d(`----------------无效缓存信息------------------`);
+            Log.d(JSON.stringify(invalidContent));
+        }
+
+        if (infos.size > 0) {
+            Log.d(`----------------当前资源引用计数信息------------------`);
+            content = [];
+            infos.forEach((value, key) => {
+                let item = { url: key, data: { refCount: value.refCount, url: value.url, retain: value.retain } };
+                content.push(item);
+            });
+            Log.d(JSON.stringify(content));
+        }
     }
 }
 
-export class CacheManager {
-    private logTag = `[CacheManager]: `;
-    private static _instance: CacheManager = null!;
-    public static Instance() {
-        return this._instance || (this._instance = new CacheManager());
-    }
-
+export class CacheManager implements ISingleton{
+    isResident?: boolean = true;
+    static module: string = "【缓存管理器】";
+    module: string = null!;
     private _bundles = new Map<string, ResourceCache>();
     private _remoteCaches = new RemoteCaches();
     public get remoteCaches() { return this._remoteCaches; }
@@ -324,16 +407,16 @@ export class CacheManager {
 
     private _getGetCacheByAsyncArgs(): { url: string, type: typeof Asset, bundle: BUNDLE_TYPE } | null {
         if (arguments.length < 3) {
-            if (DEBUG) Log.e(`${this.logTag}参数传入有误，必须两个参数`);
+            if (DEBUG) Log.e(`${this.module}参数传入有误，必须两个参数`);
             return null;
         }
         if (typeof arguments[0] != "string") {
-            if (DEBUG) Log.e(`${this.logTag}传入第一个参数有误,必须是string`);
+            if (DEBUG) Log.e(`${this.module}传入第一个参数有误,必须是string`);
             return null;
         }
 
         if (!js.isChildClassOf(arguments[1], Asset)) {
-            if (DEBUG) Log.e(`${this.logTag}传入的第二个参数有误,必须是cc.Asset的子类`);
+            if (DEBUG) Log.e(`${this.module}传入的第二个参数有误,必须是cc.Asset的子类`);
             return null;
         }
         return { url: arguments[0], type: arguments[1], bundle: arguments[2] };
@@ -363,7 +446,7 @@ export class CacheManager {
                         if (cache.data instanceof _args.type) {
                             resolve(cache.data);
                         } else {
-                            if (DEBUG) Log.e(`${this.logTag}传入类型:${js.getClassName(_args.type)}与资源实际类型: ${js.getClassName(cache.data as any)}不同 url : ${cache.info.url}`);
+                            if (DEBUG) Log.e(`${this.module}传入类型:${js.getClassName(_args.type)}与资源实际类型: ${js.getClassName(cache.data as any)}不同 url : ${cache.info.url}`);
                             resolve(null);
                         }
                     } else {
@@ -405,7 +488,7 @@ export class CacheManager {
                         if (cache && cache.data && cache.data instanceof args.type) {
                             resolve(cache.data);
                         } else {
-                            Log.e(`${this.logTag}加载失败 : ${args.url}`);
+                            Log.e(`${this.module}加载失败 : ${args.url}`);
                             resolve(null);
                         }
                     });
@@ -455,10 +538,11 @@ export class CacheManager {
         });
     }
 
-    print( delegate : CacheManagerPrintDelegate<Map<string,Resource.CacheData>,Map<string, CacheInfo>>){
-        this._bundles.forEach((value, key, originMap) => {
-            value.print(delegate);
+    debug(){
+        this._bundles.forEach(v => {
+            v.debug();
         });
-        this.remoteCaches.print(delegate);
+
+        this.remoteCaches.debug();
     }
 }

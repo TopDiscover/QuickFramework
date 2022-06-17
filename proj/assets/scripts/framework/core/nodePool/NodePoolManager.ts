@@ -78,11 +78,9 @@ export class NodePool {
 /**
  * 对象池管理器
  */
-export class NodePoolManager {
-
-    private static _instance: NodePoolManager = null!;
-    public static Instance() { return this._instance || (this._instance = new NodePoolManager()); }
-
+export class NodePoolManager implements ISingleton {
+    static module: string = "【对象池】";
+    module: string = null!;
     private pools: Map<string, NodePool> = new Map();
 
     /**
@@ -131,8 +129,11 @@ export class NodePoolManager {
         }
     }
 
-    print( delegate : ManagerPrintDelegate<Map<string, NodePool>>){
-        delegate.print(this.pools);
+    debug(){
+        Log.d(`-------对象池节点缓存信息-------`);
+        this.pools.forEach((data, key) => {
+            Log.d(key);
+        })
     }
 
 }

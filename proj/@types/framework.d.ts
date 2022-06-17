@@ -110,17 +110,6 @@ declare interface GameEventInterface {
 	onEnterForgeground(inBackgroundTime: number): void;
 }
 
-declare interface Singleton<T> {
-	new(): T;
-	/**
-	 *@description 单例统一实现 
-	 */
-	Instance(): T;
-}
-
-/**@description 获取根据类型获取单列 */
-declare function getSingleton<T>(SingletonClass: Singleton<T>): T;
-
 declare type UIView = import("../assets/scripts/framework/core/ui/UIView").default;
 declare interface UIClass<T extends UIView> {
 	new(): T;
@@ -134,6 +123,32 @@ declare interface UIClass<T extends UIView> {
 	getPrefabUrl(): string;
 }
 
+/**
+ * @description 单列接口类
+ */
+ declare interface ISingleton{
+    /**@description 初始化 */
+    init?(...args:any[]):any;
+    /**@description 销毁(单列销毁时调用) */
+    destory?(...args:any[]) : any;
+    /**@description 清理数据 */
+    clear?(...args:any[]) : any;
+	/**@description 是否常驻，即创建后不会删除 */
+	isResident?:boolean;
+	/**@description 不用自己设置，由单列管理器赋值 */
+	module : string;
+	/**输出调试信息 */
+	debug?(...args:any[]):void;
+}
+
+/**@description 单列类型限制 */
+declare interface SingletonClass<T> {
+	new(): T;
+	/**@description 模块名 */
+	module: string;
+	instance?:T;
+}
+
 declare interface BundleClass<T> {
 	new(): T;
 	/**@description 当前bundle名 */
@@ -144,8 +159,12 @@ declare type Entry = import("../assets/scripts/framework/core/entry/Entry").Entr
 declare interface EntryClass<T extends Entry> extends BundleClass<T> {
 }
 
+declare interface DataClass<T> extends ISingleton {
+	new(): T;
+}
+
 declare type GameData = import("../assets/scripts/framework/data/GameData").GameData;
-declare interface GameDataClass<T extends GameData> extends BundleClass<T> {
+declare interface GameDataClass<T extends GameData> extends DataClass<T> {
 }
 
 declare type Logic = import("../assets/scripts/framework/core/logic/Logic").Logic;
@@ -172,9 +191,6 @@ declare interface HandlerClass<T extends Handler> extends ModuleClass<T> {
 }
 
 declare type ReconnectHandler = import("../assets/scripts/common/net/ReconnectHandler").ReconnectHandler;
-declare interface ReconnectHandlerClass<T extends ReconnectHandler> {
-	new(service: Service): T;
-}
 
 declare type Service = import("../assets/scripts/framework/core/net/service/Service").Service;
 declare interface ServiceClass<T extends Service> extends ModuleClass<T> {
@@ -253,30 +269,9 @@ declare namespace Language {
 	 * 如果是公共总合，name使用 td.COMMON_LANGUAGE_NAME
 	 **/
 	export interface DataSourceDelegate {
-		name: string;
+		bundle: string;
 		data(language: string,source:any): Data;
 	}
-}
-
-/**@description 各管理器打印输出代理 */
-declare interface ManagerPrintDelegate<T> {
-	print(data: T): void;
-}
-
-declare interface UIManagerPrintDelegate<T, U, V> {
-	printViews?(data: T, key: string): void;
-	printChildren?(data: U): void;
-	printComp?(data: V): void;
-}
-
-declare interface CacheManagerPrintDelegate<T, U> {
-	printLocal(data: T, key: string): void;
-	printRemote(spriteFrameCaches: T, caches: T, infos: U): void;
-}
-
-declare interface NetHelperPrintDelegate<T, U> {
-	printSender?(data: T): void;
-	printHander?(data: U): void;
 }
 
 /**@description 视图打开，关闭，隐藏动画 */

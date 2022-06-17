@@ -6,9 +6,9 @@ import { AssetManager, assetManager } from "cc";
 import { Macro } from "../../defines/Macros";
 import { UpdateItem } from "../update/UpdateItem";
 
-export class BundleManager {
-   private static _instance: BundleManager = null!;
-   public static Instance() { return this._instance || (this._instance = new BundleManager()); }
+export class BundleManager implements ISingleton{
+   static module: string = "【Bundle管理器】";
+   module: string = null!;
    protected isEngineBundle(key: string) {
       if (key == AssetManager.BuiltinBundleName.MAIN ||
          key == AssetManager.BuiltinBundleName.RESOURCES || key == AssetManager.BuiltinBundleName.START_SCENE) {
@@ -101,21 +101,12 @@ export class BundleManager {
       });
    }
 
-   /**
-    * @description 打印bundle管理器状态信息
-    * @param delegate 
-    */
-   print(delegate: ManagerPrintDelegate<{
-      loaded: AssetManager.Bundle[], //已在加载的bundle
-   }>) {
-      if (delegate) {
-         let loaded: AssetManager.Bundle[] = [];
-         assetManager.bundles.forEach((bundle, key) => {
-            loaded.push(bundle);
-         });
-         delegate.print({
-            loaded: loaded
-         })
-      }
+   debug(){
+      Log.d(`-------Bundle管理器状态信息-------`);
+      let loaded: string[] = [];
+      assetManager.bundles.forEach((bundle, key) => {
+            loaded.push(bundle.name);
+      });
+      Log.d(`当前所有加载完成的bundle : ${loaded.toString()}`);
    }
 }

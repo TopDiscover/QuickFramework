@@ -18,6 +18,7 @@ import NetHelper from "./core/net/service/NetHelper";
 import { ServiceManager } from "./core/net/service/ServiceManager";
 import { ReleaseManager } from "./core/asset/ReleaseManager";
 import { HttpClient } from "./core/net/http/HttpClient";
+import { Singleton } from "./utils/Singleton";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
@@ -29,68 +30,72 @@ export class Framewok {
 
     /**@description 瓷业释放管理 */
     get releaseManger(){
-        return getSingleton(ReleaseManager);
+        return Singleton.instance.get(ReleaseManager) as ReleaseManager;
     }
 
     /**@description 网络Service管理器 */
     get serviceManager() {
-        return getSingleton(ServiceManager);
+        return Singleton.instance.get(ServiceManager) as ServiceManager;
     }
     
     /**@description 网络辅助类 */
     get netHelper(){
-        return getSingleton(NetHelper);
+        return Singleton.instance.get(NetHelper) as NetHelper;
     }
 
     /**@description 日志 */
     get logger(){
-        return getSingleton(LoggerImpl);
+        return Singleton.instance.get(LoggerImpl) as LoggerImpl;
     }
 
     /**@description 逻辑管理器 */
     get logicManager(){
-        return getSingleton(LogicManager);
+        return Singleton.instance.get(LogicManager) as LogicManager;
     }
 
     /**@description 数据中心 */
     get dataCenter(){
-        return getSingleton(DataCenter);
+        return Singleton.instance.get(DataCenter) as DataCenter;
     }
 
     /**@description 入口管理器 */
     get entryManager(){
-        return getSingleton(EntryManager);
+        return Singleton.instance.get(EntryManager) as EntryManager;
     }
 
     /**@description protobuf类型管理 */
     get protoManager(){
-        return getSingleton(ProtoManager);
+        return Singleton.instance.get(ProtoManager) as ProtoManager;
     }
 
     /**@description bundle管理器 */
     get bundleManager() {
-        return getSingleton(BundleManager);
+        return Singleton.instance.get(BundleManager) as BundleManager;
     }
 
     /**@description 热更新管理器 */
-    get updateManager() { return getSingleton(UpdateManager) }
+    get updateManager() { 
+        return Singleton.instance.get(UpdateManager) as UpdateManager;
+    }
 
     /**@description 常驻资源指定的模拟view */
-    get retainMemory() : any { return this.uiManager.retainMemory; }
+    get retainMemory() : any { 
+        return this.uiManager.retainMemory; 
+    }
 
     /**@description 语言包 */
     get language() {
-        return getSingleton(Language);
+        return Singleton.instance.get(Language) as Language;
     }
 
     /**@description 事件派发器 */
     get dispatcher() {
-        return getSingleton(Dispatcher);
+        return Singleton.instance.get(Dispatcher) as Dispatcher;
     }
 
     /**@description 界面管理器 */
     get uiManager() {
-        return getSingleton(UIManager);
+        return Singleton.instance.get(UIManager) as UIManager;
     }
 
     /**
@@ -98,12 +103,12 @@ export class Framewok {
      * @deprecated 该接口已经弃用，请用使用storage替换
      * */
     get localStorage() {
-        return getSingleton(LocalStorage);
+        return this.storage;
     }
 
     /**@description 本地仓库 */
     get storage() {
-        return getSingleton(LocalStorage);
+        return Singleton.instance.get(LocalStorage) as LocalStorage;
     }
 
     /**
@@ -111,12 +116,12 @@ export class Framewok {
      * @deprecated 该接口已经弃用，请用使用asset替换
      * */
     get assetManager() {
-        return getSingleton(_AssetManager);
+        return this.asset;
     }
 
     /**@description 资源管理器 */
     get asset() {
-        return getSingleton(_AssetManager);
+        return Singleton.instance.get(_AssetManager) as _AssetManager;
     }
 
     /**
@@ -124,12 +129,12 @@ export class Framewok {
      * @deprecated 该接口已经弃用，请用使用cache替换
      * */
     get cacheManager() {
-        return getSingleton(CacheManager);
+        return this.cache;
     }
 
     /**@description 资源缓存管理器 */
     get cache() {
-        return getSingleton(CacheManager);
+        return Singleton.instance.get(CacheManager) as CacheManager;
     }
 
     /**
@@ -142,11 +147,11 @@ export class Framewok {
 
     /**@description 对象池管理器 */
     get pool(){
-        return getSingleton(NodePoolManager);
+        return Singleton.instance.get(NodePoolManager) as NodePoolManager;
     }
 
     get http(){
-        return getSingleton(HttpClient);
+        return Singleton.instance.get(HttpClient) as HttpClient;
     }
 
     /**@description 小提示 */

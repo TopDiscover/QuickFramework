@@ -2,6 +2,7 @@
 import { _decorator, Component, Node, find, setDisplayStats, isDisplayStats, Toggle, js, isValid, sys, SystemEvent, view, UITransform, Widget } from 'cc';
 import { DEBUG } from 'cc/env';
 import { LogLevel } from '../../framework/defines/Enums';
+import { Singleton } from '../../framework/utils/Singleton';
 import { Config } from '../config/Config';
 const { ccclass, property } = _decorator;
 
@@ -48,6 +49,8 @@ export class DebugView extends Component {
         this.bindEvent("releaseManager", this.onReleaseManager);
         //适配器
         this.bindEvent("adaptor", this.onAdaptor);
+        //当前所有单例
+        this.bindEvent("singleton", this.onSingleton);
         this.doOther();
     }
     debug: Node = null!;
@@ -116,67 +119,27 @@ export class DebugView extends Component {
     }
 
     private onLogicManager() {
-        Log.d(`-------逻辑管理器数据-------`)
-        Manager.logicManager.print({
-            print: (data) => {
-                Log.d(js.getClassName(data));
-            }
-        });
+        Manager.logicManager.debug();
     }
 
     private onDataCenter() {
-        Log.d(`-------数据中心-------`)
-        Manager.dataCenter.print({
-            print: (data) => {
-                Log.dump(data);
-            }
-        });
+        Manager.dataCenter.debug();
     }
 
     private onEntry() {
-        Log.d(`-------Bundle入口管理器-------`)
-        Manager.entryManager.print({
-            print: (data) => {
-                Log.d(`bundle : ${data.bundle}`);
-            }
-        })
+        Manager.entryManager.debug();
     }
 
     private onProto() {
-        Log.d(`-------Proto文件加载信息,所有proto文件都加载在同一个root下,文件加载完成后，资源文件就会初释放-------`);
-        Manager.protoManager.print({
-            print: (data) => {
-                if (sys.isNative) {
-                    Log.dump(data);
-                } else {
-                    Log.d(data);
-                }
-            }
-        })
+        Manager.protoManager.debug()
     }
 
     private onBundleMgr() {
-        Log.d(`-------Bundle管理器状态信息-------`);
-        Manager.bundleManager.print({
-            print: (data) => {
-                let bundles = [];
-                for (let i = 0; i < data.loaded.length; i++) {
-                    bundles.push(data.loaded[i].name);
-                }
-                Log.d(`当前所有加载完成的bundle : ${bundles.toString()}`);
-            }
-        })
+        Manager.bundleManager.debug();
     }
 
     private onPool() {
-        Log.d(`-------对象池节点缓存信息-------`);
-        Manager.pool.print({
-            print: (source) => {
-                source.forEach((data, key) => {
-                    Log.d(key);
-                })
-            }
-        })
+        Manager.pool.debug();
     }
 
     private onLog() {
@@ -189,165 +152,31 @@ export class DebugView extends Component {
     }
 
     private onShowUI() {
-        Log.d(`-----------当前所有视图------------`);
-        Manager.uiManager.print({
-            printViews: (value, key) => {
-                Log.d(`[${key}] isLoaded : ${value.isLoaded} status : ${value.status} view : ${js.getClassName(value.view)} active : ${value.view && value.view.node ? value.view.node.active : false}`);
-            }
-        })
+        Manager.uiManager.debug({showViews:true});
     }
 
     private onShowNode() {
-        Log.d(`-----------当前所有节点信息------------`);
-        Manager.uiManager.print({
-            printChildren: (data) => {
-                Log.d(`${data.name} active : ${data.active}`);
-            }
-        })
+        Manager.uiManager.debug({showChildren:true});
     }
 
     private onShowRes() {
-        Manager.cache.print({
-            printLocal: (caches, key) => {
-                if (DEBUG) Log.d(`----------------Bundle ${key} 资源缓存信息开始----------------`)
-                let content: any[] = [];
-                let invalidContent: any[] = [];
-                caches.forEach((data, key, source) => {
-                    let itemContent = {
-                        url: data.info.url,
-                        isLoaded: data.isLoaded,
-                        isValid: isValid(data.data),
-                        assetType: js.getClassName(data.info.type),
-                        data: data.data ? js.getClassName(data.data) : null,
-                        status: data.status
-                    }
-                    let item = { url: key, data: itemContent };
-
-                    if (data.isLoaded && data.data && !isValid(data.data)) {
-                        invalidContent.push(item);
-                    } else {
-                        content.push(item);
-                    }
-                });
-                if (content.length > 0) {
-                    Log.d(`----------- 有效缓存信息 -----------`);
-                    Log.d(JSON.stringify(content));
-                }
-                if (invalidContent.length > 0) {
-                    Log.d(`----------- 无效缓存信息 -----------`);
-                    Log.d(JSON.stringify(invalidContent));
-                }
-                if (DEBUG) Log.d(`----------------Bundle ${key} 资源缓存信息结束----------------`)
-            },
-            printRemote: (spCaches, caches, infos) => {
-                Log.d(`---- 远程加载资源缓存信息 ----`);
-
-                let content: any[] = [];
-                let invalidContent: any[] = [];
-                spCaches.forEach((data, key, source) => {
-                    let itemContent = { url: data.info.url, isLoaded: data.isLoaded, isValid: isValid(data.data), assetType: js.getClassName(data.info.type), data: data.data ? js.getClassName(data.data) : null, status: data.status };
-                    let item = { url: key, data: itemContent };
-                    if (data.isLoaded && ((data.data && !isValid(data.data)) || !data.data)) {
-                        invalidContent.push(item);
-                    } else {
-                        content.push(item);
-                    }
-                });
-
-                if (content.length > 0) {
-                    Log.d(`----------------有效 spriteFrame 缓存信息------------------`);
-                    Log.d(JSON.stringify(content));
-                }
-                if (invalidContent.length > 0) {
-                    Log.d(`----------------无效 spriteFrame 缓存信息------------------`);
-                    Log.d(JSON.stringify(invalidContent));
-                }
-
-
-                content = [];
-                invalidContent = [];
-                caches.forEach((data, key, source) => {
-                    let itemContent = { url: data.info.url, isLoaded: data.isLoaded, isValid: isValid(data.data), assetType: js.getClassName(data.info.type), data: data.data ? js.getClassName(data.data) : null, status: data.status }
-                    let item = { url: key, data: itemContent };
-                    if (data.isLoaded && data.data && !isValid(data.data)) {
-                        invalidContent.push(item);
-                    } else {
-                        content.push(item);
-                    }
-                });
-                if (content.length > 0) {
-                    Log.d(`----------------有效缓存信息------------------`);
-                    Log.d(JSON.stringify(content));
-                }
-                if (invalidContent.length > 0) {
-                    Log.d(`----------------无效缓存信息------------------`);
-                    Log.d(JSON.stringify(invalidContent));
-                }
-
-                if (infos.size > 0) {
-                    Log.d(`----------------当前资源引用计数信息------------------`);
-                    content = [];
-                    infos.forEach((value, key) => {
-                        let item = { url: key, data: { refCount: value.refCount, url: value.url, retain: value.retain } };
-                        content.push(item);
-                    });
-                    Log.d(JSON.stringify(content));
-                }
-            }
-        })
+        Manager.cache.debug();
     }
 
     private onShowComp() {
-        Log.d(`-----------当前所有组件信息------------`);
-        Manager.uiManager.print({
-            printComp: (data) => {
-                Log.d(js.getClassName(data));
-            }
-        })
+        Manager.uiManager.debug({showComp:true});
     }
 
     private onNetHelper() {
-        Log.d(`-----------网络辅助相关信息------------`);
-        Log.d(`-----------当前所有Sender------------`);
-        Manager.netHelper.print({
-            printSender: (data) => {
-                Log.d(data.module);
-            }
-        });
-        Log.d(`-----------当前所有Handler------------`);
-        Manager.netHelper.print({
-            printHander: (data) => {
-                Log.d(data.module);
-            }
-        })
+        Manager.netHelper.debug();
     }
 
     private onServiceManager() {
-        Log.d(`-----------网络管理器中相关网络信息------------`);
-        Manager.serviceManager.print({
-            print: (service) => {
-                let content = `Module : ${service.module} , 进入后台的最大允许时间 : ${service.maxEnterBackgroundTime} , 优先级 : ${service.priority}`;
-                Log.d(content);
-                content = "重连信息 : "
-                if (service.reconnectHandler) {
-                    content = `是否允许重连 : ${service.reconnectHandler.enabled}`
-                } else {
-                    content += "无重连Handler";
-                }
-                Log.d(content);
-                content = `状态信息 , 是否允许连接网络 : ${service.enabled} 是否连接 : ${service.isConnected} 网络数据类型 : ${service.serviceType}`
-                Log.d(content);
-            }
-        })
+        Manager.serviceManager.debug();
     }
 
     private onHotUpdate() {
-        Log.d(`-----------热火更新管理器中相关信息------------`);
-        Manager.updateManager.print({
-            print: (data) => {
-                Log.dump(data.data, data.name);
-            }
-        })
+        Manager.updateManager.debug()
     }
 
     private onLowMemory() {
@@ -355,31 +184,7 @@ export class DebugView extends Component {
     }
 
     private onReleaseManager() {
-        Manager.releaseManger.print({
-            print: (data) => {
-                if (Manager.isLazyRelease) {
-                    if (data.bundles.length > 0) {
-                        Log.d(`待释放Bundle : ${data.bundles.toString()}`);
-                    }
-                    if (data.lazyInfo.size > 0) {
-                        data.lazyInfo.forEach((value, key, source) => {
-                            Log.d(`--------------${key}待释放资源--------------`);
-                            value.assets.forEach((info, key, source) => {
-                                Log.d(`${info.url}`);
-                            })
-                        });
-                    }
-
-                    Log.d(`远程待释放资源`);
-                    data.remote.assets.forEach((info, key, source) => {
-                        Log.d(`${info.url}`);
-                    });
-
-                } else {
-                    Log.w(`未开户懒释放功能!!!!`);
-                }
-            }
-        })
+        Manager.releaseManger.debug()
     }
 
     private onAdaptor() {
@@ -394,6 +199,10 @@ export class DebugView extends Component {
         let designRate = view.getDesignResolutionSize().width/view.getDesignResolutionSize().height;
         Log.d(`视图宽高比:${viewRate}`);
         Log.d(`设置分辨率宽高比:${designRate}`);
+    }
+
+    private onSingleton() {
+        Singleton.instance.debug();
     }
 }
 

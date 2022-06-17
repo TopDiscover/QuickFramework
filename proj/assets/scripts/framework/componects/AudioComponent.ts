@@ -4,6 +4,7 @@ import { AudioClip, AudioSource, _decorator } from "cc";
 import { DEBUG } from "cc/env";
 import { Resource } from "../core/asset/Resource";
 import { Macro } from "../defines/Macros";
+import { Singleton } from "../utils/Singleton";
 /**
  * @description 声音组件
  */
@@ -63,15 +64,9 @@ export class AudioInfo {
 }
 
 /**@description 框架内部使用，外部请不要调用 */
-class AudioData {
-    private static _instance: AudioData = null!;
-    public static get instance() {
-        if (this._instance == null) {
-            this._instance = new AudioData();
-            this._instance.init();
-        }
-        return this._instance;
-    }
+class AudioData implements ISingleton{
+    static module: string = "【音效数据】";
+    module: string = null!;
     public musicVolume = 1;
     public effectVolume = 1;
     public isEffectOn = true;
@@ -89,8 +84,7 @@ class AudioData {
     private readonly _storeMusicVolumeKey: string = "default_save_music_volume_key";
     private readonly _storeEffectVolumeKey: string = "default_save_effect_volume_key";
 
-    private init() {
-
+    init() {
         //音量开关读取
         this.isMusicOn = Manager.storage.getItem(this._storeMusicKey, this.isMusicOn);
         this.isEffectOn = Manager.storage.getItem(this._storeEffectKey, this.isEffectOn);
@@ -222,7 +216,9 @@ export default class AudioComponent extends EventComponent {
         super.onDestroy();
     }
 
-    protected audioData = AudioData.instance;
+    protected get audioData(){
+        return Singleton.instance.get(AudioData) as AudioData;
+    }
 
     /**@description 音频控件资源拥有者，该对象由UIManager打开的界面 */
     public owner: UIView | null = null;

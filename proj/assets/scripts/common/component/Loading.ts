@@ -4,9 +4,10 @@ import { Config, ViewZOrder } from "../config/Config";
  * @description 加载动画
  */
 
-export default class Loading {
-    protected static _instance: Loading = null!;
-    public static Instance() { return this._instance || (this._instance = new Loading()); }
+export default class Loading implements ISingleton{
+    static module: string = "【Loading】";
+    module: string = null!;
+    isResident = true;
     /**@description 当前loading节点 */
     protected node: Node = null!;
     protected get prefab(){

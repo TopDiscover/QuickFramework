@@ -1,6 +1,7 @@
 import { EntryDelegate } from "../../framework/core/entry/EntryDelegate";
 import { UpdateItem } from "../../framework/core/update/UpdateItem";
 import { Macro } from "../../framework/defines/Macros";
+import { Singleton } from "../../framework/utils/Singleton";
 import { Config } from "../config/Config";
 import { Global } from "../data/Global";
 import { BundleUpdateHandlerImpl } from "./BundleUpdateHandlerImpl";
@@ -30,11 +31,11 @@ export class CmmEntry extends EntryDelegate {
         if (config) {
             let item = new UpdateItem(config);
             if (bundle == Macro.BUNDLE_RESOURCES) {
-                item.handler = getSingleton(MainUpdateHandlerImpl);
+                item.handler = Singleton.instance.get(MainUpdateHandlerImpl) as MainUpdateHandlerImpl;
             } else if (bundle == Macro.BUNDLE_HALL) {
-                item.handler = getSingleton(HallUpdateHandlerImpl);
+                item.handler = Singleton.instance.get(HallUpdateHandlerImpl) as HallUpdateHandlerImpl;
             } else {
-                item.handler = getSingleton(BundleUpdateHandlerImpl);
+                item.handler = Singleton.instance.get(BundleUpdateHandlerImpl) as BundleUpdateHandlerImpl;
             }
             return item;
         }

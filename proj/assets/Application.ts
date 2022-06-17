@@ -12,6 +12,7 @@ import { CommonLanguage } from "./scripts/common/language/CommonLanguage";
 import { Utils } from "./scripts/common/utils/Utils";
 import { LogLevel } from "./scripts/framework/defines/Enums";
 import { Framewok } from "./scripts/framework/Framework";
+import { Singleton } from "./scripts/framework/utils/Singleton";
 
 /**@description 游戏所有运行单例的管理 */
 export class _Manager extends Framewok implements GameEventInterface {
@@ -21,7 +22,7 @@ export class _Manager extends Framewok implements GameEventInterface {
     }
 
     get utils(){
-        return getSingleton(Utils)
+        return Singleton.instance.get(Utils) as Utils;
     }
 
     /**@description 进入后台的时间 */
@@ -29,31 +30,31 @@ export class _Manager extends Framewok implements GameEventInterface {
 
     /**@description 重连专用提示UI部分 */
     get uiReconnect( ){
-        return getSingleton(UIReconnect);
+        return Singleton.instance.get(UIReconnect) as UIReconnect;
     }
 
     /**@description 小提示 */
     get tips() {
-        return getSingleton(Tips);
+        return Singleton.instance.get(Tips) as Tips;
     }
 
     /**@description 界面加载时的全屏Loading,显示加载进度 */
     get uiLoading(): UILoading {
-        return getSingleton(UILoading);
+        return Singleton.instance.get(UILoading) as UILoading;
     }
 
     /**@description 弹出提示框,带一到两个按钮 */
     get alert() {
-        return getSingleton(Alert);
+        return Singleton.instance.get(Alert) as Alert;
     }
 
     /**@description 公共loading */
     get loading() {
-        return getSingleton(Loading);
+        return Singleton.instance.get(Loading) as Loading;
     }
 
     get updateLoading(){
-        return getSingleton(UpdateLoading);
+        return Singleton.instance.get(UpdateLoading) as UpdateLoading;
     }
 
     private _wssCacertUrl = "";

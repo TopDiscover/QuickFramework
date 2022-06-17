@@ -2,10 +2,10 @@ import { Macro } from "../../defines/Macros";
 import { sys } from "cc";
 const LANG_KEY: string = "using_language";
 
-export class Language {
-
-    private static _instance: Language = null!;
-    public static Instance() { return this._instance || (this._instance = new Language()); }
+export class Language implements ISingleton{
+    isResident?: boolean = true;
+    static module: string = "【语言包】";
+    module: string = null!;
 
     private _data: Language.Data = { language: Macro.UNKNOWN };
     private delegates: Language.DataSourceDelegate[] = [];
@@ -29,8 +29,8 @@ export class Language {
         if (index != -1) {
             this.delegates.splice(index, 1);
             let data: any = this._data;
-            if (delegate.name != Macro.BUNDLE_RESOURCES && data[delegate.name]) {
-                data[delegate.name] = {};
+            if (delegate.bundle != Macro.BUNDLE_RESOURCES && data[delegate.bundle]) {
+                data[delegate.bundle] = {};
             }
         }
     }

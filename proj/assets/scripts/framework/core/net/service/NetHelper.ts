@@ -3,10 +3,17 @@ import { Macro } from "../../../defines/Macros";
 /**
  * @description NetHelper 网络辅助管理 对 Sender 及 Handler的管理
  */
-export default class NetHelper {
-    private static _instance: NetHelper = null!;
-    public static Instance() { return this._instance || (this._instance = new NetHelper()); }
-
+export default class NetHelper implements ISingleton {
+    destory(...args: any[]): void {
+        this.destorySender();
+        this.destoryHandler();
+    }
+    clear(...args: any[]): void {
+        this.clearSender();
+        this.clearHandler();
+    }
+    static module: string = "【网络辅助器】";
+    module: string = null!;
     /**@description 所有Sender */
     private _senders: Map<string, Sender> = new Map();
     /**@description 所有Handler */
@@ -43,15 +50,24 @@ export default class NetHelper {
      * @param ClassOrModule 
      * @returns 
      */
-    destorySender<T extends Sender>(ClassOrModule: SenderClass<T> | string) {
-        let module = this.getSenderModule(ClassOrModule);
-        let sender = this._senders.get(module);
-        if (sender) {
-            sender.onDestroy();
-            this._senders.delete(module);
+    destorySender<T extends Sender>(ClassOrModule?: SenderClass<T> | string) {
+        if ( ClassOrModule ){
+            let module = this.getSenderModule(ClassOrModule);
+            let sender = this._senders.get(module);
+            if (sender) {
+                sender.onDestroy();
+                this._senders.delete(module);
+                return true;
+            }
+            return false;
+        }else{
+            //删除所有
+            this._senders.forEach((value)=>{
+                value.onDestroy();;
+            })
+            this._senders.clear();
             return true;
         }
-        return false;
     }
 
     /**
@@ -118,15 +134,24 @@ export default class NetHelper {
      * @param ClassOrModule 
      * @returns 
      */
-    destoryHandler<T extends Handler>(ClassOrModule: HandlerClass<T> | string) {
-        let module = this.getHandlerModule(ClassOrModule);
-        let handler = this._handlers.get(module);
-        if (handler) {
-            handler.onDestroy();
-            this._handlers.delete(module);
+    destoryHandler<T extends Handler>(ClassOrModule?: HandlerClass<T> | string) {
+        if (ClassOrModule){
+            let module = this.getHandlerModule(ClassOrModule);
+            let handler = this._handlers.get(module);
+            if (handler) {
+                handler.onDestroy();
+                this._handlers.delete(module);
+                return true;
+            }
+            return false;
+        }else{
+            this._handlers.forEach((value)=>{
+                value.onDestroy();
+            })
+            this._handlers.clear();
             return true;
         }
-        return false;
+        
     }
 
     /**
@@ -162,17 +187,16 @@ export default class NetHelper {
         return module;
     }
 
-    print(delegate: NetHelperPrintDelegate<Sender, Handler>) {
-        if (delegate.printSender) {
-            this._senders.forEach((data) => {
-                delegate.printSender && delegate.printSender(data);
-            });
-        }
-        if (delegate.printHander) {
-            this._handlers.forEach((data) => {
-                delegate.printHander && delegate.printHander(data);
-            });
-        }
+    debug(){
+        Log.d(`-----------网络辅助相关信息------------`);
+        Log.d(`-----------当前所有Sender------------`);
+        this._senders.forEach((data) => {
+            Log.d(data.module);
+        });
+        Log.d(`-----------当前所有Handler------------`);
+        this._handlers.forEach((data) => {
+            Log.d(data.module);
+        });
     }
 
 }

@@ -8,6 +8,7 @@ import { Config, ViewZOrder } from "../common/config/Config";
 import { Macro } from "../framework/defines/Macros";
 import { Entry } from "../framework/core/entry/Entry";
 import { Update } from "../framework/core/update/Update";
+import { Singleton } from "../framework/utils/Singleton";
 
 class LoginEntry extends Entry {
     static bundle = Macro.BUNDLE_RESOURCES;
@@ -51,18 +52,9 @@ class LoginEntry extends Entry {
     /**@description 这个位置说明自己GameView 进入onLoad完成 */
     onEnterGameView(gameView:GameView) {
         super.onEnterGameView(gameView);
-        //销毁所有网络Handler
-        Manager.netHelper.clearHandler();
-        //销毁所有网络Sender
-        Manager.netHelper.clearSender();
-        //关闭网络
-        Manager.serviceManager.close();
-        //卸载proto
-        Manager.protoManager.unload();
         //关闭除登录之外的界面
         Manager.uiManager.closeExcept([LoginView]);
-        //清理所有数据中数据
-        Manager.dataCenter.clear();
+        Singleton.instance.destory();
     }
 
     /**@description 卸载bundle,即在自己bundle删除之前最后的一条消息 */

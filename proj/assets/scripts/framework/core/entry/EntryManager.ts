@@ -6,10 +6,10 @@ import { Macro } from "../../defines/Macros";
 import { UpdateItem } from "../update/UpdateItem";
 
 /**@description 入口管理 */
-export class EntryManager {
-    private static _instance: EntryManager = null!;
-    public static Instance() { return this._instance || (this._instance = new EntryManager()); }
-    private tag = "[EntryManager] : ";
+export class EntryManager implements ISingleton{
+    static module: string = "【入口管理器】";
+    module: string = null!;
+    isResident?: boolean  = true;
     private _entrys: Map<string, Entry> = new Map();
 
     /**@description 默认代理，可根据自己项目需要重新实现 */
@@ -22,7 +22,7 @@ export class EntryManager {
         let entry = this.getEntry(entryClass.bundle);
         if (entry) {
             if ( DEBUG ){
-                Log.w(`${this.tag}更新Bundle : ${entryClass.bundle} 入口程序!!!`);
+                Log.w(`${this.module}更新Bundle : ${entryClass.bundle} 入口程序!!!`);
             }
             this._entrys.delete(entryClass.bundle);
         }
@@ -31,7 +31,7 @@ export class EntryManager {
         this._entrys.set(entry.bundle, entry);
         if (this.node) {
             if ( DEBUG ){
-                Log.d(`${this.tag} ${entry.bundle} onLoad`);
+                Log.d(`${this.module} ${entry.bundle} onLoad`);
             }
             entry.onLoad(this.node);
         }
@@ -44,7 +44,7 @@ export class EntryManager {
                 entry.onLoad(this.node as Node);
                 if ( entry.isMain ){
                     if ( DEBUG ){
-                        Log.d(`${this.tag}${entry.bundle} onEnter`);
+                        Log.d(`${this.module}${entry.bundle} onEnter`);
                     }
                     //启动主程序入口
                     entry.onEnter();
@@ -142,11 +142,10 @@ export class EntryManager {
         return null;
     }
 
-    print(delegate: ManagerPrintDelegate<Entry>) {
-        if (delegate) {
-            this._entrys.forEach((data)=>{
-                delegate.print(data);
-            });
-        }
+    debug(){
+        Log.d(`-------Bundle入口管理器-------`)
+        this._entrys.forEach(v=>{
+            Log.d(`bundle : ${v.bundle}`);
+        })
     }
 }
