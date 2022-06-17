@@ -4,10 +4,9 @@
 
 const VIEW_ACTION_TAG = 999;
 
-export class Utils {
-    private static _instance: Utils = null!;
-    public static Instance() { return this._instance || (this._instance = new Utils()); }
-
+export class Utils implements ISingleton {
+    static module: string = "【Utils】";
+    module: string = null!;
     /**@description 显示视图动画 */
     showView(node: cc.Node | null, complete: Function) {
         if (node) {

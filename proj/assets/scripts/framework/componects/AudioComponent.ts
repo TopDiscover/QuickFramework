@@ -1,6 +1,7 @@
 import EventComponent from "./EventComponent";
 import UIView from "../core/ui/UIView";
 import { Resource } from "../core/asset/Resource";
+import { Singleton } from "../utils/Singleton";
 
 /**
  * @description 声音组件
@@ -8,15 +9,9 @@ import { Resource } from "../core/asset/Resource";
 const { ccclass, property, menu } = cc._decorator;
 
 /**@description 框架内部使用，外部请不要调用 */
-class AudioData {
-    private static _instance: AudioData = null;
-    public static get instance() {
-        if (this._instance == null) {
-            this._instance = new AudioData();
-            this._instance.init();
-        }
-        return this._instance;
-    }
+class AudioData implements ISingleton{
+    static module = "【音效数据】";
+    module: string;
     public musicVolume = 1;
     public effectVolume = 1;
     public isEffectOn = true;
@@ -35,25 +30,25 @@ class AudioData {
     private readonly _storeMusicVolumeKey: string = "default_save_music_volume_key";
     private readonly _storeEffectVolumeKey: string = "default_save_effect_volume_key";
 
-    private init() {
+    init() {
 
         //音量开关读取
-        this.isMusicOn = Manager.localStorage.getItem(this._storeMusicKey, this.isMusicOn);
-        this.isEffectOn = Manager.localStorage.getItem(this._storeEffectKey, this.isEffectOn);
+        this.isMusicOn = Manager.storage.getItem(this._storeMusicKey, this.isMusicOn);
+        this.isEffectOn = Manager.storage.getItem(this._storeEffectKey, this.isEffectOn);
 
         //音量读取
-        this.musicVolume = Manager.localStorage.getItem(this._storeMusicVolumeKey, this.musicVolume);
-        this.effectVolume = Manager.localStorage.getItem(this._storeEffectVolumeKey, this.effectVolume);
+        this.musicVolume = Manager.storage.getItem(this._storeMusicVolumeKey, this.musicVolume);
+        this.effectVolume = Manager.storage.getItem(this._storeEffectVolumeKey, this.effectVolume);
     }
 
     /**@description 存储 */
     public save() {
         try {
-            Manager.localStorage.setItem(this._storeMusicKey, this.isMusicOn);
-            Manager.localStorage.setItem(this._storeMusicVolumeKey, this.musicVolume);
+            Manager.storage.setItem(this._storeMusicKey, this.isMusicOn);
+            Manager.storage.setItem(this._storeMusicVolumeKey, this.musicVolume);
 
-            Manager.localStorage.setItem(this._storeEffectKey, this.isEffectOn);
-            Manager.localStorage.setItem(this._storeEffectVolumeKey, this.effectVolume);
+            Manager.storage.setItem(this._storeEffectKey, this.isEffectOn);
+            Manager.storage.setItem(this._storeEffectVolumeKey, this.effectVolume);
         } catch (error) {
         }
     }
@@ -77,7 +72,9 @@ export default class AudioComponent extends EventComponent {
         }
     }
 
-    protected audioData = AudioData.instance;
+    protected get audioData(){
+        return Singleton.instance.get(AudioData);
+    }
 
     /**@description 音频控件资源拥有者，该对象由UIManager打开的界面 */
     public owner: UIView = null;
@@ -181,7 +178,7 @@ export default class AudioComponent extends EventComponent {
             this.curBundle = bundle;
             this.curLoop = loop;
             if (this.audioData.isMusicOn) {
-                Manager.cacheManager.getCacheByAsync(url, cc.AudioClip, bundle).then((data) => {
+                Manager.cache.getCacheByAsync(url, cc.AudioClip, bundle).then((data) => {
                     if (data) {
                         let info = new Resource.Info;
                         info.url = url;
@@ -218,7 +215,7 @@ export default class AudioComponent extends EventComponent {
                 }
             }
             if (this.audioData.isEffectOn) {
-                Manager.cacheManager.getCacheByAsync(url, cc.AudioClip, bundle).then((data) => {
+                Manager.cache.getCacheByAsync(url, cc.AudioClip, bundle).then((data) => {
                     if (data) {
                         let info = new Resource.Info;
                         info.url = url;

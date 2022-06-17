@@ -198,12 +198,12 @@ function _setButtonWithType(
 ) {
     if (url) {
         if (typeof url == "string") {
-            Manager.cacheManager.getCacheByAsync(url, cc.SpriteFrame,bundle).then((spriteFrame) => {
+            Manager.cache.getCacheByAsync(url, cc.SpriteFrame,bundle).then((spriteFrame) => {
                 _setButtonSpriteFrame(button, memberName, view, url, spriteFrame, complete,bundle);
             });
         } else {
             //在纹理图集中查找
-            Manager.cacheManager.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource,bundle).then((data) => {
+            Manager.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource,bundle).then((data) => {
                 if (data && data.isTryReload) {
                     //来到这里面，程序已经崩溃，无意义在处理
                 } else {
@@ -367,8 +367,8 @@ export function createNodeWithPrefab(config: { bundle?:BUNDLE_TYPE , url: string
     
     let url = config.url;
     let bundle = getBundle(config);
-    let cache = Manager.cacheManager.get(bundle,url);
-    Manager.cacheManager.getCacheByAsync(url, cc.Prefab,bundle).then((data) => {
+    let cache = Manager.cache.get(bundle,url);
+    Manager.cache.getCacheByAsync(url, cc.Prefab,bundle).then((data) => {
         if (!cache) {
             let info = new Resource.Info;
             info.url = config.url;
@@ -394,9 +394,9 @@ export function _loadDirRes( config:{
     onProgress?:(finish:number,total:number,item:cc.AssetManager.RequestItem) => void , 
     onComplete:(data:Resource.CacheData)=>void}){
         let bundle = getBundle(config);
-        let cache = Manager.cacheManager.get(bundle,config.url);
+        let cache = Manager.cache.get(bundle,config.url);
         //这里要做一个防止重复加载操作，以免对加载完成后的引用计数多加次数
-        Manager.assetManager.loadDir(bundle,config.url,config.type,config.onProgress,(data)=>{
+        Manager.asset.loadDir(bundle,config.url,config.type,config.onProgress,(data)=>{
             
             if( !cache ){
                 //如果已经有了，可能是从logic中加载过来的，不在进行引用计数操作
@@ -423,8 +423,8 @@ export function _loadRes(config:{
     view : any,
 }){
     let bundle = getBundle(config);
-    let cache = Manager.cacheManager.get(bundle,config.url);
-    Manager.assetManager.load(
+    let cache = Manager.cache.get(bundle,config.url);
+    Manager.asset.load(
         bundle,
         config.url,
         config.type,
@@ -447,7 +447,7 @@ export function _loadRes(config:{
 
 export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay, config: { assetUrl: string, atlasUrl: string, view: UIView, complete: (asset: dragonBones.DragonBonesAsset, atlas: dragonBones.DragonBonesAtlasAsset) => void, bundle?: BUNDLE_TYPE }) {
     let bundle = getBundle(config);
-    Manager.cacheManager.getCacheByAsync(config.assetUrl, dragonBones.DragonBonesAsset, bundle).then((asset) => {
+    Manager.cache.getCacheByAsync(config.assetUrl, dragonBones.DragonBonesAsset, bundle).then((asset) => {
         if (asset) {
             let info = new Resource.Info;
             info.url = config.assetUrl;
@@ -455,7 +455,7 @@ export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay, config: { a
             info.data = asset;
             info.bundle = getBundle(config);
             addExtraLoadResource(config.view, info);
-            Manager.cacheManager.getCacheByAsync(config.atlasUrl, dragonBones.DragonBonesAtlasAsset, bundle).then((atlas) => {
+            Manager.cache.getCacheByAsync(config.atlasUrl, dragonBones.DragonBonesAtlasAsset, bundle).then((atlas) => {
                 if (atlas) {
                     if (cc.sys.isBrowser) {
                         let info = new Resource.Info;

@@ -4,9 +4,10 @@
 
 import { Config, ViewZOrder } from "../config/Config";
 
-export default class UILoading {
-    private static _instance: UILoading = null;
-    public static Instance() { return this._instance || (this._instance = new UILoading()); }
+export default class UILoading implements ISingleton{
+    static module: string = "【UILoading】";
+    module: string = null!;
+    isResident = true;
     /**@description 当前loading节点 */
     private node: cc.Node = null;
     private delay: number = null;

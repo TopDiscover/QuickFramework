@@ -2,9 +2,10 @@ import { Update } from "../../framework/core/update/Update";
 import { UpdateHandlerDelegate, UpdateItem } from "../../framework/core/update/UpdateItem";
 import { Macro } from "../../framework/defines/Macros";
 /**@description bundle更新下载代理 */
-export class BundleUpdateHandlerImpl implements UpdateHandlerDelegate {
-    private static _instance: BundleUpdateHandlerImpl = null!;
-    public static Instance() { return this._instance || (this._instance = new BundleUpdateHandlerImpl()); }
+export class BundleUpdateHandlerImpl implements UpdateHandlerDelegate , ISingleton{
+    static module = "【Bundle热更新】";
+    module: string = null!;
+    isResident = true;
     onNewVersionFund(item: UpdateItem): void {
         item.doUpdate();
     }

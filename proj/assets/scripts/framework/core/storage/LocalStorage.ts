@@ -10,11 +10,9 @@ interface StorageData {
     value: string | number | boolean | object;
 }
 
-export class LocalStorage {
-
-    private static _instance: LocalStorage = null!;
-    public static Instance() { return this._instance || (this._instance = new LocalStorage()); }
-
+export class LocalStorage implements ISingleton {
+    static module: string = "【本地仓库】";
+    module: string = null!;
     public key = "VuxiAKihQ0VR9WRe";
 
     private encrypt(obj: {}) {

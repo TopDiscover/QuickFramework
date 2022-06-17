@@ -5,9 +5,9 @@
 import { Macro } from "../../defines/Macros";
 import { UpdateItem } from "../update/UpdateItem";
 
-export class BundleManager {
-   private static _instance: BundleManager = null!;
-   public static Instance() { return this._instance || (this._instance = new BundleManager()); }
+export class BundleManager implements ISingleton{
+   static module: string = "【Bundle管理器】";
+   module: string = null!;
    protected isEngineBundle(key : any){
       if ( key == cc.AssetManager.BuiltinBundleName.INTERNAL || key == cc.AssetManager.BuiltinBundleName.MAIN ||
          key == cc.AssetManager.BuiltinBundleName.RESOURCES || key == cc.AssetManager.BuiltinBundleName.START_SCENE){
@@ -33,7 +33,7 @@ export class BundleManager {
             Manager.entryManager.onUnloadBundle(bundle);
             let result = this.getBundle(bundle);
             if (result) {
-               Manager.cacheManager.removeBundle(bundle);
+               Manager.cache.removeBundle(bundle);
                Manager.releaseManger.removeBundle(result);
             }
          }
@@ -100,21 +100,12 @@ export class BundleManager {
       });
    }
 
-   /**
-    * @description 打印bundle管理器状态信息
-    * @param delegate 
-    */
-   print(delegate: ManagerPrintDelegate<{
-      loaded: cc.AssetManager.Bundle[], //已在加载的bundle
-   }>) {
-      if (delegate) {
-         let loaded: cc.AssetManager.Bundle[] = [];
-         cc.assetManager.bundles.forEach((bundle, key) => {
-            loaded.push(bundle);
-         });
-         delegate.print({
-            loaded: loaded
-         })
-      }
+   debug(){
+      Log.d(`-------Bundle管理器状态信息-------`);
+      let loaded: string[] = [];
+      cc.assetManager.bundles.forEach((bundle, key) => {
+            loaded.push(bundle.name);
+      });
+      Log.d(`当前所有加载完成的bundle : ${loaded.toString()}`);
    }
 }

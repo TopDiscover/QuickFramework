@@ -177,11 +177,10 @@ class AlertDialog extends cc.Component {
     }
 }
 
-export default class Alert {
-
-    private static _instance: Alert = null;
-    public static Instance() { return this._instance || (this._instance = new Alert()); }
-
+export default class Alert implements ISingleton{
+    static module: string = "【Alert】";
+    module: string = null!;
+    isResident = true;
     private curPanel: cc.Node = null;
     private queue: AlertConfig[] = [];
 

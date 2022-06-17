@@ -3,14 +3,15 @@
  */
 import { LogLevel } from "../../defines/Enums";
 
-export class LoggerImpl {
-    private static _instance: LoggerImpl = null!;
-    public static Instance() { return this._instance || (this._instance = new LoggerImpl()); }
+export class LoggerImpl implements ISingleton{
     private logger : Logger = console as any;
     private _level: number = LogLevel.ALL;
     constructor(){
         this.update();
     }
+    static module: string = "【日志管理器】";
+    module: string = null!;
+    isResident?: boolean = true;
     /**@description 当前日志等级 */
     public get level(){
         return this._level;
@@ -122,7 +123,7 @@ export class LoggerImpl {
         return `${this.convertName(name)}${v}`;
     }
 
-    private toString(name : string,v:string){
+    private toStringForDump(name : string,v:string){
         return `${this.convertName(name)}"${v}"`;
     }
 
@@ -201,7 +202,7 @@ export class LoggerImpl {
                 out +=  this.toNumber(v_name,data);
                 break;
             case "string":
-                out += this.toString(v_name,data);
+                out += this.toStringForDump(v_name,data);
                 break;
             case "object":
                 if (Array.isArray(data)){

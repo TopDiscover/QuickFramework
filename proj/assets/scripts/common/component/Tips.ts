@@ -46,10 +46,10 @@ class ToastItem extends cc.Component {
     }
 }
 
-export default class Tips {
-
-    private static _instance: Tips = null;
-    public static Instance() { return this._instance || (this._instance = new Tips()); }
+export default class Tips implements ISingleton{
+    static module: string = "【Tips】";
+    module: string = null!;
+    isResident = true;
 
     private get prefab(){
         return Manager.uiManager.getScenePrefab("Tips");

@@ -2,10 +2,10 @@ import { Macro } from "../../defines/Macros";
 
 const LANG_KEY: string = "using_language";
 
-export class Language {
-
-    private static _instance: Language = null!;
-    public static Instance() { return this._instance || (this._instance = new Language()); }
+export class Language implements ISingleton{
+    isResident?: boolean = true;
+    static module: string = "【语言包】";
+    module: string = null!;
 
     private _data: Language.Data = { language: Macro.UNKNOWN };
     private delegates: Language.DataSourceDelegate[] = [];
@@ -29,8 +29,8 @@ export class Language {
         if (index != -1) {
             this.delegates.splice(index, 1);
             let data: any = this._data;
-            if (delegate.name != Macro.BUNDLE_RESOURCES && data[delegate.name]) {
-                data[delegate.name] = {};
+            if (delegate.bundle != Macro.BUNDLE_RESOURCES && data[delegate.bundle]) {
+                data[delegate.bundle] = {};
             }
         }
     }
@@ -61,7 +61,7 @@ export class Language {
                 this._data = delegate.data(this.getLanguage(),this._data);
             });
         }
-        Manager.localStorage.setItem(LANG_KEY, this._data.language);
+        Manager.storage.setItem(LANG_KEY, this._data.language);
     }
 
     public get(args: (string | number)[]) {
@@ -119,6 +119,6 @@ export class Language {
 
     /**@description 获取语言包名 */
     public getLanguage() {
-        return Manager.localStorage.getItem(LANG_KEY, cc.sys.LANGUAGE_CHINESE);
+        return Manager.storage.getItem(LANG_KEY, cc.sys.LANGUAGE_CHINESE);
     }
 }

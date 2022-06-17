@@ -120,12 +120,10 @@ class LazyInfo {
     }
 }
 
-export class ReleaseManager {
-    private static _instance: ReleaseManager = null!;
-    public static Instance() {
-        return this._instance || (this._instance = new ReleaseManager());
-    }
-
+export class ReleaseManager implements ISingleton {
+    static module: string = "【资源管理器】";
+    isResident?: boolean = true;
+    module: string = null!;
     /**@description 待释放资源 */
     private _lazyInfos: Map<string, LazyInfo> = new Map();
     /**@description 待释放bundle */
@@ -256,20 +254,37 @@ export class ReleaseManager {
         }
     }
 
-    print(delegate: ManagerPrintDelegate<{
-        lazyInfo: Map<string, LazyInfo>,
-        bundles: string[],
-        remote: LazyInfo
-    }>) {
-
+    debug(){
         let bundles: string[] = [];
         this._bundles.forEach((data, key, source) => {
             bundles.push(key);
         })
-        delegate.print({
+        let data = {
             lazyInfo: this._lazyInfos,
             bundles: bundles,
             remote: this._remote
-        });
+        }
+        Log.d(`--------------${this.module}调试信息如下--------------`)
+        if (Manager.isLazyRelease) {
+            if (data.bundles.length > 0) {
+                Log.d(`待释放Bundle : ${data.bundles.toString()}`);
+            }
+            if (data.lazyInfo.size > 0) {
+                data.lazyInfo.forEach((value, key, source) => {
+                    Log.d(`--------------${key}待释放资源--------------`);
+                    value.assets.forEach((info, key, source) => {
+                        Log.d(`${info.url}`);
+                    })
+                });
+            }
+
+            Log.d(`远程待释放资源`);
+            data.remote.assets.forEach((info, key, source) => {
+                Log.d(`${info.url}`);
+            });
+
+        } else {
+            Log.w(`未开户懒释放功能!!!!`);
+        }
     }
 }

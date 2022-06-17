@@ -116,9 +116,9 @@ export default class ResourceLoader {
                     this._onLoadResourceComplete(cache);
                 })
             } else if (value.dir) {
-                Manager.assetManager.loadDir(value.bundle as BUNDLE_TYPE, value.dir, <any>(value.type), <any>null, this._onLoadResourceComplete.bind(this));
+                Manager.asset.loadDir(value.bundle as BUNDLE_TYPE, value.dir, <any>(value.type), <any>null, this._onLoadResourceComplete.bind(this));
             } else {
-                Manager.assetManager.load(value.bundle as BUNDLE_TYPE, value.url as string, <any>(value.type), <any>null, this._onLoadResourceComplete.bind(this));
+                Manager.asset.load(value.bundle as BUNDLE_TYPE, value.url as string, <any>(value.type), <any>null, this._onLoadResourceComplete.bind(this));
             }
         });
     }
@@ -144,7 +144,7 @@ export default class ResourceLoader {
                     if (this._loadedResource.has(value.url)) {
                         let data = this._loadedResource.get(value.url);
                         if (data) {
-                            Manager.assetManager.releaseAsset(data);
+                            Manager.asset.releaseAsset(data);
                         }
                         this._loadedResource.delete(value.url);
                     }
@@ -152,7 +152,7 @@ export default class ResourceLoader {
                     if (this._loadedResource.has(value.dir)) {
                         let data = this._loadedResource.get(value.dir);
                         if (data) {
-                            Manager.assetManager.releaseAsset(data);
+                            Manager.asset.releaseAsset(data);
                         }
                         this._loadedResource.delete(value.dir);
                     }
@@ -183,7 +183,7 @@ export default class ResourceLoader {
             info.type = data.info.type;
             info.data = data.data;
             info.bundle = data.info.bundle;
-            Manager.assetManager.retainAsset(info);
+            Manager.asset.retainAsset(info);
             this._loadedResource.set(info.url, info);
         }
 

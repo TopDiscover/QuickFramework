@@ -68,7 +68,7 @@ export abstract class Handler {
             return;
         }
         if( CC_DEBUG ){
-            Log.e(`必须绑定Service`);
+            Log.w(`未绑定Service`);
         }
     }
 
@@ -82,7 +82,7 @@ export abstract class Handler {
             return;
         }
         if( CC_DEBUG ){
-            Log.e(`必须绑定Service`);
+            Log.w(`未绑定Service`);
         }
     }
 

@@ -63,9 +63,3 @@ window.Log.e = console.error;
 window.Log.d = console.log;
 window.Log.w = console.warn;
 window.Log.dump = ()=>{};
-
-/**@description 获取根据类型获取单列 */
-function getSingleton(SingletonClass) {
-    return SingletonClass.Instance();
-}
-window.getSingleton = getSingleton;

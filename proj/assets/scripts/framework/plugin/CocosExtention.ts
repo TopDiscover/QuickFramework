@@ -52,14 +52,14 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
         isRetain = true;
     }
     let defaultBundle = getBundle({bundle:config.defaultBundle,view:config.view})
-    Manager.assetManager.remote.loadImage(config.url, config.isNeedCache).then((data) => {
+    Manager.asset.remote.loadImage(config.url, config.isNeedCache).then((data) => {
         if (data) {
             setSpriteSpriteFrame(config.view, config.url, me, data, config.complete,Macro.BUNDLE_REMOTE, Resource.Type.Remote, isRetain);
         } else {
             if (config.defaultSpriteFrame) {
                 if (typeof config.defaultSpriteFrame == "string") {
                     //动态加载了一张图片，把资源通知管理器
-                    Manager.cacheManager.getCacheByAsync(config.defaultSpriteFrame,cc.SpriteFrame,defaultBundle).then((spriteFrame) => {
+                    Manager.cache.getCacheByAsync(config.defaultSpriteFrame,cc.SpriteFrame,defaultBundle).then((spriteFrame) => {
                         setSpriteSpriteFrame(config.view, config.defaultSpriteFrame, me, spriteFrame, config.complete,defaultBundle);
                     });
                 }
@@ -89,12 +89,12 @@ cc.Sprite.prototype.loadImage = function (config) {
     let complete = config.complete;
     let bundle = getBundle(config);
     if (typeof url == "string") {
-        Manager.cacheManager.getCacheByAsync(url, cc.SpriteFrame,bundle).then((spriteFrame) => {
+        Manager.cache.getCacheByAsync(url, cc.SpriteFrame,bundle).then((spriteFrame) => {
             setSpriteSpriteFrame(view, url as string, me, spriteFrame, complete,bundle);
         });
     } else {
         //在纹理图集中查找
-        Manager.cacheManager.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource,bundle).then((data) => {
+        Manager.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource,bundle).then((data) => {
             if ( data && data.isTryReload ){
                //来到这里面程序已经崩溃了，无意义在处理了
             }else{
@@ -129,7 +129,7 @@ sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
     if (config.isNeedCache == undefined || config.isNeedCache == null) {
         config.isNeedCache = true;
     }
-    Manager.assetManager.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then((data) => {
+    Manager.asset.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then((data) => {
         setSkeletonSkeletonData(me, config, data, Resource.Type.Remote);
     });
 }
@@ -149,7 +149,7 @@ sp.Skeleton.prototype.loadSkeleton = function (config) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
-    Manager.cacheManager.getCacheByAsync(url, sp.SkeletonData,bundle).then((data) => {
+    Manager.cache.getCacheByAsync(url, sp.SkeletonData,bundle).then((data) => {
         setSkeletonSkeletonData(me, config, data);
     });
 }
@@ -175,7 +175,7 @@ cc.Label.prototype.loadFont = function (config) {
     let font = config.font;
     let me = this;
     let bundle = getBundle(config);
-    Manager.cacheManager.getCacheByAsync(font, cc.Font,bundle).then((data) => {
+    Manager.cache.getCacheByAsync(font, cc.Font,bundle).then((data) => {
         setLabelFont(me, config, data);
     });
 }
@@ -199,7 +199,7 @@ cc.ParticleSystem.prototype.loadFile = function (config) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
-    Manager.cacheManager.getCacheByAsync(url, cc.ParticleAsset,bundle).then((data) => {
+    Manager.cache.getCacheByAsync(url, cc.ParticleAsset,bundle).then((data) => {
         setParticleSystemFile(me, config, data);
     });
 }

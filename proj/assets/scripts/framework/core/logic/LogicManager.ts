@@ -1,10 +1,9 @@
 import { Macro } from "../../defines/Macros";
 import { Logic } from "./Logic";
 
-export class LogicManager {
-    private static _instance: LogicManager = null!;
-    public static Instance() { return this._instance || (this._instance = new LogicManager()); }
-
+export class LogicManager implements ISingleton {
+    static module: string = "【逻辑管理器】";
+    module: string = null!;
     private _logics: Map<string, Logic> = new Map();
 
     /**
@@ -31,17 +30,26 @@ export class LogicManager {
         return null;
     }
 
-    destory<T extends Logic>(classOrBundle: LogicClass<T> | string) {
-        let bundle = this.getBundle(classOrBundle);
-        if (this._logics.has(bundle)) {
-            let logic = this._logics.get(bundle);
-            if (logic) {
-                logic.onDestroy();
+    destory<T extends Logic>(classOrBundle?: LogicClass<T> | string) {
+        if ( classOrBundle ){
+            let bundle = this.getBundle(classOrBundle);
+            if (this._logics.has(bundle)) {
+                let logic = this._logics.get(bundle);
+                if (logic) {
+                    logic.onDestroy();
+                }
+                this._logics.delete(bundle);
+                return true;
             }
-            this._logics.delete(bundle);
+            return false;
+        }else{
+            this._logics.forEach(v=>{
+                v.onDestroy();
+            })
+            this._logics.clear();
             return true;
         }
-        return false;
+       
     }
 
     /**@description 清空数据中心所有数据 */
@@ -54,13 +62,11 @@ export class LogicManager {
         });
     }
 
-    /**@description 打印当前所有bundle数据数据 */
-    print(delegate: ManagerPrintDelegate<Logic>) {
-        if (delegate) {
-            this._logics.forEach((logic, key, source) => {
-                delegate.print(logic);
-            });
-        }
+    debug(){
+        Log.d(`-------逻辑管理器数据-------`);
+        this._logics.forEach(v=>{
+            Log.d(js.getClassName(v));
+        })
     }
 
     /**@description 判断是否在排除项中 */

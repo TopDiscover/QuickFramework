@@ -25,7 +25,7 @@ export class ViewDynamicLoadData {
             }
             if (CC_DEBUG) Manager.uiManager.checkView(info.url, className);
             if (!this.local.has(info.url)) {
-                Manager.assetManager.retainAsset(info);
+                Manager.asset.retainAsset(info);
                 this.local.set(info.url, info);
             }
         }
@@ -38,7 +38,7 @@ export class ViewDynamicLoadData {
                 Log.e(`找不到资源持有者 : ${info.url}`);
             }
             if (CC_DEBUG) Manager.uiManager.checkView(info.url, className);
-            Manager.cacheManager.remoteCaches.retainAsset(info);
+            Manager.cache.remoteCaches.retainAsset(info);
             this.remote.set(info.url, info);
         }
     }
@@ -72,13 +72,13 @@ export class ViewDynamicLoadData {
             //先清除当前资源的引用关系
             if (this.local) {
                 this.local.forEach((info) => {
-                    Manager.assetManager.releaseAsset(info);
+                    Manager.asset.releaseAsset(info);
                 });
                 this.local.clear();
             }
             if (this.remote) {
                 this.remote.forEach((info, url) => {
-                    Manager.cacheManager.remoteCaches.releaseAsset(info);
+                    Manager.cache.remoteCaches.releaseAsset(info);
                 });
                 this.remote.clear();
             }
@@ -146,11 +146,10 @@ class ViewData {
     }
 }
 
-export class UIManager {
-
-    private static _instance: UIManager = null!;
-    public static Instance() { return this._instance || (this._instance = new UIManager()); }
-    public _logTag = `[UIManager]`;
+export class UIManager implements ISingleton{
+    isResident?: boolean = true;
+    static module: string = "【UI管理器】";
+    module: string = null!;
     /**@description 视图 */
     private _viewDatas: Map<string, ViewData> = new Map<string, ViewData>();
     private getViewData(className: string): ViewData;
@@ -256,7 +255,7 @@ export class UIManager {
     private _open<T extends UIView>(openOption: DefaultOpenOption) {
         return new Promise<T>((reslove, reject) => {
             if (!openOption.type) {
-                if (CC_DEBUG) Log.d(`${this._logTag}open ui class error`);
+                if (CC_DEBUG) Log.d(`${this.module}open ui class error`);
                 reslove(<any>null);
                 return;
             }
@@ -264,7 +263,7 @@ export class UIManager {
 
             let root = this.viewRoot;
             if (!root) {
-                if (CC_DEBUG) Log.e(`${this._logTag}找不到场景的Canvas节点`);
+                if (CC_DEBUG) Log.e(`${this.module}找不到场景的Canvas节点`);
                 reslove(<any>null);
                 return;
             }
@@ -292,7 +291,7 @@ export class UIManager {
                         Manager.uiLoading.show(openOption.delay, openOption.name);
                     }
                     //正在加载中
-                    if (CC_DEBUG) Log.w(`${this._logTag}${className} 正在加载中...`);
+                    if (CC_DEBUG) Log.w(`${this.module}${className} 正在加载中...`);
                     viewData.finishCb.push(reslove);
                     return;
                 }
@@ -334,7 +333,7 @@ export class UIManager {
                         viewData.info.type = cc.Prefab;
                         viewData.info.data = prefab;
                         viewData.info.bundle = openOption.bundle;
-                        Manager.assetManager.retainAsset(viewData.info);
+                        Manager.asset.retainAsset(viewData.info);
                         this.createNode(viewData,reslove,openOption);
                         Manager.uiLoading.hide();
                     }).catch((reason) => {
@@ -365,11 +364,11 @@ export class UIManager {
             if (!view) {
                 view = uiNode.addComponent(viewData.viewType);
                 if (!view) {
-                    if (CC_DEBUG) Log.e(`${this._logTag}挂载脚本失败 : ${className}`);
+                    if (CC_DEBUG) Log.e(`${this.module}挂载脚本失败 : ${className}`);
                     return null;
                 }
                 else {
-                    if (CC_DEBUG) Log.d(`${this._logTag}挂载脚本 : ${className}`);
+                    if (CC_DEBUG) Log.d(`${this.module}挂载脚本 : ${className}`);
                 }
             }
 
@@ -381,7 +380,7 @@ export class UIManager {
             //界面显示在屏幕中间
             let widget = view.getComponent(cc.Widget);
             if (widget) {
-                if (CC_DEBUG) Log.e(`${this._logTag}请不要在根节点挂载cc.Widget组件`);
+                if (CC_DEBUG) Log.e(`${this.module}请不要在根节点挂载cc.Widget组件`);
                 widget.destroy();
             }
             if (!view.getComponent(AdapterView)) {
@@ -403,7 +402,7 @@ export class UIManager {
         if (viewData.status == ViewStatus.WAITTING_CLOSE) {
             //加载过程中有人关闭了界面
             reslove(null);
-            if (CC_DEBUG) Log.w(`${this._logTag}${className}正等待关闭`);
+            if (CC_DEBUG) Log.w(`${this.module}${className}正等待关闭`);
             //如果此时有地方正在获取界面，直接返回空
             viewData.doCallback(null, className, "获取界内已经关闭");
             return;
@@ -420,12 +419,12 @@ export class UIManager {
         if (viewData.status == ViewStatus.WATITING_HIDE) {
             //加载过程中有人隐藏了界面
             view.hide();
-            if (CC_DEBUG) Log.w(`${this._logTag}加载过程隐藏了界面${className}`);
+            if (CC_DEBUG) Log.w(`${this.module}加载过程隐藏了界面${className}`);
             reslove(view);
             viewData.doCallback(view, className, "加载完成，但加载过程中被隐藏");
         }
         else {
-            if (CC_DEBUG) Log.d(`${this._logTag}open view : ${className}`)
+            if (CC_DEBUG) Log.d(`${this.module}open view : ${className}`)
 
             if (!viewData.isPreload) {
                 view.show(openOptions.args);
@@ -437,7 +436,7 @@ export class UIManager {
 
     private loadPrefab(bundle: BUNDLE_TYPE, url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
         return new Promise<cc.Prefab>((resolove, reject) => {
-            Manager.assetManager.load(bundle, url, cc.Prefab, progressCallback, (data) => {
+            Manager.asset.load(bundle, url, cc.Prefab, progressCallback, (data) => {
                 if (data && data.data && data.data instanceof cc.Prefab) {
                     resolove(data.data);
                 }
@@ -542,10 +541,10 @@ export class UIManager {
             }
             viewData.loadData.clear();
             if ( viewData.isPrefab ){
-                Manager.assetManager.releaseAsset(viewData.info);
+                Manager.asset.releaseAsset(viewData.info);
             }
             this._viewDatas.delete(className);
-            Log.d(`${this._logTag} close view : ${className}`);
+            Log.d(`${this.module} close view : ${className}`);
         }
     }
 
@@ -595,7 +594,7 @@ export class UIManager {
                 if (viewData.view && cc.isValid(viewData.view.node)) {
                     viewData.view.hide();
                 }
-                if (CC_DEBUG) Log.d(`${this._logTag}hide view : ${viewData.loadData.name}`);
+                if (CC_DEBUG) Log.d(`${this.module}hide view : ${viewData.loadData.name}`);
             }
             else {
                 //没有加载写成，正常加载中
@@ -673,10 +672,10 @@ export class UIManager {
             let component = root.getComponent(data);
             if (component) {
                 if (typeof data == "string") {
-                    if (CC_DEBUG) Log.w(`${this._logTag}已经存在 Component ${component}`)
+                    if (CC_DEBUG) Log.w(`${this.module}已经存在 Component ${component}`)
                 }
                 else {
-                    if (CC_DEBUG) Log.w(`${this._logTag}已经存在 Component ${cc.js.getClassName(data)}`);
+                    if (CC_DEBUG) Log.w(`${this.module}已经存在 Component ${cc.js.getClassName(data)}`);
                 }
                 return component;
             }
@@ -697,33 +696,31 @@ export class UIManager {
         }
     }
 
-    print( delegate : UIManagerPrintDelegate<ViewData,cc.Node,cc.Component>){
-        if (delegate) {
-            if (delegate.printViews) {
-                this._viewDatas.forEach((data, key) => {
-                    if (delegate.printViews) {
-                        delegate.printViews(data, key);
-                    }
-                });
-            }
-
-            if (delegate.printChildren) {
-                let root = this.viewRoot;
-                if (root) {
-                    let children = root.children;
-                    for (let i = 0; i < children.length; i++) {
-                        delegate.printChildren(children[i]);
-                    }
+    debug(config : {showViews ?: boolean,showChildren ?: boolean,showComp ?: boolean}){
+        if ( config.showViews ){
+            Log.d(`-----------当前所有视图------------`);
+            this._viewDatas.forEach((value, key) => {
+                Log.d(`[${key}] isLoaded : ${value.isLoaded} status : ${value.status} view : ${cc.js.getClassName(value.view)} active : ${value.view && value.view.node ? value.view.node.active : false}`);
+            });
+        }
+        if ( config.showChildren ){
+            let root = this.viewRoot;
+            if (root) {
+                Log.d(`-----------当前所有节点信息------------`);
+                let children = root.children;
+                for (let i = 0; i < children.length; i++) {
+                    let data = children[i];
+                    Log.d(`${data.name} active : ${data.active}`);
                 }
             }
-
-            if (delegate.printComp) {
-                let root: any = this.componentRoot;
-                if (root) {
-                    let comps: any[] = root._components;
-                    for (let i = 0; i < comps.length; i++) {
-                        delegate.printComp(comps[i]);
-                    }
+        }
+        if ( config.showComp ){
+            let root: any = this.componentRoot;
+            if (root) {
+                Log.d(`-----------当前所有组件信息------------`);
+                let comps: any[] = root._components;
+                for (let i = 0; i < comps.length; i++) {
+                    Log.d(cc.js.getClassName(comps[i]));
                 }
             }
         }
