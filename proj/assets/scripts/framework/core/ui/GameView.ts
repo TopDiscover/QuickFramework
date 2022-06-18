@@ -40,8 +40,21 @@ export default class GameView extends UIView {
         Manager.entryManager.onEnterGameView(this.bundle,this);
     }
 
+    /**
+     * @description 进入指定Bundle
+     * @param bundle Bundle名
+     * @param userData 用户自定义数据
+     */
     enterBundle( bundle : BUNDLE_TYPE , userData ?: any){
         Manager.entryManager.enterBundle(bundle , userData);
+    }
+
+    /**
+     * @description 返回上一场景
+     * @param userData 用户自定义数据
+     */
+    backBundle(userData?:any){
+        Manager.entryManager.backBundle(userData);
     }
 
     onDestroy(){

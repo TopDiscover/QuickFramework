@@ -26,6 +26,7 @@ export class DataCenter implements ISingleton {
             if (isCreate) {
                 let data = new DataTypeOrModule();
                 data.module = DataTypeOrModule.module;
+                Log.d(`${data.module}初始化`)
                 data.init();
                 this._datas.set(DataTypeOrModule.module, data);
                 return <T>data;
@@ -38,6 +39,7 @@ export class DataCenter implements ISingleton {
         if ( DataTypeOrModule ){
             let module = this.getModule(DataTypeOrModule);
             if (this._datas.has(module)) {
+                Log.d(`${module}销毁`)
                 this._datas.get(module)?.destory();
                 this._datas.delete(module);
                 return true;

@@ -2,7 +2,6 @@
 import { Handler } from '../../framework/core/net/service/Handler';
 import { Macro } from '../../framework/defines/Macros';
 import { Config } from '../config/Config';
-import { Global } from '../data/Global';
 /**
  * @description 重连Handler
  */
@@ -25,7 +24,7 @@ export class ReconnectHandler extends Handler {
     }
 
     protected get data() {
-        return Manager.dataCenter.get(Global) as Global;
+        return Manager.stageData;
     }
 
     protected _enabled = false;
@@ -83,7 +82,7 @@ export class ReconnectHandler extends Handler {
         if (this.isInvalid) return;
         Manager.alert.close(Config.RECONNECT_ALERT_TAG);
         //说明进入了登录界面
-        if (this.data.where == Macro.BUNDLE_RESOURCES) {
+        if (this.data.isLoginStage()) {
             Manager.uiReconnect.hide();
             Log.w(`重连处于登录界面，停止重连`);
             return;
@@ -166,7 +165,7 @@ export class ReconnectHandler extends Handler {
 
     /**@description 是否无效 */
     protected get isInvalid() {
-        if (!(this.service && this.enabled && this.data.where != Macro.BUNDLE_RESOURCES)) {
+        if (!(this.service && this.enabled && !this.data.isLoginStage())) {
             return true;
         }
         return false;

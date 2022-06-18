@@ -1,6 +1,5 @@
-import { Update } from "../update/Update";
 import { EntryDelegate } from "./EntryDelegate";
-import { AssetManager, Node } from "cc";
+import { Node } from "cc";
 import { DEBUG } from "cc/env";
 import { Macro } from "../../defines/Macros";
 import { UpdateItem } from "../update/UpdateItem";
@@ -86,6 +85,18 @@ export class EntryManager implements ISingleton{
                 config.userData = userData;
                 Manager.bundleManager.enterBundle(config);
             }
+        }
+    }
+
+    /**
+     * @description 返回上一场景 
+     * */
+    backBundle( userData ?: any ){
+        let bundle = Manager.stageData.prevWhere;
+        if ( bundle ){
+            this.enterBundle(bundle,userData);
+        }else{
+            Log.d(`${this.module}已经是最后一个场景，无法返回`);
         }
     }
 

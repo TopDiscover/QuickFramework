@@ -3,8 +3,6 @@ import { MainCmd, SUB_CMD_SYS } from "../protocol/CmdDefines";
 import { Net } from "../../framework/core/net/Net";
 import { Config } from "../config/Config";
 import { Service } from "../../framework/core/net/service/Service";
-import { Global } from "../data/Global";
-import { Macro } from "../../framework/defines/Macros";
 import { ReconnectHandler } from "./ReconnectHandler";
 
 /**
@@ -13,7 +11,7 @@ import { ReconnectHandler } from "./ReconnectHandler";
 export class CommonService extends Service {
 
     private get data() {
-        return Manager.dataCenter.get(Global) as Global;
+        return Manager.stageData;
     }
     protected ip = "localhost";
     protected port = 3000;
@@ -85,7 +83,7 @@ export class CommonService extends Service {
     }
 
     onEnterBackground() {
-        if (this.data.where == Macro.BUNDLE_RESOURCES) {
+        if (this.data.isLoginStage()) {
             return;
         }
         let me = this;
@@ -103,7 +101,7 @@ export class CommonService extends Service {
             clearTimeout(this._backgroundTimeOutId);
             Log.d(`在后台时间${inBackgroundTime} , 最大时间为: ${this.maxEnterBackgroundTime}`)
             //登录界面，不做处理
-            if (this.data.where == Macro.BUNDLE_RESOURCES) {
+            if (this.data.isLoginStage()) {
                 return;
             }
             if (inBackgroundTime > this.maxEnterBackgroundTime) {

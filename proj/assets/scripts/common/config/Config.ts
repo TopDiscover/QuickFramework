@@ -48,8 +48,6 @@ export namespace Config {
     /**@description 网络重连弹出框tag */
     export const RECONNECT_ALERT_TAG = 100;
 
-    export const ENTRY_CONFIG : {[key:string] : Update.Config} ={};
-
     export const SHOW_DEBUG_INFO_KEY = "SHOW_DEBUG_INFO_KEY";
 }
 
