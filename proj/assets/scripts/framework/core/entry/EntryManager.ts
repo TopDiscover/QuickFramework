@@ -86,6 +86,18 @@ export class EntryManager implements ISingleton{
         }
     }
 
+    /**
+     * @description 返回上一场景 
+     * */
+    backBundle( userData ?: any ){
+        let bundle = Manager.stageData.prevWhere;
+        if ( bundle ){
+            this.enterBundle(bundle,userData);
+        }else{
+            Log.d(`${this.module}已经是最后一个场景，无法返回`);
+        }
+    }
+
     /**@description 加载bundle完成 */
     onLoadBundleComplete(item:UpdateItem) {
         //通知入口管理进入bundle

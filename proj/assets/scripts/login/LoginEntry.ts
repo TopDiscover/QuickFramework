@@ -4,10 +4,9 @@
  */
 
 import LoginView from "./view/LoginView";
-import { Config, ViewZOrder } from "../common/config/Config";
+import { ViewZOrder } from "../common/config/Config";
 import { Macro } from "../framework/defines/Macros";
 import { Entry } from "../framework/core/entry/Entry";
-import { Update } from "../framework/core/update/Update";
 import { Singleton } from "../framework/utils/Singleton";
 
 class LoginEntry extends Entry {
@@ -32,8 +31,6 @@ class LoginEntry extends Entry {
         Manager.uiManager.close(LoginView);
     }
     protected initData(): void {
-        Config.ENTRY_CONFIG[Macro.BUNDLE_HALL] = new Update.Config(Manager.getLanguage("hallText"),Macro.BUNDLE_HALL);
-        Config.ENTRY_CONFIG[Macro.BUNDLE_RESOURCES] = new Update.Config(Manager.getLanguage("mainPack"),Macro.BUNDLE_RESOURCES);
     }
     protected pauseMessageQueue(): void {
         

@@ -16,7 +16,15 @@ class AudioData implements ISingleton{
     public effectVolume = 1;
     public isEffectOn = true;
     public isMusicOn = true;
-    public curMusicUrl = "";
+    private _curMusicUrl = "";
+    public get curMusicUrl(){
+        return this._curMusicUrl;
+    }
+    public set curMusicUrl(v){
+        this.prevMusicUrl = this._curMusicUrl;
+        this._curMusicUrl = v;
+    }
+    public prevMusicUrl = "";
     public curEffectId = -1;
     /**@description 当前背景音乐的Bundle */
     public curBundle: BUNDLE_TYPE = null;
@@ -127,6 +135,7 @@ export default class AudioComponent extends EventComponent {
     /**@description 当前播放的背景音乐 */
     public get curMusicUrl() { return this.audioData.curMusicUrl; }
     public set curMusicUrl(value) { this.audioData.curMusicUrl = value };
+    public get prevMusiUrl() { return this.audioData.prevMusicUrl }
     public get curBundle() { return this.audioData.curBundle; }
     public set curBundle(value) { this.audioData.curBundle = value; }
     protected get curLoop() { return this.audioData.curLoop; }
@@ -190,10 +199,13 @@ export default class AudioComponent extends EventComponent {
                         } else {
                             Manager.uiManager.garbage.addLocal(info);
                         }
-                        //停掉当前播放音乐
-                        this.stopMusic();
-                        //播放新的背景音乐
-                        cc.audioEngine.playMusic(data, loop);
+                        if ( !(this.isPlaying && this.curMusicUrl == this.prevMusiUrl) ){
+                            //停掉当前播放音乐
+                            this.stopMusic();
+                            //播放新的背景音乐
+                            cc.audioEngine.playMusic(data, loop);
+                        }
+                        
                         this.isPlaying = true;
                         resolve({ url: url, isSuccess: true });
                     } else {

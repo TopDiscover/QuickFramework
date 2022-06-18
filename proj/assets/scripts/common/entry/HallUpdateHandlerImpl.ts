@@ -1,7 +1,6 @@
 import { Update } from "../../framework/core/update/Update";
 import { UpdateHandlerDelegate, UpdateItem } from "../../framework/core/update/UpdateItem";
 import { Macro } from "../../framework/defines/Macros";
-import { Global } from "../data/Global";
 
 /**@description 大厅更新代理 */
 export class HallUpdateHandlerImpl implements UpdateHandlerDelegate , ISingleton{
@@ -41,8 +40,7 @@ export class HallUpdateHandlerImpl implements UpdateHandlerDelegate , ISingleton
         Manager.alert.show({
             text: content,
             confirmCb: (isOK) => {
-                let data = Manager.dataCenter.get(Global) as Global;
-                if ( data.where == Macro.BUNDLE_RESOURCES ){
+                if ( Manager.stageData.isLoginStage() ){
                     //如果是在登录界面，直接检测更新
                     Manager.entryManager.onCheckUpdate();
                 }else{

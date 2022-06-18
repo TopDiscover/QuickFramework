@@ -1,6 +1,6 @@
 export let LanguageZH = {
   language: cc.sys.LANGUAGE_CHINESE,
-  data : {
+  data: {
     alert_title: "温馨提示",
     alert_confirm: "确 定",
     alert_cancel: "取 消",
@@ -24,12 +24,49 @@ export let LanguageZH = {
     tryReconnect: "{0}网络:正在尝试第{1}次连接...",
     quitGame: "您确定要退出游戏？",
     loading_game_resources: "正在加载游戏资源...",
-    mainPack: "主包",
     mainPackVersionIsTooLow: "版本过低，请更新。",
     loadVersions: "正在加载远程版本信息",
-    warnNetBad : "您的网络已断开，请重试!!",
-    downloadFailed : "下载文件失败，请重试!!!",
-    loadFailed : "{0}加载失败!!",
-    loadingProgress : "加载资源中({0}%)...",
+    warnNetBad: "您的网络已断开，请重试!!",
+    downloadFailed: "下载文件失败，请重试!!!",
+    loadFailed: "{0}加载失败!!",
+    loadingProgress: "加载资源中({0}%)...",
+    bundles: {
+      aimLine: {
+        name: "瞄准线",
+        sort: 4,
+      },
+      eliminate: {
+        name: "爱消除",
+        sort: 2
+      },
+      loadTest: {
+        name: "加载示例",
+        sort: 5
+      },
+      netTest: {
+        name: "网络示例",
+        sort: 6
+      },
+      nodePoolTest: {
+        name: "对象池示例",
+        sort: 7
+      },
+      tankBattle: {
+        name: "坦克大战",
+        sort: 1
+      },
+      shaders: {
+        name: "shaders",
+        sort: 3
+      },
+      resources: {
+        name: "主包",
+        sort: 0
+      },
+      hall: {
+        name: "游戏大厅",
+        sort: 0
+      },
+    }
   }
 }

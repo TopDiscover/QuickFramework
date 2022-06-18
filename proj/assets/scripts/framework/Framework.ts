@@ -28,7 +28,7 @@ export class Framewok {
         return false;
     }
 
-    /**@description 瓷业释放管理 */
+    /**@description 资源释放管理 */
     get releaseManger(){
         return Singleton.instance.get(ReleaseManager) as ReleaseManager;
     }

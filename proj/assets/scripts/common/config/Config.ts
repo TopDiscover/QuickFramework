@@ -48,8 +48,6 @@ export namespace Config {
     /**@description 网络重连弹出框tag */
     export const RECONNECT_ALERT_TAG = 100;
 
-    export const ENTRY_CONFIG: { [key: string]: Update.Config } = {};
-
     export const SHOW_DEBUG_INFO_KEY = "SHOW_DEBUG_INFO_KEY";
 }
 
@@ -83,7 +81,7 @@ export namespace ViewZOrder {
 }
 
 /**@description 网络优先级,值越大，优化级越高 */
-export enum NetPriority {
+export enum NetPriority{
     Game,
     Chat,
     Lobby,
