@@ -81,7 +81,7 @@ export abstract class Service extends ServerConnector implements IService {
     }
 
     protected onMessage(data: MessageEvent) {
-
+        this.recvHeartbeat();
         //先对包信进行解析
         let header = new this._Process.Codec;
         if (!header.unPack(data)) {
