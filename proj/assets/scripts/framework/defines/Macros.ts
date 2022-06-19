@@ -22,7 +22,7 @@ export namespace Macro{
     /**@description 未知 */
     export const UNKNOWN = "UNKNOWN"
     /**@description 应该层主动关闭Socket */
-    export const ON_CUSTOM_CLOSE = "";
+    export const ON_CUSTOM_CLOSE = "ON_CUSTOM_CLOSE";
     /**@description 主包热更新模拟bundle名 */
     export const MAIN_PACK_BUNDLE_NAME = "main";
     /**@description 大厅bunlde名 */

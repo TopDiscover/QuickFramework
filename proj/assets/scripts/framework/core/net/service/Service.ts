@@ -8,7 +8,7 @@ import { Process } from "./Process";
 /** @description 处理函数声明 handleType 为你之前注册的handleType类型的数据 返回值number 为处理函数需要的时间 */
 
 
-export abstract class Service extends ServerConnector {
+export abstract class Service extends ServerConnector implements IService {
     /**@description Service所属模块，如Lobby,game */
     static module: string = Macro.UNKNOWN;
     /**@description 该字段由ServiceManager指定 */
@@ -87,7 +87,7 @@ export abstract class Service extends ServerConnector {
             Log.e(`decode header error`);
             return;
         }
-
+        
         if (this.isHeartBeat(header)) {
             //心跳消息，路过处理，应该不会有人注册心跳吧
             this.onRecvHeartBeat();
@@ -101,7 +101,7 @@ export abstract class Service extends ServerConnector {
     protected onRecvHeartBeat(){
 
     }
-    
+
     /**
   * @description 添加服务器数据监听
   * @param handleType 处理类型，指你用哪一个类来进行解析数据
@@ -163,5 +163,11 @@ export abstract class Service extends ServerConnector {
             }
         } else { Log.e("请求指定数据包头处理类型") }
 
+    }
+
+    destory(){
+        if ( this.reconnectHandler ){
+            this.reconnectHandler.onDestroy();
+        }
     }
 }

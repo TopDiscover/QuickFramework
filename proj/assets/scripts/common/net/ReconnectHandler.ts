@@ -42,8 +42,8 @@ export class ReconnectHandler extends Handler {
     protected _maxConnectCount = 3;
     /**@description 是否正在连接中 */
     isConnecting = false;
-    protected connectID = 0;
-    protected connectTimeOutID = 0;
+    protected connectID = 1;
+    protected connectTimeOutID = 2;
     /**@description 尝试重连 */
     reconnect() {
         if (this.isInvalid) return;
@@ -73,9 +73,9 @@ export class ReconnectHandler extends Handler {
             Log.d(`${this.service.module}${time}秒后尝试重连`);
         }
         this.stopAction(this.connectID);
-        this.connectID = this.delayCall(()=>{
-            this.connect()
-        }, time,"connect");
+        this.delayCall(this.connectID,time,()=>{
+            this.connect();
+        })
     }
 
     protected connect() {
@@ -97,9 +97,9 @@ export class ReconnectHandler extends Handler {
 
         //启用连接超时处理
         this.stopAction(this.connectTimeOutID);
-        this.connectTimeOutID = this.delayCall(()=>{
-            this.connectTimeOut()
-        }, Config.RECONNECT_TIME_OUT,"connectTimeOut");
+        this.delayCall(this.connectTimeOutID,Config.RECONNECT_TIME_OUT,()=>{
+            this.connectTimeOut();
+        })
     }
 
     protected connectTimeOut() {
@@ -169,5 +169,23 @@ export class ReconnectHandler extends Handler {
             return true;
         }
         return false;
+    }
+
+    private stopActions(){
+        this.stopAction(this.connectID);
+        this.stopAction(this.connectTimeOutID);
+    }
+
+    private stopAction(tag : number ){
+        cc.Tween.stopAllByTag(tag,this);
+    }
+
+    private delayCall(tag:number,time:number,func:Function){
+        cc.tween(this).tag(tag).delay(time).call(func).start();
+    }
+
+    onDestroy(): void {
+        this.stopActions();
+        super.onDestroy();
     }
 }

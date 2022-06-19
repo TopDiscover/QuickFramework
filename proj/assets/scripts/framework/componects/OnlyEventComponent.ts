@@ -1,11 +1,11 @@
 /**
  * @description 事件处理组件
  */
+export default class OnlyEventComponent {
 
-const { ccclass, property } = cc._decorator;
-
-@ccclass
-export default class EventComponent extends cc.Component {
+    get node() {
+        return Manager.uiManager.componentRoot;
+    }
 
     private _events: Map<string, Function> = new Map();
 
@@ -19,7 +19,7 @@ export default class EventComponent extends cc.Component {
             Log.e(`${name} 重复注册`);
             return;
         }
-        Manager.dispatcher.add(name,func,this);
+        Manager.dispatcher.add(name, func, this);
         this._events.set(name, func);
     }
 
@@ -40,8 +40,8 @@ export default class EventComponent extends cc.Component {
     }
 
     onDestroy() {
-        this._events.forEach((func,name)=>{
-            Manager.dispatcher.remove(name,this);
+        this._events.forEach((func, name) => {
+            Manager.dispatcher.remove(name, this);
         });
         this._events.clear();
     }

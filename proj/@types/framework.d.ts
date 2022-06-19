@@ -259,6 +259,15 @@ declare function loadRes(config: {
 
 declare type EntryDelegate = import("../assets/scripts/framework/core/entry/EntryDelegate").EntryDelegate;
 declare type Message = import("../assets/scripts/framework/core/net/message/Message").Message;
+
+interface IService{
+    addListener?(cmd: string, handleType: any, handleFunc: Function, isQueue: boolean, target: any):any;
+
+    removeListeners?(target: any, eventName?: string):any;
+
+	send?(msg:Message):any;
+}
+
 /**@description 语言包相关 */
 declare namespace Language {
 	export interface Data {

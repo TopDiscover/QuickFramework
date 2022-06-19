@@ -458,7 +458,7 @@ export class UIManager implements ISingleton{
     }
 
     private _componentRoot: cc.Node = null!;
-    private get componentRoot() {
+    get componentRoot() {
         if (!this._componentRoot && !cc.isValid(this._componentRoot)) {
             this._componentRoot = cc.find("componentRoot", this.canvas);
         }

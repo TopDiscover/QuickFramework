@@ -47,6 +47,7 @@ export class ServiceManager implements GameEventInterface , ISingleton {
                 if (this.services[i].module == name) {
                     //销毁前先关闭网络
                     this.services[i].close();
+                    this.services[i].destory();
                     this.services.splice(i, 1);
                 }
             }
@@ -63,6 +64,7 @@ export class ServiceManager implements GameEventInterface , ISingleton {
             if (!this.isInExclude(this.services[i], exclude)) {
                 //销毁前先关闭网络
                 this.services[i].close();
+                this.services[i].destory();
                 this.services.splice(i, 1);
             }
         }
