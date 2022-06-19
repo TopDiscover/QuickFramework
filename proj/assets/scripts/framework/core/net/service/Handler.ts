@@ -18,7 +18,7 @@ export abstract class Handler extends OnlyEventComponent{
     }
 
     /**@description 绑定Service对象 */
-    protected abstract get service(): IService | null;
+    protected abstract get service(): any;
 
     /**
      * @description 注册网络事件
@@ -28,8 +28,9 @@ export abstract class Handler extends OnlyEventComponent{
      * @param isQueue 接收到消息，是否进行队列处理
      */
     protected register(cmd: string, func: (data: any) => void, handleType?: any, isQueue = true) {
-        if (this.service && this.service.addListener ) {
-            this.service.addListener(cmd, handleType, func, isQueue, this);
+        let service : IService = this.service;
+        if (service && service.addListener ) {
+            service.addListener(cmd, handleType, func, isQueue, this);
             return;
         }
         if( CC_DEBUG ){
@@ -42,8 +43,9 @@ export abstract class Handler extends OnlyEventComponent{
      * @param cmd 如果为null，则反注册当前对象注册过的所有处理过程，否则对特定cmd反注册
      **/
     protected unregister(cmd?: string) {
-        if (this.service && this.service.removeListeners) {
-            this.service.removeListeners(this, cmd)
+        let service : IService = this.service;
+        if (service && service.removeListeners) {
+            service.removeListeners(this, cmd)
             return;
         }
         if( CC_DEBUG ){
