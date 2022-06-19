@@ -12,7 +12,7 @@ export abstract class Sender extends OnlyEventComponent{
     /**@description 该字段由NetHelper指定 */
     module: string = "";
     /**@description 绑定Service对象 */
-    protected abstract get service(): IService | null;
+    protected abstract get service(): any;
 
     protected send(msg: Message) {
         if (this.service && this.service.send) {
