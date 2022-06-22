@@ -20,7 +20,6 @@ export let LanguageZH = {
     manifestError: "版本文件解析错误!",
     checkingUpdate: "检测更新中...",
     alreadyRemoteVersion: "{0}已升级到最新",
-    hallText: "大厅",
     reconnect: "正在重连...",
     warningReconnect: "{0}网络已断开，是否重新连接？",
     tryReconnect: "{0}网络:正在尝试第{1}次连接...",
