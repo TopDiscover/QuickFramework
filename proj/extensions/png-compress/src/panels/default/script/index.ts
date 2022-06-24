@@ -69,9 +69,11 @@ module.exports = Editor.Panel.define({
                     onChangeEnabled(enabled: boolean) {
                         // console.log("enabled",enabled);
                         helper.config.enabled = enabled;
+                        this.onSaveConfig();
                     },
                     onChangeEnabledNoFound(enabled:boolean){
                         helper.config.enabledNoFound = enabled;
+                        this.onSaveConfig();
                     },
                     onChangeMinQuality(value: number) {
                         // console.log("minQuality",value);

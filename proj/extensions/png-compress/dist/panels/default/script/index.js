@@ -7,8 +7,8 @@ const Helper_1 = require("../../../Helper");
 let view = null;
 module.exports = Editor.Panel.define({
     listeners: {},
-    template: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
-    style: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
+    template: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
+    style: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
     $: {
         app: "#app"
     },
@@ -40,12 +40,12 @@ module.exports = Editor.Panel.define({
     },
     ready() {
         if (this.$.app) {
-            let sourcePath = path_1.join(Editor.Project.path, "assets");
-            const app = vue_1.createApp({});
+            let sourcePath = (0, path_1.join)(Editor.Project.path, "assets");
+            const app = (0, vue_1.createApp)({});
             //指定Vue3 自己定义控件跳过解析
             app.config.compilerOptions.isCustomElement = tag => tag.startsWith("ui-");
             app.component("view-content", {
-                template: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/template/vue/view.html'), 'utf-8'),
+                template: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/vue/view.html'), 'utf-8'),
                 data() {
                     return {
                         enabled: Helper_1.helper.config.enabled,
@@ -65,9 +65,11 @@ module.exports = Editor.Panel.define({
                     onChangeEnabled(enabled) {
                         // console.log("enabled",enabled);
                         Helper_1.helper.config.enabled = enabled;
+                        this.onSaveConfig();
                     },
                     onChangeEnabledNoFound(enabled) {
                         Helper_1.helper.config.enabledNoFound = enabled;
+                        this.onSaveConfig();
                     },
                     onChangeMinQuality(value) {
                         // console.log("minQuality",value);
