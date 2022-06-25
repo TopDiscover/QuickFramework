@@ -76,7 +76,8 @@ public:
         UNSTARTED,
         DOWNLOADING,
         SUCCESSED,
-        UNMARKED
+        UNMARKED,
+        UNZIP
     };
     
     //! Asset object
@@ -205,7 +206,7 @@ protected:
     /** @brief Generate resuming download assets list
      * @param units   The download units reference to be modified by the generation result
      */
-    void genResumeAssetsList(DownloadUnits *units) const;
+    void genResumeAssetsList(DownloadUnits *units , bool& unzip) const;
     
     /** @brief Prepend all search paths to the FileUtils.
      */

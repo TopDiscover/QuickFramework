@@ -956,7 +956,7 @@ void AssetsManagerEx::prepareUpdate()
     _downloadResumed = false;
     _downloadedSize.clear();
     _totalEnabled = false;
-
+    _unzip = false;
     // Temporary manifest exists, previously updating and equals to the remote version, resuming previous download
     if (_tempManifest && _tempManifest->isLoaded() && _tempManifest->isUpdating() && _tempManifest->equal(_remoteManifest))
 	{
@@ -965,7 +965,7 @@ void AssetsManagerEx::prepareUpdate()
 			_fileUtils->createDirectory(dir);
 		}
         _tempManifest->saveToFile(_tempManifestPath);
-        _tempManifest->genResumeAssetsList(&_downloadUnits);
+        _tempManifest->genResumeAssetsList(&_downloadUnits,_unzip);
         _totalWaitToDownload = _totalToDownload = (int)_downloadUnits.size();
         _downloadResumed = true;
 
@@ -1073,7 +1073,13 @@ void AssetsManagerEx::startUpdate()
             msg = StringUtils::format("Start to update %d files from remote package.", _totalToDownload);
         }
         dispatchUpdateEvent(EventAssetsManagerEx::EventCode::UPDATE_PROGRESSION, "", msg);
-        batchDownload();
+		if (_unzip) {
+			auto it = _downloadUnits.begin();
+			onSuccess(it->second.srcUrl, it->second.storagePath, it->first);
+		}
+		else {
+			batchDownload();
+		}
     }
 }
 
@@ -1578,6 +1584,8 @@ void AssetsManagerEx::onSuccess(const std::string &/*srcUrl*/, const std::string
 			bool compressed = isCompressed();//assetIt != assets.end() ? assetIt->second.compressed : false;
             if (compressed)
             {
+				_tempManifest->setAssetDownloadState(customId, Manifest::UNZIP);
+				_tempManifest->saveToFile(_tempManifestPath);
                 decompressDownloadedZip(customId, storagePath);
             }
             else
