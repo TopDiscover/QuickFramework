@@ -444,6 +444,7 @@ private:
 	/* 主包包含哪些bundle,如 main&resources */
 	std::vector<std::string> _mainBundles;
 	float _downloadAagin;
+    bool _unzip;
 };
 
 NS_CC_EXT_END

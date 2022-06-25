@@ -319,7 +319,8 @@ std::unordered_map<std::string, Manifest::AssetDiff> Manifest::genDiff(const Man
     return diff_map;
 }
 
-void Manifest::genResumeAssetsList(DownloadUnits *units) const {
+void Manifest::genResumeAssetsList(DownloadUnits *units , bool& unzip) const {
+    unzip = false;
     for (auto it = _assets.begin(); it != _assets.end(); ++it) {
         Asset asset = it->second;
 
@@ -336,6 +337,9 @@ void Manifest::genResumeAssetsList(DownloadUnits *units) const {
             unit.storagePath = _manifestRoot + asset.path;
             unit.size = asset.size;
             unit.compressed = asset.compressed;
+            if (asset.downloadState == DownloadState::UNZIP && _fileUtils->isFileExist(unit.storagePath)){
+                unzip = true;
+            }
             units->emplace(unit.customId, unit);
         }
     }
