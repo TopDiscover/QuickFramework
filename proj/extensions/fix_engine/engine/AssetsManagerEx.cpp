@@ -626,6 +626,7 @@ void AssetsManagerEx::decompressDownloadedZip(const std::string &customId, const
         auto dataInner = reinterpret_cast<AsyncData *>(param);
         if (dataInner->succeed) {
             fileSuccess(dataInner->customId, dataInner->zipFile);
+            _fileUtils->removeFile(dataInner->zipFile);
         } else {
             std::string errorMsg = "Unable to decompress file " + dataInner->zipFile;
             // Ensure zip file deletion (if decompress failure cause task thread exit anormally)
@@ -640,7 +641,8 @@ void AssetsManagerEx::decompressDownloadedZip(const std::string &customId, const
         if (decompress(asyncData->zipFile)) {
             asyncData->succeed = true;
         }
-        _fileUtils->removeFile(asyncData->zipFile);
+        // Wait for the decompression to complete before deleting the zip archive
+        // _fileUtils->removeFile(asyncData->zipFile);
     });
 }
 
