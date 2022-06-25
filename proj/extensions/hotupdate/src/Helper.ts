@@ -200,7 +200,7 @@ class Helper {
     }
     getManifestDir(buildDir: string) {
         if (buildDir && buildDir.length > 0) {
-            return path.join(buildDir,"manifest");
+            return path.join(buildDir, "manifest");
         } else {
             return "";
         }
@@ -225,7 +225,7 @@ class Helper {
 
     /**@description 生成manifest版本文件 */
     onCreateManifest(callbak?: Function) {
-        Editor.Message.send(PACKAGE_NAME,"onSetProcess",true);
+        Editor.Message.send(PACKAGE_NAME, "onSetProcess", true);
         this.saveConfig();
         this.log(`当前用户配置为 : `, this.config);
         this.log("开始生成Manifest配置文件...");
@@ -268,6 +268,8 @@ class Helper {
             Tools.readDir(path.join(buildDir, mainIncludes[i]), manifest.assets, buildDir);
         }
 
+        let versionDatas: VersionDatas = {};
+
         //生成project.manifest
         let projectManifestPath = path.join(manifestDir, "main_project.json");
         let versionManifestPath = path.join(manifestDir, "main_version.json");
@@ -275,15 +277,20 @@ class Helper {
         let md5 = require("crypto").createHash('md5').update(content).digest('hex');
         manifest.md5 = md5;
         manifest.version = version;
-        writeFileSync(projectManifestPath, JSON.stringify(manifest));
-        this.log(`生成${projectManifestPath}成功`);
-        this.addCreateProgress();
 
+        let projectData = JSON.parse(JSON.stringify(manifest));
         delete manifest.assets;
+        let versionData = JSON.parse(JSON.stringify(manifest))
+        this.insertVersionData(
+            versionDatas,
+            manifest.bundle,
+            projectData,
+            versionData,
+            projectManifestPath,
+            versionManifestPath,
+            md5
+        );
 
-        writeFileSync(versionManifestPath, JSON.stringify(manifest));
-        this.log(`生成${versionManifestPath}成功`);
-        this.addCreateProgress();
 
         //生成所有版本控制文件，用来判断当玩家停止在版本1，此时发版本2时，不让进入游戏，返回到登录，重新走完整个更新流程
         let versions: { [key: string]: { md5: string, version: string } } = {
@@ -293,7 +300,6 @@ class Helper {
         //生成各bundles版本文件
         for (let i = 0; i < subBundles.length; i++) {
             let key = subBundles[i];
-            this.log(`正在生成:${key}`);
             let manifest: Manifest = {
                 assets: {},
                 bundle: key
@@ -306,17 +312,23 @@ class Helper {
             let md5 = require("crypto").createHash('md5').update(content).digest('hex');
             manifest.md5 = md5;
             manifest.version = this.config.bundles[key].version
-            writeFileSync(projectManifestPath, JSON.stringify(manifest));
-            this.log(`生成${projectManifestPath}成功`);
-            this.addCreateProgress();
 
+            projectData = JSON.parse(JSON.stringify(manifest));
             delete manifest.assets;
+            versionData = JSON.parse(JSON.stringify(manifest));
+
             versions[`${key}`] = {} as any;
             versions[`${key}`].md5 = md5;
             versions[`${key}`].version = manifest.version;
-            writeFileSync(versionManifestPath, JSON.stringify(manifest));
-            this.log(`生成${versionManifestPath}成功`);
-            this.addCreateProgress();
+            this.insertVersionData(
+                versionDatas,
+                manifest.bundle,
+                projectData,
+                versionData,
+                projectManifestPath,
+                versionManifestPath,
+                md5
+            );
         }
 
         //写入所有版本
@@ -340,15 +352,52 @@ class Helper {
             handler: (isComplete: boolean) => {
                 this.addCreateProgress();
                 if (isComplete) {
-                    setTimeout(() => {
-                        this.log(`生成完成`);
-                        Editor.Message.send(PACKAGE_NAME,"onSetProcess",false);
-                        if (callbak) callbak();
-                    }, 500);
+                    this.createVersionFile(versionDatas, callbak);
                 }
             }
         })
         this.remake()
+    }
+
+    private insertVersionData(
+        source: VersionDatas,
+        bundle: string | undefined,
+        project: Manifest,
+        version: Manifest,
+        projectPath: string,
+        versionPath: string,
+        md5: string) {
+        if (bundle) {
+            source[bundle] = {
+                project: project,
+                version: version,
+                projectPath: projectPath,
+                versionPath: versionPath,
+                md5: md5
+            }
+        }
+    }
+
+    private createVersionFile(source: VersionDatas, callbak?: Function) {
+        this.log(`准备生成版本控制文件`);
+        //更新版本控制文件中zip大小
+        setTimeout(()=>{
+            Tools.updateZipSize(source);
+            let keys = Object.keys(source);
+            keys.forEach(bundle => {
+                let data = source[bundle];
+                writeFileSync(data.projectPath, JSON.stringify(data.project));
+                this.log(`生成${data.projectPath}成功`);
+                this.addCreateProgress();
+                writeFileSync(data.versionPath, JSON.stringify(data.version));
+                this.log(`生成${data.versionPath}成功`);
+                this.addCreateProgress();
+            })
+    
+            this.log(`生成完成`);
+            Editor.Message.send(PACKAGE_NAME, "onSetProcess", false);
+            if (callbak) callbak();
+        },1000)
     }
 
     private _createProgress = 0;
@@ -407,7 +456,7 @@ class Helper {
     }
     /**@description 删除不包含在包内的所有bundles */
     private removeNotInApkBundle() {
-        Editor.Message.send(PACKAGE_NAME,"onSetProcess",true);
+        Editor.Message.send(PACKAGE_NAME, "onSetProcess", true);
         let keys = Object.keys(this.config.bundles);
         let removeBundles: string[] = [];
         keys.forEach((key) => {
@@ -433,13 +482,13 @@ class Helper {
             this.log(`删除版本文件 : ${manifests[i]}`);
             Tools.delFile(manifests[i]);
         }
-        Editor.Message.send(PACKAGE_NAME,"onSetProcess",false);
+        Editor.Message.send(PACKAGE_NAME, "onSetProcess", false);
     }
     /**
      * @description 部署
      */
     onDeployToRemote() {
-        
+
         if (this.config.remoteDir.length <= 0) {
             this.log("[部署]请先选择本地服务器目录");
             return;
@@ -452,7 +501,7 @@ class Helper {
             this.log(`[部署]构建目录不存在 : ${this.config.buildDir} , 请先构建`);
             return;
         }
-        Editor.Message.send(PACKAGE_NAME,"onSetProcess",true);
+        Editor.Message.send(PACKAGE_NAME, "onSetProcess", true);
         let includes = this.mainBundleIncludes;
 
         let temps = [];
@@ -525,8 +574,8 @@ class Helper {
     private addProgress() {
         this._progress++;
         let value = (this._progress / this.total) * 100;
-        if ( value >= 100 ){
-            Editor.Message.send(PACKAGE_NAME,"onSetProcess",false);
+        if (value >= 100) {
+            Editor.Message.send(PACKAGE_NAME, "onSetProcess", false);
         }
         Editor.Message.send(PACKAGE_NAME, "updateDeployProgress", value);
     }
@@ -575,29 +624,29 @@ class Helper {
     onBeforeBuild() {
         this.resetProgress();
         this.resetCreateProgress();
-        Editor.Message.send(PACKAGE_NAME,"onSetProcess",true);
+        Editor.Message.send(PACKAGE_NAME, "onSetProcess", true);
     }
 
     onAfterBuild(dest: string) {
         this.onInsertHotupdate(dest);
         this.readConfig();
-        this.config.buildDir = normalize(join(dest,"assets"));
-        Editor.Message.send(PACKAGE_NAME,"onSetBuildDir",this.config.buildDir);
+        this.config.buildDir = normalize(join(dest, "assets"));
+        Editor.Message.send(PACKAGE_NAME, "onSetBuildDir", this.config.buildDir);
         this.saveConfig();
     }
 
-    onPngCompressComplete(){
+    onPngCompressComplete() {
         this.readConfig();
         if (this.config.autoCreate) {
             this.onCreateManifest(() => {
-                if (this.config.autoDeploy && this.config.remoteDir.length > 0 ){
+                if (this.config.autoDeploy && this.config.remoteDir.length > 0) {
                     this.onDeployToRemote();
-                }else{
-                    Editor.Message.send(PACKAGE_NAME,"onSetProcess",false);
+                } else {
+                    Editor.Message.send(PACKAGE_NAME, "onSetProcess", false);
                 }
             })
-        }else{
-            Editor.Message.send(PACKAGE_NAME,"onSetProcess",false);
+        } else {
+            Editor.Message.send(PACKAGE_NAME, "onSetProcess", false);
         }
     }
 }

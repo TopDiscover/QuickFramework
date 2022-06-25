@@ -16,7 +16,7 @@ export namespace Config {
     export const isSkipCheckUpdate = false;
 
     /**@description 测试热更新服务器地址 */
-    export const HOT_UPDATE_URL = "http://172.22.224.1/hotupdate";
+    export const HOT_UPDATE_URL = "http://192.168.176.1/hotupdate";
 
     /**@description 主包包含目录 */
     export const MIAN_PACK_INCLUDE: string[] = ["src","jsb-adapter","assets/resources","assets/main"];

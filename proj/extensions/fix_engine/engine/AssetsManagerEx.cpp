@@ -400,7 +400,7 @@ void AssetsManagerEx::toDownloadZip() {
 	unit.customId = _bundle + "_" + _remoteManifest->getMd5() + ".zip";
 	unit.srcUrl = _packageUrl + "/zips/" + unit.customId;
 	unit.storagePath = _tempStoragePath + unit.customId;
-	unit.size = _remoteManifest->getTotalSize();
+	unit.size = _remoteManifest->getZipSize();
 	unit.compressed = true;
 	_remoteManifest->updateToZipAsset(unit);
 

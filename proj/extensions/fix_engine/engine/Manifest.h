@@ -253,7 +253,7 @@ protected:
         _manifestRoot = root;
     };
 
-	double getTotalSize() { return _totalSize; }
+	double getZipSize() { return _zipSize; }
 	/* 更新当前资源为zip下载*/
 	void updateToZipAsset(const DownloadUnit& unit);
 
@@ -302,8 +302,8 @@ private:
 	//md5
 	std::string _md5;
 
-	//下载文件总大小
-	double _totalSize;
+	//zip文件大小
+	double _zipSize;
 
 };
 

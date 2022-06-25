@@ -36,6 +36,10 @@ class _Tools {
         }
     }
 
+    getZipName( bundle : string , md5 ?: string ){
+        return `${bundle}_${md5}.zip`;
+    }
+
     /**
      * @description 打包版本文件
      */
@@ -51,7 +55,7 @@ class _Tools {
         let bundles = Object.keys(config.bundles)
         let count = 0;
         let total = bundles.length;
-        let packZipName = `main_${config.versions["main"].md5}.zip`;
+        let packZipName = this.getZipName("main",config.versions["main"].md5);
         let packZipRootPath = Editor.Project.path + "/PackageVersion";
         packZipRootPath = normalize(packZipRootPath);
         let packVersionZipPath = path.join(packZipRootPath, packZipName);
@@ -75,7 +79,7 @@ class _Tools {
 
         for (let index = 0; index < bundles.length; index++) {
             const element = config.bundles[bundles[index]];
-            let packZipName = `${element.dir}_${config.versions[element.dir].md5}.zip`;
+            let packZipName = this.getZipName(element.dir,config.versions[element.dir].md5);
             let packVersionZipPath = path.join(packZipRootPath, packZipName);
             let jszip = new JSZIP();
             let fullPath = path.join(config.buildDir, `assets/${element.dir}`);
@@ -188,6 +192,24 @@ class _Tools {
         makeDir(source, dest, copyFile)
     }
 
+    updateZipSize(source: VersionDatas) {
+        let keys = Object.keys(source);
+        keys.forEach(bundle => {
+            let data = source[bundle];
+            let packZipRootPath = Editor.Project.path + "/PackageVersion";
+            packZipRootPath = normalize(packZipRootPath);
+            let zipName = this.getZipName(bundle,data.md5);
+            let packVersionZipPath = path.join(packZipRootPath, zipName);
+            if ( existsSync(packVersionZipPath) ){
+                let stat = statSync(packVersionZipPath);
+                data.project.size = stat.size;
+                console.log(`${zipName} 文件大小 : ${stat.size}`);
+            }else{
+                console.error(`不存在 : ${packVersionZipPath}`);
+            }
+        })
+    }
+
     /**
      * @description 读取目录下的所有文件的md5及大小信息到obj
      * @param dir 读取目录
@@ -222,7 +244,7 @@ class _Tools {
                             delete config.redirect;
                             config.uuids.sort();
                             md5 = require("crypto").createHash('md5').update(JSON.stringify(config)).digest('hex');
-                        }else{
+                        } else {
                             console.warn(`${subpath}找不到uuids字段`);
                             md5 = require("crypto").createHash('md5').update(readFileSync(subpath)).digest('hex');
                         }

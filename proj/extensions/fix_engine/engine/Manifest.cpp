@@ -86,7 +86,7 @@ Manifest::Manifest(const std::string &manifestUrl /* = ""*/)
   _packageUrl(""),
   _bundle(""),
   _md5(""),
-  _totalSize(0){
+  _zipSize(0){
     // Init variables
     _fileUtils = FileUtils::getInstance();
     if (manifestUrl.size() > 0)
@@ -103,7 +103,7 @@ Manifest::Manifest(const std::string &content, const std::string &manifestRoot)
   _packageUrl(""),
   _bundle(""),
   _md5(""),
-  _totalSize(0) {
+  _zipSize(0) {
     // Init variables
     _fileUtils = FileUtils::getInstance();
     if (content.size() > 0)
@@ -120,7 +120,7 @@ Manifest::Manifest(const std::string &content, const std::string &manifestRoot, 
   _packageUrl(""),
   _bundle(""),
   _md5(""),
-  _totalSize(0) {
+  _zipSize(0) {
     // Init variables
     _fileUtils = FileUtils::getInstance();
 	setPackageUrl(packageUrl);
@@ -468,6 +468,8 @@ void Manifest::updateToZipAsset(const DownloadUnit& unit) {
 					
 					rapidjson::Value &entry = assets[unit.customId.c_str()];
 					entry.AddMember<bool>(KEY_COMPRESSED, (int)asset.compressed, _json.GetAllocator());
+
+					entry.AddMember<int>(KEY_SIZE, (int)asset.size, _json.GetAllocator());
 				}
 			}
 		}
@@ -587,6 +589,11 @@ void Manifest::loadVersion(const rapidjson::Document &json) {
 	}
 	CCASSERT(_bundle != "", "Bundle is empty!!!!");
 
+	//zip文件大小
+	if (json.HasMember(KEY_SIZE) && json[KEY_SIZE].IsInt()) {
+		_zipSize = json[KEY_SIZE].GetInt();
+	}
+
     _versionLoaded = true;
 }
 
@@ -594,7 +601,6 @@ void Manifest::loadManifest(const rapidjson::Document &json) {
     loadVersion(json);
 
     // Retrieve all assets
-	_totalSize = 0;
     if (json.HasMember(KEY_ASSETS)) {
         const rapidjson::Value &assets = json[KEY_ASSETS];
         if (assets.IsObject()) {
@@ -602,7 +608,6 @@ void Manifest::loadManifest(const rapidjson::Document &json) {
                 std::string key = itr->name.GetString();
                 Asset asset = parseAsset(key, itr->value);
                 _assets.emplace(key, asset);
-				_totalSize += asset.size;
             }
         }
     }
