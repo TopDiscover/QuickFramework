@@ -361,23 +361,23 @@ class Helper {
     createVersionFile(source, callbak) {
         this.log(`准备生成版本控制文件`);
         //更新版本控制文件中zip大小
-        setTimeout(() => {
-            Tools_1.Tools.updateZipSize(source);
-            let keys = Object.keys(source);
-            keys.forEach(bundle => {
-                let data = source[bundle];
-                (0, fs_extra_1.writeFileSync)(data.projectPath, JSON.stringify(data.project));
-                this.log(`生成${data.projectPath}成功`);
-                this.addCreateProgress();
-                (0, fs_extra_1.writeFileSync)(data.versionPath, JSON.stringify(data.version));
-                this.log(`生成${data.versionPath}成功`);
-                this.addCreateProgress();
-            });
-            this.log(`生成完成`);
-            Editor.Message.send(PACKAGE_NAME, "onSetProcess", false);
-            if (callbak)
-                callbak();
-        }, 1000);
+        Tools_1.Tools.updateZipSize(source);
+        let keys = Object.keys(source);
+        keys.forEach(bundle => {
+            let data = source[bundle];
+            (0, fs_extra_1.writeFileSync)(data.projectPath, JSON.stringify(data.project));
+            let temp = (0, path_1.parse)(data.projectPath);
+            this.log(`生成${temp.name}${temp.ext}成功`);
+            this.addCreateProgress();
+            (0, fs_extra_1.writeFileSync)(data.versionPath, JSON.stringify(data.version));
+            temp = (0, path_1.parse)(data.versionPath);
+            this.log(`生成${temp.name}${temp.ext}成功`);
+            this.addCreateProgress();
+        });
+        this.log(`生成完成`);
+        Editor.Message.send(PACKAGE_NAME, "onSetProcess", false);
+        if (callbak)
+            callbak();
     }
     resetCreateProgress() {
         this._createProgress = 0;
@@ -517,12 +517,17 @@ class Helper {
         let zipPath = Editor.Project.path + "/PackageVersion";
         count += Tools_1.Tools.getDirFileCount(zipPath);
         this.log(`[部署]复制文件个数 : ${count}`);
+        this.total = count;
+        Tools_1.Tools.resetCopy();
         for (let i = 0; i < copyDirs.length; i++) {
             let source = path_1.default.join(this.config.buildDir, copyDirs[i]);
             let dest = path_1.default.join(this.config.remoteDir, copyDirs[i]);
             this.log(`[部署]复制${source} => ${dest}`);
             Tools_1.Tools.copySourceDirToDesDir(source, dest, () => {
                 this.addProgress();
+                if (this._progress == this.total) {
+                    console.log(`复制文件的总个数 : ${Tools_1.Tools.alreadyCopy}`);
+                }
             });
         }
         let remoteZipPath = path_1.default.join(this.config.remoteDir, "zips");
@@ -531,6 +536,9 @@ class Helper {
         this.log(`[部署]复制${zipPath} => ${remoteZipPath}`);
         Tools_1.Tools.copySourceDirToDesDir(zipPath, remoteZipPath, () => {
             this.addProgress();
+            if (this._progress == this.total) {
+                console.log(`复制文件的总个数 : ${Tools_1.Tools.alreadyCopy}`);
+            }
         });
     }
     addProgress() {
