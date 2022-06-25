@@ -1,7 +1,16 @@
-import { createReadStream, createWriteStream, exists, existsSync, mkdir, mkdirSync, readdir, readdirSync, readFileSync, rmdirSync, stat, statSync, unlinkSync } from "fs";
-const JSZIP = require("jszip");
+import { createReadStream, createWriteStream, exists, existsSync, mkdir, mkdirSync, readdir, readdirSync, readFileSync, ReadStream, rmdirSync, stat, statSync, unlinkSync, WriteStream } from "fs";
 import path, { join, normalize } from "path";
+
 class _Tools {
+
+    /**@description 等待复制文件 <from,to>*/
+    private copys : {from : string , to : string}[] = [];
+    /**@description 最大允许复制数量 */
+    private maxCopy = 50;
+    /**@description 当前正常复制的数量 */
+    private curCopy : number = 0;
+    /**@description 当前已经复制的文件数量 */
+    alreadyCopy : number = 0;
 
     /**@description 获取目录下文件个数 */
     getDirFileCount(dir: string) {
@@ -9,9 +18,12 @@ class _Tools {
         let counter = (dir: string) => {
             let readdir = readdirSync(dir);
             for (let i in readdir) {
-                count++;
                 let fullPath = path.join(dir, readdir[i]);
-                statSync(fullPath).isDirectory() && counter(fullPath)
+                if (statSync(fullPath).isDirectory()){
+                    counter(fullPath)
+                }else{
+                    count++;
+                }
             }
         };
         counter(dir);
@@ -44,6 +56,7 @@ class _Tools {
      * @description 打包版本文件
      */
     zipVersions(config: ZipVersionsConfig) {
+        let JSZIP = require("jszip");
         let jszip = new JSZIP();
         for (let index = 0; index < config.mainIncludes.length; index++) {
             const element = config.mainIncludes[index];
@@ -53,7 +66,7 @@ class _Tools {
         }
         let bundles = Object.keys(config.bundles)
         let count = 0;
-        let total = bundles.length + 1; //+1主包的进度也要包含到里面
+        let total = bundles.length + 1;//+1主包的进度也要包含到里面
         let packZipName = this.getZipName("main",config.versions["main"].md5);
         let packZipRootPath = Editor.Project.path + "/PackageVersion";
         packZipRootPath = normalize(packZipRootPath);
@@ -61,61 +74,47 @@ class _Tools {
         this.delDir(packZipRootPath);
         this.mkdirSync(packZipRootPath);
         config.log(`打包路径: ${packZipRootPath}`);
-        let packTask : { name : string , data : any }[] = [];
-        let data = jszip.generateNodeStream({
+        jszip.generateNodeStream({
             type: "nodebuffer",
             streamFiles: !0
-        }).pipe(createWriteStream(packVersionZipPath),{end : true}).once("error", (e: Error) => {
-            config.log(`[打包] 打包失败:${packZipName} => ${e.message}`)
+        }).pipe(createWriteStream(packVersionZipPath)).once("error", (e: Error) => {
+            config.log("[打包] 打包失败:" + e.message)
             count++;
             config.handler(count == total);
-        }).once("finish",() => {
+        }).once("finish", () => {
             config.log("[打包] 打包成功: " + packZipName)
+        }).once("close",()=>{
+            // config.log("[打包] 打包关闭: " + packZipName)
             count++;
             config.handler(count == total);
         })
 
-        packTask.push({name : packZipName , data : data});
-
         //打包子版本
 
-        let close = function(){
-            packTask.forEach(v=>{
-                config.log(`[打包]关闭 : ${v.name}`);
-                v.data.close();
-            })
-        }
-    
         for (let index = 0; index < bundles.length; index++) {
-            let jszip = new JSZIP();
             const element = config.bundles[bundles[index]];
             let packZipName = this.getZipName(element.dir,config.versions[element.dir].md5);
             let packVersionZipPath = path.join(packZipRootPath, packZipName);
+            let jszip = new JSZIP();
             let fullPath = path.join(config.buildDir, `assets/${element.dir}`);
             this.zipDir(fullPath, jszip.folder(`assets/${element.dir}`));
             config.log(`[打包] ${element.name} ${element.dir} ...`);
-            data = jszip.generateNodeStream({
+            let data = jszip.generateNodeStream({
                 type: "nodebuffer",
                 streamFiles: !0
             }).pipe(createWriteStream(packVersionZipPath)).once("error", (e: Error) => {
                 config.log("[打包] 打包失败:" + e.message)
                 count++;
                 config.handler(count == total);
-                if ( count == total){
-                    close();
-                }
-            }).once("finish",() => {
+            }).once("finish", () => {
                 config.log("[打包] 打包成功: " + packZipName)
+            }).once("close",()=>{
+                // config.log("[打包] 打包关闭: " + packZipName)
                 count++;
                 config.handler(count == total);
-                if ( count == total){
-                    close();
-                }
             })
 
-            packTask.push({name : packZipName , data : data});
         }
-
     }
 
     /**@description 创建目录 */
@@ -170,44 +169,79 @@ class _Tools {
         }
         return false;
     }
+
+    private createDir(dir:string){
+        if (!existsSync(dir)){
+            // Editor.log(`创建目录 : ${dir}`);
+            mkdirSync(dir);
+        }
+    }
+
+    private createCopyDatas(source: string, dest: string){
+
+        let stat = statSync(source);
+        if ( !stat.isDirectory() ){
+            return;
+        }
+        this.createDir(dest);
+        let from = "";
+        let to = "";
+        let create = (source:string,dest:string)=>{
+            let readdir = readdirSync(source);
+            readdir.forEach(v=>{
+                from = join(source,v);
+                to = join(dest,v);
+                if( statSync(from).isDirectory() ){
+                    this.createDir(to);
+                    create(from,to);
+                }else{
+                    this.copys.push({from : from, to : to});
+                }
+            })
+        }
+        create(source,dest);
+    }
+
+    resetCopy(){
+        this.copys = [];
+        this.curCopy = 0;
+        this.alreadyCopy = 0;
+    }
     /**
      * @description 复制整个目录
      * @param source 源
      * @param dest 目标
-     * @param copyFileCb 复制文件完成回调 
+     * @param onComplete 复制文件完成回调 
      */
-    copySourceDirToDesDir(source: string, dest: string, copyFileCb?: Function) {
-        let self = this;
-        let makeDir = (_source: string, _dest: string, _copyFileCb: (source: string, dest: string) => void) => {
-            exists(_dest, function (isExist) {
-                isExist ? _copyFileCb(_source, _dest) : mkdir(_dest, function () {
-                    if (copyFileCb) copyFileCb(), _copyFileCb(_source, _dest)
+    copySourceDirToDesDir(source: string, dest: string, onComplete?: Function) {
+        this.createCopyDatas(source,dest);
+        this.copyFile(onComplete);
+    }
+
+    private copyFile(onComplete?:Function){
+        // Editor.log(`复制文总数 : ${this.alreadyCopy}`);
+        if ( this.curCopy > this.maxCopy ){
+            Editor.log("复制文件总数已经达到上限，等待其它文件复制完成，再进行复制");
+            return;
+        }
+
+        while(this.curCopy < this.maxCopy && this.copys.length > 0 ){
+            let data = this.copys.shift();
+            if ( data ){
+                this.curCopy++;
+                let readStream = createReadStream(data.from);
+                let writeStram = createWriteStream(data.to);
+                readStream.pipe(writeStram).once("finish",()=>{
+        
+                }).once("close",()=>{
+                    this.alreadyCopy++;
+                    // Editor.log(`复制文件 : ${first?.from} - > ${first?.to}`);
+                    if( onComplete ) onComplete();
+                    this.curCopy--;
+                    this.copyFile(onComplete);
                 })
-            })
-        };
-        let copyFile = (_source: string, _dest: string) => {
-            readdir(_source, function (err, files) {
-                if (err) throw err;
-                files.forEach(function (filename) {
-                    let readStream;
-                    let writeStram;
-                    let sourcePath = _source + "/" + filename;
-                    let destPath = _dest + "/" + filename;
-                    stat(sourcePath, function (err, stats) {
-                        if (err) throw err;
-                        if (stats.isFile()) {
-                            readStream = createReadStream(sourcePath);
-                            writeStram = createWriteStream(destPath);
-                            readStream.pipe(writeStram);
-                            if (copyFileCb) copyFileCb()
-                        } else {
-                            stats.isDirectory() && makeDir(sourcePath, destPath, copyFile)
-                        }
-                    })
-                })
-            })
-        };
-        makeDir(source, dest, copyFile)
+            }
+        }
     }
 
     updateZipSize(source: VersionDatas) {
@@ -262,7 +296,7 @@ class _Tools {
                             delete config.redirect;
                             config.uuids.sort();
                             md5 = require("crypto").createHash('md5').update(JSON.stringify(config)).digest('hex');
-                        }else{
+                        } else {
                             Editor.warn(`${subpath}找不到uuids字段`);
                             md5 = require("crypto").createHash('md5').update(readFileSync(subpath)).digest('hex');
                         }

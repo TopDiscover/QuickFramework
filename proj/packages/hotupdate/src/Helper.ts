@@ -19,13 +19,13 @@ class Helper {
     set config(v) {
         this._config = v;
     }
+
     /**@description 检证数据 */
     private checkConfig() {
         //当前所有bundle
         let bundles = Tools.bundles;
         let isChange = false;
         //删除处理
-        // Editor.log(bundles);
         Object.keys(this.config.bundles).forEach((value) => {
             if (!bundles.includes(value)) {
                 delete this.config.bundles[value];
@@ -155,7 +155,6 @@ class Helper {
             if (this.checkConfig()) {
                 this.saveConfig();
             }
-            // this.addLog(`存在缓存 : ${this.configPath}`, this.config);
         } else {
             this.log(`不存在缓存 : ${this.configPath}`);
             this.config = this.defaultConfig;
@@ -215,11 +214,9 @@ class Helper {
     onInsertHotupdate() {
         let codePath = path.join(Editor.Project.path, "extensions/hotupdate/code/hotupdate.js");
         let code = readFileSync(codePath, "utf8");
-        // console.log(code);
         let sourcePath = this.config.buildDir + "/main.js";
         let sourceCode = readFileSync(sourcePath, "utf8");
         let templateReplace = function templateReplace() {
-            // console.log(arguments);
             return arguments[1] + code + arguments[3];
         }
         //添加子游戏测试环境版本号
@@ -523,15 +520,16 @@ class Helper {
         zipPath = normalize(zipPath);
         count += Tools.getDirFileCount(zipPath);
 
-        this.log(`[部署]复制文件个数 : ${count}`);
+        this.log(`[部署]需要复制文件个数 : ${count}`);
         this.total = count;
-
+        Tools.resetCopy();
         for (let i = 0; i < copyDirs.length; i++) {
             let source = path.join(this.config.buildDir, copyDirs[i]);
             let dest = path.join(this.config.remoteDir, copyDirs[i]);
             this.log(`[部署]复制${source} => ${dest}`);
             Tools.copySourceDirToDesDir(source, dest, () => {
                 this.addProgress();
+                this.checkComplete();
             });
         }
 
@@ -542,21 +540,25 @@ class Helper {
         this.log(`[部署]复制${zipPath} => ${remoteZipPath}`);
         Tools.copySourceDirToDesDir(zipPath, remoteZipPath, () => {
             this.addProgress();
+            this.checkComplete();
         });
 
+    }
+    
+    private checkComplete(){
+        if ( Tools.alreadyCopy == this.total){
+            this.log(`复制完成文件的总个数 : ${Tools.alreadyCopy}`);
+        }
     }
 
     /**@description 进度总数 */
     private total = 1;
 
     private addProgress() {
-        this._progress++;
-        let value = (this._progress / this.total) * 100;
+        let value = (Tools.alreadyCopy / this.total) * 100;
         Editor.Ipc.sendToPanel("hotupdate", "hotupdate:updateDeployProgress", value);
     }
-    private _progress = 0;
     private resetProgress() {
-        this._progress = 0;
         Editor.Ipc.sendToPanel("hotupdate", "hotupdate:updateDeployProgress", 0);
     }
 
@@ -613,7 +615,6 @@ class Helper {
                 return arguments[1] + bundlesString + arguments[3];
             }
             content = content.replace(/(export\s*const\s*MIAN_PACK_INCLUDE\s*:\s*string\s*\[\s*\]\s*=\s*)([\[\]"\w,-/]*)(;)/g, replaceIncludes);
-            // Editor.log(content);
             writeFileSync(configTSPath, content, "utf-8");
             let dbPath = "db://assets/scripts/common/config/Config.ts";
             Editor.assetdb.refresh(dbPath, (err: any) => {
