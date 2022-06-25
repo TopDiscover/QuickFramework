@@ -1,6 +1,6 @@
 import { createReadStream, createWriteStream, exists, existsSync, mkdir, mkdirSync, readdir, readdirSync, readFileSync, rmdirSync, stat, statSync, unlinkSync } from "fs";
+const JSZIP = require("jszip");
 import path, { join, normalize } from "path";
-
 class _Tools {
 
     /**@description 获取目录下文件个数 */
@@ -36,11 +36,14 @@ class _Tools {
         }
     }
 
+    getZipName( bundle : string , md5 ?: string ){
+        return `${bundle}_${md5}.zip`;
+    }
+
     /**
      * @description 打包版本文件
      */
     zipVersions(config: ZipVersionsConfig) {
-        let JSZIP = require("jszip");
         let jszip = new JSZIP();
         for (let index = 0; index < config.mainIncludes.length; index++) {
             const element = config.mainIncludes[index];
@@ -48,60 +51,77 @@ class _Tools {
             fullPath = normalize(fullPath);
             this.zipDir(fullPath, jszip.folder(element));
         }
-        
         let bundles = Object.keys(config.bundles)
         let count = 0;
-        let total = bundles.length;
-        let packZipName = `main_${config.versions["main"].md5}.zip`;
+        let total = bundles.length + 1; //+1主包的进度也要包含到里面
+        let packZipName = this.getZipName("main",config.versions["main"].md5);
         let packZipRootPath = Editor.Project.path + "/PackageVersion";
         packZipRootPath = normalize(packZipRootPath);
         let packVersionZipPath = path.join(packZipRootPath, packZipName);
-        packVersionZipPath = normalize(packVersionZipPath);
         this.delDir(packZipRootPath);
         this.mkdirSync(packZipRootPath);
         config.log(`打包路径: ${packZipRootPath}`);
-        jszip.generateNodeStream({
+        let packTask : { name : string , data : any }[] = [];
+        let data = jszip.generateNodeStream({
             type: "nodebuffer",
             streamFiles: !0
-        }).pipe(createWriteStream(packVersionZipPath)).on("finish", () => {
-            config.log("[打包] 打包成功: " + packZipName)
+        }).pipe(createWriteStream(packVersionZipPath),{end : true}).once("error", (e: Error) => {
+            config.log(`[打包] 打包失败:${packZipName} => ${e.message}`)
             count++;
             config.handler(count == total);
-        }).on("error", (e: Error) => {
-            config.log("[打包] 打包失败:" + e.message)
+        }).once("finish",() => {
+            config.log("[打包] 打包成功: " + packZipName)
             count++;
             config.handler(count == total);
         })
 
+        packTask.push({name : packZipName , data : data});
 
         //打包子版本
-        
+
+        let close = function(){
+            packTask.forEach(v=>{
+                config.log(`[打包]关闭 : ${v.name}`);
+                v.data.close();
+            })
+        }
+    
         for (let index = 0; index < bundles.length; index++) {
-            const element = config.bundles[bundles[index]];
-            let packZipName = `${element.dir}_${config.versions[element.dir].md5}.zip`;
-            let packVersionZipPath = path.join(packZipRootPath, packZipName);
             let jszip = new JSZIP();
+            const element = config.bundles[bundles[index]];
+            let packZipName = this.getZipName(element.dir,config.versions[element.dir].md5);
+            let packVersionZipPath = path.join(packZipRootPath, packZipName);
             let fullPath = path.join(config.buildDir, `assets/${element.dir}`);
             this.zipDir(fullPath, jszip.folder(`assets/${element.dir}`));
             config.log(`[打包] ${element.name} ${element.dir} ...`);
-            jszip.generateNodeStream({
+            data = jszip.generateNodeStream({
                 type: "nodebuffer",
                 streamFiles: !0
-            }).pipe(createWriteStream(packVersionZipPath)).on("finish", () => {
-                config.log("[打包] 打包成功: " + packZipName)
-                count++;
-                config.handler(count == total);
-            }).on("error", (e: Error) => {
+            }).pipe(createWriteStream(packVersionZipPath)).once("error", (e: Error) => {
                 config.log("[打包] 打包失败:" + e.message)
                 count++;
                 config.handler(count == total);
+                if ( count == total){
+                    close();
+                }
+            }).once("finish",() => {
+                config.log("[打包] 打包成功: " + packZipName)
+                count++;
+                config.handler(count == total);
+                if ( count == total){
+                    close();
+                }
             })
+
+            packTask.push({name : packZipName , data : data});
         }
+
     }
 
     /**@description 创建目录 */
     mkdirSync(dir: string) {
         try {
+            dir = normalize(dir);
             mkdirSync(dir)
         } catch (e: any) {
             if ("EEXIST" !== e.code) throw e
@@ -190,6 +210,24 @@ class _Tools {
         makeDir(source, dest, copyFile)
     }
 
+    updateZipSize(source: VersionDatas) {
+        let keys = Object.keys(source);
+        keys.forEach(bundle => {
+            let data = source[bundle];
+            let packZipRootPath = Editor.Project.path + "/PackageVersion";
+            packZipRootPath = normalize(packZipRootPath);
+            let zipName = this.getZipName(bundle,data.md5);
+            let packVersionZipPath = path.join(packZipRootPath, zipName);
+            if ( existsSync(packVersionZipPath) ){
+                let stat = statSync(packVersionZipPath);
+                data.project.size = stat.size;
+                Editor.log(`${zipName} 文件大小 : ${stat.size}`);
+            }else{
+                Editor.error(`不存在 : ${packVersionZipPath}`);
+            }
+        })
+    }
+
     /**
      * @description 读取目录下的所有文件的md5及大小信息到obj
      * @param dir 读取目录
@@ -268,7 +306,7 @@ class _Tools {
             subpath = path.join(dir, subpaths[i]);
             stat = statSync(subpath);
             if (stat.isDirectory()) {
-                result.push(path.relative(dir,subpath));
+                result.push(path.relative(dir, subpath));
             }
         }
         return result;

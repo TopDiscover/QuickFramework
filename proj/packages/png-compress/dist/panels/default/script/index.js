@@ -6,8 +6,8 @@ const Helper_1 = require("../../../Helper");
 let view = null;
 let panel = null;
 module.exports = Editor.Panel.extend({
-    template: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
-    style: fs_extra_1.readFileSync(path_1.join(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
+    template: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
+    style: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
     $: {
         startCompressBtn: "#startCompressBtn",
         saveBtn: "#saveBtn"
@@ -42,7 +42,7 @@ module.exports = Editor.Panel.extend({
     },
     ready() {
         panel = this;
-        let sourcePath = path_1.join(Editor.Project.path, "assets");
+        let sourcePath = (0, path_1.join)(Editor.Project.path, "assets");
         const vm = new window.Vue({
             data() {
                 return {
@@ -62,9 +62,11 @@ module.exports = Editor.Panel.extend({
                 onChangeEnabled(enabled) {
                     // console.log("enabled",enabled);
                     Helper_1.helper.config.enabled = enabled;
+                    Helper_1.helper.saveConfig();
                 },
                 onChangeEnabledNoFound(enabled) {
                     Helper_1.helper.config.enabledNoFound = enabled;
+                    Helper_1.helper.saveConfig();
                 },
                 onChangeMinQuality(value) {
                     // console.log("minQuality",value);

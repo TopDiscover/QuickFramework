@@ -59,11 +59,18 @@ class Helper {
         let platform = this._config.platform;
         let dest = this._config.dest;
         console.log(`构建资源目录为:${dest}`)
-        if ( platform == "android" || platform == "windows" || platform == "ios" || platform == "mac"){
+        if ( this.isSupportUpdate(platform) ){
             return [`${path.join(dest,"src")}`,`${path.join(dest,"jsb-adapter")}`,`${path.join(dest,"assets")}`];
         }else{
             return [];
         }
+    }
+
+    isSupportUpdate( platform : string ){
+        if ( platform == "android" || platform == "windows" || platform == "ios" || platform == "mac" || platform == "win32"){
+            return true;
+        }
+        return false;
     }
 
     get dest(){

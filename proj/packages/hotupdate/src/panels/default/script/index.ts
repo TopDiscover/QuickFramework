@@ -57,8 +57,8 @@ module.exports = Editor.Panel.extend({
         onPngCompressComplete(sender: any, info: { dest: string, platform: string }) {
             let dest = info.dest;
             let platform = info.platform;
-            console.log(`[热更新]png图片压缩完成,构建平台:`, dest, platform);
-            if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+            Editor.log(`[热更新]png图片压缩完成,构建平台:`, dest, platform);
+            if ( helper.isSupportUpdate(platform) ) {
                 helper.onPngCompressComplete();
             }
         }

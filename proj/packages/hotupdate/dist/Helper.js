@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -257,10 +261,10 @@ class Helper {
         let version = this.config.version;
         this.log("主包版本号:", version);
         let buildDir = this.config.buildDir;
-        buildDir = buildDir.replace(/\\/g, "/");
+        buildDir = (0, path_1.normalize)(buildDir);
         this.log("构建目录:", buildDir);
         let manifestDir = this.getManifestDir(buildDir);
-        manifestDir = manifestDir.replace(/\\/g, "/");
+        manifestDir = (0, path_1.normalize)(manifestDir);
         this.log("构建目录下的Manifest目录:", manifestDir);
         let serverUrl = this.config.serverIP;
         this.log("热更新地址:", serverUrl);
@@ -289,6 +293,7 @@ class Helper {
         for (let i = 0; i < mainIncludes.length; i++) {
             Tools_1.Tools.readDir(path_1.default.join(buildDir, mainIncludes[i]), manifest.assets, buildDir);
         }
+        let versionDatas = {};
         //生成project.manifest
         let projectManifestPath = path_1.default.join(manifestDir, "main_project.json");
         let versionManifestPath = path_1.default.join(manifestDir, "main_version.json");
@@ -296,13 +301,10 @@ class Helper {
         let md5 = require("crypto").createHash('md5').update(content).digest('hex');
         manifest.md5 = md5;
         manifest.version = version;
-        (0, fs_1.writeFileSync)(projectManifestPath, JSON.stringify(manifest));
-        this.log(`生成${projectManifestPath}成功`);
-        this.addCreateProgress();
+        let projectData = JSON.parse(JSON.stringify(manifest));
         delete manifest.assets;
-        (0, fs_1.writeFileSync)(versionManifestPath, JSON.stringify(manifest));
-        this.log(`生成${versionManifestPath}成功`);
-        this.addCreateProgress();
+        let versionData = JSON.parse(JSON.stringify(manifest));
+        this.insertVersionData(versionDatas, manifest.bundle, projectData, versionData, projectManifestPath, versionManifestPath, md5);
         //生成所有版本控制文件，用来判断当玩家停止在版本1，此时发版本2时，不让进入游戏，返回到登录，重新走完整个更新流程
         let versions = {
             main: { md5: md5, version: version },
@@ -310,7 +312,6 @@ class Helper {
         //生成各bundles版本文件
         for (let i = 0; i < subBundles.length; i++) {
             let key = subBundles[i];
-            this.log(`正在生成:${key}`);
             let manifest = {
                 assets: {},
                 bundle: key
@@ -322,16 +323,13 @@ class Helper {
             let md5 = require("crypto").createHash('md5').update(content).digest('hex');
             manifest.md5 = md5;
             manifest.version = this.config.bundles[key].version;
-            (0, fs_1.writeFileSync)(projectManifestPath, JSON.stringify(manifest));
-            this.log(`生成${projectManifestPath}成功`);
-            this.addCreateProgress();
+            projectData = JSON.parse(JSON.stringify(manifest));
             delete manifest.assets;
+            versionData = JSON.parse(JSON.stringify(manifest));
             versions[`${key}`] = {};
             versions[`${key}`].md5 = md5;
             versions[`${key}`].version = manifest.version;
-            (0, fs_1.writeFileSync)(versionManifestPath, JSON.stringify(manifest));
-            this.log(`生成${versionManifestPath}成功`);
-            this.addCreateProgress();
+            this.insertVersionData(versionDatas, manifest.bundle, projectData, versionData, projectManifestPath, versionManifestPath, md5);
         }
         //写入所有版本
         let versionsPath = path_1.default.join(manifestDir, `versions.json`);
@@ -354,16 +352,42 @@ class Helper {
             handler: (isComplete) => {
                 this.addCreateProgress();
                 if (isComplete) {
-                    setTimeout(() => {
-                        this.log(`生成完成`);
-                        if (callback) {
-                            callback();
-                        }
-                    }, 500);
+                    this.createVersionFile(versionDatas, callback);
                 }
             }
         });
+    }
+    insertVersionData(source, bundle, project, version, projectPath, versionPath, md5) {
+        if (bundle) {
+            source[bundle] = {
+                project: project,
+                version: version,
+                projectPath: projectPath,
+                versionPath: versionPath,
+                md5: md5
+            };
+        }
+    }
+    createVersionFile(source, callbak) {
+        this.log(`准备生成版本控制文件`);
+        //更新版本控制文件中zip大小
+        Tools_1.Tools.updateZipSize(source);
+        let keys = Object.keys(source);
+        keys.forEach(bundle => {
+            let data = source[bundle];
+            (0, fs_1.writeFileSync)(data.projectPath, JSON.stringify(data.project));
+            let temp = (0, path_1.parse)(data.projectPath);
+            this.log(`生成${temp.name}${temp.ext}成功`);
+            this.addCreateProgress();
+            (0, fs_1.writeFileSync)(data.versionPath, JSON.stringify(data.version));
+            temp = (0, path_1.parse)(data.versionPath);
+            this.log(`生成${temp.name}${temp.ext}成功`);
+            this.addCreateProgress();
+        });
+        this.log(`生成完成`);
         this._isDoCreate = false;
+        if (callbak)
+            callbak();
     }
     resetCreateProgress() {
         this._createProgress = 0;
@@ -588,6 +612,12 @@ class Helper {
         this.resetCreateProgress();
         Editor.Ipc.sendToPanel("hotupdate", "hotupdate:setBuildDir", options.dest);
         callback();
+    }
+    isSupportUpdate(platform) {
+        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac" || platform == "win32") {
+            return true;
+        }
+        return false;
     }
     onPngCompressComplete() {
         this.readConfig();

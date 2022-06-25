@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
-import path, { join, normalize } from "path";
+import path, { join, normalize, parse } from "path";
 import { Tools } from "./Tools";
 const Electron = require("electron")
 
@@ -9,14 +9,14 @@ class Helper {
         return path.join(Editor.Project.path, "config/hotupdate.json");
     }
 
-    private _config : HotupdateConfig = null!
-    get config(){
-        if ( !this._config ){
+    private _config: HotupdateConfig = null!
+    get config() {
+        if (!this._config) {
             this.readConfig();
         }
         return this._config;
     }
-    set config(v){
+    set config(v) {
         this._config = v;
     }
     /**@description 检证数据 */
@@ -175,9 +175,9 @@ class Helper {
             return;
         }
         if (obj) {
-            Editor.log("[热更新]",message, obj);
+            Editor.log("[热更新]", message, obj);
         } else {
-            Editor.log("[热更新]",message);
+            Editor.log("[热更新]", message);
         }
     }
 
@@ -206,7 +206,7 @@ class Helper {
     }
     getManifestDir(buildDir: string) {
         if (buildDir && buildDir.length > 0) {
-            return path.join(buildDir,"manifest");
+            return path.join(buildDir, "manifest");
         } else {
             return "";
         }
@@ -229,9 +229,9 @@ class Helper {
     }
 
     /**@description 生成manifest版本文件 */
-    onCreateManifest(callback?:Function) {
+    onCreateManifest(callback?: Function) {
         if (this.isDoCreate) {
-            if ( callback ) callback();
+            if (callback) callback();
             return;
         }
         this._isDoCreate = true;
@@ -241,10 +241,10 @@ class Helper {
         let version = this.config.version;
         this.log("主包版本号:", version);
         let buildDir = this.config.buildDir;
-        buildDir = buildDir.replace(/\\/g, "/");
+        buildDir = normalize(buildDir);
         this.log("构建目录:", buildDir);
         let manifestDir = this.getManifestDir(buildDir);
-        manifestDir = manifestDir.replace(/\\/g, "/");
+        manifestDir = normalize(manifestDir);
         this.log("构建目录下的Manifest目录:", manifestDir);
         let serverUrl = this.config.serverIP;
         this.log("热更新地址:", serverUrl);
@@ -259,9 +259,10 @@ class Helper {
         //文件数量
         this.total = (subBundles.length + 1) * 2;
         //压缩包数量
-        this.total += (subBundles.length+1);
+        this.total += (subBundles.length + 1);
         //所有版本文件
         this.total++;
+
         //删除旧的版本控件文件
         this.log("删除旧的Manifest目录", manifestDir);
         if (existsSync(manifestDir)) {
@@ -276,6 +277,8 @@ class Helper {
             Tools.readDir(path.join(buildDir, mainIncludes[i]), manifest.assets, buildDir);
         }
 
+        let versionDatas: VersionDatas = {};
+
         //生成project.manifest
         let projectManifestPath = path.join(manifestDir, "main_project.json");
         let versionManifestPath = path.join(manifestDir, "main_version.json");
@@ -283,15 +286,20 @@ class Helper {
         let md5 = require("crypto").createHash('md5').update(content).digest('hex');
         manifest.md5 = md5;
         manifest.version = version;
-        writeFileSync(projectManifestPath, JSON.stringify(manifest));
-        this.log(`生成${projectManifestPath}成功`);
-        this.addCreateProgress();
 
+        let projectData = JSON.parse(JSON.stringify(manifest));
         delete manifest.assets;
+        let versionData = JSON.parse(JSON.stringify(manifest))
+        this.insertVersionData(
+            versionDatas,
+            manifest.bundle,
+            projectData,
+            versionData,
+            projectManifestPath,
+            versionManifestPath,
+            md5
+        );
 
-        writeFileSync(versionManifestPath, JSON.stringify(manifest));
-        this.log(`生成${versionManifestPath}成功`);
-        this.addCreateProgress();
 
         //生成所有版本控制文件，用来判断当玩家停止在版本1，此时发版本2时，不让进入游戏，返回到登录，重新走完整个更新流程
         let versions: { [key: string]: { md5: string, version: string } } = {
@@ -301,7 +309,6 @@ class Helper {
         //生成各bundles版本文件
         for (let i = 0; i < subBundles.length; i++) {
             let key = subBundles[i];
-            this.log(`正在生成:${key}`);
             let manifest: Manifest = {
                 assets: {},
                 bundle: key
@@ -314,17 +321,23 @@ class Helper {
             let md5 = require("crypto").createHash('md5').update(content).digest('hex');
             manifest.md5 = md5;
             manifest.version = this.config.bundles[key].version
-            writeFileSync(projectManifestPath, JSON.stringify(manifest));
-            this.log(`生成${projectManifestPath}成功`);
-            this.addCreateProgress();
 
+            projectData = JSON.parse(JSON.stringify(manifest));
             delete manifest.assets;
+            versionData = JSON.parse(JSON.stringify(manifest));
+
             versions[`${key}`] = {} as any;
             versions[`${key}`].md5 = md5;
             versions[`${key}`].version = manifest.version;
-            writeFileSync(versionManifestPath, JSON.stringify(manifest));
-            this.log(`生成${versionManifestPath}成功`);
-            this.addCreateProgress();
+            this.insertVersionData(
+                versionDatas,
+                manifest.bundle,
+                projectData,
+                versionData,
+                projectManifestPath,
+                versionManifestPath,
+                md5
+            );
         }
 
         //写入所有版本
@@ -345,28 +358,63 @@ class Helper {
             },
             /**@description 所有bundle的配置信息 */
             bundles: this.config.bundles,
-            handler : (isComplete:boolean)=>{
+            handler: (isComplete: boolean) => {
                 this.addCreateProgress();
-                if ( isComplete ){
-                    setTimeout(() => {
-                        this.log(`生成完成`);
-                        if( callback ){
-                            callback();
-                        }
-                    }, 500);
+                if (isComplete) {
+                    this.createVersionFile(versionDatas, callback);
                 }
             }
         })
+    }
+
+    private insertVersionData(
+        source: VersionDatas,
+        bundle: string | undefined,
+        project: Manifest,
+        version: Manifest,
+        projectPath: string,
+        versionPath: string,
+        md5: string) {
+        if (bundle) {
+            source[bundle] = {
+                project: project,
+                version: version,
+                projectPath: projectPath,
+                versionPath: versionPath,
+                md5: md5
+            }
+        }
+    }
+
+    private createVersionFile(source: VersionDatas, callbak?: Function) {
+        this.log(`准备生成版本控制文件`);
+        //更新版本控制文件中zip大小
+        Tools.updateZipSize(source);
+        let keys = Object.keys(source);
+        keys.forEach(bundle => {
+            let data = source[bundle];
+            writeFileSync(data.projectPath, JSON.stringify(data.project));
+            let temp = parse(data.projectPath);
+            this.log(`生成${temp.name}${temp.ext}成功`);
+            this.addCreateProgress();
+            writeFileSync(data.versionPath, JSON.stringify(data.version));
+            temp = parse(data.versionPath);
+            this.log(`生成${temp.name}${temp.ext}成功`);
+            this.addCreateProgress();
+        })
+
+        this.log(`生成完成`);
         this._isDoCreate = false;
+        if (callbak) callbak();
     }
 
     private _createProgress = 0;
-    private resetCreateProgress(){
+    private resetCreateProgress() {
         this._createProgress = 0;
-        Editor.Ipc.sendToPanel("hotupdate","hotupdate:updateCreateProgress",0);
+        Editor.Ipc.sendToPanel("hotupdate", "hotupdate:updateCreateProgress", 0);
     }
-    private addCreateProgress(){
-        this._createProgress ++ ;
+    private addCreateProgress() {
+        this._createProgress++;
         let value = (this._createProgress / this.total) * 100;
         Editor.Ipc.sendToPanel("hotupdate", "hotupdate:updateCreateProgress", value);
     }
@@ -502,7 +550,7 @@ class Helper {
     private total = 1;
 
     private addProgress() {
-        this._progress ++;
+        this._progress++;
         let value = (this._progress / this.total) * 100;
         Editor.Ipc.sendToPanel("hotupdate", "hotupdate:updateDeployProgress", value);
     }
@@ -587,7 +635,7 @@ class Helper {
     if (hotUpdateSearchPaths) {
         jsb.fileUtils.setSearchPaths(JSON.parse(hotUpdateSearchPaths));
     }`);
-            writeFileSync(mainJSPath,content,"utf-8");
+            writeFileSync(mainJSPath, content, "utf-8");
             this.log(`热更新代码：${mainJSPath}`);
         }
 
@@ -599,23 +647,30 @@ class Helper {
     }
     onBuildStart(options: BuildOptions, callback: Function) {
         this.config.buildDir = options.dest;
-        if ("win32" === options.platform || "android" === options.platform || "ios" === options.platform || "mac" === options.platform){
+        if ("win32" === options.platform || "android" === options.platform || "ios" === options.platform || "mac" === options.platform) {
             Editor.warn(`如果热更新勾选了【自动生成】或【自动部署】请不要关闭此界面`);
             Editor.Panel.open("hotupdate");
         }
-        
+
         this.saveConfig();
         this.resetProgress();
         this.resetCreateProgress();
-        Editor.Ipc.sendToPanel("hotupdate","hotupdate:setBuildDir",options.dest);
+        Editor.Ipc.sendToPanel("hotupdate", "hotupdate:setBuildDir", options.dest);
         callback();
     }
 
-    onPngCompressComplete(){
+    isSupportUpdate(platform: string) {
+        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac" || platform == "win32") {
+            return true;
+        }
+        return false;
+    }
+
+    onPngCompressComplete() {
         this.readConfig();
-        if ( this.config.autoCreate ){
-            this.onCreateManifest(()=>{
-                if ( this.config.autoDeploy && this.config.remoteDir.length > 0 ){
+        if (this.config.autoCreate) {
+            this.onCreateManifest(() => {
+                if (this.config.autoDeploy && this.config.remoteDir.length > 0) {
                     this.onDeployToRemote();
                 }
             });

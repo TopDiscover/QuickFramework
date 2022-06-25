@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -30,13 +34,13 @@ class Helper {
     /**@description 配置存储路径 */
     get configPath() {
         let savePath = `${path_1.default.join(__dirname, "../../../local/gulp-compress.json")}`;
-        savePath = path_1.normalize(savePath);
+        savePath = (0, path_1.normalize)(savePath);
         return savePath;
     }
     readConfig() {
         let tempPath = this.configPath;
-        if (fs_1.existsSync(tempPath)) {
-            this._config = JSON.parse(fs_1.readFileSync(tempPath, { encoding: "utf-8" }));
+        if ((0, fs_1.existsSync)(tempPath)) {
+            this._config = JSON.parse((0, fs_1.readFileSync)(tempPath, { encoding: "utf-8" }));
         }
         else {
             this._config = { platform: "", dest: "" };
@@ -47,7 +51,7 @@ class Helper {
         this._config.dest = dest;
         this._config.platform = platform;
         Editor.log(`保存构建信息:`, this._config);
-        fs_1.writeFileSync(savePath, JSON.stringify(this._config), { encoding: "utf-8" });
+        (0, fs_1.writeFileSync)(savePath, JSON.stringify(this._config), { encoding: "utf-8" });
     }
     onBeforeBuild(platform) {
         Editor.log(LOG_NAME, `开始构建,构建平台:${platform}`);
@@ -55,8 +59,8 @@ class Helper {
     onAfterBuild(dest, platform) {
         Editor.log(LOG_NAME, `构建完成,构建目录:${dest},构建平台:${platform}`);
         this.saveConfig(dest, platform);
-        let tempPath = path_1.join(__dirname, "../");
-        tempPath = path_1.normalize(tempPath);
+        let tempPath = (0, path_1.join)(__dirname, "../");
+        tempPath = (0, path_1.normalize)(tempPath);
         Editor.warn(LOG_NAME, `如果需要对构建的JS脚本进行资源压缩，请到${tempPath}目录下`);
         Editor.warn(LOG_NAME, `执行 gulp 命令 提示：gulp --compex true 可执行代码混淆，默认不开启`);
     }
@@ -69,12 +73,18 @@ class Helper {
         let platform = this._config.platform;
         let dest = this._config.dest;
         console.log(`构建资源目录为:${dest}`);
-        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac") {
+        if (this.isSupportUpdate(platform)) {
             return [`${path_1.default.join(dest, "src")}`, `${path_1.default.join(dest, "jsb-adapter")}`, `${path_1.default.join(dest, "assets")}`];
         }
         else {
             return [];
         }
+    }
+    isSupportUpdate(platform) {
+        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac" || platform == "win32") {
+            return true;
+        }
+        return false;
     }
     get dest() {
         this.readConfig();

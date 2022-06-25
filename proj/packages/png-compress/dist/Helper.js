@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -59,19 +63,19 @@ class Helper {
     /**@description 配置存储路径 */
     get configPath() {
         let savePath = `${path_1.default.join(Editor.Project.path, "/local/png-compress.json")}`;
-        savePath = path_1.normalize(savePath);
+        savePath = (0, path_1.normalize)(savePath);
         return savePath;
     }
     saveConfig() {
         let savePath = this.configPath;
         Editor.log("保存配置如下：");
         Editor.log(JSON.stringify(this._config));
-        fs_1.writeFileSync(savePath, JSON.stringify(this.config), { encoding: "utf-8" });
+        (0, fs_1.writeFileSync)(savePath, JSON.stringify(this.config), { encoding: "utf-8" });
     }
     readConfig() {
         let tempPath = this.configPath;
-        if (fs_1.existsSync(tempPath)) {
-            this._config = JSON.parse(fs_1.readFileSync(tempPath, { encoding: "utf-8" }));
+        if ((0, fs_1.existsSync)(tempPath)) {
+            this._config = JSON.parse((0, fs_1.readFileSync)(tempPath, { encoding: "utf-8" }));
         }
         else {
             this._config = this.defaultConfig;
@@ -95,7 +99,7 @@ class Helper {
             }
         }
         if (outPath) {
-            outPath = path_1.normalize(outPath);
+            outPath = (0, path_1.normalize)(outPath);
         }
         return outPath;
     }
@@ -118,7 +122,7 @@ class Helper {
             this.compressTasks.push(new Promise(res => {
                 const sizeBefore = info.size;
                 const command = `"${this.pngquantPath}" ${compressOptions} -- "${info.path}"`;
-                child_process_1.exec(command, (error, stdout, stderr) => {
+                (0, child_process_1.exec)(command, (error, stdout, stderr) => {
                     curCount++;
                     let percent = curCount / totalCount;
                     percent *= 100;
@@ -140,18 +144,18 @@ class Helper {
      * @returns
      */
     readDir(dir, outFiles, isCompress) {
-        let stat = fs_1.statSync(dir);
+        let stat = (0, fs_1.statSync)(dir);
         if (!stat.isDirectory()) {
             return;
         }
-        var subpaths = fs_1.readdirSync(dir);
+        var subpaths = (0, fs_1.readdirSync)(dir);
         let subpath = "";
         for (var i = 0; i < subpaths.length; ++i) {
             if (subpaths[i][0] === '.') {
                 continue;
             }
             subpath = path_1.default.join(dir, subpaths[i]);
-            stat = fs_1.statSync(subpath);
+            stat = (0, fs_1.statSync)(subpath);
             if (stat.isDirectory()) {
                 this.readDir(subpath, outFiles, isCompress);
             }
@@ -176,7 +180,7 @@ class Helper {
             // 成功
             this.logger.succeedCount++;
             const fileName = path_1.default.basename(filePath);
-            const sizeAfter = fs_1.statSync(filePath).size / 1024;
+            const sizeAfter = (0, fs_1.statSync)(filePath).size / 1024;
             const savedSize = sizeBefore - sizeAfter;
             const savedRatio = savedSize / sizeBefore * 100;
             this.logger.successInfo += `\n + ${'Successful'.padEnd(13, ' ')} | ${fileName.padEnd(50, ' ')} | ${(sizeBefore.toFixed(2) + ' KB').padEnd(13, ' ')} ->   ${(sizeAfter.toFixed(2) + ' KB').padEnd(13, ' ')} | ${(savedSize.toFixed(2) + ' KB').padEnd(13, ' ')} | ${(savedRatio.toFixed(2) + '%').padEnd(20, ' ')}`;
@@ -229,7 +233,7 @@ class Helper {
         // 初始化队列
         this.compressTasks = [];
         //遍历项目资源
-        if (fs_1.existsSync(dir)) {
+        if ((0, fs_1.existsSync)(dir)) {
             Editor.log(LOG_NAME, `压缩资源路径:${dir}`);
             this.compress(dir, compressOptions, isCompress, isAutoCompress);
         }
@@ -267,7 +271,7 @@ class Helper {
                 excludeFolders.splice(i);
             }
         }
-        excludeFolders = excludeFolders.map(value => path_1.normalize(value));
+        excludeFolders = excludeFolders.map(value => (0, path_1.normalize)(value));
         return excludeFolders;
     }
     /**@description 需要排除的文件 */
@@ -282,7 +286,7 @@ class Helper {
                 excludeFiles.splice(i);
             }
         }
-        excludeFiles = excludeFiles.map(value => path_1.normalize(value));
+        excludeFiles = excludeFiles.map(value => (0, path_1.normalize)(value));
         return excludeFiles;
     }
     getAssets() {
@@ -318,7 +322,7 @@ class Helper {
             if (excludeFiles.length > 0) {
                 Editor.log(`需要排除文件:`, excludeFiles);
             }
-            let sourceAssetsDir = path_1.join(Editor.Project.path, "assets");
+            let sourceAssetsDir = (0, path_1.join)(Editor.Project.path, "assets");
             this.startCompress(resPath, (filePath) => {
                 // 排除非 png 资源和内置资源
                 if (path_1.default.extname(filePath) !== '.png' || filePath.includes(this.enginPath)) {
@@ -330,7 +334,7 @@ class Helper {
                     let sourcePath = info.path;
                     //排除指定
                     for (let i = 0; i < excludeFolders.length; i++) {
-                        let tempPath = path_1.join(sourceAssetsDir, excludeFolders[i]);
+                        let tempPath = (0, path_1.join)(sourceAssetsDir, excludeFolders[i]);
                         if (sourcePath.startsWith(tempPath)) {
                             // Editor.log(`需要排除目录:${excludeFolders[i]}`);
                             // Editor.log(`构建目录文件路径:${filePath}`);
@@ -340,7 +344,7 @@ class Helper {
                     }
                     //排除指定文件
                     for (let i = 0; i < excludeFiles.length; i++) {
-                        let tempPath = path_1.join(sourceAssetsDir, excludeFiles[i]);
+                        let tempPath = (0, path_1.join)(sourceAssetsDir, excludeFiles[i]);
                         if (sourcePath.startsWith(tempPath)) {
                             // Editor.log(`需要排除文件:${excludeFiles[i]}`);
                             // Editor.log(`构建目录文件路径:${filePath}`);
@@ -362,6 +366,7 @@ class Helper {
             }, true);
         }
         else {
+            Editor.log(`${LOG_NAME} 不进入图片压缩，发送完成压缩事件`);
             Editor.Ipc.sendToPanel("hotupdate", "onPngCompressComplete", { dest: this.dest, platform: this.platform });
         }
     }
@@ -384,7 +389,7 @@ class Helper {
             }
             //排除指定
             for (let i = 0; i < excludeFolders.length; i++) {
-                let tempPath = path_1.join(sourceAssetsDir, excludeFolders[i]);
+                let tempPath = (0, path_1.join)(sourceAssetsDir, excludeFolders[i]);
                 if (filePath.startsWith(tempPath)) {
                     // Editor.log(`需要排除目录:${excludeFolders[i]},排除文件:${filePath}`);
                     return false;
@@ -392,7 +397,7 @@ class Helper {
             }
             //排除指定文件
             for (let i = 0; i < excludeFiles.length; i++) {
-                let tempPath = path_1.join(sourceAssetsDir, excludeFiles[i]);
+                let tempPath = (0, path_1.join)(sourceAssetsDir, excludeFiles[i]);
                 if (filePath.startsWith(tempPath)) {
                     // Editor.log(`需要排除文件:${excludeFiles[i]},排除文件:${filePath}`);
                     return false;

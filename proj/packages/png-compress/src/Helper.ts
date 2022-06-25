@@ -398,6 +398,7 @@ class Helper {
                 return true
             }, true)
         }else{
+            Editor.log(`${LOG_NAME} 不进入图片压缩，发送完成压缩事件`);
             Editor.Ipc.sendToPanel("hotupdate","onPngCompressComplete",{dest:this.dest,platform: this.platform});
         }
     }

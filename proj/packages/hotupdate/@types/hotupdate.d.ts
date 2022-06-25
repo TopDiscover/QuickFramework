@@ -18,7 +18,7 @@ declare interface ZipVersionsConfig {
     /**@description 主包包含目录 */
     mainIncludes: string[];
     /**@description 所有版本信息 */
-    versions: { [key: string]: { md5: string, version: string } };
+    versions: { [key: string]: Manifest };
     /**@description 构建目录 */
     buildDir: string;
     /**@description 日志回调 */
@@ -54,4 +54,26 @@ declare interface Manifest {
     bundle?: string;
     md5?: string;
     version?: string;
+    size ?: number;
 }
+
+/**
+ * @description versions.json 结构
+ */ 
+type VersionInfo = {[key:string] : Manifest};
+
+/**
+ * @description 版本数据信息
+ */ 
+declare interface VersionData{
+    project : Manifest;
+    version : Manifest;
+    projectPath : string;
+    versionPath : string;
+    md5 : string;
+}
+
+/**
+ * @description 版本数据结构
+ */ 
+type VersionDatas = {[key:string] : VersionData};

@@ -68,7 +68,7 @@
     "height": 720,
     "width": 1280
   },
-  "includeAnySDK": null,
+  "includeAnySDK": false,
   "mainCompressionType": "default",
   "mainIsRemote": false,
   "nativeMd5Cache": false,
