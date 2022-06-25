@@ -37,7 +37,6 @@ class Helper {
         this._createProgress = 0;
         /**@description 进度总数 */
         this.total = 1;
-        this._progress = 0;
     }
     get configPath() {
         return path_1.default.join(Editor.Project.path, "config/hotupdate.json");
@@ -51,9 +50,6 @@ class Helper {
     set config(v) {
         this._config = v;
     }
-    get userCachePath() {
-        return path_1.default.join(Editor.Project.path, "local/userCache.json");
-    }
     /**@description 检证数据 */
     checkConfig() {
         //当前所有bundle
@@ -63,7 +59,7 @@ class Helper {
         Object.keys(this.config.bundles).forEach((value) => {
             if (!bundles.includes(value)) {
                 delete this.config.bundles[value];
-                console.log(`删除不存在Bundle:${value}`);
+                this.log(`删除不存在Bundle:${value}`);
                 isChange = true;
             }
         });
@@ -79,7 +75,7 @@ class Helper {
                     md5: "-",
                 };
                 this.config.bundles[bundleInfo.dir] = bundleInfo;
-                console.log(`添加Bundle:${bundles[i]}`);
+                this.log(`添加Bundle:${bundles[i]}`);
                 isChange = true;
             }
         }
@@ -121,7 +117,7 @@ class Helper {
     /**@description 保存当前用户设置 */
     saveConfig() {
         let cacheString = JSON.stringify(this.config);
-        (0, fs_extra_1.writeFileSync)(this.userCachePath, cacheString);
+        (0, fs_extra_1.writeFileSync)(this.configPath, cacheString);
         // this.addLog(`写入缓存 :`, this.userCache);
     }
     get remoteBundles() {
@@ -172,16 +168,15 @@ class Helper {
     }
     /**@description 读取本地缓存 */
     readConfig() {
-        if ((0, fs_extra_1.existsSync)(this.userCachePath)) {
-            let data = (0, fs_extra_1.readFileSync)(this.userCachePath, "utf-8");
+        if ((0, fs_extra_1.existsSync)(this.configPath)) {
+            let data = (0, fs_extra_1.readFileSync)(this.configPath, "utf-8");
             this.config = JSON.parse(data);
             if (this.checkConfig()) {
                 this.saveConfig();
             }
-            // this.addLog(`存在缓存 : ${this.userCachePath}`, this.userCache);
         }
         else {
-            this.log(`不存在缓存 : ${this.userCachePath}`);
+            this.log(`不存在缓存 : ${this.configPath}`);
             this.config = this.defaultConfig;
             this.log(`生存默认缓存 : `, this.config);
             this.saveConfig();
@@ -198,10 +193,10 @@ class Helper {
             return;
         }
         if (obj) {
-            console.log(message, obj);
+            console.log("[热更新]", message, obj);
         }
         else {
-            console.log(message);
+            console.log("[热更新]", message);
         }
     }
     /**
@@ -233,7 +228,6 @@ class Helper {
         sourcePath = (0, path_1.normalize)(sourcePath);
         let sourceCode = (0, fs_extra_1.readFileSync)(sourcePath, "utf8");
         let templateReplace = function templateReplace() {
-            // console.log(arguments);
             return arguments[1] + code + arguments[3];
         };
         //添加子游戏测试环境版本号
@@ -242,7 +236,7 @@ class Helper {
         (0, fs_extra_1.writeFileSync)(sourcePath, sourceCode, { "encoding": "utf8" });
     }
     /**@description 生成manifest版本文件 */
-    onCreateManifest(callbak) {
+    onCreateManifest(callback) {
         Editor.Message.send(PACKAGE_NAME, "onSetProcess", true);
         this.saveConfig();
         this.log(`当前用户配置为 : `, this.config);
@@ -341,7 +335,7 @@ class Helper {
             handler: (isComplete) => {
                 this.addCreateProgress();
                 if (isComplete) {
-                    this.createVersionFile(versionDatas, callbak);
+                    this.createVersionFile(versionDatas, callback);
                 }
             }
         });
@@ -497,6 +491,7 @@ class Helper {
         let copyDirs = ["manifest"].concat(temps);
         for (let i = 0; i < copyDirs.length; i++) {
             let dir = path_1.default.join(this.config.buildDir, copyDirs[i]);
+            dir = (0, path_1.normalize)(dir);
             if (!(0, fs_extra_1.existsSync)(dir)) {
                 this.log(`${this.config.buildDir} [部署]不存在${copyDirs[i]}目录,无法拷贝文件`);
                 return;
@@ -511,12 +506,14 @@ class Helper {
         count = 0;
         for (let i = 0; i < copyDirs.length; i++) {
             let dir = path_1.default.join(this.config.buildDir, copyDirs[i]);
+            dir = (0, path_1.normalize)(dir);
             count += Tools_1.Tools.getDirFileCount(dir);
         }
         //压缩文件数量
         let zipPath = Editor.Project.path + "/PackageVersion";
+        zipPath = (0, path_1.normalize)(zipPath);
         count += Tools_1.Tools.getDirFileCount(zipPath);
-        this.log(`[部署]复制文件个数 : ${count}`);
+        this.log(`[部署]需要复制文件个数 : ${count}`);
         this.total = count;
         Tools_1.Tools.resetCopy();
         for (let i = 0; i < copyDirs.length; i++) {
@@ -525,9 +522,7 @@ class Helper {
             this.log(`[部署]复制${source} => ${dest}`);
             Tools_1.Tools.copySourceDirToDesDir(source, dest, () => {
                 this.addProgress();
-                if (this._progress == this.total) {
-                    console.log(`复制文件的总个数 : ${Tools_1.Tools.alreadyCopy}`);
-                }
+                this.checkComplete();
             });
         }
         let remoteZipPath = path_1.default.join(this.config.remoteDir, "zips");
@@ -536,21 +531,22 @@ class Helper {
         this.log(`[部署]复制${zipPath} => ${remoteZipPath}`);
         Tools_1.Tools.copySourceDirToDesDir(zipPath, remoteZipPath, () => {
             this.addProgress();
-            if (this._progress == this.total) {
-                console.log(`复制文件的总个数 : ${Tools_1.Tools.alreadyCopy}`);
-            }
+            this.checkComplete();
         });
     }
+    checkComplete() {
+        if (Tools_1.Tools.alreadyCopy == this.total) {
+            this.log(`复制完成文件的总个数 : ${Tools_1.Tools.alreadyCopy}`);
+        }
+    }
     addProgress() {
-        this._progress++;
-        let value = (this._progress / this.total) * 100;
+        let value = (Tools_1.Tools.alreadyCopy / this.total) * 100;
         if (value >= 100) {
             Editor.Message.send(PACKAGE_NAME, "onSetProcess", false);
         }
         Editor.Message.send(PACKAGE_NAME, "updateDeployProgress", value);
     }
     resetProgress() {
-        this._progress = 0;
         Editor.Message.send(PACKAGE_NAME, "updateDeployProgress", 0);
     }
     updateToConfigTS() {
@@ -578,7 +574,6 @@ class Helper {
                 return arguments[1] + bundlesString + arguments[3];
             };
             content = content.replace(/(export\s*const\s*MIAN_PACK_INCLUDE\s*:\s*string\s*\[\s*\]\s*=\s*)([\[\]"\w,-/]*)(;)/g, replaceIncludes);
-            // Editor.log(content);
             (0, fs_extra_1.writeFileSync)(configTSPath, content, "utf-8");
             let dbPath = "db://assets/scripts/common/config/Config.ts";
             Editor.Message.send("asset-db", "refresh-asset", dbPath);

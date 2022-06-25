@@ -229,12 +229,12 @@ class _Tools {
             let data = this.copys.shift();
             if ( data ){
                 this.curCopy++;
-                this.alreadyCopy++;
                 let readStream = createReadStream(data.from);
                 let writeStram = createWriteStream(data.to);
                 readStream.pipe(writeStram).once("finish",()=>{
         
                 }).once("close",()=>{
+                    this.alreadyCopy++;
                     // console.log(`复制文件 : ${first?.from} - > ${first?.to}`);
                     if( onComplete ) onComplete();
                     this.curCopy--;
