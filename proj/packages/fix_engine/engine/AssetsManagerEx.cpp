@@ -766,6 +766,7 @@ void AssetsManagerEx::decompressDownloadedZip(const std::string &customId, const
         if (dataInner->succeed)
         {
             fileSuccess(dataInner->customId, dataInner->zipFile);
+            _fileUtils->removeFile(dataInner->zipFile);
         }
         else
         {
@@ -783,7 +784,8 @@ void AssetsManagerEx::decompressDownloadedZip(const std::string &customId, const
         {
             asyncData->succeed = true;
         }
-        _fileUtils->removeFile(asyncData->zipFile);
+        // Wait for the decompression to complete before deleting the zip archive
+        // _fileUtils->removeFile(asyncData->zipFile);
     });
 }
 
