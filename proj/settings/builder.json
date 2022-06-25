@@ -69,7 +69,7 @@
     "width": 1280
   },
   "includeAnySDK": false,
-  "mainCompressionType": "default",
+  "mainCompressionType": "merge_all_json",
   "mainIsRemote": false,
   "nativeMd5Cache": false,
   "agreements": {}
