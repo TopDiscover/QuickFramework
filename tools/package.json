@@ -5,7 +5,8 @@
   "scripts": {
     "bundles": "node -r ts-node/register src/Bundles.ts",
     "sync" :"node -r ts-node/register src/Sync.ts",
-    "depend" : "node -r ts-node/register src/Depend.ts"
+    "depend" : "node -r ts-node/register src/Depend.ts",
+    "main" : "node -r ts-node/register src/Index.ts"
   },
   "devDependencies": {
     "@types/node": "^15.14.9",
