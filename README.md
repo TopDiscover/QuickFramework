@@ -13,11 +13,11 @@
 
 2，重新构建项目
 
-# 示例拉取
+# 完整工程拉取
 
-win32 运行git_bundles.bat 拉取示例代码
+进入tools 目录先执行 npm install 安装依赖
 
-其它平台可运行 git_bundles.py 脚本
+然后在tools目录下执行 npm run main 
 
 # 详细文档
 更为详细的文档，[请在本项目的doc中查看](https://gitee.com/top-discover/QuickFramework/tree/3.3.1/doc)，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
