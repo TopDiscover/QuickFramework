@@ -133,8 +133,9 @@ export class Helper {
         if (existsSync(this.syncBundlesPath)) {
             unlinkSync(this.syncBundlesPath);
         }
-        symlinkSync(this.bundlesPath, this.syncBundlesPath);
-        console.log(`创建 ${this.bundlesPath} -> ${this.syncBundlesPath}`);
+        let fromPath = join(this.bundlesPath,this.bundleName);
+        symlinkSync(fromPath, this.syncBundlesPath);
+        console.log(`创建 ${fromPath} -> ${this.syncBundlesPath}`);
         this.log("链接代码",true);
     }
 
