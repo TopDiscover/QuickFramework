@@ -1,7 +1,6 @@
 import { Update } from "./Update";
 import { Macro } from "../../defines/Macros";
 import { HttpPackage } from "../net/http/HttpClient";
-import { Http } from "../net/http/Http";
 import { UpdateItem } from "./UpdateItem";
 
 const VERSION_FILENAME = "versions.json";
@@ -10,11 +9,11 @@ type VERSIONS = { [key: string]: { md5: string, version: string } };
 /**
  * @description 热更新组件
  */
-export class UpdateManager implements ISingleton{
+export class UpdateManager implements ISingleton {
     isResident?: boolean = true;
     static module: string = "【更新管理器】";
     module: string = null!;
-    
+
     /**@description 本地存储热更新文件的路径 */
     get storagePath() {
         return jsb.fileUtils.getWritablePath() + "caches/";
@@ -46,56 +45,34 @@ export class UpdateManager implements ISingleton{
     /**@description 远程所有版本信息 */
     private remoteVersions: VERSIONS = {};
 
-    /**@description 释放资源管理器，默认为hall 大厅资源管理器 */
-    restAssetsManager(name: string = Update.MAIN_PACK) {
-        if (this.assetsManagers[name]) {
-            Log.d("restAssetsManager : " + name);
-            this.assetsManagers[name].reset();
-        }
+    /**@description 是否是预览或浏览器 */
+    get isBrowser() {
+        return cc.sys.platform == cc.sys.WECHAT_GAME || CC_PREVIEW || cc.sys.isBrowser;
     }
 
     /**@description 主包包含资源目录 */
-    mainBundles : string [] = [];
+    mainBundles: string[] = [];
 
     /**@description 获取资源管理器，默认为hall 大厅的资源管理器 */
     getAssetsManager(item: UpdateItem) {
         //初始化资源管理器
         let name = item.convertBundle(item.bundle);
         if (CC_JSB) {
-            Log.d(`Storage path for remote asset : ${this.storagePath}`);
-            this.assetsManagers[name] = new Update.AssetsManager(name);
-            this.assetsManagers[name].manager = new jsb.AssetsManager(name == Update.MAIN_PACK ? `type.${Update.MAIN_PACK}` : `type.${name}`, this.storagePath);
-            //设置下载并发量
-            this.assetsManagers[name].manager.setPackageUrl(this.hotUpdateUrl);
-            this.assetsManagers[name].manager.setMainBundles(this.mainBundles);
-            //设置重新下载的标准
-            this.assetsManagers[name].manager.setDownloadAgainZip(0.8);
+            if (!this.assetsManagers[name]) {
+                this.assetsManagers[name] = new Update.AssetsManager(name, this.storagePath);
+                //设置下载并发量
+                this.assetsManagers[name].manager.setPackageUrl(this.hotUpdateUrl);
+                this.assetsManagers[name].manager.setMainBundles(this.mainBundles);
+                //设置重新下载的标准
+                this.assetsManagers[name].manager.setDownloadAgainZip(0);
+            }
         }
         return this.assetsManagers[name];
     }
 
-    /**@description 是否是预览或浏览器 */
-    private get isBrowser( ){
-        return cc.sys.platform == cc.sys.WECHAT_GAME || CC_PREVIEW || cc.sys.isBrowser;
-    }
-
-    private isSkipUpdate(item: UpdateItem) {
-        if (this.isBrowser) {
-            //预览及浏览器下，不需要有更新的操作
-            item.isUpdating = false;
-            return true;
-        } else {
-            if (this.isSkipCheckUpdate) {
-                Log.d("跳过热更新，直接使用本地资源代码");
-                item.isUpdating = false;
-            }
-            return this.isSkipCheckUpdate;
-        }
-    }
-
     /**@description 下载update项，以最新的为当前操作的对象 */
     dowonLoad(item: UpdateItem) {
-        if (this.isSkipUpdate(item)) {
+        if (item.isSkipUpdate) {
             item.handler.onLoadBundle(item);
         } else {
             this.current = this.getItem(item);
@@ -115,28 +92,27 @@ export class UpdateManager implements ISingleton{
         }
     }
 
-    private _dowonLoad(item: UpdateItem) {
+    private async _dowonLoad(item: UpdateItem) {
         this.current = item;
-        this.current.isUpdating = true;
-        this.loadVersions(this.current).then((isOk) => {
-            if (isOk) {
-                item.isUpdating = false;
-                let status = this.getStatus(item.bundle);
-                if (status == Update.Status.UP_TO_DATE) {
-                    if (item.bundle == Macro.BUNDLE_HALL && this.isMd5Change(Update.MAIN_PACK)) {
-                        //大厅已经是最新，需要检测主包是否有更新
-                        Log.d(`进入${item.bundle} 时，需要更新主包`);
-                        item.handler.onNeedUpdateMain(item);
-                    } else {
-                        Log.d(`${item.bundle} 已经是最新，直接进入...`);
-                        item.handler.onLoadBundle(item);
-                    }
+        let isOk = await this.loadVersions(this.current);
+        if (isOk) {
+            let status = this.getStatus(item.bundle);
+            if (status == Update.Status.UP_TO_DATE) {
+                item.state = Update.State.UP_TO_DATE;
+                if (item.bundle == Macro.BUNDLE_HALL && this.isMd5Change(Update.MAIN_PACK)) {
+                    //大厅已经是最新，需要检测主包是否有更新
+                    Log.d(`进入${item.bundle} 时，需要更新主包`);
+                    item.handler.onNeedUpdateMain(item);
                 } else {
-                    Log.d(`${item.bundle} 进入检测更新...`);
-                    item.checkUpdate();
+                    Log.d(`${item.bundle} 已经是最新，直接进入...`);
+                    item.handler.onLoadBundle(item);
                 }
+            } else {
+                Log.d(`${item.bundle} 进入检测更新...`);
+                item.state = Update.State.READY_TO_UPDATE;
+                item.checkUpdate();
             }
-        });
+        }
     }
 
     private getItem(item: UpdateItem) {
@@ -194,13 +170,14 @@ export class UpdateManager implements ISingleton{
         return code;
     }
 
+
     /**
      * @description 获取当前bundle的状态
      * @param bundle bundle名
      * @returns 
      */
     getStatus(bundle: string) {
-        if (cc.sys.isBrowser || this.isSkipCheckUpdate) {
+        if (this.isBrowser || this.isSkipCheckUpdate) {
             //浏览器无更新
             return Update.Status.UP_TO_DATE;
         }
@@ -222,7 +199,7 @@ export class UpdateManager implements ISingleton{
      * @param isShortVersion 是否使用简单的版本号
      */
     getVersion(bundle: BUNDLE_TYPE, isShortVersion: boolean = true) {
-        if (cc.sys.isBrowser) {
+        if (this.isBrowser) {
             return "v1.0";
         } else {
             bundle = this.convertBundle(bundle as string);
@@ -257,7 +234,7 @@ export class UpdateManager implements ISingleton{
         return false
     }
 
-    private getString(path:string){
+    private getString(path: string) {
         //下载缓存中
         let cachedPath = `${this.storagePath}${path}`;
         if (jsb.fileUtils.isFileExist(cachedPath)) {
@@ -278,7 +255,7 @@ export class UpdateManager implements ISingleton{
         return this.getString(path);
     }
 
-    getProjectString(bundle:string){
+    getProjectString(bundle: string) {
         bundle = this.convertBundle(bundle);
         let path = `${Update.MANIFEST_ROOT}${bundle}_project.json`;
         return this.getString(path);
@@ -297,35 +274,35 @@ export class UpdateManager implements ISingleton{
      * @description 热更新初始化,先读取本地的所有版本信息，再拉取远程所有的版本信息
      * */
     private loadVersions(item: UpdateItem) {
-        return new Promise<boolean>((resolove, reject) => {
-            if (cc.sys.isBrowser) {
+        return new Promise<boolean>(async (resolove, reject) => {
+            if (this.isBrowser) {
                 resolove(true);
                 return;
             }
-            item.state = Update.State.DOWNLOADING_VERSION;
+            item.state = Update.State.PREDOWNLOAD_VERSION;
             item.handler.onShowUpdating(item);
-            this.readRemoteVersions((data, err) => {
-                if (err) {
-                    this.remoteVersions = {};
-                    item.code = Update.Code.PRE_VERSIONS_NOT_FOUND;
-                    item.handler.onPreVersionFailed(item);
-                    //重新标识
-                    item.isUpdating = false;
-                    Log.e(`加载${item.bundle}时，加载远程版本信息失败...`);
-                    resolove(false);
-                } else {
-                    this.remoteVersions = JSON.parse(data);
-                    let bundle = item.convertBundle(item.bundle);
-                    if (bundle == Update.MAIN_PACK && this.getStatus(bundle) == Update.Status.UP_TO_DATE) {
-                        Log.d(`主包已经是最新，写入远程的版本信息`);
-                        this.preVersions = JSON.parse(data);
-                        //主包更新完成，清除路径缓存信息
-                        jsb.fileUtils.purgeCachedEntries();
-                    }
-                    Log.d(`加载${item.bundle}时，加载远程版本信息成功...`);
-                    resolove(true);
+            Log.d(`${this.module} 请求远程版本信息`);
+            let data = await this.readRemoteVersions();
+            if (data) {
+                this.remoteVersions = JSON.parse(data);
+                let bundle = item.convertBundle(item.bundle);
+                if (bundle == Update.MAIN_PACK && this.getStatus(bundle) == Update.Status.UP_TO_DATE) {
+                    Log.d(`${this.module} 主包已经是最新，写入远程的版本信息`);
+                    this.savePreVersions();
+                    //主包更新完成，清除路径缓存信息;
+                    jsb.fileUtils.purgeCachedEntries();
                 }
-            });
+                Log.d(`${this.module} 加载${item.bundle}时，加载远程版本信息成功...`);
+                item.state = Update.State.VERSION_LOADED;
+                resolove(true);
+            } else {
+                this.remoteVersions = {};
+                item.state = Update.State.FAIL_TO_UPDATE;
+                item.code = Update.Code.PRE_VERSIONS_NOT_FOUND;
+                item.handler.onPreVersionFailed(item);
+                Log.e(`${this.module} 加载${item.bundle}时，加载远程版本信息失败...`);
+                resolove(false);
+            }
         });
     }
 
@@ -342,29 +319,33 @@ export class UpdateManager implements ISingleton{
     }
 
     /**@description 读取远程版本文件 */
-    private readRemoteVersions(complete: (data: string, err?: Http.Error) => void) {
-        let httpPackage = new HttpPackage;
-        httpPackage.data.url = `${this.hotUpdateUrl}/${Update.MANIFEST_ROOT}${VERSION_FILENAME}`;
-        httpPackage.data.isAutoAttachCurrentTime = true;
-        httpPackage.send((data) => {
-            complete(data);
-        }, (err) => {
-            Log.dump(err);
-            complete("", err);
-        });
+    private readRemoteVersions() {
+        return new Promise<string | null>((resolove) => {
+            let httpPackage = new HttpPackage;
+            httpPackage.data.url = `${this.hotUpdateUrl}/${Update.MANIFEST_ROOT}${VERSION_FILENAME}`;
+            httpPackage.data.isAutoAttachCurrentTime = true;
+            httpPackage.send((data) => {
+                resolove(data);
+            }, (err) => {
+                Log.dump(err);
+                resolove(null);
+            });
+        })
     }
 
     savePreVersions() {
-        this.readRemoteVersions((data, err) => {
-            if (err) {
-                this.preVersions = {};
-            } else {
-                this.preVersions = JSON.parse(data);
-            }
-        });
+        // 到了这个位置，说明 this.remoteVersions 已经有数据了
+        if (Object.keys(this.remoteVersions).length > 0) {
+            Log.d(`${this.module} 保存远程版本信息如下:`);
+            let versions = JSON.stringify(this.remoteVersions);
+            Log.d(versions);
+            this.preVersions = JSON.parse(versions);
+        } else {
+            Log.e(`${this.module} 致命更新错误,无法读取到远程版本信息!!!`);
+        }
     }
 
-    debug(){
+    debug() {
         Log.d(`-----------热火更新管理器中相关信息------------`);
         Log.dump({ name: "预处理版本信息", data: this.preVersions });
         Log.dump({ name: "远程版本信息", data: this.remoteVersions });

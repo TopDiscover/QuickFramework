@@ -207,6 +207,19 @@ void AssetsManagerEx::reset() {
 	_updateState = State::UNINITED;
 }
 
+void AssetsManagerEx::setPackageUrl(const std::string& url) {
+	_packageUrl = url;
+	// Append automatically "/"
+	if (_packageUrl.size() > 0 && _packageUrl[_packageUrl.size() - 1] != '/')
+	{
+		_packageUrl.append("/");
+	}
+}
+
+const std::string& AssetsManagerEx::getPackageUrl() const{
+	return _packageUrl;
+}
+
 void AssetsManagerEx::setMainBundles(const std::vector<std::string>& bundles) {
 	_mainBundles = bundles;
 }
@@ -229,7 +242,7 @@ void AssetsManagerEx::initManifests()
     _tempManifest = new (std::nothrow) Manifest();
     if (_tempManifest)
     {
-        _tempManifest->setPackageUrl(_packageUrl);
+        _tempManifest->setPackageUrl(getPackageUrl());
         _tempManifest->parseFile(_tempManifestPath);
         // Previous update is interrupted
         if (_fileUtils->isFileExist(_tempManifestPath))
@@ -280,7 +293,10 @@ bool AssetsManagerEx::loadLocalManifest(Manifest* localManifest, const std::stri
 {
     if (_updateState > State::UNINITED)
     {
-        return false;
+		if (_updateState != State::FAIL_TO_UPDATE) {
+			//If the update fails, try to update again
+			return false;
+		}
     }
     if (!localManifest || !localManifest->isLoaded())
     {
@@ -310,7 +326,7 @@ bool AssetsManagerEx::loadLocalManifest(Manifest* localManifest, const std::stri
         cachedManifest = new (std::nothrow) Manifest();
         if (cachedManifest)
         {
-            cachedManifest->setPackageUrl(_packageUrl);
+            cachedManifest->setPackageUrl(getPackageUrl());
             cachedManifest->parseFile(_cacheManifestPath);
             if (!cachedManifest->isLoaded())
             {
@@ -376,7 +392,7 @@ bool AssetsManagerEx::loadLocalManifest(const std::string& manifestUrl)
         cachedManifest = new (std::nothrow) Manifest();
         if (cachedManifest)
         {
-            cachedManifest->setPackageUrl(_packageUrl);
+            cachedManifest->setPackageUrl(getPackageUrl());
             cachedManifest->parseFile(_cacheManifestPath);
             if (!cachedManifest->isLoaded())
             {
@@ -403,7 +419,7 @@ bool AssetsManagerEx::loadLocalManifest(const std::string& manifestUrl)
         }
         _fileUtils->setSearchPaths(trimmedPaths);
     }
-	_localManifest->setPackageUrl(_packageUrl);
+	_localManifest->setPackageUrl(getPackageUrl());
     // Load local manifest in app package
     _localManifest->parseFile(_manifestUrl);
     if (cachedManifest)
@@ -496,10 +512,9 @@ bool AssetsManagerEx::isNeedDownLoadZip(float download, float total) {
 }
 
 void AssetsManagerEx::toDownloadZip() {
-	auto packageUrl = _remoteManifest->getPackageUrl();
 	DownloadUnit unit;
 	unit.customId = _bundle + "_" + _remoteManifest->getMd5() + ".zip";
-	unit.srcUrl = _packageUrl + "/zips/" + unit.customId;
+	unit.srcUrl = getPackageUrl() + "zips/" + unit.customId;
 	unit.storagePath = _tempStoragePath + unit.customId;
 	unit.size = _remoteManifest->getZipSize();
 	unit.compressed = true;
@@ -855,7 +870,7 @@ void AssetsManagerEx::parseVersion()
 {
     if (_updateState != State::VERSION_LOADED)
         return;
-	_remoteManifest->setPackageUrl(_packageUrl);
+	_remoteManifest->setPackageUrl(getPackageUrl());
     _remoteManifest->parseVersion(_tempVersionPath);
 
     if (!_remoteManifest->isVersionLoaded())
@@ -908,7 +923,7 @@ void AssetsManagerEx::parseManifest()
     if (_updateState != State::MANIFEST_LOADED)
         return;
 
-	_remoteManifest->setPackageUrl(_packageUrl);
+	_remoteManifest->setPackageUrl(getPackageUrl());
     _remoteManifest->parseFile(_tempManifestPath);
 
     if (!_remoteManifest->isLoaded())
