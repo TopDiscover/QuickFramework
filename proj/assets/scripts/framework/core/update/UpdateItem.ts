@@ -22,8 +22,6 @@ export interface UpdateHandlerDelegate {
     onAreadyUpToData(item: UpdateItem): void;
     /**@description 下载更新完成 */
     onDownloadComplete(item: UpdateItem): void;
-    /**@description 尝试下载失败的更新 */
-    onTryDownloadFailedAssets(item: UpdateItem): void;
     /**@description 开始测试更新 */
     onStarCheckUpdate(item: UpdateItem): void;
 
@@ -48,22 +46,66 @@ export class UpdateItem {
     userData: any = null;
 
     /**@description 下载管理器，请不要从外面进行设置,管理器专用 */
-    private assetsManager: Update.AssetsManager = null!;
+    private get assetsManager() {
+        return Manager.updateManager.getAssetsManager(this);
+    }
 
-    code: Update.Code = Update.Code.UNINITED;
-    state: Update.State = Update.State.UNINITED;
+    private _code: Update.Code = Update.Code.UNINITED;
+    get code() {
+        if (this.isBrowser) {
+            return Update.Code.ALREADY_UP_TO_DATE;
+        }
+        return this._code;
+    }
+    set code(v) {
+        this._code = v;
+    }
+
+    private _state: Update.State = Update.State.UNINITED;
+    get state() {
+        if (this.isBrowser) {
+            return Update.State.UP_TO_DATE;
+        }
+        return this._state;
+    }
+    set state(v) {
+        this._state = v;
+    }
 
     constructor(config: Update.Config) {
         this.name = config.name;
         this.bundle = config.bundle;
     }
 
-    /**@description 是否正在下载或正在检测更新 */
-    isUpdating = false;
-
     /**@description 热更新bundle名 */
     get updateName() {
         return this.assetsManager.name;
+    }
+
+    /**@description 是否是预览或浏览器 */
+    private get isBrowser() {
+        return Manager.updateManager.isBrowser;
+    }
+
+    /**@description 是否跳过热更新 */
+    get isSkipUpdate() {
+        if (this.isBrowser) {
+            //预览及浏览器下，不需要有更新的操作
+            return true;
+        } else {
+            return Manager.updateManager.isSkipCheckUpdate;
+        }
+    }
+
+
+    /**
+     * @description 重置
+     */
+    reset() {
+        this.state = Update.State.UNINITED;
+        this.code = Update.Code.UNINITED;
+        Log.d(`${this.bundle} AssetsManager 重置`);
+        this.assetsManager.manager.reset();
     }
 
     /**
@@ -102,9 +144,58 @@ export class UpdateItem {
         return Manager.updateManager.hotUpdateUrl;
     }
 
+    /**@description 当前是否正在检测更新或更新过程中 */
+    get isUpdating() {
+        let state = this.assetsManager.manager.getState() as any;
+        let _isUpdating = (state: Update.State) => {
+            if (state == Update.State.PREDOWNLOAD_VERSION) {
+                Log.d(`${this.bundle} 准备下载版本文件`)
+                return true;
+            } else if (state == Update.State.DOWNLOADING_VERSION) {
+                Log.d(`${this.bundle} 下载版本文件中`)
+                return true;
+            } else if (state == Update.State.PREDOWNLOAD_MANIFEST) {
+                Log.d(`${this.bundle} 准备下载project文件`)
+                return true;
+            } else if (state == Update.State.DOWNLOADING_MANIFEST) {
+                Log.d(`${this.bundle} 下载project文件中`);
+                return true;
+            } else if (state == Update.State.VERSION_LOADED) {
+                Log.d(`${this.bundle} 下载版本文件完成，下一步骤会解析版本文件，也算在更新过程中`)
+                return true;
+            } else if (state == Update.State.MANIFEST_LOADED) {
+                Log.d(`${this.bundle} 下载project文件完成,下载步骤会解析project文件，也算在更新过程中`)
+                return true;
+            } else if (state == Update.State.UPDATING) {
+                Log.d(`${this.bundle} 正在更新中`);
+                return true;
+            }
+        }
+        //C++更新状态
+        if (_isUpdating(state)) {
+            Log.d(`${this.bundle} C++层更新中`);
+            return true;
+        }
+
+        //ts更新状态
+        if (_isUpdating(this.state)) {
+            Log.d(`${this.bundle} TS层更新中`);
+            return true;
+        }
+
+        return false;
+    }
+
     /**@description bundle更新 */
     private checkBundleUpdate() {
-        this.assetsManager = Manager.updateManager.getAssetsManager(this);
+        if (this.assetsManager.manager.getLocalManifest()) {
+            Log.d(`${this.bundle} 本地文件已经加载完成,直接进入更新流程`);
+            if (this.isUpdating) {
+                Log.d(`${this.bundle} 正在检测更新中...`);
+                this.handler.onShowUpdating(this);
+                return;
+            }
+        }
         let content = this.getProjectString();
         //先检测本地是否已经存在子游戏版本控制文件 
         if (content) {
@@ -116,11 +207,6 @@ export class UpdateItem {
             this._checkUpdate();
         } else {
             //不存在版本控制文件 ，生成一个初始版本
-            if (this.isUpdating) {
-                Log.d(`${this.bundle} Checking or updating...`);
-                this.handler.onShowUpdating(this);
-                return;
-            }
             let gameManifest = {
                 version: "0",
                 bundle: this.convertBundle(this.bundle),
@@ -128,56 +214,27 @@ export class UpdateItem {
             };
             let gameManifestContent = JSON.stringify(gameManifest);
             let jsbGameManifest = new jsb.Manifest(gameManifestContent, this.storagePath, this.hotUpdateUrl);
-            Log.d(`${this.bundle} --checkUpdate--`);
-            Log.d(`${this.bundle} mainifest content : ${gameManifestContent}`);
+            Log.d(`${this.bundle} 检测更新`);
+            Log.d(`${this.bundle} 版本信息 : ${gameManifestContent}`);
             this.assetsManager.manager.loadLocalManifest(jsbGameManifest, "");
             this._checkUpdate();
         }
     }
 
-    private _checkUpdate() {
-        Log.d(`${this.bundle} --checkUpdate--`);
-        if (this.isUpdating) {
-            Log.d(`${this.bundle} Checking or updating...`);
-            this.handler.onShowUpdating(this);
-            return;
-        }
-        if (!this.assetsManager.manager.getLocalManifest() || !this.assetsManager.manager.getLocalManifest().isLoaded()) {
-            Log.d(`${this.bundle} Failed to load local manifest ....`);
-            this.code = Update.Code.ERROR_DOWNLOAD_MANIFEST;
-            this.state = Update.State.FAIL_TO_UPDATE;
-            this.handler.onUpdateFailed(this);
-            return;
-        }
-        if (this.isTryDownloadFailedAssets()) {
-            //已经更新失败，尝试获取更新下载失败的
-            Log.d(`${this.bundle} 之前下载资源未完全下载完成，请尝试重新下载`);
-            this.code = Update.Code.UPDATE_FAILED;
-            this.state = Update.State.TRY_DOWNLOAD_FAILED_ASSETS;
-            this.handler.onTryDownloadFailedAssets(this);
-        } else {
-            this.isUpdating = true;
-            this.assetsManager.manager.setEventCallback(this.checkCb.bind(this));
-            this.assetsManager.manager.checkUpdate();
-        }
-    }
 
-    /**@description 判断是否需要重新尝试下载之前下载失败的文件 */
-    private isTryDownloadFailedAssets() {
-        if (this.assetsManager.manager.getState() as any == Update.State.FAIL_TO_UPDATE) {
-            return true;
-        }
-        return false;
+    private _checkUpdate() {
+        Log.d(`${this.bundle} 进入检测更新`);
+        this.state = Update.State.UPDATING;
+        this.assetsManager.manager.setEventCallback(this.checkCb.bind(this));
+        this.assetsManager.manager.checkUpdate();
     }
 
     private checkCb(event: any) {
-        //这里不能置空，下载manifest文件也会回调过来
-        //this.checkCallback = null;
-        //存储当前的状态，当下载版本文件失败时，state的状态与下载非版本文件是一样的状态
-        this.assetsManager.code = event.getEventCode();
-        Log.d(`${this.bundle} checkCb event code : ${event.getEventCode()} state : ${this.assetsManager.manager.getState()}`);
         let code = event.getEventCode();
-        switch (event.getEventCode()) {
+        let state = this.assetsManager.manager.getState() as any;
+        Log.d(`${this.bundle} checkCb event code : ${code} state : ${state}`);
+
+        switch (code) {
             case Update.Code.ERROR_NO_LOCAL_MANIFEST:
                 Log.d(`${this.bundle} No local manifest file found, hot update skipped.`);
                 break;
@@ -203,9 +260,8 @@ export class UpdateItem {
             default:
                 return;
         }
-
-        this.isUpdating = false;
-        this.assetsManager.code = code;
+        this.state = state;
+        this.code = code;
         if (code == Update.Code.NEW_VERSION_FOUND) {
             this.handler.onNewVersionFund(this);
         } else if (code == Update.Code.ALREADY_UP_TO_DATE) {
@@ -222,13 +278,6 @@ export class UpdateItem {
 
     }
 
-    /**@description 下载失败的资源 */
-    downloadFailedAssets() {
-        if (this.assetsManager) {
-            this.assetsManager.manager.downloadFailedAssets();
-        }
-    }
-
     /**@description 执行更新 */
     doUpdate() {
         Log.d(`${this.bundle} 即将热更新, updating : ${this.isUpdating}`);
@@ -243,10 +292,10 @@ export class UpdateItem {
     private updateCb(event: any) {
         let isUpdateFinished = false;
         let failed = false;
-        Log.d(`${this.bundle} --update cb code : ${event.getEventCode()} state : ${this.assetsManager.manager.getState()}`);
-        //存储当前的状态，当下载版本文件失败时，state的状态与下载非版本文件是一样的状态
-        this.assetsManager.code = event.getEventCode();
-        switch (this.assetsManager.code) {
+        let code = event.getEventCode();
+        let state = this.assetsManager.manager.getState() as any;
+        Log.d(`${this.bundle} --update cb code : ${code} state : ${state}`);
+        switch (code) {
             case Update.Code.ERROR_NO_LOCAL_MANIFEST:
                 Log.d(`${this.bundle} No local manifest file found, hot update skipped.`);
                 failed = true;
@@ -314,7 +363,6 @@ export class UpdateItem {
             jsb.fileUtils.setSearchPaths(searchPaths);
         }
 
-        let state = this.assetsManager.manager.getState();
         let isRestartApp = false;
         if (this.isMain) {
             if (isUpdateFinished) {
@@ -330,7 +378,7 @@ export class UpdateItem {
                     Log.d(`${this.bundle} 主包更新完成，写入远程版本信息到本地`);
                     jsb.fileUtils.purgeCachedEntries();
                     //下载完成 重置热更新管理器，在游戏期间如果有发热更新，可以再次检测
-                    Manager.updateManager.restAssetsManager(this.updateName);
+                    this.reset();
                 }
             }
         } else {
@@ -340,14 +388,12 @@ export class UpdateItem {
                 //清除搜索路径缓存
                 jsb.fileUtils.purgeCachedEntries();
                 //下载完成 重置热更新管理器，在游戏期间如果有发热更新，可以再次检测
-                Manager.updateManager.restAssetsManager(this.updateName);
+                this.reset();
             }
         }
 
-        if (this.assetsManager.code != Update.Code.UPDATE_PROGRESSION) {
-            //不是更新中状态，重置标识
-            this.isUpdating = false;
-        }
+        this.state = state;
+        this.code = code;
 
         let info: Update.DownLoadInfo = {
             downloadedBytes: event.getDownloadedBytes(),
@@ -368,7 +414,11 @@ export class UpdateItem {
             info.progress = 1.1;
             this.handler.onDownloading(this, info);
         } else if (info.code == Update.Code.UPDATE_PROGRESSION) {
-            info.progress = info.percent == Number.NaN ? 0 : info.percent;
+            if (info.totalBytes <= 0) {
+                info.progress = 0;
+            } else {
+                info.progress = info.percent == Number.NaN ? 0 : info.percent;
+            }
             this.handler.onDownloading(this, info);
         } else if (info.code == Update.Code.ALREADY_UP_TO_DATE) {
             info.progress = 1;

@@ -75,11 +75,11 @@ export namespace Update {
         DOWNLOADING_VERSION,
         /**@description 版本文件下载完成 */
         VERSION_LOADED,
-        /**@description 准备加载project.manifest文件 */
+        /**@description 准备加载project文件 */
         PREDOWNLOAD_MANIFEST,
-        /**@description 下载project.manifest文件中 */
+        /**@description 下载project文件中 */
         DOWNLOADING_MANIFEST,
-        /**@description 下载project.manifest文件完成 */
+        /**@description 下载project文件完成 */
         MANIFEST_LOADED,
         /**@description 需要下载更新 */
         NEED_UPDATE,
@@ -93,10 +93,6 @@ export namespace Update {
         UP_TO_DATE,
         /**@description 更新失败 */
         FAIL_TO_UPDATE,
-
-        /**自定定义扩展 */
-        /**@description 尝试重新下载失败文件 */
-        TRY_DOWNLOAD_FAILED_ASSETS,
     }
 
     /**
@@ -135,19 +131,41 @@ export namespace Update {
 
     export class AssetsManager {
 
-        constructor(name: string) {
+        constructor(name: string, storagePath: string) {
             this.name = name;
+            this.type = name == Update.MAIN_PACK ? `type.${Update.MAIN_PACK}` : `type.${name}`;
+            this.storagePath = storagePath;
+            this.create();
         }
 
         /**@description  当前资源管理器的状态*/
         code: any = -1;
         /**@description 当前资源管理器的名称 */
         name: string = "";
+
+        private _manager: jsb.AssetsManager = null!;
         /**@description 当前资源管理器的实体 jsb.AssetsManager */
-        manager: jsb.AssetsManager = null!;
+        get manager() {
+            if (!this._manager) {
+                this.create();
+            }
+            return this._manager;
+        }
+        set manager(v) {
+            this._manager = v;
+        }
+
+        private type: string = "";
+
+        private storagePath: string = "";
 
         reset() {
             this.manager.reset();
+        }
+
+        private create() {
+            Log.d(`创建 ${this.name} AssetsManager`);
+            this.manager = new jsb.AssetsManager(this.type, this.storagePath);
         }
     }
 }

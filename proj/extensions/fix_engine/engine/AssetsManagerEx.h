@@ -216,7 +216,8 @@ public:
     /**
 	 * @brief 设置热更新地址,由于热更新地址会动态的发生变化，热更新的地址以下发的地址为准,设置热更新地址后，会自动的替换所有热更新的源地址
 	 */
-	void setPackageUrl(const std::string& url) { _packageUrl = url; };
+	void setPackageUrl(const std::string& url);
+	const std::string& getPackageUrl() const;
 	/**
 	 * @brief 设置主包包含的bunldes ,用& 隔开，示例 main&resources
 	 */

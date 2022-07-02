@@ -28,6 +28,7 @@
 #include "json/prettywriter.h"
 #include "json/stringbuffer.h"
 #include "base/Log.h"
+#include <time.h>
 
 #include <fstream>
 #include <stdio.h>
@@ -328,10 +329,11 @@ void Manifest::genResumeAssetsList(DownloadUnits *units , bool& unzip) const {
             DownloadUnit unit;
             unit.customId = it->first;
 			if (asset.compressed) {
-				unit.srcUrl = _packageUrl + "/zips/" + asset.path;
+				
+				unit.srcUrl = getPackageUrl() + "zips/" + asset.path;
 			}
 			else {
-				unit.srcUrl = _packageUrl + asset.path;
+				unit.srcUrl = getPackageUrl() + asset.path + "?md5=" + asset.md5;
 			}
             
             unit.storagePath = _manifestRoot + asset.path;
@@ -396,11 +398,13 @@ const void Manifest::setPackageUrl(const std::string& packageUrl) {
 }
 
 const std::string Manifest::getManifestFileUrl() const {
-    return _packageUrl + MANIFEST_ROOT + _bundle + MANIFEST_FILENAME;
+	// Add a timestamp to ensure the fetch is up-to-date
+    return getPackageUrl() + MANIFEST_ROOT + _bundle + MANIFEST_FILENAME + "?time=" + std::to_string(time(nullptr));
 }
 
 const std::string Manifest::getVersionFileUrl() const {
-    return _packageUrl + MANIFEST_ROOT + _bundle + VERSION_FILENAME;
+	// Add a timestamp to ensure the fetch is up-to-date
+    return getPackageUrl() + MANIFEST_ROOT + _bundle + VERSION_FILENAME + "?time=" + std::to_string(time(nullptr));
 }
 
 const std::string &Manifest::getVersion() const {
@@ -566,13 +570,7 @@ void Manifest::loadVersion(const rapidjson::Document &json) {
     // Retrieve package url
 	if (json.HasMember(KEY_PACKAGE_URL) && json[KEY_PACKAGE_URL].IsString())
 	{
-		_packageUrl = json[KEY_PACKAGE_URL].GetString();
-
-		// Append automatically "/"
-		if (_packageUrl.size() > 0 && _packageUrl[_packageUrl.size() - 1] != '/')
-		{
-			_packageUrl.append("/");
-		}
+		setPackageUrl(json[KEY_PACKAGE_URL].GetString());
 	}
 
 	//md5
