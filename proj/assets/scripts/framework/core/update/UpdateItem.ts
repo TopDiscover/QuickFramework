@@ -371,7 +371,10 @@ export class UpdateItem {
                 //不需要对游戏进行重启的操作
                 if (event.getDownloadedFiles() > 0) {
                     Log.d(`${this.bundle} 主包更新完成，有下载文件，需要重启更新`);
-                    cc.game.restart();
+                    setTimeout(() => {
+                        Log.d(`${this.bundle} 重启游戏`);
+                        cc.game.restart();
+                    }, 1);
                     isRestartApp = true;
                 } else {
                     Log.d(`${this.bundle} 主包更新完成，写入远程版本信息到本地`);

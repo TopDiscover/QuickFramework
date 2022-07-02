@@ -138,8 +138,6 @@ export namespace Update {
             this.create();
         }
 
-        /**@description  当前资源管理器的状态*/
-        code: any = -1;
         /**@description 当前资源管理器的名称 */
         name: string = "";
 
