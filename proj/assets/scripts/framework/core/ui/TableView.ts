@@ -2,6 +2,8 @@
  * @description 扩展TableView
  */
 
+import { TableViewCell } from "./TableViewCell";
+
 const { ccclass, property } = cc._decorator;
 
 interface Options {
@@ -27,6 +29,28 @@ let getTimeInMilliseconds = () => {
     return currentTime.getMilliseconds();
 };
 
+
+const eventMap = {
+    'scroll-to-top': 0,
+    'scroll-to-bottom': 1,
+    'scroll-to-left': 2,
+    'scroll-to-right': 3,
+    'scrolling': 4,
+    'bounce-bottom': 6,
+    'bounce-left': 7,
+    'bounce-right': 8,
+    'bounce-top': 5,
+    'scroll-ended': 9,
+    'touch-up': 10,
+    'scroll-ended-with-threshold': 11,
+    'scroll-began': 12,
+
+    'cell-selected': 13,
+    'cell-cancel-selected': 14,
+    'cell-touched': 15,
+    'cell-recycle': 16,
+}
+
 /**
  * !#en Enum for ScrollView event type.
  * !#zh 滚动视图事件类型
@@ -34,85 +58,94 @@ let getTimeInMilliseconds = () => {
  */
 enum EventType {
     /**@description 内部使用 */
-    UNKNOWN = -1,
+    UNKNOWN = "UNKNOWN",
     /**
      * !#en The event emmitted when ScrollView scroll to the top boundary of inner container
      * !#zh 滚动视图滚动到顶部边界事件
      * @property {Number} SCROLL_TO_TOP
      */
-    SCROLL_TO_TOP,
+    SCROLL_TO_TOP = "scroll-to-top",
     /**
      * !#en The event emmitted when ScrollView scroll to the bottom boundary of inner container
      * !#zh 滚动视图滚动到底部边界事件
      * @property {Number} SCROLL_TO_BOTTOM
      */
-    SCROLL_TO_BOTTOM,
+    SCROLL_TO_BOTTOM = "scroll-to-bottom",
     /**
      * !#en The event emmitted when ScrollView scroll to the left boundary of inner container
      * !#zh 滚动视图滚动到左边界事件
      * @property {Number} SCROLL_TO_LEFT
      */
-    SCROLL_TO_LEFT,
+    SCROLL_TO_LEFT = "scroll-to-left",
     /**
      * !#en The event emmitted when ScrollView scroll to the right boundary of inner container
      * !#zh 滚动视图滚动到右边界事件
      * @property {Number} SCROLL_TO_RIGHT
      */
-    SCROLL_TO_RIGHT,
+    SCROLL_TO_RIGHT = "scroll-to-right",
     /**
      * !#en The event emmitted when ScrollView is scrolling
      * !#zh 滚动视图正在滚动时发出的事件
      * @property {Number} SCROLLING
      */
-    SCROLLING,
+    SCROLLING = "scrolling",
     /**
      * !#en The event emmitted when ScrollView scroll to the top boundary of inner container and start bounce
      * !#zh 滚动视图滚动到顶部边界并且开始回弹时发出的事件
      * @property {Number} BOUNCE_TOP
      */
-    BOUNCE_TOP,
+    BOUNCE_TOP = "bounce-top",
     /**
      * !#en The event emmitted when ScrollView scroll to the bottom boundary of inner container and start bounce
      * !#zh 滚动视图滚动到底部边界并且开始回弹时发出的事件
      * @property {Number} BOUNCE_BOTTOM
      */
-    BOUNCE_BOTTOM,
+    BOUNCE_BOTTOM = "bounce-bottom",
     /**
      * !#en The event emmitted when ScrollView scroll to the left boundary of inner container and start bounce
      * !#zh 滚动视图滚动到左边界并且开始回弹时发出的事件
      * @property {Number} BOUNCE_LEFT
      */
-    BOUNCE_LEFT,
+    BOUNCE_LEFT = "bounce-left",
     /**
      * !#en The event emmitted when ScrollView scroll to the right boundary of inner container and start bounce
      * !#zh 滚动视图滚动到右边界并且开始回弹时发出的事件
      * @property {Number} BOUNCE_RIGHT
      */
-    BOUNCE_RIGHT,
+    BOUNCE_RIGHT = "bounce-right",
     /**
      * !#en The event emmitted when ScrollView auto scroll ended
      * !#zh 滚动视图滚动结束的时候发出的事件
      * @property {Number} SCROLL_ENDED
      */
-    SCROLL_ENDED,
+    SCROLL_ENDED = "scroll-ended",
     /**
      * !#en The event emmitted when user release the touch
      * !#zh 当用户松手的时候会发出一个事件
      * @property {Number} TOUCH_UP
      */
-    TOUCH_UP,
+    TOUCH_UP = "touch-up",
     /**
      * !#en The event emmitted when ScrollView auto scroll ended with a threshold
      * !#zh 滚动视图自动滚动快要结束的时候发出的事件
      * @property {Number} AUTOSCROLL_ENDED_WITH_THRESHOLD
      */
-    AUTOSCROLL_ENDED_WITH_THRESHOLD,
+    AUTOSCROLL_ENDED_WITH_THRESHOLD = "scroll-ended-with-threshold",
     /**
      * !#en The event emmitted when ScrollView scroll began
      * !#zh 滚动视图滚动开始时发出的事件
      * @property {Number} SCROLL_BEGAN
      */
-    SCROLL_BEGAN,
+    SCROLL_BEGAN = "scroll-began",
+
+    /**@description 列表项被选中 */
+    CELL_SELECTED = "cell-selected",
+    /**@description 列表项取消选中 */
+    CELL_CANCEL_SELECTED = "cell-cancel-selected",
+    /**@description 列表项点击完成 */
+    CELL_TOUCHED = "cell-touched",
+    /**@description 列表项进入复用 */
+    CELL_RECYCLE = "cell-recycle"
 };
 
 enum Direction {
@@ -125,6 +158,28 @@ enum Direction {
      * */
     VERTICAL
 };
+
+export interface TableViewDelegate {
+
+    /**
+     * @description 获取指定项的大小，当列表有各项不同大小时,如果都是同一大小
+     * @param view 
+     * @param index 
+     * @returns 返回cell类型
+     */
+    tableCellSizeForIndex(view: TableView, index: number): string | number;
+    /**
+     * @description 查询index项
+     * @param view 
+     * @param index 
+     * @returns 返回cell类型
+     */
+    tableCellAtIndex(view: TableView, index: number): string | number;
+    /**@description 返回当前TalbeView的总项数 */
+    numberOfCellsInTableView(view: TableView): number;
+    /**@description 更新cell数据 */
+    updateCellData( view: TableView , cell : TableViewCell):void;
+}
 
 @ccclass
 export default class TableView extends cc.Component {
@@ -244,6 +299,9 @@ export default class TableView extends cc.Component {
     @property({ tooltip: "滚动行为是否取消子节点上注册的触摸事件", displayName: "Cancel Inner Events" })
     cancelInnerEvents: boolean = true;
 
+    @property({ tooltip: "Cell项模板", displayName: "Template", type: TableViewCell })
+    template: TableViewCell[] = []
+
     protected get _view() {
         if (this.content) {
             return this.content.parent;
@@ -280,14 +338,6 @@ export default class TableView extends cc.Component {
     protected _scrollEventEmitMask = 0;
     protected _isBouncing = false;
     protected _scrolling = false;
-
-    private _eventName: { [key: number]: string } = null;
-    toStringEventType(type: EventType) {
-        if (!this._eventName) {
-            this._eventName = cc.Enum(EventType) as any;
-        }
-        return this._eventName[type];
-    }
 
     /**
       * !#en Scroll the content to the bottom boundary of ScrollView.
@@ -529,8 +579,56 @@ export default class TableView extends cc.Component {
         return this._autoScrolling;
     }
 
-    
-    
+    /**
+     * @description 更新指定项
+     * @param index 
+     */
+    updateCellAtIndex(index: number) {
+
+    }
+
+    /**
+     * @description 插入项，默认为插入到最后
+     * @param index 
+     */
+    insertCellAtIndex(index?: number) {
+
+    }
+
+    /**
+     * @description 删除指定项
+     * @param index 
+     */
+    removeCellAtIndex(index: number) {
+
+    }
+
+    /**
+     * @description 重置数据
+     */
+    reloadData() {
+
+    }
+
+    /**
+     * @description 返回当前可重用节点
+     * @param type 指定类型获取
+     * @returns 
+     */
+    dequeueCell(type?: number | string): TableViewCell | null {
+        return null;
+    }
+
+
+    /**
+     * @description 返回指定位置的cell,注意：只会从当前显示节点中返回，如果没有在显示，会返回null
+     * @param index 
+     * @returns 
+     */
+    cellAtIndex(index: number): TableViewCell | null {
+        return null;
+    }
+
     //保护方法
 
     protected _registerEvent() {
@@ -1274,7 +1372,7 @@ export default class TableView extends cc.Component {
             event === EventType.SCROLL_TO_BOTTOM ||
             event === EventType.SCROLL_TO_LEFT ||
             event === EventType.SCROLL_TO_RIGHT) {
-            let flag = (1 << event);
+            let flag = (1 << eventMap[event]);
             if (this._scrollEventEmitMask & flag) {
                 return;
             } else {
@@ -1282,10 +1380,8 @@ export default class TableView extends cc.Component {
             }
         }
 
-        let eventName = this.toStringEventType(event);
-        Log.d(eventName);
         cc.Component.EventHandler.emitEvents(this.scrollEvents, this, event);
-        this.node.emit(eventName, this);
+        this.node.emit(event, this);
     }
 
     protected _adjustContentOutOfBoundary() {
