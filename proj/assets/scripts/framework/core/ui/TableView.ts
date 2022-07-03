@@ -2,7 +2,7 @@
  * @description 扩展TableView
  */
 
-import { TableViewCell } from "./TableViewCell";
+import { CellType, TableViewCell } from "./TableViewCell";
 
 const { ccclass, property } = cc._decorator;
 
@@ -44,11 +44,6 @@ const eventMap = {
     'touch-up': 10,
     'scroll-ended-with-threshold': 11,
     'scroll-began': 12,
-
-    'cell-selected': 13,
-    'cell-cancel-selected': 14,
-    'cell-touched': 15,
-    'cell-recycle': 16,
 }
 
 /**
@@ -137,15 +132,6 @@ enum EventType {
      * @property {Number} SCROLL_BEGAN
      */
     SCROLL_BEGAN = "scroll-began",
-
-    /**@description 列表项被选中 */
-    CELL_SELECTED = "cell-selected",
-    /**@description 列表项取消选中 */
-    CELL_CANCEL_SELECTED = "cell-cancel-selected",
-    /**@description 列表项点击完成 */
-    CELL_TOUCHED = "cell-touched",
-    /**@description 列表项进入复用 */
-    CELL_RECYCLE = "cell-recycle"
 };
 
 enum Direction {
@@ -159,33 +145,46 @@ enum Direction {
     VERTICAL
 };
 
+enum FillOrder {
+    /**
+     * @description 水平方向时，从左到右填充，垂直方向时，从上到下填充
+     */
+    TOP_DOWN,
+    /**
+     * @description 水平方向时，从右到左填充，垂直方向时，从下到上填充
+     */
+    BOTTOM_UP,
+}
+
 export interface TableViewDelegate {
 
     /**
-     * @description 获取指定项的大小，当列表有各项不同大小时,如果都是同一大小
+     * @description 获取cell类型
      * @param view 
      * @param index 
-     * @returns 返回cell类型
      */
-    tableCellSizeForIndex(view: TableView, index: number): string | number;
-    /**
-     * @description 查询index项
-     * @param view 
-     * @param index 
-     * @returns 返回cell类型
-     */
-    tableCellAtIndex(view: TableView, index: number): string | number;
+    tableCellTypeAtIndex(view: TableView, index: number): CellType;
     /**@description 返回当前TalbeView的总项数 */
     numberOfCellsInTableView(view: TableView): number;
     /**@description 更新cell数据 */
-    updateCellData( view: TableView , cell : TableViewCell):void;
+    updateCellData(view: TableView, cell: TableViewCell): void;
+
+    /**@description 列表项被选中 */
+    tableCellSelected?(view: TableView, cell: TableViewCell): void;
+    /**@description 列表项取消选中 */
+    tableCellUnselected?(view: TableView, cell: TableViewCell): void;
+    /**@description 列表项点击完成 */
+    tableCellTouched?(view: TableView, cell: TableViewCell): void;
+    /**@description 列表项进入复用 */
+    tableCellWillRecycle?(view: TableView, cell: TableViewCell): void;
 }
 
 @ccclass
 export default class TableView extends cc.Component {
-
+    name: string = "TableView";
     public static EventType = EventType;
     public static Direction = Direction;
+    public static FillOrder = FillOrder;
 
     @property({ type: cc.Node, tooltip: "包含可滚动性展示内容的节点引用", displayName: "Content", visible: true })
     private _content: cc.Node = null;
@@ -299,8 +298,45 @@ export default class TableView extends cc.Component {
     @property({ tooltip: "滚动行为是否取消子节点上注册的触摸事件", displayName: "Cancel Inner Events" })
     cancelInnerEvents: boolean = true;
 
-    @property({ tooltip: "Cell项模板", displayName: "Template", type: TableViewCell })
-    template: TableViewCell[] = []
+    @property({ tooltip: "Cell项模板", displayName: "Template", type: TableViewCell, visible: true })
+    protected _template: TableViewCell[] = [];
+    /**
+     * @description 使用需要注意，设置模板时，要一次性设置，不要拿着当前模板操作 
+     * @example 
+     * let template = this.template;
+     * template.push(template1)
+     * template.push(template2)
+     * template.push(template3)
+     * this.template = template;
+     * */
+    get template() {
+        return this._template;
+    }
+    set template(v) {
+        this._template = v;
+        this._fillCellSize();
+    }
+
+    /**@description 模板大小 */
+    protected _templateSize: Map<CellType, cc.Size> = new Map();
+
+    @property({ tooltip: "填充方式 \nTOP_DOWN 水平方向时，从左到右填充，垂直方向时，从上到下填充 \nBOTTOM_UP 水平方向时，从右到左填充，垂直方向时，从下到上填充", type: cc.Enum(FillOrder) })
+    fillOrder: FillOrder = FillOrder.TOP_DOWN;
+
+    protected _delegate: TableViewDelegate = null!;
+    /**@description 代理 */
+    get delegate() {
+        if (!this._delegate) {
+            Log.e(`【${this.name}】致命错误 : 未设置TableView代理`)
+        }
+        return this._delegate;
+    }
+    set delegate(v) {
+        if (this._delegate === v) {
+            return;
+        }
+        this._delegate = v;
+    }
 
     protected get _view() {
         if (this.content) {
@@ -338,6 +374,15 @@ export default class TableView extends cc.Component {
     protected _scrollEventEmitMask = 0;
     protected _isBouncing = false;
     protected _scrolling = false;
+
+    /**@description 当前正在使用的cell */
+    protected _cellsUsed: TableViewCell[] = [];
+    /**@description 当前回收复制的cell */
+    protected _cellsFreed: TableViewCell[] = [];
+    /**@description 当前cell的所有位置偏移量 */
+    protected _cellsOffsets: number[] = [];
+    /**@description 当前渲染节点索引 */
+    protected _indices: number[] = [];
 
     /**
       * !#en Scroll the content to the bottom boundary of ScrollView.
@@ -545,8 +590,15 @@ export default class TableView extends cc.Component {
             return;
         }
 
-        this.content.setPosition(position);
+        this._setContentPosition(position);
         this._outOfBoundaryAmountDirty = true;
+    }
+
+    private _setContentPosition(position: cc.Vec2) {
+        if (this.content) {
+            this.content.setPosition(position);
+            // Log.d(position);
+        }
     }
 
     /**
@@ -607,7 +659,28 @@ export default class TableView extends cc.Component {
      * @description 重置数据
      */
     reloadData() {
+        //删除当前渲染的cell
+        for (let i = 0; i < this._cellsUsed.length; i++) {
+            let cell = this._cellsUsed[i];
+            if (this.delegate.tableCellWillRecycle) {
+                this.delegate.tableCellWillRecycle(this, cell);
+            }
+            this._cellsFreed.push(cell);
+            cell.reset();
+            if (cell.node.parent == this.content) {
+                this.content.removeChild(cell.node);
+            }
+        }
 
+        //清空渲染节点索引
+        this._indices = [];
+        //清空当前使用的节点
+        this._cellsFreed = [];
+        //刷新节点的位置
+        this._updateCellPositions();
+        this._updateContentSize();
+
+        this._updateCells();
     }
 
     /**
@@ -615,8 +688,19 @@ export default class TableView extends cc.Component {
      * @param type 指定类型获取
      * @returns 
      */
-    dequeueCell(type?: number | string): TableViewCell | null {
-        return null;
+    dequeueCell(type: CellType): TableViewCell | null {
+        let cell: TableViewCell = null;
+        if (this._cellsFreed.length <= 0) {
+            return cell;
+        }
+        for (let i = 0; i < this._cellsFreed.length; i++) {
+            let v = this._cellsFreed[i];
+            if (v.type == type) {
+                this._cellsFreed.splice(i, 1);
+                return v;
+            }
+        }
+        return cell;
     }
 
 
@@ -629,7 +713,216 @@ export default class TableView extends cc.Component {
         return null;
     }
 
-    //保护方法
+    updateCellData(cell: TableViewCell) {
+        this.delegate.updateCellData(this, cell);
+    }
+
+    /**
+     * @description 刷新Cell位置
+     */
+    protected _updateCellPositions() {
+        let count = this.delegate.numberOfCellsInTableView(this);
+        this._cellsOffsets = [];
+        if (count > 0) {
+            let cur = 0;
+            let size: cc.Size;
+            let type: CellType;
+            for (let i = 0; i < count; i++) {
+                this._cellsOffsets.push(cur);
+                type = this.delegate.tableCellTypeAtIndex(this, i);
+                size = this._getCellSize(type);
+                if (this.horizontal) {
+                    //水平
+                    cur += size.width;
+                } else {
+                    cur += size.height;
+                }
+            }
+            //最后一项
+            this._cellsOffsets.push(cur);
+        }
+    }
+
+    /**
+     * @description 更新content的大小
+     */
+    protected _updateContentSize() {
+        let size = cc.size(0, 0);
+        let count = this.delegate.numberOfCellsInTableView(this);
+        if (count > 0) {
+            let maxPos = this._cellsOffsets[count];
+            if (this.horizontal) {
+                size = cc.size(maxPos, this._view.getContentSize().height);
+            } else {
+                size = cc.size(this._view.getContentSize().width, maxPos);
+            }
+        }
+
+        this.content.setContentSize(size);
+
+        if (this.delegate.numberOfCellsInTableView(this) > 0) {
+            if (this.horizontal) {
+                this.scrollToLeft();
+            } else {
+                this.scrollToTop();
+            }
+        }
+    }
+
+    protected _getCellSize(type: CellType) {
+        if (this._templateSize.size <= 0) {
+            this._fillCellSize();
+        }
+        let size = this._templateSize.get(type);
+        if (size) {
+            return size;
+        }
+        Log.e(`【${this.name}】未找到 ${type} 的 cell 模板`);
+        return cc.size(0, 0);
+    }
+
+    protected _fillCellSize() {
+        this._templateSize.clear();
+        for (let i = 0; i < this.template.length; i++) {
+            let template = this.template[i];
+            this._templateSize.set(template.type, template.node.getContentSize());
+        }
+    }
+
+    protected _getTemplete(type: CellType) {
+        for (let i = 0; i < this.template.length; i++) {
+            let v = this.template[i];
+            if (v.type == type) {
+                return this.template[i];
+            }
+        }
+        return null;
+    }
+
+    protected _getCellOffset(index: number) {
+        let pos = this._cellsOffsets[index];
+        if (this.horizontal) {
+            return cc.v2(pos, 0);
+        } else {
+            return cc.v2(0, pos);
+        }
+    }
+
+    protected _updateCells() {
+        let count = this.delegate.numberOfCellsInTableView(this);
+        if (count > 0) {
+            for (let i = 0; i < count; i++) {
+                let type = this.delegate.tableCellTypeAtIndex(this, i)
+                let cell = this._getTemplete(type);
+                let node = cc.instantiate(cell.node);
+                cell = node.getComponent(TableViewCell);
+                cell.view = this;
+                cell.index = i;
+                cell.isDoUpdate = true;
+                cell.node.active = true;
+                let pos = this._getCellOffset(i);
+                this.content.addChild(node);
+                node.setPosition(this._convertPosition(pos, node))
+            }
+        }
+    }
+
+    protected _convertPosition(offset: cc.Vec2, node: cc.Node) {
+        let target = this.content;
+        var targetSize = target.getContentSize();
+        var targetAnchor = target.getAnchorPoint();
+        var x = node.x, y = node.y;
+        var anchor = node.getAnchorPoint();
+
+        if (this.horizontal) {
+
+            var localLeft, localRight, targetWidth = targetSize.width;
+
+            localLeft = -targetAnchor.x * targetWidth;
+            localRight = localLeft + targetWidth;
+
+            let _isAbsLeft = false;
+            let _isAbsRight = false;
+            let _left = 0;
+            let _right = 0;
+            if (this.fillOrder == FillOrder.TOP_DOWN) {
+                _isAbsLeft = true;
+                _left = offset.x;
+            } else {
+                _isAbsRight = true;
+                _right = offset.x;
+            }
+
+            // adjust borders according to offsets
+            localLeft += _isAbsLeft ? _left : _left * targetWidth;
+            localRight -= _isAbsRight ? _right : _right * targetWidth;
+
+            var width, anchorX = anchor.x, scaleX = node.scaleX;
+            if (scaleX < 0) {
+                anchorX = 1.0 - anchorX;
+                scaleX = -scaleX;
+            }
+
+            width = node.width * scaleX;
+            if (_isAbsLeft) {
+                x = localLeft + anchorX * width;
+            }
+            else {
+                x = localRight + (anchorX - 1) * width;
+            }
+
+            let contentOffsetCenterY = (this.content.height / 2 - this.content.height * this.content.anchorY);
+            let nodeOffsetCenterY = node.height / 2 - node.height * node.anchorY;
+            y = contentOffsetCenterY - nodeOffsetCenterY;
+        }
+
+        if (this.vertical) {
+
+            //先计算content 自己0点向自己中心点的偏移量
+            let contentOffsetCentterX = (this.content.width / 2 - this.content.width * this.content.anchorX)
+            //计算Cell 自己0点向自己中心点的偏移量
+            let nodeOffsetCenterX = node.width / 2 - node.width * node.anchorX
+            //居中处理
+            x = contentOffsetCentterX - nodeOffsetCenterX;
+
+            var localTop, localBottom, targetHeight = targetSize.height;
+
+            localBottom = -targetAnchor.y * targetHeight;
+            localTop = localBottom + targetHeight;
+
+            let _isAbsBottom = false;
+            let _isAbsTop = false;
+            let _bottom = 0;
+            let _top = 0;
+            if (this.fillOrder == FillOrder.TOP_DOWN) {
+                _isAbsTop = true;
+                _top = offset.y;
+            } else {
+                _isAbsBottom = true
+                _bottom = offset.y;
+            }
+
+            // adjust borders according to offsets
+            localBottom += _isAbsBottom ? _bottom : _bottom * targetHeight;
+            localTop -= _isAbsTop ? _top : _top * targetHeight;
+
+            var height, anchorY = anchor.y, scaleY = node.scaleY;
+            if (scaleY < 0) {
+                anchorY = 1.0 - anchorY;
+                scaleY = -scaleY;
+            }
+
+            height = node.height * scaleY;
+
+            if (_isAbsBottom) {
+                y = localBottom + anchorY * height;
+            }
+            else {
+                y = localTop + (anchorY - 1) * height;
+            }
+        }
+        return cc.v2(x, y);
+    }
 
     protected _registerEvent() {
         this.node.on(cc.Node.EventType.TOUCH_START, this._onTouchBegan, this, true);
@@ -1390,7 +1683,7 @@ export default class TableView extends cc.Component {
             let outOfBoundary = this._getHowMuchOutOfBoundary(cc.v2(0, 0));
             let newPosition = this.getContentPosition().add(outOfBoundary);
             if (this.content) {
-                this.content.setPosition(newPosition);
+                this._setContentPosition(newPosition);
                 this._updateScrollBar(cc.v2(0, 0));
             }
         }
