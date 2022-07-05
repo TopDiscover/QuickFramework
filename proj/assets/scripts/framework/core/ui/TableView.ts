@@ -594,13 +594,6 @@ export default class TableView extends cc.Component {
         this._outOfBoundaryAmountDirty = true;
     }
 
-    private _setContentPosition(position: cc.Vec2) {
-        if (this.content) {
-            this.content.setPosition(position);
-            // Log.d(position);
-        }
-    }
-
     /**
      * !#en Query the content's position in its parent space.
      * !#zh 获取当前视图内容的坐标点。
@@ -766,6 +759,28 @@ export default class TableView extends cc.Component {
             } else {
                 this.scrollToTop();
             }
+        }
+    }
+
+    private _setContentPosition(position: cc.Vec2) {
+        if (this.content) {
+            this.content.setPosition(position);
+            //计算开始点结束点
+            let start = cc.v2(0,0);
+            let end = cc.v2(0,0);
+            
+            let offset = this.getContentPosition();
+            let contentSize = this.content.getContentSize();
+            let contentAnchor = this.content.getAnchorPoint();
+            let viewSize = this._view.getContentSize();
+            let viewAnchor = this._view.getAnchorPoint();
+
+            let contentBottom = -contentAnchor.y * contentSize.height;
+            let viewBottom = -viewAnchor.y * viewSize.height;
+
+            let line1 = cc.find("line1",this.content);
+            line1.setPosition(cc.v2(line1.x,contentBottom))
+
         }
     }
 
