@@ -820,107 +820,122 @@ export default class TableView extends cc.Component {
                 cell.index = i;
                 cell.isDoUpdate = true;
                 cell.node.active = true;
-                let pos = this._getCellOffset(i);
+                let offset = this._getCellOffset(i);
                 this.content.addChild(node);
-                node.setPosition(this._convertPosition(pos, node))
+                node.setPosition(this.align(node, offset))
             }
         }
     }
 
-    protected _convertPosition(offset: cc.Vec2, node: cc.Node) {
+    /**
+     * @description 根据当前填充方式及视图方向设置Cell的对齐方式
+     * @param node 
+     * @param target 
+     * @param offset 
+     * @returns 
+     */
+    protected align(node: cc.Node, offset: cc.Vec2) {
         let target = this.content;
-        var targetSize = target.getContentSize();
-        var targetAnchor = target.getAnchorPoint();
-        var x = node.x, y = node.y;
-        var anchor = node.getAnchorPoint();
+        let targetSize = target.getContentSize();
+        let targetAnchor = target.getAnchorPoint();
+        let x = node.x, y = node.y;
+        let anchor = node.getAnchorPoint();
+
+        let left = 0;
+        let right = 0;
+        let top = 0;
+        let bottom = 0;
+        let isAlignHorizontalCenter = false;
+        let isAlignLeft = false;
+        let isAlignVerticalCenter = false;
+        let isAlignBottom = false;
 
         if (this.horizontal) {
-
-            var localLeft, localRight, targetWidth = targetSize.width;
-
-            localLeft = -targetAnchor.x * targetWidth;
-            localRight = localLeft + targetWidth;
-
-            let _isAbsLeft = false;
-            let _isAbsRight = false;
-            let _left = 0;
-            let _right = 0;
+            //水平方向
+            //居中对齐 y
+            isAlignVerticalCenter = true;
             if (this.fillOrder == FillOrder.TOP_DOWN) {
-                _isAbsLeft = true;
-                _left = offset.x;
+                isAlignLeft = true;
+                left = offset.x;
             } else {
-                _isAbsRight = true;
-                _right = offset.x;
+                right = offset.x;
             }
-
-            // adjust borders according to offsets
-            localLeft += _isAbsLeft ? _left : _left * targetWidth;
-            localRight -= _isAbsRight ? _right : _right * targetWidth;
-
-            var width, anchorX = anchor.x, scaleX = node.scaleX;
-            if (scaleX < 0) {
-                anchorX = 1.0 - anchorX;
-                scaleX = -scaleX;
+        } else {
+            //垂直方向
+            //居中对齐 x
+            isAlignHorizontalCenter = true;
+            if (this.fillOrder == FillOrder.TOP_DOWN) {
+                //顶对齐 y
+                top = offset.y;
+            } else {
+                //底对齐 y
+                isAlignBottom = true;
+                bottom = offset.y;
             }
-
-            width = node.width * scaleX;
-            if (_isAbsLeft) {
-                x = localLeft + anchorX * width;
-            }
-            else {
-                x = localRight + (anchorX - 1) * width;
-            }
-
-            let contentOffsetCenterY = (this.content.height / 2 - this.content.height * this.content.anchorY);
-            let nodeOffsetCenterY = node.height / 2 - node.height * node.anchorY;
-            y = contentOffsetCenterY - nodeOffsetCenterY;
         }
 
-        if (this.vertical) {
+        // x 轴处理
 
-            //先计算content 自己0点向自己中心点的偏移量
-            let contentOffsetCentterX = (this.content.width / 2 - this.content.width * this.content.anchorX)
-            //计算Cell 自己0点向自己中心点的偏移量
-            let nodeOffsetCenterX = node.width / 2 - node.width * node.anchorX
+        let localLeft, localRight, targetWidth = targetSize.width;
+        localLeft = -targetAnchor.x * targetWidth;
+        localRight = localLeft + targetWidth;
+
+        localLeft += left;
+        localRight -= right;
+
+        let width, anchorX = anchor.x, scaleX = node.scaleX;
+        if (scaleX < 0) {
+            anchorX = 1.0 - anchorX;
+            scaleX = -scaleX;
+        }
+
+        width = node.width * scaleX;
+        if (isAlignHorizontalCenter) {
             //居中处理
-            x = contentOffsetCentterX - nodeOffsetCenterX;
-
-            var localTop, localBottom, targetHeight = targetSize.height;
-
-            localBottom = -targetAnchor.y * targetHeight;
-            localTop = localBottom + targetHeight;
-
-            let _isAbsBottom = false;
-            let _isAbsTop = false;
-            let _bottom = 0;
-            let _top = 0;
-            if (this.fillOrder == FillOrder.TOP_DOWN) {
-                _isAbsTop = true;
-                _top = offset.y;
-            } else {
-                _isAbsBottom = true
-                _bottom = offset.y;
-            }
-
-            // adjust borders according to offsets
-            localBottom += _isAbsBottom ? _bottom : _bottom * targetHeight;
-            localTop -= _isAbsTop ? _top : _top * targetHeight;
-
-            var height, anchorY = anchor.y, scaleY = node.scaleY;
-            if (scaleY < 0) {
-                anchorY = 1.0 - anchorY;
-                scaleY = -scaleY;
-            }
-
-            height = node.height * scaleY;
-
-            if (_isAbsBottom) {
-                y = localBottom + anchorY * height;
-            }
-            else {
-                y = localTop + (anchorY - 1) * height;
-            }
+            let targetCenter = (0.5 - targetAnchor.x) * targetSize.width;
+            x = targetCenter + (anchorX - 0.5) * width;
         }
+        else if (isAlignLeft) {
+            //左对齐
+            x = localLeft + anchorX * width;
+        }
+        else {
+            //右对齐
+            x = localRight + (anchorX - 1) * width;
+        }
+
+
+        // y 轴处理
+
+        let localTop, localBottom, targetHeight = targetSize.height;
+        localBottom = -targetAnchor.y * targetHeight;
+        localTop = localBottom + targetHeight;
+
+        // adjust borders according to offsets
+        localBottom += bottom;
+        localTop -= top;
+
+        let height, anchorY = anchor.y, scaleY = node.scaleY;
+        if (scaleY < 0) {
+            anchorY = 1.0 - anchorY;
+            scaleY = -scaleY;
+        }
+
+        height = node.height * scaleY;
+        if (isAlignVerticalCenter) {
+            //居中
+            let targetMiddle = (0.5 - targetAnchor.y) * targetSize.height;
+            y = targetMiddle + (anchorY - 0.5) * height;
+        }
+        else if (isAlignBottom) {
+            //底对齐
+            y = localBottom + anchorY * height;
+        }
+        else {
+            //顶对齐
+            y = localTop + (anchorY - 1) * height;
+        }
+
         return cc.v2(x, y);
     }
 
