@@ -133,6 +133,15 @@ declare module cc {
 	 * */
 	export function updateAlignment(node: cc.Node): void;
 
+	export interface Scrollbar{
+		hide():void;
+		show():void;
+		_onTouchEnded():void;
+		_onTouchBegan():void;
+		_onScroll(offset : cc.Vec2):void;
+		setTargetScrollView(view : Component):void;
+	}
+
 	export interface ParticleSystem {
 
 		/**

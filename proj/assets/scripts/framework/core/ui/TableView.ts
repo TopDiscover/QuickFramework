@@ -885,7 +885,7 @@ export default class TableView extends cc.Component {
                 cell.isDoUpdate = true;
                 cell.node.active = true;
                 let offset = this._getCellOffset(i);
-                let pos = this.align(node, offset);
+                let pos = this.align(node,this.content, offset);
                 node.setPosition(pos)
                 Log.d(`${i} =>(${pos.x},${pos.y})`);
                 this._positions.push(pos);
@@ -965,11 +965,11 @@ export default class TableView extends cc.Component {
      * @param offset 
      * @returns 
      */
-    protected align(node: cc.Node, offset: cc.Vec2) {
+    protected align(node: cc.Node, target : cc.Node, offset: cc.Vec2) {
 
         let layoutParam = new LayoutParam;
         layoutParam.node = node;
-        layoutParam.target = this.content;
+        layoutParam.target = target;
         if (this.horizontal) {
             //水平方向
             //居中对齐 y
