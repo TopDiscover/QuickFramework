@@ -2,6 +2,7 @@
  * @description 扩展TableView
  */
 
+import { LayoutParam, LayoutType } from "../layout/LayoutDefines";
 import { CellType, TableViewCell } from "./TableViewCell";
 
 const { ccclass, property } = cc._decorator;
@@ -672,8 +673,6 @@ export default class TableView extends cc.Component {
         //刷新节点的位置
         this._updateCellPositions();
         this._updateContentSize();
-
-        this._updateCells();
     }
 
     /**
@@ -753,6 +752,8 @@ export default class TableView extends cc.Component {
 
         this.content.setContentSize(size);
 
+        this._updateCells();
+
         if (this.delegate.numberOfCellsInTableView(this) > 0) {
             if (this.horizontal) {
                 this.scrollToLeft();
@@ -766,20 +767,67 @@ export default class TableView extends cc.Component {
         if (this.content) {
             this.content.setPosition(position);
             //计算开始点结束点
-            let start = cc.v2(0,0);
-            let end = cc.v2(0,0);
-            
+            let start = cc.v2(0, 0);
+            let end = cc.v2(0, 0);
+
             let offset = this.getContentPosition();
             let contentSize = this.content.getContentSize();
             let contentAnchor = this.content.getAnchorPoint();
             let viewSize = this._view.getContentSize();
             let viewAnchor = this._view.getAnchorPoint();
 
+            //转换content(0,0)点
+
+            let contentZero = cc.v2()
+
             let contentBottom = -contentAnchor.y * contentSize.height;
             let viewBottom = -viewAnchor.y * viewSize.height;
 
-            let line1 = cc.find("line1",this.content);
-            line1.setPosition(cc.v2(line1.x,contentBottom))
+            let line1 = cc.find("line1", this.content);
+            let line2 = cc.find("line2", this.content);
+            // line1.setPosition(cc.v2(line1.x,contentBottom))
+
+
+            let contentDistanceTop = (1 - contentAnchor.y) * contentSize.height;
+            let contentDistanceBottom = contentSize.height - contentDistanceTop;
+
+            // if (offset.y >= 0) {
+            //向上有偏移
+            contentBottom = offset.y + contentBottom;
+            // } else {
+
+            // }
+            line1.setPosition(cc.v2(line1.x, contentBottom))
+
+            // Log.d("offset", `(${offset.x},${offset.y})`);
+            // Log.d("contentSize", `(${contentSize.width},${contentSize.height})`);
+            // Log.d("contentAnchor", `(${contentAnchor.x},${contentAnchor.y})`);
+            // Log.d("viewSize", `(${viewSize.width},${viewSize.height})`);
+            // Log.d("viewAnchor", `(${viewAnchor.x},${viewAnchor.y})`);
+            // Log.d("contentBottom", contentBottom);
+            // Log.d("viewBottom", viewBottom);
+
+            // Log.d("contentTop1", contentDistanceTop);
+            // Log.d("contentBottom1", contentDistanceBottom);
+
+            // // offset.y = contentSize.height
+            // // Log.d(`开始位置 : ${this.indexFromOffset(offset)}`)
+
+            // Log.w("]]]",this._positions.length);
+            // this._positions.forEach((v, i) => {
+            //     Log.d(`${i} ===> (${v.x},${v.y})`)
+            // })
+
+            // let vec = cc.v2(offset.x,viewBottom).add(offset);
+
+            // Log.d("最项", `(${vec.x},${vec.y})`);
+            // line1.setPosition(line1.x,-vec.y)
+            // // vec = this.align(this.content,cc.v2(0,this.content.height));
+            // vec.y += this._view.height;
+            // Log.d("最底", `(${vec.x},${vec.y})`);
+            // line2.setPosition(line2.x,-vec.y)
+            // vec = vec.sub(offset)
+            // Log.d("可显示", `(${vec.x},${vec.y})`);
 
         }
     }
@@ -823,10 +871,11 @@ export default class TableView extends cc.Component {
         }
     }
 
+    protected _positions: cc.Vec2[] = [];
     protected _updateCells() {
         let count = this.delegate.numberOfCellsInTableView(this);
         if (count > 0) {
-            for (let i = 0; i < count; i++) {
+            for (let i = 0; i < count + 1; i++) {
                 let type = this.delegate.tableCellTypeAtIndex(this, i)
                 let cell = this._getTemplete(type);
                 let node = cc.instantiate(cell.node);
@@ -836,10 +885,77 @@ export default class TableView extends cc.Component {
                 cell.isDoUpdate = true;
                 cell.node.active = true;
                 let offset = this._getCellOffset(i);
+                let pos = this.align(node, offset);
+                node.setPosition(pos)
+                Log.d(`${i} =>(${pos.x},${pos.y})`);
+                this._positions.push(pos);
                 this.content.addChild(node);
-                node.setPosition(this.align(node, offset))
             }
         }
+    }
+
+    protected indexFromOffset(offset: cc.Vec2) {
+        let index = 0;
+        const maxIdx = this.delegate.numberOfCellsInTableView(this) - 1;
+
+        if (this.fillOrder == FillOrder.TOP_DOWN) {
+            offset.y = this.content.height - offset.y;
+        }
+        index = this._indexFromOffset(offset);
+        if (index != -1) {
+            index = Math.max(0, index);
+            if (index > maxIdx) {
+                index = -1;
+            }
+        }
+
+        return index;
+    }
+
+    protected _indexFromOffset(offset: cc.Vec2) {
+        let low = 0;
+        let high = this.delegate.numberOfCellsInTableView(this) - 1;
+        let search: number;
+        if (this.horizontal) {
+            search = offset.x;
+        } else {
+            search = offset.y;
+        }
+
+        while (high >= low) {
+            let index = Math.floor(low + (high - low) / 2);
+
+            let _cellStart = this._positions[index];
+            let cellStart: number;
+            if (this.horizontal) {
+                cellStart = _cellStart.x;
+            } else {
+                cellStart = _cellStart.y;
+            }
+
+            let _cellEnd = this._positions[index + 1];
+            let cellEnd: number;
+            if (this.horizontal) {
+                cellEnd = _cellEnd.x;
+            } else {
+                cellEnd = _cellEnd.y;
+            }
+            if (search >= cellStart && search <= cellEnd) {
+                return index;
+            }
+            else if (search < cellStart) {
+                high = index - 1;
+            }
+            else {
+                low = index + 1;
+            }
+        }
+
+        if (low <= 0) {
+            return 0;
+        }
+
+        return -1;
     }
 
     /**
@@ -850,108 +966,36 @@ export default class TableView extends cc.Component {
      * @returns 
      */
     protected align(node: cc.Node, offset: cc.Vec2) {
-        let target = this.content;
-        let targetSize = target.getContentSize();
-        let targetAnchor = target.getAnchorPoint();
-        let x = node.x, y = node.y;
-        let anchor = node.getAnchorPoint();
 
-        let left = 0;
-        let right = 0;
-        let top = 0;
-        let bottom = 0;
-        let isAlignHorizontalCenter = false;
-        let isAlignLeft = false;
-        let isAlignVerticalCenter = false;
-        let isAlignBottom = false;
-
+        let layoutParam = new LayoutParam;
+        layoutParam.node = node;
+        layoutParam.target = this.content;
         if (this.horizontal) {
             //水平方向
             //居中对齐 y
-            isAlignVerticalCenter = true;
             if (this.fillOrder == FillOrder.TOP_DOWN) {
-                isAlignLeft = true;
-                left = offset.x;
+                layoutParam.alignFlags = LayoutType.MID_LETF;
+                layoutParam.left = offset.x;
             } else {
-                right = offset.x;
+                layoutParam.alignFlags = LayoutType.MID_RIGHT;
+                layoutParam.right = offset.x;
             }
         } else {
             //垂直方向
             //居中对齐 x
-            isAlignHorizontalCenter = true;
             if (this.fillOrder == FillOrder.TOP_DOWN) {
                 //顶对齐 y
-                top = offset.y;
+                layoutParam.alignFlags = LayoutType.CENTER_TOP;
+                layoutParam.top = offset.y;
             } else {
                 //底对齐 y
-                isAlignBottom = true;
-                bottom = offset.y;
+                layoutParam.alignFlags = LayoutType.CENTER_BOT;
+                layoutParam.bottom = offset.y;
             }
         }
 
-        // x 轴处理
-
-        let localLeft, localRight, targetWidth = targetSize.width;
-        localLeft = -targetAnchor.x * targetWidth;
-        localRight = localLeft + targetWidth;
-
-        localLeft += left;
-        localRight -= right;
-
-        let width, anchorX = anchor.x, scaleX = node.scaleX;
-        if (scaleX < 0) {
-            anchorX = 1.0 - anchorX;
-            scaleX = -scaleX;
-        }
-
-        width = node.width * scaleX;
-        if (isAlignHorizontalCenter) {
-            //居中处理
-            let targetCenter = (0.5 - targetAnchor.x) * targetSize.width;
-            x = targetCenter + (anchorX - 0.5) * width;
-        }
-        else if (isAlignLeft) {
-            //左对齐
-            x = localLeft + anchorX * width;
-        }
-        else {
-            //右对齐
-            x = localRight + (anchorX - 1) * width;
-        }
-
-
-        // y 轴处理
-
-        let localTop, localBottom, targetHeight = targetSize.height;
-        localBottom = -targetAnchor.y * targetHeight;
-        localTop = localBottom + targetHeight;
-
-        // adjust borders according to offsets
-        localBottom += bottom;
-        localTop -= top;
-
-        let height, anchorY = anchor.y, scaleY = node.scaleY;
-        if (scaleY < 0) {
-            anchorY = 1.0 - anchorY;
-            scaleY = -scaleY;
-        }
-
-        height = node.height * scaleY;
-        if (isAlignVerticalCenter) {
-            //居中
-            let targetMiddle = (0.5 - targetAnchor.y) * targetSize.height;
-            y = targetMiddle + (anchorY - 0.5) * height;
-        }
-        else if (isAlignBottom) {
-            //底对齐
-            y = localBottom + anchorY * height;
-        }
-        else {
-            //顶对齐
-            y = localTop + (anchorY - 1) * height;
-        }
-
-        return cc.v2(x, y);
+        Manager.layout.align(layoutParam);
+        return layoutParam.result.position;
     }
 
     protected _registerEvent() {

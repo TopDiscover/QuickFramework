@@ -24,7 +24,7 @@ export default class TestTableView extends cc.Component implements TableViewDele
     }
 
     numberOfCellsInTableView(view: TableView): number {
-        return 4;
+        return 5;
     }
 
 
