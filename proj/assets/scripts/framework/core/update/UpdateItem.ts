@@ -374,7 +374,7 @@ export class UpdateItem {
                     Log.d(`${this.bundle} 主包更新完成，有下载文件，需要重启更新`);
                     setTimeout(() => {
                         Log.d(`${this.bundle} 重启游戏`);
-                        cc.game.restart();
+                        game.restart();
                     }, 1);
                     isRestartApp = true;
                 } else {
@@ -407,7 +407,7 @@ export class UpdateItem {
             percentByFile: event.getPercentByFile(),
             code: event.getEventCode(),
             state: state as any,
-            needRestart: isUpdateFinished,
+            needRestart: isRestartApp,
             bundle: this.bundle,
             assetId: event.getAssetId(),
             progress: 0
