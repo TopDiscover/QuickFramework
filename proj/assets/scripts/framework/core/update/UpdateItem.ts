@@ -406,7 +406,7 @@ export class UpdateItem {
             percentByFile: event.getPercentByFile(),
             code: event.getEventCode(),
             state: state as any,
-            needRestart: isUpdateFinished,
+            needRestart: isRestartApp,
             bundle: this.bundle,
             assetId: event.getAssetId(),
             progress: 0
