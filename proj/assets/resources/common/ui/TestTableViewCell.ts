@@ -18,7 +18,7 @@ export default class TestTableViewCell extends TableViewCell {
         this._label = cc.find("label",this.node).getComponent(cc.Label);
     }
 
-    setString(v : string){
-        this._label.string = v;
+    updateData(v : { content : string , index : number}){
+        this._label.string = v.content;
     }
 }
