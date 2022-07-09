@@ -157,6 +157,174 @@ enum FillOrder {
     BOTTOM_UP,
 }
 
+type CellResult = { isInSight: boolean, offset: number };
+
+/**@description Cell信息 */
+class CellInfo {
+    constructor(node: cc.Node, index: number) {
+        this.node = node;
+        this.index = index;
+        this.init();
+    }
+    /**@description 模板节点 */
+    node: cc.Node = null!;
+    /**@description 节点位置 */
+    position: cc.Vec2 = cc.v2(0, 0);
+    /**@description 相对父亲节点的偏移量 */
+    offset: number = 0;
+
+    private index = 0;
+
+    /**@description 以自己锚点为中心有左边距离 */
+    private left = 0;
+    /**@description 以自己锚点为中心有右边距离 */
+    private right = 0;
+    /**@description 以自己锚点为中心有上边距离 */
+    private top = 0;
+    /**@description 以自己锚点为中心有下边距离 */
+    private bottom = 0;
+
+    private init() {
+        this.left = this.node.width * this.node.anchorX;
+        this.right = this.node.width * (1 - this.node.anchorX);
+        this.top = this.node.height * (1 - this.node.anchorY);
+        this.bottom = this.node.height * this.node.anchorY;
+    }
+
+    debug(began?: string, end?: string) {
+        let str = `[${this.index}] 位置 : (${this.position.x},${this.position.y}) , 偏移 : ${this.offset} , 左 : ${this.left} , 右 : ${this.right} , 上 : ${this.top} , 下 : ${this.bottom} `;
+        if (began) {
+            str = began + str;
+        }
+        if (end) {
+            str += end;
+        }
+        Log.d(str);
+    }
+
+    /**
+     * @description 计算Cell距离view视图(水平方向 : 上边界,垂直方向 : 左边界)的偏移量
+     * */
+    calculate(fillOrder: FillOrder, isHorizontal: boolean, vec: cc.Vec2, viewSize: cc.Size): CellResult {
+        let result: CellResult = {
+            isInSight: false,
+            offset: 0
+        };
+        if (isHorizontal) {
+            //水平方向
+            if (fillOrder == FillOrder.TOP_DOWN) {
+                let scaleX = this.node.scaleX;
+                let x = this.position.x;
+                if (scaleX < 0) {
+                    x -= this.right;
+                }
+                //左对齐 计算超出view节点可显示区域的宽度
+                // Log.d(`vec : (${vec.x},${vec.y})`)
+                let left = vec.x + x - this.left;
+                if (left >= 0) {
+                    if (left < viewSize.width) {
+                        //自己最左还在视图内，就处理可显示区域内
+                        // Log.d(`【可见】距离左边 : ${left}`);
+                        result.isInSight = true;
+                    } else {
+                        // Log.d(`【不可见】距离左边 : ${left}`);
+                    }
+                } else {
+                    let overLeft = this.node.width + left;
+                    if (overLeft > 0) {
+                        // Log.d(`【可见】超出左边界 : ${-left}`);
+                        result.isInSight = true;
+                    } else {
+                        // Log.d(`【不可见】距离左边 : ${overLeft}`);
+                    }
+                }
+                result.offset = left;
+            } else {
+                let scaleX = this.node.scaleX;
+                let x = this.position.x;
+                if (scaleX < 0) {
+                    x += this.left;
+                }
+                //左对齐 计算超出view节点可显示区域的宽度
+                // Log.d(`vec : (${vec.x},${vec.y})`)
+                let left = vec.x + x - this.left;
+                if (left > 0) {
+                    if (left < viewSize.width) {
+                        //自己最左还在视图内，就处理可显示区域内
+                        // Log.d(`【可见】距离左边 : ${left}`);
+                        result.isInSight = true;
+                    } else {
+                        // Log.d(`【不可见】距离左边 : ${left}`);
+                    }
+                } else {
+                    let overLeft = this.node.width + left;
+                    if (overLeft > 0) {
+                        // Log.d(`【可见】距离左边 : ${left}`);
+                        result.isInSight = true;
+                    } else {
+                        // Log.d(`【不可见】超出左边界 : ${-overLeft + this.node.width}`);
+                    }
+                }
+                result.offset = left;
+            }
+        } else {
+            //垂直方向
+            if (fillOrder == FillOrder.TOP_DOWN) {
+                let scaleY = this.node.scaleY;
+                let y = this.position.y;
+                if (scaleY < 0) {
+                    y += this.bottom;
+                }
+                //顶对齐 计算超出view节点可显示区域的高度
+                let top = vec.y + y + this.top;
+                if (top > 0) {
+                    if (top > this.node.height) {
+                        // Log.d(`【不可见】超出上边界 : ${top}`);
+                    } else {
+                        // Log.d(`【可见】超出上边界 : ${top}`);
+                        result.isInSight = true;
+                    }
+                } else {
+                    if (viewSize.height + top < 0) {
+                        // Log.d(`【不可见】超出下边界 : ${top}`);
+                    } else {
+                        // Log.d(`【可见】距离顶部 : ${top}`);
+                        result.isInSight = true;
+                    }
+                }
+                result.offset = top;
+            } else {
+                let scaleY = this.node.scaleY;
+                let y = this.position.y;
+                if (scaleY < 0) {
+                    y -= this.top;
+                }
+                //底对齐 计算超出view节点可显示区域的高度
+                let top = -(vec.y + y + this.top);
+                if (top >= 0) {
+                    if (viewSize.height - top < 0) {
+                        // Log.d(`【不可见】距离上边界 : ${top}`);
+                    } else {
+                        // Log.d(`【可见】距离上边界 : ${top}`);
+                        result.isInSight = true;
+                    }
+                } else {
+                    let overTop = -top;
+                    if (overTop > this.node.height) {
+                        // Log.d(`【不可见】超出上边界 : ${overTop}`);
+                    } else {
+                        // Log.d(`【可见】超出上边界 : ${overTop}`);
+                        result.isInSight = true;
+                    }
+                }
+                result.offset = top;
+            }
+        }
+        return result;
+    }
+
+}
+
 export interface TableViewDelegate {
 
     /**
@@ -188,7 +356,7 @@ export default class TableView extends cc.Component {
     public static FillOrder = FillOrder;
 
     @property({ type: cc.Node, tooltip: "包含可滚动性展示内容的节点引用", displayName: "Content", visible: true })
-    private _content: cc.Node = null;
+    protected _content: cc.Node = null;
     /**
      * @description 可流动展示内容节点
      */
@@ -206,7 +374,7 @@ export default class TableView extends cc.Component {
     @property({
         tooltip: "滚动方向 \nHORIZONTAL 水平方向 \nVERTICAL 垂直方向", displayName: "Direction", type: cc.Enum(Direction), visible: true
     })
-    private _direction: Direction = Direction.HORIZONTAL;
+    protected _direction: Direction = Direction.HORIZONTAL;
     /**@description 视图滚动方向 */
     get direction() {
         return this._direction;
@@ -250,7 +418,7 @@ export default class TableView extends cc.Component {
             return this.direction == Direction.HORIZONTAL;
         }
     })
-    private _hBar: cc.Scrollbar = null;
+    protected _hBar: cc.Scrollbar = null;
     /**@description 水平滚动的 ScrollBar。 */
     get horizontalScrollBar() {
         return this._hBar;
@@ -272,7 +440,7 @@ export default class TableView extends cc.Component {
             return this.direction == Direction.VERTICAL;
         }
     })
-    private _vBar: cc.Scrollbar = null;
+    protected _vBar: cc.Scrollbar = null;
     /**@description 垂直滚动的 ScrollBar。 */
     get verticalScrollBar() {
         return this._vBar;
@@ -315,7 +483,6 @@ export default class TableView extends cc.Component {
     }
     set template(v) {
         this._template = v;
-        this._fillCellSize();
     }
 
     /**@description 模板大小 */
@@ -380,10 +547,12 @@ export default class TableView extends cc.Component {
     protected _cellsUsed: TableViewCell[] = [];
     /**@description 当前回收复制的cell */
     protected _cellsFreed: TableViewCell[] = [];
-    /**@description 当前cell的所有位置偏移量 */
-    protected _cellsOffsets: number[] = [];
+    /**@description 保存Cell的信息 */
+    protected _cellsInfos: CellInfo[] = [];
     /**@description 当前渲染节点索引 */
-    protected _indices: number[] = [];
+    protected _indices: Set<number> = new Set();
+    /**@description 添加或者删除时，_cellsUsed并不是按index顺序排序的，此时需要重新排序_cellsUsed */
+    protected _isUsedCellsDirty = false;
 
     /**
       * !#en Scroll the content to the bottom boundary of ScrollView.
@@ -630,7 +799,29 @@ export default class TableView extends cc.Component {
      * @param index 
      */
     updateCellAtIndex(index: number) {
-
+        let count = this.delegate.numberOfCellsInTableView(this);
+        if (!(count > 0 && index < count && index >= 0)) {
+            return;
+        }
+        let cell = this.cellAtIndex(index);
+        if (cell) {
+            //先移除旧的
+            this._moveCellOutOfSight(cell);
+        }
+        //获取cell类型
+        let type = this.delegate.tableCellTypeAtIndex(this, index);
+        //获取是否有可复用的节点
+        cell = this._dequeueCell(type);
+        if (!cell) {
+            //如果有可复用的，直接刷新
+            let template = this._getTemplete(type);
+            let node = cc.instantiate(template.node);
+            cell = node.getComponent(TableViewCell);
+        }
+        this._setIndexForCell(index, cell);
+        this._addCellIfNecessary(cell);
+        cell.init();
+        this._updateCellData(cell);
     }
 
     /**
@@ -667,20 +858,61 @@ export default class TableView extends cc.Component {
         }
 
         //清空渲染节点索引
-        this._indices = [];
+        this._indices.clear();
         //清空当前使用的节点
         this._cellsFreed = [];
         //刷新节点的位置
-        this._updateCellPositions();
+        this._updateCellOffsets();
         this._updateContentSize();
     }
 
+
     /**
-     * @description 返回当前可重用节点
-     * @param type 指定类型获取
+     * @description 返回指定位置的cell,注意：只会从当前显示节点中返回，如果没有在显示，会返回null
+     * @param index 
      * @returns 
      */
-    dequeueCell(type: CellType): TableViewCell | null {
+    cellAtIndex(index: number): TableViewCell | null {
+        if (this._indices.has(index)) {
+            let cell = this._cellsUsed.find((value) => {
+                if (value.index == index) {
+                    return true
+                }
+                return false;
+            })
+            return cell;
+        }
+        return null;
+    }
+
+    protected _updateCellData(cell: TableViewCell) {
+        // Log.d(`通知更新Cell[${cell.index}]项`);
+        this.delegate.updateCellData(this, cell);
+    }
+
+    protected _addCellIfNecessary(cell: TableViewCell) {
+        if (cell.node.parent != this.content) {
+            this.content.addChild(cell.node);
+        }
+        this._cellsUsed.push(cell);
+        this._indices.add(cell.index);
+        this._isUsedCellsDirty = true;
+    }
+
+    protected _setIndexForCell(index: number, cell: TableViewCell) {
+        cell.view = this;
+        cell.index = index;
+        cell.node.active = true;
+        let info = this._cellsInfos[index];
+        cell.node.setPosition(info.position);
+    }
+
+    /**
+    * @description 返回当前可重用节点
+    * @param type 指定类型获取
+    * @returns 
+    */
+    protected _dequeueCell(type: CellType): TableViewCell | null {
         let cell: TableViewCell = null;
         if (this._cellsFreed.length <= 0) {
             return cell;
@@ -695,34 +927,26 @@ export default class TableView extends cc.Component {
         return cell;
     }
 
-
-    /**
-     * @description 返回指定位置的cell,注意：只会从当前显示节点中返回，如果没有在显示，会返回null
-     * @param index 
-     * @returns 
-     */
-    cellAtIndex(index: number): TableViewCell | null {
-        return null;
-    }
-
-    updateCellData(cell: TableViewCell) {
-        this.delegate.updateCellData(this, cell);
-    }
-
     /**
      * @description 刷新Cell位置
      */
-    protected _updateCellPositions() {
+    protected _updateCellOffsets() {
         let count = this.delegate.numberOfCellsInTableView(this);
-        this._cellsOffsets = [];
+        this._cellsInfos = [];
         if (count > 0) {
             let cur = 0;
-            let size: cc.Size;
+            let size = { width: 0, height: 0 };
             let type: CellType;
-            for (let i = 0; i < count; i++) {
-                this._cellsOffsets.push(cur);
+            let i = 0;
+            let cell: TableViewCell;
+            for (i = 0; i < count; i++) {
                 type = this.delegate.tableCellTypeAtIndex(this, i);
-                size = this._getCellSize(type);
+                cell = this._getTemplete(type);
+                let info = new CellInfo(cell.node, i);
+                info.offset = cur;
+                this._cellsInfos.push(info);
+                size.width = cell.node.width;
+                size.height = cell.node.height;
                 if (this.horizontal) {
                     //水平
                     cur += size.width;
@@ -731,7 +955,11 @@ export default class TableView extends cc.Component {
                 }
             }
             //最后一项
-            this._cellsOffsets.push(cur);
+            type = this.delegate.tableCellTypeAtIndex(this, i);
+            cell = this._getTemplete(type);
+            let info = new CellInfo(cell.node, i);
+            info.offset = cur;
+            this._cellsInfos.push(info);
         }
     }
 
@@ -742,7 +970,7 @@ export default class TableView extends cc.Component {
         let size = cc.size(0, 0);
         let count = this.delegate.numberOfCellsInTableView(this);
         if (count > 0) {
-            let maxPos = this._cellsOffsets[count];
+            let maxPos = this._cellsInfos[count].offset;
             if (this.horizontal) {
                 size = cc.size(maxPos, this._view.getContentSize().height);
             } else {
@@ -752,7 +980,7 @@ export default class TableView extends cc.Component {
 
         this.content.setContentSize(size);
 
-        this._updateCells();
+        this._updateCellPositions();
 
         if (this.delegate.numberOfCellsInTableView(this) > 0) {
             if (this.horizontal) {
@@ -763,92 +991,106 @@ export default class TableView extends cc.Component {
         }
     }
 
-    private _setContentPosition(position: cc.Vec2) {
+    protected _setContentPosition(position: cc.Vec2) {
         if (this.content) {
             this.content.setPosition(position);
             //计算开始点结束点
-            let start = cc.v2(0, 0);
-            let end = cc.v2(0, 0);
-
             let offset = this.getContentPosition();
             let contentSize = this.content.getContentSize();
             let contentAnchor = this.content.getAnchorPoint();
             let viewSize = this._view.getContentSize();
             let viewAnchor = this._view.getAnchorPoint();
 
-            //转换content(0,0)点
-
-            let contentZero = cc.v2()
-
             let contentBottom = -contentAnchor.y * contentSize.height;
             let viewBottom = -viewAnchor.y * viewSize.height;
+            let viewLeft = viewAnchor.x * viewSize.width;
 
-            let line1 = cc.find("line1", this.content);
-            let line2 = cc.find("line2", this.content);
-            // line1.setPosition(cc.v2(line1.x,contentBottom))
-
-
-            let contentDistanceTop = (1 - contentAnchor.y) * contentSize.height;
-            let contentDistanceBottom = contentSize.height - contentDistanceTop;
-
-            // if (offset.y >= 0) {
-            //向上有偏移
+            // let line1 = cc.find("line1", this.content);
+            // let line2 = cc.find("line2", this.content);
             contentBottom = offset.y + contentBottom;
-            // } else {
 
+            let vec: cc.Vec2;
+            if (this.horizontal) {
+                vec = cc.v2(viewLeft, offset.y).add(offset);
+            } else {
+                vec = cc.v2(offset.x, viewBottom).add(offset);
+            }
+            // if ( this.horizontal ){
+            //     Log.d("最左", `(${vec.x},${vec.y})`);
+            //     line1.setPosition(-vec.x,line1.y)
+            // }else{
+            //     Log.d("最项", `(${vec.x},${vec.y})`);
+            //     line1.setPosition(line1.x, -vec.y)
             // }
-            line1.setPosition(cc.v2(line1.x, contentBottom))
 
-            // Log.d("offset", `(${offset.x},${offset.y})`);
-            // Log.d("contentSize", `(${contentSize.width},${contentSize.height})`);
-            // Log.d("contentAnchor", `(${contentAnchor.x},${contentAnchor.y})`);
-            // Log.d("viewSize", `(${viewSize.width},${viewSize.height})`);
-            // Log.d("viewAnchor", `(${viewAnchor.x},${viewAnchor.y})`);
-            // Log.d("contentBottom", contentBottom);
-            // Log.d("viewBottom", viewBottom);
-
-            // Log.d("contentTop1", contentDistanceTop);
-            // Log.d("contentBottom1", contentDistanceBottom);
-
-            // // offset.y = contentSize.height
-            // // Log.d(`开始位置 : ${this.indexFromOffset(offset)}`)
-
-            // Log.w("]]]",this._positions.length);
-            // this._positions.forEach((v, i) => {
-            //     Log.d(`${i} ===> (${v.x},${v.y})`)
+            // this._cellsInfos.forEach((v, i) => {
+            //     v.debug();
+            //     v.calculate(this.fillOrder, this.horizontal, vec, viewSize);
             // })
 
-            // let vec = cc.v2(offset.x,viewBottom).add(offset);
+            let result = this._calculateInInSight(vec);
+            if (result) {
+                if (this._isUsedCellsDirty) {
+                    this._cellsUsed = this._cellsUsed.sort((a, b) => {
+                        return a.index - b.index;
+                    })
+                }
 
-            // Log.d("最项", `(${vec.x},${vec.y})`);
-            // line1.setPosition(line1.x,-vec.y)
-            // // vec = this.align(this.content,cc.v2(0,this.content.height));
-            // vec.y += this._view.height;
-            // Log.d("最底", `(${vec.x},${vec.y})`);
-            // line2.setPosition(line2.x,-vec.y)
-            // vec = vec.sub(offset)
-            // Log.d("可显示", `(${vec.x},${vec.y})`);
+                // this._cellsUsed.forEach(v => {
+                //     Log.d(`当前显示节点[${v.index}]`)
+                // })
+                //移除start之前的不可显示节点
+                if (this._cellsUsed.length > 0) {
+                    let cell = this._cellsUsed[0];
+                    let idx = cell.index;
+                    while (idx < result.start) {
+                        this._moveCellOutOfSight(cell);
+                        if (this._cellsUsed.length > 0) {
+                            cell = this._cellsUsed[0];
+                            idx = cell.index;
+                        } else {
+                            break;
+                        }
+                    }
+                }
 
-        }
-    }
+                //移除end之后的不可显示节点
+                if (this._cellsUsed.length > 0) {
+                    let cell = this._cellsUsed[this._cellsUsed.length - 1];
+                    let idx = cell.index;
+                    while (idx < result.count && idx > result.end) {
+                        this._moveCellOutOfSight(cell);
+                        if (this._cellsUsed.length > 0) {
+                            cell = this._cellsUsed[this._cellsUsed.length - 1];
+                            idx = cell.index;
+                        } else {
+                            break;
+                        }
+                    }
+                }
 
-    protected _getCellSize(type: CellType) {
-        if (this._templateSize.size <= 0) {
-            this._fillCellSize();
-        }
-        let size = this._templateSize.get(type);
-        if (size) {
-            return size;
-        }
-        Log.e(`【${this.name}】未找到 ${type} 的 cell 模板`);
-        return cc.size(0, 0);
-    }
+                //更新显示项
+                for (let i = result.start; i <= result.end; i++) {
+                    //正在显示的，跳过更新
+                    if (this._indices.has(i)) {
+                        // Log.d(`Cell[${i}]项已经显示，跳过更新`);
+                        continue;
+                    }
+                    // Log.d(`添加Cell ${i}`);
+                    this.updateCellAtIndex(i);
+                }
+            }
 
-    protected _fillCellSize() {
-        this._templateSize.clear();
-        for (let i = 0; i < this.template.length; i++) {
-            let template = this.template[i];
-            this._templateSize.set(template.type, template.node.getContentSize());
+
+            // if ( this.horizontal ){
+            //     vec.x -= this._view.width;
+            //     Log.d("最右", `(${vec.x},${vec.y})`);
+            //     line2.setPosition(-vec.x, line1.y)
+            // }else{
+            //     vec.y += this._view.height;
+            //     Log.d("最底", `(${vec.x},${vec.y})`);
+            //     line2.setPosition(line2.x, -vec.y)
+            // }
         }
     }
 
@@ -863,99 +1105,113 @@ export default class TableView extends cc.Component {
     }
 
     protected _getCellOffset(index: number) {
-        let pos = this._cellsOffsets[index];
+        let offset = this._cellsInfos[index].offset;
         if (this.horizontal) {
-            return cc.v2(pos, 0);
+            return cc.v2(offset, 0);
         } else {
-            return cc.v2(0, pos);
+            return cc.v2(0, offset);
         }
     }
 
-    protected _positions: cc.Vec2[] = [];
-    protected _updateCells() {
+    protected _updateCellPositions() {
         let count = this.delegate.numberOfCellsInTableView(this);
         if (count > 0) {
             for (let i = 0; i < count + 1; i++) {
                 let type = this.delegate.tableCellTypeAtIndex(this, i)
                 let cell = this._getTemplete(type);
-                let node = cc.instantiate(cell.node);
-                cell = node.getComponent(TableViewCell);
-                cell.view = this;
-                cell.index = i;
-                cell.isDoUpdate = true;
-                cell.node.active = true;
                 let offset = this._getCellOffset(i);
-                let pos = this.align(node,this.content, offset);
-                node.setPosition(pos)
-                Log.d(`${i} =>(${pos.x},${pos.y})`);
-                this._positions.push(pos);
-                this.content.addChild(node);
+                let pos = this.align(cell.node, this.content, offset);
+                this._cellsInfos[i].position.x = pos.x;
+                this._cellsInfos[i].position.y = pos.y;
             }
         }
     }
 
-    protected indexFromOffset(offset: cc.Vec2) {
-        let index = 0;
-        const maxIdx = this.delegate.numberOfCellsInTableView(this) - 1;
-
-        if (this.fillOrder == FillOrder.TOP_DOWN) {
-            offset.y = this.content.height - offset.y;
+    protected _moveCellOutOfSight(cell: TableViewCell) {
+        if (this.delegate && this.delegate.tableCellWillRecycle) {
+            this.delegate.tableCellWillRecycle(this, cell);
         }
-        index = this._indexFromOffset(offset);
+        // Log.d(`移除Cell ${cell.index}`);
+        this._cellsFreed.push(cell);
+        let index = this._cellsUsed.indexOf(cell);
         if (index != -1) {
-            index = Math.max(0, index);
-            if (index > maxIdx) {
-                index = -1;
-            }
+            this._cellsUsed.splice(index, 1);
         }
-
-        return index;
+        this._indices.delete(cell.index);
+        cell.reset();
+        if (cell.node.parent == this.content) {
+            this.content.removeChild(cell.node, true);
+        }
+        this._isUsedCellsDirty = true;
     }
 
-    protected _indexFromOffset(offset: cc.Vec2) {
-        let low = 0;
-        let high = this.delegate.numberOfCellsInTableView(this) - 1;
-        let search: number;
-        if (this.horizontal) {
-            search = offset.x;
-        } else {
-            search = offset.y;
+    /**
+     * @description 计算当前可见Cell (二分查找，速度快点)
+     * */
+    protected _calculateInInSight(offset: cc.Vec2): { start: number, end: number, count: number } {
+        let result: { start: number, end: number, count: number } = null;
+        let count = this.delegate.numberOfCellsInTableView(this);
+        if (count <= 0) {
+            return result;
         }
-
+        result = { start: 0, end: 0, count: count };
+        if (count == 1) {
+            return result;
+        }
+        let low = 0;
+        let high = count;
+        let viewSize = this._view.getContentSize();
+        let search: number = -1;
+        let index = 0;
         while (high >= low) {
-            let index = Math.floor(low + (high - low) / 2);
-
-            let _cellStart = this._positions[index];
-            let cellStart: number;
-            if (this.horizontal) {
-                cellStart = _cellStart.x;
-            } else {
-                cellStart = _cellStart.y;
+            index = Math.floor(low + (high - low) / 2);
+            let cellStart = this._cellsInfos[index];
+            let startResult = cellStart.calculate(this.fillOrder, this.horizontal, offset, viewSize);
+            if (startResult.isInSight) {
+                search = index;
+                break;
             }
-
-            let _cellEnd = this._positions[index + 1];
-            let cellEnd: number;
-            if (this.horizontal) {
-                cellEnd = _cellEnd.x;
-            } else {
-                cellEnd = _cellEnd.y;
+            let cellEnd = this._cellsInfos[index + 1];
+            let endResult = cellEnd.calculate(this.fillOrder, this.horizontal, offset, viewSize);
+            if (endResult.isInSight) {
+                search = index;
+                break;
             }
-            if (search >= cellStart && search <= cellEnd) {
-                return index;
-            }
-            else if (search < cellStart) {
+            //都没有找到，向偏移为0的靠拢
+            if (Math.abs(startResult.offset) < Math.abs(endResult.offset)) {
                 high = index - 1;
-            }
-            else {
+            } else {
                 low = index + 1;
             }
         }
-
-        if (low <= 0) {
-            return 0;
+        // Log.d(`找到第一个可显示的Cell索引 : ${search}`);
+        result.start = search;
+        result.end = search;
+        //向前找出可显示Cell
+        for (let i = search - 1; i >= 0; i--) {
+            let cell = this._cellsInfos[i];
+            let temp = cell.calculate(this.fillOrder, this.horizontal, offset, viewSize);
+            if (temp.isInSight) {
+                result.start = i;
+            } else {
+                break;
+            }
         }
 
-        return -1;
+        //向后找出可显示Cell
+        for (let i = search + 1; i < count; i++) {
+            let cell = this._cellsInfos[i];
+            let temp = cell.calculate(this.fillOrder, this.horizontal, offset, viewSize);
+            if (temp.isInSight) {
+                result.end = i;
+            } else {
+                break;
+            }
+        }
+
+        // Log.d(`可显示节点 : ${result.start} -> ${result.end}`);
+
+        return result;
     }
 
     /**
@@ -965,7 +1221,7 @@ export default class TableView extends cc.Component {
      * @param offset 
      * @returns 
      */
-    protected align(node: cc.Node, target : cc.Node, offset: cc.Vec2) {
+    protected align(node: cc.Node, target: cc.Node, offset: cc.Vec2) {
 
         let layoutParam = new LayoutParam;
         layoutParam.node = node;

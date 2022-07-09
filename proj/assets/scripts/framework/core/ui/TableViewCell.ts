@@ -13,23 +13,12 @@ export type CellType = number | string;
     index : number = INVALID_INDEX;
     @property({displayName : "Type" , tooltip : "列表项类型"})
     type : CellType = DEFAULT_TYPE;
-    /**@description 是否需要刷新数据 */
-    isDoUpdate = true;
     reset(){
         this.index = INVALID_INDEX;
     }
 
-    protected onLoad(): void {
-        if ( this.view && this.isDoUpdate ){
-            this.view.updateCellData(this);
-            this.isDoUpdate = false;
-        }
-    }
+    /**@description Cell初始化，在onLoad之前 */
+    init(){
 
-    protected onDisable(): void {
-        if ( this.view && this.isDoUpdate ){
-            this.view.updateCellData(this);
-            this.isDoUpdate = false;
-        }
     }
 }

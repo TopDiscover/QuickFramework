@@ -313,7 +313,7 @@
     },
     "scrollEvents": [],
     "cancelInnerEvents": true,
-    "template": [
+    "_template": [
       {
         "__id__": 13
       },
@@ -321,6 +321,7 @@
         "__id__": 20
       }
     ],
+    "fillOrder": 0,
     "_id": ""
   },
   {
@@ -772,7 +773,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 220,
-      "height": 80
+      "height": 60
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",

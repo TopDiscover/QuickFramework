@@ -13,7 +13,7 @@ const { ccclass, property } = cc._decorator;
 @ccclass
 export default class TestTableView extends cc.Component implements TableViewDelegate {
     updateCellData(view: TableView, cell: TestTableViewCell): void {
-        cell.setString(`测试 Cell ${cell.index}`);
+        cell.setString(`Cell ${cell.index}`);
     }
 
     tableCellTypeAtIndex(view: TableView, index: number) {
@@ -24,23 +24,23 @@ export default class TestTableView extends cc.Component implements TableViewDele
     }
 
     numberOfCellsInTableView(view: TableView): number {
-        return 5;
+        return 500;
     }
 
 
     protected onLoad(): void {
 
-        let node = cc.find("Tableview", this.node);
+        // let node = cc.find("Tableview", this.node);
 
-        let view = node.getComponent(TableView);
+        // let view = node.getComponent(TableView);
 
-        let eventHandler = new cc.Component.EventHandler;
-        eventHandler.component = "TestTableView";
-        eventHandler.target = this.node;
-        eventHandler.handler = "onEvent";
-        view.scrollEvents.push(eventHandler);
-        view.delegate = this;
-        view.reloadData();
+        // let eventHandler = new cc.Component.EventHandler;
+        // eventHandler.component = "TestTableView";
+        // eventHandler.target = this.node;
+        // eventHandler.handler = "onEvent";
+        // view.scrollEvents.push(eventHandler);
+        // view.delegate = this;
+        // view.reloadData();
 
 
         let nodeH = cc.find("TableviewH", this.node);

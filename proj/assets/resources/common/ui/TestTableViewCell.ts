@@ -14,9 +14,8 @@ export default class TestTableViewCell extends TableViewCell {
 
     private _label : cc.Label = null;
 
-    protected onLoad(): void {
+    init(){
         this._label = cc.find("label",this.node).getComponent(cc.Label);
-        super.onLoad();
     }
 
     setString(v : string){
