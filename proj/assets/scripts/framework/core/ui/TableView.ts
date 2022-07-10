@@ -12,6 +12,12 @@ interface Options {
     applyToHorizontal: boolean;
     applyToVertical: boolean;
 }
+
+interface UpdateIndices{
+    from : number,
+    to : number,
+}
+
 const EPSILON = 1e-4;
 const MOVEMENT_FACTOR = 0.7;
 const NUMBER_OF_GATHERED_TOUCHES_FOR_MOVE_SPEED = 5;
@@ -161,17 +167,33 @@ type CellResult = { isInSight: boolean, offset: number };
 
 /**@description Cell信息 */
 class CellInfo {
-    constructor(node: cc.Node, index: number) {
-        this.node = node;
+    constructor(template: TableViewCell, view: TableView, offset: number, index: number) {
+        this._templete = template;
+        this._view = view;
         this.index = index;
-        this.init();
+        this.init(offset);
+    }
+    private _view: TableView = null!;
+    private get isHorizontal() {
+        return this._view.direction == Direction.HORIZONTAL;
+    }
+    private _templete: TableViewCell = null!;
+    private get fillOrder() {
+        return this._view.fillOrder;
     }
     /**@description 模板节点 */
-    node: cc.Node = null!;
-    /**@description 节点位置 */
-    position: cc.Vec2 = cc.v2(0, 0);
+    get node() {
+        return this._templete.node;
+    }
+    private _offset: cc.Vec2 = null!;
     /**@description 相对父亲节点的偏移量 */
-    offset: number = 0;
+    get offset() {
+        if (this.isHorizontal) {
+            return this._offset.x;
+        } else {
+            return this._offset.y;
+        }
+    }
 
     private index = 0;
 
@@ -184,19 +206,72 @@ class CellInfo {
     /**@description 以自己锚点为中心有下边距离 */
     bottom = 0;
 
-    private init() {
+    private init(offset: number) {
         this.left = this.node.width * this.node.anchorX;
         this.right = this.node.width * (1 - this.node.anchorX);
         this.top = this.node.height * (1 - this.node.anchorY);
         this.bottom = this.node.height * this.node.anchorY;
+        if (this.isHorizontal) {
+            this._offset = cc.v2(offset, 0);
+        } else {
+            this._offset = cc.v2(0, offset);
+        }
     }
 
-    clone(){
-        let result = new CellInfo(this.node,this.index);
+    /**@description 节点位置 */
+    position: cc.Vec2 = cc.v2(0, 0);
+
+    calculatePosition() {
+        this.position = this._align(this.node, this._view.content, this._offset);
+        return this.position;
+    }
+
+    clone() {
+        let result = new CellInfo(this._templete, this._view, this.offset, this.index);
         result.position.x = this.position.x;
         result.position.y = this.position.y;
-        result.offset = this.offset;
         return result;
+    }
+
+
+    /**
+     * @description 根据当前填充方式及视图方向设置Cell的对齐方式
+     * @param node 
+     * @param target 
+     * @param offset 
+     * @returns 
+     */
+    protected _align(node: cc.Node, target: cc.Node, offset: cc.Vec2) {
+
+        let layoutParam = new LayoutParam;
+        layoutParam.node = node;
+        layoutParam.target = target;
+        if (this.isHorizontal) {
+            //水平方向
+            //居中对齐 y
+            if (this.fillOrder == FillOrder.TOP_DOWN) {
+                layoutParam.alignFlags = LayoutType.MID_LETF;
+                layoutParam.left = offset.x;
+            } else {
+                layoutParam.alignFlags = LayoutType.MID_RIGHT;
+                layoutParam.right = offset.x;
+            }
+        } else {
+            //垂直方向
+            //居中对齐 x
+            if (this.fillOrder == FillOrder.TOP_DOWN) {
+                //顶对齐 y
+                layoutParam.alignFlags = LayoutType.CENTER_TOP;
+                layoutParam.top = offset.y;
+            } else {
+                //底对齐 y
+                layoutParam.alignFlags = LayoutType.CENTER_BOT;
+                layoutParam.bottom = offset.y;
+            }
+        }
+
+        Manager.layout.align(layoutParam);
+        return layoutParam.result.position;
     }
 
     debug(began?: string, end?: string) {
@@ -213,7 +288,7 @@ class CellInfo {
     /**
      * @description 计算Cell距离view视图(水平方向 : 左边界,垂直方向 : 上边界)的偏移量
      * */
-    calculate(fillOrder: FillOrder, isHorizontal: boolean, vec: cc.Vec2, viewSize: cc.Size): CellResult {
+    calculateSight(fillOrder: FillOrder, isHorizontal: boolean, vec: cc.Vec2, viewSize: cc.Size): CellResult {
         let result: CellResult = {
             isInSight: false,
             offset: 0
@@ -564,6 +639,9 @@ export default class TableView extends cc.Component {
     protected _isUsedCellsDirty = false;
     protected _oldDirection: Direction = null;
 
+    /**@description 测试用 */
+    private _isShowAllCell = false;
+
     /**
       * !#en Scroll the content to the bottom boundary of ScrollView.
       * !#zh 视图内容将在规定时间内滚动到视图底部。
@@ -868,20 +946,21 @@ export default class TableView extends cc.Component {
 
 
     /**@description 滚动到指定项 */
-    scrollToIndex(index: number,origin ?: cc.Vec2) {
-        if ( !(index >= 0 && index < this.delegate.numberOfCellsInTableView(this))){
+    scrollToIndex(index: number, timeInSecond = 0, attenuated = true, vec: cc.Vec2 = cc.v2(0, 0)) {
+        if (!(index >= 0 && index < this.delegate.numberOfCellsInTableView(this))) {
             Log.e(`错误的index : ${index}`)
             return;
         }
-        let info = this._cellsInfos[index].clone();
-        if ( origin ){
-            info.position = origin;
-        }
+        Log.d(`滚动到 : ${index}`);
+        let info = this._cellsInfos[index]
+        info = info.clone();
+        info.position.add(vec);
+        // info.calculatePosition();
         let offset = this.getContentPosition();
         let viewSize = this._view.getContentSize();
         let viewAnchor = this._view.getAnchorPoint();
 
-        let viewBottom = -viewAnchor.y* viewSize.height;
+        let viewBottom = -viewAnchor.y * viewSize.height;
         let viewLeft = viewAnchor.x * viewSize.width;
 
         // Log.d(`offset : (${offset.x},${offset.y})`)
@@ -892,7 +971,7 @@ export default class TableView extends cc.Component {
             offset.y = viewBottom;
         }
 
-        let result = info.calculate(this.fillOrder, this.horizontal, offset, viewSize)
+        let result = info.calculateSight(this.fillOrder, this.horizontal, offset, viewSize)
         // Log.d(v);
 
         let layoutParam = new LayoutParam;
@@ -907,11 +986,12 @@ export default class TableView extends cc.Component {
             //垂直方向
             layoutParam.alignFlags = LayoutType.CENTER_TOP;
             //按顶对齐，第一次对齐，只是对齐到可显示区域最下面，所有要x2，把显示区域移动到最顶端
-            let topOffset = 2 * (viewSize.height - info.node.height);
-            if ( this.fillOrder == FillOrder.TOP_DOWN){
+            let topOffset = 2 * viewSize.height;
+            if (this.fillOrder == FillOrder.TOP_DOWN) {
+                // Log.d(`result : ${result.offset}`)
                 layoutParam.top = result.offset - topOffset;
                 // Log.d(`top : ${layoutParam.top}`);
-            }else{
+            } else {
                 layoutParam.top = -result.offset - topOffset;
                 // Log.d(`bottom : ${layoutParam.bottom}`);
             }
@@ -920,7 +1000,7 @@ export default class TableView extends cc.Component {
         Manager.layout.align(layoutParam);
         offset = layoutParam.result.position;
         // Log.d(`offset new  : (${offset.x},${offset.y})`)
-        this.scrollToOffset(offset, 1);
+        this.scrollToOffset(offset, timeInSecond, attenuated);
     }
 
     /**
@@ -957,7 +1037,7 @@ export default class TableView extends cc.Component {
      * @description 插入项，默认为插入到最后,数据先插入才能调用
      * @param index 
      */
-    insertCellAtIndex(index?: number) {
+    insertCellAtIndex(index?: number, timeInSecond = 0, attenuated = true) {
         let count = this.delegate.numberOfCellsInTableView(this);
         if (count == 0) {
             return;
@@ -968,37 +1048,99 @@ export default class TableView extends cc.Component {
         if (index > count - 1) {
             return;
         }
-        
-        this.reloadData(false);
-        let origin = this._cellsInfos[0];
 
-        if (this.horizontal) {
-            if ( index == 0 || index == count -1 ){
-                this.scrollToIndex(index);
-            }else{
-                this.scrollToIndex(index,origin.position);
-            }
+        let offset = this.getScrollOffset();
+        let prePosition : cc.Vec2 = null;
+        let nextPosition : cc.Vec2 = null;
+        let firstCell : TableViewCell = null;
+        if ( this._cellsUsed.length > 0 ){
+            firstCell = this._cellsUsed[0];
+            prePosition = cc.v2(firstCell.node.x,firstCell.node.y);
         }
+        // this._sortCell();
+        // this._debugCell("更新Cell前")
+        // this._debugCellInfos("【更新前】")
+        this._updateCellOffsets();
+        this._updateContentSize();
+        // this._debugCellInfos("【更新后】")
+        let cell = this.cellAtIndex(index);
+        let scrollToIndex = -1;
+        if (cell) {
+            Log.d(`插入的Cell[${index}]在显示区域内`)
+            let start = this._getCellIndex(cell);
+            scrollToIndex = start;
+            let update : UpdateIndices[] = [];
+            for ( let i = 0 ; i < this._cellsUsed.length ; i++ ){
+                let temp = this._cellsUsed[i];
+                if ( temp.index >= start ){
+                    let from = temp.index;
+                    let to = temp.index + 1;
+                    this._setIndexForCell(to,temp);
+                    this._updateCellData(temp);
+                    update.push({from : from , to : to});
+                }else{
+                    this._updateCellData(temp);
+                }
+            }
+            //更新当前显示的索引
+            this._updateCellIndices(update);
+        }
+
+
+        if ( firstCell ){
+            nextPosition = cc.v2(firstCell.node.x,firstCell.node.y);
+        }
+
+        let type = this.delegate.tableCellTypeAtIndex(this,index);
+        let newCell = this._dequeueCell(type);
+        if ( !newCell ){
+            let template = this._getTemplete(type);
+            let node = cc.instantiate(template.node);
+            newCell = node.getComponent(TableViewCell);
+        }
+
+        this._setIndexForCell(index,newCell);
+        this._addCellIfNecessary(newCell);
+        newCell.init();
+        this._updateCellData(newCell);
+        // if ( scrollToIndex != -1 ){
+        //     this.scrollToIndex(scrollToIndex,timeInSecond,arguments);
+        // }else{
+            this._onContentPositionChange();
+        // }
     }
 
     /**
      * @description 删除指定项
      * @param index 
      */
-    removeCellAtIndex(index: number) {
-
+    removeCellAtIndex(index: number, timeInSecond = 0, attenuated = true) {
+        if (this._indices.has(index)) {
+            Log.d(`添加位置${index}在显示区域内`)
+            this.reloadData(false);
+            this.scrollToIndex(index, timeInSecond, attenuated);
+        } else {
+            let index = -1;
+            if (this._indices.size > 0) {
+                index = this._indices.values().next().value;
+            }
+            this.reloadData(false);
+            if (index >= 0) {
+                this.scrollToIndex(index, timeInSecond, attenuated);
+            }
+        }
     }
 
     /**
      * @description 重置数据
      */
     reloadData(isResePosition = true) {
-        if ( isResePosition ){
+        if (isResePosition) {
             this._oldDirection = null;
-        }else{
+        } else {
             this._oldDirection = this.direction;
         }
-       
+
         //删除当前渲染的cell
         for (let i = 0; i < this._cellsUsed.length; i++) {
             let cell = this._cellsUsed[i];
@@ -1019,6 +1161,9 @@ export default class TableView extends cc.Component {
         //刷新节点的位置
         this._updateCellOffsets();
         this._updateContentSize();
+        if (this.delegate.numberOfCellsInTableView(this) > 0) {
+            this._onContentPositionChange();
+        }
     }
 
 
@@ -1029,33 +1174,74 @@ export default class TableView extends cc.Component {
      */
     cellAtIndex(index: number): TableViewCell | null {
         if (this._indices.has(index)) {
-            let cell = this._cellsUsed.find((value) => {
-                if (value.index == index) {
-                    return true
+            for (let i = 0; i < this._cellsUsed.length; i++) {
+                if (this._cellsUsed[i].index == index) {
+                    return this._cellsUsed[i];
                 }
-                return false;
-            })
-            return cell;
+            }
         }
         return null;
     }
 
-    /**@description 更新所有显示区域cell数据 */
-    protected _updateCellUsedData() {
-        this._cellsUsed.forEach(v => {
-            let info = this._cellsInfos[v.index];
-            v.node.setPosition(info.position);
-            this._updateCellData(v);
+    /**
+     * @description 更新Cell显示索引
+     * @param data 
+     */
+    private _updateCellIndices( data : UpdateIndices[] ){
+        let origin : number[] = [];
+        this._indices.forEach((v,v2,set)=>{
+            origin.push(v);
+        });
+
+        this._indices.clear();
+        for ( let i = 0 ; i < origin.length ; i++ ){
+            let changeData = data.find((v)=>{
+                if ( v.from == origin[i] ){
+                    return true;
+                }
+                return false;
+            })
+            if ( changeData ){
+                origin[i] = changeData.to;
+            }
+            this._indices.add(origin[i]);
+        }
+    }
+
+    /**
+     * @description 按index的升序排序
+     */
+    private _sortCell(){
+        this._debugCell("【排序前】")
+        this._cellsUsed = this._cellsUsed.sort((a, b) => {
+            return a.index - b.index;
+        });
+        this._debugCell("【排序后】")
+    }
+
+    private _debugCellInfos(title:string){
+        Log.d(`--------------------- ${title} ---------------------`);
+        this._cellsInfos.forEach(v=>{
+            v.debug();
         })
     }
 
-    protected _getUsedCellIndex(cell: TableViewCell) {
-        return this._cellsUsed.findIndex(v => {
-            if (v == cell) {
-                return true;
-            }
-            return false;
+    private _debugCell(title : string){
+        Log.d(`--------------------- ${title} ---------------------`);
+        Log.d(`当前显示节点 :`,this._indices);
+        
+        this._cellsUsed.forEach((v,index,array)=>{
+            Log.d(`[${index}] index : ${v.index} , ${(v as any).string}`);
         })
+    }
+
+    private _getCellIndex(cell: TableViewCell): number {
+        for (let i = 0; i < this._cellsUsed.length; i++) {
+            if (this._cellsUsed[i] === cell ) {
+                return this._cellsUsed[i].index;
+            }
+        }
+        return -1;
     }
 
     protected _updateCellData(cell: TableViewCell) {
@@ -1066,6 +1252,8 @@ export default class TableView extends cc.Component {
     protected _addCellIfNecessary(cell: TableViewCell) {
         if (cell.node.parent != this.content) {
             this.content.addChild(cell.node);
+        }else{
+            Log.e(`添加的Cell 已经有父节点`);
         }
         this._cellsUsed.push(cell);
         this._indices.add(cell.index);
@@ -1101,7 +1289,8 @@ export default class TableView extends cc.Component {
     }
 
     /**
-     * @description 刷新Cell位置
+     * @description 更新Cell位置偏移
+     * @param isUpdatePosition 默认为true
      */
     protected _updateCellOffsets() {
         let count = this.delegate.numberOfCellsInTableView(this);
@@ -1115,8 +1304,7 @@ export default class TableView extends cc.Component {
             for (i = 0; i < count; i++) {
                 type = this.delegate.tableCellTypeAtIndex(this, i);
                 cell = this._getTemplete(type);
-                let info = new CellInfo(cell.node, i);
-                info.offset = cur;
+                let info = new CellInfo(cell, this, cur, i);
                 this._cellsInfos.push(info);
                 size.width = cell.node.width;
                 size.height = cell.node.height;
@@ -1128,12 +1316,16 @@ export default class TableView extends cc.Component {
                 }
             }
             //最后一项
-            type = this.delegate.tableCellTypeAtIndex(this, i);
-            cell = this._getTemplete(type);
-            let info = new CellInfo(cell.node, i);
-            info.offset = cur;
+            let info = new CellInfo(cell, this, cur, i);
             this._cellsInfos.push(info);
         }
+    }
+
+    /**@description 更新Cell位置数据 */
+    protected _updateCellPositions(){
+        this._cellsInfos.forEach(v=>{
+            v.calculatePosition();
+        })
     }
 
     /**
@@ -1152,7 +1344,6 @@ export default class TableView extends cc.Component {
         }
 
         this.content.setContentSize(size);
-
         this._updateCellPositions();
 
         if (this._oldDirection != this.direction) {
@@ -1202,15 +1393,15 @@ export default class TableView extends cc.Component {
         //     v.debug();
         //     v.calculate(this.fillOrder, this.horizontal, vec, viewSize);
         // })
+        // 要先排序，才能进行计算
+        if (this._isUsedCellsDirty) {
+            this._sortCell();
+        }
+
+        let maxId = Math.max(this.delegate.numberOfCellsInTableView(this) -1,0);
 
         let result = this._calculateInInSight(vec);
         if (result) {
-            if (this._isUsedCellsDirty) {
-                this._cellsUsed = this._cellsUsed.sort((a, b) => {
-                    return a.index - b.index;
-                })
-            }
-
             // this._cellsUsed.forEach(v => {
             //     Log.d(`当前显示节点[${v.index}]`)
             // })
@@ -1233,7 +1424,7 @@ export default class TableView extends cc.Component {
             if (this._cellsUsed.length > 0) {
                 let cell = this._cellsUsed[this._cellsUsed.length - 1];
                 let idx = cell.index;
-                while (idx < result.count && idx > result.end) {
+                while (idx <= maxId && idx > result.end) {
                     this._moveCellOutOfSight(cell);
                     if (this._cellsUsed.length > 0) {
                         cell = this._cellsUsed[this._cellsUsed.length - 1];
@@ -1254,6 +1445,8 @@ export default class TableView extends cc.Component {
                 // Log.d(`添加Cell ${i}`);
                 this.updateCellAtIndex(i);
             }
+
+            this._debugCell("【更新Cell后】")
         }
 
 
@@ -1285,33 +1478,6 @@ export default class TableView extends cc.Component {
         return null;
     }
 
-    protected _getCellOffset(index: number) {
-        let offset = this._cellsInfos[index].offset;
-        if (this.horizontal) {
-            return cc.v2(offset, 0);
-        } else {
-            return cc.v2(0, offset);
-        }
-    }
-
-    protected _updateCellPositions() {
-        let count = this.delegate.numberOfCellsInTableView(this);
-        if (count > 0) {
-            for (let i = 0; i < count + 1; i++) {
-                let type = this.delegate.tableCellTypeAtIndex(this, i)
-                let cell = this._getTemplete(type);
-                let offset = this._getCellOffset(i);
-                let pos = this._align(cell.node, this.content, offset);
-                this._cellsInfos[i].position.x = pos.x;
-                this._cellsInfos[i].position.y = pos.y;
-            }
-        }
-        // Log.d(`更新Cell位置`);
-        // this._cellsInfos.forEach(v => {
-        //     v.debug();
-        // })
-    }
-
     protected _moveCellOutOfSight(cell: TableViewCell) {
         if (this.delegate && this.delegate.tableCellWillRecycle) {
             this.delegate.tableCellWillRecycle(this, cell);
@@ -1335,11 +1501,19 @@ export default class TableView extends cc.Component {
      * */
     protected _calculateInInSight(offset: cc.Vec2): { start: number, end: number, count: number } {
         let result: { start: number, end: number, count: number } = null;
+        if (this._cellsInfos.length <= 0) {
+            return result;
+        }
         let count = this.delegate.numberOfCellsInTableView(this);
         if (count <= 0) {
             return result;
         }
         result = { start: 0, end: 0, count: count };
+        if ( this._isShowAllCell ){
+            result.start = 0;
+            result.end = count-1;
+            return result;
+        }
         if (count == 1) {
             return result;
         }
@@ -1348,16 +1522,24 @@ export default class TableView extends cc.Component {
         let viewSize = this._view.getContentSize();
         let search: number = -1;
         let index = 0;
+        // Log.d(`Cell信息大小 : ${this._cellsInfos.length}`)
         while (high >= low) {
             index = Math.floor(low + (high - low) / 2);
+            if (index < 0 || index >= this._cellsInfos.length) {
+                return null;
+            }
+            // Log.d(index);
             let cellStart = this._cellsInfos[index];
-            let startResult = cellStart.calculate(this.fillOrder, this.horizontal, offset, viewSize);
+            let startResult = cellStart.calculateSight(this.fillOrder, this.horizontal, offset, viewSize);
             if (startResult.isInSight) {
                 search = index;
                 break;
             }
+            if (index + 1 < 0 || index + 1 >= this._cellsInfos.length) {
+                return null;
+            }
             let cellEnd = this._cellsInfos[index + 1];
-            let endResult = cellEnd.calculate(this.fillOrder, this.horizontal, offset, viewSize);
+            let endResult = cellEnd.calculateSight(this.fillOrder, this.horizontal, offset, viewSize);
             if (endResult.isInSight) {
                 search = index;
                 break;
@@ -1369,13 +1551,19 @@ export default class TableView extends cc.Component {
                 low = index + 1;
             }
         }
+
+        if (search < 0) {
+            // Log.e(`未找到显示项`);
+            return null;
+        }
+
         // Log.d(`找到第一个可显示的Cell索引 : ${search}`);
         result.start = search;
         result.end = search;
         //向前找出可显示Cell
         for (let i = search - 1; i >= 0; i--) {
             let cell = this._cellsInfos[i];
-            let temp = cell.calculate(this.fillOrder, this.horizontal, offset, viewSize);
+            let temp = cell.calculateSight(this.fillOrder, this.horizontal, offset, viewSize);
             if (temp.isInSight) {
                 result.start = i;
             } else {
@@ -1383,10 +1571,11 @@ export default class TableView extends cc.Component {
             }
         }
 
+
         //向后找出可显示Cell
         for (let i = search + 1; i < count; i++) {
             let cell = this._cellsInfos[i];
-            let temp = cell.calculate(this.fillOrder, this.horizontal, offset, viewSize);
+            let temp = cell.calculateSight(this.fillOrder, this.horizontal, offset, viewSize);
             if (temp.isInSight) {
                 result.end = i;
             } else {
@@ -1394,49 +1583,9 @@ export default class TableView extends cc.Component {
             }
         }
 
-        // Log.d(`可显示节点 : ${result.start} -> ${result.end}`);
+        Log.d(`可显示节点 : ${result.start} -> ${result.end}`);
 
         return result;
-    }
-
-    /**
-     * @description 根据当前填充方式及视图方向设置Cell的对齐方式
-     * @param node 
-     * @param target 
-     * @param offset 
-     * @returns 
-     */
-    protected _align(node: cc.Node, target: cc.Node, offset: cc.Vec2) {
-
-        let layoutParam = new LayoutParam;
-        layoutParam.node = node;
-        layoutParam.target = target;
-        if (this.horizontal) {
-            //水平方向
-            //居中对齐 y
-            if (this.fillOrder == FillOrder.TOP_DOWN) {
-                layoutParam.alignFlags = LayoutType.MID_LETF;
-                layoutParam.left = offset.x;
-            } else {
-                layoutParam.alignFlags = LayoutType.MID_RIGHT;
-                layoutParam.right = offset.x;
-            }
-        } else {
-            //垂直方向
-            //居中对齐 x
-            if (this.fillOrder == FillOrder.TOP_DOWN) {
-                //顶对齐 y
-                layoutParam.alignFlags = LayoutType.CENTER_TOP;
-                layoutParam.top = offset.y;
-            } else {
-                //底对齐 y
-                layoutParam.alignFlags = LayoutType.CENTER_BOT;
-                layoutParam.bottom = offset.y;
-            }
-        }
-
-        Manager.layout.align(layoutParam);
-        return layoutParam.result.position;
     }
 
     protected _registerEvent() {

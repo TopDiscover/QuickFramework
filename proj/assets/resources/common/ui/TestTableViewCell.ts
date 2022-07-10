@@ -9,6 +9,11 @@ import { TableViewCell } from "../../../scripts/framework/core/ui/TableViewCell"
 
 const {ccclass, property} = cc._decorator;
 
+export interface CellData{
+    content : string,
+    type : number,
+}
+
 @ccclass
 export default class TestTableViewCell extends TableViewCell {
 
@@ -18,7 +23,11 @@ export default class TestTableViewCell extends TableViewCell {
         this._label = cc.find("label",this.node).getComponent(cc.Label);
     }
 
-    updateData(v : { content : string , index : number}){
+    updateData(v : CellData){
         this._label.string = v.content;
+    }
+
+    get string(){
+        return this._label.string;
     }
 }
