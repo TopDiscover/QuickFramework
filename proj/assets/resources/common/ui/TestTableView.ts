@@ -86,6 +86,7 @@ export default class TestTableView extends cc.Component implements TableViewDele
         cc.find("op/mid", this.node).on(cc.Node.EventType.TOUCH_END, this.onInsertMid, this, true);
         cc.find("op/dmid", this.node).on(cc.Node.EventType.TOUCH_END, this.onDeleteMid, this, true);
         cc.find("op/to", this.node).on(cc.Node.EventType.TOUCH_END, this.onScrollTo, this, true);
+        cc.find("op/update", this.node).on(cc.Node.EventType.TOUCH_END, this.onUpdateData, this, true);
 
     }
 
@@ -146,6 +147,13 @@ export default class TestTableView extends cc.Component implements TableViewDele
         let index = 5;
         this.horizontal && this._tableViewH.scrollToIndex(index,this.time);
         this.vertical && this._tableViewV.scrollToIndex(index,this.time)
+    }
+
+    private onUpdateData(){
+        let index = 3;
+        this._datas[index].content = "更新的Cell";
+        this.horizontal && this._tableViewH.updateCellAtIndex(index);
+        this.vertical && this._tableViewV.updateCellAtIndex(index);
     }
 
     private onEvent(target: TableView, event: string) {
