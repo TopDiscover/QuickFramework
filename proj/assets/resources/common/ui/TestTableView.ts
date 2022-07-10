@@ -18,8 +18,8 @@ export default class TestTableView extends cc.Component implements TableViewDele
     private _tableViewH: TableView = null;
     private _tableViewV: TableView = null;
     private _count = 0;
-    protected horizontal = true;
-    protected vertical = false;
+    protected horizontal = false;
+    protected vertical = true;
 
     protected getType( index : number ){
         return index % 2 == 0  ? 1 : 2;
@@ -98,29 +98,29 @@ export default class TestTableView extends cc.Component implements TableViewDele
     }
 
     private get time(){
-        return 2;
+        return 1;
     }
 
     private onInsertMid() {
         let index = 2;
         this._datas.splice(index, 0, { content: `Cell新${this._count}`, type : this.getNewType(index) })
         this._count++;
-        this.horizontal && this._tableViewH.insertCellAtIndex(index,this.time);
-        this.vertical && this._tableViewV.insertCellAtIndex(index,this.time);
+        this.horizontal && this._tableViewH.insertCellAtIndex(index);
+        this.vertical && this._tableViewV.insertCellAtIndex(index);
     }
     private onInsertEnd() {
         let index = this._datas.length-1;
         this._datas.push({ content: `Cell新${this._count}`, type : this.getNewType(index) })
         this._count++;
-        this.horizontal && this._tableViewH.insertCellAtIndex(index,this.time);
-        this.vertical && this._tableViewV.insertCellAtIndex(index,this.time);
+        this.horizontal && this._tableViewH.insertCellAtIndex(index);
+        this.vertical && this._tableViewV.insertCellAtIndex(index);
     }
     private onInsertFront() {
         let index = 0;
         this._datas.unshift({ content: `Cell新${this._count}`, type : this.getNewType(index) })
         this._count++;
-        this.horizontal && this._tableViewH.insertCellAtIndex(index,this.time);
-        this.vertical && this._tableViewV.insertCellAtIndex(index,this.time);
+        this.horizontal && this._tableViewH.insertCellAtIndex(index);
+        this.vertical && this._tableViewV.insertCellAtIndex(index);
     }
 
     private onDeleteMid() {

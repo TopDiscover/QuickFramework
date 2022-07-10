@@ -1041,7 +1041,7 @@ export default class TableView extends cc.Component {
      * @description 插入项，默认为插入到最后,数据先插入才能调用
      * @param index 
      */
-    insertCellAtIndex(index?: number, timeInSecond = 0, attenuated = true) {
+    insertCellAtIndex(index?: number) {
         let count = this.delegate.numberOfCellsInTableView(this);
         if (count == 0) {
             return;
@@ -1060,18 +1060,15 @@ export default class TableView extends cc.Component {
             firstCell = this._cellsUsed[0];
             prePosition = cc.v2(firstCell.node.x, firstCell.node.y);
         }
-        // this._sortCell();
         // this._debugCell("更新Cell前")
         // this._debugCellInfos("【插入${index}更新Cell前】")
         this._updateCellOffsets();
         this._updateContentSize();
         // this._debugCellInfos(`【插入${index}更新Cell后】`)
         let cell = this.cellAtIndex(index);
-        let scrollToIndex = -1;
         if (cell) {
             Log.d(`插入的Cell[${index}]在显示区域内`)
             let start = this._getCellIndex(cell);
-            scrollToIndex = start;
             let update: UpdateIndices[] = [];
             for (let i = 0; i < this._cellsUsed.length; i++) {
                 let temp = this._cellsUsed[i];
@@ -1089,7 +1086,7 @@ export default class TableView extends cc.Component {
             //更新当前显示的索引
             this._updateCellIndices(update);
         } else {
-            Log.d(`插入的Cell${index}不丰显示区域内,更新显示区域内的索引`);
+            Log.d(`插入的Cell${index}不在显示区域内,更新显示区域内的索引`);
             let update: UpdateIndices[] = [];
             for (let i = 0; i < this._cellsUsed.length; i++) {
                 let temp = this._cellsUsed[i];
@@ -1124,12 +1121,7 @@ export default class TableView extends cc.Component {
         this._addCellIfNecessary(newCell);
         newCell.init();
         this._updateCellData(newCell);
-        // if ( scrollToIndex != -1 ){
-        //     this.scrollToIndex(scrollToIndex,timeInSecond,arguments);
-        // }else{
-        this._onContentPositionChange();
-        // }
-        // this._debugData();
+        this.scrollToOffset(offset);
     }
 
     /**
