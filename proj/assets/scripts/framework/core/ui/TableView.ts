@@ -1065,43 +1065,15 @@ export default class TableView extends cc.Component {
         this._updateCellOffsets();
         this._updateContentSize();
         // this._debugCellInfos(`【插入${index}更新Cell后】`)
+
         let cell = this.cellAtIndex(index);
         if (cell) {
             Log.d(`插入的Cell[${index}]在显示区域内`)
             let start = this._getCellIndex(cell);
-            let update: UpdateIndices[] = [];
-            for (let i = 0; i < this._cellsUsed.length; i++) {
-                let temp = this._cellsUsed[i];
-                if (temp.index >= start) {
-                    let from = temp.index;
-                    let to = temp.index + 1;
-                    this._setIndexForCell(to, temp);
-                    this._updateCellData(temp);
-                    update.push({ from: from, to: to });
-                } else {
-                    //区域外的，需要更新位置
-                    this._updateCellPosition(temp);
-                }
-            }
-            //更新当前显示的索引
-            this._updateCellIndices(update);
+            this._moveCellIndex(start,1);
         } else {
             Log.d(`插入的Cell${index}不在显示区域内,更新显示区域内的索引`);
-            let update: UpdateIndices[] = [];
-            for (let i = 0; i < this._cellsUsed.length; i++) {
-                let temp = this._cellsUsed[i];
-                if (temp.index >= index) {
-                    let from = temp.index;
-                    let to = temp.index + 1;
-                    this._setIndexForCell(to, temp);
-                    this._updateCellData(temp);
-                    update.push({ from: from, to: to });
-                } else {
-                    //区域外的，需要更新位置
-                    this._updateCellPosition(temp);
-                }
-            }
-            this._updateCellIndices(update);
+            this._moveCellIndex(index,1);
         }
 
 
@@ -1127,22 +1099,41 @@ export default class TableView extends cc.Component {
     /**
      * @description 删除指定项
      * @param index 
+     * @description 通知删除数据，在些回调用删除数据源
      */
-    removeCellAtIndex(index: number, timeInSecond = 0, attenuated = true) {
-        // if (this._indices.has(index)) {
-        //     Log.d(`添加位置${index}在显示区域内`)
-        //     this.reloadData(false);
-        //     this.scrollToIndex(index, timeInSecond, attenuated);
-        // } else {
-        //     let index = -1;
-        //     if (this._indices.size > 0) {
-        //         index = this._indices.values().next().value;
-        //     }
-        //     this.reloadData(false);
-        //     if (index >= 0) {
-        //         this.scrollToIndex(index, timeInSecond, attenuated);
-        //     }
-        // }
+    removeCellAtIndex(index: number,deleteDataFunc :( index : number)=>void) {
+        let count = this.delegate.numberOfCellsInTableView(this);
+        if ( !(count >0 && index >= 0 && index < count) ) {
+            return;
+        }
+
+        let moveIndex = (start : number)=>{
+            let update: UpdateIndices[] = [];
+            for (let i = 0; i < this._cellsUsed.length; i++) {
+                let temp = this._cellsUsed[i];
+                if (temp.index >= start) {
+                    let from = temp.index;
+                    let to = temp.index + 1;
+                    this._setIndexForCell(to, temp);
+                    this._updateCellData(temp);
+                    update.push({ from: from, to: to });
+                } else {
+                    //区域外的，需要更新位置
+                    this._updateCellPosition(temp);
+                }
+            }
+            //更新当前显示的索引
+            this._updateCellIndices(update);
+        }
+
+        //先从显示区域内获得该节点
+        let cell = this.cellAtIndex(index);
+        if ( cell ){
+
+        }else{
+            Log.d(`在可视区域内没有Cell[${index}]`);
+        }
+        // deleteDataFunc(index);
     }
 
     /**
@@ -1220,6 +1211,30 @@ export default class TableView extends cc.Component {
             }
             this._indices.add(origin[i]);
         }
+    }
+
+    /**
+     * @description 移动cell的incdex
+     * @param start 开始位置
+     * @param offset 偏移，取值范围，-1 或 1
+     */
+    private _moveCellIndex( start : number , offset : number ){
+        let update: UpdateIndices[] = [];
+        for (let i = 0; i < this._cellsUsed.length; i++) {
+            let temp = this._cellsUsed[i];
+            if (temp.index >= start) {
+                let from = temp.index;
+                let to = temp.index + offset;
+                this._setIndexForCell(to, temp);
+                this._updateCellData(temp);
+                update.push({ from: from, to: to });
+            } else {
+                //区域外的，需要更新位置
+                this._updateCellPosition(temp);
+            }
+        }
+        //更新当前显示的索引
+        this._updateCellIndices(update);
     }
 
     /**

@@ -124,23 +124,26 @@ export default class TestTableView extends cc.Component implements TableViewDele
         this.vertical && this._tableViewV.insertCellAtIndex(index);
     }
 
+    private onDeleteData( index : number ){
+        if ( index >= 0 && index < this._datas.length ){
+            this._datas.splice(index,1);
+        }
+    }
+
     private onDeleteMid() {
         let index = 2;
-        this._datas.splice(index,1);
-        this.horizontal && this._tableViewH.removeCellAtIndex(index,this.time);
-        this.vertical && this._tableViewV.removeCellAtIndex(index,this.time);
+        this.horizontal && this._tableViewH.removeCellAtIndex(index,this.onDeleteData.bind(this));
+        this.vertical && this._tableViewV.removeCellAtIndex(index,this.onDeleteData.bind(this));
     }
     private onDeleteEnd() {
         let index = this._datas.length-1;
-        this._datas.splice(index,1);
-        this.horizontal && this._tableViewH.removeCellAtIndex(index,this.time);
-        this.vertical && this._tableViewV.removeCellAtIndex(index,this.time);
+        this.horizontal && this._tableViewH.removeCellAtIndex(index,this.onDeleteData.bind(this));
+        this.vertical && this._tableViewV.removeCellAtIndex(index,this.onDeleteData.bind(this));
     }
     private onDeleteFront() {
         let index = 0;
-        this._datas.splice(index,1);
-        this.horizontal && this._tableViewH.removeCellAtIndex(index,this.time);
-        this.vertical && this._tableViewV.removeCellAtIndex(index,this.time);
+        this.horizontal && this._tableViewH.removeCellAtIndex(index,this.onDeleteData.bind(this));
+        this.vertical && this._tableViewV.removeCellAtIndex(index,this.onDeleteData.bind(this));
     }
 
     private onScrollTo() {
