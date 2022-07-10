@@ -18,8 +18,8 @@ export default class TestTableView extends cc.Component implements TableViewDele
     private _tableViewH: TableView = null;
     private _tableViewV: TableView = null;
     private _count = 0;
-    protected horizontal = false;
-    protected vertical = true;
+    protected horizontal = true;
+    protected vertical = false;
 
     protected getType(index: number) {
         return index % 2 == 0 ? 1 : 2;

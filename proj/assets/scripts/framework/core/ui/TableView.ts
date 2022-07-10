@@ -1,7 +1,3 @@
-/**
- * @description 扩展TableView
- */
-
 import { LayoutParam, LayoutType } from "../layout/LayoutDefines";
 import { CellType, TableViewCell } from "./TableViewCell";
 
@@ -436,6 +432,11 @@ export interface TableViewDelegate {
     tableDebug?(view: TableView): void;
 }
 
+/**
+ * @description 扩展TableView
+ * 数据源部分不同两个不同的tableview，不能同时指向同一份数据源
+ */
+
 @ccclass
 export default class TableView extends cc.Component {
     name: string = "TableView";
@@ -642,7 +643,8 @@ export default class TableView extends cc.Component {
     /**@description 添加或者删除时，_cellsUsed并不是按index顺序排序的，此时需要重新排序_cellsUsed */
     protected _isUsedCellsDirty = false;
     protected _oldDirection: Direction = null;
-    protected _isDoDelete: boolean = false;
+    /**@description 在插入或删除时，会收到content的大小改变事件，从来调用刷新，在操作插入删除时，屏蔽掉 */
+    protected _isDoing: boolean = false;
 
     /**@description 测试用 */
     private _isShowAllCell = false;
@@ -1054,6 +1056,7 @@ export default class TableView extends cc.Component {
         if (index > count - 1) {
             return;
         }
+        this._isDoing = true;
         let offset = this.getScrollOffset();
         // this._debugCell("更新Cell前")
         // this._debugCellInfos("【插入${index}更新Cell前】")
@@ -1083,6 +1086,8 @@ export default class TableView extends cc.Component {
         this._addCellIfNecessary(newCell);
         newCell.init();
         this._updateCellData(newCell);
+        this._isDoing = false;
+        this._onContentPositionChange();
         this.scrollToOffset(offset);
     }
 
@@ -1101,16 +1106,16 @@ export default class TableView extends cc.Component {
 
         //通知删除数据
         deleteDataFunc(index);
-        this._isDoDelete = true;
+        this._isDoing = true;
 
         this._updateCellOffsets();
         this._updateContentSize();
-        this._debugCell(`【删除前】`);
+        // this._debugCell(`【删除前】`);
         this._moveCellIndex(index, true);
-        this._isDoDelete = false;
+        this._isDoing = false;
         this._onContentPositionChange();
         this.scrollToOffset(offset);
-        this._debugCell(`【删除后】`);
+        // this._debugCell(`【删除后】`);
     }
 
     /**
@@ -1396,7 +1401,7 @@ export default class TableView extends cc.Component {
     }
 
     protected _onContentPositionChange() {
-        if (this._isDoDelete) {
+        if (this._isDoing) {
             return;
         }
         // Log.d(`当前Content偏移 : (${this.content.x},${this.content.y})`)
