@@ -642,6 +642,7 @@ export default class TableView extends cc.Component {
     /**@description 添加或者删除时，_cellsUsed并不是按index顺序排序的，此时需要重新排序_cellsUsed */
     protected _isUsedCellsDirty = false;
     protected _oldDirection: Direction = null;
+    protected _isDoDelete: boolean = false;
 
     /**@description 测试用 */
     private _isShowAllCell = false;
@@ -1038,7 +1039,8 @@ export default class TableView extends cc.Component {
     }
 
     /**
-     * @description 插入项，默认为插入到最后,数据先插入才能调用
+     * @description 插入项，默认为插入到最后,数据先插入才能调用，注意：注入时，需要数据项先更新数据
+     * 如果是最后插入时，应该返回已经插入数据项的length-1,即最后一个数据项的下标索引
      * @param index 
      */
     insertCellAtIndex(index?: number) {
@@ -1063,10 +1065,10 @@ export default class TableView extends cc.Component {
         if (cell) {
             Log.d(`插入的Cell[${index}]在显示区域内`)
             let start = this._getCellIndex(cell);
-            this._moveCellIndex(start,1);
+            this._moveCellIndex(start);
         } else {
             Log.d(`插入的Cell${index}不在显示区域内,更新显示区域内的索引`);
-            this._moveCellIndex(index,1);
+            this._moveCellIndex(index);
         }
 
         let type = this.delegate.tableCellTypeAtIndex(this, index);
@@ -1089,39 +1091,26 @@ export default class TableView extends cc.Component {
      * @param index 
      * @description 通知删除数据，在些回调用删除数据源
      */
-    removeCellAtIndex(index: number,deleteDataFunc :( index : number)=>void) {
+    removeCellAtIndex(index: number, deleteDataFunc: (index: number) => void) {
         let count = this.delegate.numberOfCellsInTableView(this);
-        if ( !(count >0 && index >= 0 && index < count) ) {
+        if (!(count > 0 && index >= 0 && index < count)) {
             return;
         }
-
-        let moveIndex = (start : number)=>{
-            let update: UpdateIndices[] = [];
-            for (let i = 0; i < this._cellsUsed.length; i++) {
-                let temp = this._cellsUsed[i];
-                if (temp.index >= start) {
-                    let from = temp.index;
-                    let to = temp.index + 1;
-                    this._setIndexForCell(to, temp);
-                    this._updateCellData(temp);
-                    update.push({ from: from, to: to });
-                } else {
-                    //区域外的，需要更新位置
-                    this._updateCellPosition(temp);
-                }
-            }
-            //更新当前显示的索引
-            this._updateCellIndices(update);
-        }
-
+        let offset = this.getScrollOffset();
         //先从显示区域内获得该节点
-        let cell = this.cellAtIndex(index);
-        if ( cell ){
 
-        }else{
-            Log.d(`在可视区域内没有Cell[${index}]`);
-        }
-        // deleteDataFunc(index);
+        //通知删除数据
+        deleteDataFunc(index);
+        this._isDoDelete = true;
+
+        this._updateCellOffsets();
+        this._updateContentSize();
+        this._debugCell(`【删除前】`);
+        this._moveCellIndex(index, true);
+        this._isDoDelete = false;
+        this._onContentPositionChange();
+        this.scrollToOffset(offset);
+        this._debugCell(`【删除后】`);
     }
 
     /**
@@ -1186,6 +1175,10 @@ export default class TableView extends cc.Component {
             origin.push(v);
         });
 
+        if (origin.length <= 0) {
+            return;
+        }
+
         this._indices.clear();
         for (let i = 0; i < origin.length; i++) {
             let changeData = data.find((v) => {
@@ -1204,13 +1197,28 @@ export default class TableView extends cc.Component {
     /**
      * @description 移动cell的incdex
      * @param start 开始位置
-     * @param offset 偏移，取值范围，-1 或 1
+     * @param isDelete 是否是删除 默认为false
      */
-    private _moveCellIndex( start : number , offset : number ){
+    private _moveCellIndex(start: number, isDelete = false) {
         let update: UpdateIndices[] = [];
+        let offset = isDelete ? -1 : 1;
+        if (isDelete) {
+            let deleteCellIndex = this._cellsUsed.findIndex((v, index, arr) => {
+                if (v.index == start) {
+                    return true;
+                }
+                return false;
+            })
+            if (deleteCellIndex != -1) {
+                this._moveCellOutOfSight(this._cellsUsed[deleteCellIndex]);
+            }
+        }
         for (let i = 0; i < this._cellsUsed.length; i++) {
             let temp = this._cellsUsed[i];
             if (temp.index >= start) {
+                if (isDelete && temp.index == start) {
+                    continue;
+                }
                 let from = temp.index;
                 let to = temp.index + offset;
                 this._setIndexForCell(to, temp);
@@ -1388,6 +1396,9 @@ export default class TableView extends cc.Component {
     }
 
     protected _onContentPositionChange() {
+        if (this._isDoDelete) {
+            return;
+        }
         // Log.d(`当前Content偏移 : (${this.content.x},${this.content.y})`)
         //计算开始点结束点
         let offset = this.getContentPosition();

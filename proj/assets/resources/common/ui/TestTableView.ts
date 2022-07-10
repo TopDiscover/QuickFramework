@@ -21,8 +21,8 @@ export default class TestTableView extends cc.Component implements TableViewDele
     protected horizontal = false;
     protected vertical = true;
 
-    protected getType( index : number ){
-        return index % 2 == 0  ? 1 : 2;
+    protected getType(index: number) {
+        return index % 2 == 0 ? 1 : 2;
     }
 
     updateCellData(view: TableView, cell: TestTableViewCell): void {
@@ -30,7 +30,7 @@ export default class TestTableView extends cc.Component implements TableViewDele
     }
 
     tableCellTypeAtIndex(view: TableView, index: number) {
-       return this._datas[index].type;
+        return this._datas[index].type;
     }
 
     numberOfCellsInTableView(view: TableView): number {
@@ -39,14 +39,14 @@ export default class TestTableView extends cc.Component implements TableViewDele
 
     tableDebug(view: TableView): void {
         Log.d(`------------------ 当前原始数据 ------------------`)
-        this._datas.forEach((v,i,arr)=>{
+        this._datas.forEach((v, i, arr) => {
             Log.d(`[${i}] type : ${v.type} , content : ${v.content}`);
         })
     }
 
     private initData() {
-        for (let i = 0; i <5; i++) {
-            this._datas.push({ content: `cell${i}`, type : this.getType(i) });
+        for (let i = 0; i < 10; i++) {
+            this._datas.push({ content: `cell${i}`, type: this.getType(i) });
         }
     }
 
@@ -90,69 +90,69 @@ export default class TestTableView extends cc.Component implements TableViewDele
 
     }
 
-    private getNewType( index : number ){
+    private getNewType(index: number) {
         let type = 1;
-        if ( index >=0 && index < this._datas.length && this._datas[index].type == 1 ){
+        if (index >= 0 && index < this._datas.length && this._datas[index].type == 1) {
             type = 2;
         }
         return type;
     }
 
-    private get time(){
+    private get time() {
         return 1;
     }
 
     private onInsertMid() {
         let index = 2;
-        this._datas.splice(index, 0, { content: `Cell新${this._count}`, type : this.getNewType(index) })
+        this._datas.splice(index, 0, { content: `Cell新${this._count}`, type: this.getNewType(index) })
         this._count++;
         this.horizontal && this._tableViewH.insertCellAtIndex(index);
         this.vertical && this._tableViewV.insertCellAtIndex(index);
     }
     private onInsertEnd() {
-        let index = this._datas.length-1;
-        this._datas.push({ content: `Cell新${this._count}`, type : this.getNewType(index) })
+        let index = this._datas.length - 1;
+        this._datas.push({ content: `Cell新${this._count}`, type: this.getNewType(index) })
         this._count++;
         this.horizontal && this._tableViewH.insertCellAtIndex();
         this.vertical && this._tableViewV.insertCellAtIndex();
     }
     private onInsertFront() {
         let index = 0;
-        this._datas.unshift({ content: `Cell新${this._count}`, type : this.getNewType(index) })
+        this._datas.unshift({ content: `Cell新${this._count}`, type: this.getNewType(index) })
         this._count++;
         this.horizontal && this._tableViewH.insertCellAtIndex(index);
         this.vertical && this._tableViewV.insertCellAtIndex(index);
     }
 
-    private onDeleteData( index : number ){
-        if ( index >= 0 && index < this._datas.length ){
-            this._datas.splice(index,1);
+    private onDeleteData(index: number) {
+        if (index >= 0 && index < this._datas.length) {
+            this._datas.splice(index, 1);
         }
     }
 
     private onDeleteMid() {
         let index = 2;
-        this.horizontal && this._tableViewH.removeCellAtIndex(index,this.onDeleteData.bind(this));
-        this.vertical && this._tableViewV.removeCellAtIndex(index,this.onDeleteData.bind(this));
+        this.horizontal && this._tableViewH.removeCellAtIndex(index, this.onDeleteData.bind(this));
+        this.vertical && this._tableViewV.removeCellAtIndex(index, this.onDeleteData.bind(this));
     }
     private onDeleteEnd() {
-        let index = this._datas.length-1;
-        this.horizontal && this._tableViewH.removeCellAtIndex(index,this.onDeleteData.bind(this));
-        this.vertical && this._tableViewV.removeCellAtIndex(index,this.onDeleteData.bind(this));
+        let index = this._datas.length - 1;
+        this.horizontal && this._tableViewH.removeCellAtIndex(index, this.onDeleteData.bind(this));
+        this.vertical && this._tableViewV.removeCellAtIndex(index, this.onDeleteData.bind(this));
     }
     private onDeleteFront() {
         let index = 0;
-        this.horizontal && this._tableViewH.removeCellAtIndex(index,this.onDeleteData.bind(this));
-        this.vertical && this._tableViewV.removeCellAtIndex(index,this.onDeleteData.bind(this));
+        this.horizontal && this._tableViewH.removeCellAtIndex(index, this.onDeleteData.bind(this));
+        this.vertical && this._tableViewV.removeCellAtIndex(index, this.onDeleteData.bind(this));
     }
 
     private onScrollTo() {
         let index = 5;
-        this.horizontal && this._tableViewH.scrollToIndex(index,this.time);
-        this.vertical && this._tableViewV.scrollToIndex(index,this.time)
+        this.horizontal && this._tableViewH.scrollToIndex(index, this.time);
+        this.vertical && this._tableViewV.scrollToIndex(index, this.time)
     }
 
-    private onUpdateData(){
+    private onUpdateData() {
         let index = 3;
         this._datas[index].content = "更新的Cell";
         this.horizontal && this._tableViewH.updateCellAtIndex(index);
@@ -160,7 +160,7 @@ export default class TestTableView extends cc.Component implements TableViewDele
     }
 
     private onEvent(target: TableView, event: string) {
-        if ( event == TableView.EventType.TOUCH_UP ){
+        if (event == TableView.EventType.TOUCH_UP) {
             Log.d(event)
         }
     }
