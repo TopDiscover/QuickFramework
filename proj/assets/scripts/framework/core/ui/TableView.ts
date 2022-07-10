@@ -1053,13 +1053,6 @@ export default class TableView extends cc.Component {
             return;
         }
         let offset = this.getScrollOffset();
-        let prePosition: cc.Vec2 = null;
-        let nextPosition: cc.Vec2 = null;
-        let firstCell: TableViewCell = null;
-        if (this._cellsUsed.length > 0) {
-            firstCell = this._cellsUsed[0];
-            prePosition = cc.v2(firstCell.node.x, firstCell.node.y);
-        }
         // this._debugCell("更新Cell前")
         // this._debugCellInfos("【插入${index}更新Cell前】")
         this._updateCellOffsets();
@@ -1074,11 +1067,6 @@ export default class TableView extends cc.Component {
         } else {
             Log.d(`插入的Cell${index}不在显示区域内,更新显示区域内的索引`);
             this._moveCellIndex(index,1);
-        }
-
-
-        if (firstCell) {
-            nextPosition = cc.v2(firstCell.node.x, firstCell.node.y);
         }
 
         let type = this.delegate.tableCellTypeAtIndex(this, index);

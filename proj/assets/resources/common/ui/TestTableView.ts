@@ -113,8 +113,8 @@ export default class TestTableView extends cc.Component implements TableViewDele
         let index = this._datas.length-1;
         this._datas.push({ content: `Cell新${this._count}`, type : this.getNewType(index) })
         this._count++;
-        this.horizontal && this._tableViewH.insertCellAtIndex(index);
-        this.vertical && this._tableViewV.insertCellAtIndex(index);
+        this.horizontal && this._tableViewH.insertCellAtIndex();
+        this.vertical && this._tableViewV.insertCellAtIndex();
     }
     private onInsertFront() {
         let index = 0;
