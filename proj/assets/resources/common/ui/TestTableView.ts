@@ -37,6 +37,13 @@ export default class TestTableView extends cc.Component implements TableViewDele
         return this._datas.length;
     }
 
+    tableDebug(view: TableView): void {
+        Log.d(`------------------ 当前原始数据 ------------------`)
+        this._datas.forEach((v,i,arr)=>{
+            Log.d(`[${i}] type : ${v.type} , content : ${v.content}`);
+        })
+    }
+
     private initData() {
         for (let i = 0; i <5; i++) {
             this._datas.push({ content: `cell${i}`, type : this.getType(i) });

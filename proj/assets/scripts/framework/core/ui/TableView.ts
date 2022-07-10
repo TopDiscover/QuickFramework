@@ -13,9 +13,9 @@ interface Options {
     applyToVertical: boolean;
 }
 
-interface UpdateIndices{
-    from : number,
-    to : number,
+interface UpdateIndices {
+    from: number,
+    to: number,
 }
 
 const EPSILON = 1e-4;
@@ -430,6 +430,10 @@ export interface TableViewDelegate {
     tableCellTouched?(view: TableView, cell: TableViewCell): void;
     /**@description 列表项进入复用 */
     tableCellWillRecycle?(view: TableView, cell: TableViewCell): void;
+    /**@description 获取数据 */
+    tableData?(view: TableView): any[];
+    /**@description 调试数据用 */
+    tableDebug?(view: TableView): void;
 }
 
 @ccclass
@@ -1048,66 +1052,84 @@ export default class TableView extends cc.Component {
         if (index > count - 1) {
             return;
         }
-
         let offset = this.getScrollOffset();
-        let prePosition : cc.Vec2 = null;
-        let nextPosition : cc.Vec2 = null;
-        let firstCell : TableViewCell = null;
-        if ( this._cellsUsed.length > 0 ){
+        let prePosition: cc.Vec2 = null;
+        let nextPosition: cc.Vec2 = null;
+        let firstCell: TableViewCell = null;
+        if (this._cellsUsed.length > 0) {
             firstCell = this._cellsUsed[0];
-            prePosition = cc.v2(firstCell.node.x,firstCell.node.y);
+            prePosition = cc.v2(firstCell.node.x, firstCell.node.y);
         }
         // this._sortCell();
         // this._debugCell("更新Cell前")
-        // this._debugCellInfos("【更新前】")
+        // this._debugCellInfos("【插入${index}更新Cell前】")
         this._updateCellOffsets();
         this._updateContentSize();
-        // this._debugCellInfos("【更新后】")
+        // this._debugCellInfos(`【插入${index}更新Cell后】`)
         let cell = this.cellAtIndex(index);
         let scrollToIndex = -1;
         if (cell) {
             Log.d(`插入的Cell[${index}]在显示区域内`)
             let start = this._getCellIndex(cell);
             scrollToIndex = start;
-            let update : UpdateIndices[] = [];
-            for ( let i = 0 ; i < this._cellsUsed.length ; i++ ){
+            let update: UpdateIndices[] = [];
+            for (let i = 0; i < this._cellsUsed.length; i++) {
                 let temp = this._cellsUsed[i];
-                if ( temp.index >= start ){
+                if (temp.index >= start) {
                     let from = temp.index;
                     let to = temp.index + 1;
-                    this._setIndexForCell(to,temp);
+                    this._setIndexForCell(to, temp);
                     this._updateCellData(temp);
-                    update.push({from : from , to : to});
-                }else{
-                    this._updateCellData(temp);
+                    update.push({ from: from, to: to });
+                } else {
+                    //区域外的，需要更新位置
+                    this._updateCellPosition(temp);
                 }
             }
             //更新当前显示的索引
             this._updateCellIndices(update);
+        } else {
+            Log.d(`插入的Cell${index}不丰显示区域内,更新显示区域内的索引`);
+            let update: UpdateIndices[] = [];
+            for (let i = 0; i < this._cellsUsed.length; i++) {
+                let temp = this._cellsUsed[i];
+                if (temp.index >= index) {
+                    let from = temp.index;
+                    let to = temp.index + 1;
+                    this._setIndexForCell(to, temp);
+                    this._updateCellData(temp);
+                    update.push({ from: from, to: to });
+                } else {
+                    //区域外的，需要更新位置
+                    this._updateCellPosition(temp);
+                }
+            }
+            this._updateCellIndices(update);
         }
 
 
-        if ( firstCell ){
-            nextPosition = cc.v2(firstCell.node.x,firstCell.node.y);
+        if (firstCell) {
+            nextPosition = cc.v2(firstCell.node.x, firstCell.node.y);
         }
 
-        let type = this.delegate.tableCellTypeAtIndex(this,index);
+        let type = this.delegate.tableCellTypeAtIndex(this, index);
         let newCell = this._dequeueCell(type);
-        if ( !newCell ){
+        if (!newCell) {
             let template = this._getTemplete(type);
             let node = cc.instantiate(template.node);
             newCell = node.getComponent(TableViewCell);
         }
 
-        this._setIndexForCell(index,newCell);
+        this._setIndexForCell(index, newCell);
         this._addCellIfNecessary(newCell);
         newCell.init();
         this._updateCellData(newCell);
         // if ( scrollToIndex != -1 ){
         //     this.scrollToIndex(scrollToIndex,timeInSecond,arguments);
         // }else{
-            this._onContentPositionChange();
+        this._onContentPositionChange();
         // }
+        // this._debugData();
     }
 
     /**
@@ -1115,20 +1137,20 @@ export default class TableView extends cc.Component {
      * @param index 
      */
     removeCellAtIndex(index: number, timeInSecond = 0, attenuated = true) {
-        if (this._indices.has(index)) {
-            Log.d(`添加位置${index}在显示区域内`)
-            this.reloadData(false);
-            this.scrollToIndex(index, timeInSecond, attenuated);
-        } else {
-            let index = -1;
-            if (this._indices.size > 0) {
-                index = this._indices.values().next().value;
-            }
-            this.reloadData(false);
-            if (index >= 0) {
-                this.scrollToIndex(index, timeInSecond, attenuated);
-            }
-        }
+        // if (this._indices.has(index)) {
+        //     Log.d(`添加位置${index}在显示区域内`)
+        //     this.reloadData(false);
+        //     this.scrollToIndex(index, timeInSecond, attenuated);
+        // } else {
+        //     let index = -1;
+        //     if (this._indices.size > 0) {
+        //         index = this._indices.values().next().value;
+        //     }
+        //     this.reloadData(false);
+        //     if (index >= 0) {
+        //         this.scrollToIndex(index, timeInSecond, attenuated);
+        //     }
+        // }
     }
 
     /**
@@ -1187,21 +1209,21 @@ export default class TableView extends cc.Component {
      * @description 更新Cell显示索引
      * @param data 
      */
-    private _updateCellIndices( data : UpdateIndices[] ){
-        let origin : number[] = [];
-        this._indices.forEach((v,v2,set)=>{
+    private _updateCellIndices(data: UpdateIndices[]) {
+        let origin: number[] = [];
+        this._indices.forEach((v, v2, set) => {
             origin.push(v);
         });
 
         this._indices.clear();
-        for ( let i = 0 ; i < origin.length ; i++ ){
-            let changeData = data.find((v)=>{
-                if ( v.from == origin[i] ){
+        for (let i = 0; i < origin.length; i++) {
+            let changeData = data.find((v) => {
+                if (v.from == origin[i]) {
                     return true;
                 }
                 return false;
             })
-            if ( changeData ){
+            if (changeData) {
                 origin[i] = changeData.to;
             }
             this._indices.add(origin[i]);
@@ -1211,37 +1233,43 @@ export default class TableView extends cc.Component {
     /**
      * @description 按index的升序排序
      */
-    private _sortCell(){
-        this._debugCell("【排序前】")
+    private _sortCell() {
+        // this._debugCell("【排序前】")
         this._cellsUsed = this._cellsUsed.sort((a, b) => {
             return a.index - b.index;
         });
-        this._debugCell("【排序后】")
+        // this._debugCell("【排序后】")
     }
 
-    private _debugCellInfos(title:string){
+    private _debugCellInfos(title: string) {
         Log.d(`--------------------- ${title} ---------------------`);
-        this._cellsInfos.forEach(v=>{
+        this._cellsInfos.forEach(v => {
             v.debug();
         })
     }
 
-    private _debugCell(title : string){
+    private _debugCell(title: string) {
         Log.d(`--------------------- ${title} ---------------------`);
-        Log.d(`当前显示节点 :`,this._indices);
-        
-        this._cellsUsed.forEach((v,index,array)=>{
-            Log.d(`[${index}] index : ${v.index} , ${(v as any).string}`);
+        Log.d(`当前显示节点 :`, this._indices);
+
+        this._cellsUsed.forEach((v, index, array) => {
+            Log.d(`[${index}] , type : ${v.type} ,index : ${v.index} , ${(v as any).string} , position : (${v.node.x},${v.node.y})`);
         })
     }
 
     private _getCellIndex(cell: TableViewCell): number {
         for (let i = 0; i < this._cellsUsed.length; i++) {
-            if (this._cellsUsed[i] === cell ) {
+            if (this._cellsUsed[i] === cell) {
                 return this._cellsUsed[i].index;
             }
         }
         return -1;
+    }
+
+    private _debugData() {
+        if (this.delegate && this.delegate.tableDebug) {
+            this.delegate.tableDebug(this);
+        }
     }
 
     protected _updateCellData(cell: TableViewCell) {
@@ -1249,10 +1277,16 @@ export default class TableView extends cc.Component {
         this.delegate.updateCellData(this, cell);
     }
 
+    /**@description 更新Cell位置 */
+    protected _updateCellPosition(cell: TableViewCell) {
+        let info = this._cellsInfos[cell.index];
+        cell.node.setPosition(info.position)
+    }
+
     protected _addCellIfNecessary(cell: TableViewCell) {
         if (cell.node.parent != this.content) {
             this.content.addChild(cell.node);
-        }else{
+        } else {
             Log.e(`添加的Cell 已经有父节点`);
         }
         this._cellsUsed.push(cell);
@@ -1322,8 +1356,8 @@ export default class TableView extends cc.Component {
     }
 
     /**@description 更新Cell位置数据 */
-    protected _updateCellPositions(){
-        this._cellsInfos.forEach(v=>{
+    protected _updateCellPositions() {
+        this._cellsInfos.forEach(v => {
             v.calculatePosition();
         })
     }
@@ -1398,7 +1432,7 @@ export default class TableView extends cc.Component {
             this._sortCell();
         }
 
-        let maxId = Math.max(this.delegate.numberOfCellsInTableView(this) -1,0);
+        let maxId = Math.max(this.delegate.numberOfCellsInTableView(this) - 1, 0);
 
         let result = this._calculateInInSight(vec);
         if (result) {
@@ -1446,7 +1480,8 @@ export default class TableView extends cc.Component {
                 this.updateCellAtIndex(i);
             }
 
-            this._debugCell("【更新Cell后】")
+            // this._debugCell("【更新Cell后】")
+            // this._debugCellInfos("【更新Cell后】");
         }
 
 
@@ -1509,9 +1544,9 @@ export default class TableView extends cc.Component {
             return result;
         }
         result = { start: 0, end: 0, count: count };
-        if ( this._isShowAllCell ){
+        if (this._isShowAllCell) {
             result.start = 0;
-            result.end = count-1;
+            result.end = count - 1;
             return result;
         }
         if (count == 1) {
@@ -1583,7 +1618,7 @@ export default class TableView extends cc.Component {
             }
         }
 
-        Log.d(`可显示节点 : ${result.start} -> ${result.end}`);
+        // Log.d(`可显示节点 : ${result.start} -> ${result.end}`);
 
         return result;
     }
