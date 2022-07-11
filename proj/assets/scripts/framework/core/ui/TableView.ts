@@ -417,13 +417,6 @@ export interface TableViewDelegate {
     numberOfCellsInTableView(view: TableView): number;
     /**@description 更新cell数据 */
     updateCellData(view: TableView, cell: TableViewCell): void;
-
-    /**@description 列表项被选中 */
-    tableCellSelected?(view: TableView, cell: TableViewCell): void;
-    /**@description 列表项取消选中 */
-    tableCellUnselected?(view: TableView, cell: TableViewCell): void;
-    /**@description 列表项点击完成 */
-    tableCellTouched?(view: TableView, cell: TableViewCell): void;
     /**@description 列表项进入复用 */
     tableCellWillRecycle?(view: TableView, cell: TableViewCell): void;
     /**@description 获取数据 */
