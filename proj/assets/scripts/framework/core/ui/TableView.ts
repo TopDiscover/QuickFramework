@@ -1080,7 +1080,7 @@ export default class TableView extends cc.Component {
         newCell.init();
         this._updateCellData(newCell);
         this._isDoing = false;
-        this._onContentPositionChange();
+        this._calculateSightArea();
         this.scrollToOffset(offset);
     }
 
@@ -1106,7 +1106,7 @@ export default class TableView extends cc.Component {
         // this._debugCell(`【删除前】`);
         this._moveCellIndex(index, true);
         this._isDoing = false;
-        this._onContentPositionChange();
+        this._calculateSightArea();
         this.scrollToOffset(offset);
         // this._debugCell(`【删除后】`);
     }
@@ -1137,12 +1137,22 @@ export default class TableView extends cc.Component {
         //清空渲染节点索引
         this._indices.clear();
         //清空当前使用的节点
-        this._cellsFreed = [];
+        this._cellsUsed = [];
+        this._isDoing = true;
         //刷新节点的位置
         this._updateCellOffsets();
         this._updateContentSize();
-        if (this.delegate.numberOfCellsInTableView(this) > 0) {
-            this._onContentPositionChange();
+        this._isDoing = false;
+        this._calculateSightArea();
+        if (this._oldDirection != this.direction) {
+            if (this.delegate.numberOfCellsInTableView(this) > 0) {
+                if (this.horizontal) {
+                    this.scrollToLeft();
+                } else {
+                    this.scrollToTop();
+                }
+            }
+            this._oldDirection = this.direction;
         }
     }
 
@@ -1366,7 +1376,7 @@ export default class TableView extends cc.Component {
     /**
      * @description 更新content的大小
      */
-    protected _updateContentSize() {
+    protected _updateContentSize( ) {
         let size = cc.size(0, 0);
         let count = this.delegate.numberOfCellsInTableView(this);
         if (count > 0) {
@@ -1380,20 +1390,13 @@ export default class TableView extends cc.Component {
 
         this.content.setContentSize(size);
         this._updateCellPositions();
-
-        if (this._oldDirection != this.direction) {
-            if (this.delegate.numberOfCellsInTableView(this) > 0) {
-                if (this.horizontal) {
-                    this.scrollToLeft();
-                } else {
-                    this.scrollToTop();
-                }
-            }
-            this._oldDirection = this.direction;
-        }
     }
 
-    protected _onContentPositionChange() {
+    /**
+     * @description 计算显示区域
+     * @returns 
+     */
+    protected _calculateSightArea() {
         if (this._isDoing) {
             return;
         }
@@ -1503,7 +1506,7 @@ export default class TableView extends cc.Component {
     protected _setContentPosition(position: cc.Vec2) {
         if (this.content) {
             this.content.setPosition(position);
-            this._onContentPositionChange();
+            this._calculateSightArea();
         }
     }
 
