@@ -426,7 +426,7 @@ export interface TableViewDelegate {
 }
 
 /**
- * @description 扩展TableView
+ * @description 扩展TableView,该控制是基于coocs 引擎ScorollView源码而来
  * 数据源部分不同两个不同的tableview，不能同时指向同一份数据源
  */
 
