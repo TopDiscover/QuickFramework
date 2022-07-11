@@ -8,6 +8,15 @@ declare module cc {
 		userData: any;
 	}
 
+	export interface Scrollbar{
+		hide():void;
+		show():void;
+		_onTouchEnded():void;
+		_onTouchBegan():void;
+		_onScroll(offset : cc.Vec2):void;
+		setTargetScrollView(view : Component):void;
+	}
+
 	export interface Sprite {
 		/**
 		 * @description 从网络加载图片，推荐使用第二种方式
