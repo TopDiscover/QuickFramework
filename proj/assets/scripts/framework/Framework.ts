@@ -19,6 +19,7 @@ import { ServiceManager } from "./core/net/service/ServiceManager";
 import { ReleaseManager } from "./core/asset/ReleaseManager";
 import { HttpClient } from "./core/net/http/HttpClient";
 import { Singleton } from "./utils/Singleton";
+import { LayoutManager } from "./core/layout/LayoutManager";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
@@ -167,6 +168,10 @@ export class Framewok {
     /**@description websocket wss 证书url地址 */
     get wssCacertUrl() {
         return "";
+    }
+
+    get layout(){
+        return Singleton.instance.get(LayoutManager) as LayoutManager;
     }
 
     /**@description 当前游戏GameView, GameView进入onLoad赋值 */
