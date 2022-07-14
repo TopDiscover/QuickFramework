@@ -3,139 +3,10 @@ import { CellType, TableViewCell } from "./TableViewCell";
 
 const { ccclass, property } = cc._decorator;
 
-interface Options {
-    anchor: cc.Vec2;
-    applyToHorizontal: boolean;
-    applyToVertical: boolean;
-}
-
 interface UpdateIndices {
     from: number,
     to: number,
 }
-
-const EPSILON = 1e-4;
-const MOVEMENT_FACTOR = 0.7;
-const NUMBER_OF_GATHERED_TOUCHES_FOR_MOVE_SPEED = 5;
-const OUT_OF_BOUNDARY_BREAKING_FACTOR = 0.05;
-
-let _tempPoint = cc.v2();
-let _tempPrevPoint = cc.v2();
-
-let quintEaseOut = (time: number) => {
-    time -= 1;
-    return (time * time * time * time * time + 1);
-};
-
-let getTimeInMilliseconds = () => {
-    let currentTime = new Date();
-    return currentTime.getMilliseconds();
-};
-
-
-const eventMap = {
-    'scroll-to-top': 0,
-    'scroll-to-bottom': 1,
-    'scroll-to-left': 2,
-    'scroll-to-right': 3,
-    'scrolling': 4,
-    'bounce-bottom': 6,
-    'bounce-left': 7,
-    'bounce-right': 8,
-    'bounce-top': 5,
-    'scroll-ended': 9,
-    'touch-up': 10,
-    'scroll-ended-with-threshold': 11,
-    'scroll-began': 12,
-}
-
-/**
- * !#en Enum for ScrollView event type.
- * !#zh 滚动视图事件类型
- * @enum ScrollView.EventType
- */
-enum EventType {
-    /**@description 内部使用 */
-    UNKNOWN = "UNKNOWN",
-    /**
-     * !#en The event emmitted when ScrollView scroll to the top boundary of inner container
-     * !#zh 滚动视图滚动到顶部边界事件
-     * @property {Number} SCROLL_TO_TOP
-     */
-    SCROLL_TO_TOP = "scroll-to-top",
-    /**
-     * !#en The event emmitted when ScrollView scroll to the bottom boundary of inner container
-     * !#zh 滚动视图滚动到底部边界事件
-     * @property {Number} SCROLL_TO_BOTTOM
-     */
-    SCROLL_TO_BOTTOM = "scroll-to-bottom",
-    /**
-     * !#en The event emmitted when ScrollView scroll to the left boundary of inner container
-     * !#zh 滚动视图滚动到左边界事件
-     * @property {Number} SCROLL_TO_LEFT
-     */
-    SCROLL_TO_LEFT = "scroll-to-left",
-    /**
-     * !#en The event emmitted when ScrollView scroll to the right boundary of inner container
-     * !#zh 滚动视图滚动到右边界事件
-     * @property {Number} SCROLL_TO_RIGHT
-     */
-    SCROLL_TO_RIGHT = "scroll-to-right",
-    /**
-     * !#en The event emmitted when ScrollView is scrolling
-     * !#zh 滚动视图正在滚动时发出的事件
-     * @property {Number} SCROLLING
-     */
-    SCROLLING = "scrolling",
-    /**
-     * !#en The event emmitted when ScrollView scroll to the top boundary of inner container and start bounce
-     * !#zh 滚动视图滚动到顶部边界并且开始回弹时发出的事件
-     * @property {Number} BOUNCE_TOP
-     */
-    BOUNCE_TOP = "bounce-top",
-    /**
-     * !#en The event emmitted when ScrollView scroll to the bottom boundary of inner container and start bounce
-     * !#zh 滚动视图滚动到底部边界并且开始回弹时发出的事件
-     * @property {Number} BOUNCE_BOTTOM
-     */
-    BOUNCE_BOTTOM = "bounce-bottom",
-    /**
-     * !#en The event emmitted when ScrollView scroll to the left boundary of inner container and start bounce
-     * !#zh 滚动视图滚动到左边界并且开始回弹时发出的事件
-     * @property {Number} BOUNCE_LEFT
-     */
-    BOUNCE_LEFT = "bounce-left",
-    /**
-     * !#en The event emmitted when ScrollView scroll to the right boundary of inner container and start bounce
-     * !#zh 滚动视图滚动到右边界并且开始回弹时发出的事件
-     * @property {Number} BOUNCE_RIGHT
-     */
-    BOUNCE_RIGHT = "bounce-right",
-    /**
-     * !#en The event emmitted when ScrollView auto scroll ended
-     * !#zh 滚动视图滚动结束的时候发出的事件
-     * @property {Number} SCROLL_ENDED
-     */
-    SCROLL_ENDED = "scroll-ended",
-    /**
-     * !#en The event emmitted when user release the touch
-     * !#zh 当用户松手的时候会发出一个事件
-     * @property {Number} TOUCH_UP
-     */
-    TOUCH_UP = "touch-up",
-    /**
-     * !#en The event emmitted when ScrollView auto scroll ended with a threshold
-     * !#zh 滚动视图自动滚动快要结束的时候发出的事件
-     * @property {Number} AUTOSCROLL_ENDED_WITH_THRESHOLD
-     */
-    AUTOSCROLL_ENDED_WITH_THRESHOLD = "scroll-ended-with-threshold",
-    /**
-     * !#en The event emmitted when ScrollView scroll began
-     * !#zh 滚动视图滚动开始时发出的事件
-     * @property {Number} SCROLL_BEGAN
-     */
-    SCROLL_BEGAN = "scroll-began",
-};
 
 enum Direction {
     /**
@@ -218,7 +89,9 @@ class CellInfo {
     position: cc.Vec2 = cc.v2(0, 0);
 
     calculatePosition() {
-        this.position = this._align(this.node, this._view.content, this._offset);
+        let result = this._align(this.node, this._view.content!, this._offset);
+        this.position.x = result.x;
+        this.position.y = result.y;
         return this.position;
     }
 
@@ -426,32 +299,13 @@ export interface TableViewDelegate {
 }
 
 /**
- * @description 扩展TableView,该控制是基于coocs 引擎ScorollView源码而来
- * 数据源部分不同两个不同的tableview，不能同时指向同一份数据源
+ * @description 扩展TableView
  */
 
 @ccclass
-export default class TableView extends cc.Component {
-    name: string = "TableView";
-    public static EventType = EventType;
+export default class TableView extends cc.ScrollView {
     public static Direction = Direction;
     public static FillOrder = FillOrder;
-
-    @property({ type: cc.Node, tooltip: "包含可滚动性展示内容的节点引用", displayName: "Content", visible: true })
-    protected _content: cc.Node = null;
-    /**
-     * @description 可流动展示内容节点
-     */
-    get content() {
-        return this._content;
-    }
-    set content(v) {
-        if (this._content == v) {
-            return;
-        }
-        this._content = v;
-        this._calculateBoundary();
-    }
 
     @property({
         tooltip: "滚动方向 \nHORIZONTAL 水平方向 \nVERTICAL 垂直方向", displayName: "Direction", type: cc.Enum(Direction), visible: true
@@ -468,86 +322,17 @@ export default class TableView extends cc.Component {
         this._direction = v;
     }
 
-    protected get horizontal() {
-        return this.direction == Direction.HORIZONTAL;
-    }
-
-    protected get vertical() {
-        return this.direction == Direction.VERTICAL;
-    }
+    /**
+     * @deprecated 不支持该方法，请使用direction替代
+     */
+    @property({ visible: false, override: true })
+    public horizontal = true;
 
     /**
-     * @description 是否开启滚动惯性。
-     */
-    @property({ tooltip: "是否开启滚动惯性", displayName: "Inertia" })
-    inertia: boolean = true;
-
-    /**@description 开启惯性后，在用户停止触摸后滚动多快停止，0表示永不停止，1表示立刻停止。 */
-    @property({ tooltip: "开启惯性后，在用户停止触摸后滚动多快停止，0表示永不停止，1表示立刻停止。", displayName: "Brake", range: [0, 1, 0.1] })
-    brake: number = 0.5;
-
-    /**@description 是否允许滚动内容超过边界，并在停止触摸后回弹 */
-    @property({ tooltip: "是否允许滚动内容超过边界，并在停止触摸后回弹", displayName: "Elastic" })
-    elastic: boolean = true;
-
-    /**@description 回弹持续的时间，0 表示将立即反弹。 */
-    @property({ tooltip: "回弹持续的时间，0 表示将立即反弹", displayName: "Bounce Duration", range: [0, 10] })
-    bounceDuration: number = 1;
-
-
-    @property({
-        tooltip: "水平滚动的 ScrollBar", displayName: "Horizontal Scroll Bar", type: cc.Scrollbar, animatable: false, visible: function () {
-            return this.direction == Direction.HORIZONTAL;
-        }
-    })
-    protected _hBar: cc.Scrollbar = null;
-    /**@description 水平滚动的 ScrollBar。 */
-    get horizontalScrollBar() {
-        return this._hBar;
-    }
-    set horizontalScrollBar(v) {
-        if (this._hBar === v) {
-            return;
-        }
-        this._hBar = v;
-        if (this._hBar) {
-            this._hBar.setTargetScrollView(this);
-            this._updateScrollBar()
-        }
-    }
-
-
-    @property({
-        tooltip: "垂直滚动的 ScrollBar", displayName: "Vertical Scroll Bar", type: cc.Scrollbar, animatable: false, visible: function () {
-            return this.direction == Direction.VERTICAL;
-        }
-    })
-    protected _vBar: cc.Scrollbar = null;
-    /**@description 垂直滚动的 ScrollBar。 */
-    get verticalScrollBar() {
-        return this._vBar;
-    }
-    set verticalScrollBar(v) {
-        if (this._vBar === v) {
-            return;
-        }
-        this._vBar = v;
-        if (this._vBar) {
-            this._vBar.setTargetScrollView(this);
-            this._updateScrollBar();
-        }
-    }
-
-    /**@description 滚动视图的事件回调函数 */
-    @property({ tooltip: "滚动视图的事件回调函数", type: cc.Component.EventHandler, displayName: "ScrollEvents" })
-    scrollEvents: cc.Component.EventHandler[] = [];
-
-    /**
-     * @description 如果这个属性被设置为 true，那么滚动行为会取消子节点上注册的触摸事件，默认被设置为 true。
-     * 注意，子节点上的 touchstart 事件仍然会触发，触点移动距离非常短的情况下 touchmove 和 touchend 也不会受影响。
-     */
-    @property({ tooltip: "滚动行为是否取消子节点上注册的触摸事件", displayName: "Cancel Inner Events" })
-    cancelInnerEvents: boolean = true;
+    * @deprecated 不支持该方法，请使用direction替代
+    */
+    @property({ visible: false, override: true })
+    public vertical = true;
 
     @property({ tooltip: "Cell项模板", displayName: "Template", type: TableViewCell, visible: true })
     protected _template: TableViewCell[] = [];
@@ -588,42 +373,13 @@ export default class TableView extends cc.Component {
         this._delegate = v;
     }
 
-    protected get _view() {
-        if (this.content) {
-            return this.content.parent;
+    get view(): cc.Node {
+        const parent = this.content && this.content.parent;
+        if (!parent) {
+            return null;
         }
-        return null;
+        return parent;
     }
-
-    protected _topBoundary = 0;
-    protected _bottomBoundary = 0;
-    protected _leftBoundary = 0;
-    protected _rightBoundary = 0;
-
-    protected _touchMoveDisplacements: cc.Vec2[] = [];
-    protected _touchMoveTimeDeltas: number[] = [];
-    protected _touchMovePreviousTimestamp = 0;
-    protected _touchMoved = false;
-
-    protected _autoScrolling = false;
-    protected _autoScrollAttenuate = false;
-    protected _autoScrollStartPosition = cc.v2(0, 0);
-    protected _autoScrollTargetDelta = cc.v2(0, 0);
-    protected _autoScrollTotalTime = 0;
-    protected _autoScrollAccumulatedTime = 0;
-    protected _autoScrollCurrentlyOutOfBoundary = false;
-    protected _autoScrollBraking = false;
-    protected _autoScrollBrakingStartPosition = cc.v2(0, 0);
-
-    protected _outOfBoundaryAmount = cc.v2(0, 0);
-    protected _outOfBoundaryAmountDirty = true;
-    protected _stopMouseWheel = false;
-    protected _mouseWheelEventElapsedTime = 0.0;
-    protected _isScrollEndedWithThresholdEventFired = false;
-    //use bit wise operations to indicate the direction
-    protected _scrollEventEmitMask = 0;
-    protected _isBouncing = false;
-    protected _scrolling = false;
 
     /**@description 当前正在使用的cell */
     protected _cellsUsed: TableViewCell[] = [];
@@ -635,371 +391,70 @@ export default class TableView extends cc.Component {
     protected _indices: Set<number> = new Set();
     /**@description 添加或者删除时，_cellsUsed并不是按index顺序排序的，此时需要重新排序_cellsUsed */
     protected _isUsedCellsDirty = false;
-    protected _oldDirection: Direction = null;
+    protected _oldDirection: Direction | null = null;
     /**@description 在插入或删除时，会收到content的大小改变事件，从来调用刷新，在操作插入删除时，屏蔽掉 */
     protected _isDoing: boolean = false;
 
     /**@description 测试用 */
-    private _isShowAllCell = false;
+    protected _isShowAllCell = false;
 
-    /**
-      * !#en Scroll the content to the bottom boundary of ScrollView.
-      * !#zh 视图内容将在规定时间内滚动到视图底部。
-      * @method scrollToBottom
-      * @param {Number} [timeInSecond=0] - Scroll time in second, if you don't pass timeInSecond,
-      * the content will jump to the bottom boundary immediately.
-      * @param {Boolean} [attenuated=true] - Whether the scroll acceleration attenuated, default is true.
-      * @example
-      * // Scroll to the bottom of the view.
-      * scrollView.scrollToBottom(0.1);
-      */
-    scrollToBottom(timeInSecond = 0, attenuated = true) {
-        let moveDelta = this._calculateMovePercentDelta({
-            anchor: cc.v2(0, 0),
-            applyToHorizontal: false,
-            applyToVertical: true,
-        });
 
-        if (timeInSecond) {
-            this._startAutoScroll(moveDelta, timeInSecond, attenuated !== false);
-        } else {
-            this._moveContent(moveDelta, true);
+    protected get viewSize() {
+        if (this.view) {
+            return this.view.getContentSize();
         }
+        return cc.size(0, 0);
     }
 
-    /**
-     * !#en Scroll the content to the top boundary of ScrollView.
-     * !#zh 视图内容将在规定时间内滚动到视图顶部。
-     * @method scrollToTop
-     * @param {Number} [timeInSecond=0] - Scroll time in second, if you don't pass timeInSecond,
-     * the content will jump to the top boundary immediately.
-     * @param {Boolean} [attenuated=true] - Whether the scroll acceleration attenuated, default is true.
-     * @example
-     * // Scroll to the top of the view.
-     * scrollView.scrollToTop(0.1);
-     */
-    scrollToTop(timeInSecond = 0, attenuated = true) {
-        let moveDelta = this._calculateMovePercentDelta({
-            anchor: cc.v2(0, 1),
-            applyToHorizontal: false,
-            applyToVertical: true,
-        });
-
-        if (timeInSecond) {
-            this._startAutoScroll(moveDelta, timeInSecond, attenuated !== false);
-        } else {
-            this._moveContent(moveDelta);
+    protected get viewAnchor() {
+        if (this.view) {
+            return this.view.getAnchorPoint();
         }
+        return cc.v2(0, 0);
     }
 
-    /**
-     * !#en Scroll the content to the left boundary of ScrollView.
-     * !#zh 视图内容将在规定时间内滚动到视图左边。
-     * @method scrollToLeft
-     * @param {Number} [timeInSecond=0] - Scroll time in second, if you don't pass timeInSecond,
-     * the content will jump to the left boundary immediately.
-     * @param {Boolean} [attenuated=true] - Whether the scroll acceleration attenuated, default is true.
-     * @example
-     * // Scroll to the left of the view.
-     * scrollView.scrollToLeft(0.1);
-     */
-    scrollToLeft(timeInSecond = 0, attenuated = true) {
-        let moveDelta = this._calculateMovePercentDelta({
-            anchor: cc.v2(0, 0),
-            applyToHorizontal: true,
-            applyToVertical: false,
-        });
-
-        if (timeInSecond) {
-            this._startAutoScroll(moveDelta, timeInSecond, attenuated !== false);
-        } else {
-            this._moveContent(moveDelta);
+    protected get contentSize() {
+        if (this.content) {
+            return this.content.getContentSize();
         }
+        return cc.size(0, 0);
     }
 
-    /**
-     * !#en Scroll the content to the right boundary of ScrollView.
-     * !#zh 视图内容将在规定时间内滚动到视图右边。
-     * @method scrollToRight
-     * @param {Number} [timeInSecond=0] - Scroll time in second, if you don't pass timeInSecond,
-     * the content will jump to the right boundary immediately.
-     * @param {Boolean} [attenuated=true] - Whether the scroll acceleration attenuated, default is true.
-     * @example
-     * // Scroll to the right of the view.
-     * scrollView.scrollToRight(0.1);
-     */
-    scrollToRight(timeInSecond = 0, attenuated = true) {
-        let moveDelta = this._calculateMovePercentDelta({
-            anchor: cc.v2(1, 0),
-            applyToHorizontal: true,
-            applyToVertical: false,
-        });
-
-        if (timeInSecond) {
-            this._startAutoScroll(moveDelta, timeInSecond, attenuated !== false);
-        } else {
-            this._moveContent(moveDelta);
+    protected get contentAnchor() {
+        if (this.content) {
+            return this.content.getAnchorPoint();
         }
+        return cc.v2(0, 0);
     }
-
-
-    /**
-     * !#en Scroll with an offset related to the ScrollView's top left origin, if timeInSecond is omitted, then it will jump to the
-     *       specific offset immediately.
-     * !#zh 视图内容在规定时间内将滚动到 ScrollView 相对左上角原点的偏移位置, 如果 timeInSecond参数不传，则立即滚动到指定偏移位置。
-     * @method scrollToOffset
-     * @param {Vec2} offset - A Vec2, the value of which each axis between 0 and maxScrollOffset
-     * @param {Number} [timeInSecond=0] - Scroll time in second, if you don't pass timeInSecond,
-     * the content will jump to the specific offset of ScrollView immediately.
-     * @param {Boolean} [attenuated=true] - Whether the scroll acceleration attenuated, default is true.
-     * @example
-     * // Scroll to middle position in 0.1 second in x-axis
-     * let maxScrollOffset = this.getMaxScrollOffset();
-     * scrollView.scrollToOffset(cc.v2(maxScrollOffset.x / 2, 0), 0.1);
-     */
-    scrollToOffset(offset: cc.Vec2, timeInSecond = 0, attenuated = true) {
-        let maxScrollOffset = this.getMaxScrollOffset();
-
-        let anchor = cc.v2(0, 0);
-        //if maxScrollOffset is 0, then always align the content's top left origin to the top left corner of its parent
-        if (maxScrollOffset.x === 0) {
-            anchor.x = 0;
-        } else {
-            anchor.x = offset.x / maxScrollOffset.x;
-        }
-
-        if (maxScrollOffset.y === 0) {
-            anchor.y = 1;
-        } else {
-            anchor.y = (maxScrollOffset.y - offset.y) / maxScrollOffset.y;
-        }
-
-        this.scrollTo(anchor, timeInSecond, attenuated);
-    }
-
-
-    /**
-     * !#en  Get the positive offset value corresponds to the content's top left boundary.
-     * !#zh  获取滚动视图相对于左上角原点的当前滚动偏移
-     * @method getScrollOffset
-     * @return {Vec2}  - A Vec2 value indicate the current scroll offset.
-     */
-    getScrollOffset() {
-        let topDelta = this._getContentTopBoundary() - this._topBoundary;
-        let leftDeta = this._getContentLeftBoundary() - this._leftBoundary;
-
-        return cc.v2(leftDeta, topDelta);
-    }
-
-    /**
-     * !#en Get the maximize available  scroll offset
-     * !#zh 获取滚动视图最大可以滚动的偏移量
-     * @method getMaxScrollOffset
-     * @return {Vec2} - A Vec2 value indicate the maximize scroll offset in x and y axis.
-     */
-    getMaxScrollOffset() {
-        let viewSize = this._view.getContentSize();
-        let contentSize = this.content.getContentSize();
-        let horizontalMaximizeOffset = contentSize.width - viewSize.width;
-        let verticalMaximizeOffset = contentSize.height - viewSize.height;
-        horizontalMaximizeOffset = horizontalMaximizeOffset >= 0 ? horizontalMaximizeOffset : 0;
-        verticalMaximizeOffset = verticalMaximizeOffset >= 0 ? verticalMaximizeOffset : 0;
-
-        return cc.v2(horizontalMaximizeOffset, verticalMaximizeOffset);
-    }
-
-    /**
-     * !#en Scroll the content to the percent position of ScrollView in any direction.
-     * !#zh 视图内容在规定时间内进行垂直方向和水平方向的滚动，并且滚动到指定百分比位置上。
-     * @method scrollTo
-     * @param {Vec2} anchor - A point which will be clamp between cc.v2(0,0) and cc.v2(1,1).
-     * @param {Number} [timeInSecond=0] - Scroll time in second, if you don't pass timeInSecond,
-     * the content will jump to the percent position of ScrollView immediately.
-     * @param {Boolean} [attenuated=true] - Whether the scroll acceleration attenuated, default is true.
-     * @example
-     * // Vertical scroll to the bottom of the view.
-     * scrollView.scrollTo(cc.v2(0, 1), 0.1);
-     *
-     * // Horizontal scroll to view right.
-     * scrollView.scrollTo(cc.v2(1, 0), 0.1);
-     */
-    scrollTo(anchor: cc.Vec2, timeInSecond = 0, attenuated = true) {
-        let moveDelta = this._calculateMovePercentDelta({
-            anchor: cc.v2(anchor),
-            applyToHorizontal: true,
-            applyToVertical: true,
-        });
-
-        if (timeInSecond) {
-            this._startAutoScroll(moveDelta, timeInSecond, attenuated !== false);
-        } else {
-            this._moveContent(moveDelta);
-        }
-    }
-
-    /**
-     * !#en Scroll the content to the horizontal percent position of ScrollView.
-     * !#zh 视图内容在规定时间内将滚动到 ScrollView 水平方向的百分比位置上。
-     * @method scrollToPercentHorizontal
-     * @param {Number} percent - A value between 0 and 1.
-     * @param {Number} [timeInSecond=0] - Scroll time in second, if you don't pass timeInSecond,
-     * the content will jump to the horizontal percent position of ScrollView immediately.
-     * @param {Boolean} [attenuated=true] - Whether the scroll acceleration attenuated, default is true.
-     * @example
-     * // Scroll to middle position.
-     * scrollView.scrollToBottomRight(0.5, 0.1);
-     */
-    scrollToPercentHorizontal(percent: number, timeInSecond = 0, attenuated = true) {
-        let moveDelta = this._calculateMovePercentDelta({
-            anchor: cc.v2(percent, 0),
-            applyToHorizontal: true,
-            applyToVertical: false,
-        });
-
-        if (timeInSecond) {
-            this._startAutoScroll(moveDelta, timeInSecond, attenuated !== false);
-        } else {
-            this._moveContent(moveDelta);
-        }
-    }
-
-
-    /**
-     * !#en Scroll the content to the vertical percent position of ScrollView.
-     * !#zh 视图内容在规定时间内滚动到 ScrollView 垂直方向的百分比位置上。
-     * @method scrollToPercentVertical
-     * @param {Number} percent - A value between 0 and 1.
-     * @param {Number} [timeInSecond=0] - Scroll time in second, if you don't pass timeInSecond,
-     * the content will jump to the vertical percent position of ScrollView immediately.
-     * @param {Boolean} [attenuated=true] - Whether the scroll acceleration attenuated, default is true.
-     * // Scroll to middle position.
-     * scrollView.scrollToPercentVertical(0.5, 0.1);
-     */
-    scrollToPercentVertical(percent: number, timeInSecond = 0, attenuated = true) {
-        let moveDelta = this._calculateMovePercentDelta({
-            anchor: cc.v2(0, percent),
-            applyToHorizontal: false,
-            applyToVertical: true,
-        });
-
-        if (timeInSecond) {
-            this._startAutoScroll(moveDelta, timeInSecond, attenuated !== false);
-        } else {
-            this._moveContent(moveDelta);
-        }
-    }
-
-    /**
-     * !#en  Stop auto scroll immediately
-     * !#zh  停止自动滚动, 调用此 API 可以让 Scrollview 立即停止滚动
-     * @method stopAutoScroll
-     */
-    stopAutoScroll() {
-        this._autoScrolling = false;
-        this._autoScrollAccumulatedTime = this._autoScrollTotalTime;
-    }
-
-    /**
-     * !#en Modify the content position.
-     * !#zh 设置当前视图内容的坐标点。
-     * @method setContentPosition
-     * @param {Vec2} position - The position in content's parent space.
-     */
-    setContentPosition(position: cc.Vec2) {
-        if (position.fuzzyEquals(this.getContentPosition(), EPSILON)) {
-            return;
-        }
-
-        this._setContentPosition(position);
-        this._outOfBoundaryAmountDirty = true;
-    }
-
-    /**
-     * !#en Query the content's position in its parent space.
-     * !#zh 获取当前视图内容的坐标点。
-     * @method getContentPosition
-     * @returns {Vec2} - The content's position in its parent space.
-     */
-    getContentPosition() {
-        return this.content.getPosition();
-    }
-
-    /**
-     * !#en Query whether the user is currently dragging the ScrollView to scroll it
-     * !#zh 用户是否在拖拽当前滚动视图
-     * @method isScrolling
-     * @returns {Boolean} - Whether the user is currently dragging the ScrollView to scroll it
-     */
-    isScrolling() {
-        return this._scrolling;
-    }
-
-    /**
-     * !#en Query whether the ScrollView is currently scrolling because of a bounceback or inertia slowdown.
-     * !#zh 当前滚动视图是否在惯性滚动
-     * @method isAutoScrolling
-     * @returns {Boolean} - Whether the ScrollView is currently scrolling because of a bounceback or inertia slowdown.
-     */
-    isAutoScrolling() {
-        return this._autoScrolling;
-    }
-
 
     /**@description 滚动到指定项 */
-    scrollToIndex(index: number, timeInSecond = 0, attenuated = true, vec: cc.Vec2 = cc.v2(0, 0)) {
+    scrollToIndex(index: number, timeInSecond = 0, attenuated = true) {
+        if (!this.content) {
+            return;
+        }
         if (!(index >= 0 && index < this.delegate.numberOfCellsInTableView(this))) {
             Log.e(`错误的index : ${index}`)
             return;
         }
-        Log.d(`滚动到 : ${index}`);
+        // Log.d(`滚动到 : ${index}`);
+        let offset = this.getScrollOffset();
         let info = this._cellsInfos[index]
-        info = info.clone();
-        info.position.add(vec);
-        // info.calculatePosition();
-        let offset = this.getContentPosition();
-        let viewSize = this._view.getContentSize();
-        let viewAnchor = this._view.getAnchorPoint();
-
-        let viewBottom = -viewAnchor.y * viewSize.height;
-        let viewLeft = viewAnchor.x * viewSize.width;
-
         // Log.d(`offset : (${offset.x},${offset.y})`)
-        // Log.d(`contentSize : (${this.content.width},${this.content.height})`);
-        if (this.horizontal) {
-            offset.x = viewLeft;
-        } else {
-            offset.y = viewBottom;
-        }
-
-        let result = info.calculateSight(this.fillOrder, this.horizontal, offset, viewSize)
-        // Log.d(v);
-
-        let layoutParam = new LayoutParam;
-        layoutParam.node = this.content;
-        layoutParam.target = this._view;
-        if (this.horizontal) {
-            //水平方向//计算出节点相对content的偏移量
-            layoutParam.alignFlags = LayoutType.MID_LETF;
-            layoutParam.left = result.offset;
-            // Log.d(`left : ${layoutParam.left}`);
-        } else {
-            //垂直方向
-            layoutParam.alignFlags = LayoutType.CENTER_TOP;
-            //按顶对齐，第一次对齐，只是对齐到可显示区域最下面，所有要x2，把显示区域移动到最顶端
-            let topOffset = 2 * viewSize.height;
-            if (this.fillOrder == FillOrder.TOP_DOWN) {
-                // Log.d(`result : ${result.offset}`)
-                layoutParam.top = result.offset - topOffset;
-                // Log.d(`top : ${layoutParam.top}`);
+        if (this.fillOrder == FillOrder.TOP_DOWN) {
+            if (this.direction == Direction.HORIZONTAL) {
+                offset.x = info.offset;
             } else {
-                layoutParam.top = -result.offset - topOffset;
-                // Log.d(`bottom : ${layoutParam.bottom}`);
+                offset.y = info.offset;
+            }
+        } else {
+            let next = this._cellsInfos[index + 1];
+            if (this.direction == Direction.HORIZONTAL) {
+                offset.x = this.contentSize.width - next.offset;
+            } else {
+                offset.y = this.contentSize.height - next.offset;
             }
         }
 
-        Manager.layout.align(layoutParam);
-        offset = layoutParam.result.position;
-        // Log.d(`offset new  : (${offset.x},${offset.y})`)
         this.scrollToOffset(offset, timeInSecond, attenuated);
     }
 
@@ -1024,8 +479,14 @@ export default class TableView extends cc.Component {
         if (!cell) {
             //如果有可复用的，直接刷新
             let template = this._getTemplete(type);
+            if (!template) {
+                return;
+            }
             let node = cc.instantiate(template.node);
             cell = node.getComponent(TableViewCell);
+        }
+        if (!cell) {
+            return;
         }
         this._setIndexForCell(index, cell);
         this._addCellIfNecessary(cell);
@@ -1051,11 +512,8 @@ export default class TableView extends cc.Component {
         }
         this._isDoing = true;
         let offset = this.getScrollOffset();
-        // this._debugCell("更新Cell前")
-        // this._debugCellInfos("【插入${index}更新Cell前】")
         this._updateCellOffsets();
         this._updateContentSize();
-        // this._debugCellInfos(`【插入${index}更新Cell后】`)
 
         let cell = this.cellAtIndex(index);
         if (cell) {
@@ -1071,10 +529,15 @@ export default class TableView extends cc.Component {
         let newCell = this._dequeueCell(type);
         if (!newCell) {
             let template = this._getTemplete(type);
+            if (!template) {
+                return;
+            }
             let node = cc.instantiate(template.node);
             newCell = node.getComponent(TableViewCell);
         }
-
+        if (!newCell) {
+            return;
+        }
         this._setIndexForCell(index, newCell);
         this._addCellIfNecessary(newCell);
         newCell.init();
@@ -1103,12 +566,10 @@ export default class TableView extends cc.Component {
 
         this._updateCellOffsets();
         this._updateContentSize();
-        // this._debugCell(`【删除前】`);
         this._moveCellIndex(index, true);
         this._isDoing = false;
         this._calculateSightArea();
         this.scrollToOffset(offset);
-        // this._debugCell(`【删除后】`);
     }
 
     /**
@@ -1130,7 +591,7 @@ export default class TableView extends cc.Component {
             this._cellsFreed.push(cell);
             cell.reset();
             if (cell.node.parent == this.content) {
-                this.content.removeChild(cell.node);
+                this.content?.removeChild(cell.node);
             }
         }
 
@@ -1146,7 +607,7 @@ export default class TableView extends cc.Component {
         this._calculateSightArea();
         if (this._oldDirection != this.direction) {
             if (this.delegate.numberOfCellsInTableView(this) > 0) {
-                if (this.horizontal) {
+                if (this.direction == Direction.HORIZONTAL) {
                     this.scrollToLeft();
                 } else {
                     this.scrollToTop();
@@ -1245,11 +706,9 @@ export default class TableView extends cc.Component {
      * @description 按index的升序排序
      */
     private _sortCell() {
-        // this._debugCell("【排序前】")
         this._cellsUsed = this._cellsUsed.sort((a, b) => {
             return a.index - b.index;
         });
-        // this._debugCell("【排序后】")
     }
 
     private _debugCellInfos(title: string) {
@@ -1264,7 +723,7 @@ export default class TableView extends cc.Component {
         Log.d(`当前显示节点 :`, this._indices);
 
         this._cellsUsed.forEach((v, index, array) => {
-            Log.d(`[${index}] , type : ${v.type} ,index : ${v.index} , ${(v as any).string} , position : (${v.node.x},${v.node.y})`);
+            Log.d(`[${index}] , type : ${v.type} ,index : ${v.index} , ${(v as any).string} , position : (${v.node.position.x},${v.node.position.y})`);
         })
     }
 
@@ -1296,7 +755,7 @@ export default class TableView extends cc.Component {
 
     protected _addCellIfNecessary(cell: TableViewCell) {
         if (cell.node.parent != this.content) {
-            this.content.addChild(cell.node);
+            this.content?.addChild(cell.node);
         } else {
             Log.e(`添加的Cell 已经有父节点`);
         }
@@ -1319,7 +778,7 @@ export default class TableView extends cc.Component {
     * @returns 
     */
     protected _dequeueCell(type: CellType): TableViewCell | null {
-        let cell: TableViewCell = null;
+        let cell: TableViewCell | null = null;
         if (this._cellsFreed.length <= 0) {
             return cell;
         }
@@ -1345,15 +804,15 @@ export default class TableView extends cc.Component {
             let size = { width: 0, height: 0 };
             let type: CellType;
             let i = 0;
-            let cell: TableViewCell;
+            let cell: TableViewCell = null!;
             for (i = 0; i < count; i++) {
                 type = this.delegate.tableCellTypeAtIndex(this, i);
-                cell = this._getTemplete(type);
+                cell = this._getTemplete(type)!;
                 let info = new CellInfo(cell, this, cur, i);
                 this._cellsInfos.push(info);
                 size.width = cell.node.width;
                 size.height = cell.node.height;
-                if (this.horizontal) {
+                if (this.direction == Direction.HORIZONTAL) {
                     //水平
                     cur += size.width;
                 } else {
@@ -1376,19 +835,20 @@ export default class TableView extends cc.Component {
     /**
      * @description 更新content的大小
      */
-    protected _updateContentSize( ) {
+    protected _updateContentSize() {
         let size = cc.size(0, 0);
         let count = this.delegate.numberOfCellsInTableView(this);
         if (count > 0) {
             let maxPos = this._cellsInfos[count].offset;
-            if (this.horizontal) {
-                size = cc.size(maxPos, this._view.getContentSize().height);
+            if (this.direction == Direction.HORIZONTAL) {
+                size = cc.size(maxPos, this.viewSize.height);
             } else {
-                size = cc.size(this._view.getContentSize().width, maxPos);
+                size = cc.size(this.viewSize.width, maxPos);
             }
         }
-
-        this.content.setContentSize(size);
+        if (this.content) {
+            this.content.setContentSize(size);
+        }
         this._updateCellPositions();
     }
 
@@ -1397,43 +857,33 @@ export default class TableView extends cc.Component {
      * @returns 
      */
     protected _calculateSightArea() {
+        if (!this.content) {
+            return;
+        }
+
         if (this._isDoing) {
             return;
         }
-        // Log.d(`当前Content偏移 : (${this.content.x},${this.content.y})`)
         //计算开始点结束点
-        let offset = this.getContentPosition();
-        let contentSize = this.content.getContentSize();
-        let contentAnchor = this.content.getAnchorPoint();
-        let viewSize = this._view.getContentSize();
-        let viewAnchor = this._view.getAnchorPoint();
+        let _offset = this.content.position;
+        let offset = cc.v2(_offset.x, _offset.y);
+        let contentSize = this.contentSize;
+        let contentAnchor = this.contentAnchor;
+        let viewSize = this.viewSize;
+        let viewAnchor = this.viewAnchor;
 
         let contentBottom = -contentAnchor.y * contentSize.height;
         let viewBottom = -viewAnchor.y * viewSize.height;
         let viewLeft = viewAnchor.x * viewSize.width;
 
-        // let line1 = cc.find("line1", this.content);
-        // let line2 = cc.find("line2", this.content);
         contentBottom = offset.y + contentBottom;
 
-        let vec: cc.Vec2;
-        if (this.horizontal) {
+        let vec: cc.Vec2 = null!;
+        if (this.direction == Direction.HORIZONTAL) {
             vec = cc.v2(viewLeft, offset.y).add(offset);
         } else {
             vec = cc.v2(offset.x, viewBottom).add(offset);
         }
-        // if ( this.horizontal ){
-        //     Log.d("最左", `(${vec.x},${vec.y})`);
-        //     line1.setPosition(-vec.x,line1.y)
-        // }else{
-        //     Log.d("最项", `(${vec.x},${vec.y})`);
-        //     line1.setPosition(line1.x, -vec.y)
-        // }
-
-        // this._cellsInfos.forEach((v, i) => {
-        //     v.debug();
-        //     v.calculate(this.fillOrder, this.horizontal, vec, viewSize);
-        // })
         // 要先排序，才能进行计算
         if (this._isUsedCellsDirty) {
             this._sortCell();
@@ -1443,9 +893,6 @@ export default class TableView extends cc.Component {
 
         let result = this._calculateInInSight(vec);
         if (result) {
-            // this._cellsUsed.forEach(v => {
-            //     Log.d(`当前显示节点[${v.index}]`)
-            // })
             //移除start之前的不可显示节点
             if (this._cellsUsed.length > 0) {
                 let cell = this._cellsUsed[0];
@@ -1483,32 +930,12 @@ export default class TableView extends cc.Component {
                     // Log.d(`Cell[${i}]项已经显示，跳过更新`);
                     continue;
                 }
-                // Log.d(`添加Cell ${i}`);
                 this.updateCellAtIndex(i);
             }
-
-            // this._debugCell("【更新Cell后】")
-            // this._debugCellInfos("【更新Cell后】");
-        }
-
-
-        // if ( this.horizontal ){
-        //     vec.x -= this._view.width;
-        //     Log.d("最右", `(${vec.x},${vec.y})`);
-        //     line2.setPosition(-vec.x, line1.y)
-        // }else{
-        //     vec.y += this._view.height;
-        //     Log.d("最底", `(${vec.x},${vec.y})`);
-        //     line2.setPosition(line2.x, -vec.y)
-        // }
-    }
-
-    protected _setContentPosition(position: cc.Vec2) {
-        if (this.content) {
-            this.content.setPosition(position);
-            this._calculateSightArea();
         }
     }
+
+
 
     protected _getTemplete(type: CellType) {
         for (let i = 0; i < this.template.length; i++) {
@@ -1533,7 +960,7 @@ export default class TableView extends cc.Component {
         this._indices.delete(cell.index);
         cell.reset();
         if (cell.node.parent == this.content) {
-            this.content.removeChild(cell.node, true);
+            this.content?.removeChild(cell.node);
         }
         this._isUsedCellsDirty = true;
     }
@@ -1541,8 +968,8 @@ export default class TableView extends cc.Component {
     /**
      * @description 计算当前可见Cell (二分查找，速度快点)
      * */
-    protected _calculateInInSight(offset: cc.Vec2): { start: number, end: number, count: number } {
-        let result: { start: number, end: number, count: number } = null;
+    protected _calculateInInSight(offset: cc.Vec2): { start: number, end: number, count: number } | null {
+        let result: { start: number, end: number, count: number } | null = null;
         if (this._cellsInfos.length <= 0) {
             return result;
         }
@@ -1561,18 +988,16 @@ export default class TableView extends cc.Component {
         }
         let low = 0;
         let high = count;
-        let viewSize = this._view.getContentSize();
+        let viewSize = this.viewSize;
         let search: number = -1;
         let index = 0;
-        // Log.d(`Cell信息大小 : ${this._cellsInfos.length}`)
         while (high >= low) {
             index = Math.floor(low + (high - low) / 2);
             if (index < 0 || index >= this._cellsInfos.length) {
                 return null;
             }
-            // Log.d(index);
             let cellStart = this._cellsInfos[index];
-            let startResult = cellStart.calculateSight(this.fillOrder, this.horizontal, offset, viewSize);
+            let startResult = cellStart.calculateSight(this.fillOrder, this.direction == Direction.HORIZONTAL, offset, viewSize);
             if (startResult.isInSight) {
                 search = index;
                 break;
@@ -1581,7 +1006,7 @@ export default class TableView extends cc.Component {
                 return null;
             }
             let cellEnd = this._cellsInfos[index + 1];
-            let endResult = cellEnd.calculateSight(this.fillOrder, this.horizontal, offset, viewSize);
+            let endResult = cellEnd.calculateSight(this.fillOrder, this.direction == Direction.HORIZONTAL, offset, viewSize);
             if (endResult.isInSight) {
                 search = index;
                 break;
@@ -1595,17 +1020,15 @@ export default class TableView extends cc.Component {
         }
 
         if (search < 0) {
-            // Log.e(`未找到显示项`);
             return null;
         }
 
-        // Log.d(`找到第一个可显示的Cell索引 : ${search}`);
         result.start = search;
         result.end = search;
         //向前找出可显示Cell
         for (let i = search - 1; i >= 0; i--) {
             let cell = this._cellsInfos[i];
-            let temp = cell.calculateSight(this.fillOrder, this.horizontal, offset, viewSize);
+            let temp = cell.calculateSight(this.fillOrder, this.direction == Direction.HORIZONTAL, offset, viewSize);
             if (temp.isInSight) {
                 result.start = i;
             } else {
@@ -1617,7 +1040,7 @@ export default class TableView extends cc.Component {
         //向后找出可显示Cell
         for (let i = search + 1; i < count; i++) {
             let cell = this._cellsInfos[i];
-            let temp = cell.calculateSight(this.fillOrder, this.horizontal, offset, viewSize);
+            let temp = cell.calculateSight(this.fillOrder, this.direction == Direction.HORIZONTAL, offset, viewSize);
             if (temp.isInSight) {
                 result.end = i;
             } else {
@@ -1630,20 +1053,32 @@ export default class TableView extends cc.Component {
         return result;
     }
 
-    protected _registerEvent() {
-        this.node.on(cc.Node.EventType.TOUCH_START, this._onTouchBegan, this, true);
-        this.node.on(cc.Node.EventType.TOUCH_MOVE, this._onTouchMoved, this, true);
-        this.node.on(cc.Node.EventType.TOUCH_END, this._onTouchEnded, this, true);
-        this.node.on(cc.Node.EventType.TOUCH_CANCEL, this._onTouchCancelled, this, true);
-        this.node.on(cc.Node.EventType.MOUSE_WHEEL, this._onMouseWheel, this, true);
+    /**
+     * @description 不支持该方法
+     */
+    scrollToTopLeft(timeInSecond?: number, attenuated?: boolean): void {
+        Log.w(`不支持该方法`);
     }
 
-    protected _unregisterEvent() {
-        this.node.off(cc.Node.EventType.TOUCH_START, this._onTouchBegan, this, true);
-        this.node.off(cc.Node.EventType.TOUCH_MOVE, this._onTouchMoved, this, true);
-        this.node.off(cc.Node.EventType.TOUCH_END, this._onTouchEnded, this, true);
-        this.node.off(cc.Node.EventType.TOUCH_CANCEL, this._onTouchCancelled, this, true);
-        this.node.off(cc.Node.EventType.MOUSE_WHEEL, this._onMouseWheel, this, true);
+    /**
+     * @description 不支持该方法
+     */
+    scrollToTopRight(timeInSecond?: number, attenuated?: boolean): void {
+        Log.w(`不支持该方法`);
+    }
+
+    /**
+     * @deprecated 不支持该方法
+     */
+    scrollToBottomLeft(timeInSecond?: number, attenuated?: boolean): void {
+        Log.w(`不支持该方法`);
+    }
+
+    /**
+     * @description 不支持该方法
+     */
+    scrollToBottomRight(timeInSecond?: number, attenuated?: boolean): void {
+        Log.w(`不支持该方法`);
     }
 
     protected _onMouseWheel(event: cc.Event.EventMouse, captureListeners?: cc.Node[]) {
@@ -1659,10 +1094,10 @@ export default class TableView extends cc.Component {
         if (CC_JSB || CC_RUNTIME) {
             wheelPrecision = -7;
         }
-        if (this.vertical) {
+        if (this.direction == Direction.VERTICAL) {
             deltaMove = cc.v2(0, event.getScrollY() * wheelPrecision);
         }
-        else if (this.horizontal) {
+        else {
             deltaMove = cc.v2(event.getScrollY() * wheelPrecision, 0);
         }
 
@@ -1676,234 +1111,6 @@ export default class TableView extends cc.Component {
         }
 
         this._stopPropagationIfTargetIsMe(event);
-    }
-
-    protected _checkMouseWheel(dt: number) {
-        let currentOutOfBoundary = this._getHowMuchOutOfBoundary();
-        let maxElapsedTime = 0.1;
-
-        if (!currentOutOfBoundary.fuzzyEquals(cc.v2(0, 0), EPSILON)) {
-            this._processInertiaScroll();
-            this.unschedule(this._checkMouseWheel);
-            this._dispatchEvent(EventType.SCROLL_ENDED);
-            this._stopMouseWheel = false;
-            return;
-        }
-
-        this._mouseWheelEventElapsedTime += dt;
-
-        // mouse wheel event is ended
-        if (this._mouseWheelEventElapsedTime > maxElapsedTime) {
-            this._onScrollBarTouchEnded();
-            this.unschedule(this._checkMouseWheel);
-            this._dispatchEvent(EventType.SCROLL_ENDED);
-            this._stopMouseWheel = false;
-        }
-    }
-
-    protected _calculateMovePercentDelta(options: Options) {
-        let anchor = options.anchor;
-        let applyToHorizontal = options.applyToHorizontal;
-        let applyToVertical = options.applyToVertical;
-        this._calculateBoundary();
-
-        anchor = anchor.clampf(cc.v2(0, 0), cc.v2(1, 1));
-
-        let scrollSize = this._view.getContentSize();
-        let contentSize = this.content.getContentSize();
-        let bottomDeta = this._getContentBottomBoundary() - this._bottomBoundary;
-        bottomDeta = -bottomDeta;
-
-        let leftDeta = this._getContentLeftBoundary() - this._leftBoundary;
-        leftDeta = -leftDeta;
-
-        let moveDelta = cc.v2(0, 0);
-        let totalScrollDelta = 0;
-        if (applyToHorizontal) {
-            totalScrollDelta = contentSize.width - scrollSize.width;
-            moveDelta.x = leftDeta - totalScrollDelta * anchor.x;
-        }
-
-        if (applyToVertical) {
-            totalScrollDelta = contentSize.height - scrollSize.height;
-            moveDelta.y = bottomDeta - totalScrollDelta * anchor.y;
-        }
-
-        return moveDelta;
-    }
-
-    protected _moveContentToTopLeft(scrollViewSize: cc.Size) {
-        let contentSize = this.content.getContentSize();
-
-        let bottomDeta = this._getContentBottomBoundary() - this._bottomBoundary;
-        bottomDeta = -bottomDeta;
-        let moveDelta = cc.v2(0, 0);
-        let totalScrollDelta = 0;
-
-        let leftDeta = this._getContentLeftBoundary() - this._leftBoundary;
-        leftDeta = -leftDeta;
-
-        if (contentSize.height < scrollViewSize.height) {
-            totalScrollDelta = contentSize.height - scrollViewSize.height;
-            moveDelta.y = bottomDeta - totalScrollDelta;
-        }
-
-        if (contentSize.width < scrollViewSize.width) {
-            totalScrollDelta = contentSize.width - scrollViewSize.width;
-            moveDelta.x = leftDeta;
-        }
-
-        this._updateScrollBarState();
-        this._moveContent(moveDelta);
-        this._adjustContentOutOfBoundary();
-    }
-
-    protected _calculateBoundary() {
-        if (this.content) {
-            //refresh content size
-            let layout = this.content.getComponent(cc.Layout);
-            if (layout && layout.enabledInHierarchy) {
-                layout.updateLayout();
-            }
-            let viewSize = this._view.getContentSize();
-
-            let anchorX = viewSize.width * this._view.anchorX;
-            let anchorY = viewSize.height * this._view.anchorY;
-
-            this._leftBoundary = -anchorX;
-            this._bottomBoundary = -anchorY;
-
-            this._rightBoundary = this._leftBoundary + viewSize.width;
-            this._topBoundary = this._bottomBoundary + viewSize.height;
-
-            this._moveContentToTopLeft(viewSize);
-        }
-    }
-
-    /**
-     * !#en Whether this scroll view has the nested view group.
-     * !#zh 此 Scoll View 是否含有嵌套的 View Group
-     * @method hasNestedViewGroup
-     * @returns {Boolean} - Whether this ScrollView has the nested view group.
-     */
-    protected hasNestedViewGroup(event: cc.Event, captureListeners?: cc.Node[]) {
-        if (event.eventPhase !== cc.Event.CAPTURING_PHASE) return;
-
-        if (captureListeners) {
-            //captureListeners are arranged from child to parent
-            for (let i = 0; i < captureListeners.length; ++i) {
-                let item = captureListeners[i];
-
-                if (this.node === item) {
-                    if (event.target.getComponent(cc.ViewGroup)) {
-                        return true;
-                    }
-                    return false;
-                }
-
-                if (item.getComponent(cc.ViewGroup)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    //This is for Scrollview as children of a Button
-    protected _stopPropagationIfTargetIsMe(event: cc.Event) {
-        if (event.eventPhase === cc.Event.AT_TARGET && event.target === this.node) {
-            event.stopPropagation();
-        }
-    }
-
-    // touch event handler
-    protected _onTouchBegan(event: cc.Event.EventTouch, captureListeners?: cc.Node[]) {
-        if (!this.enabledInHierarchy) return;
-        if (this.hasNestedViewGroup(event, captureListeners)) return;
-
-        let touch = event.touch;
-        if (this.content) {
-            this._handlePressLogic();
-        }
-        this._touchMoved = false;
-        this._stopPropagationIfTargetIsMe(event);
-    }
-
-    protected _onTouchMoved(event: cc.Event.EventTouch, captureListeners?: cc.Node[]) {
-        if (!this.enabledInHierarchy) return;
-        if (this.hasNestedViewGroup(event, captureListeners)) return;
-
-        let touch = event.touch;
-        if (this.content) {
-            this._handleMoveLogic(touch);
-        }
-        // Do not prevent touch events in inner nodes
-        if (!this.cancelInnerEvents) {
-            return;
-        }
-
-        let deltaMove = touch.getLocation().sub(touch.getStartLocation());
-        //FIXME: touch move delta should be calculated by DPI.
-        if (deltaMove.mag() > 7) {
-            if (!this._touchMoved && event.target !== this.node) {
-                // Simulate touch cancel for target node
-                let cancelEvent = new cc.Event.EventTouch(event.getTouches(), event.bubbles);
-                cancelEvent.type = cc.Node.EventType.TOUCH_CANCEL;
-                cancelEvent.touch = event.touch;
-                (<any>cancelEvent).simulate = true;
-                event.target.dispatchEvent(cancelEvent);
-                this._touchMoved = true;
-            }
-        }
-        this._stopPropagationIfTargetIsMe(event);
-    }
-
-    protected _onTouchEnded(event: cc.Event.EventTouch, captureListeners?: cc.Node[]) {
-        if (!this.enabledInHierarchy) return;
-        if (this.hasNestedViewGroup(event, captureListeners)) return;
-
-        this._dispatchEvent(EventType.TOUCH_UP);
-
-        let touch = event.touch;
-        if (this.content) {
-            this._handleReleaseLogic(touch);
-        }
-        if (this._touchMoved) {
-            event.stopPropagation();
-        } else {
-            this._stopPropagationIfTargetIsMe(event);
-        }
-    }
-
-    protected _onTouchCancelled(event: cc.Event.EventTouch, captureListeners?: cc.Node[]) {
-        if (!this.enabledInHierarchy) return;
-        if (this.hasNestedViewGroup(event, captureListeners)) return;
-
-        // Filte touch cancel event send from self
-        if (!(<any>event).simulate) {
-            let touch = event.touch;
-            if (this.content) {
-                this._handleReleaseLogic(touch);
-            }
-        }
-        this._stopPropagationIfTargetIsMe(event);
-    }
-
-    protected _processDeltaMove(deltaMove: cc.Vec2) {
-        this._scrollChildren(deltaMove);
-        this._gatherTouchMove(deltaMove);
-    }
-
-    // Contains node angle calculations
-    protected _getLocalAxisAlignDelta(touch: cc.Touch) {
-        this.node.convertToNodeSpaceAR(touch.getLocation(), _tempPoint);
-        this.node.convertToNodeSpaceAR(touch.getPreviousLocation(), _tempPrevPoint);
-        return _tempPoint.sub(_tempPrevPoint);
-    }
-
-    protected _handleMoveLogic(touch: cc.Touch) {
-        let deltaMove = this._getLocalAxisAlignDelta(touch);
-        this._processDeltaMove(deltaMove);
     }
 
     protected _scrollChildren(deltaMove: cc.Vec2) {
@@ -1922,534 +1129,79 @@ export default class TableView extends cc.Component {
             realMove = realMove.add(outOfBoundary);
         }
 
-        let vertical_scrollEventType = EventType.UNKNOWN;
-        let horizontal_scrollEventType = EventType.UNKNOWN;
+        let vertical_scrollEventType = "";
+        let horizontal_scrollEventType = "";
 
-        if (this.vertical) {
+        if (this.direction == Direction.VERTICAL) {
             if (realMove.y > 0) { //up
                 let icBottomPos = this.content.y - this.content.anchorY * this.content.height;
 
                 if (icBottomPos + realMove.y >= this._bottomBoundary) {
-                    vertical_scrollEventType = EventType.SCROLL_TO_BOTTOM;
+                    vertical_scrollEventType = 'scroll-to-bottom';
                 }
             }
             else if (realMove.y < 0) { //down
                 let icTopPos = this.content.y - this.content.anchorY * this.content.height + this.content.height;
 
                 if (icTopPos + realMove.y <= this._topBoundary) {
-                    vertical_scrollEventType = EventType.SCROLL_TO_TOP;
+                    vertical_scrollEventType = 'scroll-to-top';
                 }
             }
         }
-        if (this.horizontal) {
+        if (this.direction == Direction.HORIZONTAL) {
             if (realMove.x < 0) { //left
                 let icRightPos = this.content.x - this.content.anchorX * this.content.width + this.content.width;
                 if (icRightPos + realMove.x <= this._rightBoundary) {
-                    horizontal_scrollEventType = EventType.SCROLL_TO_RIGHT;
+                    horizontal_scrollEventType = 'scroll-to-right';
                 }
             }
             else if (realMove.x > 0) { //right
                 let icLeftPos = this.content.x - this.content.anchorX * this.content.width;
                 if (icLeftPos + realMove.x >= this._leftBoundary) {
-                    horizontal_scrollEventType = EventType.SCROLL_TO_LEFT;
+                    horizontal_scrollEventType = 'scroll-to-left';
                 }
             }
         }
 
         this._moveContent(realMove, false);
 
-        if ((this.horizontal && realMove.x !== 0) || (this.vertical && realMove.y !== 0)) {
+        if ((this.direction == Direction.HORIZONTAL && realMove.x !== 0) || (this.direction == Direction.VERTICAL && realMove.y !== 0)) {
             if (!this._scrolling) {
                 this._scrolling = true;
-                this._dispatchEvent(EventType.SCROLL_BEGAN);
+                this._dispatchEvent('scroll-began');
             }
-            this._dispatchEvent(EventType.SCROLLING);
+            this._dispatchEvent('scrolling');
         }
 
-        if (vertical_scrollEventType !== EventType.UNKNOWN) {
+        if (vertical_scrollEventType !== '') {
             this._dispatchEvent(vertical_scrollEventType);
         }
 
-        if (horizontal_scrollEventType !== EventType.UNKNOWN) {
+        if (horizontal_scrollEventType !== '') {
             this._dispatchEvent(horizontal_scrollEventType);
         }
 
     }
 
-    protected _handlePressLogic() {
-        if (this._autoScrolling) {
-            this._dispatchEvent(EventType.SCROLL_ENDED);
-        }
-        this._autoScrolling = false;
-        this._isBouncing = false;
-
-        this._touchMovePreviousTimestamp = getTimeInMilliseconds();
-        this._touchMoveDisplacements.length = 0;
-        this._touchMoveTimeDeltas.length = 0;
-
-        this._onScrollBarTouchBegan();
-    }
-
-    protected _clampDelta(delta: cc.Vec2) {
-        let contentSize = this.content.getContentSize();
-        let scrollViewSize = this._view.getContentSize();
-        if (contentSize.width < scrollViewSize.width) {
-            delta.x = 0;
-        }
-        if (contentSize.height < scrollViewSize.height) {
-            delta.y = 0;
-        }
-
-        return delta;
-    }
-
-    protected _gatherTouchMove(delta: cc.Vec2) {
-        delta = this._clampDelta(delta);
-
-        while (this._touchMoveDisplacements.length >= NUMBER_OF_GATHERED_TOUCHES_FOR_MOVE_SPEED) {
-            this._touchMoveDisplacements.shift();
-            this._touchMoveTimeDeltas.shift();
-        }
-
-        this._touchMoveDisplacements.push(delta);
-
-        let timeStamp = getTimeInMilliseconds();
-        this._touchMoveTimeDeltas.push((timeStamp - this._touchMovePreviousTimestamp) / 1000);
-        this._touchMovePreviousTimestamp = timeStamp;
-    }
-
-    protected _startBounceBackIfNeeded() {
-        if (!this.elastic) {
-            return false;
-        }
-
-        let bounceBackAmount = this._getHowMuchOutOfBoundary();
-        bounceBackAmount = this._clampDelta(bounceBackAmount);
-
-        if (bounceBackAmount.fuzzyEquals(cc.v2(0, 0), EPSILON)) {
-            return false;
-        }
-
-        let bounceBackTime = Math.max(this.bounceDuration, 0);
-        this._startAutoScroll(bounceBackAmount, bounceBackTime, true);
-
-        if (!this._isBouncing) {
-            if (bounceBackAmount.y > 0) this._dispatchEvent(EventType.BOUNCE_TOP);
-            if (bounceBackAmount.y < 0) this._dispatchEvent(EventType.BOUNCE_BOTTOM);
-            if (bounceBackAmount.x > 0) this._dispatchEvent(EventType.BOUNCE_RIGHT);
-            if (bounceBackAmount.x < 0) this._dispatchEvent(EventType.BOUNCE_LEFT);
-            this._isBouncing = true;
-        }
-
-        return true;
-    }
-
-    protected _processInertiaScroll() {
-        let bounceBackStarted = this._startBounceBackIfNeeded();
-        if (!bounceBackStarted && this.inertia) {
-            let touchMoveVelocity = this._calculateTouchMoveVelocity();
-            if (!touchMoveVelocity.fuzzyEquals(cc.v2(0, 0), EPSILON) && this.brake < 1) {
-                this._startInertiaScroll(touchMoveVelocity);
-            }
-        }
-
-        this._onScrollBarTouchEnded();
-    }
-
-    protected _handleReleaseLogic(touch: cc.Touch) {
-        let delta = this._getLocalAxisAlignDelta(touch);
-        this._gatherTouchMove(delta);
-        this._processInertiaScroll();
-        if (this._scrolling) {
-            this._scrolling = false;
-            if (!this._autoScrolling) {
-                this._dispatchEvent(EventType.SCROLL_ENDED);
-            }
-        }
-    }
-
-    protected _isOutOfBoundary() {
-        let outOfBoundary = this._getHowMuchOutOfBoundary();
-        return !outOfBoundary.fuzzyEquals(cc.v2(0, 0), EPSILON);
-    }
-
-    protected _isNecessaryAutoScrollBrake() {
-        if (this._autoScrollBraking) {
-            return true;
-        }
-
-        if (this._isOutOfBoundary()) {
-            if (!this._autoScrollCurrentlyOutOfBoundary) {
-                this._autoScrollCurrentlyOutOfBoundary = true;
-                this._autoScrollBraking = true;
-                this._autoScrollBrakingStartPosition = this.getContentPosition();
-                return true;
-            }
-
-        } else {
-            this._autoScrollCurrentlyOutOfBoundary = false;
-        }
-
-        return false;
-    }
-
-    protected getScrollEndedEventTiming() {
-        return EPSILON;
-    }
-
-    protected _processAutoScrolling(dt: number) {
-        let isAutoScrollBrake = this._isNecessaryAutoScrollBrake();
-        let brakingFactor = isAutoScrollBrake ? OUT_OF_BOUNDARY_BREAKING_FACTOR : 1;
-        this._autoScrollAccumulatedTime += dt * (1 / brakingFactor);
-
-        let percentage = Math.min(1, this._autoScrollAccumulatedTime / this._autoScrollTotalTime);
-        if (this._autoScrollAttenuate) {
-            percentage = quintEaseOut(percentage);
-        }
-
-        let newPosition = this._autoScrollStartPosition.add(this._autoScrollTargetDelta.mul(percentage));
-        let reachedEnd = Math.abs(percentage - 1) <= EPSILON;
-
-        let fireEvent = Math.abs(percentage - 1) <= this.getScrollEndedEventTiming();
-        if (fireEvent && !this._isScrollEndedWithThresholdEventFired) {
-            this._dispatchEvent(EventType.AUTOSCROLL_ENDED_WITH_THRESHOLD);
-            this._isScrollEndedWithThresholdEventFired = true;
-        }
-
-        if (this.elastic) {
-            let brakeOffsetPosition = newPosition.sub(this._autoScrollBrakingStartPosition);
-            if (isAutoScrollBrake) {
-                brakeOffsetPosition = brakeOffsetPosition.mul(brakingFactor);
-            }
-            newPosition = this._autoScrollBrakingStartPosition.add(brakeOffsetPosition);
-        } else {
-            let moveDelta = newPosition.sub(this.getContentPosition());
-            let outOfBoundary = this._getHowMuchOutOfBoundary(moveDelta);
-            if (!outOfBoundary.fuzzyEquals(cc.v2(0, 0), EPSILON)) {
-                newPosition = newPosition.add(outOfBoundary);
-                reachedEnd = true;
-            }
-        }
-
-        if (reachedEnd) {
-            this._autoScrolling = false;
-        }
-
-        let deltaMove = newPosition.sub(this.getContentPosition());
-        this._moveContent(this._clampDelta(deltaMove), reachedEnd);
-        this._dispatchEvent(EventType.SCROLLING);
-
-        // scollTo API controll move
-        if (!this._autoScrolling) {
-            this._isBouncing = false;
-            this._scrolling = false;
-            this._dispatchEvent(EventType.SCROLL_ENDED);
-        }
-    }
-
-    protected _startInertiaScroll(touchMoveVelocity: cc.Vec2) {
-        let inertiaTotalMovement = touchMoveVelocity.mul(MOVEMENT_FACTOR);
-        this._startAttenuatingAutoScroll(inertiaTotalMovement, touchMoveVelocity);
-    }
-
-    protected _calculateAttenuatedFactor(distance: number) {
-        if (this.brake <= 0) {
-            return (1 - this.brake);
-        }
-
-        //attenuate formula from: http://learnopengl.com/#!Lighting/Light-casters
-        return (1 - this.brake) * (1 / (1 + distance * 0.000014 + distance * distance * 0.000000008));
-    }
-
-    protected _startAttenuatingAutoScroll(deltaMove: cc.Vec2, initialVelocity: cc.Vec2) {
-        let time = this._calculateAutoScrollTimeByInitalSpeed(initialVelocity.mag());
-
-
-        let targetDelta = deltaMove.normalize();
-        let contentSize = this.content.getContentSize();
-        let scrollviewSize = this._view.getContentSize();
-
-        let totalMoveWidth = (contentSize.width - scrollviewSize.width);
-        let totalMoveHeight = (contentSize.height - scrollviewSize.height);
-
-        let attenuatedFactorX = this._calculateAttenuatedFactor(totalMoveWidth);
-        let attenuatedFactorY = this._calculateAttenuatedFactor(totalMoveHeight);
-
-        targetDelta = cc.v2(targetDelta.x * totalMoveWidth * (1 - this.brake) * attenuatedFactorX, targetDelta.y * totalMoveHeight * attenuatedFactorY * (1 - this.brake));
-
-        let originalMoveLength = deltaMove.mag();
-        let factor = targetDelta.mag() / originalMoveLength;
-        targetDelta = targetDelta.add(deltaMove);
-
-        if (this.brake > 0 && factor > 7) {
-            factor = Math.sqrt(factor);
-            targetDelta = deltaMove.mul(factor).add(deltaMove);
-        }
-
-        if (this.brake > 0 && factor > 3) {
-            factor = 3;
-            time = time * factor;
-        }
-
-        if (this.brake === 0 && factor > 1) {
-            time = time * factor;
-        }
-
-        this._startAutoScroll(targetDelta, time, true);
-    }
-
-    protected _calculateAutoScrollTimeByInitalSpeed(initalSpeed: number) {
-        return Math.sqrt(Math.sqrt(initalSpeed / 5));
-    }
-
-    protected _startAutoScroll(deltaMove: cc.Vec2, timeInSecond: number, attenuated: boolean) {
-        let adjustedDeltaMove = this._flattenVectorByDirection(deltaMove);
-
-        this._autoScrolling = true;
-        this._autoScrollTargetDelta = adjustedDeltaMove;
-        this._autoScrollAttenuate = attenuated;
-        this._autoScrollStartPosition = this.getContentPosition();
-        this._autoScrollTotalTime = timeInSecond;
-        this._autoScrollAccumulatedTime = 0;
-        this._autoScrollBraking = false;
-        this._isScrollEndedWithThresholdEventFired = false;
-        this._autoScrollBrakingStartPosition = cc.v2(0, 0);
-
-        let currentOutOfBoundary = this._getHowMuchOutOfBoundary();
-        if (!currentOutOfBoundary.fuzzyEquals(cc.v2(0, 0), EPSILON)) {
-            this._autoScrollCurrentlyOutOfBoundary = true;
-        }
-    }
-
-    protected _calculateTouchMoveVelocity() {
-        let totalTime = 0;
-        totalTime = this._touchMoveTimeDeltas.reduce(function (a, b) {
-            return a + b;
-        }, totalTime);
-
-        if (totalTime <= 0 || totalTime >= 0.5) {
-            return cc.v2(0, 0);
-        }
-
-        let totalMovement = cc.v2(0, 0);
-        totalMovement = this._touchMoveDisplacements.reduce(function (a, b) {
-            return a.add(b);
-        }, totalMovement);
-
-        return cc.v2(totalMovement.x * (1 - this.brake) / totalTime,
-            totalMovement.y * (1 - this.brake) / totalTime);
-    }
-
     protected _flattenVectorByDirection(vector: cc.Vec2) {
-        let result = vector;
-        result.x = this.horizontal ? result.x : 0;
-        result.y = this.vertical ? result.y : 0;
+        const result = vector;
+        result.x = this.direction == Direction.HORIZONTAL ? result.x : 0;
+        result.y = this.direction == Direction.VERTICAL ? result.y : 0;
         return result;
     }
 
-    protected _moveContent(deltaMove: cc.Vec2, canStartBounceBack = false) {
-        let adjustedMove = this._flattenVectorByDirection(deltaMove);
-        let newPosition = this.getContentPosition().add(adjustedMove);
-
-        this.setContentPosition(newPosition);
-
-        let outOfBoundary = this._getHowMuchOutOfBoundary();
-        this._updateScrollBar(outOfBoundary);
-
-        if (this.elastic && canStartBounceBack) {
-            this._startBounceBackIfNeeded();
-        }
-    }
-
-    protected _getContentLeftBoundary() {
-        let contentPos = this.getContentPosition();
-        return contentPos.x - this.content.getAnchorPoint().x * this.content.getContentSize().width;
-    }
-
-    protected _getContentRightBoundary() {
-        let contentSize = this.content.getContentSize();
-        return this._getContentLeftBoundary() + contentSize.width;
-    }
-
-    protected _getContentTopBoundary() {
-        let contentSize = this.content.getContentSize();
-        return this._getContentBottomBoundary() + contentSize.height;
-    }
-
-    protected _getContentBottomBoundary() {
-        let contentPos = this.getContentPosition();
-        return contentPos.y - this.content.getAnchorPoint().y * this.content.getContentSize().height;
-    }
-
-    protected _getHowMuchOutOfBoundary(addition?: cc.Vec2) {
-        addition = addition || cc.v2(0, 0);
-        if (addition.fuzzyEquals(cc.v2(0, 0), EPSILON) && !this._outOfBoundaryAmountDirty) {
-            return this._outOfBoundaryAmount;
-        }
-
-        let outOfBoundaryAmount = cc.v2(0, 0);
-        if (this._getContentLeftBoundary() + addition.x > this._leftBoundary) {
-            outOfBoundaryAmount.x = this._leftBoundary - (this._getContentLeftBoundary() + addition.x);
-        } else if (this._getContentRightBoundary() + addition.x < this._rightBoundary) {
-            outOfBoundaryAmount.x = this._rightBoundary - (this._getContentRightBoundary() + addition.x);
-        }
-
-        if (this._getContentTopBoundary() + addition.y < this._topBoundary) {
-            outOfBoundaryAmount.y = this._topBoundary - (this._getContentTopBoundary() + addition.y);
-        } else if (this._getContentBottomBoundary() + addition.y > this._bottomBoundary) {
-            outOfBoundaryAmount.y = this._bottomBoundary - (this._getContentBottomBoundary() + addition.y);
-        }
-
-        if (addition.fuzzyEquals(cc.v2(0, 0), EPSILON)) {
-            this._outOfBoundaryAmount = outOfBoundaryAmount;
-            this._outOfBoundaryAmountDirty = false;
-        }
-
-        outOfBoundaryAmount = this._clampDelta(outOfBoundaryAmount);
-
-        return outOfBoundaryAmount;
-    }
-
-    protected _updateScrollBarState() {
-        if (!this.content) {
+    /**
+    * @description 重写ScrollView的私有方法
+    * @param position 
+    * @returns 
+    */
+    setContentPosition(position: cc.Vec2) {
+        if (position.fuzzyEquals(this.getContentPosition(), this.getScrollEndedEventTiming())) {
             return;
         }
-        let contentSize = this.content.getContentSize();
-        let scrollViewSize = this._view.getContentSize();
-        if (this.verticalScrollBar) {
-            if (contentSize.height < scrollViewSize.height) {
-                this.verticalScrollBar.hide();
-            } else {
-                this.verticalScrollBar.show();
-            }
-        }
 
-        if (this.horizontalScrollBar) {
-            if (contentSize.width < scrollViewSize.width) {
-                this.horizontalScrollBar.hide();
-            } else {
-                this.horizontalScrollBar.show();
-            }
-        }
-    }
-
-    protected _updateScrollBar(outOfBoundary: cc.Vec2 = cc.v2(0, 0)) {
-        if (this.horizontalScrollBar) {
-            this.horizontalScrollBar._onScroll(outOfBoundary);
-        }
-
-        if (this.verticalScrollBar) {
-            this.verticalScrollBar._onScroll(outOfBoundary);
-        }
-    }
-
-    protected _onScrollBarTouchBegan() {
-        if (this.horizontalScrollBar) {
-            this.horizontalScrollBar._onTouchBegan();
-        }
-
-        if (this.verticalScrollBar) {
-            this.verticalScrollBar._onTouchBegan();
-        }
-    }
-
-    protected _onScrollBarTouchEnded() {
-        if (this.horizontalScrollBar) {
-            this.horizontalScrollBar._onTouchEnded();
-        }
-
-        if (this.verticalScrollBar) {
-            this.verticalScrollBar._onTouchEnded();
-        }
-    }
-
-    protected _dispatchEvent(event: EventType) {
-        if (event === EventType.SCROLL_ENDED) {
-            this._scrollEventEmitMask = 0;
-
-        } else if (event === EventType.SCROLL_TO_TOP ||
-            event === EventType.SCROLL_TO_BOTTOM ||
-            event === EventType.SCROLL_TO_LEFT ||
-            event === EventType.SCROLL_TO_RIGHT) {
-            let flag = (1 << eventMap[event]);
-            if (this._scrollEventEmitMask & flag) {
-                return;
-            } else {
-                this._scrollEventEmitMask |= flag;
-            }
-        }
-
-        cc.Component.EventHandler.emitEvents(this.scrollEvents, this, event);
-        this.node.emit(event, this);
-    }
-
-    protected _adjustContentOutOfBoundary() {
+        this.content.setPosition(position);
+        this._calculateSightArea();
         this._outOfBoundaryAmountDirty = true;
-        if (this._isOutOfBoundary()) {
-            let outOfBoundary = this._getHowMuchOutOfBoundary(cc.v2(0, 0));
-            let newPosition = this.getContentPosition().add(outOfBoundary);
-            if (this.content) {
-                this._setContentPosition(newPosition);
-                this._updateScrollBar(cc.v2(0, 0));
-            }
-        }
-    }
-
-    protected start() {
-        this._calculateBoundary();
-        //Because widget component will adjust content position and scrollview position is correct after visit
-        //So this event could make sure the content is on the correct position after loading.
-        if (this.content) {
-            cc.director.once(cc.Director.EVENT_BEFORE_DRAW, this._adjustContentOutOfBoundary, this);
-        }
-    }
-
-    protected _hideScrollbar() {
-        if (this.horizontalScrollBar) {
-            this.horizontalScrollBar.hide();
-        }
-
-        if (this.verticalScrollBar) {
-            this.verticalScrollBar.hide();
-        }
-    }
-
-    protected onDisable() {
-        if (!CC_EDITOR) {
-            this._unregisterEvent();
-            if (this.content) {
-                this.content.off(cc.Node.EventType.SIZE_CHANGED, this._calculateBoundary, this);
-                this.content.off(cc.Node.EventType.SCALE_CHANGED, this._calculateBoundary, this);
-                if (this._view) {
-                    this._view.off(cc.Node.EventType.POSITION_CHANGED, this._calculateBoundary, this);
-                    this._view.off(cc.Node.EventType.SCALE_CHANGED, this._calculateBoundary, this);
-                    this._view.off(cc.Node.EventType.SIZE_CHANGED, this._calculateBoundary, this);
-                }
-            }
-        }
-        this._hideScrollbar();
-        this.stopAutoScroll();
-    }
-
-    protected onEnable() {
-        if (!CC_EDITOR) {
-            this._registerEvent();
-            if (this.content) {
-                this.content.on(cc.Node.EventType.SIZE_CHANGED, this._calculateBoundary, this);
-                this.content.on(cc.Node.EventType.SCALE_CHANGED, this._calculateBoundary, this);
-                if (this._view) {
-                    this._view.on(cc.Node.EventType.POSITION_CHANGED, this._calculateBoundary, this);
-                    this._view.on(cc.Node.EventType.SCALE_CHANGED, this._calculateBoundary, this);
-                    this._view.on(cc.Node.EventType.SIZE_CHANGED, this._calculateBoundary, this);
-                }
-            }
-        }
-        this._updateScrollBarState();
-    }
-
-    protected update(dt) {
-        if (this._autoScrolling) {
-            this._processAutoScrolling(dt);
-        }
     }
 }
