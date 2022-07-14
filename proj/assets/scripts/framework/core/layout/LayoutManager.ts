@@ -23,13 +23,7 @@ export class LayoutManager implements ISingleton {
         let target: Node | Scene;
         let inverseTranslate = new Vec2();
         let inverseScale = new Vec2();
-
-
-        let a = 10;
-        a++;
-
-
-
+        
         if (hasTarget) {
             target = hasTarget;
             this.computeInverseTransForTarget(node, target, inverseTranslate, inverseScale);

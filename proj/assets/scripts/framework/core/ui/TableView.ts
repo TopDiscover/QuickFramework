@@ -1,10 +1,8 @@
-import { ScrollView, _decorator, Node, Enum, Size, Vec3, UITransform, Vec2, instantiate, v3, v2, ScrollBar } from "cc";
+import { ScrollView, _decorator, Node, Enum, Size, Vec3, UITransform, Vec2, instantiate, v3, v2, ScrollBar, EventMouse } from "cc";
 import { LayoutParam, LayoutType } from "../layout/LayoutDefines";
 import { CellType, TableViewCell } from "./TableViewCell";
 
 const { ccclass, property } = _decorator;
-
-const _tempVec3 = new Vec3();
 
 interface UpdateIndices {
     from: number,
@@ -314,7 +312,8 @@ export default class TableView extends ScrollView {
     public static FillOrder = FillOrder;
 
     @property({
-        override: true, displayOrder: 20, visible: function (this: TableView) {
+        override: true, displayOrder: 20,
+        visible: function (this: TableView) {
             return this.direction == Direction.HORIZONTAL;
         }
     })
@@ -335,7 +334,8 @@ export default class TableView extends ScrollView {
     }
 
     @property({
-        override: true, displayOrder: 21, visible: function (this: TableView) {
+        override: true, displayOrder: 21,
+        visible: function (this: TableView) {
             return this.direction == Direction.VERTICAL;
         }
     })
@@ -367,13 +367,6 @@ export default class TableView extends ScrollView {
         if (this._direction == v) {
             return;
         }
-        if ( v == Direction.HORIZONTAL ){
-            this.horizontal = true;
-            this.vertical = false;
-        }else{
-            this.horizontal = false;
-            this.vertical = true;
-        }
         this._direction = v;
     }
 
@@ -387,7 +380,7 @@ export default class TableView extends ScrollView {
     * @deprecated 不支持该方法，请使用direction替代
     */
     @property({ visible: false, override: true })
-    public vertical = false;
+    public vertical = true;
 
     @property({ tooltip: "Cell项模板", displayName: "Template", type: TableViewCell, visible: true, displayOrder: 23 })
     protected _template: TableViewCell[] = [];
@@ -443,7 +436,7 @@ export default class TableView extends ScrollView {
     protected _isDoing: boolean = false;
 
     /**@description 测试用 */
-    private _isShowAllCell = false;
+    protected _isShowAllCell = false;
 
 
     protected get viewSize() {
@@ -463,7 +456,7 @@ export default class TableView extends ScrollView {
     }
 
     protected get contentSize() {
-        let trans = this.view?.getComponent(UITransform);
+        let trans = this.content?.getComponent(UITransform);
         if (trans) {
             return trans.contentSize;
         }
@@ -478,65 +471,6 @@ export default class TableView extends ScrollView {
         return Vec2.ZERO;
     }
 
-    /**
-     * @deprecated 不支持
-     * @param timeInSecond 
-     * @param attenuated 
-     */
-    scrollToBottomLeft(timeInSecond?: number, attenuated = true) {
-        Log.w(`不支持 : scrollToBottomLeft`);
-    }
-
-    /**
-     * @description 不支持
-     * @param timeInSecond 
-     * @param attenuated 
-     */
-    scrollToBottomRight(timeInSecond?: number, attenuated = true) {
-        Log.w(`不支持 : scrollToBottomRight`);
-    }
-
-    public setContentPosition(position: Vec3) {
-        this._setContentPosition(position);
-    }
-
-    protected _setContentPosition(position: Vec3) {
-        if (!this.content) {
-            return;
-        }
-        const contentPos = this._getContentPosition();
-        if (Math.abs(position.x - contentPos.x) < this.getScrollEndedEventTiming() && Math.abs(position.y - contentPos.y) < this.getScrollEndedEventTiming()) {
-            return;
-        }
-        this.content.setPosition(position);
-        this._calculateSightArea();
-    }
-
-    private _getContentPosition(): Vec3 {
-        if (!this._content) {
-            return Vec3.ZERO.clone();
-        }
-
-        this._contentPos.set(this._content.position);
-        return this._contentPos;
-    }
-
-    protected _adjustContentOutOfBoundary() {
-        if (!this._content) {
-            return;
-        }
-
-        this._outOfBoundaryAmountDirty = true;
-        if (this._isOutOfBoundary()) {
-            const outOfBoundary = this._getHowMuchOutOfBoundary();
-            _tempVec3.set(this._getContentPosition());
-            _tempVec3.add(outOfBoundary);
-            this._content.setPosition(_tempVec3);
-            this._updateScrollBar(Vec2.ZERO);
-            this._calculateSightArea();
-        }
-    }
-
     /**@description 滚动到指定项 */
     scrollToIndex(index: number, timeInSecond = 0, attenuated = true) {
         if (!this.content) {
@@ -546,54 +480,26 @@ export default class TableView extends ScrollView {
             Log.e(`错误的index : ${index}`)
             return;
         }
-        Log.d(`滚动到 : ${index}`);
+        // Log.d(`滚动到 : ${index}`);
+        let offset = this.getScrollOffset();
         let info = this._cellsInfos[index]
-        // info.calculatePosition();
-        let _offset = this._getContentPosition();
-        let offset = v2(_offset.x, _offset.y);
-        let viewSize = this.viewSize;
-        let viewAnchor = this.viewAnchor;
-
-        let viewBottom = -viewAnchor.y * viewSize.height;
-        let viewLeft = viewAnchor.x * viewSize.width;
-
         // Log.d(`offset : (${offset.x},${offset.y})`)
-        // Log.d(`contentSize : (${this.content.width},${this.content.height})`);
-        if (this.direction == Direction.HORIZONTAL) {
-            offset.x = viewLeft;
-        } else {
-            offset.y = viewBottom;
-        }
-
-        let result = info.calculateSight(this.fillOrder, this.direction == Direction.HORIZONTAL, offset, viewSize)
-        // Log.d(v);
-
-        let layoutParam = new LayoutParam;
-        layoutParam.node = this.content;
-        layoutParam.target = this.view!.node;
-        if (this.direction == Direction.HORIZONTAL) {
-            //水平方向//计算出节点相对content的偏移量
-            layoutParam.alignFlags = LayoutType.MID_LETF;
-            layoutParam.left = result.offset;
-            // Log.d(`left : ${layoutParam.left}`);
-        } else {
-            //垂直方向
-            layoutParam.alignFlags = LayoutType.CENTER_TOP;
-            //按顶对齐，第一次对齐，只是对齐到可显示区域最下面，所有要x2，把显示区域移动到最顶端
-            let topOffset = 2 * viewSize.height;
-            if (this.fillOrder == FillOrder.TOP_DOWN) {
-                // Log.d(`result : ${result.offset}`)
-                layoutParam.top = result.offset - topOffset;
-                // Log.d(`top : ${layoutParam.top}`);
+        if (this.fillOrder == FillOrder.TOP_DOWN) {
+            if (this.direction == Direction.HORIZONTAL) {
+                offset.x = info.offset;
             } else {
-                layoutParam.top = -result.offset - topOffset;
-                // Log.d(`bottom : ${layoutParam.bottom}`);
+                offset.y = info.offset;
+            }
+        } else {
+            let next = this._cellsInfos[index + 1];
+            if (this.direction == Direction.HORIZONTAL) {
+                offset.x = this.contentSize.width - next.offset;
+            } else {
+                offset.y = this.contentSize.height - next.offset;
             }
         }
 
-        Manager.layout.align(layoutParam);
-        // Log.d(`offset new  : (${offset.x},${offset.y})`)
-        this.scrollToOffset(layoutParam.result.position, timeInSecond, attenuated);
+        this.scrollToOffset(offset, timeInSecond, attenuated);
     }
 
     /**
@@ -650,11 +556,8 @@ export default class TableView extends ScrollView {
         }
         this._isDoing = true;
         let offset = this.getScrollOffset();
-        // this._debugCell("更新Cell前")
-        // this._debugCellInfos("【插入${index}更新Cell前】")
         this._updateCellOffsets();
         this._updateContentSize();
-        // this._debugCellInfos(`【插入${index}更新Cell后】`)
 
         let cell = this.cellAtIndex(index);
         if (cell) {
@@ -707,12 +610,10 @@ export default class TableView extends ScrollView {
 
         this._updateCellOffsets();
         this._updateContentSize();
-        // this._debugCell(`【删除前】`);
         this._moveCellIndex(index, true);
         this._isDoing = false;
         this._calculateSightArea();
         this.scrollToOffset(offset);
-        // this._debugCell(`【删除后】`);
     }
 
     /**
@@ -849,11 +750,9 @@ export default class TableView extends ScrollView {
      * @description 按index的升序排序
      */
     private _sortCell() {
-        // this._debugCell("【排序前】")
         this._cellsUsed = this._cellsUsed.sort((a, b) => {
             return a.index - b.index;
         });
-        // this._debugCell("【排序后】")
     }
 
     private _debugCellInfos(title: string) {
@@ -1011,9 +910,8 @@ export default class TableView extends ScrollView {
         if (this._isDoing) {
             return;
         }
-        // Log.d(`当前Content偏移 : (${this.content.x},${this.content.y})`)
         //计算开始点结束点
-        let _offset = this._getContentPosition();
+        let _offset = this.content.position;
         let offset = new Vec2(_offset.x, _offset.y);
         let contentSize = this.contentSize;
         let contentAnchor = this.contentAnchor;
@@ -1024,8 +922,6 @@ export default class TableView extends ScrollView {
         let viewBottom = -viewAnchor.y * viewSize.height;
         let viewLeft = viewAnchor.x * viewSize.width;
 
-        // let line1 = cc.find("line1", this.content);
-        // let line2 = cc.find("line2", this.content);
         contentBottom = offset.y + contentBottom;
 
         let vec: Vec2 = null!;
@@ -1034,18 +930,6 @@ export default class TableView extends ScrollView {
         } else {
             vec = v2(offset.x, viewBottom).add(offset);
         }
-        // if ( this.horizontal ){
-        //     Log.d("最左", `(${vec.x},${vec.y})`);
-        //     line1.setPosition(-vec.x,line1.y)
-        // }else{
-        //     Log.d("最项", `(${vec.x},${vec.y})`);
-        //     line1.setPosition(line1.x, -vec.y)
-        // }
-
-        // this._cellsInfos.forEach((v, i) => {
-        //     v.debug();
-        //     v.calculate(this.fillOrder, this.horizontal, vec, viewSize);
-        // })
         // 要先排序，才能进行计算
         if (this._isUsedCellsDirty) {
             this._sortCell();
@@ -1092,24 +976,9 @@ export default class TableView extends ScrollView {
                     // Log.d(`Cell[${i}]项已经显示，跳过更新`);
                     continue;
                 }
-                // Log.d(`添加Cell ${i}`);
                 this.updateCellAtIndex(i);
             }
-
-            // this._debugCell("【更新Cell后】")
-            // this._debugCellInfos("【更新Cell后】");
         }
-
-
-        // if ( this.horizontal ){
-        //     vec.x -= this._view.width;
-        //     Log.d("最右", `(${vec.x},${vec.y})`);
-        //     line2.setPosition(-vec.x, line1.y)
-        // }else{
-        //     vec.y += this._view.height;
-        //     Log.d("最底", `(${vec.x},${vec.y})`);
-        //     line2.setPosition(line2.x, -vec.y)
-        // }
     }
 
 
@@ -1168,13 +1037,11 @@ export default class TableView extends ScrollView {
         let viewSize = this.viewSize;
         let search: number = -1;
         let index = 0;
-        // Log.d(`Cell信息大小 : ${this._cellsInfos.length}`)
         while (high >= low) {
             index = Math.floor(low + (high - low) / 2);
             if (index < 0 || index >= this._cellsInfos.length) {
                 return null;
             }
-            // Log.d(index);
             let cellStart = this._cellsInfos[index];
             let startResult = cellStart.calculateSight(this.fillOrder, this.direction == Direction.HORIZONTAL, offset, viewSize);
             if (startResult.isInSight) {
@@ -1199,11 +1066,9 @@ export default class TableView extends ScrollView {
         }
 
         if (search < 0) {
-            // Log.e(`未找到显示项`);
             return null;
         }
 
-        // Log.d(`找到第一个可显示的Cell索引 : ${search}`);
         result.start = search;
         result.end = search;
         //向前找出可显示Cell
@@ -1234,15 +1099,87 @@ export default class TableView extends ScrollView {
         return result;
     }
 
-    start(){
-        this.horizontal = this.direction == Direction.HORIZONTAL;
-        this.vertical = this.direction == Direction.VERTICAL;
-        super.start();
+    /**
+     * @description 不支持该方法
+     */
+    scrollToTopLeft(timeInSecond?: number, attenuated?: boolean): void {
+        Log.w(`不支持该方法`);
     }
 
-    onEnable(){
-        this.horizontal = this.direction == Direction.HORIZONTAL;
-        this.vertical = this.direction == Direction.VERTICAL;
-        super.onEnable();
+    /**
+     * @description 不支持该方法
+     */
+    scrollToTopRight(timeInSecond?: number, attenuated?: boolean): void {
+        Log.w(`不支持该方法`);
+    }
+
+    /**
+     * @deprecated 不支持该方法
+     */
+    scrollToBottomLeft(timeInSecond?: number, attenuated?: boolean): void {
+        Log.w(`不支持该方法`);
+    }
+
+    /**
+     * @description 不支持该方法
+     */
+    scrollToBottomRight(timeInSecond?: number, attenuated?: boolean): void {
+        Log.w(`不支持该方法`);
+    }
+
+    protected _onMouseWheel(event: EventMouse, captureListeners?: Node[]) {
+        if (!this.enabledInHierarchy) {
+            return;
+        }
+
+        if (this._hasNestedViewGroup(event, captureListeners)) {
+            return;
+        }
+
+        const deltaMove = new Vec3();
+        const wheelPrecision = -0.1;
+        const scrollY = event.getScrollY();
+        if (this.direction == Direction.VERTICAL) {
+            deltaMove.set(0, scrollY * wheelPrecision, 0);
+        } else {
+            deltaMove.set(scrollY * wheelPrecision, 0, 0);
+        }
+
+        this._mouseWheelEventElapsedTime = 0;
+        this._processDeltaMove(deltaMove);
+
+        if (!this._stopMouseWheel) {
+            this._handlePressLogic();
+            this.schedule(this._checkMouseWheel, 1.0 / 60, NaN, 0);
+            this._stopMouseWheel = true;
+        }
+
+        this._stopPropagationIfTargetIsMe(event);
+    }
+
+    protected _flattenVectorByDirection(vector: Vec3) {
+        const result = vector;
+        result.x = this.direction == Direction.HORIZONTAL ? result.x : 0;
+        result.y = this.direction == Direction.VERTICAL ? result.y : 0;
+        return result;
+    }
+
+    /**
+    * @description 重写ScrollView的私有方法
+    * @param position 
+    * @returns 
+    */
+    private _setContentPosition(position: Vec3) {
+        if (!this._content) {
+            return;
+        }
+        const contentPos = this.content?.getPosition()!;
+        if (Math.abs(position.x - contentPos.x) < this.getScrollEndedEventTiming() && Math.abs(position.y - contentPos.y) < this.getScrollEndedEventTiming()) {
+            return;
+        }
+
+        this._content.setPosition(position);
+        this._calculateSightArea();
+        this._outOfBoundaryAmountDirty = true;
     }
 }
