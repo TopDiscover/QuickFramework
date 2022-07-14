@@ -305,6 +305,7 @@ class _Tools {
             else if (stat.isFile()) {
                 // Size in Bytes
                 size = stat['size'];
+                // creator >= 2.4.7 , md5 变化问题引擎组已经修复
                 md5 = require("crypto").createHash('md5').update((0, fs_1.readFileSync)(subpath)).digest('hex');
                 compressed = path_1.default.extname(subpath).toLowerCase() === '.zip';
                 relative = path_1.default.relative(source, subpath);
