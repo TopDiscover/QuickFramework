@@ -8,13 +8,29 @@ declare module cc {
 		userData: any;
 	}
 
-	export interface Scrollbar{
-		hide():void;
-		show():void;
-		_onTouchEnded():void;
-		_onTouchBegan():void;
-		_onScroll(offset : cc.Vec2):void;
-		setTargetScrollView(view : Component):void;
+	/**@description 这些接口是TableView中使用到的接口，需要声明引擎内部的接口 */
+	export interface ScrollView{
+
+		_outOfBoundaryAmountDirty : boolean;
+		_mouseWheelEventElapsedTime : number;
+		_bottomBoundary : number;
+		_topBoundary : number;
+		_rightBoundary : number;
+		_leftBoundary : number;
+		_stopMouseWheel:boolean;
+		_scrolling : boolean;
+
+		getScrollEndedEventTiming():number;
+		hasNestedViewGroup(event:Event,captureListeners?:Node[]);
+		
+		_processDeltaMove(deltaMove:cc.Vec2);
+		_handlePressLogic();
+		_checkMouseWheel(dt:number);
+		_stopPropagationIfTargetIsMe(event:Event);
+		_clampDelta(deltaMove:cc.Vec2):cc.Vec2;
+		_dispatchEvent(event:string);
+		_getHowMuchOutOfBoundary(addition?:cc.Vec2):cc.Vec2;
+		_moveContent(deltaMove:cc.Vec2, canStartBounceBack:boolean);
 	}
 
 	export interface Sprite {
