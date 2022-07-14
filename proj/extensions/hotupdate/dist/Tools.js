@@ -305,30 +305,9 @@ class _Tools {
             else if (stat.isFile()) {
                 // Size in Bytes
                 size = stat['size'];
-                //这里需要处理下,在只修改主包或都其它bundle时，会引起md5的变更config.json
-                if (subpath.includes("config.json")) {
-                    try {
-                        let content = (0, fs_1.readFileSync)(subpath, "utf-8");
-                        let config = JSON.parse(content);
-                        if (config && config.uuids && Array.isArray(config.uuids)) {
-                            delete config.redirect;
-                            config.uuids.sort();
-                            md5 = require("crypto").createHash('md5').update(JSON.stringify(config)).digest('hex');
-                        }
-                        else {
-                            console.warn(`${subpath}找不到uuids字段`);
-                            md5 = require("crypto").createHash('md5').update((0, fs_1.readFileSync)(subpath)).digest('hex');
-                        }
-                    }
-                    catch (err) {
-                        console.error(err);
-                        md5 = require("crypto").createHash('md5').update((0, fs_1.readFileSync)(subpath)).digest('hex');
-                    }
-                }
-                else {
-                    md5 = require("crypto").createHash('md5').update((0, fs_1.readFileSync)(subpath)).digest('hex');
-                    compressed = path_1.default.extname(subpath).toLowerCase() === '.zip';
-                }
+                // creator >= 3.4.2 , md5 变化问题引擎组已经修复
+                md5 = require("crypto").createHash('md5').update((0, fs_1.readFileSync)(subpath)).digest('hex');
+                compressed = path_1.default.extname(subpath).toLowerCase() === '.zip';
                 relative = path_1.default.relative(source, subpath);
                 relative = relative.replace(/\\/g, '/');
                 relative = encodeURI(relative);
