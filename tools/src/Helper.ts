@@ -1,17 +1,14 @@
-import { exec, ExecException } from "child_process";
-import { existsSync, symlinkSync, unlinkSync } from "fs";
-import { join } from "path";
-import { chdir, resourceUsage, stderr, stdout } from "process";
-
-interface ResultCmd {
-    data: any;
-    isSuccess: boolean;
-}
+import archiver from "archiver";
+import { createReadStream, createWriteStream, existsSync, readdirSync, statSync } from "fs";
+import { join, relative } from "path";
+import FileUtils from "./core/FileUtils";
+import { Handler } from "./core/Handler";
+import * as FixEngine from "./fix_engine/Helper";
 
 /**
  * @description 辅助类
  */
-export class Helper {
+export class Helper extends Handler {
 
     private static _instance: Helper = null!;
     static get instance() {
@@ -21,56 +18,7 @@ export class Helper {
     /**@description Bunldes 地址 */
     private readonly bundlesUrl = "https://gitee.com/top-discover/QuickFrameworkBundles.git";
 
-    /**@description 保存bundles的名称 */
-    private readonly bundleName = "bundles";
-
-    /**@description 当前项目路径 */
-    private readonly projPath = join(__dirname, "../../")
-
-    /**@description bundles保存路径 */
-    private readonly bundlesPath = join(__dirname, `../../${this.bundleName}`);
-
-    /**@description 链接代码路径 */
-    private readonly syncBundlesPath = join(__dirname, `../../proj/assets/${this.bundleName}`);
-
-    /**@description 需要安装依赖的目录 */
-    private readonly extensions = [
-        // "check_resources",
-        "fix_engine",
-        // "gulp-compress",
-        "hotupdate",
-        "png-compress",
-        "test-server",
-    ];
-
-    /**@description 插件路径 */
-    private readonly extensionsPath = join(__dirname, `../../proj/extensions/`);
-
-    /**@description 执行命令 */
-    private exec(cmd: string) {
-        return new Promise<ResultCmd>((resolve, reject) => {
-            console.log(`执行命令 : ${cmd}`);
-            let result = exec(cmd, (err, stdout, stderr) => {
-                if (err) {
-                    resolve({ isSuccess: false, data: stderr });
-                } else {
-                    resolve({ isSuccess: true, data: stdout });
-                }
-            });
-            result.stdout?.on("data", (data) => {
-                console.log(data)
-            });
-            result.stderr?.on("data", (data) => {
-                console.error(data);
-            })
-        })
-    }
-
-    private chdir(dir: string) {
-        console.log(`切换工作目录到 : ${dir}`);
-        chdir(dir);
-        console.log(`当前工作目录 : ${process.cwd()}`);
-    }
+    private _fixEngine = new FixEngine.default;
 
     /**@description 获取当前分支信息 */
     private async gitCurBranch() {
@@ -94,75 +42,152 @@ export class Helper {
 
     /**@description 摘取远程bundles */
     async gitBundles() {
-        this.log("摘取远程bundles",false);
+        this.log("摘取远程bundles", false);
         let branch = await this.gitCurBranch();
 
         if (existsSync(this.bundlesPath)) {
-            console.log(`已经存在 : ${this.bundlesPath}`);
+            this.logger.log(`已经存在 : ${this.bundlesPath}`);
             this.chdir(this.bundlesPath);
             let result = await this.exec("git pull");
-            console.log(`正在更新 : ${this.bundleName}`)
+            this.logger.log(`正在更新 : ${this.bundleName}`)
             if (!result.isSuccess) {
                 return;
             }
             result = await this.exec(`git checkout ${branch}`);
             if (result.isSuccess) {
-                console.log(`切换分支${branch}成功 : ${this.bundleName}`)
+                this.logger.log(`切换分支${branch}成功 : ${this.bundleName}`)
             }
         } else {
-            console.log(`不存在 : ${this.bundlesPath}`);
+            this.logger.log(`不存在 : ${this.bundlesPath}`);
             this.chdir(this.projPath);
-            console.log(`拉取远程 : ${this.bundleName}`)
+            this.logger.log(`拉取远程 : ${this.bundleName}`)
             let result = await this.exec(`git clone ${this.bundlesUrl} ${this.bundleName}`);
             if (!result.isSuccess) {
                 return;
             }
-            console.log(`摘取成功 : ${this.bundleName}`);
+            this.logger.log(`摘取成功 : ${this.bundleName}`);
             this.chdir(this.bundlesPath);
             result = await this.exec(`git checkout ${branch}`);
             if (result.isSuccess) {
-                console.log(`切换分支${branch}成功 : ${this.bundleName}`)
+                this.logger.log(`切换分支${branch}成功 : ${this.bundleName}`)
             }
         }
-        this.log("摘取远程bundles",true);
+        this.log("摘取远程bundles", true);
     }
 
     /**@description 链接代码 */
     symlinkSyncCode() {
-        this.log("链接代码",false);
-        if (existsSync(this.syncBundlesPath)) {
-            unlinkSync(this.syncBundlesPath);
-        }
-        let fromPath = join(this.bundlesPath,this.bundleName);
-        symlinkSync(fromPath, this.syncBundlesPath);
-        console.log(`创建 ${fromPath} -> ${this.syncBundlesPath}`);
-        this.log("链接代码",true);
+        this.log("链接代码", false);
+        let fromPath = join(this.bundlesPath, this.bundleName);
+        FileUtils.instance.symlinkSync(fromPath, this.syncBundlesPath)
+        this.log("链接代码", true);
     }
 
-    private log( name : string , isEnd : boolean ){
-        let start = "/****************** 【";
-        let end   = "】******************/"
-        if ( isEnd ){
-            console.log(`${start}${name} 完成 ${end}`)
-        }else{
-            console.log(`${start}${name} 开始 ${end}`)
+    /**
+     * @description 链接扩展插件代码
+     */
+    symlinkSyncExtensions() {
+        this.log(`链接扩展插件代码`, false);
+
+        for (let i = 0; i < this.extensions.length; i++) {
+            const element = this.extensions[i];
+            let toPath = join(this.extensionsPath, `${element}/src/core`);
+            let formPath = join(__dirname, `core`);
+            //core 部分代码
+            this.logger.log(`链接core`);
+            FileUtils.instance.symlinkSync(formPath, toPath);
+            //node_modules 依赖
+            this.logger.log(`链接node_modules`);
+            formPath = this.node_modules;
+            toPath = join(this.extensionsPath,`${element}/node_modules`);
+            FileUtils.instance.symlinkSync(formPath,toPath);
+
+            //链接实现
+            this.logger.log(`链接Impl`);
+            formPath = join(__dirname, element);
+            toPath = join(this.extensionsPath, `${element}/src/impl`);
+            FileUtils.instance.symlinkSync(formPath, toPath);
         }
+
+        this.log(`链接扩展插件代码`, true);
     }
 
     /**@description 安装依赖 */
     async installDepends() {
 
-        this.log("安装插件依赖",false);
+        this.log("安装插件依赖", false);
 
         for (let index = 0; index < this.extensions.length; index++) {
             const element = this.extensions[index];
             let path = join(this.extensionsPath, element);
             this.chdir(path);
-            console.log(`正在更新插件依赖 : ${element}`);
+            this.logger.log(`正在更新插件依赖 : ${element}`);
             await this.exec("npm install");
         }
 
-        this.log("安装插件依赖",true)
+        this.log("安装插件依赖", true)
+    }
+
+
+    /**@description 引擎修改 */
+    async fixEngine() {
+        this.log(`引擎修正`,false);
+        this._fixEngine.run();
+        this.log(`引擎修正`,true);
+    }
+
+    private getFilesFromPath(path: string, root: string, outFiles: { name: string, path: string }[]) {
+        if (!existsSync(path)) {
+            return null;
+        }
+
+        let readDir = readdirSync(path);
+        for (let i = 0; i < readDir.length; i++) {
+            let file = readDir[i];
+            let fullPath = join(path, file);
+            let stat = statSync(fullPath);
+            if (stat.isFile()) {
+                outFiles.push({ name: relative(root, fullPath), path: fullPath });
+            } else {
+                stat.isDirectory() && this.getFilesFromPath(fullPath, root, outFiles);
+            }
+        }
+    }
+
+    async zipArchive() {
+
+        let out: { name: string, path: string }[] = [];
+        let root = `D:/workspace/QuickFramework331/proj/build/windows/assets`;
+        this.getFilesFromPath(root, root, out);
+
+
+        let arch = archiver("zip", {
+            zlib: { level: 9 }
+        });
+
+        let output = createWriteStream(`D:/workspace/QuickFramework331/test.zip`);
+
+        arch.pipe(output);
+
+        for (let i = 0; i < out.length; i++) {
+            arch.append(createReadStream(out[i].path), { name: out[i].name })
+        }
+
+        arch.once("close", () => {
+            this.logger.log("close")
+        })
+
+        arch.once("end", () => {
+            this.logger.log("end");
+        })
+
+        arch.once("error", () => {
+            this.logger.log("error")
+        })
+
+        arch.finalize();
+        this.logger.log("ssssssssssss");
+
     }
 
 }
