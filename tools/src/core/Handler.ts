@@ -68,7 +68,10 @@ export class Handler {
             this.logger.log(`执行命令 : ${cmd}`);
             let result = exec(cmd, (err, stdout, stderr) => {
                 if (err) {
-                    resolve({ isSuccess: false, data: stderr });
+                    this.logger.error(`执行命令 : ${cmd}失败`);
+                    this.logger.error(err);
+                    // this.logger.error("错误原因",stderr);
+                    resolve({ isSuccess: false, data: err });
                 } else {
                     resolve({ isSuccess: true, data: stdout });
                 }
@@ -78,7 +81,6 @@ export class Handler {
             });
             result.stderr?.on("error", (data) => {
                 this.logger.error(data);
-                console.log(data);
             })
         })
     }
