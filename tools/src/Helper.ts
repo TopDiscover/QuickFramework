@@ -130,6 +130,12 @@ export class Helper extends Handler {
                 toPath = join(this.extensionsPath, `${element}/dist/impl/gulpfile.js`);
                 FileUtils.instance.symlinkSync(formPath, toPath,"file");
             }
+
+            //链接声明部分
+            this.logger.log(`链接声明部分`);
+            formPath = join(__dirname,`../@types`);
+            toPath = join(this.extensionsPath,`${element}/@types`);
+            FileUtils.instance.symlinkSync(formPath,toPath);
         }
 
         this.log(`链接扩展插件代码`, true);
