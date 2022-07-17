@@ -8,8 +8,6 @@ var CmdType;
 (function (CmdType) {
     /**@description 拉取 Bunldes 代码 */
     CmdType["GitBundles"] = "-gitBundles";
-    /**@description 安装依赖 */
-    CmdType["Depend"] = "-depend";
     /**@description 链接Bundles代码 */
     CmdType["Sync"] = "-sync";
     /**@description 链接扩展插件代码 */
@@ -18,6 +16,12 @@ var CmdType;
     CmdType["FixEngine"] = "-fixEngine";
     /**@description Gulp 压缩 */
     CmdType["Gulp"] = "-gulp";
+    /**@description 链接 gulpfile.js 到dist */
+    CmdType["LinkGulp"] = "-linkGulp";
+    /**@description 获取工程目录所有资源信息资源 */
+    CmdType["Assets"] = "-assets";
+    /**@description 压缩图片资源 */
+    CmdType["Pngquant"] = "-pngquant";
 })(CmdType = exports.CmdType || (exports.CmdType = {}));
 var Extensions;
 (function (Extensions) {

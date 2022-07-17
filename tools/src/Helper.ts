@@ -6,6 +6,9 @@ import FileUtils from "./core/FileUtils";
 import { Handler } from "./core/Handler";
 import * as FixEngine from "./fix_engine/Helper";
 import * as Gulp from "./gulp-compress/Helper";
+import * as Assets from "./core/AssetsHelper";
+import * as PngCompress from "./png-compress/Helper";
+import { Environment } from "./core/Environment";
 
 /**
  * @description 辅助类
@@ -25,6 +28,14 @@ export class Helper extends Handler {
 
     /**@description Gulp 压缩 */
     private _gulp = new Gulp.default()
+
+    /**@description 资源辅助类 */
+    private _assets = new Assets.default();
+
+    /**
+     * @description 图片压缩
+     */
+    private _pngCompress = new PngCompress.default();
 
     /**@description 获取当前分支信息 */
     private async gitCurBranch() {
@@ -134,7 +145,7 @@ export class Helper extends Handler {
 
     async gulp(){
         this.log(`Gulp`,false);
-        this._gulp.run();
+        await this._gulp.run();
         this.log(`Gulp`,true);
     }
 
@@ -143,6 +154,19 @@ export class Helper extends Handler {
         let path = "gulp-compress/gulpfile.js";
         FileUtils.instance.copyFile(join(__dirname,path),join(__dirname,`../dist/${path}`));
         this.log(`链接 gulpfile.js`,true);
+    }
+
+    async getAssets() {
+        await this._assets.getAssets();
+    }
+
+    /**
+     * @description 图集压缩
+     */
+    async pngCompress(){
+        this.log(`图片压缩`,false);
+        await this._pngCompress.onAfterBuild(Environment.build);
+        this.log(`图片压缩`,true);
     }
 
     private getFilesFromPath(path: string, root: string, outFiles: { name: string, path: string }[]) {

@@ -7,6 +7,8 @@ class Config extends Handler_1.Handler {
         super();
         /**@description 配置数据 */
         this._data = null;
+        /**@description 默认配置 */
+        this.defaultData = null;
     }
     get data() {
         return this._data;
@@ -38,7 +40,13 @@ class Config extends Handler_1.Handler {
                 // this.logger.log(`读取【${this.path}】配置数据 : ${data}`);
             }
             else {
-                this.logger.error(`${this.path} 不存在`);
+                if (this.defaultData) {
+                    this._data = this.defaultData;
+                    this.save();
+                }
+                else {
+                    this.logger.error(`${this.path} 不存在`);
+                }
             }
         }
         else {

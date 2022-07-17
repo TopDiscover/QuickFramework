@@ -15,8 +15,13 @@ class _Environment {
         this.supportVersions = ["3.3.1", "3.3.2", "3.4.0", "3.4.1", "3.4.2"];
         /**@description 扩展插件目录名 */
         this.extensionsName = "extensions";
+        this.build = {
+            platform: "web-mobile",
+            dest: "D:/workspace/QuickFramework331/proj/build/web-mobile",
+            md5Cache: false,
+        };
         /**@description 是否在tools目录下执行命令 */
-        this.isTools = false;
+        this.isCommand = false;
         /**@description 项目插件 */
         this.extensions = [
             // Extensions.CheckResources,
@@ -26,7 +31,7 @@ class _Environment {
             Defines_1.Extensions.TestServer,
         ];
         /**@description 是否进行代码混淆 */
-        this.isGulpCompex = true;
+        this.isGulpCompex = false;
     }
     static get instance() {
         return this._instance || (this._instance = new _Environment);

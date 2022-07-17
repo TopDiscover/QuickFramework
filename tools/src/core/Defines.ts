@@ -37,6 +37,10 @@ export enum CmdType{
     Gulp = "-gulp",
     /**@description 链接 gulpfile.js 到dist */
     LinkGulp = "-linkGulp",
+    /**@description 获取工程目录所有资源信息资源 */
+    Assets = "-assets",
+    /**@description 压缩图片资源 */
+    Pngquant = "-pngquant",
 }
 
 /**@description 命令行执行结果 */
@@ -53,6 +57,8 @@ export interface FileResult{
     relative : string,
     /**@description 文件的绝对路径 */
     path : string,
+    /**@description 文件大小 */
+    size : number,
 }
 
 export enum Extensions{
@@ -73,4 +79,47 @@ export enum Extensions{
 export interface GulpConfig{
     platform : string,
     dest : string
+}
+
+export interface BuilderOptions{
+    platform : string,
+    dest : string,
+    md5Cache : boolean,
+    debug ?: boolean,
+}
+
+export interface PngCompressConfig{
+    /**@description 构建完成反向查找不能查找到该资源，是否强行进行压缩,建议开启 */
+    enabledNoFound: boolean;
+    /**@description 项目构建完成后自动压缩PNG 资源 */
+    enabled: boolean,
+    /**@description 最低压缩质量 */
+    minQuality: number,
+    /**@description 最高压缩质量 */
+    maxQuality: number,
+    /**@description 压缩速度 */
+    speed: number,
+    /**@description 需要排除的文件夹,多个值之间必须用换行隔开 */
+    excludeFolders: string,
+    /**@description 需要排除的文件，多个值之间必须用换行隔开 */
+    excludeFiles: string,
+    /**@description 是否正在压缩 */
+    isProcessing : boolean,
+}
+
+export interface LibraryMaps{
+    [key:string] : string,
+    ".png" : string,
+    ".json" : string,
+}
+
+export interface AssetInfo{
+    /**@description 资源类型 */
+    type : string,
+    /**@description 资源uuid */
+    uuid : string,
+    /**@description 资源工程路径 */
+    file ?: string,
+    /**@description library */
+    library ?: LibraryMaps,
 }

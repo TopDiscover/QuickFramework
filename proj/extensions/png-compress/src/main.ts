@@ -1,6 +1,7 @@
 //@ts-ignore
-import { IBuildResult, IBuildTaskOption, Platform } from '../@types/packages/builder/@types';
-import { BuilderOptions, helper } from './Helper';
+import { Platform } from '../@types/packages/builder/@types';
+import { BuilderOptions } from './core/Defines';
+import { helper } from './HelperImpl';
 /**
  * @en 
  * @zh 为扩展的主进程的注册方法
@@ -11,28 +12,32 @@ export const methods: { [key: string]: (...any: any) => any } = {
         Editor.Panel.open(PACKAGE_NAME);
     },
     onBeforeBuild(platform: Platform) {
-        helper.readConfig();
-        if (helper.config.enabled) {
-            helper.config.isProcessing = true;
-            helper.saveConfig();
-            Editor.Message.send(PACKAGE_NAME, "onStartCompress");
-        } else {
-            helper.config.isProcessing = false;
-            helper.saveConfig();
+        helper.read(true);
+        if ( helper.data ){
+            if (helper.data.enabled) {
+                helper.data.isProcessing = true;
+                helper.save();
+                Editor.Message.send(PACKAGE_NAME, "onStartCompress");
+            } else {
+                helper.data.isProcessing = false;
+                helper.save();
+            }
         }
+        
         console.log("[图片压缩]:", `开始构建,构建平台:${platform}`);
     },
     onAfterBuild(op: BuilderOptions) {
-        helper.readConfig();
-        if (helper.config.enabled) {
-            helper.config.isProcessing = true;
-            helper.saveConfig();
-            Editor.Panel.open(PACKAGE_NAME);
-        } else {
-            helper.config.isProcessing = false;
-            helper.saveConfig();
+        helper.read(true)
+        if ( helper.data ){
+            if (helper.data.enabled) {
+                helper.data.isProcessing = true;
+                helper.save();
+                Editor.Panel.open(PACKAGE_NAME);
+            } else {
+                helper.data.isProcessing = false;
+                helper.save();
+            }
         }
-
         helper.onAfterBuild(op);
     }
 };

@@ -24,7 +24,7 @@ class FileUtils extends Handler_1.Handler {
         (0, fs_1.symlinkSync)(target, path, type);
         this.logger.log(`创建链接 ${target} -> ${path}`);
     }
-    _getFiles(path, root, result) {
+    _getFiles(path, root, result, isInclude) {
         if (!(0, fs_1.existsSync)(path)) {
             return result;
         }
@@ -32,24 +32,65 @@ class FileUtils extends Handler_1.Handler {
         for (let i = 0; i < readDir.length; i++) {
             let file = readDir[i];
             let fullPath = (0, path_1.join)(path, file);
+            if (fullPath[0] === '.') {
+                continue;
+            }
             let stat = (0, fs_1.statSync)(fullPath);
             if (stat.isFile()) {
-                result.push({ relative: (0, path_1.relative)(root, fullPath), path: fullPath, name: file });
+                let info = { relative: (0, path_1.relative)(root, fullPath), path: fullPath, name: file, size: stat.size };
+                if (isInclude) {
+                    if (isInclude(info)) {
+                        result.push(info);
+                    }
+                }
+                else {
+                    result.push(info);
+                }
             }
             else {
-                stat.isDirectory() && this._getFiles(fullPath, root, result);
+                stat.isDirectory() && this._getFiles(fullPath, root, result, isInclude);
             }
         }
     }
     /**
      * @description 获取目录下所有文件
      * @param path
+     * @param isInclude 是否包含该文件
      * @returns
      */
-    getFiles(path) {
+    getFiles(path, isInclude) {
         let out = [];
-        this._getFiles(path, path, out);
+        this._getFiles(path, path, out, isInclude);
         return out;
+    }
+    /**
+     * @description 复制文件
+     * @param src
+     * @param dest
+     * @param isForceCopy 如果之前有，会删除掉之前的dest文件
+     * @param callback
+     */
+    copyFile(src, dest, isForceCopy = false, onComplete) {
+        if (isForceCopy) {
+            this.delFile(dest);
+        }
+        let read = (0, fs_1.createReadStream)(src);
+        let write = (0, fs_1.createWriteStream)(dest);
+        read.pipe(write).once("close", () => {
+            onComplete && onComplete();
+        });
+    }
+    /**
+     * @description 删除文件
+     * @param filePath
+     * @returns
+     */
+    delFile(filePath) {
+        if ((0, fs_1.existsSync)(filePath)) {
+            (0, fs_1.unlinkSync)(filePath);
+            return true;
+        }
+        return false;
     }
 }
 exports.default = FileUtils;

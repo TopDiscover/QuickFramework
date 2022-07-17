@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.unload = exports.load = exports.methods = void 0;
-const Helper_1 = require("./Helper");
+const HelperImpl_1 = require("./HelperImpl");
 /**
  * @en
  * @zh 为扩展的主进程的注册方法
@@ -12,30 +12,34 @@ exports.methods = {
         Editor.Panel.open(PACKAGE_NAME);
     },
     onBeforeBuild(platform) {
-        Helper_1.helper.readConfig();
-        if (Helper_1.helper.config.enabled) {
-            Helper_1.helper.config.isProcessing = true;
-            Helper_1.helper.saveConfig();
-            Editor.Message.send(PACKAGE_NAME, "onStartCompress");
-        }
-        else {
-            Helper_1.helper.config.isProcessing = false;
-            Helper_1.helper.saveConfig();
+        HelperImpl_1.helper.read(true);
+        if (HelperImpl_1.helper.data) {
+            if (HelperImpl_1.helper.data.enabled) {
+                HelperImpl_1.helper.data.isProcessing = true;
+                HelperImpl_1.helper.save();
+                Editor.Message.send(PACKAGE_NAME, "onStartCompress");
+            }
+            else {
+                HelperImpl_1.helper.data.isProcessing = false;
+                HelperImpl_1.helper.save();
+            }
         }
         console.log("[图片压缩]:", `开始构建,构建平台:${platform}`);
     },
     onAfterBuild(op) {
-        Helper_1.helper.readConfig();
-        if (Helper_1.helper.config.enabled) {
-            Helper_1.helper.config.isProcessing = true;
-            Helper_1.helper.saveConfig();
-            Editor.Panel.open(PACKAGE_NAME);
+        HelperImpl_1.helper.read(true);
+        if (HelperImpl_1.helper.data) {
+            if (HelperImpl_1.helper.data.enabled) {
+                HelperImpl_1.helper.data.isProcessing = true;
+                HelperImpl_1.helper.save();
+                Editor.Panel.open(PACKAGE_NAME);
+            }
+            else {
+                HelperImpl_1.helper.data.isProcessing = false;
+                HelperImpl_1.helper.save();
+            }
         }
-        else {
-            Helper_1.helper.config.isProcessing = false;
-            Helper_1.helper.saveConfig();
-        }
-        Helper_1.helper.onAfterBuild(op);
+        HelperImpl_1.helper.onAfterBuild(op);
     }
 };
 /**

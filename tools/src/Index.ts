@@ -11,10 +11,12 @@ async function main() {
         }
     }
 
-    Environment.isTools = true;
+    Environment.isCommand = true;
 
     // 如果需要使用Gulp 请先编译代码
     // argv.push(CmdType.Gulp);
+    // argv.push(CmdType.Assets);
+    // argv.push(CmdType.Pngquant);
 
     console.log(`输入参数为 : `,argv);
     if (argv.length <= 0) {
@@ -37,6 +39,10 @@ async function main() {
                 await Helper.instance.gulp();
             }else if( type == CmdType.LinkGulp){
                 await Helper.instance.linkGulp();
+            }else if( type == CmdType.Assets){
+                await Helper.instance.getAssets();
+            }else if( type == CmdType.Pngquant){
+                await Helper.instance.pngCompress();
             }
             type = argv.shift();
         }

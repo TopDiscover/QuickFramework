@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs_extra_1 = require("fs-extra");
+const fs_1 = require("fs");
 const path_1 = require("path");
 const vue_1 = require("vue");
-const Helper_1 = require("../../../Helper");
+const HelperImpl_1 = require("../../../HelperImpl");
 let view = null;
 module.exports = Editor.Panel.define({
     listeners: {},
-    template: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
-    style: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
+    template: (0, fs_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
+    style: (0, fs_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
     $: {
         app: "#app"
     },
@@ -19,8 +19,8 @@ module.exports = Editor.Panel.define({
                 view.progress = progress;
                 if (progress >= 100) {
                     view.isProcessing = false;
-                    Helper_1.helper.config.isProcessing = false;
-                    Helper_1.helper.saveConfig();
+                    HelperImpl_1.helper.data.isProcessing = false;
+                    HelperImpl_1.helper.save();
                 }
             }
         },
@@ -45,17 +45,17 @@ module.exports = Editor.Panel.define({
             //指定Vue3 自己定义控件跳过解析
             app.config.compilerOptions.isCustomElement = tag => tag.startsWith("ui-");
             app.component("view-content", {
-                template: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/vue/view.html'), 'utf-8'),
+                template: (0, fs_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/vue/view.html'), 'utf-8'),
                 data() {
                     return {
-                        enabled: Helper_1.helper.config.enabled,
-                        enabledNoFound: Helper_1.helper.config.enabledNoFound,
-                        minQuality: Helper_1.helper.config.minQuality,
-                        maxQuality: Helper_1.helper.config.maxQuality,
-                        speed: Helper_1.helper.config.speed,
-                        excludeFolders: Helper_1.helper.config.excludeFolders,
-                        excludeFiles: Helper_1.helper.config.excludeFiles,
-                        isProcessing: Helper_1.helper.config.isProcessing,
+                        enabled: HelperImpl_1.helper.data.enabled,
+                        enabledNoFound: HelperImpl_1.helper.data.enabledNoFound,
+                        minQuality: HelperImpl_1.helper.data.minQuality,
+                        maxQuality: HelperImpl_1.helper.data.maxQuality,
+                        speed: HelperImpl_1.helper.data.speed,
+                        excludeFolders: HelperImpl_1.helper.data.excludeFolders,
+                        excludeFiles: HelperImpl_1.helper.data.excludeFiles,
+                        isProcessing: HelperImpl_1.helper.data.isProcessing,
                         progress: 0,
                         buildAssetsDir: "",
                         sourceAssetsDir: sourcePath,
@@ -64,39 +64,39 @@ module.exports = Editor.Panel.define({
                 methods: {
                     onChangeEnabled(enabled) {
                         // console.log("enabled",enabled);
-                        Helper_1.helper.config.enabled = enabled;
+                        HelperImpl_1.helper.data.enabled = enabled;
                         this.onSaveConfig();
                     },
                     onChangeEnabledNoFound(enabled) {
-                        Helper_1.helper.config.enabledNoFound = enabled;
+                        HelperImpl_1.helper.data.enabledNoFound = enabled;
                         this.onSaveConfig();
                     },
                     onChangeMinQuality(value) {
                         // console.log("minQuality",value);
-                        Helper_1.helper.config.minQuality = value;
+                        HelperImpl_1.helper.data.minQuality = value;
                     },
                     onChangeMaxQuality(value) {
                         // console.log("maxQuality",value)
-                        Helper_1.helper.config.maxQuality = value;
+                        HelperImpl_1.helper.data.maxQuality = value;
                     },
                     onChangeSpeed(value) {
                         // console.log("speed",value);
-                        Helper_1.helper.config.speed = value;
+                        HelperImpl_1.helper.data.speed = value;
                     },
                     onInputExcludeFoldersOver(value) {
                         // console.log("excludeFolders",value);
-                        Helper_1.helper.config.excludeFolders = value;
+                        HelperImpl_1.helper.data.excludeFolders = value;
                     },
                     onInputExcludeFilesOver(value) {
                         // console.log(`excludeFiles`,value);
-                        Helper_1.helper.config.excludeFiles = value;
+                        HelperImpl_1.helper.data.excludeFiles = value;
                     },
                     /**@description 保存配置 */
                     onSaveConfig() {
-                        Helper_1.helper.saveConfig();
+                        HelperImpl_1.helper.save();
                     },
                     onStartCompress() {
-                        Helper_1.helper.onStartCompress(this.sourceAssetsDir);
+                        HelperImpl_1.helper.startCompress(this.sourceAssetsDir);
                     }
                 },
                 created() {

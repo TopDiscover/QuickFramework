@@ -17,6 +17,9 @@ export default class Config<T> extends Handler{
         return "";
     }
 
+    /**@description 默认配置 */
+    readonly defaultData : T | null = null;
+
     constructor(){
         super();
     } 
@@ -43,7 +46,12 @@ export default class Config<T> extends Handler{
                 
                 // this.logger.log(`读取【${this.path}】配置数据 : ${data}`);
             }else{
-                this.logger.error(`${this.path} 不存在`);
+                if ( this.defaultData ){
+                    this._data = this.defaultData;
+                    this.save();
+                }else{
+                    this.logger.error(`${this.path} 不存在`);
+                }
             }
         }else{
             this.logger.error(`配置的路径为空`);

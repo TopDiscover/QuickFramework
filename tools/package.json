@@ -9,7 +9,9 @@
     "main": "node -r ts-node/register src/Index.ts",
     "fixEngine": "node -r ts-node/register src/Index.ts -fixEngine",
     "gulp": "node dist/Index.js -gulp",
-    "linkGulp": "node -r ts-node/register src/Index.ts -linkGulp"
+    "linkGulp": "node -r ts-node/register src/Index.ts -linkGulp",
+    "assets": "node -r ts-node/register src/Index.ts -assets",
+    "pngquant": "node -r ts-node/register src/Index.ts -pngquant"
   },
   "devDependencies": {
     "@types/archiver": "^5.3.1",
@@ -31,6 +33,7 @@
     "gulp-javascript-obfuscator": "^1.1.6",
     "gulp-uglify": "^3.0.2",
     "nodejs-websocket": "^1.7.2",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "vue": "^3.1.4"
   }
 }

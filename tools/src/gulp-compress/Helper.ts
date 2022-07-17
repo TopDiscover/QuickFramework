@@ -45,6 +45,9 @@ export default class Helper extends Config<GulpConfig> {
     }
 
     protected get dest() {
+        if ( Environment.isCommand ){
+            return Environment.build.dest;
+        }
         // return join(__dirname, "../../test");
         this.read(true);
         if (!this.data) {
@@ -61,6 +64,12 @@ export default class Helper extends Config<GulpConfig> {
 
     /**@description 判断是否是web */
     get isWeb() {
+        if ( Environment.isCommand ){
+            if ( this.isNative(Environment.build.platform)){
+                return false;
+            }
+            return true;
+        }
         this.read(true)
         if (!this.data) {
             this.logger.error(`${this.module}构建信息有误`);
@@ -74,6 +83,9 @@ export default class Helper extends Config<GulpConfig> {
     }
 
     get platform() {
+        if ( Environment.isCommand ){
+            return Environment.build.platform;
+        }
         this.read(true);
         if (!this.data) {
             this.logger.error(`${this.module}构建信息有误`);

@@ -4,15 +4,6 @@
     "name": "png-compress",
     "description": "图片压缩工具，提供两种模式，如果项目的资源比较多，建议不要勾选启用构建完成后自动压缩图片，不然会造成构建完成后，压缩图片资源时间过长",
     "main": "./dist/main.js",
-    "dependencies": {
-        "vue": "^3.1.4",
-        "fs-extra": "^10.0.0"
-    },
-    "devDependencies": {
-        "@types/node": "^16.0.1",
-        "@types/fs-extra": "^9.0.5",
-        "typescript": "^4.3.4"
-    },
     "panels": {
         "default": {
             "title": "图片压缩",

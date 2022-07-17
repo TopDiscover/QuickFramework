@@ -1,7 +1,7 @@
-import { readFileSync } from 'fs-extra';
+import { readFileSync } from 'fs';
 import { join } from 'path';
 import { createApp } from 'vue';
-import { helper, MyView } from '../../../Helper';
+import { helper, MyView } from '../../../HelperImpl';
 
 let view: MyView = null!;
 module.exports = Editor.Panel.define({
@@ -20,8 +20,8 @@ module.exports = Editor.Panel.define({
                 view.progress = progress;
                 if (progress >= 100) {
                     view.isProcessing = false;
-                    helper.config.isProcessing = false;
-                    helper.saveConfig();
+                    helper.data!.isProcessing = false;
+                    helper.save();
                 }
             }
         },
@@ -49,17 +49,17 @@ module.exports = Editor.Panel.define({
                 template: readFileSync(join(__dirname, '../../../../static/template/vue/view.html'), 'utf-8'),
                 data() {
                     return {
-                        enabled: helper.config.enabled,
-                        enabledNoFound : helper.config.enabledNoFound,
+                        enabled: helper.data!.enabled,
+                        enabledNoFound : helper.data!.enabledNoFound,
 
-                        minQuality: helper.config.minQuality,
-                        maxQuality: helper.config.maxQuality,
-                        speed: helper.config.speed,
+                        minQuality: helper.data!.minQuality,
+                        maxQuality: helper.data!.maxQuality,
+                        speed: helper.data!.speed,
 
-                        excludeFolders: helper.config.excludeFolders,
-                        excludeFiles: helper.config.excludeFiles,
+                        excludeFolders: helper.data!.excludeFolders,
+                        excludeFiles: helper.data!.excludeFiles,
 
-                        isProcessing: helper.config.isProcessing,//开始及保存按钮操作状态
+                        isProcessing: helper.data!.isProcessing,//开始及保存按钮操作状态
                         progress: 0,//压缩进度
                         buildAssetsDir: "",//构建资源目录
                         sourceAssetsDir: sourcePath,
@@ -68,39 +68,39 @@ module.exports = Editor.Panel.define({
                 methods: {
                     onChangeEnabled(enabled: boolean) {
                         // console.log("enabled",enabled);
-                        helper.config.enabled = enabled;
+                        helper.data!.enabled = enabled;
                         this.onSaveConfig();
                     },
                     onChangeEnabledNoFound(enabled:boolean){
-                        helper.config.enabledNoFound = enabled;
+                        helper.data!.enabledNoFound = enabled;
                         this.onSaveConfig();
                     },
                     onChangeMinQuality(value: number) {
                         // console.log("minQuality",value);
-                        helper.config.minQuality = value;
+                        helper.data!.minQuality = value;
                     },
                     onChangeMaxQuality(value: number) {
                         // console.log("maxQuality",value)
-                        helper.config.maxQuality = value;
+                        helper.data!.maxQuality = value;
                     },
                     onChangeSpeed(value: number) {
                         // console.log("speed",value);
-                        helper.config.speed = value;
+                        helper.data!.speed = value;
                     },
                     onInputExcludeFoldersOver(value: string) {
                         // console.log("excludeFolders",value);
-                        helper.config.excludeFolders = value;
+                        helper.data!.excludeFolders = value;
                     },
                     onInputExcludeFilesOver(value: string) {
                         // console.log(`excludeFiles`,value);
-                        helper.config.excludeFiles = value;
+                        helper.data!.excludeFiles = value;
                     },
                     /**@description 保存配置 */
                     onSaveConfig() {
-                        helper.saveConfig();
+                        helper.save();
                     },
                     onStartCompress() {
-                        helper.onStartCompress(this.sourceAssetsDir);
+                        helper.startCompress(this.sourceAssetsDir);
                     }
                 },
                 created() {

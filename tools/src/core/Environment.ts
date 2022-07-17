@@ -2,7 +2,7 @@
  * @description 环境变更配置
  */
 
-import { Extensions } from "./Defines";
+import { BuilderOptions, Extensions } from "./Defines";
 
 class _Environment {
 
@@ -23,8 +23,14 @@ class _Environment {
     /**@description 扩展插件目录名 */
     readonly extensionsName = "extensions";
 
+    readonly build : BuilderOptions = {
+        platform : "web-mobile",
+        dest : "D:/workspace/QuickFramework331/proj/build/web-mobile",
+        md5Cache: false,
+    }
+
     /**@description 是否在tools目录下执行命令 */
-    isTools = false;
+    isCommand = false;
 
     /**@description 项目插件 */
     readonly extensions = [

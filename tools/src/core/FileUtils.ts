@@ -28,7 +28,7 @@ export default class FileUtils extends Handler {
         this.logger.log(`创建链接 ${target} -> ${path}`)
     }
 
-    private _getFiles(path: string, root: string, result: FileResult[]) {
+    private _getFiles(path: string, root: string, result: FileResult[], isInclude?: (info: FileResult) => boolean) {
         if (!existsSync(path)) {
             return result;
         }
@@ -36,11 +36,21 @@ export default class FileUtils extends Handler {
         for (let i = 0; i < readDir.length; i++) {
             let file = readDir[i];
             let fullPath = join(path, file);
+            if (fullPath[0] === '.') {
+                continue;
+            }
             let stat = statSync(fullPath);
             if (stat.isFile()) {
-                result.push({ relative: relative(root, fullPath), path: fullPath, name: file });
+                let info = { relative: relative(root, fullPath), path: fullPath, name: file, size: stat.size }
+                if (isInclude) {
+                    if (isInclude(info)) {
+                        result.push(info);
+                    }
+                } else {
+                    result.push(info);
+                }
             } else {
-                stat.isDirectory() && this._getFiles(fullPath, root, result);
+                stat.isDirectory() && this._getFiles(fullPath, root, result, isInclude);
             }
         }
     }
@@ -48,11 +58,12 @@ export default class FileUtils extends Handler {
     /**
      * @description 获取目录下所有文件
      * @param path 
+     * @param isInclude 是否包含该文件
      * @returns 
      */
-    getFiles(path: string) {
+    getFiles(path: string, isInclude?: (info: FileResult) => boolean) {
         let out: FileResult[] = [];
-        this._getFiles(path, path, out);
+        this._getFiles(path, path, out, isInclude);
         return out;
     }
 
@@ -63,13 +74,13 @@ export default class FileUtils extends Handler {
      * @param isForceCopy 如果之前有，会删除掉之前的dest文件
      * @param callback 
      */
-    copyFile(src: string, dest: string, isForceCopy = false, onComplete?:Function) {
-        if ( isForceCopy ){
+    copyFile(src: string, dest: string, isForceCopy = false, onComplete?: Function) {
+        if (isForceCopy) {
             this.delFile(dest);
         }
         let read = createReadStream(src);
         let write = createWriteStream(dest);
-        read.pipe(write).once("close",()=>{
+        read.pipe(write).once("close", () => {
             onComplete && onComplete();
         })
     }

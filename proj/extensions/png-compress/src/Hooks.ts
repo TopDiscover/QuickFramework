@@ -1,5 +1,5 @@
 import { IBuildResult, IBuildTaskOption } from "../@types/packages/builder/@types";
-import { BuilderOptions } from "./Helper";
+import { BuilderOptions } from "./core/Defines";
 
 const PACKAGE_NAME = 'png-compress'; 
 export function load() {
