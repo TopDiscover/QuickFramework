@@ -30,11 +30,13 @@ class _Environment {
     readonly extensions = [
         // Extensions.CheckResources,
         Extensions.FixEngine,
-        // Extensions.GulpCompress,
         Extensions.Hotupdate,
         Extensions.PngCompress,
         Extensions.TestServer,
     ];
+
+    /**@description 是否进行代码混淆 */
+    readonly isGulpCompex = true;
 }
 
 export const Environment = _Environment.instance;

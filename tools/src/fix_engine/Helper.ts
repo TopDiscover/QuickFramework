@@ -6,6 +6,8 @@ import { Handler } from "../core/Handler";
 
 export default class Helper extends Handler {
 
+    module = "【引擎修正】";
+
     /**@description cocos creator 版本号 */
     protected get creatorVerion() {
         return Environment.creatorVerion;
@@ -107,19 +109,19 @@ export default class Helper extends Handler {
     }
 
     run() {
-        this.logger.log(`Creator 插件版本 : ${this.creatorPluginVersion}`);
-        this.logger.log(`当前插件版本 : ${this.pluginVersion}`);
-        this.logger.log(`Creator 版本 : ${this.creatorVerion}`);
-        this.logger.log(`Creator 安装目录 : ${this.creatorPath}`);
+        this.logger.log(`${this.module}Creator 插件版本 : ${this.creatorPluginVersion}`);
+        this.logger.log(`${this.module}当前插件版本 : ${this.pluginVersion}`);
+        this.logger.log(`${this.module}Creator 版本 : ${this.creatorVerion}`);
+        this.logger.log(`${this.module}Creator 安装目录 : ${this.creatorPath}`);
 
         if (!this.isUpdate) {
-            this.logger.log(`您目录Creator 目录下的插件版本已经是最新`);
+            this.logger.log(`${this.module}您目录Creator 目录下的插件版本已经是最新`);
             return;
         }
 
         if (!this.isSupport(this.creatorVerion)) {
-            this.logger.log(`该插件只能使用在${this.supportVersions.toString()} 版本的Creator`);
-            this.logger.log(`请自己手动对比fix_engine/engine目录下对引擎的修改`);
+            this.logger.log(`${this.module}该插件只能使用在${this.supportVersions.toString()} 版本的Creator`);
+            this.logger.log(`${this.module}请自己手动对比fix_engine/engine目录下对引擎的修改`);
             return;
         }
 
@@ -135,8 +137,8 @@ export default class Helper extends Handler {
                 sourcePath = normalize(sourcePath);
                 let sourceData = readFileSync(sourcePath, "utf-8");
                 writeFileSync(destPath, sourceData, { encoding: "utf-8" });
-                this.logger.log(`${sourcePath} -> ${destPath}`);
-                this.logger.log(data.desc);
+                this.logger.log(`${this.module}${sourcePath} -> ${destPath}`);
+                this.logger.log(`${this.module}data.desc`);
             } else if (data.from == "ccdts") {
                 //更新声明文件
                 let destPath = join(this.creatorPath, data.to);
@@ -162,9 +164,9 @@ export default class Helper extends Handler {
                         destData = destData.replace(/(decRef\s*\()([autoRelease\?:boolean]*)(\)\s*:\s*cc.Asset)/g, replaceDecRef);
                     }
                     writeFileSync(destPath, destData, { encoding: "utf-8" });
-                    this.logger.log(data.desc);
+                    this.logger.log(`${this.module}data.desc`);
                 } else {
-                    this.logger.error(`找不到引擎目录下文件:${destPath}`);
+                    this.logger.error(`${this.module}找不到引擎目录下文件:${destPath}`);
                 }
 
             } else if (data.from == "jsbdts") {
@@ -184,9 +186,9 @@ export default class Helper extends Handler {
                     }
                     destData = destData.replace(/(export\s*class\s*AssetsManager\s*\{)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string)/g, replaceAssetsManager);
                     writeFileSync(destPath, destData, { encoding: "utf-8" });
-                    this.logger.log(data.desc);
+                    this.logger.log(`${this.module}data.desc`);
                 } else {
-                    this.logger.error(`找不到引擎目录下文件:${destPath}`);
+                    this.logger.error(`${this.module}找不到引擎目录下文件:${destPath}`);
                 }
             } else {
                 //查看本地是否有文件
@@ -198,12 +200,12 @@ export default class Helper extends Handler {
                     if (existsSync(sourcePath)) {
                         let sourceData = readFileSync(sourcePath, "utf-8");
                         writeFileSync(destPath, sourceData, { encoding: "utf-8" });
-                        this.logger.log(data.desc);
+                        this.logger.log(`${this.module}data.desc`);
                     } else {
-                        this.logger.error(`找不到源文件:${sourcePath}`);
+                        this.logger.error(`${this.module}找不到源文件:${sourcePath}`);
                     }
                 } else {
-                    this.logger.error(`找不到引擎目录下文件:${destPath}`);
+                    this.logger.error(`${this.module}找不到引擎目录下文件:${destPath}`);
                 }
             }
         }

@@ -7,6 +7,8 @@ import { Environment } from "./Environment";
 
 export class Handler {
 
+    module = "Handler";
+
     /**@description 日志 */
     private _logger: Logger = null!
     get logger() {
@@ -49,6 +51,12 @@ export class Handler {
     /**@description 依赖库 */
     readonly node_modules = join(this.projPath,"tools/node_modules");
 
+    /**@description 构建目录 */
+    readonly buildPath = join(this.projPath,"proj/build");
+
+    /**@description local目录 */
+    readonly localPath = join(__dirname,"../../../proj/local");
+
     /**@description 当前插件路径 */
     get curExtensionPath(){
         return "";
@@ -70,6 +78,7 @@ export class Handler {
             });
             result.stderr?.on("error", (data) => {
                 this.logger.error(data);
+                console.log(data);
             })
         })
     }

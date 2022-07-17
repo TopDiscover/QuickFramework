@@ -13,7 +13,7 @@ async function main() {
 
     Environment.isTools = true;
 
-    // argv.push(CmdType.FixEngine);
+    // argv.push(CmdType.Gulp);
 
     console.log(`输入参数为 : `,argv);
     if (argv.length <= 0) {
@@ -36,6 +36,8 @@ async function main() {
                 
             }else if ( type == CmdType.FixEngine ){
                 await Helper.instance.fixEngine();
+            }else if ( type == CmdType.Gulp){
+                await Helper.instance.gulp();
             }
             type = argv.shift();
         }

@@ -1,9 +1,11 @@
 import archiver from "archiver";
 import { createReadStream, createWriteStream, existsSync, readdirSync, statSync } from "fs";
 import { join, relative } from "path";
+import { Extensions } from "./core/Defines";
 import FileUtils from "./core/FileUtils";
 import { Handler } from "./core/Handler";
 import * as FixEngine from "./fix_engine/Helper";
+import * as Gulp from "./gulp-compress/Helper";
 
 /**
  * @description 辅助类
@@ -18,7 +20,11 @@ export class Helper extends Handler {
     /**@description Bunldes 地址 */
     private readonly bundlesUrl = "https://gitee.com/top-discover/QuickFrameworkBundles.git";
 
+    /**@description 引擎修正 */
     private _fixEngine = new FixEngine.default;
+
+    /**@description Gulp 压缩 */
+    private _gulp = new Gulp.default()
 
     /**@description 获取当前分支信息 */
     private async gitCurBranch() {
@@ -107,6 +113,12 @@ export class Helper extends Handler {
             formPath = join(__dirname, element);
             toPath = join(this.extensionsPath, `${element}/src/impl`);
             FileUtils.instance.symlinkSync(formPath, toPath);
+
+            if ( element == Extensions.GulpCompress){
+                formPath = join(__dirname, `${element}/gulpfile.js`);
+                toPath = join(this.extensionsPath, `${element}/dist/impl/gulpfile.js`);
+                FileUtils.instance.symlinkSync(formPath, toPath,"file");
+            }
         }
 
         this.log(`链接扩展插件代码`, true);
@@ -134,6 +146,12 @@ export class Helper extends Handler {
         this.log(`引擎修正`,false);
         this._fixEngine.run();
         this.log(`引擎修正`,true);
+    }
+
+    async gulp(){
+        this.log(`Gulp`,false);
+        this._gulp.run();
+        this.log(`Gulp`,true);
     }
 
     private getFilesFromPath(path: string, root: string, outFiles: { name: string, path: string }[]) {

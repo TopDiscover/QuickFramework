@@ -35,6 +35,8 @@ export enum CmdType{
     Extensions = "-extensions",
     /**@description 引擎修改 */
     FixEngine = "-fixEngine",
+    /**@description Gulp 压缩 */
+    Gulp = "-gulp",
 }
 
 /**@description 命令行执行结果 */
@@ -66,4 +68,9 @@ export enum Extensions{
     PngCompress = "png-compress",
     /**@description 测试服务器 */
     TestServer = "test-server",
+}
+
+export interface GulpConfig{
+    platform : string,
+    dest : string
 }
