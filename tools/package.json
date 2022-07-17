@@ -5,11 +5,11 @@
   "scripts": {
     "bundles": "node -r ts-node/register src/Index.ts -gitBundles",
     "sync": "node -r ts-node/register src/Index.ts -sync",
-    "depend": "node -r ts-node/register src/Index.ts -depend",
     "extensions": "node -r ts-node/register src/Index.ts -extensions",
     "main": "node -r ts-node/register src/Index.ts",
     "fixEngine": "node -r ts-node/register src/Index.ts -fixEngine",
-    "gulp": "node dist/Index.js -gulp"
+    "gulp": "node dist/Index.js -gulp",
+    "linkGulp": "node -r ts-node/register src/Index.ts -linkGulp"
   },
   "devDependencies": {
     "@types/archiver": "^5.3.1",

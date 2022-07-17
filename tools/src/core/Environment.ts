@@ -36,7 +36,7 @@ class _Environment {
     ];
 
     /**@description 是否进行代码混淆 */
-    readonly isGulpCompex = true;
+    readonly isGulpCompex = false;
 }
 
 export const Environment = _Environment.instance;

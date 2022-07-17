@@ -1,7 +1,7 @@
 // 获取 gulp
 let gulp = require('gulp')
-const Helper = require("./Helper")
-const helper = new Helper.default();
+const Helper = require("./Helper").default
+const helper = new Helper;
 const isWeb = helper.isWeb;
 // 压缩 js 文件
 gulp.task("tomin", helper.toMinJS.bind(helper));

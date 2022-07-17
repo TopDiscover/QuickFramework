@@ -124,22 +124,6 @@ export class Helper extends Handler {
         this.log(`链接扩展插件代码`, true);
     }
 
-    /**@description 安装依赖 */
-    async installDepends() {
-
-        this.log("安装插件依赖", false);
-
-        for (let index = 0; index < this.extensions.length; index++) {
-            const element = this.extensions[index];
-            let path = join(this.extensionsPath, element);
-            this.chdir(path);
-            this.logger.log(`正在更新插件依赖 : ${element}`);
-            await this.exec("npm install");
-        }
-
-        this.log("安装插件依赖", true)
-    }
-
 
     /**@description 引擎修改 */
     async fixEngine() {
@@ -152,6 +136,13 @@ export class Helper extends Handler {
         this.log(`Gulp`,false);
         this._gulp.run();
         this.log(`Gulp`,true);
+    }
+
+    async linkGulp(){
+        this.log(`链接 gulpfile.js`,false);
+        let path = "gulp-compress/gulpfile.js";
+        FileUtils.instance.copyFile(join(__dirname,path),join(__dirname,`../dist/${path}`));
+        this.log(`链接 gulpfile.js`,true);
     }
 
     private getFilesFromPath(path: string, root: string, outFiles: { name: string, path: string }[]) {

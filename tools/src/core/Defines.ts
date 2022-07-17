@@ -27,8 +27,6 @@ export interface Logger {
 export enum CmdType{
     /**@description 拉取 Bunldes 代码 */
     GitBundles = "-gitBundles",
-    /**@description 安装依赖 */
-    Depend = "-depend",
     /**@description 链接Bundles代码 */
     Sync = "-sync",
     /**@description 链接扩展插件代码 */
@@ -37,6 +35,8 @@ export enum CmdType{
     FixEngine = "-fixEngine",
     /**@description Gulp 压缩 */
     Gulp = "-gulp",
+    /**@description 链接 gulpfile.js 到dist */
+    LinkGulp = "-linkGulp",
 }
 
 /**@description 命令行执行结果 */

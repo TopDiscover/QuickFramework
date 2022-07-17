@@ -13,11 +13,11 @@ async function main() {
 
     Environment.isTools = true;
 
+    // 如果需要使用Gulp 请先编译代码
     // argv.push(CmdType.Gulp);
 
     console.log(`输入参数为 : `,argv);
     if (argv.length <= 0) {
-        await Helper.instance.installDepends();
         await Helper.instance.gitBundles();
         await Helper.instance.symlinkSyncCode();
     }
@@ -29,15 +29,14 @@ async function main() {
                 await Helper.instance.gitBundles();
             }else if ( type == CmdType.Sync){
                 await Helper.instance.symlinkSyncCode();
-            }else if( type == CmdType.Depend){
-                await Helper.instance.installDepends();
             }else if( type == CmdType.Extensions){
                 await Helper.instance.symlinkSyncExtensions();
-                
             }else if ( type == CmdType.FixEngine ){
                 await Helper.instance.fixEngine();
             }else if ( type == CmdType.Gulp){
                 await Helper.instance.gulp();
+            }else if( type == CmdType.LinkGulp){
+                await Helper.instance.linkGulp();
             }
             type = argv.shift();
         }
