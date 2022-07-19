@@ -36,7 +36,7 @@ class _Environment {
     readonly extensions = [
         Extensions.CheckResources,
         Extensions.ConfirmDelSubgames,
-        // Extensions.FixEngine,
+        Extensions.FixEngine,
         // Extensions.Hotupdate,
         // Extensions.PngCompress,
         Extensions.TestServer,
