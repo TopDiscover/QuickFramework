@@ -1,23 +1,33 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.helper = void 0;
 const fs_1 = require("fs");
 const path_1 = require("path");
+const Config_1 = __importDefault(require("./core/Config"));
+const Defines_1 = require("./core/Defines");
 const Electron = require("electron");
-class Helper {
+class Helper extends Config_1.default {
     constructor() {
+        super();
+        this.module = "【资源检测】";
         this.bundles = {};
         this.root = `${Editor.Project.path}/assets/bundles`;
+        this.logger = Editor;
+    }
+    get path() {
+        let out = (0, path_1.join)(this.configPath, `${Defines_1.Extensions.Hotupdate}.json`);
+        return out;
     }
     init() {
-        let bundleConfigPath = `${Editor.Project.path}/config/hotupdate.json`;
-        let config = fs_1.readFileSync(bundleConfigPath, { encoding: "utf-8" });
-        let configObj = JSON.parse(config);
-        let bundles = Object.keys(configObj.bundles);
+        this.read();
+        let bundles = Object.keys(this.data.bundles);
         for (let i = 0; i < bundles.length; i++) {
-            let info = configObj.bundles[bundles[i]];
+            let info = this.data.bundles[bundles[i]];
             if (info.dir == "hall") {
-                Editor.log(`${info.name}(${info.dir})不参考检测`);
+                this.logger.log(`${this.module}${info.name}(${info.dir})不参考检测`);
             }
             else {
                 this.bundles[info.dir] = { name: info.dir, dir: info.dir, db: `db://assets/bundles/${info.dir}` };
@@ -25,14 +35,14 @@ class Helper {
         }
     }
     openDir(dir) {
-        if (fs_1.existsSync(dir)) {
-            dir = path_1.normalize(dir);
-            Editor.log(dir);
+        if ((0, fs_1.existsSync)(dir)) {
+            dir = (0, path_1.normalize)(dir);
+            this.logger.log(`${this.module} 打开目录 : ${dir}`);
             Electron.shell.showItemInFolder(dir);
             Electron.shell.beep();
         }
         else {
-            Editor.error(`不存在:${dir}`);
+            this.logger.error(`${this.module}不存在:${dir}`);
         }
     }
     /**@description 获取其它游戏的资源 */
@@ -264,21 +274,21 @@ sprite-atlas:plist
         return result;
     }
     logWarn(res, url) {
-        Editor.warn(`资源${res.path} => ${res.compPath}.${res.type} 引用了不属于自己游戏的资源 ${url}`);
+        this.logger.warn(`${this.module}资源${res.path} => ${res.compPath}.${res.type} 引用了不属于自己游戏的资源 ${url}`);
     }
     onCheckSubGame(gameName) {
         let otherGamesTexture = [];
-        Editor.log(`正在获取其它游戏资源列表`);
+        this.logger.log(`${this.module}正在获取其它游戏资源列表`);
         this.getOtherGameResources(gameName, otherGamesTexture, (resources) => {
             let gamePrefabs = [];
-            Editor.log(`获取其它游戏资源列表完成`);
-            Editor.log(`正在获取${this.bundles[gameName].db}预置体资源`);
+            this.logger.log(`${this.module}获取其它游戏资源列表完成`);
+            this.logger.log(`${this.module}正在获取${this.bundles[gameName].db}预置体资源`);
             this.getGamePrefabs(gameName, gamePrefabs, (results) => {
-                Editor.log(`获取${this.bundles[gameName].db}预置体资源成功`);
+                this.logger.log(`${this.module}获取${this.bundles[gameName].db}预置体资源成功`);
                 results.forEach((result) => {
-                    let viewData = fs_1.readFileSync(result.path);
+                    let viewData = (0, fs_1.readFileSync)(result.path);
                     //取出该界面引用的资源
-                    Editor.log(`正在检测${result.url}`);
+                    this.logger.log(`${this.module}正在检测${result.url}`);
                     let refResources = this.parseView(viewData, result.url);
                     for (let i = 0; i < refResources.length; i++) {
                         let res = refResources[i];
@@ -358,13 +368,13 @@ sprite-atlas:plist
                                         }
                                     });
                                     if (!res.defaultClip && !res.clips) {
-                                        Editor.warn(`资源${res.path} => ${res.compPath}.${res.type} 只添加了动画组件，但没有任何动画`);
+                                        this.logger.warn(`${this.module}资源${res.path} => ${res.compPath}.${res.type} 只添加了动画组件，但没有任何动画`);
                                     }
                                 }
                                 break;
                         }
                     }
-                    Editor.log(`检测${result.url}完成!!`);
+                    this.logger.log(`${this.module}检测${result.url}完成!!`);
                 });
             });
         });

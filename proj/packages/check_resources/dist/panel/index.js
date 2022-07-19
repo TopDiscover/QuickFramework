@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs_extra_1 = require("fs-extra");
+const fs_1 = require("fs");
 const path_1 = require("path");
 const Helper_1 = require("../Helper");
 Editor.Panel.extend({
-    style: fs_extra_1.readFileSync(path_1.join(__dirname, "../../static/index.css")),
-    template: fs_extra_1.readFileSync(path_1.join(__dirname, "../../static/index.html")),
+    style: (0, fs_1.readFileSync)((0, path_1.join)(__dirname, "../../static/index.css")),
+    template: (0, fs_1.readFileSync)((0, path_1.join)(__dirname, "../../static/index.html")),
     ready() {
         Helper_1.helper.init();
         const self = this;

@@ -1,6 +1,6 @@
 "use strict";
 
-import { readFileSync } from "fs-extra";
+import { readFileSync } from "fs";
 import { join } from "path";
 import { helper, ShowInfo } from "../Helper";
 interface MyView {

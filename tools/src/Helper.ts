@@ -116,8 +116,11 @@ export class Helper extends Handler {
             let toPath = join(this.extensionsPath, `${element}/src/core`);
             let formPath = join(__dirname, `core`);
             //core 部分代码
-            this.logger.log(`链接core`);
-            FileUtils.instance.symlinkSync(formPath, toPath);
+            if ( Environment.isLinkCore(element)){
+                this.logger.log(`链接core`);
+                FileUtils.instance.symlinkSync(formPath, toPath);
+            }
+            
             //node_modules 依赖
             this.logger.log(`链接node_modules`);
             formPath = this.node_modules;
@@ -125,16 +128,12 @@ export class Helper extends Handler {
             FileUtils.instance.symlinkSync(formPath,toPath);
 
             //链接实现
-            this.logger.log(`链接Impl`);
-            formPath = join(__dirname, element);
-            toPath = join(this.extensionsPath, `${element}/src/impl`);
-            FileUtils.instance.symlinkSync(formPath, toPath);
-
-            // if ( element == Extensions.GulpCompress){
-            //     formPath = join(__dirname, `${element}/gulpfile.js`);
-            //     toPath = join(this.extensionsPath, `${element}/dist/impl/gulpfile.js`);
-            //     FileUtils.instance.symlinkSync(formPath, toPath,"file");
-            // }
+            if ( Environment.isLinkImpl(element) ){
+                this.logger.log(`链接Impl`);
+                formPath = join(__dirname, element);
+                toPath = join(this.extensionsPath, `${element}/src/impl`);
+                FileUtils.instance.symlinkSync(formPath, toPath);
+            }
 
             //链接声明部分
             this.logger.log(`链接声明部分`);
