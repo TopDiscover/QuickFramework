@@ -3,19 +3,38 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "bundles": "node -r ts-node/register src/Bundles.ts",
-    "sync" :"node -r ts-node/register src/Sync.ts",
-    "depend" : "node -r ts-node/register src/Depend.ts",
-    "main" : "node -r ts-node/register src/Index.ts"
+    "bundles": "node -r ts-node/register src/Index.ts -gitBundles",
+    "sync": "node -r ts-node/register src/Index.ts -sync",
+    "extensions": "node -r ts-node/register src/Index.ts -extensions",
+    "main": "node -r ts-node/register src/Index.ts",
+    "fixEngine": "node -r ts-node/register src/Index.ts -fixEngine",
+    "gulp": "node dist/Index.js -gulp",
+    "linkGulp": "node -r ts-node/register src/Index.ts -linkGulp",
+    "assets": "node -r ts-node/register src/Index.ts -assets",
+    "pngquant": "node -r ts-node/register src/Index.ts -pngquant",
+    "hotupdate": "node -r ts-node/register src/Index.ts -hotupdate"
   },
   "devDependencies": {
-    "@types/node": "^15.14.9",
+    "@types/archiver": "^5.3.1",
+    "@types/gulp": "^4.0.9",
+    "@types/gulp-clean-css": "^4.3.0",
+    "@types/gulp-javascript-obfuscator": "^1.1.0",
+    "@types/gulp-uglify": "^3.0.7",
+    "@types/node": "^16.7.0",
     "onchange": "^7.1.0",
     "ts-node": "^10.7.0",
     "tsrpc-cli": "^2.4.0",
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "path": "^0.12.7"
+    "archiver": "^5.3.1",
+    "gulp": "^4.0.2",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-htmlmin": "^5.0.1",
+    "gulp-javascript-obfuscator": "^1.1.6",
+    "gulp-uglify": "^3.0.2",
+    "nodejs-websocket": "^1.7.2",
+    "path": "^0.12.7",
+    "vue": "^2.6.14"
   }
 }
