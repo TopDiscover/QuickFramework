@@ -35,6 +35,7 @@ class _Environment {
     /**@description 项目插件 */
     readonly extensions = [
         Extensions.CheckResources,
+        Extensions.ConfirmDelSubgames,
         // Extensions.FixEngine,
         // Extensions.Hotupdate,
         // Extensions.PngCompress,
@@ -46,6 +47,9 @@ class _Environment {
      * @param extensionsName 
      */
     isLinkCore( extensionsName : string ){
+        if ( extensionsName == Extensions.ConfirmDelSubgames){
+            return false;
+        }
         return true;
     }
 
@@ -54,7 +58,18 @@ class _Environment {
      * @param extensionsName 
      */
      isLinkImpl( extensionsName : string ){
-        if ( extensionsName == Extensions.CheckResources ){
+        if ( extensionsName == Extensions.CheckResources || extensionsName == Extensions.ConfirmDelSubgames){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @description 是否需要 node_modules
+     * @param extensionsName 
+     */
+     isLinkNodeModules( extensionsName : string ){
+        if ( extensionsName == Extensions.ConfirmDelSubgames){
             return false;
         }
         return true;

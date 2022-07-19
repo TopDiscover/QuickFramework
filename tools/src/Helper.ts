@@ -122,10 +122,13 @@ export class Helper extends Handler {
             }
             
             //node_modules 依赖
-            this.logger.log(`链接node_modules`);
-            formPath = this.node_modules;
-            toPath = join(this.extensionsPath,`${element}/node_modules`);
-            FileUtils.instance.symlinkSync(formPath,toPath);
+            if ( Environment.isLinkNodeModules(element) ){
+                this.logger.log(`链接node_modules`);
+                formPath = this.node_modules;
+                toPath = join(this.extensionsPath,`${element}/node_modules`);
+                FileUtils.instance.symlinkSync(formPath,toPath);
+            }
+           
 
             //链接实现
             if ( Environment.isLinkImpl(element) ){
