@@ -17,6 +17,7 @@ async function main() {
     // argv.push(CmdType.Gulp);
     // argv.push(CmdType.Assets);
     // argv.push(CmdType.Pngquant);
+    // argv.push(CmdType.Hotupdate);
 
     console.log(`输入参数为 : `,argv);
     if (argv.length <= 0) {
@@ -43,6 +44,8 @@ async function main() {
                 await Helper.instance.getAssets();
             }else if( type == CmdType.Pngquant){
                 await Helper.instance.pngCompress();
+            }else if( type == CmdType.Hotupdate){
+                await Helper.instance.hotupdate();
             }
             type = argv.shift();
         }

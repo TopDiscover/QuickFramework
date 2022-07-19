@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs_extra_1 = require("fs-extra");
+const fs_1 = require("fs");
 const path_1 = require("path");
 const vue_1 = require("vue");
 const Helper_1 = require("../../../Helper");
 let view;
 module.exports = Editor.Panel.define({
     listeners: {},
-    template: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
-    style: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
+    template: (0, fs_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
+    style: (0, fs_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
     $: {
         app: '#app'
     },
@@ -28,27 +28,27 @@ module.exports = Editor.Panel.define({
         }
     },
     ready() {
-        Helper_1.helper.readConfig();
+        Helper_1.helper.read(true);
         if (this.$.app) {
             const app = (0, vue_1.createApp)({});
             //指定Vue3 自己定义控件跳过解析
             app.config.compilerOptions.isCustomElement = tag => tag.startsWith("ui-");
             app.component('view-content', {
-                template: (0, fs_extra_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/vue/view.html'), 'utf-8'),
+                template: (0, fs_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/vue/view.html'), 'utf-8'),
                 data() {
                     return {
-                        bundles: Helper_1.helper.config.bundles,
-                        version: Helper_1.helper.config.version,
-                        serverIP: Helper_1.helper.config.serverIP,
-                        hotupdateUrls: Helper_1.helper.config.historyIps,
-                        buildDir: Helper_1.helper.config.buildDir,
-                        buildOutDir: Helper_1.helper.getManifestDir(Helper_1.helper.config.buildDir),
+                        bundles: Helper_1.helper.data.bundles,
+                        version: Helper_1.helper.data.version,
+                        serverIP: Helper_1.helper.data.serverIP,
+                        hotupdateUrls: Helper_1.helper.data.historyIps,
+                        buildDir: Helper_1.helper.data.buildDir,
+                        buildOutDir: Helper_1.helper.getManifestDir(Helper_1.helper.data.buildDir),
                         remoteVersion: Helper_1.helper.remoteVersion,
-                        remoteDir: Helper_1.helper.config.remoteDir,
+                        remoteDir: Helper_1.helper.data.remoteDir,
                         remoteBundles: Helper_1.helper.remoteBundles,
-                        includes: Helper_1.helper.config.includes,
-                        autoCreate: Helper_1.helper.config.autoCreate,
-                        autoDeploy: Helper_1.helper.config.autoDeploy,
+                        includes: Helper_1.helper.data.includes,
+                        autoCreate: Helper_1.helper.data.autoCreate,
+                        autoDeploy: Helper_1.helper.data.autoDeploy,
                         progress: 0,
                         createProgress: 0,
                         isProcessing: false,
@@ -56,71 +56,71 @@ module.exports = Editor.Panel.define({
                 },
                 methods: {
                     onChangeIncludes(value, key) {
-                        if (Helper_1.helper.config.includes[key].isLock) {
+                        if (Helper_1.helper.data.includes[key].isLock) {
                             console.warn(`${key}已经被锁定，修改无效`);
                             return;
                         }
-                        Helper_1.helper.config.includes[key].include = value;
-                        Helper_1.helper.saveConfig();
+                        Helper_1.helper.data.includes[key].include = value;
+                        Helper_1.helper.save();
                         Helper_1.helper.updateToConfigTS();
                     },
                     onChangeAutoCreateManifest(value) {
-                        Helper_1.helper.config.autoCreate = value;
-                        Helper_1.helper.saveConfig();
+                        Helper_1.helper.data.autoCreate = value;
+                        Helper_1.helper.save();
                     },
                     onChangeAutoDeploy(value) {
-                        Helper_1.helper.config.autoDeploy = value;
-                        Helper_1.helper.saveConfig();
+                        Helper_1.helper.data.autoDeploy = value;
+                        Helper_1.helper.save();
                     },
                     onRefreshMainVersion() {
-                        this.remoteVersion = Helper_1.helper.onRefreshVersion();
+                        this.remoteVersion = Helper_1.helper.getVersion();
                     },
                     onRefreshVersion(dir) {
-                        this.remoteBundles[dir].md5 = Helper_1.helper.onRefreshVersion(dir);
+                        this.remoteBundles[dir].md5 = Helper_1.helper.getVersion(dir);
                     },
                     onDeployToRemote() {
-                        Helper_1.helper.onDeployToRemote();
+                        Helper_1.helper.deployToRemote();
                     },
                     onRemoteDirConfirm(dir) {
-                        Helper_1.helper.config.remoteDir = dir;
-                        Helper_1.helper.saveConfig();
+                        Helper_1.helper.data.remoteDir = dir;
+                        Helper_1.helper.save();
                     },
                     onChangeBundleVersion(version, dir) {
-                        Helper_1.helper.config.bundles[dir].version = version;
-                        Helper_1.helper.saveConfig();
+                        Helper_1.helper.data.bundles[dir].version = version;
+                        Helper_1.helper.save();
                     },
                     onChangeIncludeApk(value, dir) {
-                        Helper_1.helper.config.bundles[dir].includeApk = value;
-                        Helper_1.helper.saveConfig();
+                        Helper_1.helper.data.bundles[dir].includeApk = value;
+                        Helper_1.helper.save();
                     },
                     onDelBunles() {
                         Helper_1.helper.onDelBundles();
                     },
                     onCreateManifest() {
-                        Helper_1.helper.onCreateManifest();
+                        Helper_1.helper.createManifest();
                     },
                     onBuildDirConfirm(url) {
-                        Helper_1.helper.config.buildDir = url;
-                        this.buildOutDir = Helper_1.helper.getManifestDir(Helper_1.helper.config.buildDir);
-                        Helper_1.helper.saveConfig();
+                        Helper_1.helper.data.buildDir = url;
+                        this.buildOutDir = Helper_1.helper.getManifestDir(Helper_1.helper.data.buildDir);
+                        Helper_1.helper.save();
                     },
                     onInputVersionOver(version) {
                         this.version = version;
-                        Helper_1.helper.config.version = this.version;
-                        Helper_1.helper.saveConfig();
+                        Helper_1.helper.data.version = this.version;
+                        Helper_1.helper.save();
                     },
                     onInputUrlOver(inputUrl) {
                         let url = inputUrl;
                         if (/^(https?:\/\/)?([\da-z\.-]+)\.([\da-z\.]{2,6})([\/\w \.-:]*)*\/?$/.test(url) == false) {
-                            Helper_1.helper.log(url + `不是以http://https://开头，或者不是网址`);
+                            Helper_1.helper.logger.log(`${Helper_1.helper.module}${url}不是以http://https://开头，或者不是网址`);
                             return;
                         }
-                        Helper_1.helper.config.serverIP = url;
+                        Helper_1.helper.data.serverIP = url;
                         this.serverIP = url;
                         if (Helper_1.helper.addHotAddress(url)) {
-                            this.hotupdateUrls = Helper_1.helper.config.historyIps;
+                            this.hotupdateUrls = Helper_1.helper.data.historyIps;
                         }
-                        Helper_1.helper.saveConfig();
+                        Helper_1.helper.save();
                         Helper_1.helper.updateToConfigTS();
                     },
                     onChangeHotupdateUrls(event) {

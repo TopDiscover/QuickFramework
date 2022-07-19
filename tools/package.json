@@ -11,7 +11,8 @@
     "gulp": "node dist/Index.js -gulp",
     "linkGulp": "node -r ts-node/register src/Index.ts -linkGulp",
     "assets": "node -r ts-node/register src/Index.ts -assets",
-    "pngquant": "node -r ts-node/register src/Index.ts -pngquant"
+    "pngquant": "node -r ts-node/register src/Index.ts -pngquant",
+    "hotupdate": "node -r ts-node/register src/Index.ts -hotupdate"
   },
   "devDependencies": {
     "@types/archiver": "^5.3.1",
@@ -19,7 +20,7 @@
     "@types/gulp-clean-css": "^4.3.0",
     "@types/gulp-javascript-obfuscator": "^1.1.0",
     "@types/gulp-uglify": "^3.0.7",
-    "@types/node": "^16.0.1",
+    "@types/node": "^16.7.0",
     "onchange": "^7.1.0",
     "ts-node": "^10.7.0",
     "tsrpc-cli": "^2.4.0",

@@ -20,10 +20,6 @@ export default class AssetsHelper extends Handler{
         return join(this.projPath,"proj/library/.internal-info.json");
     }
 
-    protected get assetsDBPath(){
-        return join(this.projPath,"proj/assets");
-    }
-
     protected _internalInfo : Map<string,AssetInfo> = null!;
     /**@description 引擎内部资源 */
     protected get internalInfo(){

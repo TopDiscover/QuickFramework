@@ -22,6 +22,8 @@ var CmdType;
     CmdType["Assets"] = "-assets";
     /**@description 压缩图片资源 */
     CmdType["Pngquant"] = "-pngquant";
+    /**@description 热更新 */
+    CmdType["Hotupdate"] = "-hotupdate";
 })(CmdType = exports.CmdType || (exports.CmdType = {}));
 var Extensions;
 (function (Extensions) {

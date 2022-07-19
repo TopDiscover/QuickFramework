@@ -355,7 +355,7 @@ class Helper extends Config_1.default {
             if (excludeFiles.length > 0) {
                 this.logger.log(`需要排除文件:`, excludeFiles);
             }
-            let sourceAssetsDir = (0, path_1.join)(this.projPath, "proj/assets");
+            const sourceAssetsDir = this.assetsDBPath;
             await this._startCompress(resPath, (result) => {
                 // 排除非 png 资源和内置资源
                 if ((0, path_1.extname)(result.path) !== '.png' || result.path.includes(this.enginPath)) {

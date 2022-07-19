@@ -25,9 +25,6 @@ class AssetsHelper extends Handler_1.Handler {
     get internalInfoPath() {
         return (0, path_1.join)(this.projPath, "proj/library/.internal-info.json");
     }
-    get assetsDBPath() {
-        return (0, path_1.join)(this.projPath, "proj/assets");
-    }
     /**@description 引擎内部资源 */
     get internalInfo() {
         if (this._internalInfo) {

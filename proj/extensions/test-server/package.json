@@ -4,13 +4,6 @@
     "name": "test-server",
     "description": "本地Websocket服务器",
     "main": "./dist/main.js",
-    "dependencies": {
-        "nodejs-websocket": "^1.7.2"
-    },
-    "devDependencies": {
-        "@types/node": "^16.0.1",
-        "typescript": "^4.3.4"
-    },
     "contributions": {
         "menu": [
             {

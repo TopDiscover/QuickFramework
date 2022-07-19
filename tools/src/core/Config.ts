@@ -32,31 +32,20 @@ export default class Config<T> extends Handler{
      */
     read(isReload = false){
         if ( this.path ){
-            if ( !isReload ){
-                //不需要重新加载数据
-                if ( this._data ){
-                    //如果已经有数据，不在进行加载
-                    return;
-                }
+            if ( !isReload && this._data){
+                return;
             }
             if ( existsSync(this.path) ){
                 let data = readFileSync(this.path,"utf-8");
                 let source = JSON.parse(data);
                 this._data = source;
-                
-                // this.logger.log(`读取【${this.path}】配置数据 : ${data}`);
             }else{
                 if ( this.defaultData ){
                     this._data = this.defaultData;
                     this.save();
-                }else{
-                    this.logger.error(`${this.path} 不存在`);
                 }
             }
-        }else{
-            this.logger.error(`配置的路径为空`);
         }
-        // this.logger.log("配置数据 : " ,this._data,this.path);
     }
 
     /**
@@ -64,15 +53,11 @@ export default class Config<T> extends Handler{
      */
     save(){
         if ( this.path && this.data ){
-            if ( existsSync(this.path )){
-                let data = JSON.stringify(this.data);
-                writeFileSync(this.path,data,"utf-8");
-                this.logger.log(`保存【${this.path}】配置数据 : ${data}`);
-            }else{
-                this.logger.error(`${this.path} 不存在`)
-            }
+            let data = JSON.stringify(this.data);
+            writeFileSync(this.path,data,"utf-8");
+            this.logger.log(`${this.module}保存【${this.path}】配置数据 : ${data}`);
         }else{
-            this.logger.error(`配置的路径为空`);
+            this.logger.error(`${this.module}配置的路径为空`);
         }
     }
 

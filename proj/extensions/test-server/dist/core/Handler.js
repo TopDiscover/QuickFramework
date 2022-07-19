@@ -15,8 +15,10 @@ class Handler {
         this.bundleName = "bundles";
         /**@description bundles保存路径 */
         this.bundlesPath = (0, path_1.join)(this.projPath, this.bundleName);
-        /**@description 链接代码路径 */
-        this.syncBundlesPath = (0, path_1.join)(this.projPath, `proj/assets/${this.bundleName}`);
+        /**@description 项目 assets 目录 */
+        this.assetsDBPath = (0, path_1.join)(this.projPath, "proj/assets");
+        /**@description 项目 bundles 路径 */
+        this.assetsBundlesPath = (0, path_1.join)(this.projPath, `proj/assets/${this.bundleName}`);
         /**@description 插件路径 */
         this.extensionsPath = (0, path_1.join)(this.projPath, `proj/${Environment_1.Environment.extensionsName}`);
         /**@description 需要安装依赖的目录 */

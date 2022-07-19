@@ -36,8 +36,11 @@ export class Handler {
     /**@description bundles保存路径 */
     readonly bundlesPath = join(this.projPath, this.bundleName);
 
-    /**@description 链接代码路径 */
-    readonly syncBundlesPath = join(this.projPath, `proj/assets/${this.bundleName}`);
+    /**@description 项目 assets 目录 */
+    readonly assetsDBPath = join(this.projPath,"proj/assets");
+
+    /**@description 项目 bundles 路径 */
+    readonly assetsBundlesPath = join(this.projPath, `proj/assets/${this.bundleName}`);
 
     /**@description 插件路径 */
     readonly extensionsPath = join(this.projPath, `proj/${Environment.extensionsName}`);

@@ -1,6 +1,6 @@
 import archiver from "archiver";
 import { createReadStream, createWriteStream, existsSync, readdirSync, statSync } from "fs";
-import { join, relative } from "path";
+import { basename, join, relative } from "path";
 import { Extensions } from "./core/Defines";
 import FileUtils from "./core/FileUtils";
 import { Handler } from "./core/Handler";
@@ -8,6 +8,7 @@ import * as FixEngine from "./fix_engine/Helper";
 import * as Gulp from "./gulp-compress/Helper";
 import * as Assets from "./core/AssetsHelper";
 import * as PngCompress from "./png-compress/Helper";
+import * as Hotupdate from "./hotupdate/Helper";
 import { Environment } from "./core/Environment";
 
 /**
@@ -36,6 +37,11 @@ export class Helper extends Handler {
      * @description 图片压缩
      */
     private _pngCompress = new PngCompress.default();
+
+    /**
+     * @description 热更新
+     */
+    private _hotupdate = new Hotupdate.default();
 
     /**@description 获取当前分支信息 */
     private async gitCurBranch() {
@@ -96,7 +102,7 @@ export class Helper extends Handler {
     symlinkSyncCode() {
         this.log("链接代码", false);
         let fromPath = join(this.bundlesPath, this.bundleName);
-        FileUtils.instance.symlinkSync(fromPath, this.syncBundlesPath)
+        FileUtils.instance.symlinkSync(fromPath, this.assetsBundlesPath)
         this.log("链接代码", true);
     }
 
@@ -158,7 +164,7 @@ export class Helper extends Handler {
     async linkGulp(){
         this.log(`链接 gulpfile.js`,false);
         let path = "gulp-compress/gulpfile.js";
-        FileUtils.instance.copyFile(join(__dirname,path),join(__dirname,`../dist/${path}`));
+        await FileUtils.instance.copyFile(join(__dirname,path),join(__dirname,`../dist/${path}`));
         this.log(`链接 gulpfile.js`,true);
     }
 
@@ -175,58 +181,10 @@ export class Helper extends Handler {
         this.log(`图片压缩`,true);
     }
 
-    private getFilesFromPath(path: string, root: string, outFiles: { name: string, path: string }[]) {
-        if (!existsSync(path)) {
-            return null;
-        }
-
-        let readDir = readdirSync(path);
-        for (let i = 0; i < readDir.length; i++) {
-            let file = readDir[i];
-            let fullPath = join(path, file);
-            let stat = statSync(fullPath);
-            if (stat.isFile()) {
-                outFiles.push({ name: relative(root, fullPath), path: fullPath });
-            } else {
-                stat.isDirectory() && this.getFilesFromPath(fullPath, root, outFiles);
-            }
-        }
-    }
-
-    async zipArchive() {
-
-        let out: { name: string, path: string }[] = [];
-        let root = `D:/workspace/QuickFramework331/proj/build/windows/assets`;
-        this.getFilesFromPath(root, root, out);
-
-
-        let arch = archiver("zip", {
-            zlib: { level: 9 }
-        });
-
-        let output = createWriteStream(`D:/workspace/QuickFramework331/test.zip`);
-
-        arch.pipe(output);
-
-        for (let i = 0; i < out.length; i++) {
-            arch.append(createReadStream(out[i].path), { name: out[i].name })
-        }
-
-        arch.once("close", () => {
-            this.logger.log("close")
-        })
-
-        arch.once("end", () => {
-            this.logger.log("end");
-        })
-
-        arch.once("error", () => {
-            this.logger.log("error")
-        })
-
-        arch.finalize();
-        this.logger.log("ssssssssssss");
-
+    async hotupdate(){
+        this.log(`打包热更新`,false);
+        await this._hotupdate.run();
+        this.log(`打包热更新`,true);
     }
 
 }
