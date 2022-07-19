@@ -1,6 +1,5 @@
-import archiver from "archiver";
-import { createReadStream, createWriteStream, existsSync, readdirSync, statSync } from "fs";
-import { basename, join, relative } from "path";
+import { existsSync } from "fs";
+import { join } from "path";
 import { Extensions } from "./core/Defines";
 import FileUtils from "./core/FileUtils";
 import { Handler } from "./core/Handler";
@@ -131,11 +130,11 @@ export class Helper extends Handler {
             toPath = join(this.extensionsPath, `${element}/src/impl`);
             FileUtils.instance.symlinkSync(formPath, toPath);
 
-            if ( element == Extensions.GulpCompress){
-                formPath = join(__dirname, `${element}/gulpfile.js`);
-                toPath = join(this.extensionsPath, `${element}/dist/impl/gulpfile.js`);
-                FileUtils.instance.symlinkSync(formPath, toPath,"file");
-            }
+            // if ( element == Extensions.GulpCompress){
+            //     formPath = join(__dirname, `${element}/gulpfile.js`);
+            //     toPath = join(this.extensionsPath, `${element}/dist/impl/gulpfile.js`);
+            //     FileUtils.instance.symlinkSync(formPath, toPath,"file");
+            // }
 
             //链接声明部分
             this.logger.log(`链接声明部分`);

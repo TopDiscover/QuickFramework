@@ -11,6 +11,7 @@ web-desktop/
 web-mobile/
 runtime/
 node_modules/
+node_modules
 jsb/
 export/
 

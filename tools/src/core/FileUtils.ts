@@ -1,8 +1,8 @@
 import archiver from "archiver";
 import { createHash } from "crypto";
-import { access, cp, createReadStream, createWriteStream, existsSync, mkdirSync, PathLike, readdirSync, readFileSync, realpath, stat, statSync, symlink, symlinkSync, unlinkSync } from "fs";
-import { copyFile, rm, rmdir } from "fs/promises";
-import path, { basename, join, relative } from "path";
+import { cp, createReadStream, createWriteStream, existsSync, mkdirSync, PathLike, readdirSync, readFileSync, statSync, symlink, symlinkSync, unlinkSync } from "fs";
+import { copyFile, rm } from "fs/promises";
+import { basename, join, relative } from "path";
 import { Asset, CopyData, DirResult, FileResult } from "./Defines";
 import { Environment } from "./Environment";
 import { Handler } from "./Handler";

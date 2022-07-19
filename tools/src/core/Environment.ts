@@ -12,20 +12,20 @@ class _Environment {
     }
 
     /**@description cocos creator 安装目录 */
-    readonly creatorPath: string = "D:/Creator/Creator/3.3.1/resources";
+    readonly creatorPath: string = "D:/Creator/Creator/2.4.7/resources";
 
     /**@description cocos creator 版本 */
-    readonly creatorVerion: string = "3.3.1";
+    readonly creatorVerion: string = "2.4.7";
 
     /**@description 支持版本 */
-    readonly supportVersions = ["3.3.1", "3.3.2", "3.4.0", "3.4.1", "3.4.2"];
+    readonly supportVersions = ["2.4.0", "2.4.1", "2.4.2", "2.4.3", "2.4.4", "2.4.5", "2.4.6", "2.4.7","2.4.8"];
 
     /**@description 扩展插件目录名 */
-    readonly extensionsName = "extensions";
+    readonly extensionsName = "packages";
 
     readonly build : BuilderOptions = {
-        platform : "windows",
-        dest : "D:/workspace/QuickFramework331/proj/build/windows",
+        platform : "win32",
+        dest : "D:/workspace/QuickFramework247/proj/build/jsb-link",
         md5Cache: false,
     }
 
@@ -35,9 +35,9 @@ class _Environment {
     /**@description 项目插件 */
     readonly extensions = [
         // Extensions.CheckResources,
-        Extensions.FixEngine,
-        Extensions.Hotupdate,
-        Extensions.PngCompress,
+        // Extensions.FixEngine,
+        // Extensions.Hotupdate,
+        // Extensions.PngCompress,
         Extensions.TestServer,
     ];
 
