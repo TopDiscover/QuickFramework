@@ -1,6 +1,5 @@
 import { existsSync } from "fs";
 import { join } from "path";
-import { Extensions } from "./core/Defines";
 import FileUtils from "./core/FileUtils";
 import { Handler } from "./core/Handler";
 import * as FixEngine from "./fix_engine/Helper";
