@@ -2,7 +2,7 @@
  * @description 环境变更配置
  */
 
-import { BuilderOptions, Extensions } from "./Defines";
+import { BuilderOptions, Extensions, HotupdateConfig } from "./Defines";
 
 class _Environment {
 
@@ -24,8 +24,8 @@ class _Environment {
     readonly extensionsName = "extensions";
 
     readonly build : BuilderOptions = {
-        platform : "web-mobile",
-        dest : "D:/workspace/QuickFramework331/proj/build/web-mobile",
+        platform : "windows",
+        dest : "D:/workspace/QuickFramework331/proj/build/windows",
         md5Cache: false,
     }
 

@@ -2,6 +2,7 @@ import { existsSync, readFileSync, statSync, writeFileSync } from "fs";
 import { join, normalize, parse } from "path";
 import Config from "../core/Config";
 import { BundleInfo, Extensions, HotupdateConfig, Manifest, VersionDatas } from "../core/Defines";
+import { Environment } from "../core/Environment";
 import FileUtils from "../core/FileUtils";
 
 /**
@@ -20,6 +21,9 @@ export interface UIDelegate {
     onUpdateCreateProgress(percent: number): void;
 }
 
+/**
+ * @description 注意，热更新会直接使用插件生成的，命令行运行时，请手动修改热更新相关配置
+ */
 export default class Helper extends Config<HotupdateConfig> implements UIDelegate {
     onUpdateCreateProgress(percent: number): void {
         this.logger.log(`${this.module}当前进度 : (${this.cur}/${this.total}) ${percent}`);
@@ -41,6 +45,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
     get data() {
         if (!this._data) {
             this.read(true);
+            this.toCommand();
         }
         return this._data;
     }
@@ -98,6 +103,15 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
         }
         this.reloadRemoteBundles();
         return this._remoteBundles;
+    }
+
+    /**
+     * @description 命令行数据转换
+     */
+    private toCommand(){
+        if ( Environment.isCommand && this._data ){
+            this._data.buildDir = join(Environment.build.dest,"assets");
+        }
     }
 
     private reloadRemoteBundles() {
@@ -250,14 +264,24 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
         return join(this.zipPath, `${bundle}_${md5}.zip`);
     }
 
+    /**
+     * @description 打包完成后，调用
+     */
     async run() {
-        // await this.createManifest();
-        // await this.removeNotInApkBundle();
-        await this.deployToRemote();
-        // await this.insertHotupdate(Environment.build.dest);
-        // await this.insertHotupdate(join(this.data!.buildDir, "../"));
+        let data = this.data!;
+        // 插入热更新代码
+        await this.insertHotupdate(join(data.buildDir,"../"));
+        if ( data.autoCreate ){
+            //如果开启了自动创建 版本文件
+            await this.createManifest();
+            if ( data.autoDeploy && data.remoteDir.length > 0 ){
+                //如果开启了自动部署
+                await this.deployToRemote();
+            }
+            //删除未包含在包内的bundle
+            await this.removeNotInApkBundle();
+        }
     }
-
 
     getManifestDir(buildDir: string) {
         if (buildDir && buildDir.length > 0) {

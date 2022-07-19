@@ -16,8 +16,8 @@ class _Environment {
         /**@description 扩展插件目录名 */
         this.extensionsName = "extensions";
         this.build = {
-            platform: "web-mobile",
-            dest: "D:/workspace/QuickFramework331/proj/build/web-mobile",
+            platform: "windows",
+            dest: "D:/workspace/QuickFramework331/proj/build/windows",
             md5Cache: false,
         };
         /**@description 是否在tools目录下执行命令 */
