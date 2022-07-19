@@ -41,6 +41,39 @@ class _Environment {
         Extensions.TestServer,
     ];
 
+    /**
+     * @description 是否需要 core 
+     * @param extensionsName 
+     */
+    isLinkCore( extensionsName : string ){
+        if ( extensionsName == Extensions.ConfirmDelSubgames){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @description 是否需要 impl
+     * @param extensionsName 
+     */
+     isLinkImpl( extensionsName : string ){
+        if ( extensionsName == Extensions.CheckResources || extensionsName == Extensions.ConfirmDelSubgames){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @description 是否需要 node_modules
+     * @param extensionsName 
+     */
+     isLinkNodeModules( extensionsName : string ){
+        if ( extensionsName == Extensions.ConfirmDelSubgames){
+            return false;
+        }
+        return true;
+    }
+
     /**@description 是否进行代码混淆 */
     readonly isGulpCompex = false;
 }

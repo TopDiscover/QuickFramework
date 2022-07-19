@@ -144,7 +144,7 @@ export default class Helper extends Config<GulpConfig> {
              * 如果启用debugProtection，则有效。
              * 默认：0
              */
-            debugProtectionInterval: 0,
+            // debugProtectionInterval: 0,
             /**
              * @description 
              * 通过将console.log、console.info、console.error、console.warn、console.debug、console.exception和console.trace

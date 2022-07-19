@@ -1,7 +1,7 @@
 /**
  * @description 资源辅助类
  */
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync } from "fs";
 import { extname, join, parse } from "path";
 import { AssetInfo, FileResult, LibraryMaps } from "./Defines";
 import { Environment } from "./Environment";

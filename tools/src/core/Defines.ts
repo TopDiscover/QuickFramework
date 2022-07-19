@@ -78,6 +78,8 @@ export enum Extensions {
     PngCompress = "png-compress",
     /**@description 测试服务器 */
     TestServer = "test-server",
+    /**@description 确定删除bundle */
+    ConfirmDelSubgames = "confirm_del_subgames"
 }
 
 export interface GulpConfig {
