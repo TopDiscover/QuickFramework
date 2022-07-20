@@ -8,33 +8,32 @@ exports.messages = {
         Editor.Panel.open("png-compress");
     }
 };
-const LOG_NAME = "[图片压缩]:";
 function onBuildStart(options, callback) {
-    Helper_1.helper.readConfig();
-    if (Helper_1.helper.config.enabled) {
-        Helper_1.helper.config.isProcessing = true;
-        Helper_1.helper.saveConfig();
+    Helper_1.helper.read(true);
+    if (Helper_1.helper.data && Helper_1.helper.data.enabled) {
+        Helper_1.helper.data.isProcessing = true;
+        Helper_1.helper.save();
         Editor.Ipc.sendToPanel(PACKAGE_NAME, "onStartCompress");
     }
     else {
-        Helper_1.helper.config.isProcessing = false;
-        Helper_1.helper.saveConfig();
+        Helper_1.helper.data.isProcessing = false;
+        Helper_1.helper.save();
     }
-    Editor.log("[图片压缩]:", `开始构建,构建平台:${options.platform}`);
+    Helper_1.helper.logger.log(`${Helper_1.helper.module}开始构建,构建平台:${options.platform}`);
     callback();
 }
 function onBuildFinished(options, callback) {
-    Helper_1.helper.readConfig();
-    if (Helper_1.helper.config.enabled) {
-        Helper_1.helper.config.isProcessing = true;
-        Helper_1.helper.saveConfig();
+    Helper_1.helper.read(true);
+    if (Helper_1.helper.data.enabled) {
+        Helper_1.helper.data.isProcessing = true;
+        Helper_1.helper.save();
         Editor.Panel.open("png-compress");
     }
     else {
-        Helper_1.helper.config.isProcessing = false;
-        Helper_1.helper.saveConfig();
+        Helper_1.helper.data.isProcessing = false;
+        Helper_1.helper.save();
     }
-    Editor.log(`${LOG_NAME} 构建完成,是否构建后自动压缩:${Helper_1.helper.config.enabled}`);
+    Helper_1.helper.logger.log(`${Helper_1.helper.module} 构建完成,是否构建后自动压缩:${Helper_1.helper.data.enabled}`);
     Helper_1.helper.onAfterBuild({
         platform: options.platform,
         md5Cache: options.md5Cache,

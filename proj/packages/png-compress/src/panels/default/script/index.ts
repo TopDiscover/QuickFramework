@@ -1,6 +1,5 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs-extra';
+import { readFileSync } from 'fs';
 import { join } from 'path';
-import Vue from 'vue/dist/vue';
 import { helper } from '../../../Helper';
 
 interface MyView {
@@ -33,8 +32,8 @@ module.exports = Editor.Panel.extend({
                 if (progress >= 100) {
                     panel.$saveBtn.disabled = false;
                     panel.$startCompressBtn.disabled = false;
-                    helper.config.isProcessing = false;
-                    helper.saveConfig();
+                    helper.data!.isProcessing = false;
+                    helper.save();
                 }
             }
         },
@@ -59,15 +58,15 @@ module.exports = Editor.Panel.extend({
         const vm = new window.Vue({
             data() {
                 return {
-                    enabled: helper.config.enabled,
-                    enabledNoFound : helper.config.enabledNoFound,
+                    enabled: helper.data!.enabled,
+                    enabledNoFound : helper.data!.enabledNoFound,
 
-                    minQuality: helper.config.minQuality,
-                    maxQuality: helper.config.maxQuality,
-                    speed: helper.config.speed,
+                    minQuality: helper.data!.minQuality,
+                    maxQuality: helper.data!.maxQuality,
+                    speed: helper.data!.speed,
 
-                    excludeFolders: helper.config.excludeFolders,
-                    excludeFiles: helper.config.excludeFiles,
+                    excludeFolders: helper.data!.excludeFolders,
+                    excludeFiles: helper.data!.excludeFiles,
 
                     progress: 0,//压缩进度
                     buildAssetsDir: "",//构建资源目录
@@ -77,49 +76,49 @@ module.exports = Editor.Panel.extend({
             methods: {
                 onChangeEnabled(enabled: boolean) {
                     // console.log("enabled",enabled);
-                    helper.config.enabled = enabled;
-                    helper.saveConfig();
+                    helper.data!.enabled = enabled;
+                    helper.save();
                 },
                 onChangeEnabledNoFound(enabled:boolean){
-                    helper.config.enabledNoFound = enabled;
-                    helper.saveConfig();
+                    helper.data!.enabledNoFound = enabled;
+                    helper.save();
                 },
                 onChangeMinQuality(value: number) {
                     // console.log("minQuality",value);
-                    helper.config.minQuality = value;
+                    helper.data!.minQuality = value;
                 },
                 onChangeMaxQuality(value: number) {
                     // console.log("maxQuality",value)
-                    helper.config.maxQuality = value;
+                    helper.data!.maxQuality = value;
                 },
                 onChangeSpeed(value: number) {
                     // console.log("speed",value);
-                    helper.config.speed = value;
+                    helper.data!.speed = value;
                 },
                 onInputExcludeFoldersOver(value: string) {
                     // console.log("excludeFolders",value);
-                    helper.config.excludeFolders = value;
+                    helper.data!.excludeFolders = value;
                 },
                 onInputExcludeFilesOver(value: string) {
                     // console.log(`excludeFiles`,value);
-                    helper.config.excludeFiles = value;
+                    helper.data!.excludeFiles = value;
                 },
                 /**@description 保存配置 */
                 onSaveConfig() {
-                    if ( helper.config.isProcessing ){
-                        Editor.warn(`处理过程中，请不要操作`);
+                    if ( helper.data!.isProcessing ){
+                        helper.logger.warn(`${helper.module}处理过程中，请不要操作`);
                         return;
                     }
-                    helper.saveConfig();
+                    helper.save();
                 },
                 onStartCompress() {
-                    if ( helper.config.isProcessing ){
-                        Editor.warn(`处理过程中，请不要操作`);
+                    if ( helper.data!.isProcessing ){
+                        helper.logger.warn(`${helper.module}处理过程中，请不要操作`);
                         return;
                     }
                     let view = this as any as MyView;
-                    helper.config.isProcessing = true;
-                    helper.onStartCompress(view.sourceAssetsDir);
+                    helper.data!.isProcessing = true;
+                    helper.startCompress(view.sourceAssetsDir);
                 },
                 onOpenBulidOutDir() {
                     let view = this as any as MyView;
@@ -148,8 +147,8 @@ module.exports = Editor.Panel.extend({
             },
             created: function () {
                 view = this as any;
-                panel.$saveBtn.disabled = helper.config.isProcessing;
-                panel.$startCompressBtn.disabled = helper.config.isProcessing;
+                panel.$saveBtn.disabled = helper.data!.isProcessing;
+                panel.$startCompressBtn.disabled = helper.data!.isProcessing;
             },
             mounted: function () {
 
