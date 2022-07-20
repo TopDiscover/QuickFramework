@@ -365,7 +365,7 @@ class Helper extends Config_1.default {
                     }
                 }
             });
-            this.saveAllAssets(allAssets);
+            // this.saveAllAssets(allAssets);
             // 需要排除的文件夹
             let excludeFolders = this.excludeFolders;
             let excludeFiles = this.excludeFiles;
