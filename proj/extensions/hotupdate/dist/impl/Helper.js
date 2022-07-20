@@ -89,7 +89,12 @@ class Helper extends Config_1.default {
      */
     toCommand() {
         if (Environment_1.Environment.isCommand && this._data) {
-            this._data.buildDir = (0, path_1.join)(Environment_1.Environment.build.dest, "assets");
+            if (Environment_1.Environment.isVersion3X) {
+                this._data.buildDir = (0, path_1.join)(Environment_1.Environment.build.dest, "assets");
+            }
+            else {
+                this._data.buildDir = Environment_1.Environment.build.dest;
+            }
         }
     }
     reloadRemoteBundles() {
@@ -181,6 +186,9 @@ class Helper extends Config_1.default {
                     this._data.includes["jsb-adapter"] = { name: "jsb-adapter", include: true, isLock: false };
                     this._data.includes["assets/resources"] = { name: "assets/resources", include: true, isLock: true };
                     this._data.includes["assets/main"] = { name: "assets/main", include: true, isLock: true };
+                    if (!Environment_1.Environment.isVersion3X) {
+                        this._data.includes["assets/internal"] = { name: "assets/internal", include: true, isLock: true };
+                    }
                     this._data.autoCreate = true;
                     this._data.autoDeploy = false;
                     this._data.remoteDir = "";
@@ -239,7 +247,12 @@ class Helper extends Config_1.default {
     async run() {
         let data = this.data;
         // 插入热更新代码
-        await this.insertHotupdate((0, path_1.join)(data.buildDir, "../"));
+        if (Environment_1.Environment.isVersion3X) {
+            await this.insertHotupdate((0, path_1.join)(data.buildDir, "../"));
+        }
+        else {
+            await this.insertHotupdate(data.buildDir);
+        }
         if (data.autoCreate) {
             //如果开启了自动创建 版本文件
             await this.createManifest();
@@ -517,19 +530,32 @@ class Helper extends Config_1.default {
     }
     /**@description 插入热更新代码*/
     async insertHotupdate(dest) {
-        let codePath = (0, path_1.join)(this.curExtensionPath, "code/hotupdate.js");
-        let code = (0, fs_1.readFileSync)(codePath, "utf8");
-        // console.log(code);
-        let sourcePath = (0, path_1.join)(dest, "assets/main.js");
-        sourcePath = (0, path_1.normalize)(sourcePath);
-        let sourceCode = (0, fs_1.readFileSync)(sourcePath, "utf8");
-        let templateReplace = function templateReplace() {
-            return arguments[1] + code + arguments[3];
-        };
-        //添加子游戏测试环境版本号
-        sourceCode = sourceCode.replace(/(\);)([\s\w\S]*)(const[ ]*importMapJson)/g, templateReplace);
-        this.logger.log(`${this.module}向${sourcePath}中插入热更新代码`);
-        (0, fs_1.writeFileSync)(sourcePath, sourceCode, { "encoding": "utf8" });
+        if (Environment_1.Environment.isVersion3X) {
+            let codePath = (0, path_1.join)(this.curExtensionPath, "code/hotupdate.js");
+            let code = (0, fs_1.readFileSync)(codePath, "utf8");
+            // console.log(code);
+            let sourcePath = (0, path_1.join)(dest, "assets/main.js");
+            sourcePath = (0, path_1.normalize)(sourcePath);
+            let sourceCode = (0, fs_1.readFileSync)(sourcePath, "utf8");
+            let templateReplace = function templateReplace() {
+                return arguments[1] + code + arguments[3];
+            };
+            //添加子游戏测试环境版本号
+            sourceCode = sourceCode.replace(/(\);)([\s\w\S]*)(const[ ]*importMapJson)/g, templateReplace);
+            this.logger.log(`${this.module}向${sourcePath}中插入热更新代码`);
+            (0, fs_1.writeFileSync)(sourcePath, sourceCode, { "encoding": "utf8" });
+        }
+        else {
+            let mainJSPath = (0, path_1.join)(dest, "main.js");
+            let content = (0, fs_1.readFileSync)(mainJSPath, "utf-8");
+            content = content.replace(/if\s*\(\s*window.jsb\)\s*\{/g, `if (window.jsb) {
+        var hotUpdateSearchPaths = localStorage.getItem('HotUpdateSearchPaths');
+        if (hotUpdateSearchPaths) {
+            jsb.fileUtils.setSearchPaths(JSON.parse(hotUpdateSearchPaths));
+        }`);
+            (0, fs_1.writeFileSync)(mainJSPath, content, "utf-8");
+            this.logger.log(`${this.module}热更新代码：${mainJSPath}`);
+        }
     }
 }
 exports.default = Helper;

@@ -124,10 +124,12 @@ export interface AssetInfo {
     type: string,
     /**@description 资源uuid */
     uuid: string,
-    /**@description 资源工程路径 */
+    /**@description 3.x 资源工程路径 */
     file?: string,
     /**@description library */
     library?: LibraryMaps,
+    /**@description 2.x 资源工程路径 */
+    path?:string,
 }
 
 

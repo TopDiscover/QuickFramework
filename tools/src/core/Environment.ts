@@ -35,6 +35,7 @@ class _Environment {
     /**@description 项目插件 */
     readonly extensions = [
         // Extensions.CheckResources,
+        // Extensions.ConfirmDelSubgames,
         Extensions.FixEngine,
         Extensions.Hotupdate,
         Extensions.PngCompress,
@@ -71,6 +72,13 @@ class _Environment {
         if ( extensionsName == Extensions.ConfirmDelSubgames){
             return false;
         }
+        return true;
+    }
+
+    /**
+     * @description 当前是否是3.x 版本Creator
+     */
+    get isVersion3X(){
         return true;
     }
 

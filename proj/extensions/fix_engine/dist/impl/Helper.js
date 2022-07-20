@@ -129,7 +129,7 @@ class Helper extends Handler_1.Handler {
                 let sourceData = (0, fs_1.readFileSync)(sourcePath, "utf-8");
                 (0, fs_1.writeFileSync)(destPath, sourceData, { encoding: "utf-8" });
                 this.logger.log(`${this.module}${sourcePath} -> ${destPath}`);
-                this.logger.log(`${this.module}data.desc`);
+                this.logger.log(`${this.module}${data.desc}`);
             }
             else if (data.from == "ccdts") {
                 //更新声明文件
@@ -157,7 +157,7 @@ class Helper extends Handler_1.Handler {
                         destData = destData.replace(/(decRef\s*\()([autoRelease\?:boolean]*)(\)\s*:\s*cc.Asset)/g, replaceDecRef);
                     }
                     (0, fs_1.writeFileSync)(destPath, destData, { encoding: "utf-8" });
-                    this.logger.log(`${this.module}data.desc`);
+                    this.logger.log(`${this.module}${data.desc}`);
                 }
                 else {
                     this.logger.error(`${this.module}找不到引擎目录下文件:${destPath}`);
@@ -180,7 +180,7 @@ class Helper extends Handler_1.Handler {
                     };
                     destData = destData.replace(/(export\s*class\s*AssetsManager\s*\{)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string)/g, replaceAssetsManager);
                     (0, fs_1.writeFileSync)(destPath, destData, { encoding: "utf-8" });
-                    this.logger.log(`${this.module}data.desc`);
+                    this.logger.log(`${this.module}${data.desc}`);
                 }
                 else {
                     this.logger.error(`${this.module}找不到引擎目录下文件:${destPath}`);
@@ -196,7 +196,7 @@ class Helper extends Handler_1.Handler {
                     if ((0, fs_1.existsSync)(sourcePath)) {
                         let sourceData = (0, fs_1.readFileSync)(sourcePath, "utf-8");
                         (0, fs_1.writeFileSync)(destPath, sourceData, { encoding: "utf-8" });
-                        this.logger.log(`${this.module}data.desc`);
+                        this.logger.log(`${this.module}${data.desc}`);
                     }
                     else {
                         this.logger.error(`${this.module}找不到源文件:${sourcePath}`);

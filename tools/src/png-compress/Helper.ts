@@ -86,7 +86,13 @@ export default class Helper extends Config<PngCompressConfig> {
     protected compressTasks: any[] = [];
 
     /**@description 引擎内置资源 */
-    protected readonly enginPath = "main";
+    protected get enginPath() {
+        if (Environment.isVersion3X) {
+            return "main";
+        } else {
+            return "internal";
+        }
+    }
 
     protected _assetsHelper = new AssetsHelper();
     protected get assetsHelper() {
@@ -191,7 +197,7 @@ export default class Helper extends Config<PngCompressConfig> {
                 success: this.records.successAssets,
                 failed: this.records.failedAssets
             }
-            
+
             let path = join(this.localPath, `${Extensions.PngCompress}${this.date}_cache.json`);
             writeFileSync(path, JSON.stringify(data), "utf-8");
         }
@@ -279,8 +285,12 @@ export default class Helper extends Config<PngCompressConfig> {
     }
 
     private getPlatformAssetDir(platform: string) {
-        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac") {
-            return "assets/assets";
+        if (Environment.isVersion3X) {
+            if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac") {
+                return "assets/assets";
+            } else {
+                return "assets";
+            }
         } else {
             return "assets";
         }
@@ -335,6 +345,12 @@ export default class Helper extends Config<PngCompressConfig> {
         return this.assetsHelper.getAssets();
     }
 
+    /**@description 测试用 */
+    protected saveAllAssets(assets: AssetInfo[]) {
+        let path = join(this.localPath,"assets_cache.json");
+        writeFileSync(path,JSON.stringify(assets),"utf-8");
+    }
+
     async onAfterBuild(options: BuilderOptions) {
         this.logger.log(`${this.module} 构建完成后是否自动压缩资源:${this.data!.enabled}`);
         this.logger.log(`${this.module} 构建平台:${options.platform}`)
@@ -350,13 +366,16 @@ export default class Helper extends Config<PngCompressConfig> {
 
             //找出所有图片
             let allImages: { [key: string]: AssetInfo } = {} as any;
-
             allAssets.forEach((info) => {
-                //排除图片资源 
-                if (info.type == "cc.ImageAsset" || info.type == "cc.SpriteAtlas") {
-                    allImages[info.uuid] = info;
+                if (Environment.isVersion3X) {
+                    //排除图片资源 
+                    if (info.type == "cc.ImageAsset" || info.type == "cc.SpriteAtlas") {
+                        allImages[info.uuid] = info;
+                    }
                 }
             });
+
+            // this.saveAllAssets(allAssets);
 
             // 需要排除的文件夹
             let excludeFolders = this.excludeFolders;
@@ -377,7 +396,7 @@ export default class Helper extends Config<PngCompressConfig> {
                 let uuid = this.getUUID(result.path, options.md5Cache);
                 let info = allImages[uuid];
                 if (info) {
-                    let sourcePath = info.file;
+                    let sourcePath = Environment.isVersion3X ? info.file : info.path;
                     if (!sourcePath) {
                         // this.logger.log(`未找到${uuid}的原始文件`);
                         return false;

@@ -1,7 +1,7 @@
 /**
  * @description 资源辅助类
  */
-import { readFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import { extname, join, parse } from "path";
 import { AssetInfo, FileResult, LibraryMaps } from "./Defines";
 import { Environment } from "./Environment";
@@ -17,7 +17,11 @@ export default class AssetsHelper extends Handler{
     }
 
     protected get internalInfoPath(){
-        return join(this.projPath,"proj/library/.internal-info.json");
+        if ( Environment.isVersion3X ){
+            return join(this.projPath,"proj/library/.internal-info.json");
+        }else{
+            return join(Environment.creatorPath,"static/default-assets/image");
+        }
     }
 
     protected _internalInfo : Map<string,AssetInfo> = null!;
@@ -26,19 +30,40 @@ export default class AssetsHelper extends Handler{
         if ( this._internalInfo ){
             return this._internalInfo;
         }
-        let dataStr = readFileSync(this.internalInfoPath,"utf-8");
-        let data = JSON.parse(dataStr);
-        let keys = Object.keys(data);
-        this._internalInfo = new Map();
-        keys.forEach(v=>{
+        if ( Environment.isVersion3X ){
+            let dataStr = readFileSync(this.internalInfoPath,"utf-8");
+            let data = JSON.parse(dataStr);
+            let keys = Object.keys(data);
+            this._internalInfo = new Map();
+            keys.forEach(v=>{
+                let info : AssetInfo = {
+                    uuid : data[v].uuid,
+                    type : "internal",
+                    file : v,
+                }
+                this._internalInfo.set(info.uuid,info);
+            })
+        }else{
+            //2.x 直接去安装目录找资源吧
             let info : AssetInfo = {
-                uuid : data[v].uuid,
+                uuid : "",
                 type : "internal",
-                file : v,
-
+                file : "",
             }
-            this._internalInfo.set(info.uuid,info);
-        })
+            this._internalInfo = new Map();
+            FileUtils.instance.getFiles(this.internalInfoPath,(v)=>{
+                if( extname(v.name) == ".meta" ){
+                    let dataStr = readFileSync(v.path,"utf-8");
+                    let data = JSON.parse(dataStr);
+                    info.uuid = data.uuid;
+                    let temp = parse(v.path);
+                    info.path = join(temp.dir,`${temp.name}`); 
+                    this._internalInfo.set(info.uuid,info);
+                }
+                return false;
+            });
+        }
+       
         return this._internalInfo;
     }
 
@@ -47,9 +72,16 @@ export default class AssetsHelper extends Handler{
 
 
     protected isPngAsset( type : string ){
-        if ( type == "cc.ImageAsset" || type == "cc.SpriteAtlas"){
-            return true;
+        if ( Environment.isVersion3X ){
+            if ( type == "cc.ImageAsset" || type == "cc.SpriteAtlas"){
+                return true;
+            }
+        }else{
+            if ( type == "cc.Texture2D"){
+                return true;
+            }
         }
+        
         return false;
     }
 
@@ -86,6 +118,14 @@ export default class AssetsHelper extends Handler{
                     ".json" : info.path,
                     ".png" : "",
                 };
+
+                if ( !Environment.isVersion3X ){
+                    let temp = parse(info.path);
+                    let pngPath = join(temp.dir,`${temp.name}.png`);
+                    if ( existsSync(pngPath) ){
+                        lib[".png"] = pngPath;
+                    }
+                }
 
                 let uuid = this.getUUID(info.name);
 
@@ -134,6 +174,7 @@ export default class AssetsHelper extends Handler{
                     if ( obj ){
                         reslut = parse(info.path);
                         obj.file = join(reslut.dir,reslut.name);
+                        obj.path = obj.file;
                     }
                 }
             }else if( reslut.ext == ".pac"){
@@ -146,6 +187,7 @@ export default class AssetsHelper extends Handler{
                     if ( obj ){
                         reslut = parse(info.path);
                         obj.file = join(reslut.dir,reslut.name);
+                        obj.path = obj.file;
                     }
                 }
             }
@@ -158,7 +200,9 @@ export default class AssetsHelper extends Handler{
 
         FileUtils.instance.getFiles(this.libraryPath,(info)=>{
             this.handleLibraryJson(info);
-            this.handleLibraryPng(info);
+            if ( Environment.isVersion3X ){
+                this.handleLibraryPng(info);
+            }
             return false;
         });
         FileUtils.instance.getFiles(this.assetsDBPath,(info)=>{

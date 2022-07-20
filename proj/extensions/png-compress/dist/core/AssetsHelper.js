@@ -23,30 +23,64 @@ class AssetsHelper extends Handler_1.Handler {
         return (0, path_1.join)(this.projPath, "proj/library");
     }
     get internalInfoPath() {
-        return (0, path_1.join)(this.projPath, "proj/library/.internal-info.json");
+        if (Environment_1.Environment.isVersion3X) {
+            return (0, path_1.join)(this.projPath, "proj/library/.internal-info.json");
+        }
+        else {
+            return (0, path_1.join)(Environment_1.Environment.creatorPath, "static/default-assets/image");
+        }
     }
     /**@description 引擎内部资源 */
     get internalInfo() {
         if (this._internalInfo) {
             return this._internalInfo;
         }
-        let dataStr = (0, fs_1.readFileSync)(this.internalInfoPath, "utf-8");
-        let data = JSON.parse(dataStr);
-        let keys = Object.keys(data);
-        this._internalInfo = new Map();
-        keys.forEach(v => {
+        if (Environment_1.Environment.isVersion3X) {
+            let dataStr = (0, fs_1.readFileSync)(this.internalInfoPath, "utf-8");
+            let data = JSON.parse(dataStr);
+            let keys = Object.keys(data);
+            this._internalInfo = new Map();
+            keys.forEach(v => {
+                let info = {
+                    uuid: data[v].uuid,
+                    type: "internal",
+                    file: v,
+                };
+                this._internalInfo.set(info.uuid, info);
+            });
+        }
+        else {
+            //2.x 直接去安装目录找资源吧
             let info = {
-                uuid: data[v].uuid,
+                uuid: "",
                 type: "internal",
-                file: v,
+                file: "",
             };
-            this._internalInfo.set(info.uuid, info);
-        });
+            this._internalInfo = new Map();
+            FileUtils_1.default.instance.getFiles(this.internalInfoPath, (v) => {
+                if ((0, path_1.extname)(v.name) == ".meta") {
+                    let dataStr = (0, fs_1.readFileSync)(v.path, "utf-8");
+                    let data = JSON.parse(dataStr);
+                    info.uuid = data.uuid;
+                    let temp = (0, path_1.parse)(v.path);
+                    info.path = (0, path_1.join)(temp.dir, `${temp.name}`);
+                    this._internalInfo.set(info.uuid, info);
+                }
+                return false;
+            });
+        }
         return this._internalInfo;
     }
     isPngAsset(type) {
-        if (type == "cc.ImageAsset" || type == "cc.SpriteAtlas") {
-            return true;
+        if (Environment_1.Environment.isVersion3X) {
+            if (type == "cc.ImageAsset" || type == "cc.SpriteAtlas") {
+                return true;
+            }
+        }
+        else {
+            if (type == "cc.Texture2D") {
+                return true;
+            }
         }
         return false;
     }
@@ -81,6 +115,13 @@ class AssetsHelper extends Handler_1.Handler {
                     ".json": info.path,
                     ".png": "",
                 };
+                if (!Environment_1.Environment.isVersion3X) {
+                    let temp = (0, path_1.parse)(info.path);
+                    let pngPath = (0, path_1.join)(temp.dir, `${temp.name}.png`);
+                    if ((0, fs_1.existsSync)(pngPath)) {
+                        lib[".png"] = pngPath;
+                    }
+                }
                 let uuid = this.getUUID(info.name);
                 let _info = {
                     uuid: uuid,
@@ -125,6 +166,7 @@ class AssetsHelper extends Handler_1.Handler {
                     if (obj) {
                         reslut = (0, path_1.parse)(info.path);
                         obj.file = (0, path_1.join)(reslut.dir, reslut.name);
+                        obj.path = obj.file;
                     }
                 }
             }
@@ -138,6 +180,7 @@ class AssetsHelper extends Handler_1.Handler {
                     if (obj) {
                         reslut = (0, path_1.parse)(info.path);
                         obj.file = (0, path_1.join)(reslut.dir, reslut.name);
+                        obj.path = obj.file;
                     }
                 }
             }
@@ -148,7 +191,9 @@ class AssetsHelper extends Handler_1.Handler {
         this.logger.log(`${this.module} ${this.libraryPath}`);
         FileUtils_1.default.instance.getFiles(this.libraryPath, (info) => {
             this.handleLibraryJson(info);
-            this.handleLibraryPng(info);
+            if (Environment_1.Environment.isVersion3X) {
+                this.handleLibraryPng(info);
+            }
             return false;
         });
         FileUtils_1.default.instance.getFiles(this.assetsDBPath, (info) => {

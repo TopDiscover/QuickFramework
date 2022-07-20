@@ -108,9 +108,13 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
     /**
      * @description 命令行数据转换
      */
-    private toCommand(){
-        if ( Environment.isCommand && this._data ){
-            this._data.buildDir = join(Environment.build.dest,"assets");
+    private toCommand() {
+        if (Environment.isCommand && this._data) {
+            if ( Environment.isVersion3X ){
+                this._data.buildDir = join(Environment.build.dest, "assets");
+            }else{
+                this._data.buildDir = Environment.build.dest;
+            }
         }
     }
 
@@ -206,6 +210,9 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
                     this._data.includes["jsb-adapter"] = { name: "jsb-adapter", include: true, isLock: false };
                     this._data.includes["assets/resources"] = { name: "assets/resources", include: true, isLock: true };
                     this._data.includes["assets/main"] = { name: "assets/main", include: true, isLock: true };
+                    if (!Environment.isVersion3X ){
+                        this._data.includes["assets/internal"] = { name: "assets/internal", include: true, isLock: true };
+                    }
                     this._data.autoCreate = true;
                     this._data.autoDeploy = false;
                     this._data.remoteDir = "";
@@ -270,11 +277,16 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
     async run() {
         let data = this.data!;
         // 插入热更新代码
-        await this.insertHotupdate(join(data.buildDir,"../"));
-        if ( data.autoCreate ){
+        if ( Environment.isVersion3X ){
+            await this.insertHotupdate(join(data.buildDir, "../"));
+        }else{
+            await this.insertHotupdate(data.buildDir);
+        }
+        
+        if (data.autoCreate) {
             //如果开启了自动创建 版本文件
             await this.createManifest();
-            if ( data.autoDeploy && data.remoteDir.length > 0 ){
+            if (data.autoDeploy && data.remoteDir.length > 0) {
                 //如果开启了自动部署
                 await this.deployToRemote();
             }
@@ -602,18 +614,31 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
 
     /**@description 插入热更新代码*/
     async insertHotupdate(dest: string) {
-        let codePath = join(this.curExtensionPath, "code/hotupdate.js");
-        let code = readFileSync(codePath, "utf8");
-        // console.log(code);
-        let sourcePath = join(dest, "assets/main.js");
-        sourcePath = normalize(sourcePath);
-        let sourceCode = readFileSync(sourcePath, "utf8");
-        let templateReplace = function templateReplace() {
-            return arguments[1] + code + arguments[3];
+        if (Environment.isVersion3X) {
+            let codePath = join(this.curExtensionPath, "code/hotupdate.js");
+            let code = readFileSync(codePath, "utf8");
+            // console.log(code);
+            let sourcePath = join(dest, "assets/main.js");
+            sourcePath = normalize(sourcePath);
+            let sourceCode = readFileSync(sourcePath, "utf8");
+            let templateReplace = function templateReplace() {
+                return arguments[1] + code + arguments[3];
+            }
+            //添加子游戏测试环境版本号
+            sourceCode = sourceCode.replace(/(\);)([\s\w\S]*)(const[ ]*importMapJson)/g, templateReplace);
+            this.logger.log(`${this.module}向${sourcePath}中插入热更新代码`);
+            writeFileSync(sourcePath, sourceCode, { "encoding": "utf8" });
+        } else {
+            let mainJSPath = join(dest, "main.js");
+            let content = readFileSync(mainJSPath, "utf-8");
+            content = content.replace(/if\s*\(\s*window.jsb\)\s*\{/g,
+                `if (window.jsb) {
+        var hotUpdateSearchPaths = localStorage.getItem('HotUpdateSearchPaths');
+        if (hotUpdateSearchPaths) {
+            jsb.fileUtils.setSearchPaths(JSON.parse(hotUpdateSearchPaths));
+        }`);
+            writeFileSync(mainJSPath, content, "utf-8");
+            this.logger.log(`${this.module}热更新代码：${mainJSPath}`);
         }
-        //添加子游戏测试环境版本号
-        sourceCode = sourceCode.replace(/(\);)([\s\w\S]*)(const[ ]*importMapJson)/g, templateReplace);
-        this.logger.log(`${this.module}向${sourcePath}中插入热更新代码`);
-        writeFileSync(sourcePath, sourceCode, { "encoding": "utf8" });
     }
 }

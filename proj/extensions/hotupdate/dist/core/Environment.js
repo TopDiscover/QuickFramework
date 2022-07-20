@@ -25,6 +25,7 @@ class _Environment {
         /**@description 项目插件 */
         this.extensions = [
             // Extensions.CheckResources,
+            // Extensions.ConfirmDelSubgames,
             Defines_1.Extensions.FixEngine,
             Defines_1.Extensions.Hotupdate,
             Defines_1.Extensions.PngCompress,
@@ -35,6 +36,42 @@ class _Environment {
     }
     static get instance() {
         return this._instance || (this._instance = new _Environment);
+    }
+    /**
+     * @description 是否需要 core
+     * @param extensionsName
+     */
+    isLinkCore(extensionsName) {
+        if (extensionsName == Defines_1.Extensions.ConfirmDelSubgames) {
+            return false;
+        }
+        return true;
+    }
+    /**
+     * @description 是否需要 impl
+     * @param extensionsName
+     */
+    isLinkImpl(extensionsName) {
+        if (extensionsName == Defines_1.Extensions.CheckResources || extensionsName == Defines_1.Extensions.ConfirmDelSubgames) {
+            return false;
+        }
+        return true;
+    }
+    /**
+     * @description 是否需要 node_modules
+     * @param extensionsName
+     */
+    isLinkNodeModules(extensionsName) {
+        if (extensionsName == Defines_1.Extensions.ConfirmDelSubgames) {
+            return false;
+        }
+        return true;
+    }
+    /**
+     * @description 当前是否是3.x 版本Creator
+     */
+    get isVersion3X() {
+        return true;
     }
 }
 _Environment._instance = null;

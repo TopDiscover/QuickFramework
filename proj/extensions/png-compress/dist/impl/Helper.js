@@ -57,8 +57,6 @@ class Helper extends Config_1.default {
         this.records = null;
         //压缩队列 
         this.compressTasks = [];
-        /**@description 引擎内置资源 */
-        this.enginPath = "main";
         this._assetsHelper = new AssetsHelper_1.default();
     }
     get path() {
@@ -100,6 +98,15 @@ class Helper extends Config_1.default {
             }
         }
         return path;
+    }
+    /**@description 引擎内置资源 */
+    get enginPath() {
+        if (Environment_1.Environment.isVersion3X) {
+            return "main";
+        }
+        else {
+            return "internal";
+        }
     }
     get assetsHelper() {
         return this._assetsHelper;
@@ -275,8 +282,13 @@ class Helper extends Config_1.default {
         this.onPngCompressComplete(this.dest, this.platform);
     }
     getPlatformAssetDir(platform) {
-        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac") {
-            return "assets/assets";
+        if (Environment_1.Environment.isVersion3X) {
+            if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac") {
+                return "assets/assets";
+            }
+            else {
+                return "assets";
+            }
         }
         else {
             return "assets";
@@ -327,6 +339,11 @@ class Helper extends Config_1.default {
     async getAllAssets() {
         return this.assetsHelper.getAssets();
     }
+    /**@description 测试用 */
+    saveAllAssets(assets) {
+        let path = (0, path_1.join)(this.localPath, "assets_cache.json");
+        (0, fs_1.writeFileSync)(path, JSON.stringify(assets), "utf-8");
+    }
     async onAfterBuild(options) {
         this.logger.log(`${this.module} 构建完成后是否自动压缩资源:${this.data.enabled}`);
         this.logger.log(`${this.module} 构建平台:${options.platform}`);
@@ -341,11 +358,14 @@ class Helper extends Config_1.default {
             //找出所有图片
             let allImages = {};
             allAssets.forEach((info) => {
-                //排除图片资源 
-                if (info.type == "cc.ImageAsset" || info.type == "cc.SpriteAtlas") {
-                    allImages[info.uuid] = info;
+                if (Environment_1.Environment.isVersion3X) {
+                    //排除图片资源 
+                    if (info.type == "cc.ImageAsset" || info.type == "cc.SpriteAtlas") {
+                        allImages[info.uuid] = info;
+                    }
                 }
             });
+            // this.saveAllAssets(allAssets);
             // 需要排除的文件夹
             let excludeFolders = this.excludeFolders;
             let excludeFiles = this.excludeFiles;
@@ -364,7 +384,7 @@ class Helper extends Config_1.default {
                 let uuid = this.getUUID(result.path, options.md5Cache);
                 let info = allImages[uuid];
                 if (info) {
-                    let sourcePath = info.file;
+                    let sourcePath = Environment_1.Environment.isVersion3X ? info.file : info.path;
                     if (!sourcePath) {
                         // this.logger.log(`未找到${uuid}的原始文件`);
                         return false;

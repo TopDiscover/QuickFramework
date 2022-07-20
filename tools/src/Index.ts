@@ -17,7 +17,7 @@ async function main() {
     // argv.push(CmdType.Gulp);
     // argv.push(CmdType.Assets);
     // argv.push(CmdType.Pngquant);
-    // argv.push(CmdType.Hotupdate);
+    // argv.push(CmdType.FixEngine);
 
     console.log(`输入参数为 : `,argv);
     if (argv.length <= 0) {
