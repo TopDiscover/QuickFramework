@@ -27,8 +27,8 @@ class _Environment {
             Defines_1.Extensions.CheckResources,
             Defines_1.Extensions.ConfirmDelSubgames,
             Defines_1.Extensions.FixEngine,
-            // Extensions.Hotupdate,
-            // Extensions.PngCompress,
+            Defines_1.Extensions.Hotupdate,
+            Defines_1.Extensions.PngCompress,
             Defines_1.Extensions.TestServer,
         ];
         /**@description 是否进行代码混淆 */
@@ -66,6 +66,12 @@ class _Environment {
             return false;
         }
         return true;
+    }
+    /**
+     * @description 当前是否是3.x 版本Creator
+     */
+    get isVersion3X() {
+        return false;
     }
 }
 _Environment._instance = null;

@@ -89,7 +89,12 @@ class Helper extends Config_1.default {
      */
     toCommand() {
         if (Environment_1.Environment.isCommand && this._data) {
-            this._data.buildDir = (0, path_1.join)(Environment_1.Environment.build.dest, "assets");
+            if (Environment_1.Environment.isVersion3X) {
+                this._data.buildDir = (0, path_1.join)(Environment_1.Environment.build.dest, "assets");
+            }
+            else {
+                this._data.buildDir = Environment_1.Environment.build.dest;
+            }
         }
     }
     reloadRemoteBundles() {

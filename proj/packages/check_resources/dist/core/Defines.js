@@ -39,4 +39,6 @@ var Extensions;
     Extensions["PngCompress"] = "png-compress";
     /**@description 测试服务器 */
     Extensions["TestServer"] = "test-server";
+    /**@description 确定删除bundle */
+    Extensions["ConfirmDelSubgames"] = "confirm_del_subgames";
 })(Extensions = exports.Extensions || (exports.Extensions = {}));

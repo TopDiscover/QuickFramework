@@ -83,6 +83,8 @@ module.exports = Editor.Panel.extend({
                     Helper_1.helper.deployToRemote();
                 },
                 onRemoteDirConfirm(dir) {
+                    if (Helper_1.helper.isDoing)
+                        return;
                     let result = Editor.Dialog.openFile({
                         title: "选择本地测试服务器路径",
                         defaultPath: Editor.Project.path,
@@ -118,6 +120,8 @@ module.exports = Editor.Panel.extend({
                     Helper_1.helper.insertHotupdate(Helper_1.helper.data.buildDir);
                 },
                 onBuildDirConfirm(url) {
+                    if (Helper_1.helper.isDoing)
+                        return;
                     let view = this;
                     let result = Editor.Dialog.openFile({
                         title: "选择构建后的根目录",

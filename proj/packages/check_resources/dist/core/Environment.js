@@ -25,9 +25,10 @@ class _Environment {
         /**@description 项目插件 */
         this.extensions = [
             Defines_1.Extensions.CheckResources,
-            // Extensions.FixEngine,
-            // Extensions.Hotupdate,
-            // Extensions.PngCompress,
+            Defines_1.Extensions.ConfirmDelSubgames,
+            Defines_1.Extensions.FixEngine,
+            Defines_1.Extensions.Hotupdate,
+            Defines_1.Extensions.PngCompress,
             Defines_1.Extensions.TestServer,
         ];
         /**@description 是否进行代码混淆 */
@@ -41,6 +42,9 @@ class _Environment {
      * @param extensionsName
      */
     isLinkCore(extensionsName) {
+        if (extensionsName == Defines_1.Extensions.ConfirmDelSubgames) {
+            return false;
+        }
         return true;
     }
     /**
@@ -48,10 +52,26 @@ class _Environment {
      * @param extensionsName
      */
     isLinkImpl(extensionsName) {
-        if (extensionsName == Defines_1.Extensions.CheckResources) {
+        if (extensionsName == Defines_1.Extensions.CheckResources || extensionsName == Defines_1.Extensions.ConfirmDelSubgames) {
             return false;
         }
         return true;
+    }
+    /**
+     * @description 是否需要 node_modules
+     * @param extensionsName
+     */
+    isLinkNodeModules(extensionsName) {
+        if (extensionsName == Defines_1.Extensions.ConfirmDelSubgames) {
+            return false;
+        }
+        return true;
+    }
+    /**
+     * @description 当前是否是3.x 版本Creator
+     */
+    get isVersion3X() {
+        return false;
     }
 }
 _Environment._instance = null;
