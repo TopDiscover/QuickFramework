@@ -37,7 +37,7 @@ class _Environment {
         Extensions.CheckResources,
         Extensions.ConfirmDelSubgames,
         Extensions.FixEngine,
-        // Extensions.Hotupdate,
+        Extensions.Hotupdate,
         Extensions.PngCompress,
         Extensions.TestServer,
     ];

@@ -1,6 +1,6 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs-extra';
+import { readFileSync } from 'fs';
 import { join } from 'path';
-import Vue from 'vue/dist/vue';
+import { BundleInfo } from '../../../core/Defines';
 import { helper } from '../../../Helper';
 
 interface MyView {
@@ -57,66 +57,65 @@ module.exports = Editor.Panel.extend({
         onPngCompressComplete(sender: any, info: { dest: string, platform: string }) {
             let dest = info.dest;
             let platform = info.platform;
-            Editor.log(`[热更新]png图片压缩完成,构建平台:`, dest, platform);
+            helper.logger.log(`${helper.module}png图片压缩完成,构建平台:`, dest, platform);
             if ( helper.isSupportUpdate(platform) ) {
                 helper.onPngCompressComplete();
             }
         }
     },
     ready() {
-        helper.readConfig();
+        helper.read(true);
         let self: MyView = this as any;
         const vm = new window.Vue({
             data() {
                 return {
-                    bundles: helper.config.bundles,
-                    version: helper.config.version,
-                    serverIP: helper.config.serverIP,
-                    hotupdateUrls: helper.config.historyIps,
-                    buildDir: helper.config.buildDir,
-                    buildOutDir: helper.getManifestDir(helper.config.buildDir),
+                    bundles: helper.data!.bundles,
+                    version: helper.data!.version,
+                    serverIP: helper.data!.serverIP,
+                    hotupdateUrls: helper.data!.historyIps,
+                    buildDir: helper.data!.buildDir,
+                    buildOutDir: helper.getManifestDir(helper.data!.buildDir),
                     remoteVersion: helper.remoteVersion,
-                    remoteDir: helper.config.remoteDir,
+                    remoteDir: helper.data!.remoteDir,
                     remoteBundles: helper.remoteBundles,
-                    includes: helper.config.includes,
-                    autoCreate: helper.config.autoCreate,
-                    autoDeploy: helper.config.autoDeploy,
+                    includes: helper.data!.includes,
+                    autoCreate: helper.data!.autoCreate,
+                    autoDeploy: helper.data!.autoDeploy,
                     progress: 0,
                     createProgress: 0,
                 };
             },
             methods: {
                 onChangeIncludes(value: boolean, key: string) {
-                    if (helper.config.includes[key].isLock) {
-                        Editor.warn(`${key}已经被锁定，修改无效`);
+                    if (helper.data!.includes[key].isLock) {
+                        helper.logger.warn(`${helper.module}${key}已经被锁定，修改无效`);
                         return;
                     }
-                    helper.config.includes[key].include = value;
-                    helper.saveConfig();
+                    helper.data!.includes[key].include = value;
+                    helper.save();
                     helper.updateToConfigTS();
                 },
                 onChangeAutoCreateManifest(value: boolean) {
-                    helper.config.autoCreate = value;
-                    helper.saveConfig();
+                    helper.data!.autoCreate = value;
+                    helper.save();
                 },
                 onChangeAutoDeploy(value: boolean) {
-                    helper.config.autoDeploy = value;
-                    helper.saveConfig();
+                    helper.data!.autoDeploy = value;
+                    helper.save();
                 },
                 onRefreshMainVersion() {
                     let view: MyVue = this as any;
-                    view.remoteVersion = helper.onRefreshVersion();
+                    view.remoteVersion = helper.getVersion();
                 },
                 onRefreshVersion(dir: string) {
-                    helper.onRefreshVersion(dir);
                     let view: MyVue = this as any;
-                    view.remoteBundles[dir].md5 = helper.onRefreshVersion(dir);
+                    view.remoteBundles[dir].md5 = helper.getVersion(dir);
                 },
                 onDeployToRemote() {
-                    helper.onDeployToRemote();
+                    helper.deployToRemote();
                 },
                 onRemoteDirConfirm(dir: string) {
-                    if (helper.isDoCreate) return;
+                    if ( helper.isDoing) return;
                     let result = Editor.Dialog.openFile({
                         title: "选择本地测试服务器路径",
                         defaultPath: Editor.Project.path,
@@ -125,9 +124,9 @@ module.exports = Editor.Panel.extend({
                     if (-1 !== result) {
                         let fullPath = result[0];
                         let view: MyVue = this as any;
-                        helper.config.remoteDir = fullPath;
+                        helper.data!.remoteDir = fullPath;
                         view.remoteDir = fullPath;
-                        helper.saveConfig();
+                        helper.save();
                     }
                 },
                 onOpenRemoteDir() {
@@ -135,24 +134,24 @@ module.exports = Editor.Panel.extend({
                     helper.openDir(view.remoteDir);
                 },
                 onChangeBundleVersion(version: string, dir: string) {
-                    helper.config.bundles[dir].version = version;
-                    helper.saveConfig();
+                    helper.data!.bundles[dir].version = version;
+                    helper.save();
                 },
                 onChangeIncludeApk(value: boolean, dir: string) {
-                    helper.config.bundles[dir].includeApk = value;
-                    helper.saveConfig();
+                    helper.data!.bundles[dir].includeApk = value;
+                    helper.save();
                 },
                 onDelBunles() {
                     helper.onDelBundles();
                 },
                 onCreateManifest() {
-                    helper.onCreateManifest();
+                    helper.createManifest();
                 },
                 onInsertHotupdate() {
-                    helper.onInsertHotupdate();
+                    helper.insertHotupdate(helper.data!.buildDir);
                 },
                 onBuildDirConfirm(url: string) {
-                    if (helper.isDoCreate) return;
+                    if ( helper.isDoing ) return;
                     let view: MyVue = this as any;
                     let result = Editor.Dialog.openFile({
                         title: "选择构建后的根目录",
@@ -162,39 +161,39 @@ module.exports = Editor.Panel.extend({
                     if (-1 !== result) {
                         let fullPath = result[0];
                         if (helper.checkBuildDir(fullPath)) {
-                            helper.config.buildDir = fullPath;
+                            helper.data!.buildDir = fullPath;
                             view.buildDir = fullPath;
-                            view.buildOutDir = helper.getManifestDir(helper.config.buildDir);
-                            helper.saveConfig();
+                            view.buildOutDir = helper.getManifestDir(helper.data!.buildDir);
+                            helper.save();
                         }
                     }
                 },
                 onInputVersionOver(version: string) {
-                    if (helper.isDoCreate) {
+                    if (helper.isDoing) {
                         return;
                     }
                     let view: MyVue = this as any;
                     view.version = version;
-                    helper.config.version = view.version;
-                    helper.saveConfig();
+                    helper.data!.version = view.version;
+                    helper.save();
                 },
                 onInputUrlOver(inputUrl: string) {
-                    if (helper.isDoCreate) {
+                    if (helper.isDoing) {
                         return;
                     }
                     let url = inputUrl;
                     if (/^(https?:\/\/)?([\da-z\.-]+)\.([\da-z\.]{2,6})([\/\w \.-:]*)*\/?$/.test(url) == false) {
-                        helper.log(url + `不是以http://https://开头，或者不是网址`);
+                        helper.logger.log(helper.module + url + `不是以http://https://开头，或者不是网址`);
                         return;
                     }
 
-                    helper.config.serverIP = url;
+                    helper.data!.serverIP = url;
                     let view: MyVue = this as any;
                     view.serverIP = url;
                     if (helper.addHotAddress(url)) {
-                        view.hotupdateUrls = helper.config.historyIps;
+                        view.hotupdateUrls = helper.data!.historyIps;
                     }
-                    helper.saveConfig();
+                    helper.save();
                     helper.updateToConfigTS();
                 },
                 onChangeHotupdateUrls(url: string) {
@@ -202,7 +201,7 @@ module.exports = Editor.Panel.extend({
                     view.onInputUrlOver(url);
                 },
                 onUserLocalIP() {
-                    if (helper.isDoCreate) return;
+                    if (helper.isDoing) return;
                     let network = require("os").networkInterfaces();
                     let url = "";
                     Object.keys(network).forEach((key) => {
