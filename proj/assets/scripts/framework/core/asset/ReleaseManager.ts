@@ -206,6 +206,23 @@ export class ReleaseManager implements ISingleton {
         this._bundles.delete(bundle);
     }
 
+    /**
+     * @description 判断bundle是否存在于释放管理器中
+     */
+    isExistBunble( bundle : BUNDLE_TYPE ){
+        if ( Manager.isLazyRelease ){
+            //开启了懒释放功能
+            let name = this.getBundleName(bundle);
+            if ( this._bundles.has(name) ){
+                return true;
+            }
+            return false;
+        }else{
+            //未开启，在释放之前已经获取过了，严格来说，不可能走到这里
+            return false;
+        }
+    }
+
     onLowMemory() {
         Log.d(`${LOG_TAG}------------收到内存警告，释放无用资源------------`);
         this._lazyInfos.forEach((info, key, source) => {

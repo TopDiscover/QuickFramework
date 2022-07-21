@@ -31,7 +31,10 @@ export class BundleManager implements ISingleton{
          let bundle = loaded[i];
          if (excludeBundles.indexOf(bundle) == -1) {
             //在排除bundle中找不到，直接删除
-            Manager.entryManager.onUnloadBundle(bundle);
+            if ( !Manager.releaseManger.isExistBunble(bundle) ){
+               Manager.entryManager.onUnloadBundle(bundle);
+            }
+            
             let result = this.getBundle(bundle);
             if (result) {
                Manager.cache.removeBundle(bundle);
