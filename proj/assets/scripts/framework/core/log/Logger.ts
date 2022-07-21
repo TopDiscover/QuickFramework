@@ -55,7 +55,7 @@ export class LoggerImpl implements ISingleton{
     private update(){
         if ( this.isValid(LogLevel.DUMP) ){
             if ( cc.sys.isBrowser ){
-                this.logger.dump = console.log;
+                this.logger.dump = console.debug;
             }else{
                 this.logger.dump = this.dump.bind(this);
             }
