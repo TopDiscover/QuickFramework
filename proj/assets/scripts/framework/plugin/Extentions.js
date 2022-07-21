@@ -46,7 +46,7 @@ String.format = function () {
     var statment = param[0]; // get the first element(the original statement)
     if (typeof statment != "string") {
         if (!EDITOR)
-            error(`String.format error,first param is not a string`);
+            console.error(`String.format error,first param is not a string`);
         return "";
     }
     param.shift(); // remove the first element from array
