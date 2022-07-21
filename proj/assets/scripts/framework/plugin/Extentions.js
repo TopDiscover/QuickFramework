@@ -58,8 +58,8 @@ String.format = function () {
     });
 }
 
-window.Log = console;
-window.Log.e = console.error;
-window.Log.d = console.log;
-window.Log.w = console.warn;
-window.Log.dump = ()=>{};
+window.Log = {};
+window.Log.e = console.error.bind(console);
+window.Log.d = console.log.bind(console);
+window.Log.w = console.warn.bind(console);
+window.Log.dump = console.debug.bind(console);
