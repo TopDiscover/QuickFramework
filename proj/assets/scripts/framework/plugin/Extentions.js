@@ -7,23 +7,31 @@ window.md5 = function md5(data) {
 }
 
 Date.prototype.format = function (format) {
-    var date = {
-        "M+": this.getMonth() + 1,
-        "d+": this.getDate(),
-        "h+": this.getHours(),
-        "m+": this.getMinutes(),
-        "s+": this.getSeconds(),
-        "q+": Math.floor((this.getMonth() + 3) / 3),
-        "S+": this.getMilliseconds()
+
+    let self = this;
+    let date = {
+        "M+": self.getMonth() + 1,
+        "d+": self.getDate(),
+        "h+": self.getHours(),
+        "m+": self.getMinutes(),
+        "s+": self.getSeconds(),
+        "q+": Math.floor((self.getMonth() + 3) / 3),
+        "S+": self.getMilliseconds()
     };
-    if (/(y+)/i.test(format)) {
-        format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+    
+    let replaceYear = function(){
+        return self.getFullYear().toString();
     }
-    for (var k in date) {
-        if (new RegExp("(" + k + ")").test(format)) {
-            format = format.replace(RegExp.$1, RegExp.$1.length == 1 ?
-                date[k] : ("00" + date[k]).substr(("" + date[k]).length));
-        }
+    format = format.replace(/(y+)/i,replaceYear)
+    
+    let replace = function(){
+        let $2 = arguments[2];
+        let value = date[arguments[0]];
+        let str = $2.length == 1 ? `${value}` : `00${value}`.substring(value.toString().length);
+        return str
+    }
+    for (let k in date) {
+        format = format.replace(new RegExp(`(${k})`),replace.bind(null,k))
     }
     return format;
 };
@@ -36,6 +44,15 @@ Date.timeNow = function () {
 Date.timeNowMillisecons = function () {
     let now = new Date();
     return now.getTime();
+}
+/**@description 返回当前时间格式化后的字符串 */
+Date.format = function(format,date){
+    if ( date ){
+        return date.format(format);
+    }else{
+        let now = new Date();
+        return now.format(format);
+    }
 }
 
 String.format = function () {

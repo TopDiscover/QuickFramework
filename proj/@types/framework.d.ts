@@ -29,10 +29,19 @@ declare interface Date {
 	/**
 	 * @description 格式当前时间 
 	 * @example 
+	 * y : 年
+	 * M ：月
+	 * d : 日
+	 * h : 时 
+	 * m : 分
+	 * s : 秒
+	 * q : 季度
+	 * S ：毫秒
 	 * let now = new Date();
 	 * let str = now.format("yyyy:MM:dd hh:mm:ss"); //2019:11:07 10:19:51
 	 * str = now.format("yyyy/MM/dd");//2019/11/07
 	 * str = now.format("hh:mm:ss");//10:19:51
+	 * str = now.format("yyyy/MM/dd hh:mm:ss.SS 第qq季度");//2022/07/21 23:32:23.75 第03季度
 	 * */
 	format(format: string): string;
 }
@@ -50,6 +59,12 @@ declare interface DateConstructor {
 	 * Date.timeNowMillisecons()
 	 * */
 	timeNowMillisecons(): number;
+	/**
+	 * @description 返回格式化后的时间
+	 * @param format 
+	 * @param date 如果不传入，则为当前时间
+	 */
+	 format(format: string,date? : Date): string;
 }
 
 declare interface StringConstructor {
