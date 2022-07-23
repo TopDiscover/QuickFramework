@@ -1,6 +1,6 @@
 
 /** 热更新代码 开始*/
-var hotUpdateSearchPaths = localStorage.getItem('HotUpdateSearchPaths');
+var hotUpdateSearchPaths = sys.localStorage.getItem('HotUpdateSearchPaths');
 if (hotUpdateSearchPaths) {
 jsb.fileUtils.setSearchPaths(JSON.parse(hotUpdateSearchPaths));
 }

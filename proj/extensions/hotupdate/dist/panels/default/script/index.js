@@ -25,6 +25,10 @@ module.exports = Editor.Panel.define({
         },
         onSetProcess(isProcess) {
             view.isProcessing = isProcess;
+        },
+        onSetVersion(version) {
+            view.version = version;
+            view.bundles = Helper_1.helper.data.bundles;
         }
     },
     ready() {
@@ -46,24 +50,16 @@ module.exports = Editor.Panel.define({
                         remoteVersion: Helper_1.helper.remoteVersion,
                         remoteDir: Helper_1.helper.data.remoteDir,
                         remoteBundles: Helper_1.helper.remoteBundles,
-                        includes: Helper_1.helper.data.includes,
                         autoCreate: Helper_1.helper.data.autoCreate,
                         autoDeploy: Helper_1.helper.data.autoDeploy,
                         progress: 0,
                         createProgress: 0,
                         isProcessing: false,
+                        isAutoVersion: Helper_1.helper.data.isAutoVersion,
+                        appVersion: Helper_1.helper.data.appVersion
                     };
                 },
                 methods: {
-                    onChangeIncludes(value, key) {
-                        if (Helper_1.helper.data.includes[key].isLock) {
-                            console.warn(`${key}已经被锁定，修改无效`);
-                            return;
-                        }
-                        Helper_1.helper.data.includes[key].include = value;
-                        Helper_1.helper.save();
-                        Helper_1.helper.updateToConfigTS();
-                    },
                     onChangeAutoCreateManifest(value) {
                         Helper_1.helper.data.autoCreate = value;
                         Helper_1.helper.save();
@@ -109,6 +105,11 @@ module.exports = Editor.Panel.define({
                         Helper_1.helper.data.version = this.version;
                         Helper_1.helper.save();
                     },
+                    onInputAppVersionOver(version) {
+                        this.appVersion = version;
+                        Helper_1.helper.data.appVersion = version;
+                        Helper_1.helper.save();
+                    },
                     onInputUrlOver(inputUrl) {
                         let url = inputUrl;
                         if (/^(https?:\/\/)?([\da-z\.-]+)\.([\da-z\.]{2,6})([\/\w \.-:]*)*\/?$/.test(url) == false) {
@@ -140,6 +141,12 @@ module.exports = Editor.Panel.define({
                             url = "http://" + url + "/hotupdate";
                         }
                         this.onInputUrlOver(url);
+                    },
+                    onChangeAutoVersion(value) {
+                        this.isAutoVersion = value;
+                        Helper_1.helper.data.isAutoVersion = value;
+                        Helper_1.helper.save();
+                        Helper_1.helper.updateToConfigTS();
                     },
                 },
                 created: function () {

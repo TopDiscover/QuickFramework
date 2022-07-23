@@ -186,13 +186,11 @@ export class HttpClient implements ISingleton{
         url = this.crossProxy(url);
         url = this.convertParams(url,httpPackage.params);
 
-        if ( sys.isBrowser ){
-            if ( httpPackage.data.isAutoAttachCurrentTime ){
-                if ( url.indexOf("?") >=0 ){
-                    url = `${url}&cur_loc_t=${Date.timeNow()}`;
-                }else{
-                    url = `${url}?cur_loc_t=${Date.timeNow()}`;
-                }
+        if ( httpPackage.data.isAutoAttachCurrentTime ){
+            if ( url.indexOf("?") >=0 ){
+                url = `${url}&cur_loc_t=${Date.timeNow()}`;
+            }else{
+                url = `${url}?cur_loc_t=${Date.timeNow()}`;
             }
         }
 

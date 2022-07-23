@@ -146,6 +146,8 @@ export interface BundleInfo {
     md5?: string;
 }
 
+export type BunldesConfig = { [key: string]: BundleInfo };
+
 export interface HotupdateConfig {
     /**@description 主包版本号 */
     version: string,
@@ -156,15 +158,17 @@ export interface HotupdateConfig {
     /**@description 构建项目目录 */
     buildDir: string,
     /**@description 各bundle的版本配置 */
-    bundles: { [key: string]: BundleInfo },
+    bundles: BunldesConfig,
     /**@description 远程服务器所在目录 */
     remoteDir: string,
-    /**@description 主包包含目录 */
-    includes: { [key: string]: { name: string, include: boolean, isLock: boolean } };
     /**@description 自动创建 */
     autoCreate: boolean;
     /**@description 自动部署 */
     autoDeploy: boolean;
+    /**@description 自动生成版本号 */
+    isAutoVersion : boolean;
+    /**app应用版本号 */
+    appVersion : string;
 }
 
 export type Asset = {[k:string] :{ size : number , md5 : string}};
@@ -197,5 +201,9 @@ export interface VersionData {
  * @description 版本数据结构
  */
 export type VersionDatas = { [key: string]: VersionData };
+
+export type VersionJson = {[key: string]: { md5: string, version: string }};
+
+export type ApkJson = { version: string };
 
 export type CopyData = { from : string , to : string}[];

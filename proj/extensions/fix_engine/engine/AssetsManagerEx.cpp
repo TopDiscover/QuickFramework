@@ -58,6 +58,7 @@ const std::string AssetsManagerEx::MANIFEST_ID = "@manifest";
 #define MAIN_BUNDLE "main"
 #define ASSETS "assets"
 #define MD5_UNKNOWN "UNKNOWN"
+#define MAIN_JS "main.js"
 
 // Implementation of AssetsManagerEx
 
@@ -375,10 +376,15 @@ void AssetsManagerEx::removeBundleDirectory(const std::string& path) {
 	if (_bundle == MAIN_BUNDLE) {
 		//只删除当前bundle的资源
 		for (auto it = _mainBundles.begin(); it != _mainBundles.end(); ++it) {
+			if (*it == MAIN_JS) {
+				//入口文件单独删除
+				continue;
+			}
 			saveRemoveDirectory(path + *it + "/");
 		}
 		saveRemoveFile(path + MANIFEST_PATH + _bundle + VERSION_FILENAME);
 		saveRemoveFile(path + MANIFEST_PATH + _bundle + MANIFEST_FILENAME);
+		saveRemoveFile(path + MAIN_JS);
 	}
 	else {
 		saveRemoveDirectory(path + ASSETS + "/" + _bundle + "/");
@@ -939,7 +945,12 @@ void AssetsManagerEx::updateSucceed() {
 		if (_bundle == MAIN_BUNDLE) {
 			for (auto i = 0; i < _mainBundles.size(); i++) {
 				auto path = _mainBundles[i] + "/";
-				moveTempToCached(_tempStoragePath + path, path, diff_map, i + 1 == _mainBundles.size());
+				if (_mainBundles[i] == MAIN_JS) {
+					moveTempToCached(_tempStoragePath, MAIN_JS, diff_map, i + 1 == _mainBundles.size());
+				}
+				else {
+					moveTempToCached(_tempStoragePath + path, path, diff_map, i + 1 == _mainBundles.size());
+				}
 			}
 		}
 		else {
@@ -967,6 +978,49 @@ void AssetsManagerEx::updateSucceed() {
 }
 
 void AssetsManagerEx::moveTempToCached(const std::string& root, const std::string& path, std::unordered_map<std::string, Manifest::AssetDiff>& diff_map, bool isComplete) {
+
+
+	auto copyVersions = [=]() {
+		//完成后复制版本文件
+		if (isComplete) {
+			auto tempDstRoot = _storagePath + MANIFEST_PATH;
+			if (!_fileUtils->isDirectoryExist(tempDstRoot)) {
+				_fileUtils->createDirectory(tempDstRoot);
+			}
+
+			auto versionDstPath = tempDstRoot + _bundle + VERSION_FILENAME;
+			if (_fileUtils->isFileExist(versionDstPath))
+			{
+				_fileUtils->removeFile(versionDstPath);
+			}
+
+			auto projectDstPath = tempDstRoot + _bundle + MANIFEST_FILENAME;
+			if (_fileUtils->isFileExist(projectDstPath)) {
+				_fileUtils->removeFile(projectDstPath);
+			}
+
+			auto tempSrcRoot = _tempStoragePath + MANIFEST_PATH;
+			auto versionSrcPath = tempSrcRoot + _bundle + VERSION_FILENAME;
+			auto projectSrcPath = tempSrcRoot + _bundle + MANIFEST_FILENAME;
+
+			_fileUtils->renameFile(versionSrcPath, versionDstPath);
+			_fileUtils->renameFile(projectSrcPath, projectDstPath);
+		}
+	};
+
+	// move main.js
+	if (path == MAIN_JS){
+		auto dstPath = _storagePath + MAIN_JS;
+		auto srcPath = root + MAIN_JS;
+		if (_fileUtils->isFileExist(dstPath)) {
+			_fileUtils->removeFile(dstPath);
+		}
+		if (_fileUtils->isFileExist(srcPath)) {
+			_fileUtils->renameFile(srcPath, dstPath);
+		}
+		copyVersions();
+		return;
+	}
 
 	// 3. merge temporary storage path to storage path so that temporary version turns to cached version
 	if (_fileUtils->isDirectoryExist(root)) {
@@ -1038,31 +1092,7 @@ void AssetsManagerEx::moveTempToCached(const std::string& root, const std::strin
 			}
 		}
 	}
-	//完成后复制版本文件
-	if (isComplete) {
-		auto tempDstRoot = _storagePath + MANIFEST_PATH;
-		if (!_fileUtils->isDirectoryExist(tempDstRoot)) {
-			_fileUtils->createDirectory(tempDstRoot);
-		}
-	
-		auto versionDstPath = tempDstRoot + _bundle + VERSION_FILENAME;
-		if (_fileUtils->isFileExist(versionDstPath))
-		{
-			_fileUtils->removeFile(versionDstPath);
-		}
-	
-		auto projectDstPath = tempDstRoot + _bundle + MANIFEST_FILENAME;
-		if (_fileUtils->isFileExist(projectDstPath)) {
-			_fileUtils->removeFile(projectDstPath);
-		}
-	
-		auto tempSrcRoot = _tempStoragePath + MANIFEST_PATH;
-		auto versionSrcPath = tempSrcRoot + _bundle + VERSION_FILENAME;
-		auto projectSrcPath = tempSrcRoot + _bundle + MANIFEST_FILENAME;
-	
-		_fileUtils->renameFile(versionSrcPath, versionDstPath);
-		_fileUtils->renameFile(projectSrcPath, projectDstPath);
-	}
+	copyVersions();
 }
 
 void AssetsManagerEx::checkUpdate() {

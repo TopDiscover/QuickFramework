@@ -4,24 +4,10 @@
 import { sys } from "cc";
 import { LogLevel } from "../../defines/Enums";
 
-let _Impl : Logger = {
-    e : null!,
-    w : null!,
-    d : null!,
-    dump : null!
-}
-
 export class LoggerImpl implements ISingleton{
     private logger : Logger = console as any;
     private _level: number = LogLevel.ALL;
     constructor(){
-        if ( sys.platform == sys.Platform.WECHAT_GAME ){
-            this.logger = _Impl;
-            this.logger.d = console.log.bind(console);
-            this.logger.w = console.warn.bind(console);
-            this.logger.e = console.error.bind(console);
-            this.logger.dump = console.debug.bind(console);
-        }
         this.update();
     }
     static module: string = "【日志管理器】";

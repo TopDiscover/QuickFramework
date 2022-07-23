@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { createApp } from 'vue';
+import { BunldesConfig } from '../../../core/Defines';
 import { helper } from '../../../Helper';
 
 let view : {
@@ -9,6 +10,8 @@ let view : {
     buildDir : string;
     buildOutDir : string;
     isProcessing : boolean;
+    version : string;
+    bundles : BunldesConfig;
 };
 
 module.exports = Editor.Panel.define({
@@ -33,6 +36,10 @@ module.exports = Editor.Panel.define({
         },
         onSetProcess(isProcess:boolean){
             view.isProcessing = isProcess;
+        },
+        onSetVersion(version:string){
+            view.version = version;
+            view.bundles = helper.data!.bundles;
         }
     },
     ready() {
@@ -54,24 +61,16 @@ module.exports = Editor.Panel.define({
                         remoteVersion: helper.remoteVersion,
                         remoteDir: helper.data!.remoteDir,
                         remoteBundles: helper.remoteBundles,
-                        includes: helper.data!.includes,
                         autoCreate: helper.data!.autoCreate,
                         autoDeploy: helper.data!.autoDeploy,
                         progress: 0,
                         createProgress: 0,
                         isProcessing : false,
+                        isAutoVersion : helper.data!.isAutoVersion,
+                        appVersion : helper.data!.appVersion
                     };
                 },
                 methods: {
-                    onChangeIncludes(value:boolean,key:string){
-                        if ( helper.data!.includes[key].isLock ){
-                            console.warn(`${key}已经被锁定，修改无效`);
-                            return;
-                        }
-                        helper.data!.includes[key].include = value;
-                        helper.save();
-                        helper.updateToConfigTS();
-                    },
                     onChangeAutoCreateManifest(value:boolean){
                         helper.data!.autoCreate = value;
                         helper.save();
@@ -117,6 +116,11 @@ module.exports = Editor.Panel.define({
                         helper.data!.version = this.version;
                         helper.save();
                     },
+                    onInputAppVersionOver(version:string){
+                        this.appVersion = version;
+                        helper.data!.appVersion = version;
+                        helper.save();
+                    },
                     onInputUrlOver(inputUrl: string) {
                         let url = inputUrl;
                         if (/^(https?:\/\/)?([\da-z\.-]+)\.([\da-z\.]{2,6})([\/\w \.-:]*)*\/?$/.test(url) == false) {
@@ -149,7 +153,12 @@ module.exports = Editor.Panel.define({
                         }
                         this.onInputUrlOver(url);
                     },
-
+                    onChangeAutoVersion(value : boolean){
+                        this.isAutoVersion = value;
+                        helper.data!.isAutoVersion = value;
+                        helper.save();
+                        helper.updateToConfigTS();
+                    },
                 },
                 created: function () {
                     view = this;

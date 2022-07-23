@@ -65,25 +65,39 @@ export class Handler {
         return "";
     }
 
+    formatDate(format : string , input : Date ) {
+        let date : {[key:string] : number}= {
+            "M+": input.getMonth() + 1,
+            "d+": input.getDate(),
+            "h+": input.getHours(),
+            "m+": input.getMinutes(),
+            "s+": input.getSeconds(),
+            "q+": Math.floor((input.getMonth() + 3) / 3),
+            "S+": input.getMilliseconds()
+        };
+        
+        let replaceYear = function(){
+            return input.getFullYear().toString();
+        }
+        format = format.replace(/(y+)/i,replaceYear)
+        
+        let replace = function(){
+            let $2:string = arguments[2];
+            let value = date[arguments[0]];
+            let str = $2.length == 1 ? `${value}` : `00${value}`.substring(value.toString().length);
+            return str
+        }
+        for (let k in date) {
+            format = format.replace(new RegExp(`(${k})`),replace.bind(null,k))
+        }
+        return format;
+    };
+
+
     /**@description 获取当前的日期 */
     get date(){
         let date = new Date();
-        let localeDate = date.toLocaleDateString();
-        let replace = function(){
-            let monthStr : string = arguments[2];
-            let month = parseInt(monthStr.substring(1));
-            monthStr = month < 10 ? `0${month.toString()}` : month.toString();
-            
-            let dayStr = arguments[3];
-            let day = parseInt(dayStr.substring(1));
-            dayStr = day < 10 ? `0${day.toString()}` : day.toString();
-            return arguments[1] + monthStr + dayStr;
-        }
-        localeDate = localeDate.replace(/(\d+)(\/\d+)(\/\d+)/g,replace);
-        let time = date.toLocaleTimeString();
-        time = time.replace(/(\d+)(\:\d+)(\:\d+)/g,replace);
-        let result = `${localeDate}${time}`;
-        return result;
+        return this.formatDate("yyyyMMddhhmmss",date);
     }
 
     /**@description 执行命令 */

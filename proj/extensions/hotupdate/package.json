@@ -65,6 +65,11 @@
                 "methods": [
                     "default.onSetProcess"
                 ]
+            },
+            "onSetVersion" :{
+                "methods": [
+                    "default.onSetVersion"
+                ]
             }
         },
         "builder": "./dist/Builder.js"

@@ -203,7 +203,8 @@ class Helper extends Config_1.default {
                 success: this.records.successAssets,
                 failed: this.records.failedAssets
             };
-            let path = (0, path_1.join)(this.localPath, `${Defines_1.Extensions.PngCompress}${this.date}_cache.json`);
+            let path = (0, path_1.join)(this.localPath, `${Defines_1.Extensions.PngCompress}_${this.date}_cache.json`);
+            this.logger.log(`${this.module}写入日志到${path}`);
             (0, fs_1.writeFileSync)(path, JSON.stringify(data), "utf-8");
         }
     }

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, statSync, writeFileSync } from "fs";
 import { join, normalize, parse } from "path";
 import Config from "../core/Config";
-import { BundleInfo, Extensions, HotupdateConfig, Manifest, VersionDatas } from "../core/Defines";
+import { ApkJson, BundleInfo, Extensions, FileResult, HotupdateConfig, Manifest, VersionDatas, VersionJson } from "../core/Defines";
 import { Environment } from "../core/Environment";
 import FileUtils from "../core/FileUtils";
 
@@ -19,6 +19,10 @@ export interface UIDelegate {
      * @param percent 
      */
     onUpdateCreateProgress(percent: number): void;
+    /**
+     * @description 设置版本号
+     */
+    onSetVersion(version: string): void;
 }
 
 /**
@@ -34,6 +38,17 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
         // Editor.Message.send(PACKAGE_NAME, "onSetProcess", true);
     }
 
+    onSetVersion(version: string): void {
+        this.logger.log(`${this.module}设置版本号 : ${version}`);
+        if (this.data) {
+            this.data.version = version;
+            let bundles = Object.keys(this.data.bundles);
+            bundles.forEach(v => {
+                this.data!.bundles[v].version = version;
+            })
+            this.save();
+        }
+    }
 
     module = "【热更新】";
 
@@ -50,18 +65,35 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
         return this._data;
     }
 
-    readonly defaultData = {
+    readonly defaultData: HotupdateConfig = {
         version: "1.0",
+        appVersion: "1.0",
         serverIP: "",
         historyIps: [],
         buildDir: "",
         bundles: {},
         remoteDir: "",
-        includes: {},
         autoCreate: true,
-        autoDeploy: false
+        autoDeploy: false,
+        isAutoVersion: true,
     }
 
+    readonly mainJS = "main.js";
+
+    private _mainBundleIncludes: string[] = null!;
+    /**
+     * @description 主包包含目录
+     */
+    /**@description 返回需要添加到主包版本的文件目录 */
+    private get mainBundleIncludes() {
+        if (!this._mainBundleIncludes) {
+            this._mainBundleIncludes = ["src", "jsb-adapter", "assets/resources", "assets/main", this.mainJS];
+            if (!Environment.isVersion3X) {
+                this._mainBundleIncludes.push("assets/internal");
+            }
+        }
+        return this._mainBundleIncludes;
+    }
 
     private _cur = 0;
     /**@description 当前进度 */
@@ -110,9 +142,9 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
      */
     private toCommand() {
         if (Environment.isCommand && this._data) {
-            if ( Environment.isVersion3X ){
+            if (Environment.isVersion3X) {
                 this._data.buildDir = join(Environment.build.dest, "assets");
-            }else{
+            } else {
                 this._data.buildDir = Environment.build.dest;
             }
         }
@@ -206,13 +238,6 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
             } else {
                 if (this.defaultData) {
                     this._data = this.defaultData;
-                    this._data.includes["src"] = { name: "src", include: true, isLock: false };
-                    this._data.includes["jsb-adapter"] = { name: "jsb-adapter", include: true, isLock: false };
-                    this._data.includes["assets/resources"] = { name: "assets/resources", include: true, isLock: true };
-                    this._data.includes["assets/main"] = { name: "assets/main", include: true, isLock: true };
-                    if (!Environment.isVersion3X ){
-                        this._data.includes["assets/internal"] = { name: "assets/internal", include: true, isLock: true };
-                    }
                     this._data.autoCreate = true;
                     this._data.autoDeploy = false;
                     this._data.remoteDir = "";
@@ -256,11 +281,6 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
         return bundles;
     }
 
-    /**@description 返回需要添加到主包版本的文件目录 */
-    private get mainBundleIncludes() {
-        return Object.keys(this.data!.includes);
-    }
-
     /**
      * @description 获取保存的zip路径
      * @param bundle 
@@ -275,14 +295,17 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
      * @description 打包完成后，调用
      */
     async run() {
+        // await this.createManifest();
+        // await this.deployToRemote();
+        // return;
         let data = this.data!;
         // 插入热更新代码
-        if ( Environment.isVersion3X ){
+        if (Environment.isVersion3X) {
             await this.insertHotupdate(join(data.buildDir, "../"));
-        }else{
+        } else {
             await this.insertHotupdate(data.buildDir);
         }
-        
+
         if (data.autoCreate) {
             //如果开启了自动创建 版本文件
             await this.createManifest();
@@ -327,21 +350,37 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
         let data = this.data!;
         let mainIncludes = this.mainBundleIncludes;
         let paths: string[] = [];
+        let append: FileResult[] = [];
         for (let i = 0; i < mainIncludes.length; i++) {
             const element = mainIncludes[i];
             let fullPath = join(data.buildDir, element);
             fullPath = normalize(fullPath);
-            paths.push(fullPath);
+            if (element == this.mainJS) {
+                append = FileUtils.instance.getFiles(data.buildDir, undefined, data.buildDir, true);
+            } else {
+                paths.push(fullPath);
+            }
         }
+        //先做一分备份，把当前zip目录备份出来，如果打包的内容md5没有变化，不再进行打包
+        let tempZipPath = `${this.zipPath}_temp`;
+        await FileUtils.instance.copyDir(this.zipPath, tempZipPath)
         //删除之前的版本包
         await FileUtils.instance.delDir(this.zipPath);
         FileUtils.instance.createDir(this.zipPath);
         this.logger.log(`${this.module}打包路径 : ${this.zipPath}`);
         let zipPath = this.getZip("main", versions["main"].md5)
-        this.logger.log(`${this.module}正在打包 : ${parse(zipPath).name}`);
-        await FileUtils.instance.archive(paths, zipPath, data.buildDir);
-        this.cur = this.cur + 1;
-        this.logger.log(`${this.module}打包完成 : ${parse(zipPath).name}`);
+        let result = parse(zipPath);
+        let tempMainPath = join(tempZipPath, `${result.name}${result.ext}`);
+        if (existsSync(tempMainPath)) {
+            this.logger.log(`${this.module}打包内容未发生改变，不再重新生成${result.name}${result.ext}`);
+            await FileUtils.instance.copyFile(tempMainPath, zipPath);
+            this.cur = this.cur + 1;
+        } else {
+            this.logger.log(`${this.module}正在打包 : ${parse(zipPath).name}`);
+            await FileUtils.instance.archive(paths, zipPath, data.buildDir, append);
+            this.cur = this.cur + 1;
+            this.logger.log(`${this.module}打包完成 : ${parse(zipPath).name}`);
+        }
 
         let bundles = Object.keys(data.bundles)
 
@@ -349,34 +388,60 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
         for (let i = 0; i < bundles.length; i++) {
             let bundle = bundles[i];
             zipPath = this.getZip(bundle, versions[bundle].md5);
-            this.logger.log(`${this.module}正在打包 : ${parse(zipPath).name}`);
-            let fullPath = join(data.buildDir, `assets/${bundle}`);
-            await FileUtils.instance.archive(fullPath, zipPath, data.buildDir);
-            this.cur = this.cur + 1;
-            this.logger.log(`${this.module}打包完成 : ${parse(zipPath).name}`);
+            result = parse(zipPath);
+            tempMainPath = join(tempZipPath, `${result.name}${result.ext}`);
+            if (existsSync(tempMainPath)) {
+                this.logger.log(`${this.module}打包内容未发生改变，不再重新生成${result.name}${result.ext}`);
+                await FileUtils.instance.copyFile(tempMainPath, zipPath);
+                this.cur = this.cur + 1;
+            } else {
+                this.logger.log(`${this.module}正在打包 : ${parse(zipPath).name}`);
+                let fullPath = join(data.buildDir, `assets/${bundle}`);
+                await FileUtils.instance.archive(fullPath, zipPath, data.buildDir);
+                this.cur = this.cur + 1;
+                this.logger.log(`${this.module}打包完成 : ${parse(zipPath).name}`);
+            }
         }
+
+        //删除 temp 目录
+        await FileUtils.instance.delDir(tempZipPath);
+
+        // let assets = {};
+        // FileUtils.instance.md5Dir(this.zipPath,assets,this.zipPath);
+        // console.log(assets);
     }
 
     /**@description 生成版本文件 */
     private createVersionFile(source: VersionDatas) {
         this.logger.log(`${this.module}准备生成版本控制文件`);
         //更新版本控制文件中zip大小
-
+        let isAutoVersion = this.data!.isAutoVersion;
+        let version = this.date;
         let keys = Object.keys(source);
+        if (isAutoVersion) {
+            this.onSetVersion(version);
+        }
         keys.forEach(bundle => {
             let data = source[bundle];
             let zipPath = this.getZip(bundle, data.md5);
             data.project.size = statSync(zipPath).size
+
+            if (isAutoVersion) {
+                data.project.version = version;
+            }
             writeFileSync(data.projectPath, JSON.stringify(data.project));
             let temp = parse(data.projectPath);
             this.logger.log(`${this.module}生成${temp.name}${temp.ext}成功`);
             this.cur = this.cur + 1;
+
+            if (isAutoVersion) {
+                data.version.version = version;
+            }
             writeFileSync(data.versionPath, JSON.stringify(data.version));
             temp = parse(data.versionPath);
             this.logger.log(`${this.module}生成${temp.name}${temp.ext}成功`);
             this.cur = this.cur + 1;
         })
-
         this.onSetProcess(false);
         this.logger.log(`${this.module}生成完成`);
     }
@@ -393,6 +458,8 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
             this.logger.log(`${this.module}开始生成版本控制文件`);
             let data = this.data!;
             let version = data.version;
+            let appVersion = data.appVersion;
+            this.logger.log(`${this.module}App版本号:${appVersion}`)
             this.logger.log(`${this.module}主包版本号:${version}`);
             let buildDir = data.buildDir;
             buildDir = normalize(buildDir);
@@ -416,6 +483,8 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
             this.total += (subBundles.length + 1);
             //所有版本文件
             this.total++;
+            //生成主包内置版本号，该文件不会更新
+            this.total++;
 
             //删除旧的版本控件文件
             this.logger.log("删除旧的Manifest目录", manifestDir);
@@ -428,7 +497,12 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
             //读出主包资源，生成主包版本
             let mainIncludes = this.mainBundleIncludes;
             for (let i = 0; i < mainIncludes.length; i++) {
-                FileUtils.instance.md5Dir(join(buildDir, mainIncludes[i]), manifest.assets!, buildDir);
+                let v = mainIncludes[i];
+                if (v == this.mainJS) {
+                    FileUtils.instance.md5Dir(buildDir, manifest.assets!, buildDir, true);
+                } else {
+                    FileUtils.instance.md5Dir(join(buildDir, mainIncludes[i]), manifest.assets!, buildDir);
+                }
             }
 
             let versionDatas: VersionDatas = {};
@@ -456,7 +530,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
 
 
             //生成所有版本控制文件，用来判断当玩家停止在版本1，此时发版本2时，不让进入游戏，返回到登录，重新走完整个更新流程
-            let versions: { [key: string]: { md5: string, version: string } } = {
+            let versions: VersionJson = {
                 main: { md5: md5, version: version },
             }
 
@@ -499,6 +573,13 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
             writeFileSync(versionsPath, JSON.stringify(versions));
             this.logger.log(`${this.module}生成versions.json成功`);
             this.cur = this.cur + 1;
+
+            //定入主包内置版本号，即apk版本号
+            let apkVersionPath = join(manifestDir, `apk.json`);
+            let apkJson: ApkJson = { version: appVersion }
+            writeFileSync(apkVersionPath, JSON.stringify(apkJson));
+            this.cur = this.cur + 1;
+
             await this.zipVersions(versions);
             this.createVersionFile(versionDatas);
             resolve(true);
@@ -556,12 +637,16 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
             return;
         }
         this.onSetProcess(true);
-        let includes = this.mainBundleIncludes;
+        let includes = this.mainBundleIncludes
 
         let temps = [];
         for (let i = 0; i < includes.length; i++) {
             //只保留根目录
             let dir = includes[i];
+            if (dir == this.mainJS) {
+                temps.push(dir);
+                continue;
+            }
             let index = dir.search(/\\|\//);
             if (index == -1) {
                 if (temps.indexOf(dir) == -1) {
@@ -595,9 +680,13 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
         for (let i = 0; i < copyDirs.length; i++) {
             let source = join(data.buildDir, copyDirs[i]);
             let dest = join(data.remoteDir, copyDirs[i]);
-            // this.logger.log(`${this.module}准备复制${source} => ${dest}`);
-            await FileUtils.instance.copyDir(source, dest);
-            // this.logger.log(`${this.module}复制完成${source} => ${dest}`);
+            if (copyDirs[i] == this.mainJS) {
+                await FileUtils.instance.copyFile(source, dest);
+            } else {
+                // this.logger.log(`${this.module}准备复制${source} => ${dest}`);
+                await FileUtils.instance.copyDir(source, dest);
+                // this.logger.log(`${this.module}复制完成${source} => ${dest}`);
+            }
             this.cur = this.cur + 1;
         }
 
@@ -618,7 +707,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
             let codePath = join(this.curExtensionPath, "code/hotupdate.js");
             let code = readFileSync(codePath, "utf8");
             // console.log(code);
-            let sourcePath = join(dest, "assets/main.js");
+            let sourcePath = join(dest, `assets/${this.mainJS}`);
             sourcePath = normalize(sourcePath);
             let sourceCode = readFileSync(sourcePath, "utf8");
             let templateReplace = function templateReplace() {
@@ -629,7 +718,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
             this.logger.log(`${this.module}向${sourcePath}中插入热更新代码`);
             writeFileSync(sourcePath, sourceCode, { "encoding": "utf8" });
         } else {
-            let mainJSPath = join(dest, "main.js");
+            let mainJSPath = join(dest, this.mainJS);
             let content = readFileSync(mainJSPath, "utf-8");
             content = content.replace(/if\s*\(\s*window.jsb\)\s*\{/g,
                 `if (window.jsb) {

@@ -47,13 +47,22 @@ export class UpdateManager implements ISingleton {
     /**@description 远程所有版本信息 */
     private remoteVersions: VERSIONS = {};
 
+    /**@description 默认版本 */
+    readonly defaultVersion = "1.0";
+
+    /**@description 默认md5 */
+    readonly defaultMD5 = Macro.UNKNOWN;
+
     /**@description 是否是预览或浏览器 */
     get isBrowser() {
         return sys.platform == sys.Platform.WECHAT_GAME || PREVIEW || sys.isBrowser;
     }
 
-    /**@description 主包包含资源目录 */
-    mainBundles: string[] = [];
+    /**@description 主包包含资源目录,固定的，请勿修改 */
+    readonly mainBundles: string[] = ["src", "jsb-adapter", "assets/resources", "assets/main", "main.js"];
+
+    /**@description 是否使用了自动版本 */
+    isAutoVersion : boolean = true;
 
     /**@description 获取资源管理器，默认为hall 大厅的资源管理器 */
     getAssetsManager(item: UpdateItem) {
@@ -195,30 +204,70 @@ export class UpdateManager implements ISingleton {
         }
     }
 
-    /**
-     * @description 获取版本号,此版本号只是显示用，该热更新跟版本号无任何关系
-     * @param bundle 
-     * @param isShortVersion 是否使用简单的版本号
-     */
-    getVersion(bundle: BUNDLE_TYPE, isShortVersion: boolean = true) {
+    /**@description app 版本号 */
+    get appVersion() {
         if (this.isBrowser) {
-            return "v1.0";
+            return this.defaultVersion;
+        } else {
+            let path = `${Update.MANIFEST_ROOT}$apk.json`;
+            let dataStr = this.getString(path);
+            if (dataStr) {
+                let data = JSON.parse(dataStr);
+                return `v${data.version}`;
+            } else {
+                Log.e(`${this.module}无法读取到${path}`);
+                return this.defaultVersion;
+            }
+        }
+    }
+
+    /**
+     * @description 返回当前bundle的md5
+     * @param bundle 
+     */
+    getMd5(bundle: BUNDLE_TYPE) {
+        if (this.isBrowser) {
+            return this.defaultMD5;
         } else {
             bundle = this.convertBundle(bundle as string);
             let versionInfo = this.getVersionInfo(bundle);
             if (versionInfo) {
-                if (isShortVersion) {
-                    return `v${versionInfo.version}`;
-                }
-                return `v${versionInfo.version}(${versionInfo.md5})`;
+                return `${versionInfo.md5}`;
             } else {
                 if (this.remoteVersions[bundle]) {
-                    if (isShortVersion) {
-                        return `v${this.remoteVersions[bundle]}`;
-                    }
-                    return `v${this.remoteVersions[bundle]}(${this.remoteVersions[bundle].md5})`;
+                    Log.w(`${this.module}本地无版本信息,返回远程版本${this.remoteVersions[bundle].md5}`);
+                    return `${this.remoteVersions[bundle].md5}`;
                 } else {
-                    return `v1.0`;
+                    Log.e(`${this.module}远程无版本信息，返回默认版本${this.defaultMD5}`);
+                    return this.defaultMD5;
+                }
+            }
+        }
+    }
+
+    /**
+     * @description 获取版本号,此版本号只是显示用，该热更新跟版本号无任何关系
+     * @param bundle
+     */
+    getVersion(bundle: BUNDLE_TYPE) {
+        if (this.isBrowser) {
+            return this.defaultVersion;
+        } else {
+            bundle = this.convertBundle(bundle as string);
+            if ( this.isAutoVersion ){
+                ///如果使用了自动版本，所有的版本号都是一致的,都使用主包版本号
+                bundle = Macro.MAIN_PACK_BUNDLE_NAME;
+            }
+            let versionInfo = this.getVersionInfo(bundle);
+            if (versionInfo) {
+                return `${versionInfo.version}`;
+            } else {
+                if (this.remoteVersions[bundle]) {
+                    Log.w(`${this.module}本地无版本信息,返回远程版本${this.remoteVersions[bundle].version}`);
+                    return `${this.remoteVersions[bundle].version}`;
+                } else {
+                    Log.e(`${this.module}远程无版本信息，返回默认版本${this.defaultVersion}`);
+                    return this.defaultVersion;
                 }
             }
         }

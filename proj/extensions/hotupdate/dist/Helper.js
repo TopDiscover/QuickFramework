@@ -23,6 +23,10 @@ class HelperImpl extends Helper_1.default {
     onSetBuildDir(dir) {
         Editor.Message.send(PACKAGE_NAME, "onSetBuildDir", dir);
     }
+    onSetVersion(version) {
+        super.onSetVersion(version);
+        Editor.Message.send(PACKAGE_NAME, "onSetVersion", version);
+    }
     /**
      * @description 添加历史地址
      * @param url
@@ -59,19 +63,13 @@ class HelperImpl extends Helper_1.default {
                 return arguments[1] + serverID + arguments[3];
             };
             content = content.replace(/(export\s*const\s*HOT_UPDATE_URL\s*=\s*")([\w:/.-]*)(")/g, replace);
-            let bundles = [];
-            for (let bundle in this.data.includes) {
-                let info = this.data.includes[bundle];
-                if (info.include) {
-                    bundles.push(info.name);
-                }
-            }
-            let bundlesString = JSON.stringify(bundles);
-            let replaceIncludes = function () {
-                self.logger.log(`${self.module}更新主包包含目录为:${bundlesString}`);
-                return arguments[1] + bundlesString + arguments[3];
+            (0, fs_1.writeFileSync)(configTSPath, content, "utf-8");
+            let replaceAutoVersion = function () {
+                var _a, _b;
+                self.logger.log(`${self.module}更新是否使用了自动版本:${(_a = self.data) === null || _a === void 0 ? void 0 : _a.isAutoVersion}`);
+                return arguments[1] + ((_b = self.data) === null || _b === void 0 ? void 0 : _b.isAutoVersion);
             };
-            content = content.replace(/(export\s*const\s*MIAN_PACK_INCLUDE\s*:\s*string\s*\[\s*\]\s*=\s*)([\[\]"\w,-/]*)(;)/g, replaceIncludes);
+            content = content.replace(/(export\s*const\s*USE_AUTO_VERSION\s*=\s*)(\w+)/g, replaceAutoVersion);
             (0, fs_1.writeFileSync)(configTSPath, content, "utf-8");
             let dbPath = "db://assets/scripts/common/config/Config.ts";
             Editor.Message.send("asset-db", "refresh-asset", dbPath);
