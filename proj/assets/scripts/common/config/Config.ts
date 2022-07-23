@@ -16,10 +16,10 @@ export namespace Config {
     export const isSkipCheckUpdate = false;
 
     /**@description 测试热更新服务器地址 */
-    export const HOT_UPDATE_URL = "http://192.168.176.1/hotupdate";
+    export const HOT_UPDATE_URL = "http://172.31.112.1/hotupdate";
 
-    /**@description 主包包含目录 */
-    export const MIAN_PACK_INCLUDE: string[] = ["src","jsb-adapter","assets/resources","assets/main","assets/internal"];
+    /**@description 是否使用了自动版本 */
+    export const USE_AUTO_VERSION = true;
 
     /**@description Loading动画显示超时回调默认超时时间 */
     export const LOADING_TIME_OUT = 30;

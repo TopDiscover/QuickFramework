@@ -71,6 +71,6 @@
   "includeAnySDK": false,
   "mainCompressionType": "merge_all_json",
   "mainIsRemote": false,
-  "nativeMd5Cache": false,
+  "nativeMd5Cache": true,
   "agreements": {}
 }

@@ -34,8 +34,9 @@ const Electron = require("electron");
 const PACKAGE_NAME = "hotupdate";
 class HelperImpl extends Helper_1.default {
     constructor() {
-        super(...arguments);
+        super();
         this.isDoing = false;
+        this.logger = Editor;
     }
     isSupportUpdate(platform) {
         if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac" || platform == "win32") {
@@ -53,10 +54,14 @@ class HelperImpl extends Helper_1.default {
     }
     onSetProcess(isProcessing) {
         this.isDoing = isProcessing;
-        // Editor.Ipc.sendToPanel(PACKAGE_NAME, "hotupdate:onSetProcess", isProcessing);
+        Editor.Ipc.sendToPanel(PACKAGE_NAME, "hotupdate:onSetProcess", isProcessing);
     }
     onSetBuildDir(dir) {
         Editor.Ipc.sendToPanel(PACKAGE_NAME, "hotupdate:setBuildDir", dir);
+    }
+    onSetVersion(version) {
+        super.onSetVersion(version);
+        Editor.Ipc.sendToPanel(PACKAGE_NAME, "hotupdate:onSetVersion", version);
     }
     /**
      * @description 添加历史地址
@@ -89,19 +94,12 @@ class HelperImpl extends Helper_1.default {
                 return arguments[1] + serverID + arguments[3];
             };
             content = content.replace(/(export\s*const\s*HOT_UPDATE_URL\s*=\s*")([\w:/.-]*)(")/g, replace);
-            let bundles = [];
-            for (let bundle in this.data.includes) {
-                let info = this.data.includes[bundle];
-                if (info.include) {
-                    bundles.push(info.name);
-                }
-            }
-            let bundlesString = JSON.stringify(bundles);
-            let replaceIncludes = function () {
-                self.logger.log(`${self.module}更新主包包含目录为:${bundlesString}`);
-                return arguments[1] + bundlesString + arguments[3];
+            let replaceAutoVersion = function () {
+                var _a, _b;
+                self.logger.log(`${self.module}更新是否使用了自动版本:${(_a = self.data) === null || _a === void 0 ? void 0 : _a.isAutoVersion}`);
+                return arguments[1] + ((_b = self.data) === null || _b === void 0 ? void 0 : _b.isAutoVersion);
             };
-            content = content.replace(/(export\s*const\s*MIAN_PACK_INCLUDE\s*:\s*string\s*\[\s*\]\s*=\s*)([\[\]"\w,-/]*)(;)/g, replaceIncludes);
+            content = content.replace(/(export\s*const\s*USE_AUTO_VERSION\s*=\s*)(\w+)/g, replaceAutoVersion);
             (0, fs_1.writeFileSync)(configTSPath, content, "utf-8");
             let dbPath = "db://assets/scripts/common/config/Config.ts";
             Editor.assetdb.refresh(dbPath, (err) => {
@@ -143,6 +141,7 @@ class HelperImpl extends Helper_1.default {
         callback();
     }
     onBuildStart(options, callback) {
+        this.onSetProcess(true);
         this.data.buildDir = options.dest;
         if (this.isSupportUpdate(options.platform)) {
             this.logger.warn(`${this.module}如果热更新勾选了【自动生成】或【自动部署】请不要关闭此界面`);

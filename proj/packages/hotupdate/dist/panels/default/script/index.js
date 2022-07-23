@@ -4,10 +4,53 @@ const fs_1 = require("fs");
 const path_1 = require("path");
 const Helper_1 = require("../../../Helper");
 let vueView = null;
+let ui = null;
+const el = {
+    uiAutoVersion: "#uiAutoVersion",
+    uiVersion: "#uiVersion",
+    uiUrlConfirm: "#uiUrlConfirm",
+    uiHistoryUrl: "#uiHistoryUrl",
+    uiBuildDir: "#uiBuildDir",
+    uiAutoCreate: "#uiAutoCreate",
+    uiAutoDeploy: "#uiAutoDeploy",
+    uiDelBundles: "#uiDelBundles",
+    uiCreateVersion: "#uiCreateVersion",
+    uiUrl: "#uiUrl",
+    uiBuildDirSelect: "#uiBuildDirSelect",
+    uiRemoteSelect: "#uiRemoteSelect",
+    uiDeploy: "#uiDeploy",
+    uiBundles: "#uiBundles",
+};
+function setProcessing(isProcessing) {
+    let els = Object.keys(el);
+    els.forEach(v => {
+        if (v == "uiBundles") {
+            let elBundles = ui.$uiBundles;
+            let versions = elBundles.childNodes;
+            versions.forEach(v => {
+                if (v.nodeName == "UI-PROP") {
+                    let props = v.childNodes;
+                    props.forEach(prop => {
+                        if (prop.nodeName == "DIV") {
+                            prop.childNodes.forEach(div => {
+                                if (div.nodeName == "UI-CHECKBOX" || div.nodeName == "UI-INPUT") {
+                                    div.disabled = isProcessing;
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        else {
+            ui[`$${v}`].disabled = isProcessing;
+        }
+    });
+}
 module.exports = Editor.Panel.extend({
     template: (0, fs_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
     style: (0, fs_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
-    $: {},
+    $: el,
     messages: {
         'hotupdate:onConfirmDelBundle'() {
             Helper_1.helper.removeNotInApkBundle();
@@ -22,6 +65,13 @@ module.exports = Editor.Panel.extend({
         "hotupdate:updateCreateProgress"(sender, value) {
             vueView.createProgress = value;
         },
+        "hotupdate:onSetVersion"(sender, version) {
+            vueView.version = version;
+            vueView.bundles = Helper_1.helper.data.bundles;
+        },
+        "hotupdate:onSetProcess"(sender, isProcessing) {
+            setProcessing(isProcessing);
+        },
         onPngCompressComplete(sender, info) {
             let dest = info.dest;
             let platform = info.platform;
@@ -34,6 +84,7 @@ module.exports = Editor.Panel.extend({
     ready() {
         Helper_1.helper.read(true);
         let self = this;
+        ui = this;
         const vm = new window.Vue({
             data() {
                 return {
@@ -46,23 +97,15 @@ module.exports = Editor.Panel.extend({
                     remoteVersion: Helper_1.helper.remoteVersion,
                     remoteDir: Helper_1.helper.data.remoteDir,
                     remoteBundles: Helper_1.helper.remoteBundles,
-                    includes: Helper_1.helper.data.includes,
                     autoCreate: Helper_1.helper.data.autoCreate,
                     autoDeploy: Helper_1.helper.data.autoDeploy,
                     progress: 0,
                     createProgress: 0,
+                    isAutoVersion: Helper_1.helper.data.isAutoVersion,
+                    appVersion: Helper_1.helper.data.appVersion
                 };
             },
             methods: {
-                onChangeIncludes(value, key) {
-                    if (Helper_1.helper.data.includes[key].isLock) {
-                        Helper_1.helper.logger.warn(`${Helper_1.helper.module}${key}已经被锁定，修改无效`);
-                        return;
-                    }
-                    Helper_1.helper.data.includes[key].include = value;
-                    Helper_1.helper.save();
-                    Helper_1.helper.updateToConfigTS();
-                },
                 onChangeAutoCreateManifest(value) {
                     Helper_1.helper.data.autoCreate = value;
                     Helper_1.helper.save();
@@ -147,6 +190,12 @@ module.exports = Editor.Panel.extend({
                     Helper_1.helper.data.version = view.version;
                     Helper_1.helper.save();
                 },
+                onInputAppVersionOver(version) {
+                    let view = this;
+                    view.appVersion = version;
+                    Helper_1.helper.data.appVersion = version;
+                    Helper_1.helper.save();
+                },
                 onInputUrlOver(inputUrl) {
                     if (Helper_1.helper.isDoing) {
                         return;
@@ -194,7 +243,14 @@ module.exports = Editor.Panel.extend({
                 onOpenBulidOutDir() {
                     let view = this;
                     Helper_1.helper.openDir(view.buildOutDir);
-                }
+                },
+                onChangeAutoVersion(value) {
+                    let view = this;
+                    view.isAutoVersion = value;
+                    Helper_1.helper.data.isAutoVersion = value;
+                    Helper_1.helper.save();
+                    Helper_1.helper.updateToConfigTS();
+                },
             },
             created: function () {
                 vueView = this;

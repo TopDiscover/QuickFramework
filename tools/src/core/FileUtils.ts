@@ -34,7 +34,16 @@ export default class FileUtils extends Handler {
         this.logger.log(`创建链接 ${target} -> ${path}`)
     }
 
-    private _getFiles(path: string, root: string, result: FileResult[], isInclude?: (info: FileResult) => boolean) {
+    /**
+     * @description 
+     * @param path 
+     * @param root 
+     * @param result 
+     * @param isInclude 
+     * @param isCurrentDirFiles 是否只读取当前目录的文件
+     * @returns 
+     */
+    private _getFiles(path: string, root: string, result: FileResult[], isInclude?: (info: FileResult) => boolean,isCurrentDirFiles = false) {
         if (!existsSync(path)) {
             return result;
         }
@@ -56,7 +65,9 @@ export default class FileUtils extends Handler {
                     result.push(info);
                 }
             } else {
-                stat.isDirectory() && this._getFiles(fullPath, root, result, isInclude);
+                if ( !isCurrentDirFiles ){
+                    stat.isDirectory() && this._getFiles(fullPath, root, result, isInclude);
+                }   
             }
         }
     }
@@ -67,12 +78,12 @@ export default class FileUtils extends Handler {
      * @param isInclude 是否包含该文件
      * @returns 
      */
-    getFiles(path: string, isInclude?: (info: FileResult) => boolean, root?: string) {
+    getFiles(path: string, isInclude?: (info: FileResult) => boolean, root?: string,isCurrentDirFiles = false) {
         let out: FileResult[] = [];
         if (!root) {
             root = path;
         }
-        this._getFiles(path, root, out, isInclude);
+        this._getFiles(path, root, out, isInclude,isCurrentDirFiles);
         return out;
     }
 
@@ -156,7 +167,7 @@ export default class FileUtils extends Handler {
      * @param path 打包路径
      * @param outPath 输出zip目录全路径
      */
-    archive(path: string | string[], outPath: string, root?: string) {
+    archive(path: string | string[], outPath: string, root: string,append?:FileResult[]) {
         return new Promise<boolean>((resolve) => {
             let files: FileResult[] = [];
             if (typeof path == "string") {
@@ -167,9 +178,12 @@ export default class FileUtils extends Handler {
                     files = files.concat(temp);
                 }
             }
+            if ( append ){
+                files = files.concat(append);
+            }
             this.formatPaths(files);
             let arch = archiver("zip", {
-                zlib: { level: 9 }
+                zlib: { level: 9}
             });
             let output = createWriteStream(outPath);
             //绑定流
@@ -220,8 +234,8 @@ export default class FileUtils extends Handler {
      * @param path 
      * @param assets 
      */
-    md5Dir(path: string, assets: Asset, root: string) {
-        let files = FileUtils.instance.getFiles(path, undefined, root)
+    md5Dir(path: string, assets: Asset, root: string,isCurrentDirFiles = false) {
+        let files = FileUtils.instance.getFiles(path, undefined, root,isCurrentDirFiles)
         files.forEach(v => {
             let md5 = this.md5(readFileSync(v.path));
             let relative = this.formatPath(v.relative);

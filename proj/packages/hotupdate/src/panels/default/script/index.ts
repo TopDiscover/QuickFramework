@@ -31,15 +31,64 @@ interface MyVue {
     progress: number;
     /**@description 创建进度 */
     createProgress: number;
+    /**@description app版本 */
+    appVersion : string;
+    /**@description 自动版本 */
+    isAutoVersion : boolean;
     onInputUrlOver(event: { target: HTMLInputElement } | string): void;
 }
+
 let vueView: MyVue = null!;
+
+let ui : any = null;
+
+const el = {
+    uiAutoVersion : "#uiAutoVersion",
+    uiVersion : "#uiVersion",
+    uiUrlConfirm : "#uiUrlConfirm",
+    uiHistoryUrl : "#uiHistoryUrl",
+    uiBuildDir : "#uiBuildDir",
+    uiAutoCreate : "#uiAutoCreate",
+    uiAutoDeploy : "#uiAutoDeploy",
+    uiDelBundles : "#uiDelBundles",
+    uiCreateVersion : "#uiCreateVersion",
+    uiUrl : "#uiUrl",
+    uiBuildDirSelect : "#uiBuildDirSelect",
+    uiRemoteSelect : "#uiRemoteSelect",
+    uiDeploy : "#uiDeploy",
+    uiBundles : "#uiBundles",
+}
+
+function setProcessing( isProcessing : boolean ){
+    let els = Object.keys(el);
+    els.forEach(v=>{
+        if ( v == "uiBundles"){
+            let elBundles : HTMLElement = ui.$uiBundles;
+            let versions = elBundles.childNodes;
+            versions.forEach(v=>{
+                if ( v.nodeName == "UI-PROP"){
+                    let props = v.childNodes;
+                    props.forEach(prop=>{
+                        if ( prop.nodeName == "DIV"){
+                            prop.childNodes.forEach(div=>{
+                                if ( div.nodeName == "UI-CHECKBOX" || div.nodeName == "UI-INPUT"){
+                                    (<any>div).disabled = isProcessing;  
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+        }else{
+            ui[`$${v}`].disabled = isProcessing;
+        }
+    })
+}
+
 module.exports = Editor.Panel.extend({
     template: readFileSync(join(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
     style: readFileSync(join(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
-    $: {
-
-    },
+    $: el,
     messages: {
         'hotupdate:onConfirmDelBundle'() {
             helper.removeNotInApkBundle();
@@ -54,6 +103,13 @@ module.exports = Editor.Panel.extend({
         "hotupdate:updateCreateProgress"(sender: any, value: number) {
             vueView.createProgress = value;
         },
+        "hotupdate:onSetVersion"(sender: any, version: string) {
+            vueView.version = version;
+            vueView.bundles = helper.data!.bundles;
+        },
+        "hotupdate:onSetProcess"(sender:any,isProcessing:boolean){
+            setProcessing(isProcessing);
+        },
         onPngCompressComplete(sender: any, info: { dest: string, platform: string }) {
             let dest = info.dest;
             let platform = info.platform;
@@ -66,6 +122,7 @@ module.exports = Editor.Panel.extend({
     ready() {
         helper.read(true);
         let self: MyView = this as any;
+        ui = this;
         const vm = new window.Vue({
             data() {
                 return {
@@ -78,23 +135,15 @@ module.exports = Editor.Panel.extend({
                     remoteVersion: helper.remoteVersion,
                     remoteDir: helper.data!.remoteDir,
                     remoteBundles: helper.remoteBundles,
-                    includes: helper.data!.includes,
                     autoCreate: helper.data!.autoCreate,
                     autoDeploy: helper.data!.autoDeploy,
                     progress: 0,
                     createProgress: 0,
+                    isAutoVersion : helper.data!.isAutoVersion,
+                    appVersion : helper.data!.appVersion
                 };
             },
             methods: {
-                onChangeIncludes(value: boolean, key: string) {
-                    if (helper.data!.includes[key].isLock) {
-                        helper.logger.warn(`${helper.module}${key}已经被锁定，修改无效`);
-                        return;
-                    }
-                    helper.data!.includes[key].include = value;
-                    helper.save();
-                    helper.updateToConfigTS();
-                },
                 onChangeAutoCreateManifest(value: boolean) {
                     helper.data!.autoCreate = value;
                     helper.save();
@@ -177,6 +226,12 @@ module.exports = Editor.Panel.extend({
                     helper.data!.version = view.version;
                     helper.save();
                 },
+                onInputAppVersionOver(version:string){
+                    let view: MyVue = this as any;
+                    view.appVersion = version;
+                    helper.data!.appVersion = version;
+                    helper.save();
+                },
                 onInputUrlOver(inputUrl: string) {
                     if (helper.isDoing) {
                         return;
@@ -224,7 +279,14 @@ module.exports = Editor.Panel.extend({
                 onOpenBulidOutDir() {
                     let view: MyVue = this as any;
                     helper.openDir(view.buildOutDir);
-                }
+                },
+                onChangeAutoVersion(value : boolean){
+                    let view: MyVue = this as any;
+                    view.isAutoVersion = value;
+                    helper.data!.isAutoVersion = value;
+                    helper.save();
+                    helper.updateToConfigTS();
+                },
             },
             created: function () {
                 vueView = this as any;

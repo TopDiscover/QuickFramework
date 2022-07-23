@@ -198,7 +198,8 @@ export default class Helper extends Config<PngCompressConfig> {
                 failed: this.records.failedAssets
             }
 
-            let path = join(this.localPath, `${Extensions.PngCompress}${this.date}_cache.json`);
+            let path = join(this.localPath, `${Extensions.PngCompress}_${this.date}_cache.json`);
+            this.logger.log(`${this.module}写入日志到${path}`);
             writeFileSync(path, JSON.stringify(data), "utf-8");
         }
 

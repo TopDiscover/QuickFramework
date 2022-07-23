@@ -18,15 +18,18 @@ class Helper extends Config_1.default {
         this.module = "【热更新】";
         this.defaultData = {
             version: "1.0",
+            appVersion: "1.0",
             serverIP: "",
             historyIps: [],
             buildDir: "",
             bundles: {},
             remoteDir: "",
-            includes: {},
             autoCreate: true,
-            autoDeploy: false
+            autoDeploy: false,
+            isAutoVersion: true,
         };
+        this.mainJS = "main.js";
+        this._mainBundleIncludes = null;
         this._cur = 0;
         /**@description 文件总数 */
         this.total = 0;
@@ -45,6 +48,17 @@ class Helper extends Config_1.default {
     onSetProcess(isProcessing) {
         // Editor.Message.send(PACKAGE_NAME, "onSetProcess", true);
     }
+    onSetVersion(version) {
+        this.logger.log(`${this.module}设置版本号 : ${version}`);
+        if (this.data) {
+            this.data.version = version;
+            let bundles = Object.keys(this.data.bundles);
+            bundles.forEach(v => {
+                this.data.bundles[v].version = version;
+            });
+            this.save();
+        }
+    }
     get path() {
         let out = (0, path_1.join)(this.configPath, `${Defines_1.Extensions.Hotupdate}.json`);
         return out;
@@ -55,6 +69,19 @@ class Helper extends Config_1.default {
             this.toCommand();
         }
         return this._data;
+    }
+    /**
+     * @description 主包包含目录
+     */
+    /**@description 返回需要添加到主包版本的文件目录 */
+    get mainBundleIncludes() {
+        if (!this._mainBundleIncludes) {
+            this._mainBundleIncludes = ["src", "jsb-adapter", "assets/resources", "assets/main", this.mainJS];
+            if (!Environment_1.Environment.isVersion3X) {
+                this._mainBundleIncludes.push("assets/internal");
+            }
+        }
+        return this._mainBundleIncludes;
     }
     /**@description 当前进度 */
     get cur() {
@@ -182,13 +209,6 @@ class Helper extends Config_1.default {
             else {
                 if (this.defaultData) {
                     this._data = this.defaultData;
-                    this._data.includes["src"] = { name: "src", include: true, isLock: false };
-                    this._data.includes["jsb-adapter"] = { name: "jsb-adapter", include: true, isLock: false };
-                    this._data.includes["assets/resources"] = { name: "assets/resources", include: true, isLock: true };
-                    this._data.includes["assets/main"] = { name: "assets/main", include: true, isLock: true };
-                    if (!Environment_1.Environment.isVersion3X) {
-                        this._data.includes["assets/internal"] = { name: "assets/internal", include: true, isLock: true };
-                    }
                     this._data.autoCreate = true;
                     this._data.autoDeploy = false;
                     this._data.remoteDir = "";
@@ -228,10 +248,6 @@ class Helper extends Config_1.default {
         });
         return bundles;
     }
-    /**@description 返回需要添加到主包版本的文件目录 */
-    get mainBundleIncludes() {
-        return Object.keys(this.data.includes);
-    }
     /**
      * @description 获取保存的zip路径
      * @param bundle
@@ -245,6 +261,9 @@ class Helper extends Config_1.default {
      * @description 打包完成后，调用
      */
     async run() {
+        // await this.createManifest();
+        // await this.deployToRemote();
+        // return;
         let data = this.data;
         // 插入热更新代码
         if (Environment_1.Environment.isVersion3X) {
@@ -287,46 +306,89 @@ class Helper extends Config_1.default {
         let data = this.data;
         let mainIncludes = this.mainBundleIncludes;
         let paths = [];
+        let append = [];
         for (let i = 0; i < mainIncludes.length; i++) {
             const element = mainIncludes[i];
             let fullPath = (0, path_1.join)(data.buildDir, element);
             fullPath = (0, path_1.normalize)(fullPath);
-            paths.push(fullPath);
+            if (element == this.mainJS) {
+                append = FileUtils_1.default.instance.getFiles(data.buildDir, undefined, data.buildDir, true);
+            }
+            else {
+                paths.push(fullPath);
+            }
         }
+        //先做一分备份，把当前zip目录备份出来，如果打包的内容md5没有变化，不再进行打包
+        let tempZipPath = `${this.zipPath}_temp`;
+        await FileUtils_1.default.instance.copyDir(this.zipPath, tempZipPath);
         //删除之前的版本包
         await FileUtils_1.default.instance.delDir(this.zipPath);
         FileUtils_1.default.instance.createDir(this.zipPath);
         this.logger.log(`${this.module}打包路径 : ${this.zipPath}`);
         let zipPath = this.getZip("main", versions["main"].md5);
-        this.logger.log(`${this.module}正在打包 : ${(0, path_1.parse)(zipPath).name}`);
-        await FileUtils_1.default.instance.archive(paths, zipPath, data.buildDir);
-        this.cur = this.cur + 1;
-        this.logger.log(`${this.module}打包完成 : ${(0, path_1.parse)(zipPath).name}`);
+        let result = (0, path_1.parse)(zipPath);
+        let tempMainPath = (0, path_1.join)(tempZipPath, `${result.name}${result.ext}`);
+        if ((0, fs_1.existsSync)(tempMainPath)) {
+            this.logger.log(`${this.module}打包内容未发生改变，不再重新生成${result.name}${result.ext}`);
+            await FileUtils_1.default.instance.copyFile(tempMainPath, zipPath);
+            this.cur = this.cur + 1;
+        }
+        else {
+            this.logger.log(`${this.module}正在打包 : ${(0, path_1.parse)(zipPath).name}`);
+            await FileUtils_1.default.instance.archive(paths, zipPath, data.buildDir, append);
+            this.cur = this.cur + 1;
+            this.logger.log(`${this.module}打包完成 : ${(0, path_1.parse)(zipPath).name}`);
+        }
         let bundles = Object.keys(data.bundles);
         //打包子版本
         for (let i = 0; i < bundles.length; i++) {
             let bundle = bundles[i];
             zipPath = this.getZip(bundle, versions[bundle].md5);
-            this.logger.log(`${this.module}正在打包 : ${(0, path_1.parse)(zipPath).name}`);
-            let fullPath = (0, path_1.join)(data.buildDir, `assets/${bundle}`);
-            await FileUtils_1.default.instance.archive(fullPath, zipPath, data.buildDir);
-            this.cur = this.cur + 1;
-            this.logger.log(`${this.module}打包完成 : ${(0, path_1.parse)(zipPath).name}`);
+            result = (0, path_1.parse)(zipPath);
+            tempMainPath = (0, path_1.join)(tempZipPath, `${result.name}${result.ext}`);
+            if ((0, fs_1.existsSync)(tempMainPath)) {
+                this.logger.log(`${this.module}打包内容未发生改变，不再重新生成${result.name}${result.ext}`);
+                await FileUtils_1.default.instance.copyFile(tempMainPath, zipPath);
+                this.cur = this.cur + 1;
+            }
+            else {
+                this.logger.log(`${this.module}正在打包 : ${(0, path_1.parse)(zipPath).name}`);
+                let fullPath = (0, path_1.join)(data.buildDir, `assets/${bundle}`);
+                await FileUtils_1.default.instance.archive(fullPath, zipPath, data.buildDir);
+                this.cur = this.cur + 1;
+                this.logger.log(`${this.module}打包完成 : ${(0, path_1.parse)(zipPath).name}`);
+            }
         }
+        //删除 temp 目录
+        await FileUtils_1.default.instance.delDir(tempZipPath);
+        // let assets = {};
+        // FileUtils.instance.md5Dir(this.zipPath,assets,this.zipPath);
+        // console.log(assets);
     }
     /**@description 生成版本文件 */
     createVersionFile(source) {
         this.logger.log(`${this.module}准备生成版本控制文件`);
         //更新版本控制文件中zip大小
+        let isAutoVersion = this.data.isAutoVersion;
+        let version = this.date;
         let keys = Object.keys(source);
+        if (isAutoVersion) {
+            this.onSetVersion(version);
+        }
         keys.forEach(bundle => {
             let data = source[bundle];
             let zipPath = this.getZip(bundle, data.md5);
             data.project.size = (0, fs_1.statSync)(zipPath).size;
+            if (isAutoVersion) {
+                data.project.version = version;
+            }
             (0, fs_1.writeFileSync)(data.projectPath, JSON.stringify(data.project));
             let temp = (0, path_1.parse)(data.projectPath);
             this.logger.log(`${this.module}生成${temp.name}${temp.ext}成功`);
             this.cur = this.cur + 1;
+            if (isAutoVersion) {
+                data.version.version = version;
+            }
             (0, fs_1.writeFileSync)(data.versionPath, JSON.stringify(data.version));
             temp = (0, path_1.parse)(data.versionPath);
             this.logger.log(`${this.module}生成${temp.name}${temp.ext}成功`);
@@ -347,6 +409,8 @@ class Helper extends Config_1.default {
             this.logger.log(`${this.module}开始生成版本控制文件`);
             let data = this.data;
             let version = data.version;
+            let appVersion = data.appVersion;
+            this.logger.log(`${this.module}App版本号:${appVersion}`);
             this.logger.log(`${this.module}主包版本号:${version}`);
             let buildDir = data.buildDir;
             buildDir = (0, path_1.normalize)(buildDir);
@@ -369,6 +433,8 @@ class Helper extends Config_1.default {
             this.total += (subBundles.length + 1);
             //所有版本文件
             this.total++;
+            //生成主包内置版本号，该文件不会更新
+            this.total++;
             //删除旧的版本控件文件
             this.logger.log("删除旧的Manifest目录", manifestDir);
             if ((0, fs_1.existsSync)(manifestDir)) {
@@ -379,7 +445,13 @@ class Helper extends Config_1.default {
             //读出主包资源，生成主包版本
             let mainIncludes = this.mainBundleIncludes;
             for (let i = 0; i < mainIncludes.length; i++) {
-                FileUtils_1.default.instance.md5Dir((0, path_1.join)(buildDir, mainIncludes[i]), manifest.assets, buildDir);
+                let v = mainIncludes[i];
+                if (v == this.mainJS) {
+                    FileUtils_1.default.instance.md5Dir(buildDir, manifest.assets, buildDir, true);
+                }
+                else {
+                    FileUtils_1.default.instance.md5Dir((0, path_1.join)(buildDir, mainIncludes[i]), manifest.assets, buildDir);
+                }
             }
             let versionDatas = {};
             //生成project.manifest
@@ -423,6 +495,11 @@ class Helper extends Config_1.default {
             let versionsPath = (0, path_1.join)(manifestDir, `versions.json`);
             (0, fs_1.writeFileSync)(versionsPath, JSON.stringify(versions));
             this.logger.log(`${this.module}生成versions.json成功`);
+            this.cur = this.cur + 1;
+            //定入主包内置版本号，即apk版本号
+            let apkVersionPath = (0, path_1.join)(manifestDir, `apk.json`);
+            let apkJson = { version: appVersion };
+            (0, fs_1.writeFileSync)(apkVersionPath, JSON.stringify(apkJson));
             this.cur = this.cur + 1;
             await this.zipVersions(versions);
             this.createVersionFile(versionDatas);
@@ -482,6 +559,10 @@ class Helper extends Config_1.default {
         for (let i = 0; i < includes.length; i++) {
             //只保留根目录
             let dir = includes[i];
+            if (dir == this.mainJS) {
+                temps.push(dir);
+                continue;
+            }
             let index = dir.search(/\\|\//);
             if (index == -1) {
                 if (temps.indexOf(dir) == -1) {
@@ -514,9 +595,14 @@ class Helper extends Config_1.default {
         for (let i = 0; i < copyDirs.length; i++) {
             let source = (0, path_1.join)(data.buildDir, copyDirs[i]);
             let dest = (0, path_1.join)(data.remoteDir, copyDirs[i]);
-            // this.logger.log(`${this.module}准备复制${source} => ${dest}`);
-            await FileUtils_1.default.instance.copyDir(source, dest);
-            // this.logger.log(`${this.module}复制完成${source} => ${dest}`);
+            if (copyDirs[i] == this.mainJS) {
+                await FileUtils_1.default.instance.copyFile(source, dest);
+            }
+            else {
+                // this.logger.log(`${this.module}准备复制${source} => ${dest}`);
+                await FileUtils_1.default.instance.copyDir(source, dest);
+                // this.logger.log(`${this.module}复制完成${source} => ${dest}`);
+            }
             this.cur = this.cur + 1;
         }
         let source = this.zipPath;
@@ -534,7 +620,7 @@ class Helper extends Config_1.default {
             let codePath = (0, path_1.join)(this.curExtensionPath, "code/hotupdate.js");
             let code = (0, fs_1.readFileSync)(codePath, "utf8");
             // console.log(code);
-            let sourcePath = (0, path_1.join)(dest, "assets/main.js");
+            let sourcePath = (0, path_1.join)(dest, `assets/${this.mainJS}`);
             sourcePath = (0, path_1.normalize)(sourcePath);
             let sourceCode = (0, fs_1.readFileSync)(sourcePath, "utf8");
             let templateReplace = function templateReplace() {
@@ -546,7 +632,7 @@ class Helper extends Config_1.default {
             (0, fs_1.writeFileSync)(sourcePath, sourceCode, { "encoding": "utf8" });
         }
         else {
-            let mainJSPath = (0, path_1.join)(dest, "main.js");
+            let mainJSPath = (0, path_1.join)(dest, this.mainJS);
             let content = (0, fs_1.readFileSync)(mainJSPath, "utf-8");
             content = content.replace(/if\s*\(\s*window.jsb\)\s*\{/g, `if (window.jsb) {
         var hotUpdateSearchPaths = localStorage.getItem('HotUpdateSearchPaths');
