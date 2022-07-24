@@ -83,7 +83,7 @@ class HelperImpl extends Helper_1.default {
         this.onSetProcess(true);
     }
     onAfterBuild(dest) {
-        this.insertHotupdate(dest);
+        // this.insertHotupdate(dest);
         this.read(true);
         this.data.buildDir = (0, path_1.normalize)((0, path_1.join)(dest, "assets"));
         this.onSetBuildDir(this.data.buildDir);

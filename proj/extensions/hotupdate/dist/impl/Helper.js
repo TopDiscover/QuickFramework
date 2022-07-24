@@ -509,6 +509,7 @@ class Helper extends Config_1.default {
     /**@description 删除不包含在包内的所有bundles */
     async removeNotInApkBundle() {
         this.onSetProcess(true);
+        this.read(true);
         let data = this.data;
         let keys = Object.keys(data.bundles);
         let removeBundles = [];

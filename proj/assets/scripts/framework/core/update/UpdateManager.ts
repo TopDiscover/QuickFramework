@@ -16,7 +16,7 @@ export class UpdateManager implements ISingleton {
     static module: string = "【更新管理器】";
     module: string = null!;
 
-    /**@description 本地存储热更新文件的路径 */
+    /**@description 本地存储热更新文件的路径,注意，该路径不能变动，Game.cpp中已经写了，如果要变动，需要连C++层一起改 */
     get storagePath() {
         return jsb.fileUtils.getWritablePath() + "caches/";
     }
