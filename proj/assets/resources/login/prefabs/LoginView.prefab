@@ -899,7 +899,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 182.25,
+      "width": 226.74,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -935,7 +935,7 @@
       "b": 255,
       "a": 255
     },
-    "_string": "测试代码1",
+    "_string": "测试代码999",
     "_horizontalAlign": 2,
     "_verticalAlign": 1,
     "_actualFontSize": 40,
