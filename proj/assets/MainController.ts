@@ -1,4 +1,4 @@
-import { Asset, find, Game, game, SystemEvent, systemEvent, _decorator , Node, setDisplayStats } from "cc";
+import { Asset, find, Game, game, SystemEvent, systemEvent, _decorator , Node, setDisplayStats, director, math } from "cc";
 import { Config } from "./scripts/common/config/Config";
 import { DebugView } from "./scripts/common/debug/DebugView";
 import EventComponent from "./scripts/framework/componects/EventComponent";
@@ -19,6 +19,7 @@ export default class MainController extends EventComponent {
 
     onLoad() {
         super.onLoad();
+        director.getScene()!.globals.ambient.skyColor = new math.Color(0,0,0,1)
         Manager.onLoad(this.node);
         if (this.wssCacert) {
             Manager.wssCacertUrl = this.wssCacert.nativeUrl;
