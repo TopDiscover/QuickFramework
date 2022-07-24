@@ -345,22 +345,22 @@ export class UpdateItem {
             this.assetsManager.manager.setEventCallback(null as any);
         }
 
-        if (isUpdateFinished) {
-            //下载完成,需要重新设置搜索路径，添加下载路径
-            var searchPaths: string[] = jsb.fileUtils.getSearchPaths();
-            var newPaths: string[] = this.assetsManager.manager.getLocalManifest().getSearchPaths();
-            Log.d(JSON.stringify(newPaths));
-            Array.prototype.unshift.apply(searchPaths, newPaths);
+        // if (isUpdateFinished) {
+        //     //下载完成,需要重新设置搜索路径，添加下载路径
+        //     var searchPaths: string[] = jsb.fileUtils.getSearchPaths();
+        //     var newPaths: string[] = this.assetsManager.manager.getLocalManifest().getSearchPaths();
+        //     Log.d(JSON.stringify(newPaths));
+        //     Array.prototype.unshift.apply(searchPaths, newPaths);
 
-            //这里做一个搜索路径去重处理
-            let obj: any = {};
-            for (let i = 0; i < searchPaths.length; i++) {
-                obj[searchPaths[i]] = true;
-            }
-            searchPaths = Object.keys(obj);
-            cc.sys.localStorage.setItem('HotUpdateSearchPaths', JSON.stringify(searchPaths));
-            jsb.fileUtils.setSearchPaths(searchPaths);
-        }
+        //     //这里做一个搜索路径去重处理
+        //     let obj: any = {};
+        //     for (let i = 0; i < searchPaths.length; i++) {
+        //         obj[searchPaths[i]] = true;
+        //     }
+        //     searchPaths = Object.keys(obj);
+        //     sys.localStorage.setItem('HotUpdateSearchPaths', JSON.stringify(searchPaths));
+        //     jsb.fileUtils.setSearchPaths(searchPaths);
+        // }
 
         let isRestartApp = false;
         if (this.isMain) {

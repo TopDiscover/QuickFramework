@@ -135,9 +135,9 @@ class HelperImpl extends Helper_1.default {
         }
     }
     onBuildFinished(options, callback) {
-        if (this.isSupportUpdate(options.platform)) {
-            this.insertHotupdate(options.dest);
-        }
+        // if ( this.isSupportUpdate(options.platform) ){
+        //     this.insertHotupdate(options.dest);
+        // }
         callback();
     }
     onBuildStart(options, callback) {

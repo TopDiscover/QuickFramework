@@ -118,9 +118,9 @@ class HelperImpl extends Helper{
     }
 
     onBuildFinished(options: BuildOptions, callback: Function) {
-        if ( this.isSupportUpdate(options.platform) ){
-            this.insertHotupdate(options.dest);
-        }
+        // if ( this.isSupportUpdate(options.platform) ){
+        //     this.insertHotupdate(options.dest);
+        // }
         callback();
     }
     onBuildStart(options: BuildOptions, callback: Function) {
