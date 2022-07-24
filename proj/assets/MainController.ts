@@ -19,7 +19,6 @@ export default class MainController extends EventComponent {
 
     onLoad() {
         super.onLoad();
-        director.getScene()!.globals.ambient.skyColor = new math.Color(0,0,0,1)
         Manager.onLoad(this.node);
         if (this.wssCacert) {
             Manager.wssCacertUrl = this.wssCacert.nativeUrl;
