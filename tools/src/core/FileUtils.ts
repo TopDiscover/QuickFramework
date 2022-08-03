@@ -297,6 +297,10 @@ export default class FileUtils extends Handler {
     copyDir(source: string, dest: string) {
         return new Promise<boolean>(async resolve => {
             this.logger.log(`准备复制 : ${source}->${dest}`);
+            if ( !existsSync(source) ){
+                resolve(false);
+                return;
+            }
             await this.delDir(dest);
             if ( Environment.isCommand ){
                 cp(source, dest, {
