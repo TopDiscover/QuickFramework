@@ -24,6 +24,7 @@ async function main() {
     if (argv.length <= 0) {
         await Helper.instance.gitBundles();
         await Helper.instance.symlinkSyncCode();
+        await Helper.instance.symlinkSyncExtensions();
     }
     else{
 
