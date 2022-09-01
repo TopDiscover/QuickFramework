@@ -1,11 +1,11 @@
 {
-  "ver": "1.0.21",
+  "ver": "1.0.24",
   "importer": "image",
   "imported": true,
   "uuid": "3a791d9c-1fc4-4c47-a94b-e3d6c37df8b3",
   "files": [
-    ".png",
-    ".json"
+    ".json",
+    ".png"
   ],
   "subMetas": {
     "alert_bg": {
@@ -50,9 +50,10 @@
         "mipfilter": "none",
         "anisotropy": 0,
         "isUuid": true,
-        "imageUuidOrDatabaseUri": "3a791d9c-1fc4-4c47-a94b-e3d6c37df8b3"
+        "imageUuidOrDatabaseUri": "3a791d9c-1fc4-4c47-a94b-e3d6c37df8b3",
+        "visible": false
       },
-      "ver": "1.0.21",
+      "ver": "1.0.22",
       "imported": true,
       "files": [
         ".json"
@@ -84,9 +85,67 @@
         "packable": true,
         "isUuid": true,
         "imageUuidOrDatabaseUri": "3a791d9c-1fc4-4c47-a94b-e3d6c37df8b3@6c48a",
-        "atlasUuid": ""
+        "atlasUuid": "",
+        "pixelsToUnit": 100,
+        "pivotX": 0.5,
+        "pivotY": 0.5,
+        "meshType": 0,
+        "vertices": {
+          "rawPosition": [
+            -335,
+            -203,
+            0,
+            335,
+            -203,
+            0,
+            -335,
+            203,
+            0,
+            335,
+            203,
+            0
+          ],
+          "indexes": [
+            0,
+            1,
+            2,
+            2,
+            1,
+            3
+          ],
+          "uv": [
+            0,
+            406,
+            670,
+            406,
+            0,
+            0,
+            670,
+            0
+          ],
+          "nuv": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            1,
+            1
+          ],
+          "minPos": [
+            -335,
+            -203,
+            0
+          ],
+          "maxPos": [
+            335,
+            203,
+            0
+          ]
+        }
       },
-      "ver": "1.0.9",
+      "ver": "1.0.11",
       "imported": true,
       "files": [
         ".json"
@@ -97,6 +156,7 @@
   "userData": {
     "hasAlpha": true,
     "type": "sprite-frame",
-    "redirect": "3a791d9c-1fc4-4c47-a94b-e3d6c37df8b3@f9941"
+    "redirect": "3a791d9c-1fc4-4c47-a94b-e3d6c37df8b3@f9941",
+    "fixAlphaTransparencyArtifacts": false
   }
 }

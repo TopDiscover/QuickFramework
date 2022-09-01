@@ -1,11 +1,11 @@
 {
-  "ver": "1.0.21",
+  "ver": "1.0.24",
   "importer": "image",
   "imported": true,
   "uuid": "066f7c8d-c633-499e-847d-86d926ff3461",
   "files": [
-    ".png",
-    ".json"
+    ".json",
+    ".png"
   ],
   "subMetas": {
     "prograss": {
@@ -50,9 +50,10 @@
         "mipfilter": "none",
         "anisotropy": 0,
         "isUuid": true,
-        "imageUuidOrDatabaseUri": "066f7c8d-c633-499e-847d-86d926ff3461"
+        "imageUuidOrDatabaseUri": "066f7c8d-c633-499e-847d-86d926ff3461",
+        "visible": false
       },
-      "ver": "1.0.21",
+      "ver": "1.0.22",
       "imported": true,
       "files": [
         ".json"
@@ -84,9 +85,67 @@
         "packable": true,
         "isUuid": true,
         "imageUuidOrDatabaseUri": "066f7c8d-c633-499e-847d-86d926ff3461@6c48a",
-        "atlasUuid": ""
+        "atlasUuid": "",
+        "pixelsToUnit": 100,
+        "pivotX": 0.5,
+        "pivotY": 0.5,
+        "meshType": 0,
+        "vertices": {
+          "rawPosition": [
+            -231,
+            -18.5,
+            0,
+            231,
+            -18.5,
+            0,
+            -231,
+            18.5,
+            0,
+            231,
+            18.5,
+            0
+          ],
+          "indexes": [
+            0,
+            1,
+            2,
+            2,
+            1,
+            3
+          ],
+          "uv": [
+            4,
+            41,
+            466,
+            41,
+            4,
+            4,
+            466,
+            4
+          ],
+          "nuv": [
+            0.00851063829787234,
+            0.09090909090909091,
+            0.9914893617021276,
+            0.09090909090909091,
+            0.00851063829787234,
+            0.9318181818181818,
+            0.9914893617021276,
+            0.9318181818181818
+          ],
+          "minPos": [
+            -231,
+            -18.5,
+            0
+          ],
+          "maxPos": [
+            231,
+            18.5,
+            0
+          ]
+        }
       },
-      "ver": "1.0.9",
+      "ver": "1.0.11",
       "imported": true,
       "files": [
         ".json"
@@ -97,6 +156,7 @@
   "userData": {
     "hasAlpha": true,
     "type": "sprite-frame",
-    "redirect": "066f7c8d-c633-499e-847d-86d926ff3461@f9941"
+    "redirect": "066f7c8d-c633-499e-847d-86d926ff3461@f9941",
+    "fixAlphaTransparencyArtifacts": false
   }
 }

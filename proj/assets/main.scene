@@ -29,7 +29,9 @@
     ],
     "_active": true,
     "_components": [],
-    "_prefab": null,
+    "_prefab": {
+      "__id__": 447
+    },
     "autoReleaseAssets": false,
     "_globals": {
       "__id__": 442
@@ -101,7 +103,23 @@
       "__id__": 4
     },
     "_illuminance": 65000,
-    "_id": "597uMYCbhEtJQc0ffJlcgA"
+    "_id": "597uMYCbhEtJQc0ffJlcgA",
+    "_illuminanceLDR": 1.6927083333333335,
+    "_illuminanceHDR": 65000,
+    "_shadowEnabled": false,
+    "_shadowPcf": 0,
+    "_shadowBias": 0.1,
+    "_shadowNormalBias": 0,
+    "_shadowSaturation": 1,
+    "_shadowDistance": 100,
+    "_shadowInvisibleOcclusionRange": 200,
+    "_shadowFixedArea": false,
+    "_shadowNear": 1,
+    "_shadowFar": 30,
+    "_shadowOrthoSize": 5,
+    "_csmLevel": 1,
+    "_csmLayerLambda": 0.75,
+    "_csmOptimizationMode": 2
   },
   {
     "__type__": "cc.StaticLightSettings",
@@ -11807,20 +11825,50 @@
   {
     "__type__": "cc.AmbientInfo",
     "_skyColor": {
-      "__type__": "cc.Color",
-      "r": 0,
-      "g": 0,
-      "b": 0,
-      "a": 1
+      "__type__": "cc.Vec4",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "w": 0.520833125
     },
     "_skyIllum": 80000,
     "_groundAlbedo": {
-      "__type__": "cc.Color",
-      "r": 233,
-      "g": 222,
-      "b": 222,
-      "a": 255
-    }
+      "__type__": "cc.Vec4",
+      "x": 0.9137254901960784,
+      "y": 0.8705882352941177,
+      "z": 0.8705882352941177,
+      "w": 1
+    },
+    "_skyColorLDR": {
+      "__type__": "cc.Vec4",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "w": 0.520833125
+    },
+    "_skyColorHDR": {
+      "__type__": "cc.Vec4",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "w": 0.520833125
+    },
+    "_groundAlbedoLDR": {
+      "__type__": "cc.Vec4",
+      "x": 0.9137254901960784,
+      "y": 0.8705882352941177,
+      "z": 0.8705882352941177,
+      "w": 1
+    },
+    "_groundAlbedoHDR": {
+      "__type__": "cc.Vec4",
+      "x": 0.9137254901960784,
+      "y": 0.8705882352941177,
+      "z": 0.8705882352941177,
+      "w": 1
+    },
+    "_skyIllumLDR": 3.125,
+    "_skyIllumHDR": 80000
   },
   {
     "__type__": "cc.ShadowsInfo",
@@ -11840,38 +11888,32 @@
       "b": 76,
       "a": 255
     },
-    "_fixedArea": false,
-    "_pcf": 0,
-    "_bias": 0.1,
-    "_normalBias": 0,
-    "_near": 1,
-    "_far": 30,
-    "_shadowDistance": 100,
-    "_invisibleOcclusionRange": 200,
-    "_orthoSize": 5,
     "_maxReceived": 4,
     "_size": {
       "__type__": "cc.Vec2",
       "x": 512,
       "y": 512
-    },
-    "_saturation": 1
+    }
   },
   {
     "__type__": "cc.SkyboxInfo",
     "_envmap": null,
-    "_isRGBE": false,
     "_enabled": false,
-    "_useIBL": false
+    "_useHDR": true,
+    "_envmapLDR": null,
+    "_envmapHDR": null,
+    "_diffuseMapLDR": null,
+    "_diffuseMapHDR": null,
+    "_envLightingType": 0
   },
   {
     "__type__": "cc.FogInfo",
     "_type": 0,
     "_fogColor": {
       "__type__": "cc.Color",
-      "r": 200,
-      "g": 200,
-      "b": 200,
+      "r": 225,
+      "g": 225,
+      "b": 225,
       "a": 255
     },
     "_enabled": false,
@@ -11880,6 +11922,28 @@
     "_fogEnd": 300,
     "_fogAtten": 5,
     "_fogTop": 1.5,
-    "_fogRange": 1.2
+    "_fogRange": 1.2,
+    "_accurate": false
+  },
+  {
+    "__type__": "cc.PrefabInfo",
+    "fileId": "98fa17d8-70db-4b60-aae0-288a6e364e15",
+    "nestedPrefabInstanceRoots": [
+      {
+        "__id__": 385
+      },
+      {
+        "__id__": 395
+      },
+      {
+        "__id__": 403
+      },
+      {
+        "__id__": 411
+      },
+      {
+        "__id__": 419
+      }
+    ]
   }
 ]
