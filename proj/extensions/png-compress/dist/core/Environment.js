@@ -8,11 +8,11 @@ const Defines_1 = require("./Defines");
 class _Environment {
     constructor() {
         /**@description cocos creator 安装目录 */
-        this.creatorPath = "D:/Creator/Creator/3.3.1/resources";
+        this.creatorPath = "D:/Creator/Creator/3.6.0/resources";
         /**@description cocos creator 版本 */
-        this.creatorVerion = "3.3.1";
+        this.creatorVerion = "3.6.0";
         /**@description 支持版本 */
-        this.supportVersions = ["3.3.1", "3.3.2", "3.4.0", "3.4.1", "3.4.2"];
+        this.supportVersions = ["3.6.0"];
         /**@description 扩展插件目录名 */
         this.extensionsName = "extensions";
         this.build = {

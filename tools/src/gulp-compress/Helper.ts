@@ -56,7 +56,7 @@ export default class Helper extends Config<GulpConfig> {
 
         let dest = this.data.dest;
         if (this.isNative(this.data.platform)) {
-            dest = join(this.buildPath, `assets`);
+            dest = join(this.buildPath, `data`);
         }
         // this.logger.log(`${this.module}构建资源目录为 : ${dest}`);
         return dest;

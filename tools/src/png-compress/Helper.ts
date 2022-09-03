@@ -288,12 +288,12 @@ export default class Helper extends Config<PngCompressConfig> {
     private getPlatformAssetDir(platform: string) {
         if (Environment.isVersion3X) {
             if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac") {
-                return "assets/assets";
+                return "data/assets";
             } else {
-                return "assets";
+                return "data";
             }
         } else {
-            return "assets";
+            return "data";
         }
     }
 

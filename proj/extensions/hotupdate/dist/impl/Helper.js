@@ -117,7 +117,7 @@ class Helper extends Config_1.default {
     toCommand() {
         if (Environment_1.Environment.isCommand && this._data) {
             if (Environment_1.Environment.isVersion3X) {
-                this._data.buildDir = (0, path_1.join)(Environment_1.Environment.build.dest, "assets");
+                this._data.buildDir = (0, path_1.join)(Environment_1.Environment.build.dest, "data");
             }
             else {
                 this._data.buildDir = Environment_1.Environment.build.dest;
@@ -265,13 +265,12 @@ class Helper extends Config_1.default {
         // await this.deployToRemote();
         // return;
         let data = this.data;
-        // 插入热更新代码
-        if (Environment_1.Environment.isVersion3X) {
-            await this.insertHotupdate((0, path_1.join)(data.buildDir, "../"));
-        }
-        else {
-            await this.insertHotupdate(data.buildDir);
-        }
+        // 插入热更新代码 此步骤不再需要
+        // if (Environment.isVersion3X) {
+        //     await this.insertHotupdate(join(data.buildDir, "../"));
+        // } else {
+        //     await this.insertHotupdate(data.buildDir);
+        // }
         if (data.autoCreate) {
             //如果开启了自动创建 版本文件
             await this.createManifest();

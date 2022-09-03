@@ -286,6 +286,10 @@ class FileUtils extends Handler_1.Handler {
     copyDir(source, dest) {
         return new Promise(async (resolve) => {
             this.logger.log(`准备复制 : ${source}->${dest}`);
+            if (!(0, fs_1.existsSync)(source)) {
+                resolve(false);
+                return;
+            }
             await this.delDir(dest);
             if (Environment_1.Environment.isCommand) {
                 (0, fs_1.cp)(source, dest, {

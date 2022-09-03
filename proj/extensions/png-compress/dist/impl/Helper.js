@@ -285,14 +285,14 @@ class Helper extends Config_1.default {
     getPlatformAssetDir(platform) {
         if (Environment_1.Environment.isVersion3X) {
             if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac") {
-                return "assets/assets";
+                return "data/assets";
             }
             else {
-                return "assets";
+                return "data";
             }
         }
         else {
-            return "assets";
+            return "data";
         }
     }
     getUUID(filePath, md5Cache) {
