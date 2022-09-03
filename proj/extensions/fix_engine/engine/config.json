@@ -51,7 +51,7 @@
     },
     "simulator/Game.cpp":{
         "to" : "resources/3d/engine/native/tools/simulator/frameworks/runtime-src/Classes/Game.cpp",
-        "from" : "engine-native/Game.cpp",
+        "from" : "simulator/Game.cpp",
         "desc" : "修正simulator热更新搜索路径问题，加载main.js前必须要先添加缓存目录以保证能加载到了新代码"
     }
 }

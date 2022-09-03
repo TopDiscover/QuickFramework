@@ -143,9 +143,9 @@ class Helper extends Handler_1.Handler {
                     let replace = function () {
                         return arguments[1] + sourceData + arguments[3];
                     };
-                    if (this.creatorVerion >= "3.0.0") {
+                    if (this.creatorVerion >= "3.6.0") {
                         //3.x 版本Creator 处理
-                        destData = destData.replace(/(declare\s*module\s*"cc"\s*\{)([\s\n\S]*)(export\s*function\s* murmurhash2_32_gc)/g, replace);
+                        destData = destData.replace(/(declare\s*module\s*"cc"\s*\{)([\s\n\S]*)(export\s*const\s*macro\s*:\s*Macro\s*;)/g, replace);
                     }
                     else {
                         //2.x 版本Creator 处理

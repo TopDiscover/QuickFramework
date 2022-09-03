@@ -443,6 +443,26 @@ static bool js_extension_Manifest_getVersion(se::State& s) // NOLINT(readability
 }
 SE_BIND_FUNC(js_extension_Manifest_getVersion)
 
+static bool js_extension_Manifest_getMd5(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    auto* cobj = SE_THIS_OBJECT<cc::extension::Manifest>(s);
+    // SE_PRECONDITION2(cobj, false, "Invalid Native Object");
+    if (nullptr == cobj) return true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 0) {
+        const std::string& result = cobj->getMd5();
+        ok &= nativevalue_to_se(result, s.rval(), nullptr /*ctx*/);
+        SE_PRECONDITION2(ok, false, "Error processing arguments");
+        SE_HOLD_RETURN_VALUE(result, s.thisObject(), s.rval());
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+    return false;
+}
+SE_BIND_FUNC(js_extension_Manifest_getMd5)
+
 static bool js_extension_Manifest_getVersionFileUrl(se::State& s) // NOLINT(readability-identifier-naming)
 {
     auto* cobj = SE_THIS_OBJECT<cc::extension::Manifest>(s);
@@ -661,6 +681,7 @@ bool js_register_extension_Manifest(se::Object* obj) // NOLINT(readability-ident
     cls->defineFunction("getPackageUrl", _SE(js_extension_Manifest_getPackageUrl));
     cls->defineFunction("getSearchPaths", _SE(js_extension_Manifest_getSearchPaths));
     cls->defineFunction("getVersion", _SE(js_extension_Manifest_getVersion));
+    cls->defineFunction("getMd5", _SE(js_extension_Manifest_getMd5));
     cls->defineFunction("getVersionFileUrl", _SE(js_extension_Manifest_getVersionFileUrl));
     cls->defineFunction("isLoaded", _SE(js_extension_Manifest_isLoaded));
     cls->defineFunction("isUpdating", _SE(js_extension_Manifest_isUpdating));
@@ -1046,6 +1067,26 @@ static bool js_extension_AssetsManagerEx_setEventCallback(se::State& s) // NOLIN
 }
 SE_BIND_FUNC(js_extension_AssetsManagerEx_setEventCallback)
 
+static bool js_extension_AssetsManagerEx_setPackageUrl(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    auto* cobj = SE_THIS_OBJECT<cc::extension::AssetsManagerEx>(s);
+    // SE_PRECONDITION2(cobj, false, "Invalid Native Object");
+    if (nullptr == cobj) return true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        HolderType<std::string, true> arg0 = {};
+        ok &= sevalue_to_native(args[0], &arg0, s.thisObject());
+        SE_PRECONDITION2(ok, false, "Error processing arguments");
+        cobj->setPackageUrl(arg0.value());
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    return false;
+}
+SE_BIND_FUNC(js_extension_AssetsManagerEx_setPackageUrl)
+
 static bool js_extension_AssetsManagerEx_setMaxConcurrentTask(se::State& s) // NOLINT(readability-identifier-naming)
 {
     auto* cobj = SE_THIS_OBJECT<cc::extension::AssetsManagerEx>(s);
@@ -1190,6 +1231,62 @@ static bool js_extension_AssetsManagerEx_update(se::State& s) // NOLINT(readabil
 }
 SE_BIND_FUNC(js_extension_AssetsManagerEx_update)
 
+static bool js_extension_AssetsManagerEx_reset(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    auto* cobj = SE_THIS_OBJECT<cc::extension::AssetsManagerEx>(s);
+    // SE_PRECONDITION2(cobj, false, "Invalid Native Object");
+    if (nullptr == cobj) return true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    if (argc == 0) {
+        cobj->reset();
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+    return false;
+}
+SE_BIND_FUNC(js_extension_AssetsManagerEx_reset)
+
+static bool js_extension_AssetsManagerEx_setMainBundles(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    auto* cobj = SE_THIS_OBJECT<cc::extension::AssetsManagerEx>(s);
+    // SE_PRECONDITION2(cobj, false, "Invalid Native Object");
+    if (nullptr == cobj) return true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        HolderType<std::vector<std::string>, true> arg0 = {};
+        ok &= sevalue_to_native(args[0], &arg0, s.thisObject());
+        SE_PRECONDITION2(ok, false, "Error processing arguments");
+        cobj->setMainBundles(arg0.value());
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    return false;
+}
+SE_BIND_FUNC(js_extension_AssetsManagerEx_setMainBundles)
+
+static bool js_extension_AssetsManagerEx_setDownloadAgainZip(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    auto* cobj = SE_THIS_OBJECT<cc::extension::AssetsManagerEx>(s);
+    // SE_PRECONDITION2(cobj, false, "Invalid Native Object");
+    if (nullptr == cobj) return true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        HolderType<float, false> arg0 = {};
+        ok &= sevalue_to_native(args[0], &arg0, s.thisObject());
+        SE_PRECONDITION2(ok, false, "Error processing arguments");
+        cobj->setDownloadAgainZip(arg0.value());
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    return false;
+}
+SE_BIND_FUNC(js_extension_AssetsManagerEx_setDownloadAgainZip)
+
 static bool js_extension_AssetsManagerEx_create_static(se::State& s) // NOLINT(readability-identifier-naming)
 {
     const auto& args = s.args();
@@ -1316,10 +1413,14 @@ bool js_register_extension_AssetsManagerEx(se::Object* obj) // NOLINT(readabilit
     cls->defineFunction("loadRemoteManifest", _SE(js_extension_AssetsManagerEx_loadRemoteManifest));
     cls->defineFunction("prepareUpdate", _SE(js_extension_AssetsManagerEx_prepareUpdate));
     cls->defineFunction("setEventCallback", _SE(js_extension_AssetsManagerEx_setEventCallback));
+    cls->defineFunction("setPackageUrl", _SE(js_extension_AssetsManagerEx_setPackageUrl));
     cls->defineFunction("setMaxConcurrentTask", _SE(js_extension_AssetsManagerEx_setMaxConcurrentTask));
     cls->defineFunction("setVerifyCallback", _SE(js_extension_AssetsManagerEx_setVerifyCallback));
     cls->defineFunction("setVersionCompareHandle", _SE(js_extension_AssetsManagerEx_setVersionCompareHandle));
     cls->defineFunction("update", _SE(js_extension_AssetsManagerEx_update));
+    cls->defineFunction("reset", _SE(js_extension_AssetsManagerEx_reset));
+    cls->defineFunction("setMainBundles", _SE(js_extension_AssetsManagerEx_setMainBundles));
+    cls->defineFunction("setDownloadAgainZip", _SE(js_extension_AssetsManagerEx_setDownloadAgainZip));
     cls->defineStaticFunction("create", _SE(js_extension_AssetsManagerEx_create_static));
     cls->defineFinalizeFunction(_SE(js_cc_extension_AssetsManagerEx_finalize));
     cls->install();

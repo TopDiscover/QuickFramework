@@ -225,3 +225,10 @@ export namespace dragonBones{
 }
 
 /**@description 引擎扩展声明结束 */
+    /**
+     * @en
+     * Predefined constants, see [[Macro]] for detailed contents.
+     * @zh
+     * 预定义常量，具体内容参考 [[Macro]] 文档。
+     */
+    
