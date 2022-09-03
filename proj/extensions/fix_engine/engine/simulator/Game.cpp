@@ -22,48 +22,65 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-
 #include "Game.h"
+#include "cocos/application/ApplicationManager.h"
 #include "cocos/bindings/event/CustomEventTypes.h"
 #include "cocos/bindings/event/EventDispatcher.h"
-#include "cocos/bindings/manual/jsb_module_register.h"
-#include "cocos/bindings/manual/jsb_global.h"
 #include "cocos/bindings/jswrapper/SeApi.h"
-#include "cocos/bindings/event/EventDispatcher.h"
 #include "cocos/bindings/manual/jsb_classtype.h"
+#include "cocos/bindings/manual/jsb_global.h"
+#include "cocos/bindings/manual/jsb_module_register.h"
+#include "cocos/renderer/pipeline/GlobalDescriptorSetManager.h"
+
+#if (CC_PLATFORM == CC_PLATFORM_WINDOWS)
+    #include "SimulatorApp.h"
+    #include "windows.h"
+#elif (CC_PLATFORM == CC_PLATFORM_MACOS)
+    #include <CoreGraphics/CGDisplayConfiguration.h>
+    #include "../proj.ios_mac/mac/SimulatorApp.h"
+#endif
 
 #include "ide-support/CodeIDESupport.h"
-#include "runtime/Runtime.h"
 #include "ide-support/RuntimeJsImpl.h"
 #include "runtime/ConfigParser.h"
+#include "runtime/Runtime.h"
+#include "platform/FileUtils.h"
+
 using namespace std;
+Game::Game() {
+}
 
-Game::Game(int width, int height) : cc::Application(width, height) {}
-
-Game::~Game()
-{
+Game::~Game() {
     // NOTE:Please don't remove this call if you want to debug with Cocos Code IDE
     RuntimeEngine::getInstance()->end();
 }
 
-bool Game::init()
-{
-
-    cc::Application::init();
-    se::ScriptEngine *se = se::ScriptEngine::getInstance();
-
-    // set default FPS
-    Application::getInstance()->setPreferredFramesPerSecond(60);
-    jsb_init_file_operation_delegate();
-    jsb_register_all_modules();
+int Game::init() {
+    cc::pipeline::GlobalDSManager::setDescriptorSetLayout();
+    SimulatorApp::getInstance()->run();
+    int windowWidth  = SimulatorApp::getInstance()->getWidth();
+    int windowHeight = SimulatorApp::getInstance()->getHegith();
+#if (CC_PLATFORM == CC_PLATFORM_WINDOWS)
+    int windowPositionX = (GetSystemMetrics(SM_CXSCREEN) - windowWidth) / 2;
+    int windowPositionY = (GetSystemMetrics(SM_CYSCREEN) - windowHeight) / 2;
+#elif (CC_PLATFORM == CC_PLATFORM_MACOS)
+    auto mainDisplayId   = CGMainDisplayID();
+    int  windowPositionX = (CGDisplayPixelsWide(mainDisplayId) - windowWidth) / 2;
+    int  windowPositionY = (CGDisplayPixelsHigh(mainDisplayId) - windowHeight) / 2;
+#endif
+    createWindow("My game", windowPositionX, windowPositionY, SimulatorApp::getInstance()->getWidth(),
+                 SimulatorApp::getInstance()->getHegith(),
+                 cc::ISystemWindow::CC_WINDOW_SHOWN |
+                     cc::ISystemWindow::CC_WINDOW_RESIZABLE |
+                     cc::ISystemWindow::CC_WINDOW_INPUT_FOCUS);
 
     auto parser = ConfigParser::getInstance();
- #if defined(CC_DEBUG) && (CC_DEBUG > 0)
-     // Enable debugger here
-    jsb_enable_debugger("0.0.0.0", 5086, parser->isWaitForConnect());
- #endif
+    setDebugIpAndPort("0.0.0.0", 5086, parser->isWaitForConnect());
 
-    se->start();
+    int ret = cc::CocosApplication::init();
+    if (ret != 0) {
+        return ret;
+    }
 
     auto runtimeEngine = RuntimeEngine::getInstance();
     runtimeEngine->setEventTrackingEnable(true);
@@ -73,38 +90,42 @@ bool Game::init()
 
     // 首先必须要设置缓存下载载的搜索路径，不然，会首先加载到原的代码，而不是最新缓存的代码
     auto cache = cc::FileUtils::getInstance()->getWritablePath() + "caches/";
-	auto searchPath = cc::FileUtils::getInstance()->getSearchPaths();
-	auto it = std::find_if(searchPath.begin(), searchPath.end(), [=](const std::string& value) {
-		if (value == cache) {
-			return true;
-		}
-		return false;
-	});
-	if (it == searchPath.end()) {
-		cc::FileUtils::getInstance()->addSearchPath(cache, true);
-	}
+    auto searchPath = cc::FileUtils::getInstance()->getSearchPaths();
+    auto it = std::find_if(searchPath.begin(), searchPath.end(), [=](const std::string& value) {
+        if (value == cache) {
+            return true;
+        }
+        return false;
+    });
+    if (it == searchPath.end()) {
+        cc::FileUtils::getInstance()->addSearchPath(cache, true);
+    }
 
-    se::AutoHandleScope hs;
-    jsb_run_script("jsb-adapter/jsb-builtin.js");
-    jsb_run_script("main.js");
+    setXXTeaKey("");
+
+    runScript("jsb-adapter/web-adapter.js");
+    runScript("main.js");
 
     // Runtime end
     CC_LOG_DEBUG("iShow!");
-    return true;
+    return 0;
 }
 
 // This function will be called when the app is inactive. When comes a phone call,it's be invoked too
 void Game::onPause() {
-    cc::Application::onPause();
-    cc::EventDispatcher::dispatchEnterBackgroundEvent();
+    cc::CocosApplication::onPause();
 }
 
 void Game::onResume() {
-    cc::Application::onResume();
-    cc::EventDispatcher::dispatchEnterForegroundEvent();
+    cc::CocosApplication::onResume();
 }
 
 void Game::onClose() {
-    cc::Application::onClose();
-    cc::EventDispatcher::dispatchCloseEvent();
+    cc::CocosApplication::onClose();
 }
+
+void Game::handleException(const char* location, const char* message, const char* stack) {
+    //TODO: nothing
+}
+
+CC_REGISTER_APPLICATION(Game);

@@ -24,16 +24,15 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-#ifndef __Manifest__
-#define __Manifest__
+#pragma once
 
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-#include "base/Ref.h"
-#include "extensions/ExtensionMacros.h"
+#include "base/RefCounted.h"
 #include "extensions/ExtensionExport.h"
+#include "extensions/ExtensionMacros.h"
 #include "network/Downloader.h"
 #include "platform/FileUtils.h"
 
@@ -45,8 +44,8 @@ struct DownloadUnit {
     std::string srcUrl;
     std::string storagePath;
     std::string customId;
-    float       size;
-	bool compressed;
+    float size;
+    bool compressed;
 };
 
 struct ManifestAsset {
@@ -57,9 +56,9 @@ struct ManifestAsset {
     int downloadState;
 };
 
-typedef std::unordered_map<std::string, DownloadUnit> DownloadUnits;
+using DownloadUnits = std::unordered_map<std::string, DownloadUnit>;
 
-class CC_EX_DLL Manifest : public Ref {
+class CC_EX_DLL Manifest : public RefCounted {
 public:
     friend class AssetsManagerEx;
 
@@ -79,7 +78,7 @@ public:
     };
 
     //! Asset object
-    typedef ManifestAsset Asset;
+    using Asset = ManifestAsset;
 
     //! Object indicate the difference between two Assets
     struct AssetDiff {
@@ -98,23 +97,23 @@ public:
     /** @brief Gets remote package url.
      */
     const std::string &getPackageUrl() const;
-	/************************************************************************/
-	/* @brief 设置远程热更新地址                                            */
-	/************************************************************************/
-	const void setPackageUrl(const std::string& packageUrl);
+    /***********************************************************************/
+    /* @brief 设置远程热更新地址                                             */
+    /***********************************************************************/
+    const void setPackageUrl(const std::string& packageUrl);
 
     /** @brief Gets remote manifest file url.
      */
-    const std::string getManifestFileUrl() const;
+    const std::string &getManifestFileUrl() const;
 
     /** @brief Gets remote version file url.
      */
-    const std::string getVersionFileUrl() const;
+    const std::string &getVersionFileUrl() const;
 
     /** @brief Gets manifest version.
      */
     const std::string &getVersion() const;
-	const std::string &getMd5() const;
+    const std::string &getMd5() const;
 
     /** @brief Get the search paths list related to the Manifest.
      */
@@ -129,14 +128,14 @@ public:
     /** @brief Constructor for Manifest class, create manifest by parsing a json file
      * @param manifestUrl Url of the local manifest
      */
-    Manifest(const std::string &manifestUrl = "");
+    explicit Manifest(const std::string &manifestUrl = "");
 
     /** @brief Constructor for Manifest class, create manifest by parsing a json string
      * @param content Json string content
      * @param manifestRoot The root path of the manifest file (It should be local path, so that we can find assets path relative to the root path)
      */
     Manifest(const std::string &content, const std::string &manifestRoot);
-    Manifest(const std::string &content, const std::string &manifestRoot , const std::string &packageUrl);
+    Manifest(const std::string &content, const std::string &manifestRoot, const std::string &packageUrl);
 
     /** @brief Parse the manifest file information into this manifest
      * @param manifestUrl Url of the local manifest
@@ -190,14 +189,14 @@ protected:
      */
     bool versionGreaterOrEquals(const Manifest *b, const std::function<int(const std::string &versionA, const std::string &versionB)> &handle) const;
 
+    bool equal(const Manifest*b) const;
+
     /** @brief Check whether the version of this manifest is greater or equals than another.
      * @param b         The other manifest
      * @param [handle]  Customized comparasion handle function
      * @return Greater or not
      */
     bool versionGreater(const Manifest *b, const std::function<int(const std::string &versionA, const std::string &versionB)> &handle) const;
-
-	bool equal(const Manifest*b) const;
 
     /** @brief Generate difference between this Manifest and another.
      * @param b   The other manifest
@@ -208,7 +207,7 @@ protected:
      * @param units   The download units reference to be modified by the generation result
      */
     void genResumeAssetsList(DownloadUnits *units , bool& unzip) const;
-    
+
     /** @brief Prepend all search paths to the FileUtils.
      */
     void prependSearchPaths();
@@ -219,9 +218,9 @@ protected:
 
     void saveToFile(const std::string &filepath);
 
-	void saveVersionToFile(const std::string& filepath);
+    void saveVersionToFile(const std::string& filepath);
 
-    Asset parseAsset(const std::string &path, const rapidjson::Value &json);
+    static Asset parseAsset(const std::string &path, const rapidjson::Value &json);
 
     void clear();
 
@@ -254,9 +253,9 @@ protected:
         _manifestRoot = root;
     };
 
-	double getZipSize() { return _zipSize; }
-	/* 更新当前资源为zip下载*/
-	void updateToZipAsset(const DownloadUnit& unit);
+    double getZipSize() { return _zipSize; }
+    /* 更新当前资源为zip下载*/
+    void updateToZipAsset(const DownloadUnit& unit);
 
 private:
     //! Indicate whether the version informations have been fully loaded
@@ -298,15 +297,13 @@ private:
     rapidjson::Document _json;
 
     //设置bundle
-	std::string _bundle;
+    std::string _bundle;
 
-	//md5
-	std::string _md5;
+    //md5
+    std::string _md5;
 
-	//zip文件大小
-	double _zipSize;
-
+    //zip文件大小
+    double _zipSize;
 };
 
 NS_CC_EXT_END
-#endif /* defined(__Manifest__) */

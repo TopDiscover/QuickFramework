@@ -12,13 +12,13 @@ class _Environment {
     }
 
     /**@description cocos creator 安装目录 */
-    readonly creatorPath: string = "D:/Creator/Creator/3.3.1/resources";
+    readonly creatorPath: string = "D:/Creator/Creator/3.6.0/resources";
 
     /**@description cocos creator 版本 */
-    readonly creatorVerion: string = "3.3.1";
+    readonly creatorVerion: string = "3.6.0";
 
     /**@description 支持版本 */
-    readonly supportVersions = ["3.3.1", "3.3.2", "3.4.0", "3.4.1", "3.4.2"];
+    readonly supportVersions = ["3.6.0"];
 
     /**@description 扩展插件目录名 */
     readonly extensionsName = "extensions";
