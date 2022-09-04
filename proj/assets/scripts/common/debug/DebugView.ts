@@ -1,5 +1,5 @@
 
-import { _decorator, Component, Node, find, Toggle, view, Input, profiler } from 'cc';
+import { _decorator, Component, Node, find, Toggle, view, Input, profiler ,screen } from 'cc';
 import { LogLevel } from '../../framework/defines/Enums';
 import { Singleton } from '../../framework/utils/Singleton';
 import { Config } from '../config/Config';
@@ -192,13 +192,13 @@ export class DebugView extends Component {
 
     private onAdaptor() {
         Log.d(`-----------------------------适配信息-----------------------------------------------`);
-        Log.d(`屏幕分辨率: ${view.getCanvasSize().width} x ${view.getCanvasSize().height}`);
+        Log.d(`屏幕分辨率: ${screen.windowSize.width} x ${screen.windowSize.height}`);
         Log.d(`视图窗口可见区域分辨率: ${view.getVisibleSize().width} x ${view.getVisibleSize().height}`);
-        Log.d(`视图中边框尺寸: ${view.getFrameSize().width} x ${view.getFrameSize().height}`);
-        Log.d(`设备或浏览器像素比例: ${view.getDevicePixelRatio()}`);
+        Log.d(`视图中边框尺寸: ${screen.windowSize.width} x ${screen.windowSize.height}`);
+        Log.d(`设备或浏览器像素比例: ${screen.devicePixelRatio}`);
         Log.d(`返回视图窗口可见区域像素尺寸: ${view.getVisibleSizeInPixel().width} x ${view.getVisibleSizeInPixel().height}`);
         Log.d(`当前场景设计分辨率: ${view.getDesignResolutionSize().width} x ${view.getDesignResolutionSize().height}`);
-        let viewRate = view.getFrameSize().width/view.getFrameSize().height;
+        let viewRate = screen.windowSize.width/screen.windowSize.height;
         let designRate = view.getDesignResolutionSize().width/view.getDesignResolutionSize().height;
         Log.d(`视图宽高比:${viewRate}`);
         Log.d(`设置分辨率宽高比:${designRate}`);

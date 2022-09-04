@@ -1,7 +1,7 @@
 /**
  */
 
-import { sys, v3, view, _decorator } from "cc";
+import { sys, v3, view, _decorator,screen, Scene } from "cc";
 import { DEBUG, EDITOR, JSB } from "cc/env";
 import { Adapter, SafeArea } from "./Adapter";
 
@@ -73,8 +73,8 @@ export default class AdapterView extends Adapter {
     static get safeArea() {
         if (this._safeArea == null || this._safeArea == undefined) {
             // 初始屏幕宽高像素
-            let screenWidth = view.getCanvasSize().width;
-            let screenHeight = view.getCanvasSize().height;
+            let screenWidth = screen.windowSize.width;
+            let screenHeight = screen.windowSize.height;
             if ( EDITOR ){
                 screenWidth = view.getDesignResolutionSize().width;
                 screenHeight = view.getDesignResolutionSize().height;
