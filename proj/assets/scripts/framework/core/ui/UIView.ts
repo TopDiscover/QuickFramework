@@ -1,6 +1,6 @@
 import EventComponent from "../../componects/EventComponent";
 import AudioComponent from "../../componects/AudioComponent";
-import { _decorator, Node, game, Game, EventKeyboard, tween, Tween, Vec3, systemEvent, SystemEvent, js, macro } from "cc";
+import { _decorator, Node, game, Game, EventKeyboard, macro, input, Input } from "cc";
 import { Macro } from "../../defines/Macros";
 
 /**
@@ -109,10 +109,10 @@ export default class UIView extends EventComponent {
     protected set enabledKeyUp(value) {
         this._enabledKeyUp = value;
         if (value) {
-            systemEvent.off(SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
-            systemEvent.on(SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
+            input.off(Input.EventType.KEY_UP, this.onKeyUp, this);
+            input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
         } else {
-            systemEvent.off(SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
+            input.off(Input.EventType.KEY_UP, this.onKeyUp, this);
         }
     }
 
@@ -124,10 +124,10 @@ export default class UIView extends EventComponent {
     protected set enabledKeyDown(value) {
         this._enabledKeyUp = value;
         if (value) {
-            systemEvent.off(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
-            systemEvent.on(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
+            input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
+            input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
         } else {
-            systemEvent.off(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
+            input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
         }
     }
 

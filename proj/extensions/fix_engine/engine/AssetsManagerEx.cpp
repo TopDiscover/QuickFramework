@@ -96,7 +96,7 @@ void AssetsManagerEx::init(const std::string &manifestUrl, const std::string &st
     };
     setStoragePath(storagePath);
     _downloadAagin = 1;
-    //这里做一下处理，当传入的是一个特定的格式时，修改当前3个缓存的路径
+    
     std::string typeString = "type.";
     auto pos = manifestUrl.find(typeString);
 	if ( pos != std::string::npos) {
@@ -119,7 +119,7 @@ void AssetsManagerEx::init(const std::string &manifestUrl, const std::string &st
 		}
 	}
 
-    //manifest 目录
+    //manifest
     auto dir = basename(_tempStoragePath + MANIFEST_PATH);
 	if (!_fileUtils->isDirectoryExist(dir)) {
 		_fileUtils->createDirectory(dir);
@@ -404,7 +404,7 @@ void AssetsManagerEx::removeTempDirectory() {
 }
 
 bool AssetsManagerEx::isNeedDownLoadZip(float download, float total) {
-	//下载总数占比
+	//The proportion of total downloads
 	auto percent = download / total;
 	if (percent >= 1.0000f) {
 		return true;
@@ -817,7 +817,7 @@ void AssetsManagerEx::prepareUpdate() {
     _totalEnabled = false;
     _unzip = false;
     // Temporary manifest exists, previously updating and equals to the remote version, resuming previous download
-    if (_tempManifest && _tempManifest->isLoaded() && _tempManifest->isUpdating() && _tempManifest->versionEquals(_remoteManifest)) {
+    if (_tempManifest && _tempManifest->isLoaded() && _tempManifest->isUpdating() && _tempManifest->equal(_remoteManifest)) {
         auto dir = basename(_tempManifestPath);
         if (!_fileUtils->isDirectoryExist(dir)) {
             _fileUtils->createDirectory(dir);
@@ -852,7 +852,7 @@ void AssetsManagerEx::prepareUpdate() {
 
         // Check difference between local manifest and remote manifest
         if (_localManifest->getMd5() == MD5_UNKNOWN) {
-            // 如果第一次未下载 ，直接下载zip包进行解压
+            // If it is not downloaded for the first time, directly download the zip package and unzip it
             toDownloadZip();
         }
         else {
@@ -989,7 +989,7 @@ void AssetsManagerEx::updateSucceed() {
 void AssetsManagerEx::moveTempToCached(const std::string& root, const std::string& path, std::unordered_map<std::string, Manifest::AssetDiff>& diff_map, bool isComplete) {
 
     auto copyVersions = [=]() {
-        //完成后复制版本文件
+        //Copy the version file when done
         if (isComplete) {
             auto tempDstRoot = _storagePath + MANIFEST_PATH;
             if (!_fileUtils->isDirectoryExist(tempDstRoot)) {
@@ -1037,12 +1037,11 @@ void AssetsManagerEx::moveTempToCached(const std::string& root, const std::strin
         _fileUtils->listFilesRecursively(root, &files);
         int baseOffset = (int)_tempStoragePath.length();
 
-        //字符串分割函数
         auto split = [](std::string str, std::string pattern = "/")
         {
             std::string::size_type pos;
             std::vector<std::string> result;
-            str += pattern;//扩展字符串以方便操作
+            str += pattern;
             int size = str.size();
             for (int i = 0; i < size; i++)
             {

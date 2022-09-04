@@ -1,4 +1,4 @@
-import { find, ProgressBar, Slider, Toggle, _decorator , Node, SystemEvent } from "cc";
+import { find, ProgressBar, Slider, Toggle, _decorator , Node, Input } from "cc";
 import UIView from "../../framework/core/ui/UIView";
 import { Macro } from "../../framework/defines/Macros";
 
@@ -20,10 +20,10 @@ export default class SettingView extends UIView {
 
         this.content = find("content", this.node) as Node;
         let close = find("close",this.content) as Node;
-        close.on(SystemEvent.EventType.TOUCH_END, this.onClose, this);
+        close.on(Input.EventType.TOUCH_END, this.onClose, this);
 
         let quit = find("background/quit",this.content) as Node;
-        quit.on(SystemEvent.EventType.TOUCH_END, this.onQuit, this);
+        quit.on(Input.EventType.TOUCH_END, this.onQuit, this);
 
         let music = find("background/musicVolume",this.content) as Node;
         music.on("slide", this.onMusicVolumeChange, this);

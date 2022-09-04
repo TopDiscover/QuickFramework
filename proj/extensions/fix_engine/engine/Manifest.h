@@ -104,11 +104,11 @@ public:
 
     /** @brief Gets remote manifest file url.
      */
-    const std::string &getManifestFileUrl() const;
+    const std::string getManifestFileUrl() const;
 
     /** @brief Gets remote version file url.
      */
-    const std::string &getVersionFileUrl() const;
+    const std::string getVersionFileUrl() const;
 
     /** @brief Gets manifest version.
      */

@@ -39,11 +39,6 @@
         "from" : "ccdts",
         "desc" : "执行更新添加对自定义引擎扩展接口声明"
     },
-    "jsbdts":{
-        "to" : "resources/3d/engine/@types/jsb.d.ts",
-        "from" : "jsbdts",
-        "desc" : "执行更新添加对自定义引擎扩展热更新接口声明"
-    },
     "engine-native/BaseGame.cpp":{
         "to" : "resources/3d/engine/native/cocos/application/BaseGame.cpp",
         "from" : "engine-native/BaseGame.cpp",

@@ -1,4 +1,4 @@
-import { game, sys } from "cc";
+import { game, native, sys } from "cc";
 import { Macro } from "../../defines/Macros";
 import { Update } from "./Update";
 
@@ -200,7 +200,7 @@ export class UpdateItem {
         //先检测本地是否已经存在子游戏版本控制文件 
         if (content) {
             //存在版本控制文件 
-            let jsbGameManifest = new jsb.Manifest(content, this.storagePath, this.hotUpdateUrl);
+            let jsbGameManifest = new native.Manifest(content, this.storagePath, this.hotUpdateUrl);
             Log.d(`${this.bundle} --存在本地版本控制文件checkUpdate--`);
             // Log.d(`${this.bundle} mainifestUrl : ${content}`);
             this.assetsManager.manager.loadLocalManifest(jsbGameManifest, "");
@@ -213,7 +213,7 @@ export class UpdateItem {
                 md5: Macro.UNKNOWN,
             };
             let gameManifestContent = JSON.stringify(gameManifest);
-            let jsbGameManifest = new jsb.Manifest(gameManifestContent, this.storagePath, this.hotUpdateUrl);
+            let jsbGameManifest = new native.Manifest(gameManifestContent, this.storagePath, this.hotUpdateUrl);
             Log.d(`${this.bundle} 检测更新`);
             Log.d(`${this.bundle} 版本信息 : ${gameManifestContent}`);
             this.assetsManager.manager.loadLocalManifest(jsbGameManifest, "");
@@ -355,7 +355,7 @@ export class UpdateItem {
                 //不需要对游戏进行重启的操作
                 if (event.getDownloadedFiles() > 0) {
                     Log.d(`${this.bundle} 主包更新完成，有下载文件，需要重启更新`);
-                    jsb.fileUtils.purgeCachedEntries();
+                    native.fileUtils.purgeCachedEntries();
                     setTimeout(() => {
                         Log.d(`${this.bundle} 重启游戏`);
                         game.restart();
@@ -363,7 +363,7 @@ export class UpdateItem {
                     isRestartApp = true;
                 } else {
                     Log.d(`${this.bundle} 主包更新完成，写入远程版本信息到本地`);
-                    jsb.fileUtils.purgeCachedEntries();
+                    native.fileUtils.purgeCachedEntries();
                     //下载完成 重置热更新管理器，在游戏期间如果有发热更新，可以再次检测
                     this.reset();
                 }
@@ -373,7 +373,7 @@ export class UpdateItem {
             if (isUpdateFinished) {
                 Log.d(`${this.bundle} 下载资源数 : ${event.getDownloadedFiles()}`)
                 //清除搜索路径缓存
-                jsb.fileUtils.purgeCachedEntries();
+                native.fileUtils.purgeCachedEntries();
                 //下载完成 重置热更新管理器，在游戏期间如果有发热更新，可以再次检测
                 this.reset();
             }

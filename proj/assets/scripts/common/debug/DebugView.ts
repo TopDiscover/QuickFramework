@@ -1,6 +1,5 @@
 
-import { _decorator, Component, Node, find, setDisplayStats, isDisplayStats, Toggle, js, isValid, sys, SystemEvent, view, UITransform, Widget } from 'cc';
-import { DEBUG } from 'cc/env';
+import { _decorator, Component, Node, find, Toggle, view, Input, profiler } from 'cc';
 import { LogLevel } from '../../framework/defines/Enums';
 import { Singleton } from '../../framework/utils/Singleton';
 import { Config } from '../config/Config';
@@ -65,7 +64,7 @@ export class DebugView extends Component {
 
         let background = find("background", this.node);
         if (background) {
-            background.on(SystemEvent.EventType.TOUCH_END, () => {
+            background.on(Input.EventType.TOUCH_END, () => {
                 this.node.active = false;
                 if (this.debug) this.debug.active = true;
             });
@@ -75,14 +74,14 @@ export class DebugView extends Component {
     private bindEvent(path: string, cb: Function) {
         let node = find(path, this.content);
         if (node) {
-            node.on(SystemEvent.EventType.TOUCH_END, cb, this);
+            node.on(Input.EventType.TOUCH_END, cb, this);
         }
     }
 
     private initLogView() {
         let background = find("background", this.logView);
         if (background) {
-            background.on(SystemEvent.EventType.TOUCH_END, () => {
+            background.on(Input.EventType.TOUCH_END, () => {
                 this.logView.active = false;
             });
         }
@@ -147,8 +146,12 @@ export class DebugView extends Component {
     }
 
     private onShowDebugInfo() {
-        setDisplayStats(!isDisplayStats())
-        Manager.storage.setItem(Config.SHOW_DEBUG_INFO_KEY, isDisplayStats());
+        if (profiler.isShowingStats() ){
+            profiler.hideStats();
+        }else{
+            profiler.showStats();
+        }
+        Manager.storage.setItem(Config.SHOW_DEBUG_INFO_KEY, profiler.isShowingStats());
     }
 
     private onShowUI() {

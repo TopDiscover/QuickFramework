@@ -1,3 +1,4 @@
+import { native } from "cc";
 import { Macro } from "../../defines/Macros";
 
 /**@description 热更新相关*/
@@ -141,7 +142,7 @@ export namespace Update {
         /**@description 当前资源管理器的名称 */
         name: string = "";
 
-        private _manager: jsb.AssetsManager = null!;
+        private _manager: native.AssetsManager = null!;
         /**@description 当前资源管理器的实体 jsb.AssetsManager */
         get manager() {
             if (!this._manager) {
@@ -163,7 +164,7 @@ export namespace Update {
 
         private create() {
             Log.d(`创建 ${this.name} AssetsManager`);
-            this.manager = new jsb.AssetsManager(this.type, this.storagePath);
+            this.manager = new native.AssetsManager(this.type, this.storagePath);
         }
     }
 }

@@ -406,12 +406,12 @@ const void Manifest::setPackageUrl(const std::string& packageUrl) {
     }
 }
 
-const std::string &Manifest::getManifestFileUrl() const {
+const std::string Manifest::getManifestFileUrl() const {
     // Add a timestamp to ensure the fetch is up-to-date
     return getPackageUrl() + MANIFEST_ROOT + _bundle + MANIFEST_FILENAME + "?time=" + std::to_string(time(nullptr));
 }
 
-const std::string &Manifest::getVersionFileUrl() const {
+const std::string Manifest::getVersionFileUrl() const {
     // Add a timestamp to ensure the fetch is up-to-date
     return getPackageUrl() + MANIFEST_ROOT + _bundle + VERSION_FILENAME + "?time=" + std::to_string(time(nullptr));
 }

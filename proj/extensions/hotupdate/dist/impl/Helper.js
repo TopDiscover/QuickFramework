@@ -77,7 +77,7 @@ class Helper extends Config_1.default {
     get mainBundleIncludes() {
         if (!this._mainBundleIncludes) {
             this._mainBundleIncludes = ["src", "jsb-adapter", "assets/resources", "assets/main", this.mainJS];
-            if (!Environment_1.Environment.isVersion3X) {
+            if (Environment_1.Environment.isVersion3X) {
                 this._mainBundleIncludes.push("assets/internal");
             }
         }

@@ -1,6 +1,5 @@
-import { Component, find, instantiate, isValid, Label, Node, Prefab, RichText, SystemEvent, tween, Vec3 } from "cc";
-import { Macro } from "../../framework/defines/Macros";
-import { Config, ViewZOrder } from "../config/Config";
+import { Component, find, Input, instantiate, isValid, Label, Node, RichText, tween, Vec3 } from "cc";
+import { ViewZOrder } from "../config/Config";
 
 class AlertDialog extends Component {
 
@@ -108,13 +107,13 @@ class AlertDialog extends Component {
         if (this._confirm && this._cancel && this._closeBtn) {
 
             //关闭按钮
-            this._closeBtn.on(SystemEvent.EventType.TOUCH_END, this.close.bind(this));
+            this._closeBtn.on(Input.EventType.TOUCH_END, this.close.bind(this));
 
             //确定按钮
             if (config.confirmCb) {
                 this._confirm.active = true;
-                this._confirm.on(SystemEvent.EventType.TOUCH_END, this.onClick.bind(this, config.confirmCb, true));
-                this._closeBtn.on(SystemEvent.EventType.TOUCH_END, this.onClick.bind(this, config.confirmCb, false));
+                this._confirm.on(Input.EventType.TOUCH_END, this.onClick.bind(this, config.confirmCb, true));
+                this._closeBtn.on(Input.EventType.TOUCH_END, this.onClick.bind(this, config.confirmCb, false));
             }
             else {
                 this._confirm.active = false;
@@ -123,7 +122,7 @@ class AlertDialog extends Component {
             //取消按钮
             if (config.cancelCb) {
                 this._cancel.active = true;
-                this._cancel.on(SystemEvent.EventType.TOUCH_END, this.onClick.bind(this, config.cancelCb, false));
+                this._cancel.on(Input.EventType.TOUCH_END, this.onClick.bind(this, config.cancelCb, false));
             } else {
                 this._cancel.active = false;
             }

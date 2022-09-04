@@ -1,4 +1,4 @@
-import { Asset, find, Game, game, SystemEvent, systemEvent, _decorator , Node, setDisplayStats, director, math } from "cc";
+import { Asset, find, Game, game, _decorator , Node, Input, input, profiler } from "cc";
 import { Config } from "./scripts/common/config/Config";
 import { DebugView } from "./scripts/common/debug/DebugView";
 import EventComponent from "./scripts/framework/componects/EventComponent";
@@ -27,7 +27,11 @@ export default class MainController extends EventComponent {
         this.debugView = find("debugView",this.node);
         if (debug&&this.debugView) {
             let isVisibleDebugInfo = Manager.storage.getItem(Config.SHOW_DEBUG_INFO_KEY,true);
-            setDisplayStats(isVisibleDebugInfo);
+            if ( isVisibleDebugInfo ) {
+                profiler.showStats();
+            }else{
+                profiler.hideStats();
+            }
             if ( Config.isShowDebugButton ){
                 debug.active = true;
                 let view = this.debugView.addComponent(DebugView)
@@ -35,7 +39,7 @@ export default class MainController extends EventComponent {
                     view.debug = debug;
                 }
                 this.debugView.active = false;
-                debug.on(SystemEvent.EventType.TOUCH_END,()=>{
+                debug.on(Input.EventType.TOUCH_END,()=>{
                     if ( debug ) debug.active = false;
                     if ( this.debugView ){
                         this.debugView.active = true;
@@ -60,7 +64,7 @@ export default class MainController extends EventComponent {
 
     onDestroy() {
         //移除键盘事件
-        systemEvent.off(SystemEvent.EventType.KEY_UP);
+        input.off(Input.EventType.KEY_UP);
 
         //移除游戏事件注册
         game.off(Game.EVENT_HIDE);

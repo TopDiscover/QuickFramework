@@ -88,7 +88,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
     private get mainBundleIncludes() {
         if (!this._mainBundleIncludes) {
             this._mainBundleIncludes = ["src", "jsb-adapter", "assets/resources", "assets/main", this.mainJS];
-            if (!Environment.isVersion3X) {
+            if (Environment.isVersion3X) {
                 this._mainBundleIncludes.push("assets/internal");
             }
         }

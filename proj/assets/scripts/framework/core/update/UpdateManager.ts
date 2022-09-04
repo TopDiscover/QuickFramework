@@ -1,5 +1,5 @@
 import { Update } from "./Update";
-import { sys, } from "cc";
+import { native, sys, } from "cc";
 import { JSB, PREVIEW } from "cc/env";
 import { Macro } from "../../defines/Macros";
 import { HttpPackage } from "../net/http/HttpClient";
@@ -18,7 +18,7 @@ export class UpdateManager implements ISingleton {
 
     /**@description 本地存储热更新文件的路径,注意，该路径不能变动，Game.cpp中已经写了，如果要变动，需要连C++层一起改 */
     get storagePath() {
-        return jsb.fileUtils.getWritablePath() + "caches/";
+        return native.fileUtils.getWritablePath() + "caches/";
     }
 
     /**@description 所有下载项 */
@@ -288,12 +288,12 @@ export class UpdateManager implements ISingleton {
     private getString(path: string) {
         //下载缓存中
         let cachedPath = `${this.storagePath}${path}`;
-        if (jsb.fileUtils.isFileExist(cachedPath)) {
-            return jsb.fileUtils.getStringFromFile(cachedPath);
+        if (native.fileUtils.isFileExist(cachedPath)) {
+            return native.fileUtils.getStringFromFile(cachedPath);
         } else {
             //包内
-            if (jsb.fileUtils.isFileExist(path)) {
-                return jsb.fileUtils.getStringFromFile(path);
+            if (native.fileUtils.isFileExist(path)) {
+                return native.fileUtils.getStringFromFile(path);
             } else {
                 return undefined;
             }
@@ -341,7 +341,7 @@ export class UpdateManager implements ISingleton {
                     Log.d(`${this.module} 主包已经是最新，写入远程的版本信息`);
                     this.savePreVersions();
                     //主包更新完成，清除路径缓存信息;
-                    jsb.fileUtils.purgeCachedEntries();
+                    native.fileUtils.purgeCachedEntries();
                 }
                 Log.d(`${this.module} 加载${item.bundle}时，加载远程版本信息成功...`);
                 item.state = Update.State.VERSION_LOADED;

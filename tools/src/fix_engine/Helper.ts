@@ -24,28 +24,41 @@ export default class Helper extends Handler {
     protected HotUpdateDTS = {
         assetsManager: `
     
-        /**@description 热更新地址 */
-        setPackageUrl(url:string):void;
-        /**@description 设置主包包含哪些bunlde,如果 main,resources */
-        setMainBundles(bundles:string[]):void;
-        /**
-         * @description 设置 下载总数占比(即【将要下载资源文件总数】/【总下载资源文件总数】) 
-         * 如 ：当为1时，删除本地缓存直接下载整个zip包进行解压
-         *      当为0时，不会下载zip ,都以散列文件方式更新
-         *      当 percent > 0 && percent < 1，假设为0.5,【下载总数占比】50%会删除掉本地缓存，重新下载zip包进行解压
-         * 注意：在将要下载的总数 == 总下载总数 这个值无效，会直接下载zip包
-         * @param percent 取值范围0~1
-         */
-        setDownloadAgainZip(percent:number):void;
-        /**@description 重置检测状态 */
-        reset():void;
-    
+            /**@description 热更新地址 */
+            setPackageUrl(url:string):void;
+            /**@description 设置主包包含哪些bunlde,如果 main,resources */
+            setMainBundles(bundles:string[]):void;
+            /**
+             * @description 设置 下载总数占比(即【将要下载资源文件总数】/【总下载资源文件总数】) 
+             * 如 ：当为1时，删除本地缓存直接下载整个zip包进行解压
+             *      当为0时，不会下载zip ,都以散列文件方式更新
+             *      当 percent > 0 && percent < 1，假设为0.5,【下载总数占比】50%会删除掉本地缓存，重新下载zip包进行解压
+             * 注意：在将要下载的总数 == 总下载总数 这个值无效，会直接下载zip包
+             * @param percent 取值范围0~1
+             */
+            setDownloadAgainZip(percent:number):void;
+            /**@description 重置检测状态 */
+            reset():void;
+            /**
+             * @en Create function for creating a new AssetsManagerEx
+             *
+             * warning   The cached manifest in your storage path have higher priority and will be searched first,
+             * only if it doesn't exist, AssetsManagerEx will use the given manifestUrl.
+             *
+             * @zh 创建 AssetManager
+             *
+             * @param manifestUrl  @en The url for the local manifest file @zh manifest 文件路径
+             * @param storagePath  @en The storage path for downloaded assets @zh 存储路径
+             */
         `,
         manifest: `
-    
-        constructor (content: string, manifestRoot: string,packageUrl:string);
-        getMd5():string;
-        
+
+            constructor (content: string, manifestRoot: string,packageUrl:string);
+            getMd5():string;
+            /**
+             * @en Check whether the version informations have been fully loaded
+             * @zh 检查是否已加载版本信息
+             */
         `
     }
 
@@ -154,6 +167,20 @@ export default class Helper extends Handler {
                     if (this.creatorVerion >= "3.6.0") {
                         //3.x 版本Creator 处理
                         destData = destData.replace(/(declare\s*module\s*"cc"\s*\{)([\s\n\S]*)(export\s*const\s*macro\s*:\s*Macro\s*;)/g, replace);
+
+                        let self = this;
+                        let replaceManifest = function () {
+                            return arguments[1] + self.HotUpdateDTS.manifest + arguments[3];
+                        }
+                        destData = destData.replace(/(export\s*class\s*Manifest\s*\{)([\s\n\S]*)(isVersionLoaded\s*\(\s*\):\s*\w+;)/g, replaceManifest);
+                        
+                        let replaceAssetsManager = function () {
+                            return arguments[1] + self.HotUpdateDTS.assetsManager + arguments[3];
+                        }
+                        destData = destData.replace(/(export\s*class\s*AssetsManager\s*\{)([\s\n\S]*)(static\s*create\(\s*manifestUrl)/g, replaceAssetsManager);
+
+                        // writeFileSync(join(__dirname,"cc.d.ts"),destData,"utf-8");
+
                     } else {
                         //2.x 版本Creator 处理
                         destData = destData.replace(/(\*\/)([\s\S\n]*)(declare\s*namespace\s*cc\s*\{)/g, replace);
@@ -169,27 +196,6 @@ export default class Helper extends Handler {
                     this.logger.error(`${this.module}找不到引擎目录下文件:${destPath}`);
                 }
 
-            } else if (data.from == "jsbdts") {
-                //更新热更新声明文件
-                //(export\s*class\s*Manifest)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string\))
-                let destPath = join(this.creatorPath, data.to);
-                destPath = normalize(destPath);
-                if (existsSync(destPath)) {
-                    let self = this;
-                    let destData = readFileSync(destPath, "utf-8");
-                    let replaceManifest = function () {
-                        return arguments[1] + self.HotUpdateDTS.manifest + arguments[3];
-                    }
-                    destData = destData.replace(/(export\s*class\s*Manifest\s*\{)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string\))/g, replaceManifest);
-                    let replaceAssetsManager = function () {
-                        return arguments[1] + self.HotUpdateDTS.assetsManager + arguments[3];
-                    }
-                    destData = destData.replace(/(export\s*class\s*AssetsManager\s*\{)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string)/g, replaceAssetsManager);
-                    writeFileSync(destPath, destData, { encoding: "utf-8" });
-                    this.logger.log(`${this.module}${data.desc}`);
-                } else {
-                    this.logger.error(`${this.module}找不到引擎目录下文件:${destPath}`);
-                }
             } else {
                 //查看本地是否有文件
                 let sourcePath = join(this.curExtensionPath, `engine/${data.from}`);
