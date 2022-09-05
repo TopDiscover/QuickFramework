@@ -65,7 +65,7 @@ export class LogicManager implements ISingleton {
     debug(){
         Log.d(`-------逻辑管理器数据-------`);
         this._logics.forEach(v=>{
-            Log.d(js.getClassName(v));
+            Log.d(cc.js.getClassName(v));
         })
     }
 
