@@ -949,41 +949,55 @@ void AssetsManagerEx::updateSucceed() {
     std::unordered_map<std::string, Manifest::AssetDiff> diffMap = _localManifest->genDiff(_remoteManifest);
 
     // 3. merge temporary storage path to storage path so that temporary version turns to cached version
-    if (this->_isUsingBundle) {
-        if (_bundle == MAIN_BUNDLE) {
-            for (auto i = 0 ; i < _mainBundles.size() ; i++)
-            {
-                auto path = _mainBundles[i] + "/";
-                if (_mainBundles[i] == MAIN_JS) {
-                    moveTempToCached(_tempStoragePath, MAIN_JS, diffMap, i + 1 == _mainBundles.size());
+    struct AsyncData
+    {
+        std::unordered_map<std::string, Manifest::AssetDiff> diffMap;
+    };
+
+    auto asyncData = ccnew AsyncData;
+    asyncData->diffMap = diffMap;
+
+    auto onComplete = [this](void* param) {
+        auto dataInner = reinterpret_cast<AsyncData*>(param);
+        // 4. swap the localManifest
+        CC_SAFE_RELEASE(_localManifest);
+        _localManifest = _remoteManifest;
+        _localManifest->setManifestRoot(_storagePath);
+        _remoteManifest = nullptr;
+        // 5. make local manifest take effect
+        prepareLocalManifest();
+        // 6. Set update state
+        _updateState = State::UP_TO_DATE;
+        // 7. Notify finished event
+        dispatchUpdateEvent(EventAssetsManagerEx::EventCode::UPDATE_FINISHED);
+        // 8. Remove temp storage path
+        removeTempDirectory();
+        delete dataInner;
+    };
+
+    AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_OTHER, onComplete, (void*)asyncData, [this, asyncData]() {
+        if (this->_isUsingBundle) {
+            if (_bundle == MAIN_BUNDLE) {
+                for (auto i = 0; i < _mainBundles.size(); i++)
+                {
+                    auto path = _mainBundles[i] + "/";
+                    if (_mainBundles[i] == MAIN_JS) {
+                        moveTempToCached(_tempStoragePath, MAIN_JS, asyncData->diffMap, i + 1 == _mainBundles.size());
+                    }
+                    else {
+                        moveTempToCached(_tempStoragePath + path, path, asyncData->diffMap, i + 1 == _mainBundles.size());
+                    }
                 }
-                else {
-                    moveTempToCached(_tempStoragePath + path, path, diffMap, i + 1 == _mainBundles.size());
-                }
+            }
+            else {
+                auto path = ASSETS + std::string("/") + _bundle + "/";
+                moveTempToCached(_tempStoragePath + path, path, asyncData->diffMap);
             }
         }
         else {
-            auto path = ASSETS + std::string("/") + _bundle + "/";
-            moveTempToCached(_tempStoragePath + path, path, diffMap);
+            moveTempToCached(_tempStoragePath, "", asyncData->diffMap);
         }
-    }
-    else {
-        moveTempToCached(_tempStoragePath, "", diffMap);
-    }
-
-    // 4. swap the localManifest
-    CC_SAFE_RELEASE(_localManifest);
-    _localManifest = _remoteManifest;
-    _localManifest->setManifestRoot(_storagePath);
-    _remoteManifest = nullptr;
-    // 5. make local manifest take effect
-    prepareLocalManifest();
-    // 6. Set update state
-    _updateState = State::UP_TO_DATE;
-    // 7. Notify finished event
-    dispatchUpdateEvent(EventAssetsManagerEx::EventCode::UPDATE_FINISHED);
-    // 8. Remove temp storage path
-    removeTempDirectory();
+    });
 }
 
 void AssetsManagerEx::moveTempToCached(const std::string& root, const std::string& path, std::unordered_map<std::string, Manifest::AssetDiff>& diff_map, bool isComplete) {
