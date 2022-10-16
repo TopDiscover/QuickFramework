@@ -134,7 +134,7 @@ export namespace Update {
 
         constructor(name: string, storagePath: string) {
             this.name = name;
-            this.type = name == Update.MAIN_PACK ? `type.${Update.MAIN_PACK}` : `type.${name}`;
+            this.type = `type.${name}`;
             this.storagePath = storagePath;
             this.create();
         }
