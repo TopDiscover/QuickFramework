@@ -1,0 +1,17 @@
+
+<div class="layout vertical" > 
+    <h2>资源加密工具,支持web和原生(jsb-default暂不支持)</h2>
+</div>
+<hr />
+选择需要加密的目录(指定构建后的目录)<div>
+    <ui-input id="srcLabel" readonly></ui-input>
+    <ui-button id="btnSrcChoice">选择目录</ui-button>
+</div>
+<hr />
+<ui-prop name="加密签名" id="input_encriptSign" type="string"></ui-prop>
+<ui-prop name="加密密钥" id="input_encriptKey" type="string"></ui-prop>
+<hr />
+<ui-prop>
+        <ui-checkbox id="checkboxRemember" checked = "true">记住设置</ui-checkbox>
+        <ui-button id="btnBuild">加密</ui-button>
+</ui-prop>
