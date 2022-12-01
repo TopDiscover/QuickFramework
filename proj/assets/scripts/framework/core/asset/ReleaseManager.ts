@@ -278,7 +278,12 @@ export class ReleaseManager implements ISingleton {
 
     onAutoReleaseUnuseResources(){
         Log.d(`${LOG_TAG}------------释放长时间未使用资源开始------------`);
-        this._lazyInfos.forEach((info, key, source) => {
+        let curBundle = Manager.stageData.where;
+        //排除当前bundle的资源，当前bundle正在运行，没有必要释放当前bundle资源
+        this._lazyInfos.forEach((info, bundle, source) => {
+            if ( bundle == curBundle ){
+                return;
+            }
             info.tryRemoveTimeoutResources()
         });
 
