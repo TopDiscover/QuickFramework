@@ -18,8 +18,20 @@ import { Singleton } from "./scripts/framework/utils/Singleton";
 export class _Manager extends Framewok implements GameEventInterface {
 
     get isLazyRelease(){
-        Log.w(`需要使用都自己导出cc.game.EVENT_LOW_MEMORY事件`);
+        if ( !this.isAutoReleaseUnuseResources ){
+            Log.w(`需要使用都自己导出cc.game.EVENT_LOW_MEMORY事件`);
+        }
         return true;
+    }
+
+    /**@description 是否开启自动释放长时间未使用资源 */
+    get isAutoReleaseUnuseResources(){
+        return true;
+    }
+
+    /**@description 当isLazyRelease 为true时有效，当资源长时间未使用时自动释放 */
+    get autoReleaseUnuseResourcesTimeout(){
+        return 5 * 60;
     }
 
     get utils(){
@@ -103,6 +115,8 @@ export class _Manager extends Framewok implements GameEventInterface {
         Manager.serviceManager.onLoad();
         //入口管理器
         Manager.entryManager.onLoad(node);
+        //释放管理器
+        Manager.releaseManger.onLoad(node);
     }
 
     update(node: cc.Node) {
@@ -117,6 +131,8 @@ export class _Manager extends Framewok implements GameEventInterface {
         Manager.serviceManager.onDestroy();
         //入口管理器
         Manager.entryManager.onDestroy(node);
+        //释放管理器
+        Manager.releaseManger.onDestroy(node);
     }
 
     onEnterBackground(): void {
