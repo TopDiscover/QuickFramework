@@ -128,7 +128,7 @@ class LazyInfo {
                 }
                 let now = Date.timeNow();
                 let pass = now - info.stamp;
-                if ( pass > Manager.autoReleaseUnuseResourcesTimeout ){
+                if ( pass >= Manager.autoReleaseUnuseResourcesTimeout ){
                     //释放长时间未使用资源
                     let bundle = Manager.bundleManager.getBundle(info.bundle);
                     if (Array.isArray(info.data)) {
@@ -336,12 +336,11 @@ export class ReleaseManager implements ISingleton {
     }
 
     onLoad(node: cc.Node) {
-        cc.tween(node)
+        cc.tween(node).repeatForever(cc.tween(node)
         .delay(Manager.autoReleaseUnuseResourcesTimeout)
         .call(()=>{
             this.onAutoReleaseUnuseResources();
-        })
-        .repeatForever()
+        }))
         .tag(this._actionTag)
         .start()
     }
