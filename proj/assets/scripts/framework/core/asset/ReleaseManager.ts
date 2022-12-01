@@ -282,24 +282,6 @@ export class ReleaseManager implements ISingleton {
             info.tryRemoveTimeoutResources()
         });
 
-        let bundles : string[] = [];
-        this._lazyInfos.forEach((info,bundle,source)=>{
-            if ( info.assets.size <= 0 ) {
-                bundles.push(bundle);
-                this._lazyInfos.delete(bundle);
-            }
-        })
-
-        Log.d(`${LOG_TAG}-------------释放无用bundle-------------`);
-        bundles.forEach((bundle) => {
-            let temp = cc.assetManager.getBundle(bundle);
-            if (temp) {
-                Log.d(`释放无用bundle : ${bundle}`);
-                cc.assetManager.removeBundle(temp);
-                this._bundles.delete(bundle);
-            }
-        });
-
         Log.d(`${LOG_TAG}-------------释放无用远程资源-------------`);
         this._remote.tryRemoveTimeoutResources();
 
