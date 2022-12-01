@@ -118,7 +118,7 @@ class LazyInfo {
 
     /**@description 尝试释放长时间未使用资源 */
     tryRemoveTimeoutResources(){
-        if ( Manager.isLazyRelease ){
+        if ( Manager.isLazyRelease && Manager.isAutoReleaseUnuseResources ){
             this._assets.forEach((info,url,source)=>{
                 if ( info.retain ){
                     return;

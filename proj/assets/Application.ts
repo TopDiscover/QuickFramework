@@ -18,7 +18,14 @@ import { Singleton } from "./scripts/framework/utils/Singleton";
 export class _Manager extends Framewok implements GameEventInterface {
 
     get isLazyRelease(){
-        Log.w(`需要使用都自己导出cc.game.EVENT_LOW_MEMORY事件`);
+        if ( !this.isAutoReleaseUnuseResources ){
+            Log.w(`需要使用都自己导出cc.game.EVENT_LOW_MEMORY事件`);
+        }
+        return true;
+    }
+
+    /**@description 是否开启自动释放长时间未使用资源 */
+    get isAutoReleaseUnuseResources(){
         return true;
     }
 
