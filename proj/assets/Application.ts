@@ -24,7 +24,7 @@ export class _Manager extends Framewok implements GameEventInterface {
 
     /**@description 当isLazyRelease 为true时有效，当资源长时间未使用时自动释放 */
     get autoReleaseUnuseResourcesTimeout(){
-        return  60;
+        return 5 * 60;
     }
 
     get utils(){
