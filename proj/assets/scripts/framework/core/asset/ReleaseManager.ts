@@ -5,7 +5,7 @@
  * Author = zheng_fasheng
  */
 
-import { Asset, assetManager, AssetManager, isValid, sp } from "cc";
+import { Asset, assetManager, Node, isValid, tween, Tween } from "cc";
 import { Macro } from "../../defines/Macros";
 import { Resource } from "./Resource";
 
@@ -38,6 +38,7 @@ class LazyInfo {
                 info.data.addRef();
             }
         }
+        info.stamp = Date.timeNow();
         this._assets.set(info.url, info);
     }
 
@@ -116,6 +117,37 @@ class LazyInfo {
         this.onLowMemory();
     }
 
+    /**@description 尝试释放长时间未使用资源 */
+    tryRemoveTimeoutResources(){
+        if ( Manager.isLazyRelease && Manager.isAutoReleaseUnuseResources ){
+            this._assets.forEach((info,url,source)=>{
+                if ( info.retain ){
+                    return;
+                }
+                if ( info.stamp == null ){
+                    return;
+                }
+                let now = Date.timeNow();
+                let pass = now - info.stamp;
+                if ( pass >= Manager.autoReleaseUnuseResourcesTimeout ){
+                    //释放长时间未使用资源
+                    let bundle = Manager.bundleManager.getBundle(info.bundle)!;
+                    if (Array.isArray(info.data)) {
+                        for (let i = 0; i < info.data.length; i++) {
+                            let path = `${info.url}/${info.data[i].name}`;
+                            bundle.release(path, info.type);
+                        }
+                        Log.d(`${LOG_TAG}成功释放长时间未使用资源目录 : ${info.bundle}.${info.url}`);
+                    } else {
+                        bundle.release(info.url, info.type);
+                        Log.d(`${LOG_TAG}成功释放长时间未使用资源 : ${info.bundle}.${info.url}`);
+                    }
+                    this._assets.delete(url);
+                }
+            })
+        }
+    }
+
     get assets() {
         return this._assets;
     }
@@ -131,6 +163,8 @@ export class ReleaseManager implements ISingleton {
     private _bundles: Map<string, boolean> = new Map();
     /**@description 远程资源 */
     private _remote: LazyInfo = new LazyInfo(Macro.BUNDLE_REMOTE);
+
+    private _actionTag = 999;
 
     private getBundle(bundle: BUNDLE_TYPE) {
         return Manager.bundleManager.getBundle(bundle);
@@ -243,6 +277,23 @@ export class ReleaseManager implements ISingleton {
         this._remote.onLowMemory();
     }
 
+    onAutoReleaseUnuseResources(){
+        Log.d(`${LOG_TAG}------------释放长时间未使用资源开始------------`);
+        let curBundle = Manager.stageData.where;
+        //排除当前bundle的资源，当前bundle正在运行，没有必要释放当前bundle资源
+        this._lazyInfos.forEach((info, bundle, source) => {
+            if ( bundle == curBundle ){
+                return;
+            }
+            info.tryRemoveTimeoutResources()
+        });
+
+        Log.d(`${LOG_TAG}-------------释放无用远程资源-------------`);
+        this._remote.tryRemoveTimeoutResources();
+
+        Log.d(`${LOG_TAG}------------释放长时间未使用资源结束------------`);
+    }
+
     /**@description 尝试释放指定bundel的资源 */
     tryRemoveBundle(bundle:BUNDLE_TYPE){
         Log.d(`${LOG_TAG}--------------尝试释放${bundle}加载资源------------`);
@@ -270,6 +321,20 @@ export class ReleaseManager implements ISingleton {
                 assetManager.releaseAsset(info.data as Asset);
             }
         }
+    }
+
+    onLoad(node: Node) {
+        tween(node).repeatForever(tween(node)
+        .delay(Manager.autoReleaseUnuseResourcesTimeout)
+        .call(()=>{
+            this.onAutoReleaseUnuseResources();
+        }))
+        .tag(this._actionTag)
+        .start()
+    }
+
+    onDestroy(node: Node) {
+        Tween.stopAllByTag(this._actionTag);
     }
 
     debug(){

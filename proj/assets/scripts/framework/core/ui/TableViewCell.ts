@@ -1,5 +1,4 @@
 import { Component, _decorator } from "cc";
-import TableView from "./TableView";
 
 const { ccclass, property } = _decorator;
 

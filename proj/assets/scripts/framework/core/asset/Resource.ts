@@ -35,6 +35,8 @@ export namespace Resource {
         bundle: BUNDLE_TYPE = null!;
         /**@description 默认为本地资源 */
         resourceType: Type = Type.Local;
+        /**@description 加入释放资源的時間戳 */
+        stamp : number | null = null;
     }
     export class CacheData {
         /**@description 是否已经加载完成 */
