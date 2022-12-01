@@ -22,6 +22,11 @@ export class _Manager extends Framewok implements GameEventInterface {
         return true;
     }
 
+    /**@description 当isLazyRelease 为true时有效，当资源长时间未使用时自动释放 */
+    get autoReleaseUnuseResourcesTimeout(){
+        return 5 * 60;
+    }
+
     get utils(){
         return Singleton.instance.get(Utils) as Utils;
     }
@@ -103,6 +108,8 @@ export class _Manager extends Framewok implements GameEventInterface {
         Manager.serviceManager.onLoad();
         //入口管理器
         Manager.entryManager.onLoad(node);
+        //释放管理器
+        Manager.releaseManger.onLoad(node);
     }
 
     update(node: cc.Node) {
@@ -117,6 +124,8 @@ export class _Manager extends Framewok implements GameEventInterface {
         Manager.serviceManager.onDestroy();
         //入口管理器
         Manager.entryManager.onDestroy(node);
+        //释放管理器
+        Manager.releaseManger.onDestroy(node);
     }
 
     onEnterBackground(): void {
