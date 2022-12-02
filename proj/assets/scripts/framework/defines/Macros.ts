@@ -15,8 +15,6 @@ export namespace Macro{
     export const ENABLE_CHANGE_LANGUAGE = true;
     /**@description 语言包路径使用前缀 */
     export const USING_LAN_KEY = "i18n.";
-    /**@description 语言变更 */
-    export const CHANGE_LANGUAGE = "Event_CHANGE_LANGUAGE";
     /**@description 屏幕适配 */
     export const ADAPT_SCREEN = "Event_ADAPT_SCREEN";
     /**@description 未知 */

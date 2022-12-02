@@ -6,7 +6,8 @@ export class Language implements ISingleton{
     isResident?: boolean = true;
     static module: string = "【语言包】";
     module: string = null!;
-
+    
+    private _labels : cc.Label[] = [];
     private _data: Language.Data = { language: Macro.UNKNOWN };
     private delegates: Language.DataSourceDelegate[] = [];
 
@@ -54,13 +55,14 @@ export class Language implements ISingleton{
             this.delegates.forEach((delegate, index, source) => {
                 this._data = delegate.data(language,this._data);
             });
-            //通知更新
-            dispatch(Macro.CHANGE_LANGUAGE, language);
+            //更新带有语言包类型的所有Label
+            this.onChangeLanguage();
         } else {
             this.delegates.forEach((delegate, index, source) => {
                 this._data = delegate.data(this.getLanguage(),this._data);
             });
         }
+        Log.d(this.module,`当前语言:${this._data.language}`);
         Manager.storage.setItem(LANG_KEY, this._data.language);
     }
 
@@ -120,5 +122,37 @@ export class Language implements ISingleton{
     /**@description 获取语言包名 */
     public getLanguage() {
         return Manager.storage.getItem(LANG_KEY, cc.sys.LANGUAGE_CHINESE);
+    }
+
+    /**
+     * @description 添加支持多语言的Label
+     * @param label 
+     */
+    public addLabel( label : cc.Label ){
+        if( this._labels.indexOf(label) == -1 ){
+            this._labels.push(label);
+        }
+    }
+
+    /**
+     * @description 移除支持多语言的Label
+     * @param label 
+     */
+    public removeLabel( label : cc.Label ){
+        let index = this._labels.indexOf(label)
+        if ( index >= 0 ){
+            this._labels.splice(index,1);
+        }
+    }
+
+    /**
+     * @description 语言包发生更新，变更语言包Label
+     */
+    public onChangeLanguage( ){
+        this._labels.forEach(v=>{
+            if ( cc.isValid(v) ){
+                v.language = v.language;
+            }
+        })
     }
 }

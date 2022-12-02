@@ -245,11 +245,11 @@ Reflect.defineProperty(cc.Label.prototype, "language", {
                 if ( isUsing ){
                     if (!!!self._isUsinglanguage) {
                         self._isUsinglanguage = true;
-                        Manager.dispatcher.add(Macro.CHANGE_LANGUAGE, self._onChangeLanguage, self);
+                        Manager.language.addLabel(self);
                     }
                 }else{
                     if (self._language) {
-                        Manager.dispatcher.remove(Macro.CHANGE_LANGUAGE, self);
+                        Manager.language.removeLabel(self);
                     }
                 }
             })
@@ -261,14 +261,10 @@ Reflect.defineProperty(cc.Label.prototype, "language", {
 
 if ( !CC_EDITOR && Macro.ENABLE_CHANGE_LANGUAGE ){
     let __Label__Proto : any = cc.Label.prototype;
-    __Label__Proto._onChangeLanguage = function(){
-        this.language = this.language;
-    }
-    
     let __label_onDestroy__ = __Label__Proto.onDestroy;
     __Label__Proto.onDestroy = function () {
         if ( this._isUsinglanguage ){
-            Manager.dispatcher.remove(Macro.CHANGE_LANGUAGE,this);
+            Manager.language.removeLabel(this);
         }
         __label_onDestroy__ && __label_onDestroy__.call(this);
     }
@@ -280,7 +276,6 @@ if ( !CC_EDITOR && Macro.ENABLE_CHANGE_LANGUAGE ){
         }
         __label_onLoad__ && __label_onLoad__.call(this);
     }
-
 }
 
 /**@description 通过预置体路径创建节点 
