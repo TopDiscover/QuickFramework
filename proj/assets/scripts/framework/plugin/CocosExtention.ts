@@ -166,21 +166,6 @@ cc.Button.prototype.loadButton = function (config) {
 }
 
 /**
- * @description 加载字体
- * @example
- * let content = cc.find("content",this.node); 
- * content.getComponent(cc.Label).loadFont({font:roomPath + dfFont,view:this});
- */
-cc.Label.prototype.loadFont = function (config) {
-    let font = config.font;
-    let me = this;
-    let bundle = getBundle(config);
-    Manager.cache.getCacheByAsync(font, cc.Font,bundle).then((data) => {
-        setLabelFont(me, config, data);
-    });
-}
-
-/**
  * @description 加载龙骨动画
  */
 dragonBones.ArmatureDisplay.prototype.loadDisplay = function(config) {
@@ -203,80 +188,6 @@ cc.ParticleSystem.prototype.loadFile = function (config) {
         setParticleSystemFile(me, config, data);
     });
 }
-
-/**@description 强制label在当前帧进行绘制 */
-cc.Label.prototype.forceDoLayout = function () {
-    //2.2.0
-    if (this._forceUpdateRenderData) {
-        this._forceUpdateRenderData();
-    }
-    //2.2.0以下版本
-    else if (this._updateRenderData) {
-        this._updateRenderData(true);
-    }
-}
-
-// Reflect.defineProperty(cc.Label.prototype, "language", {
-//     get : function(){
-//         return this._language;
-//     },
-//     set : function(v){
-//         //该游戏允许在游戏中进行语言包切换,当设置的值为 null | [] 时，清除language的事件绑定
-//         let self = this;
-//         let updateLanguage = ( v , cb )=>{
-//             if( v && ( (Array.isArray(v) && v.length > 0) || !!v) ){
-//                 let value = null;
-//                 if ( Array.isArray(v) ){
-//                     value = v;
-//                 }else{
-//                     value = [v];
-//                 }
-//                 cb && cb(true);
-//                 self._language = [].concat(value);
-//                 self.string = Manager.language.get(value);
-//             }else{
-//                 cb && cb(false);
-//                 self._language = null;
-//                 self.string = "";
-//             }
-//         }
-//         if (Macro.ENABLE_CHANGE_LANGUAGE) {
-//             updateLanguage(v,(isUsing)=>{
-//                 if ( isUsing ){
-//                     if (!!!self._isUsinglanguage) {
-//                         self._isUsinglanguage = true;
-//                         Manager.language.addLabel(self);
-//                     }
-//                 }else{
-//                     if (self._language) {
-//                         Manager.language.removeLabel(self);
-//                     }
-//                 }
-//             })
-//         } else {
-//             updateLanguage(v,null);
-//         }
-//     }
-// });
-
-// if ( !CC_EDITOR && Macro.ENABLE_CHANGE_LANGUAGE ){
-//     let __Label__Proto : any = cc.Label.prototype;
-//     let __label_onDestroy__ = __Label__Proto.onDestroy;
-//     __Label__Proto.onDestroy = function () {
-//         if ( this._isUsinglanguage ){
-//             Manager.language.removeLabel(this);
-//         }
-//         __label_onDestroy__ && __label_onDestroy__.call(this);
-//     }
-
-//     let __label_onLoad__ = __Label__Proto.onLoad;
-//     __Label__Proto.onLoad = function () {
-//         if ( this.string.indexOf(Macro.USING_LAN_KEY) > -1){
-//             this.language = [this.string];
-//         }
-//         __label_onLoad__ && __label_onLoad__.call(this);
-//     }
-// }
 
 /**@description 通过预置体路径创建节点 
  * @param config 配置信息

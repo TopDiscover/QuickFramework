@@ -7,7 +7,7 @@ export class Language implements ISingleton{
     static module: string = "【语言包】";
     module: string = null!;
     
-    private _labels : cc.Label[] = [];
+    private _components : Language.LanguageComponent[] = [];
     private _data: Language.Data = { language: Macro.UNKNOWN };
     private delegates: Language.DataSourceDelegate[] = [];
 
@@ -126,23 +126,23 @@ export class Language implements ISingleton{
     }
 
     /**
-     * @description 添加支持多语言的Label
-     * @param label 
+     * @description 添加支持多语言的组件
+     * @param component 
      */
-    public addLabel( label : cc.Label ){
-        if( this._labels.indexOf(label) == -1 ){
-            this._labels.push(label);
+    public add( component : Language.LanguageComponent ){
+        if( this._components.indexOf(component) == -1 ){
+            this._components.push(component);
         }
     }
 
     /**
-     * @description 移除支持多语言的Label
-     * @param label 
+     * @description 移除支持多语言的组件
+     * @param component 
      */
-    public removeLabel( label : cc.Label ){
-        let index = this._labels.indexOf(label)
+    public remove( component : Language.LanguageComponent ){
+        let index = this._components.indexOf(component)
         if ( index >= 0 ){
-            this._labels.splice(index,1);
+            this._components.splice(index,1);
         }
     }
 
@@ -150,9 +150,9 @@ export class Language implements ISingleton{
      * @description 语言包发生更新，变更语言包Label
      */
     public onChangeLanguage( ){
-        this._labels.forEach(v=>{
+        this._components.forEach(v=>{
             if ( cc.isValid(v) ){
-                v.language = v.language;
+                v.forceDoLayout();
             }
         })
     }
