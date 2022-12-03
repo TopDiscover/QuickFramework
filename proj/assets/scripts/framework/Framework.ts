@@ -182,40 +182,6 @@ export class Framewok {
     }
 
     /**
-     * @description 把语言包转换成i18n.xxx形式
-     * @param param 语言包配置
-     * @param bundle bundle
-     * @example
-     * export let TANK_LAN_ZH = {
-     * language: cc.sys.LANGUAGE_CHINESE,
-     * data: {
-     * title: `坦克大战`,
-     * player: '单人模式 ',
-     * palyers: '双人模式',
-     * }
-     * }
-     * //以上是坦克大战的语言包,assetBundle为tankBattle
-     * Manager.makeLanguage("title","tankBattle"); //=> i18n.tankBattle.title 指向游戏特定的语言包
-     * Manager.makeLanguage("title"); //=> i18n.title 指向的大厅的公共语言包
-     */
-    makeLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE = Macro.BUNDLE_RESOURCES): (string | number)[] | string {
-        if (typeof param == "string") {
-            if (bundle) {
-                return `${Macro.USING_LAN_KEY}${bundle}.${param}`;
-            }
-            return `${Macro.USING_LAN_KEY}${param}`;
-        }
-        if (typeof param[0] == "string" && param instanceof Array) {
-            if (bundle) {
-                param[0] = `${Macro.USING_LAN_KEY}${bundle}.${param[0]}`;
-            } else {
-                param[0] = `${Macro.USING_LAN_KEY}${param[0]}`;
-            }
-        }
-        return param;
-    }
-
-    /**
      * @description 获取语言包 
      * 
      */

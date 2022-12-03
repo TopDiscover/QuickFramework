@@ -177,7 +177,7 @@ export class ReconnectHandler extends Handler {
     }
 
     private stopAction(tag : number ){
-        cc.Tween.stopAllByTag(tag,this);
+        cc.Tween.stopAllByTag(tag);
     }
 
     private delayCall(tag:number,time:number,func:Function){
