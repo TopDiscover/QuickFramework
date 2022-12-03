@@ -216,67 +216,67 @@ cc.Label.prototype.forceDoLayout = function () {
     }
 }
 
-Reflect.defineProperty(cc.Label.prototype, "language", {
-    get : function(){
-        return this._language;
-    },
-    set : function(v){
-        //该游戏允许在游戏中进行语言包切换,当设置的值为 null | [] 时，清除language的事件绑定
-        let self = this;
-        let updateLanguage = ( v , cb )=>{
-            if( v && ( (Array.isArray(v) && v.length > 0) || !!v) ){
-                let value = null;
-                if ( Array.isArray(v) ){
-                    value = v;
-                }else{
-                    value = [v];
-                }
-                cb && cb(true);
-                self._language = [].concat(value);
-                self.string = Manager.language.get(value);
-            }else{
-                cb && cb(false);
-                self._language = null;
-                self.string = "";
-            }
-        }
-        if (Macro.ENABLE_CHANGE_LANGUAGE) {
-            updateLanguage(v,(isUsing)=>{
-                if ( isUsing ){
-                    if (!!!self._isUsinglanguage) {
-                        self._isUsinglanguage = true;
-                        Manager.language.addLabel(self);
-                    }
-                }else{
-                    if (self._language) {
-                        Manager.language.removeLabel(self);
-                    }
-                }
-            })
-        } else {
-            updateLanguage(v,null);
-        }
-    }
-});
+// Reflect.defineProperty(cc.Label.prototype, "language", {
+//     get : function(){
+//         return this._language;
+//     },
+//     set : function(v){
+//         //该游戏允许在游戏中进行语言包切换,当设置的值为 null | [] 时，清除language的事件绑定
+//         let self = this;
+//         let updateLanguage = ( v , cb )=>{
+//             if( v && ( (Array.isArray(v) && v.length > 0) || !!v) ){
+//                 let value = null;
+//                 if ( Array.isArray(v) ){
+//                     value = v;
+//                 }else{
+//                     value = [v];
+//                 }
+//                 cb && cb(true);
+//                 self._language = [].concat(value);
+//                 self.string = Manager.language.get(value);
+//             }else{
+//                 cb && cb(false);
+//                 self._language = null;
+//                 self.string = "";
+//             }
+//         }
+//         if (Macro.ENABLE_CHANGE_LANGUAGE) {
+//             updateLanguage(v,(isUsing)=>{
+//                 if ( isUsing ){
+//                     if (!!!self._isUsinglanguage) {
+//                         self._isUsinglanguage = true;
+//                         Manager.language.addLabel(self);
+//                     }
+//                 }else{
+//                     if (self._language) {
+//                         Manager.language.removeLabel(self);
+//                     }
+//                 }
+//             })
+//         } else {
+//             updateLanguage(v,null);
+//         }
+//     }
+// });
 
-if ( !CC_EDITOR && Macro.ENABLE_CHANGE_LANGUAGE ){
-    let __Label__Proto : any = cc.Label.prototype;
-    let __label_onDestroy__ = __Label__Proto.onDestroy;
-    __Label__Proto.onDestroy = function () {
-        if ( this._isUsinglanguage ){
-            Manager.language.removeLabel(this);
-        }
-        __label_onDestroy__ && __label_onDestroy__.call(this);
-    }
+// if ( !CC_EDITOR && Macro.ENABLE_CHANGE_LANGUAGE ){
+//     let __Label__Proto : any = cc.Label.prototype;
+//     let __label_onDestroy__ = __Label__Proto.onDestroy;
+//     __Label__Proto.onDestroy = function () {
+//         if ( this._isUsinglanguage ){
+//             Manager.language.removeLabel(this);
+//         }
+//         __label_onDestroy__ && __label_onDestroy__.call(this);
+//     }
 
-    let __label_onLoad__ = __Label__Proto.onLoad;
-    __Label__Proto.onLoad = function () {
-        if ( this.string.indexOf(Macro.USING_LAN_KEY) > -1){
-            this.language = [this.string];
-        }
-        __label_onLoad__ && __label_onLoad__.call(this);
-    }
-}
+//     let __label_onLoad__ = __Label__Proto.onLoad;
+//     __Label__Proto.onLoad = function () {
+//         if ( this.string.indexOf(Macro.USING_LAN_KEY) > -1){
+//             this.language = [this.string];
+//         }
+//         __label_onLoad__ && __label_onLoad__.call(this);
+//     }
+// }
 
 /**@description 通过预置体路径创建节点 
  * @param config 配置信息
@@ -355,7 +355,7 @@ if( !cc.randomRange ){
 }
 
 export function CocosExtentionInit() {
-    if (!CC_EDITOR) {
+    if (CC_EDITOR) {
         Log.d("Cocos扩展初始化");
     }
 }

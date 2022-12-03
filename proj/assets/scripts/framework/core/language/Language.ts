@@ -99,6 +99,7 @@ export class Language implements ISingleton{
                 }
                 if (i != keys.length) {
                     Log.e(`语言包不存在 : ${keyString}`);
+                    break;
                 }
                 if (typeof (data) == "string") {
                     result = String.format(data, args);
@@ -154,5 +155,16 @@ export class Language implements ISingleton{
                 v.language = v.language;
             }
         })
+    }
+}
+
+/**
+ * @description 编辑器模式下注入Bundle语言包数据
+ * @param type Language.DataSourceDelegate
+ */
+export function injectLanguageData( type : any ){
+    if ( CC_EDITOR ){
+        let data = new (type as any);
+        Manager.language.addSourceDelegate(data);
     }
 }

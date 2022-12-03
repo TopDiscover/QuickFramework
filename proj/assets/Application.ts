@@ -6,6 +6,7 @@ import UILoading from "./scripts/common/component/UILoading";
 import { UIReconnect } from "./scripts/common/component/UIReconnect";
 import UpdateLoading from "./scripts/common/component/UpdateLoading";
 import { Config } from "./scripts/common/config/Config";
+import { Bundles } from "./scripts/common/data/Bundles";
 import { StageData } from "./scripts/common/data/StageData";
 import { CmmEntry } from "./scripts/common/entry/CmmEntry";
 import { CommonLanguage } from "./scripts/common/language/CommonLanguage";
@@ -22,6 +23,10 @@ export class _Manager extends Framewok implements GameEventInterface {
             Log.w(`需要使用都自己导出cc.game.EVENT_LOW_MEMORY事件`);
         }
         return true;
+    }
+
+    get Bundles(){
+        return Bundles;
     }
 
     /**@description 是否开启自动释放长时间未使用资源 */

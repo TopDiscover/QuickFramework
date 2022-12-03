@@ -340,4 +340,6 @@ declare type ByteArray = import("../assets/scripts/framework/plugin/ByteArray").
 
 declare type TableView = import("../assets/scripts/framework/core/ui/TableView").default;
 
+declare type Bundles = import("../assets/scripts/common/data/Bundles").Bundles;
+
 declare let Manager: import("../assets/Application")._Manager;
