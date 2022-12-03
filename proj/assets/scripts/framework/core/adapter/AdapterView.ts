@@ -21,7 +21,7 @@ const { ccclass, property ,executeInEditMode,menu } = cc._decorator;
  */
 @ccclass
 @executeInEditMode
-@menu("adapter/AdapterView")
+@menu("Quick适配组件/AdapterView")
 export default class AdapterView extends Adapter {
     onLoad() {
         this._onResize();

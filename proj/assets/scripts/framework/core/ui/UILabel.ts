@@ -34,7 +34,7 @@ cc.Label.prototype.forceDoLayout = function () {
 }
 
 @ccclass
-@menu("ui/UILabel")
+@menu("Quick渲染组件/UILabel")
 export default class UILabel extends cc.Label {
 
     /**@description 多谗言包 */

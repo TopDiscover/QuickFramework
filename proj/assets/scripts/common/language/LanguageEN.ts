@@ -22,7 +22,7 @@ export let LanguageEN = {
         reconnect: "Reconnect ... ",
         warningReconnect: "{0}网络已断开，是否重新连接？",
         tryReconnect: "{0}网络:正在尝试第{1}次连接...",
-        quitGame: "您确定要退出游戏？",
+        quitGame: "Are you sure quit the game?",
         loading_game_resources: "正在加载游戏资源...",
         mainPackVersionIsTooLow: "版本过低，请更新。",
         loadVersions: "正在加载远程版本信息",

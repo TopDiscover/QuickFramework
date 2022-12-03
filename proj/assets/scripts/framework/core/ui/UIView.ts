@@ -5,14 +5,15 @@ import { Macro } from "../../defines/Macros";
 /**
  * @description 视图基类
  */
-const { ccclass, property } = cc._decorator;
+const { ccclass, property, menu } = cc._decorator;
 
 @ccclass
+@menu("Quick公共组件/UIView")
 export default class UIView extends EventComponent {
 
     /**
-	 *@description 视图prefab 地址 resources目录下如z_panels/WeiZoneLayer,如果是在主场景上的节点，使用Canvas:xx/xx
-	 */
+     *@description 视图prefab 地址 resources目录下如z_panels/WeiZoneLayer,如果是在主场景上的节点，使用Canvas:xx/xx
+     */
     public static getPrefabUrl(): string {
         Log.e(`请求实现public static getPrefabUrl`);
         return Macro.UNKNOWN;
@@ -58,44 +59,44 @@ export default class UIView extends EventComponent {
     }
 
     /**@description 关闭界面动画 */
-    protected get closeAction() : ViewAction | null{
+    protected get closeAction(): ViewAction | null {
         return null;
-    } 
+    }
 
-    public close( ) {
-        if ( this.closeAction ){
-            this.closeAction(()=>{
+    public close() {
+        if (this.closeAction) {
+            this.closeAction(() => {
                 Manager.uiManager.close(this.className);
             });
-        }else{
+        } else {
             Manager.uiManager.close(this.className);
         }
     }
 
-    protected get showAction() : ViewAction | null{
+    protected get showAction(): ViewAction | null {
         return null;
     }
 
     /**@description args为open代入的参数 */
-    public show( args ?: any[] | any) {
+    public show(args?: any[] | any) {
         //再如果界面已经存在于界面管理器中，此时传入新的参数，只从show里面过来,这里重新对_args重新赋值
         this._args = args;
         if (this.node) this.node.active = true;
-        if ( this.showAction ){
-            this.showAction(()=>{});
+        if (this.showAction) {
+            this.showAction(() => { });
         }
     }
 
-    protected get hideAction() : ViewAction | null{
+    protected get hideAction(): ViewAction | null {
         return null;
     }
 
-    public hide( ) {
-        if ( this.hideAction ){
-            this.hideAction(()=>{
+    public hide() {
+        if (this.hideAction) {
+            this.hideAction(() => {
                 if (this.node) this.node.removeFromParent();
             });
-        }else{
+        } else {
             if (this.node) this.node.removeFromParent();
         }
     }

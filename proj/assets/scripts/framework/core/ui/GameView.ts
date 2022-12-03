@@ -6,9 +6,10 @@ import UIView from "./UIView";
  * 游戏层设置为ViewZOrder.zero
  */
 
-const {ccclass, property} = cc._decorator;
+const {ccclass, property,menu} = cc._decorator;
 
 @ccclass
+@menu("Quick公共组件/GameView")
 export default class GameView extends UIView {
 
     static logicType : LogicClass<Logic> | null = null;

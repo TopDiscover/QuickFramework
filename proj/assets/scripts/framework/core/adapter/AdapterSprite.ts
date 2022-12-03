@@ -55,7 +55,7 @@ export enum SpriteAlignType {
  */
 @ccclass
 @executeInEditMode
-@menu("adapter/AdapterSprite")
+@menu("Quick适配组件/AdapterSprite")
 export default class AdapterSprite extends Adapter {
     @property({
         type: cc.Enum(SpriteScaleType),

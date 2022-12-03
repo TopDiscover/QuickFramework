@@ -1,7 +1,7 @@
 import { LayoutParam, LayoutType } from "../layout/LayoutDefines";
 import { CellType, TableViewCell } from "./TableViewCell";
 
-const { ccclass, property } = cc._decorator;
+const { ccclass, property, menu } = cc._decorator;
 
 interface UpdateIndices {
     from: number,
@@ -303,6 +303,7 @@ export interface TableViewDelegate {
  */
 
 @ccclass
+@menu("QuickUI组件/TableView")
 export default class TableView extends cc.ScrollView {
     public static Direction = Direction;
     public static FillOrder = FillOrder;

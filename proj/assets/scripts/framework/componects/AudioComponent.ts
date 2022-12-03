@@ -65,7 +65,6 @@ class AudioData implements ISingleton{
 const PLAY_MUSIC = "AudioComponent_PLAY_MUSIC";
 
 @ccclass
-@menu("framework/base/AudioComponent")
 export default class AudioComponent extends EventComponent {
 
 

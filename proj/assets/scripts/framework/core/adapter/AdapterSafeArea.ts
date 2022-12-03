@@ -18,7 +18,7 @@ const { ccclass, property,executeInEditMode,menu } = cc._decorator;
  */
 @ccclass
 @executeInEditMode
-@menu("adapter/AdapterSafeArea")
+@menu("Quick适配组件/AdapterSafeArea")
 export default class AdapterSafeArea extends Adapter {
     @property({
         tooltip: "是否包含安全区域和屏幕上边界之间的缝隙",

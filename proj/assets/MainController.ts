@@ -8,7 +8,7 @@ import EventComponent from "./scripts/framework/componects/EventComponent";
 const { ccclass, property, menu } = cc._decorator;
 
 @ccclass
-@menu("manager/MainController")
+@menu("Quick公共组件/MainController")
 export default class MainController extends EventComponent {
 
     @property(cc.Asset)

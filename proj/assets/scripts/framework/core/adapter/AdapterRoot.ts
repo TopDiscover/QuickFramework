@@ -33,7 +33,7 @@ const { ccclass, property ,executeInEditMode,menu} = cc._decorator;
  */
 @ccclass
 @executeInEditMode
-@menu("adapter/AdapterRoot")
+@menu("Quick适配组件/AdapterRoot")
 export default class AdapterRoot extends Adapter {
 
     onLoad() {
