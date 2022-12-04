@@ -72,5 +72,7 @@ export let LanguageEN = {
         /**@description 图件多语言配置 */
 
         pic_background: "common/images/com_bg_start2",
+
+        richtext : "<color=#00ff00>Rich</c><color=#0fffff>Text</color>",
     }
 }

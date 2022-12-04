@@ -73,5 +73,7 @@ export let LanguageZH = {
 
     pic_background : "common/images/background",
     // pic_background : "common/images/com_bg_start2",
+
+    richtext : "<color=#00ff00>富</c><color=#0fffff>文本</color>",
   }
 }
