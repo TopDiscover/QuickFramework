@@ -12,7 +12,7 @@ interface Logger {
 	 * @param label 标签
 	 * @param deep 深度
 	 */
-	dump(object: unknown, label?: string,deep?:number): void;
+	dump(object: unknown, label?: string, deep?: number): void;
 }
 declare let Log: Logger;
 
@@ -64,7 +64,7 @@ declare interface DateConstructor {
 	 * @param format 
 	 * @param date 如果不传入，则为当前时间
 	 */
-	 format(format: string,date? : Date): string;
+	format(format: string, date?: Date): string;
 }
 
 declare interface StringConstructor {
@@ -132,8 +132,8 @@ declare interface UIClass<T extends UIView> {
 	 *@description 视图prefab 地址 resources目录下如z_panels/WeiZoneLayer,
 	 * 如果是在主场景上的节点
 	 * static getPrefabUrl(){
-     *   return `@LoginView`;
-     * } 
+	 *   return `@LoginView`;
+	 * } 
 	 */
 	getPrefabUrl(): string;
 }
@@ -141,19 +141,19 @@ declare interface UIClass<T extends UIView> {
 /**
  * @description 单列接口类
  */
- declare interface ISingleton{
-    /**@description 初始化 */
-    init?(...args:any[]):any;
-    /**@description 销毁(单列销毁时调用) */
-    destory?(...args:any[]) : any;
-    /**@description 清理数据 */
-    clear?(...args:any[]) : any;
+declare interface ISingleton {
+	/**@description 初始化 */
+	init?(...args: any[]): any;
+	/**@description 销毁(单列销毁时调用) */
+	destory?(...args: any[]): any;
+	/**@description 清理数据 */
+	clear?(...args: any[]): any;
 	/**@description 是否常驻，即创建后不会删除 */
-	isResident?:boolean;
+	isResident?: boolean;
 	/**@description 不用自己设置，由单列管理器赋值 */
-	module : string;
+	module: string;
 	/**输出调试信息 */
-	debug?(...args:any[]):void;
+	debug?(...args: any[]): void;
 }
 
 /**@description 单列类型限制 */
@@ -161,7 +161,7 @@ declare interface SingletonClass<T> {
 	new(): T;
 	/**@description 模块名 */
 	module: string;
-	instance?:T;
+	instance?: T;
 }
 
 declare interface BundleClass<T> {
@@ -275,12 +275,12 @@ declare function loadRes(config: {
 declare type EntryDelegate = import("../assets/scripts/framework/core/entry/EntryDelegate").EntryDelegate;
 declare type Message = import("../assets/scripts/framework/core/net/message/Message").Message;
 
-interface IService{
-    addListener?(cmd: string, handleType: any, handleFunc: Function, isQueue: boolean, target: any):any;
+interface IService {
+	addListener?(cmd: string, handleType: any, handleFunc: Function, isQueue: boolean, target: any): any;
 
-    removeListeners?(target: any, eventName?: string):any;
+	removeListeners?(target: any, eventName?: string): any;
 
-	send?(msg:Message):any;
+	send?(msg: Message): any;
 }
 
 /**@description 语言包相关 */
@@ -294,17 +294,21 @@ declare namespace Language {
 	 **/
 	export interface DataSourceDelegate {
 		bundle: string;
-		data(language: string,source:any): Data;
+		data(language: string, source: any): Data;
+	}
+
+	export interface LanguageComponent {
+		forceDoLayout(): void;
 	}
 }
 
 /**@description 视图打开，关闭，隐藏动画 */
-declare type ViewAction = (complete : ()=>void)=>void;
+declare type ViewAction = (complete: () => void) => void;
 
 /**@description UIManager open参数说明 */
 declare interface OpenOption {
 	/**@description 打开界面的类型 */
-	type : UIClass<UIView>;
+	type: UIClass<UIView>;
 	/**@description 视图绑定预置资源所在bundle,默认为resources目标 */
 	bundle?: BUNDLE_TYPE;
 	/**@description 节点层级，默认为0 */
@@ -327,7 +331,7 @@ declare interface OpenOption {
 	args?: any | any[];
 }
 
-declare interface DefaultOpenOption extends OpenOption{
+declare interface DefaultOpenOption extends OpenOption {
 	/**@description 视图绑定预置资源所在bundle,默认为resources目标 */
 	bundle: BUNDLE_TYPE;
 	/**@description 节点层级，默认为0 */
@@ -339,5 +343,7 @@ declare interface DefaultOpenOption extends OpenOption{
 declare type ByteArray = import("../assets/scripts/framework/plugin/ByteArray").ByteArray;
 
 declare type TableView = import("../assets/scripts/framework/core/ui/TableView").default;
+
+declare type Bundles = import("../assets/scripts/common/data/Bundles").Bundles;
 
 declare let Manager: import("../assets/Application")._Manager;

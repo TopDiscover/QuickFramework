@@ -6,9 +6,10 @@ import { Macro } from "../../defines/Macros";
 /**
  * @description 视图基类
  */
-const { ccclass, property } = _decorator;
+const { ccclass, property , menu} = _decorator;
 
 @ccclass
+@menu("Quick公共组件/UIView")
 export default class UIView extends EventComponent {
 
     /**

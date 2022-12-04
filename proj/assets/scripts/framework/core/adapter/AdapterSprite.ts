@@ -2,7 +2,7 @@ import { Enum, Sprite, UITransform, v3, Widget, _decorator } from "cc";
 import { EDITOR } from "cc/env";
 import { Adapter } from "./Adapter";
 
-const { ccclass, property , executeInEditMode} = _decorator;
+const { ccclass, property , executeInEditMode,menu} = _decorator;
 
 /**
  * 缩放方式
@@ -57,6 +57,7 @@ export enum SpriteAlignType {
  */
 @ccclass
 @executeInEditMode(true)
+@menu("Quick适配组件/AdapterSprite")
 export default class AdapterSprite extends Adapter {
     @property({
         type: Enum(SpriteScaleType),

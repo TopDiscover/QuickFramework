@@ -173,22 +173,6 @@ prototype.loadButton = function (config: any) {
 }
 
 /**
- * @description 加载字体
- * @example
- * let content = cc.find("content",this.node); 
- * content.getComponent(cc.Label).loadFont({font:roomPath + dfFont,view:this});
- */
-prototype = Label.prototype;
-prototype.loadFont = function (config: any) {
-    let font = config.font;
-    let me = this;
-    let bundle = getBundle(config);
-    Manager.cache.getCacheByAsync(font, Font, bundle).then((data) => {
-        setLabelFont(me, config, data);
-    });
-}
-
-/**
  * @description 加载龙骨动画
  */
 dragonBones.ArmatureDisplay.prototype.loadDisplay = function(config) {
@@ -213,73 +197,7 @@ dragonBones.ArmatureDisplay.prototype.loadDisplay = function(config) {
      });
  }
 
-Reflect.defineProperty(Label.prototype, "language", {
-    get: function () {
-        return (<any>this)._language;
-    },
-    set: function (v) {
-        //该游戏允许在游戏中进行语言包切换,当设置的值为 null | [] 时，清除language的事件绑定
-        let self: any = this;
-        let updateLanguage = (v: any, cb: any) => {
-            if (v && ((Array.isArray(v) && v.length > 0) || !!v)) {
-                let value: any = null;
-                if (Array.isArray(v)) {
-                    value = v;
-                } else {
-                    value = [v];
-                }
-                cb && cb(true);
-                self._language = [].concat(value);
-                self.string = Manager.language.get(value);
-            } else {
-                cb && cb(false);
-                self._language = null;
-                self.string = "";
-            }
-        }
-        if (Macro.ENABLE_CHANGE_LANGUAGE) {
-            updateLanguage(v, (isUsing: boolean) => {
-                if (isUsing) {
-                    if (!!!self._isUsinglanguage) {
-                        self._isUsinglanguage = true;
-                        Manager.dispatcher.add(Macro.CHANGE_LANGUAGE, self._onChangeLanguage, self);
-                    }
-                } else {
-                    if (self._language) {
-                        Manager.dispatcher.remove(Macro.CHANGE_LANGUAGE, self);
-                    }
-                }
-            })
-        } else {
-            updateLanguage(v, null);
-        }
-    }
-});
-
 prototype = Label.prototype;
-if (!EDITOR && Macro.ENABLE_CHANGE_LANGUAGE) {
-    prototype._onChangeLanguage = function () {
-        this.language = this.language;
-    }
-
-    let __label_onDestroy__ = prototype.onDestroy;
-    prototype.onDestroy = function () {
-        if (this._isUsinglanguage) {
-            Manager.dispatcher.remove(Macro.CHANGE_LANGUAGE, this);
-        }
-        __label_onDestroy__ && __label_onDestroy__.call(this);
-    }
-
-    let __label_onLoad__ = prototype.onLoad;
-    prototype.onLoad = function () {
-        if (this.string.indexOf(Macro.USING_LAN_KEY) > -1) {
-            this.language = [this.string];
-        }
-        __label_onLoad__ && __label_onLoad__.call(this);
-    }
-
-}
-
 /**@description 强制label在当前帧进行绘制 */
 prototype.forceDoLayout = function () {
     //2.2.0
@@ -293,6 +211,21 @@ prototype.forceDoLayout = function () {
         this.updateRenderData(true);
     }
 }
+
+/**
+ * @description 加载字体
+ * @example
+ * let content = cc.find("content",this.node); 
+ * content.getComponent(cc.Label).loadFont({font:roomPath + dfFont,view:this});
+ */
+ prototype.loadFont = function (config: any) {
+     let font = config.font;
+     let me = this;
+     let bundle = getBundle(config);
+     Manager.cache.getCacheByAsync(font, Font, bundle).then((data) => {
+         setLabelFont(me, config, data);
+     });
+ }
 
 /**@description 通过预置体路径创建节点 
  * @param config 配置信息

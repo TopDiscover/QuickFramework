@@ -5,7 +5,7 @@ import { sys, v3, view, _decorator,screen, Scene } from "cc";
 import { DEBUG, EDITOR, JSB } from "cc/env";
 import { Adapter, SafeArea } from "./Adapter";
 
-const { ccclass, property ,executeInEditMode } = _decorator;
+const { ccclass, property ,executeInEditMode,menu } = _decorator;
 /**
  * 安全区域适配组件
  *
@@ -23,6 +23,7 @@ const { ccclass, property ,executeInEditMode } = _decorator;
  */
 @ccclass
 @executeInEditMode(true)
+@menu("Quick适配组件/AdapterView")
 export default class AdapterView extends Adapter {
     onLoad() {
         this._onResize();

@@ -111,21 +111,6 @@ export interface Label {
 
     /**@description 强制label在当前帧进行绘制 */
     forceDoLayout(): void;
-
-    /**
-     * @description 设置语言包路径,假设语言包为
-     * @example 示例
-     * export let i18n = {
-     * language : cc.sys.LANGUAGE_CHINESE,
-     * tips : "您好",
-     * test : "测试 : {0}-->{1}-->{2}"
-     * }
-     * node.getComponent(cc.Label).language = "i18n.tips"; //string显示为：您好
-     * node.getComponent(cc.Label).language = ["i18n.tips"];//string显示为：您好
-     * node.getComponent(cc.Label).language = ["i18n.test",100,200,300];//string显示为：100-->200-->300
-     * node.getConponent(cc.Label).language = null;//清除语言路径信息,如果在不需要使用语言包路径时，使用赋值空清除
-     * */
-    language: (string | number)[] | string;
 }
 
 export interface ParticleSystem2D {

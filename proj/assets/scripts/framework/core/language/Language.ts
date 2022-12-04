@@ -1,12 +1,14 @@
 import { Macro } from "../../defines/Macros";
-import { sys } from "cc";
+import { isValid, sys } from "cc";
+import { EDITOR } from "cc/env";
 const LANG_KEY: string = "using_language";
 
 export class Language implements ISingleton{
     isResident?: boolean = true;
     static module: string = "【语言包】";
     module: string = null!;
-
+    
+    private _components : Language.LanguageComponent[] = [];
     private _data: Language.Data = { language: Macro.UNKNOWN };
     private delegates: Language.DataSourceDelegate[] = [];
 
@@ -54,13 +56,14 @@ export class Language implements ISingleton{
             this.delegates.forEach((delegate, index, source) => {
                 this._data = delegate.data(language,this._data);
             });
-            //通知更新
-            dispatch(Macro.CHANGE_LANGUAGE, language);
+            //更新带有语言包类型的所有Label
+            this.onChangeLanguage();
         } else {
             this.delegates.forEach((delegate, index, source) => {
                 this._data = delegate.data(this.getLanguage(),this._data);
             });
         }
+        Log.d(this.module,`当前语言:${this._data.language}`);
         Manager.storage.setItem(LANG_KEY, this._data.language);
     }
 
@@ -97,6 +100,7 @@ export class Language implements ISingleton{
                 }
                 if (i != keys.length) {
                     Log.e(`语言包不存在 : ${keyString}`);
+                    break;
                 }
                 if (typeof (data) == "string") {
                     result = String.format(data, args);
@@ -120,5 +124,48 @@ export class Language implements ISingleton{
     /**@description 获取语言包名 */
     public getLanguage() {
         return Manager.storage.getItem(LANG_KEY, sys.Language.CHINESE);
+    }
+
+    /**
+     * @description 添加支持多语言的组件
+     * @param component 
+     */
+    public add( component : Language.LanguageComponent ){
+        if( this._components.indexOf(component) == -1 ){
+            this._components.push(component);
+        }
+    }
+
+    /**
+     * @description 移除支持多语言的组件
+     * @param component 
+     */
+    public remove( component : Language.LanguageComponent ){
+        let index = this._components.indexOf(component)
+        if ( index >= 0 ){
+            this._components.splice(index,1);
+        }
+    }
+
+    /**
+     * @description 语言包发生更新，变更语言包Label
+     */
+    public onChangeLanguage( ){
+        this._components.forEach(v=>{
+            if ( isValid(v) ){
+                v.forceDoLayout();
+            }
+        })
+    }
+}
+
+/**
+ * @description 编辑器模式下注入Bundle语言包数据
+ * @param type Language.DataSourceDelegate
+ */
+export function injectLanguageData( type : any ){
+    if ( EDITOR ){
+        let data = new (type as any);
+        Manager.language.addSourceDelegate(data);
     }
 }

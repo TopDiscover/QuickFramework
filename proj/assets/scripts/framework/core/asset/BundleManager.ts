@@ -92,7 +92,7 @@ export class BundleManager implements ISingleton{
       }
       item.handler.onStartLoadBundle(item);
       Log.d(`loadBundle : ${item.bundle}`);
-      assetManager.loadBundle(item.bundle, (err, bundle) => {
+      this._loadBundle(item.bundle, (err, bundle) => {
          if (err) {
             Log.e(`load bundle : ${item.bundle} fail !!!`);
             item.handler.onLoadBundleError(item,err);
@@ -102,6 +102,10 @@ export class BundleManager implements ISingleton{
             item.handler.onLoadBundleComplete(item);
          }
       });
+   }
+
+   public _loadBundle(bundle:BUNDLE_TYPE,onComplete: (err: Error, bundle: AssetManager.Bundle) => void){
+      assetManager.loadBundle(bundle as string,onComplete);
    }
 
    debug(){

@@ -10,7 +10,7 @@ import { Config } from "../config/Config";
 const { ccclass, property, menu } = _decorator;
 
 @ccclass
-@menu("common/component/GlobalAudio")
+@menu("Quick公共组件/GlobalAudio")
 export default class GlobalAudio extends AudioComponent {
     playDialogOpen() {
         this.playEffect(Config.audioPath.dialog, Macro.BUNDLE_RESOURCES, false);

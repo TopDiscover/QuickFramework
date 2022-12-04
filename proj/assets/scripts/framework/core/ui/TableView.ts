@@ -2,7 +2,7 @@ import { ScrollView, _decorator, Node, Enum, Size, Vec3, UITransform, Vec2, inst
 import { LayoutParam, LayoutType } from "../layout/LayoutDefines";
 import { CellType, TableViewCell } from "./TableViewCell";
 
-const { ccclass, property } = _decorator;
+const { ccclass, property , menu} = _decorator;
 
 interface UpdateIndices {
     from: number,
@@ -307,6 +307,7 @@ export interface TableViewDelegate {
  */
 
 @ccclass("TableView")
+@menu("QuickUI组件/TableView")
 export default class TableView extends ScrollView {
     public static Direction = Direction;
     public static FillOrder = FillOrder;
