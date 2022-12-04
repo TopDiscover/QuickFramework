@@ -130,7 +130,7 @@ export default class UILabel extends cc.Label {
 
     protected onLoad(): void {
         Manager.language.add(this);
-        this.forceDoLayout();
+        this.update(0);
     }
 
     protected onDestroy(): void {

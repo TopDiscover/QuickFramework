@@ -67,6 +67,10 @@ export let LanguageEN = {
                 name: "游戏大厅",
                 sort: 0
             },
-        }
+        },
+
+        /**@description 图件多语言配置 */
+
+        pic_background: "common/images/com_bg_start2",
     }
 }

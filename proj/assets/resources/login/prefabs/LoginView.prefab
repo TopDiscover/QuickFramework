@@ -180,7 +180,17 @@
     "_id": ""
   },
   {
-    "__type__": "cc.Sprite",
+    "__type__": "cc.BlockInputEvents",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 2
+    },
+    "_enabled": true,
+    "_id": ""
+  },
+  {
+    "__type__": "6a332jTG+hIkL3bDRfebvTL",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -197,8 +207,8 @@
     "_spriteFrame": {
       "__uuid__": "25e2d1af-e832-4995-bfaf-cca5c392d40b"
     },
-    "_type": 1,
-    "_sizeMode": 0,
+    "_type": 0,
+    "_sizeMode": 1,
     "_fillType": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
@@ -209,16 +219,11 @@
     "_fillRange": 0,
     "_isTrimmedMode": true,
     "_atlas": null,
-    "_id": ""
-  },
-  {
-    "__type__": "cc.BlockInputEvents",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 2
-    },
-    "_enabled": true,
+    "_lan": "pic_background",
+    "_bundle": 7,
+    "_params": [],
+    "_mult": true,
+    "_user": "LoginView",
     "_id": ""
   },
   {

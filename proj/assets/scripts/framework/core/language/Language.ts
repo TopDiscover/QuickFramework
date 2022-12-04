@@ -10,6 +10,7 @@ export class Language implements ISingleton{
     private _components : Language.LanguageComponent[] = [];
     private _data: Language.Data = { language: Macro.UNKNOWN };
     private delegates: Language.DataSourceDelegate[] = [];
+    views : Map<string,UIClass<UIView>> = new Map();
 
     public addSourceDelegate(delegate: Language.DataSourceDelegate) {
         if (this.delegates.indexOf(delegate) == -1) {
