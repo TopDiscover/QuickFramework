@@ -74,5 +74,8 @@ export let LanguageEN = {
         pic_background: "common/images/com_bg_start2",
 
         richtext : "<color=#00ff00>Rich</c><color=#0fffff>Text</color>",
+        pic_atlas : ["common/images/lobby_texture"],
+        pic_key : "update_status_hot",
+        pic_remote : "https://www.baidu.com/img/flexible/logo/pc/index_gray.png",
     }
 }

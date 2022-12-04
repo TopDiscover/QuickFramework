@@ -189,6 +189,32 @@ cc.ParticleSystem.prototype.loadFile = function (config) {
     });
 }
 
+cc.Label.prototype.forceDoLayout = function () {
+    //2.2.0
+    if (this._forceUpdateRenderData) {
+        this._forceUpdateRenderData();
+    }
+    //2.2.0以下版本
+    else if (this._updateRenderData) {
+        this._updateRenderData(true);
+    }
+}
+
+/**
+ * @description 加载字体
+ * @example
+ * let content = cc.find("content",this.node); 
+ * content.getComponent(cc.Label).loadFont({font:roomPath + dfFont,view:this});
+ */
+ cc.Label.prototype.loadFont = function (config) {
+    let font = config.font;
+    let me = this;
+    let bundle = getBundle(config);
+    Manager.cache.getCacheByAsync(font, cc.Font,bundle).then((data) => {
+        setLabelFont(me, config, data);
+    });
+}
+
 /**@description 通过预置体路径创建节点 
  * @param config 配置信息
  * @param config.url 预置体路径

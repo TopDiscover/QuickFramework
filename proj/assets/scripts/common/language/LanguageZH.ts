@@ -75,5 +75,9 @@ export let LanguageZH = {
     // pic_background : "common/images/com_bg_start2",
 
     richtext : "<color=#00ff00>富</c><color=#0fffff>文本</color>",
+    pic_atlas : ["common/images/lobby_texture"],
+    pic_key : "update_status_hot",
+    // pic_remote : "https://fanyi-cdn.cdn.bcebos.com/static/translation/img/header/logo_e835568.png",
+    pic_remote : "https://www.baidu.com/img/flexible/logo/pc/index_gray.png",
   }
 }

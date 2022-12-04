@@ -6,7 +6,8 @@
  */
 
 import { Macro } from "../../defines/Macros";
-import { setSpriteSpriteFrame } from "../../plugin/CocosUtils";
+import { addExtraLoadResource, setSpriteSpriteFrame } from "../../plugin/CocosUtils";
+import { Resource } from "../asset/Resource";
 
 const { ccclass, property, menu } = cc._decorator;
 
@@ -38,6 +39,14 @@ export default class UISprite extends cc.Sprite {
     /**@description 资源的持有人 */
     @property
     protected _user = Macro.UNKNOWN;
+
+    /**@description 图集资源 */
+    @property
+    protected _lanAtlas: string = "";
+
+    /**@description 是否是远程资源 */
+    @property
+    protected _remote = false;
 
     /**
      * @description 语言包所在bundle
@@ -78,6 +87,36 @@ export default class UISprite extends cc.Sprite {
         this._lan = v;
         this._isDirty = true;
     }
+
+    /**
+     * @description 图集资源
+     */
+    @property({ displayName: "图集资源", tooltip: "图集资源" })
+    get languageAtlas() {
+        return this._lanAtlas;
+    }
+    set languageAtlas(v) {
+        if (this._lanAtlas == v) {
+            return;
+        }
+        this._lanAtlas = v;
+        this._isDirty = true;
+    }
+
+    /**
+     * @description 图集资源
+     */
+     @property({ displayName: "远程地址", tooltip: "远程地址" })
+     get isRemote() {
+         return this._remote;
+     }
+     set isRemote(v) {
+         if (this._remote == v) {
+             return;
+         }
+         this._remote = v;
+         this._isDirty = true;
+     }
 
     /**
      * @description 附加参数 假设resources语言包为
@@ -152,24 +191,52 @@ export default class UISprite extends cc.Sprite {
 
             let loaded = Manager.bundleManager.getBundle(realBundle);
             if (!loaded) {
-                Log.d(`${realBundle}未加载`);
+                // Log.d(`${realBundle}未加载`);
                 return;
             }
             let url = Manager.getLanguage(param, realBundle)
             if (!url) {
                 return;
             }
-
-            Log.d(`资源路径：${realBundle}/${url}`);
             let view = await Manager.uiManager.getView(this.user);
-            Manager.cache.getCacheByAsync(url, cc.SpriteFrame, realBundle)
-                .then(spriteFrame => {
-                    setSpriteSpriteFrame(view, url, this, spriteFrame, (data) => {
-                        if (this.onLoadComplete) {
-                            this.onLoadComplete(data);
+            if ( this.isRemote ){
+                Manager.asset.remote.loadImage(url, true).then((data) => {
+                    if (data) {
+                        setSpriteSpriteFrame(view, url, this, data,(data)=>{
+                            if ( this.onLoadComplete ){
+                                this.onLoadComplete(data);
+                            }
+                        },Macro.BUNDLE_REMOTE, Resource.Type.Remote, false);
+                    }
+                });
+            }else{
+                if (this.languageAtlas.length > 0) {
+                    // Log.d("设置图集",this.languageAtlas);
+                    //在纹理图集中查找
+                    let urls = Manager.getLanguage([this.languageAtlas],realBundle)
+                    Manager.cache.getSpriteFrameByAsync(urls, url, view, addExtraLoadResource,realBundle).then((data) => {
+                        if ( data && data.isTryReload ){
+                        //来到这里面程序已经崩溃了，无意义在处理了
+                        }else{
+                            setSpriteSpriteFrame(view, data.url, this, data.spriteFrame, (data)=>{
+                                if ( this.onLoadComplete ){
+                                    this.onLoadComplete(data);
+                                }
+                            },realBundle,Resource.Type.Local,false,true);
                         }
-                    }, realBundle);
-                })
+                    });
+                } else {
+                    // Log.d(`资源路径：${realBundle}/${url}`);
+                    Manager.cache.getCacheByAsync(url, cc.SpriteFrame, realBundle)
+                        .then(spriteFrame => {
+                            setSpriteSpriteFrame(view, url, this, spriteFrame, (data) => {
+                                if (this.onLoadComplete) {
+                                    this.onLoadComplete(data);
+                                }
+                            }, realBundle);
+                        })
+                }
+            }
         }
     }
 }
