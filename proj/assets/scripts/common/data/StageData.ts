@@ -46,7 +46,7 @@ export class StageData extends GameData {
     init() {
         super.init();
         //初始化游戏入口配置
-        let games = Manager.getLanguage("bundles") as any;
+        let games = Manager.getLanguage("bundles") as any as TYPEBUNDLE;
         let keys = Object.keys(games);
         this._entrys.clear();
         keys.forEach(v => {
