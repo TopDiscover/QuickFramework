@@ -90,12 +90,12 @@ export default class UILabel extends cc.Label {
         this._isDirty = true;
     }
 
-    @property({displayName:"是否启用多语言",tooltip:"是否启用多语言,默认为启用"})
-    get isUseMultilingual(){
+    @property({ displayName: "是否启用多语言", tooltip: "是否启用多语言,默认为启用" })
+    get isUseMultilingual() {
         return this._mult;
     }
-    set isUseMultilingual(v){
-        if ( v == this._mult ){
+    set isUseMultilingual(v) {
+        if (v == this._mult) {
             return;
         }
         this._mult = v;
@@ -103,15 +103,24 @@ export default class UILabel extends cc.Label {
     }
 
     protected onLoad(): void {
+        if (super.onLoad) {
+            super.onLoad();
+        }
         Manager.language.add(this);
         this.update(0);
     }
 
     protected onDestroy(): void {
         Manager.language.remove(this);
+        if (super.onDestroy) {
+            super.onDestroy();
+        }
     }
 
     protected update(dt: number): void {
+        if (super.update) {
+            super.update(dt);
+        }
         if (this._isDirty) {
             this.forceDoLayout();
             this._isDirty = false;
@@ -119,7 +128,7 @@ export default class UILabel extends cc.Label {
     }
 
     forceDoLayout(): void {
-        if ( this.isUseMultilingual ){
+        if (this.isUseMultilingual) {
             let bundle = this.bundle;
             let realBundle = Bundles[bundle]
             let param: (string | number)[] = [];

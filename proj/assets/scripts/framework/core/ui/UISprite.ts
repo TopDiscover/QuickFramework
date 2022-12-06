@@ -106,17 +106,17 @@ export default class UISprite extends cc.Sprite {
     /**
      * @description 图集资源
      */
-     @property({ displayName: "远程地址", tooltip: "远程地址" })
-     get isRemote() {
-         return this._remote;
-     }
-     set isRemote(v) {
-         if (this._remote == v) {
-             return;
-         }
-         this._remote = v;
-         this._isDirty = true;
-     }
+    @property({ displayName: "远程地址", tooltip: "远程地址" })
+    get isRemote() {
+        return this._remote;
+    }
+    set isRemote(v) {
+        if (this._remote == v) {
+            return;
+        }
+        this._remote = v;
+        this._isDirty = true;
+    }
 
     /**
      * @description 附加参数 假设resources语言包为
@@ -166,15 +166,24 @@ export default class UISprite extends cc.Sprite {
     }
 
     protected onLoad(): void {
+        if (super.onLoad) {
+            super.onLoad();
+        }
         Manager.language.add(this);
         this.update(0);
     }
 
     protected onDestroy(): void {
         Manager.language.remove(this);
+        if (super.onDestroy) {
+            super.onDestroy();
+        }
     }
 
     protected update(dt: number): void {
+        if (super.update) {
+            super.update(dt);
+        }
         if (this._isDirty) {
             this.forceDoLayout();
             this._isDirty = false;
@@ -199,30 +208,30 @@ export default class UISprite extends cc.Sprite {
                 return;
             }
             let view = await Manager.uiManager.getView(this.user);
-            if ( this.isRemote ){
+            if (this.isRemote) {
                 Manager.asset.remote.loadImage(url, true).then((data) => {
                     if (data) {
-                        setSpriteSpriteFrame(view, url, this, data,(data)=>{
-                            if ( this.onLoadComplete ){
+                        setSpriteSpriteFrame(view, url, this, data, (data) => {
+                            if (this.onLoadComplete) {
                                 this.onLoadComplete(data);
                             }
-                        },Macro.BUNDLE_REMOTE, Resource.Type.Remote, false);
+                        }, Macro.BUNDLE_REMOTE, Resource.Type.Remote, false);
                     }
                 });
-            }else{
+            } else {
                 if (this.languageAtlas.length > 0) {
                     // Log.d("设置图集",this.languageAtlas);
                     //在纹理图集中查找
-                    let urls = Manager.getLanguage([this.languageAtlas],realBundle)
-                    Manager.cache.getSpriteFrameByAsync(urls, url, view, addExtraLoadResource,realBundle).then((data) => {
-                        if ( data && data.isTryReload ){
-                        //来到这里面程序已经崩溃了，无意义在处理了
-                        }else{
-                            setSpriteSpriteFrame(view, data.url, this, data.spriteFrame, (data)=>{
-                                if ( this.onLoadComplete ){
+                    let urls = Manager.getLanguage([this.languageAtlas], realBundle)
+                    Manager.cache.getSpriteFrameByAsync(urls, url, view, addExtraLoadResource, realBundle).then((data) => {
+                        if (data && data.isTryReload) {
+                            //来到这里面程序已经崩溃了，无意义在处理了
+                        } else {
+                            setSpriteSpriteFrame(view, data.url, this, data.spriteFrame, (data) => {
+                                if (this.onLoadComplete) {
                                     this.onLoadComplete(data);
                                 }
-                            },realBundle,Resource.Type.Local,false,true);
+                            }, realBundle, Resource.Type.Local, false, true);
                         }
                     });
                 } else {
