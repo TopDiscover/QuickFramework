@@ -347,3 +347,8 @@ declare type TableView = import("../assets/scripts/framework/core/ui/TableView")
 declare type Bundles = import("../assets/scripts/common/data/Bundles").Bundles;
 
 declare let Manager: import("../assets/Application")._Manager;
+
+declare type LanguageZH = typeof import("../assets/scripts/common/language/LanguageZH").LanguageZH;
+declare type LanguageEN = typeof import("../assets/scripts/common/language/LanguageEN").LanguageEN;
+
+declare type LanguageData = LanguageEN & LanguageZH;

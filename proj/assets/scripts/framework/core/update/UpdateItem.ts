@@ -36,7 +36,10 @@ export interface UpdateHandlerDelegate {
 
 export class UpdateItem {
     /**@description 更新项名字,如果大厅 */
-    name: string = "";
+    private _name = "";
+    get name(){
+        return Manager.getLanguage(this._name as any);
+    };
     /**@description 更新项bundle名 */
     bundle: string = "";
     /**@description 处理者,统一指定，具体实现由内部的代理来处理 */
@@ -72,7 +75,7 @@ export class UpdateItem {
     }
 
     constructor(config: Update.Config) {
-        this.name = config.name;
+        this._name = config.name;
         this.bundle = config.bundle;
     }
 

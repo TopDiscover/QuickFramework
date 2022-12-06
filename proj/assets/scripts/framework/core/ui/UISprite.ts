@@ -194,21 +194,19 @@ export default class UISprite extends cc.Sprite {
         if (this.isUseMultilingual) {
             let bundle = this.bundle;
             let realBundle = Bundles[bundle]
-            let param: (string | number)[] = [];
-            param.push(this.language);
-            param.push(...this.params);
-
             let loaded = Manager.bundleManager.getBundle(realBundle);
             if (!loaded) {
                 // Log.d(`${realBundle}未加载`);
                 return;
             }
-            let url = Manager.getLanguage(param, realBundle)
+
+            let url = Manager.getLanguage(this.language as any,this.params, realBundle)
             if (!url) {
                 return;
             }
             let view = await Manager.uiManager.getView(this.user);
             if (this.isRemote) {
+                // Log.d("加载远程图片")
                 Manager.asset.remote.loadImage(url, true).then((data) => {
                     if (data) {
                         setSpriteSpriteFrame(view, url, this, data, (data) => {
@@ -222,7 +220,7 @@ export default class UISprite extends cc.Sprite {
                 if (this.languageAtlas.length > 0) {
                     // Log.d("设置图集",this.languageAtlas);
                     //在纹理图集中查找
-                    let urls = Manager.getLanguage([this.languageAtlas], realBundle)
+                    let urls = Manager.getLanguage(this.languageAtlas as any,[], realBundle)
                     Manager.cache.getSpriteFrameByAsync(urls, url, view, addExtraLoadResource, realBundle).then((data) => {
                         if (data && data.isTryReload) {
                             //来到这里面程序已经崩溃了，无意义在处理了
