@@ -93,7 +93,7 @@ export class ReconnectHandler extends Handler {
             this.showReconnectDialog();
             return;
         }
-        Manager.uiReconnect.show(Manager.getLanguage(["tryReconnect", this.service.module, this._connectCount]));
+        Manager.uiReconnect.show(Manager.getLanguage("tryReconnect",[this.service.module, this._connectCount]));
         this.service.connect();
 
         //启用连接超时处理
@@ -122,7 +122,7 @@ export class ReconnectHandler extends Handler {
         Manager.alert.show({
             tag: Config.RECONNECT_ALERT_TAG,
             isRepeat: false,
-            text: Manager.getLanguage(["warningReconnect", this.service.module]) as string,
+            text: Manager.getLanguage("warningReconnect",[this.service.module]) as string,
             confirmCb: (isOK) => {
                 if (isOK) {
                     Log.d(`${this.service?.module} 重连连接网络`);

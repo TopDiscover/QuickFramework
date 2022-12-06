@@ -33,7 +33,7 @@ export default class UpdateLoading extends Loading {
                 return;
             }
             if (progress >= 0 && progress <= 100) {
-                this.text.string = Manager.getLanguage(["loadingProgress",progress]);
+                this.text.string = Manager.getLanguage("loadingProgress",[progress]);
             }
         }
     }

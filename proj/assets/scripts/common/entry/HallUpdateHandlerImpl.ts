@@ -67,7 +67,7 @@ export class HallUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleton 
     }
     onLoadBundleError(item: UpdateItem, err: Error | null): void {
         Manager.updateLoading.hide();
-        Manager.tips.show(Manager.getLanguage(["loadFailed", item.name]));
+        Manager.tips.show(Manager.getLanguage("loadFailed",[item.name]));
     }
     onLoadBundleComplete(item: UpdateItem): void {
         Manager.updateLoading.hide();

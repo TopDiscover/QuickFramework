@@ -46,12 +46,12 @@ export class StageData extends GameData {
     init() {
         super.init();
         //初始化游戏入口配置
-        let games = Manager.getLanguage("bundles") as TYPEBUNDLE;
+        let games = Manager.getLanguage("bundles") as any;
         let keys = Object.keys(games);
         this._entrys.clear();
         keys.forEach(v => {
             let data = games[v];
-            let entry = new Update.Config(Manager.getLanguage(`bundles.${v}.name`), v);
+            let entry = new Update.Config(`bundles.${v}.name`, v);
             this._entrys.set(v, entry);
             if (!(v == Macro.BUNDLE_HALL || v == Macro.BUNDLE_RESOURCES)) {
                 this._games.push({ name: data.name, sort: data.sort, language: `bundles.${v}.name`, bundle: v });

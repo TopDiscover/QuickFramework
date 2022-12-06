@@ -127,10 +127,7 @@ export default class UILabel extends Label {
         if (this.isUseMultilingual) {
             let bundle = this.bundle;
             let realBundle = Bundles[bundle]
-            let param: (string | number)[] = [];
-            param.push(this.language);
-            param.push(...this.params);
-            let str = Manager.getLanguage(param, realBundle)
+            let str = Manager.getLanguage(this.language as any,this.params, realBundle)
             this.string = str;
         }
         super.forceDoLayout();

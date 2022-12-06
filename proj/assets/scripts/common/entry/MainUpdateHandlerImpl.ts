@@ -53,7 +53,7 @@ export class MainUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleton 
     onLoadBundleError(item: UpdateItem, err: Error | null): void {
         //主包原则上说是不可能加载错误的
         Manager.updateLoading.hide();
-        Manager.tips.show(Manager.getLanguage(["loadFailed", item.name]));
+        Manager.tips.show(Manager.getLanguage("loadFailed",[item.name]));
         Log.dump(err, "onLoadBundleError");
     }
     onLoadBundleComplete(item: UpdateItem): void {

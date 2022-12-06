@@ -185,21 +185,14 @@ export class Framewok {
      * @description 获取语言包 
      * 
      */
-    getLanguage(param: string | (string | number)[], bundle: BUNDLE_TYPE | null = null): any {
+    getLanguage<K extends string & keyof LanguageData["data"]>(key: K ,params : (string|number)[] = [], bundle: BUNDLE_TYPE | null = null): LanguageData["data"][K] {
         if ( !bundle ){
             bundle = Macro.BUNDLE_RESOURCES;
         }
-        let key = "";
-        if (typeof param == "string") {
-            key = `${Macro.USING_LAN_KEY}${bundle}.${param}`;
-            return this.language.get([key]);
-        }
-        if (typeof param[0] == "string" && param instanceof Array) {
-            param[0] = `${Macro.USING_LAN_KEY}${bundle}.${param[0]}`;
-            return this.language.get(param);
-        }
-        Log.e(`传入参数有误`);
-        return "";
+        let configs : (string | number)[] = [];
+        configs.push(`${Macro.USING_LAN_KEY}${bundle}.${key}`);
+        configs.push(...params);
+        return this.language.get(configs);
     }
 
     init(){
