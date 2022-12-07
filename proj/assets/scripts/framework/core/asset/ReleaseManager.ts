@@ -129,6 +129,16 @@ class LazyInfo {
                 let now = Date.timeNow();
                 let pass = now - info.stamp;
                 if ( pass >= Manager.autoReleaseUnuseResourcesTimeout ){
+                    
+                    if ( this.name == Macro.BUNDLE_REMOTE){
+                        if ( info.data instanceof cc.Asset ){
+                            Log.d(`${LOG_TAG}bundle : ${this.name} 释放远程加载资源${info.url}`);
+                            cc.assetManager.releaseAsset(info.data as cc.Asset);
+                        }
+                        this._assets.delete(url);
+                        return;
+                    }
+
                     //释放长时间未使用资源
                     let bundle = Manager.bundleManager.getBundle(info.bundle);
                     if (Array.isArray(info.data)) {
