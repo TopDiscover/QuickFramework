@@ -108,7 +108,7 @@ export class _Manager extends Framewok implements GameEventInterface {
 
         //语言包初始化
         //cc.log("language init");
-        this.language.addSourceDelegate(new CommonLanguage);
+        this.language.addDelegate(new CommonLanguage);
     }
 
     onLoad(node: Node) {

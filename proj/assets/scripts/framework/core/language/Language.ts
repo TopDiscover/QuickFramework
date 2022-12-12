@@ -1,38 +1,39 @@
 import { Macro } from "../../defines/Macros";
 import { isValid, sys } from "cc";
-import { EDITOR } from "cc/env";
+import { LanguageDelegate } from "./LanguageDelegate";
 const LANG_KEY: string = "using_language";
 
-export class Language implements ISingleton{
+export class Language implements ISingleton {
     isResident?: boolean = true;
     static module: string = "【语言包】";
     module: string = null!;
-    
-    private _components : Language.LanguageComponent[] = [];
-    private _data: Language.Data = { language: Macro.UNKNOWN };
-    private delegates: Language.DataSourceDelegate[] = [];
+    /**@description 支持多语言切换组件 */
+    private _components: Language.LanguageComponent[] = [];
+    /**@description 总语言包数据 */
+    private _data: Language.Data = { language: Macro.UNKNOWN};
+    /**@description 语言包数据代理 */
+    private delegates: Map<string, LanguageDelegate> = new Map();
 
-    public addSourceDelegate(delegate: Language.DataSourceDelegate) {
-        if (this.delegates.indexOf(delegate) == -1) {
-            this.delegates.push(delegate);
-            this.updateSource(this.getLanguage());
-        }
+    public addDelegate(delegate: LanguageDelegate | null) {
+        if (!delegate) return;
+        this.delegates.set(delegate.bundle, delegate);
+        this.updateData(this.getLanguage());
     }
 
-    private updateSource(language: string) {
+    private updateData(language: string) {
         this._data.language = language;
         this.delegates.forEach((delegate, index, source) => {
-            this._data = delegate.data(language,this._data);
+            this._data = delegate.merge(language, this._data);
         });
     }
 
-    public removeSourceDelegate(delegate: Language.DataSourceDelegate) {
-        let index = this.delegates.indexOf(delegate);
-        if (index != -1) {
-            this.delegates.splice(index, 1);
-            let data: any = this._data;
-            if (delegate.bundle != Macro.BUNDLE_RESOURCES && data[delegate.bundle]) {
-                data[delegate.bundle] = {};
+    public removeDelegate(delegate: LanguageDelegate | null) {
+        if (!delegate) return;
+        let result = this.delegates.delete(delegate.bundle);
+        if (result) {
+            if (delegate.bundle != Macro.BUNDLE_RESOURCES) {
+                //主包的语言不释放
+                delete this._data[delegate.bundle];
             }
         }
     }
@@ -42,7 +43,7 @@ export class Language implements ISingleton{
      * @param language 语言包类型
      */
     public change(language: string) {
-        if (this.delegates.length <= 0) {
+        if (this.delegates.size <= 0) {
             //请先设置代理
             return;
         }
@@ -51,19 +52,19 @@ export class Language implements ISingleton{
             return;
         }
         this._data.language = language;
-        if ( Macro.ENABLE_CHANGE_LANGUAGE ){
+        if (Macro.ENABLE_CHANGE_LANGUAGE) {
             //先更新所有数据
             this.delegates.forEach((delegate, index, source) => {
-                this._data = delegate.data(language,this._data);
+                this._data = delegate.merge(language, this._data);
             });
             //更新带有语言包类型的所有Label
             this.onChangeLanguage();
         } else {
             this.delegates.forEach((delegate, index, source) => {
-                this._data = delegate.data(this.getLanguage(),this._data);
+                this._data = delegate.merge(this.getLanguage(), this._data);
             });
         }
-        Log.d(this.module,`当前语言:${this._data.language}`);
+        Log.d(this.module, `当前语言:${this._data.language}`);
         Manager.storage.setItem(LANG_KEY, this._data.language);
     }
 
@@ -86,21 +87,20 @@ export class Language implements ISingleton{
                 }
                 keys.shift();//删除掉i18n.的头部
                 args.shift();
-                let data = (<any>this._data)[keys[0]];
-                if (!data) {
-                    Log.e(`语言包不存在 : ${keyString}`);
-                    break;
-                }
-                let i = 1;
-                for (; i < keys.length; i++) {
-                    if (data[keys[i]] == undefined) {
+                let data : any = null;
+                while(keys.length > 0 ){
+                    let key = keys.shift();
+                    if ( key ){
+                        if ( !data ){
+                            data = this._data[key];
+                        }else{
+                            data = data[key];
+                        }
+                    }else{
+                        Log.e(`语言包不存在 : ${keyString}`);
+                        result = "";
                         break;
                     }
-                    data = data[keys[i]];
-                }
-                if (i != keys.length) {
-                    Log.e(`语言包不存在 : ${keyString}`);
-                    break;
                 }
                 if (typeof (data) == "string") {
                     result = String.format(data, args);
@@ -130,8 +130,8 @@ export class Language implements ISingleton{
      * @description 添加支持多语言的组件
      * @param component 
      */
-    public add( component : Language.LanguageComponent ){
-        if( this._components.indexOf(component) == -1 ){
+    public add(component: Language.LanguageComponent) {
+        if (this._components.indexOf(component) == -1) {
             this._components.push(component);
         }
     }
@@ -140,32 +140,21 @@ export class Language implements ISingleton{
      * @description 移除支持多语言的组件
      * @param component 
      */
-    public remove( component : Language.LanguageComponent ){
+    public remove(component: Language.LanguageComponent) {
         let index = this._components.indexOf(component)
-        if ( index >= 0 ){
-            this._components.splice(index,1);
+        if (index >= 0) {
+            this._components.splice(index, 1);
         }
     }
 
     /**
      * @description 语言包发生更新，变更语言包Label
      */
-    public onChangeLanguage( ){
-        this._components.forEach(v=>{
-            if ( isValid(v) ){
+    public onChangeLanguage() {
+        this._components.forEach(v => {
+            if (isValid(v)) {
                 v.forceDoLayout();
             }
         })
-    }
-}
-
-/**
- * @description 编辑器模式下注入Bundle语言包数据
- * @param type Language.DataSourceDelegate
- */
-export function injectLanguageData( type : any ){
-    if ( EDITOR ){
-        let data = new (type as any);
-        Manager.language.addSourceDelegate(data);
     }
 }

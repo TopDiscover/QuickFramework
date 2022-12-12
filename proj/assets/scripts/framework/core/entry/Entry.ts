@@ -1,6 +1,7 @@
 import ResourceLoader from "../asset/ResourceLoader";
 import { js, Node } from "cc";
 import { DEBUG } from "cc/env";
+import { LanguageDelegate } from "../language/LanguageDelegate";
 
 export abstract class Entry {
 
@@ -10,7 +11,7 @@ export abstract class Entry {
     /**@description 当前bundle名,由管理器指定 */
     bundle: string = "";
     /**@description 当前语言包数据源代码，可为null */
-    protected language: Language.DataSourceDelegate | null = null;
+    protected language: LanguageDelegate | null = null;
 
     /**@description 模块资源加载器 */
     protected loader: ResourceLoader = null!;
@@ -21,8 +22,8 @@ export abstract class Entry {
     /**@description 当胆入口是否已经运行中 */
     isRunning: boolean = false;
 
-    protected _gameView : GameView = null!;
-    set gameView( gameView : GameView ){
+    protected _gameView: GameView = null!;
+    set gameView(gameView: GameView) {
         this._gameView = gameView;
     }
     get gameView() {
@@ -45,11 +46,9 @@ export abstract class Entry {
     }
 
     /**@description 管理器通知自己进入GameView */
-    onEnter( userData?:any): void {
+    onEnter(userData?: any): void {
         //语言包初始化
-        if (this.language) {
-            Manager.language.addSourceDelegate(this.language);
-        }
+        Manager.language.addDelegate(this.language);
         //初始化游戏数据
         this.initData();
         //添加网络事件
@@ -63,18 +62,18 @@ export abstract class Entry {
     }
 
     /**@description 这个位置说明自己GameView 进入onLoad完成 */
-    onEnterGameView( gameViw : GameView ): void {
+    onEnterGameView(gameViw: GameView): void {
         this._gameView = gameViw;
         let viewType = Manager.uiManager.getViewType(gameViw);
-        if ( viewType ){
-            if ( viewType.logicType ){
+        if (viewType) {
+            if (viewType.logicType) {
                 viewType.logicType.bundle = gameViw.bundle as string;
-                let logic = Manager.logicManager.get(viewType.logicType,true);
-                if ( logic ){
+                let logic = Manager.logicManager.get(viewType.logicType, true);
+                if (logic) {
                     gameViw.setLogic(logic);
                 }
-            }else{
-                if ( DEBUG ){
+            } else {
+                if (DEBUG) {
                     Log.w(`${js.getClassName(viewType)}未指定logictype`);
                 }
             }
@@ -82,7 +81,7 @@ export abstract class Entry {
     }
 
     onShowGameView(gameView: GameView) {
-        
+
     }
 
     onDestroyGameView(gameView: GameView) {
@@ -93,6 +92,8 @@ export abstract class Entry {
     onUnloadBundle(): void {
         //自己bundle初始卸载前要关闭当前bundle的所有界面
         Manager.uiManager.closeBundleView(this.bundle);
+        //移除入口语言包数据
+        Manager.language.removeDelegate(this.language);
         //移除本模块网络事件
         this.removeNetHandler();
         //卸载资源
@@ -105,7 +106,7 @@ export abstract class Entry {
 
     /**@description 加载模块资源 */
     protected abstract loadResources(completeCb: () => void): void;
-    protected unloadResources(): void{
+    protected unloadResources(): void {
         this.loader.unLoadResources();
     }
 
@@ -122,7 +123,7 @@ export abstract class Entry {
     protected abstract resumeMessageQueue(): void;
 
     /**@description 外部模块可直接指定bund进行去bundle内调用 */
-    public call(eventName:string,args:any[]):void{
+    public call(eventName: string, args: any[]): void {
 
     }
 }
