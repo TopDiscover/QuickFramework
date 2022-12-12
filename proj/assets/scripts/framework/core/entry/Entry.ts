@@ -1,4 +1,5 @@
 import ResourceLoader from "../asset/ResourceLoader";
+import { LanguageDelegate } from "../language/LanguageDelegate";
 
 export abstract class Entry {
 
@@ -8,7 +9,7 @@ export abstract class Entry {
     /**@description 当前bundle名,由管理器指定 */
     bundle: string = "";
     /**@description 当前语言包数据源代码，可为null */
-    protected language: Language.DataSourceDelegate | null = null;
+    protected language: LanguageDelegate | null = null;
 
     /**@description 模块资源加载器 */
     protected loader: ResourceLoader = null!;
@@ -45,9 +46,7 @@ export abstract class Entry {
     /**@description 管理器通知自己进入GameView */
     onEnter( userData?:any): void {
         //语言包初始化
-        if (this.language) {
-            Manager.language.addSourceDelegate(this.language);
-        }
+        Manager.language.addDelegate(this.language);
         //初始化游戏数据
         this.initData();
         //添加网络事件
@@ -91,6 +90,8 @@ export abstract class Entry {
     onUnloadBundle(): void {
         //自己bundle初始卸载前要关闭当前bundle的所有界面
         Manager.uiManager.closeBundleView(this.bundle);
+        //移除入口语言包数据
+        Manager.language.removeDelegate(this.language);
         //移除本模块网络事件
         this.removeNetHandler();
         //卸载资源

@@ -287,14 +287,7 @@ interface IService {
 declare namespace Language {
 	export interface Data {
 		language: string;
-	}
-	/** 
-	 * @description 数据代理
-	 * 如果是公共总合，name使用 td.COMMON_LANGUAGE_NAME
-	 **/
-	export interface DataSourceDelegate {
-		bundle: string;
-		data(language: string, source: any): Data;
+		[key:string] : Object;
 	}
 
 	export interface LanguageComponent {

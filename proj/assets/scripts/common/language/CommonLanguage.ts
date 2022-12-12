@@ -3,23 +3,12 @@
 import { LanguageZH } from "./LanguageZH";
 import { LanguageEN } from "./LanguageEN";
 import { Macro } from "../../framework/defines/Macros";
+import { LanguageDelegate } from "../../framework/core/language/LanguageDelegate";
 
-export class CommonLanguage implements Language.DataSourceDelegate{
-    bundle = Macro.BUNDLE_RESOURCES;
-    data( language : string , source : any): Language.Data {
-
-        let data : any = source;
-        if( data[`${this.bundle}`] && data[`${this.bundle}`].language == language ){
-            return source;
-        }
-        let lan = LanguageZH;
-        if (language == LanguageEN.language) {
-            lan = LanguageEN;
-        }
-        data[`${this.bundle}`] = {};
-        data[`${this.bundle}`] = lan.data;
-        data[`${this.bundle}`].language = lan.language;
-        //默认中文
-        return source;
+export class CommonLanguage extends LanguageDelegate{
+    init(): void {
+        this.add(LanguageEN);
+        this.add(LanguageZH);
     }
+    bundle = Macro.BUNDLE_RESOURCES;
 }
