@@ -697,6 +697,12 @@ export class UIManager implements ISingleton{
     }
 
     debug(config : {showViews ?: boolean,showChildren ?: boolean,showComp ?: boolean}){
+        if ( !config ){
+            config = {};
+            config.showChildren = true;
+            config.showComp = true;
+            config.showViews = true;
+        }
         if ( config.showViews ){
             Log.d(`-----------当前所有视图------------`);
             this._viewDatas.forEach((value, key) => {

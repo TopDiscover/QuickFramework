@@ -156,45 +156,29 @@ declare interface ISingleton {
 	debug?(...args: any[]): void;
 }
 
-/**@description 单列类型限制 */
-declare interface SingletonClass<T> {
+declare interface ModuleClass<T> {
 	new(): T;
 	/**@description 模块名 */
 	module: string;
+}
+
+/**@description 单列类型限制 */
+declare interface SingletonClass<T> extends ModuleClass<T> {
 	instance?: T;
 }
 
-declare interface BundleClass<T> {
+declare interface EntryClass<T> {
 	new(): T;
 	/**@description 当前bundle名 */
 	bundle: string;
 }
 
 declare type Entry = import("../assets/scripts/framework/core/entry/Entry").Entry;
-declare interface EntryClass<T extends Entry> extends BundleClass<T> {
-}
-
-declare interface DataClass<T> extends ISingleton {
-	new(): T;
-}
-
-declare type GameData = import("../assets/scripts/framework/data/GameData").GameData;
-declare interface GameDataClass<T extends GameData> extends DataClass<T> {
-}
-
 declare type Logic = import("../assets/scripts/framework/core/logic/Logic").Logic;
-declare interface LogicClass<T extends Logic> extends BundleClass<T> {
-}
-
 declare type GameView = import("../assets/scripts/framework/core/ui/GameView").default;
 declare interface GameViewClass<T extends UIView> {
 	new(): T;
-	logicType: LogicClass<Logic>;
-}
-
-declare interface ModuleClass<T> {
-	new(): T;
-	module: string;
+	logicType: ModuleClass<Logic>;
 }
 
 declare type Sender = import("../assets/scripts/framework/core/net/service/Sender").Sender;

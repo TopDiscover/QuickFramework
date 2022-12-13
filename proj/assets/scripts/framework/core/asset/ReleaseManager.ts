@@ -276,6 +276,10 @@ export class ReleaseManager implements ISingleton {
         this._bundles.forEach((value, bundle) => {
             let temp = cc.assetManager.getBundle(bundle);
             if (temp) {
+                if ( Manager.bundleManager.isEngineBundle(bundle) ){
+                    Log.d(`${bundle} : 引擎bundle，跳过处理`)
+                    return;
+                }
                 Log.d(`释放无用bundle : ${bundle}`);
                 cc.assetManager.removeBundle(temp);
                 this._bundles.delete(bundle);

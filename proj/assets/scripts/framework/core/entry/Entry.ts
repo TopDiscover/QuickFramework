@@ -63,11 +63,11 @@ export abstract class Entry {
     onEnterGameView( gameViw : GameView ): void {
         this._gameView = gameViw;
         let viewType = Manager.uiManager.getViewType(gameViw);
-        if ( viewType ){
-            if ( viewType.logicType ){
-                viewType.logicType.bundle = gameViw.bundle as string;
-                let logic = Manager.logicManager.get(viewType.logicType,true);
-                if ( logic ){
+        if (viewType) {
+            if (viewType.logicType) {
+                viewType.logicType.module = gameViw.bundle as string;
+                let logic = Manager.logicManager.get(viewType.logicType, true);
+                if (logic) {
                     gameViw.setLogic(logic);
                 }
             }else{

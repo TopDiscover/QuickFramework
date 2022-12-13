@@ -8,7 +8,7 @@ import { UpdateItem } from "../update/UpdateItem";
 export class BundleManager implements ISingleton{
    static module: string = "【Bundle管理器】";
    module: string = null!;
-   protected isEngineBundle(key : any){
+   isEngineBundle(key : any){
       if ( key == cc.AssetManager.BuiltinBundleName.INTERNAL || key == cc.AssetManager.BuiltinBundleName.MAIN ||
          key == cc.AssetManager.BuiltinBundleName.RESOURCES || key == cc.AssetManager.BuiltinBundleName.START_SCENE){
             return true;

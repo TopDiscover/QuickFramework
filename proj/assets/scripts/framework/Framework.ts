@@ -14,12 +14,13 @@ import { EntryManager } from "./core/entry/EntryManager";
 import { DataCenter } from "./data/DataCenter";
 import { LogicManager } from "./core/logic/LogicManager";
 import { LoggerImpl } from "./core/log/Logger";
-import NetHelper from "./core/net/service/NetHelper";
 import { ServiceManager } from "./core/net/service/ServiceManager";
 import { ReleaseManager } from "./core/asset/ReleaseManager";
 import { HttpClient } from "./core/net/http/HttpClient";
 import { Singleton } from "./utils/Singleton";
 import { LayoutManager } from "./core/layout/LayoutManager";
+import { SenderManager } from "./core/net/service/SenderManager";
+import { HandlerManager } from "./core/net/service/HandlerManager";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
@@ -39,9 +40,14 @@ export class Framewok {
         return Singleton.instance.get(ServiceManager) as ServiceManager;
     }
     
-    /**@description 网络辅助类 */
-    get netHelper(){
-        return Singleton.instance.get(NetHelper) as NetHelper;
+    /**@description 网络消息发送管理器 */
+    get senderManager(){
+        return Singleton.instance.get(SenderManager) as SenderManager;
+    }
+
+    /**@description 网络消息处理管理器 */
+    get handlerManager(){
+        return Singleton.instance.get(HandlerManager) as HandlerManager;
     }
 
     /**@description 日志 */

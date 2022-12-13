@@ -12,7 +12,7 @@ const {ccclass, property,menu} = cc._decorator;
 @menu("Quick公共组件/GameView")
 export default class GameView extends UIView {
 
-    static logicType : LogicClass<Logic> | null = null;
+    static logicType : ModuleClass<Logic> | null = null;
     protected _logic : Logic | null = null;
     protected get logic(){
         return this._logic;

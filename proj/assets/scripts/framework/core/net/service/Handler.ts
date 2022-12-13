@@ -4,7 +4,7 @@ import { Macro } from "../../../defines/Macros";
 /**
  * @description 该模块只负责对网络消息的返回处理
  */
-export abstract class Handler extends OnlyEventComponent{
+export abstract class Handler extends OnlyEventComponent implements ISingleton{
 
     /**@description Sender所属模块，如聊天,vip, */
     static module: string = Macro.UNKNOWN;
@@ -60,6 +60,18 @@ export abstract class Handler extends OnlyEventComponent{
         //移除当前Handler绑定事件
         this.unregister();
         super.onDestroy();
+    }
+
+    debug(){
+        Log.d(this.module);
+    }
+
+    destory(){
+        this.onDestroy();
+    }
+
+    init(){
+        this.onLoad();
     }
 }
 
