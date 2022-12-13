@@ -3,10 +3,6 @@
  */
 export default class OnlyEventComponent {
 
-    get node() {
-        return Manager.uiManager.componentRoot;
-    }
-
     private _events: Map<string, Function> = new Map();
 
     /**
@@ -35,11 +31,11 @@ export default class OnlyEventComponent {
 
     }
 
-    onLoad() {
+    onLoad( ...args : any[] ) {
         this.addEvents();
     }
 
-    onDestroy() {
+    onDestroy(...args : any[]) {
         this._events.forEach((func, name) => {
             Manager.dispatcher.remove(name, this);
         });
