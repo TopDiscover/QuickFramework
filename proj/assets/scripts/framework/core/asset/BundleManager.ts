@@ -9,9 +9,11 @@ import { UpdateItem } from "../update/UpdateItem";
 export class BundleManager implements ISingleton{
    static module: string = "【Bundle管理器】";
    module: string = null!;
-   protected isEngineBundle(key: string) {
+   isEngineBundle(key: string) {
       if (key == AssetManager.BuiltinBundleName.MAIN ||
-         key == AssetManager.BuiltinBundleName.RESOURCES || key == AssetManager.BuiltinBundleName.START_SCENE) {
+         key == AssetManager.BuiltinBundleName.RESOURCES || 
+         key == AssetManager.BuiltinBundleName.START_SCENE ||
+         key == AssetManager.BuiltinBundleName.INTERNAL ) {
          return true;
       }
       return false;
