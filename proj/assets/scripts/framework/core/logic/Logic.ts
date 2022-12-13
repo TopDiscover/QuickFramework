@@ -1,3 +1,4 @@
+import { js } from "cc";
 import OnlyEventComponent from "../../componects/OnlyEventComponent";
 import { Macro } from "../../defines/Macros";
 
@@ -28,4 +29,7 @@ export class Logic extends OnlyEventComponent {
         this.onDestroy();
     }
 
+    debug(){
+        Log.d(`${this.module} : ${js.getClassName(this)}`);
+    }
 }

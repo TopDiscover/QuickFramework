@@ -5,7 +5,7 @@ import { Macro } from "../defines/Macros";
  */
 export class SingletonT<TYPE extends ISingleton> {
     protected _datas: Map<string, TYPE> = new Map();
-
+    module: string = null!;
     /**
      * @description 获取数据
      * @param typeOrkey 具体数据的实现类型或key
@@ -88,9 +88,15 @@ export class SingletonT<TYPE extends ISingleton> {
     }
 
     debug() {
+        Log.d(`************************** ${this.module} 开始 **************************`);
         this._datas.forEach((data, key, source) => {
-            data.debug && data.debug();
+            if ( data.debug ){
+                data.debug();
+            }else{
+                Log.d(`${data.module} : 未实现debug接口`);
+            }
         });
+        Log.d(`************************** ${this.module} 结束 **************************`);
     }
 
     /**

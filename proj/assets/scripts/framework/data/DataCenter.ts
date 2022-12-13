@@ -4,9 +4,5 @@ import { GameData } from "./GameData";
 export class DataCenter extends SingletonT<GameData> implements ISingleton {
     static module: string = "【数据中心】";
     module: string = null!;
-    debug(){
-        Log.d(`-------数据中心-------`)
-        super.debug();
-    }
 }
 

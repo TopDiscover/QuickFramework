@@ -5,7 +5,7 @@ import { Macro } from "../../../defines/Macros";
 /**
  * @description 该对象只用于对网络数据的发送
  */
-export abstract class Sender extends OnlyEventComponent{
+export abstract class Sender extends OnlyEventComponent implements ISingleton{
 
     /**@description Sender所属模块，如聊天,vip, */
     static module: string = Macro.UNKNOWN;
@@ -22,6 +22,18 @@ export abstract class Sender extends OnlyEventComponent{
         if (DEBUG) {
             Log.e(`必须绑定Service`);
         }
+    }
+
+    debug(){
+        Log.d(this.module);
+    }
+
+    destory(){
+        this.onDestroy();
+    }
+
+    init(){
+        this.onLoad();
     }
 }
 
