@@ -67,7 +67,7 @@ export abstract class Entry {
         let viewType = Manager.uiManager.getViewType(gameViw);
         if (viewType) {
             if (viewType.logicType) {
-                viewType.logicType.bundle = gameViw.bundle as string;
+                viewType.logicType.module = gameViw.bundle as string;
                 let logic = Manager.logicManager.get(viewType.logicType, true);
                 if (logic) {
                     gameViw.setLogic(logic);

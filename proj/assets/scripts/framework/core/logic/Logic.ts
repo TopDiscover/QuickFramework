@@ -2,10 +2,14 @@ import OnlyEventComponent from "../../componects/OnlyEventComponent";
 import { Macro } from "../../defines/Macros";
 
 export class Logic extends OnlyEventComponent {
-    /**@description logic bundle，管理器设置 */
-    static bundle = Macro.UNKNOWN;
-    /**@description logic bundle，管理器设置 */
-    bundle: string = Macro.UNKNOWN;
+    /**@description 所属模块,管理器设置，GameView中的bundle的值 */
+    static module = Macro.UNKNOWN;
+    /**@description 所属模块,管理器设置，GameView中的bundle的值 */
+    module = Macro.UNKNOWN;
+    /**@description 当前逻辑管理器bundle */
+    get bundle() {
+        return this.module;
+    }
 
     protected gameView: GameView = null!;
 
@@ -19,4 +23,9 @@ export class Logic extends OnlyEventComponent {
         super.onLoad(gameView);
     }
     update(dt: number): void { }
+
+    destory(...args: any[]): void {
+        this.onDestroy();
+    }
+
 }
