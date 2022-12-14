@@ -182,13 +182,7 @@ declare interface GameViewClass<T extends UIView> {
 }
 
 declare type Sender = import("../assets/scripts/framework/core/net/service/Sender").Sender;
-declare interface SenderClass<T extends Sender> extends ModuleClass<T> {
-}
-
 declare type Handler = import("../assets/scripts/framework/core/net/service/Handler").Handler;
-declare interface HandlerClass<T extends Handler> extends ModuleClass<T> {
-}
-
 declare type ReconnectHandler = import("../assets/scripts/common/net/ReconnectHandler").ReconnectHandler;
 
 declare type Service = import("../assets/scripts/framework/core/net/service/Service").Service;
