@@ -142,7 +142,10 @@ export class Utils implements ISingleton {
         if (data < 1000) {
             return `${prefix}${data}`;
         }
-        let result = String(data);
+        let numStr = String(data);
+        let results = numStr.split(".");
+        //只取出整数部分
+        let result = results[0];
         let len = result.length;
         let unit = (len - 1) / 3;
         unit = Math.floor(unit);
@@ -167,6 +170,11 @@ export class Utils implements ISingleton {
                 decimalPoint = "." + decimalPoint.substring(0, point);
             } else {
                 decimalPoint = "." + decimalPoint;
+                if ( results.length > 1 ){
+                    //还有小数部分
+                    decimalPoint += results[1];
+                    decimalPoint = decimalPoint.substring(0,point+1);
+                }
             }
         }
         return prefix + digit + decimalPoint + unitParten;

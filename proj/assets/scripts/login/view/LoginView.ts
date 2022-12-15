@@ -23,7 +23,7 @@ export default class LoginView extends GameView {
             this.enterBundle(Macro.BUNDLE_HALL);
         });
 
-        let test = cc.find("test",this.node).getComponent(cc.Label)
-        test.string = Manager.utils.convertThousandths(-100000022222)
+        // let test = cc.find("test",this.node).getComponent(cc.Label)
+        // test.string = Manager.utils.convertValue(-1123456222.8844,4)
     }
 }
