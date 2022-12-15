@@ -22,5 +22,8 @@ export default class LoginView extends GameView {
         this._login.on(cc.Node.EventType.TOUCH_END, () => {
             this.enterBundle(Macro.BUNDLE_HALL);
         });
+
+        let test = cc.find("test",this.node).getComponent(cc.Label)
+        test.string = Manager.utils.convertThousandths(-100000022222)
     }
 }

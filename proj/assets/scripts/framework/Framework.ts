@@ -21,6 +21,7 @@ import { Singleton } from "./utils/Singleton";
 import { LayoutManager } from "./core/layout/LayoutManager";
 import { SenderManager } from "./core/net/service/SenderManager";
 import { HandlerManager } from "./core/net/service/HandlerManager";
+import { Utils } from "./utils/Utils";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
@@ -68,6 +69,10 @@ export class Framewok {
     /**@description 入口管理器 */
     get entryManager(){
         return Singleton.instance.get(EntryManager) as EntryManager;
+    }
+
+    get utils(){
+        return Singleton.instance.get(Utils) as Utils;
     }
 
     /**@description protobuf类型管理 */
