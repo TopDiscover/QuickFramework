@@ -158,13 +158,13 @@ export class Utils implements ISingleton {
             } break;
         }
         let pos = len - unit * 3;
-        let digit = result.substr(0, pos);
+        let digit = result.substring(0, pos);
         let decimalPoint = "";
         if (point > 0) {
-            decimalPoint = result.substr(pos);
+            decimalPoint = result.substring(pos);
             if (decimalPoint.length > point) {
                 //当前小数点部分大于保留的精度
-                decimalPoint = "." + decimalPoint.substr(0, point);
+                decimalPoint = "." + decimalPoint.substring(0, point);
             } else {
                 decimalPoint = "." + decimalPoint;
             }
