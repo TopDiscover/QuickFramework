@@ -139,11 +139,26 @@ export class Utils implements ISingleton {
             data *= -1;
             prefix = "-";
         }
-        if (data < 1000) {
-            return `${prefix}${data}`;
+        if ( point < 0 ){
+            point = 0;
         }
         let numStr = String(data);
         let results = numStr.split(".");
+        if (data < 1000) {
+            if ( results.length > 1 ){
+                //带小数点
+                let integerPart = results[0];
+                let decimalPart = results[1];
+                decimalPart = decimalPart.substring(0,point);
+                if ( point <= 0 ){
+                    return `${prefix}${integerPart}`;
+                }
+                return `${prefix}${integerPart}.${decimalPart}`;
+            }else{
+                //无小数点的整数
+                return `${prefix}${data}`;
+            }
+        }
         //只取出整数部分
         let result = results[0];
         let len = result.length;
