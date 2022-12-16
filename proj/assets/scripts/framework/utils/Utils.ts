@@ -133,28 +133,28 @@ export class Utils implements ISingleton {
      * @param data 传入数值
      * @param point 精确小数点位数 默认为2位
      */
-    convertValue(data: number, point: number = 2) {
+    formatValue(data: number, point: number = 2) {
         let prefix = "";
         if (data < 0) {
             data *= -1;
             prefix = "-";
         }
-        if ( point < 0 ){
+        if (point < 0) {
             point = 0;
         }
         let numStr = String(data);
         let results = numStr.split(".");
         if (data < 1000) {
-            if ( results.length > 1 ){
+            if (results.length > 1) {
                 //带小数点
                 let integerPart = results[0];
                 let decimalPart = results[1];
-                decimalPart = decimalPart.substring(0,point);
-                if ( point <= 0 ){
+                decimalPart = decimalPart.substring(0, point);
+                if (point <= 0) {
                     return `${prefix}${integerPart}`;
                 }
                 return `${prefix}${integerPart}.${decimalPart}`;
-            }else{
+            } else {
                 //无小数点的整数
                 return `${prefix}${data}`;
             }
@@ -185,13 +185,71 @@ export class Utils implements ISingleton {
                 decimalPoint = "." + decimalPoint.substring(0, point);
             } else {
                 decimalPoint = "." + decimalPoint;
-                if ( results.length > 1 ){
+                if (results.length > 1) {
                     //还有小数部分
                     decimalPoint += results[1];
-                    decimalPoint = decimalPoint.substring(0,point+1);
+                    decimalPoint = decimalPoint.substring(0, point + 1);
                 }
             }
         }
         return prefix + digit + decimalPoint + unitParten;
+    }
+
+    /**
+     * @description 将K,M,B,T显示的字符串转换成数值
+     * @param formatValue 传入格式化的字符串 1.2K 
+     * @param point 获取精确小数点位数
+     * @example 
+     * toNumber(1.234567K,2) = 1234.57
+     */
+    toNumber(formatValue: string, point: number = 2) {
+        let reg = /(-*\d*)(\.*)(\d+)([KMBT]*)/g;
+        let value = formatValue.match(reg);
+        if (value && value.length > 0) {
+            let K = 1000;
+            let scales: { [key: string]: number } = {
+                K: K,
+                M: K * K,
+                B: K * K * K,
+                T: K * K * K * K
+            }
+            //摘取字符串中的数值
+            let valueStr = value[0];
+            valueStr = valueStr.replace(reg, function () {
+                //整数部分
+                let integerPart: string = arguments[1]
+                if (integerPart.length <= 0) {
+                    integerPart = "0";
+                }
+                //小数点
+                let decimalPoint: string = arguments[2];
+                //小数点部分
+                let decimalPart: string = arguments[3];
+                if (decimalPart.length <= 0) {
+                    decimalPart = "0";
+                }
+                //单位
+                let unit: string = arguments[4];
+                let integerValue = parseInt(integerPart);
+                let decimalValue = parseFloat(decimalPart);
+                //有整数部分，数值放大处理
+                let scale = scales[unit];
+                if (scale) {
+                    //放在整数部分
+                    integerValue *= scale;
+                    decimalValue *= scale;
+                    let space = String(scale).substring(1);//取出缩放中的000
+                    let temp = String(decimalValue);
+                    decimalPart = temp.substring(space.length);
+                    integerPart += temp.substring(0, space.length);
+                }
+                // console.log(`整数部分:${integerPart}`);
+                // console.log(`小数点:${decimalPoint}`);
+                // console.log(`小数部分:${decimalPart}`);
+                return `${integerPart}${decimalPoint}${decimalPart}`;
+            })
+            return parseFloat(parseFloat(valueStr).toFixed(point));
+        }
+        return 0;
     }
 }
