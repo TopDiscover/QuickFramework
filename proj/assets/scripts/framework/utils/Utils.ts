@@ -203,9 +203,10 @@ export class Utils implements ISingleton {
      * toNumber(1.234567K,2) = 1234.57
      */
     toNumber(formatValue: string, point: number = 2) {
-        let reg = /(-*\d*)(\.*)(\d+)([KMBT]*)/g;
-        let value = formatValue.match(reg);
-        if (value && value.length > 0) {
+        let reg = /-?\d+e?[+-]?\d+[KMBT]?|-?\d*\.\d*e?[+-]?\d*[KMBT]?|-?\d+[KMBT]?/;
+        let matchs = formatValue.match(reg);
+        if (matchs && matchs.length > 0) {
+            //摘取字符串中的数值
             let K = 1000;
             let scales: { [key: string]: number } = {
                 K: K,
@@ -213,43 +214,26 @@ export class Utils implements ISingleton {
                 B: K * K * K,
                 T: K * K * K * K
             }
-            //摘取字符串中的数值
-            let valueStr = value[0];
-            valueStr = valueStr.replace(reg, function () {
-                //整数部分
-                let integerPart: string = arguments[1]
-                if (integerPart.length <= 0) {
-                    integerPart = "0";
-                }
-                //小数点
-                let decimalPoint: string = arguments[2];
-                //小数点部分
-                let decimalPart: string = arguments[3];
-                if (decimalPart.length <= 0) {
-                    decimalPart = "0";
-                }
-                //单位
-                let unit: string = arguments[4];
-                let integerValue = parseInt(integerPart);
-                let decimalValue = parseFloat(decimalPart);
-                //有整数部分，数值放大处理
-                let scale = scales[unit];
-                if (scale) {
-                    //放在整数部分
-                    integerValue *= scale;
-                    decimalValue *= scale;
-                    let space = String(scale).substring(1);//取出缩放中的000
-                    let temp = String(decimalValue);
-                    decimalPart = temp.substring(space.length);
-                    integerPart += temp.substring(0, space.length);
-                }
-                // console.log(`整数部分:${integerPart}`);
-                // console.log(`小数点:${decimalPoint}`);
-                // console.log(`小数部分:${decimalPart}`);
-                return `${integerPart}${decimalPoint}${decimalPart}`;
-            })
-            return parseFloat(parseFloat(valueStr).toFixed(point));
+            let valueStr = ""
+            for (let index = 0; index < matchs.length; index++) {
+                valueStr += matchs[index];
+            }
+            let unitMatch = valueStr.match(/[KMBT]/);
+            let unit: string = "";
+            if (unitMatch && unitMatch.length > 0) {
+                unit = unitMatch[0];
+            }
+    
+            let numberPart = valueStr.substring(0, valueStr.length - unit.length);
+            let numberValue = parseFloat(numberPart);
+            let scale = scales[unit];
+            if (scale) {
+                //放在整数部分
+                numberValue *= scale;
+            }
+            return parseFloat(numberValue.toFixed(point));
         }
+        Log.e(`无法匹配${formatValue}`)
         return 0;
     }
 }
