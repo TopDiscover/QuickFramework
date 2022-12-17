@@ -224,4 +224,16 @@ export class Utils implements ISingleton {
         }
         return false;
     }
+
+    /**
+     * @description 判断是否是腾讯QQ号(腾讯QQ号从10000开始)
+     * @param qq 
+     */
+    isTencentQQ(qq: string) {
+        let test = /^[1-9][0-9]{4,}$/;
+        if (test.test(qq)) {
+            return true;
+        }
+        return false;
+    }
 }
