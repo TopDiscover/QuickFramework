@@ -129,8 +129,8 @@ export class Utils implements ISingleton {
     }
 
     /**
-     * @description 格式化成K,M,B,T计数单位显示
-     * @param data 传入数值
+     * @description 格式化成K,M,B,T计数单位
+     * @param data 传入数值，支持科学计数法
      * @param point 精确小数点位数 默认为2位
      */
     formatValue(data: number, point: number = 2) {
@@ -169,10 +169,12 @@ export class Utils implements ISingleton {
 
     /**
      * @description 将K,M,B,T显示的字符串转换成数值
-     * @param formatValue 传入格式化的字符串 1.2K 
+     * @param formatValue 传入格式化的字符串 1.2K 支持科学计数法
      * @param point 获取精确小数点位数
      * @example 
-     * toNumber(1.234567K,2) = 1234.57
+     * toNumber("1.234567K",2) = 1234.57
+     * toNumber("1.e3K",2) = 1000000
+     * toNumber("qqq1.e3Kee",2) = 1000000
      */
     toNumber(formatValue: string, point: number = 2) {
         let reg = /-?\d+e?[+-]?\d+[KMBT]?|-?\d*\.\d*e?[+-]?\d*[KMBT]?|-?\d+[KMBT]?/;
@@ -195,7 +197,7 @@ export class Utils implements ISingleton {
             if (unitMatch && unitMatch.length > 0) {
                 unit = unitMatch[0];
             }
-    
+
             let numberPart = valueStr.substring(0, valueStr.length - unit.length);
             let numberValue = parseFloat(numberPart);
             let scale = scales[unit];
@@ -207,5 +209,19 @@ export class Utils implements ISingleton {
         }
         Log.e(`无法匹配${formatValue}`)
         return 0;
+    }
+
+    /**
+     * @description 判断是否是一个有效的中国公民身份证号码
+     * @param id 
+     * @returns 
+     */
+    isIDNumber(id: string) {
+        //18 位身份证号
+        let test = /^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/g;
+        if (test.test(id)) {
+            return true;
+        }
+        return false;
     }
 }
