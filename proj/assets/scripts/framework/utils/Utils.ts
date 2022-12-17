@@ -134,65 +134,37 @@ export class Utils implements ISingleton {
      * @param point 精确小数点位数 默认为2位
      */
     formatValue(data: number, point: number = 2) {
-        let prefix = "";
+        let K = 1000;
+        let scales: { [key: string]: number } = {
+            K: K,
+            M: K * K,
+            B: K * K * K,
+            T: K * K * K * K
+        }
+        let units = ["K", "M", "B", "T"];
+        let unit = "";
+        let numberString = "";
+        let tempValue = 0;
+        let flag = 1;
         if (data < 0) {
-            data *= -1;
-            prefix = "-";
+            flag = -1;
         }
-        if (point < 0) {
-            point = 0;
-        }
-        let numStr = String(data);
-        let results = numStr.split(".");
-        if (data < 1000) {
-            if (results.length > 1) {
-                //带小数点
-                let integerPart = results[0];
-                let decimalPart = results[1];
-                decimalPart = decimalPart.substring(0, point);
-                if (point <= 0) {
-                    return `${prefix}${integerPart}`;
-                }
-                return `${prefix}${integerPart}.${decimalPart}`;
-            } else {
-                //无小数点的整数
-                return `${prefix}${data}`;
-            }
-        }
-        //只取出整数部分
-        let result = results[0];
-        let len = result.length;
-        let unit = (len - 1) / 3;
-        unit = Math.floor(unit);
-        let unitParten = "";
-        switch (unit) {
-            case 1: unitParten = "K"; break;
-            case 2: unitParten = "M"; break;
-            case 3: unitParten = "B"; break;
-            case 4: unitParten = "T"; break;
-            default: {
-                unitParten = "T";
-                unit = 4;
-            } break;
-        }
-        let pos = len - unit * 3;
-        let digit = result.substring(0, pos);
-        let decimalPoint = "";
-        if (point > 0) {
-            decimalPoint = result.substring(pos);
-            if (decimalPoint.length > point) {
-                //当前小数点部分大于保留的精度
-                decimalPoint = "." + decimalPoint.substring(0, point);
-            } else {
-                decimalPoint = "." + decimalPoint;
-                if (results.length > 1) {
-                    //还有小数部分
-                    decimalPoint += results[1];
-                    decimalPoint = decimalPoint.substring(0, point + 1);
+        data = Math.abs(data);
+        if (data < K) {
+            numberString = data.toFixed(point);
+        } else {
+            for (let i = units.length - 1; i >= 0; i--) {
+                let scale = scales[units[i]];
+                tempValue = data / scale;
+                if (tempValue >= 1) {
+                    numberString = tempValue.toFixed(point);
+                    unit = units[i];
+                    break;
                 }
             }
         }
-        return prefix + digit + decimalPoint + unitParten;
+        tempValue = parseFloat(numberString);
+        return `${tempValue * flag}${unit}`;
     }
 
     /**
