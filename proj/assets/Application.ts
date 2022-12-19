@@ -11,7 +11,7 @@ import { Bundles } from "./scripts/common/data/Bundles";
 import { StageData } from "./scripts/common/data/StageData";
 import { CmmEntry } from "./scripts/common/entry/CmmEntry";
 import { CommonLanguage } from "./scripts/common/language/CommonLanguage";
-import { Utils } from "./scripts/common/utils/Utils";
+import { CmmUtils } from "./scripts/common/utils/CmmUtils";
 import { LogLevel } from "./scripts/framework/defines/Enums";
 import { Framewok } from "./scripts/framework/Framework";
 import { Singleton } from "./scripts/framework/utils/Singleton";
@@ -38,7 +38,7 @@ export class _Manager extends Framewok implements GameEventInterface {
     }
 
     get utils(){
-        return Singleton.instance.get(Utils) as Utils;
+        return Singleton.instance.get(CmmUtils) as CmmUtils;
     }
 
     /**@description 进入后台的时间 */
