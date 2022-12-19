@@ -38,13 +38,9 @@ Date.prototype.format = function (format) {
 
 /**@description 返回当前时间的秒数 */
 Date.timeNow = function () {
-    return Math.floor(Date.timeNowMillisecons() / 1000);
+    return Math.floor(Date.now() / 1000);
 }
-/**@description 返回当前时间的毫秒数 */
-Date.timeNowMillisecons = function () {
-    let now = new Date();
-    return now.getTime();
-}
+
 /**@description 返回当前时间格式化后的字符串 */
 Date.format = function(format,date){
     if ( date ){
