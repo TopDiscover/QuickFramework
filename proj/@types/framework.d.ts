@@ -54,12 +54,6 @@ declare interface DateConstructor {
 	 *  */
 	timeNow(): number;
 	/**
-	 * @description 返回当前时间的毫秒数 
-	 * @example 
-	 * Date.timeNowMillisecons()
-	 * */
-	timeNowMillisecons(): number;
-	/**
 	 * @description 返回格式化后的时间
 	 * @param format 
 	 * @param date 如果不传入，则为当前时间
