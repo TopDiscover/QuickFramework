@@ -114,7 +114,7 @@ export class Utils implements ISingleton {
      * @example 
      * 1000000000 -->  1,000,000,000
      * */
-    convertThousandths(data: number) {
+    toThousandths(data: number) {
         let prefix: string = "";
         if (data < 0) {
             data *= -1;
@@ -133,7 +133,7 @@ export class Utils implements ISingleton {
      * @param data 传入数值，支持科学计数法
      * @param point 精确小数点位数 默认为2位
      */
-    formatValue(data: number, point: number = 2) {
+    toFormat(data: number, point: number = 2) {
         let K = 1000;
         let scales: { [key: string]: number } = {
             K: K,
