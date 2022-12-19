@@ -106,19 +106,7 @@ export default class AdapterSprite extends Adapter {
         this.updateSprite(this.scaleType, this.alignType);
     }
 
-    onEnable() {
-        let onResize = this._onResize.bind(this);
-        window.addEventListener("resize", onResize);
-        window.addEventListener("orientationchange", onResize);
-    }
-
-    onDisable() {
-        let onResize = this._onResize.bind(this);
-        window.removeEventListener("resize", onResize);
-        window.removeEventListener("orientationchange", onResize);
-    }
-
-    private _onResize() {
+    protected onChangeSize() {
         this.updateSprite(this.scaleType, this.alignType);
     }
 

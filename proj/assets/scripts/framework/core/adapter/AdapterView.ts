@@ -25,23 +25,7 @@ const { ccclass, property ,executeInEditMode,menu } = _decorator;
 @executeInEditMode(true)
 @menu("Quick适配组件/AdapterView")
 export default class AdapterView extends Adapter {
-    onLoad() {
-        this._onResize();
-    }
-
-    onEnable() {
-        let onResize = this._onResize.bind(this);
-        window.addEventListener("resize", onResize);
-        window.addEventListener("orientationchange", onResize);
-    }
-
-    onDisable() {
-        let onResize = this._onResize.bind(this);
-        window.removeEventListener("resize", onResize);
-        window.removeEventListener("orientationchange", onResize);
-    }
-
-    private _onResize() {
+    protected onChangeSize() {
         AdapterView.safeArea = null as any;
         if (this.node) {
 

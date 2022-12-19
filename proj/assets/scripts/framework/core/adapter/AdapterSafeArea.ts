@@ -41,23 +41,7 @@ export default class AdapterSafeArea extends Adapter {
     })
     withInsertRight: boolean = false;
 
-    onLoad() {
-        this._onResize();
-    }
-
-    onEnable() {
-        let onResize = this._onResize.bind(this);
-        window.addEventListener("resize", onResize);
-        window.addEventListener("orientationchange", onResize);
-    }
-
-    onDisable() {
-        let onResize = this._onResize.bind(this);
-        window.removeEventListener("resize", onResize);
-        window.removeEventListener("orientationchange", onResize);
-    }
-
-    private _onResize() {
+    protected onChangeSize() {
         let widget = this.getComponent(Widget);
         if (!widget || !widget.enabled) {
             return;

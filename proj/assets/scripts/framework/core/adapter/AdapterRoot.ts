@@ -37,26 +37,10 @@ const { ccclass, property ,executeInEditMode,menu} = _decorator;
 @menu("Quick适配组件/AdapterRoot")
 export default class AdapterRoot extends Adapter {
 
-    onLoad() {
-        this._onResize();
-    }
-
-    onEnable() {
-        let onResize = this._onResize.bind(this);
-        window.addEventListener("resize", onResize);
-        window.addEventListener("orientationchange", onResize);
-    }
-
-    onDisable() {
-        let onResize = this._onResize.bind(this);
-        window.removeEventListener("resize", onResize);
-        window.removeEventListener("orientationchange", onResize);
-    }
-
     /**
      * 窗口尺寸发生改变时，更新适配节点的宽高
      */
-    private _onResize() {
+    protected onChangeSize() {
 
         // 1. 先找到 SHOW_ALL 模式适配之后，本节点的实际宽高以及初始缩放值
         let canvasSize = screen.windowSize

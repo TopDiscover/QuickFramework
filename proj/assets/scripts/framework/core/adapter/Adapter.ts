@@ -103,4 +103,50 @@ export class Adapter extends Component {
         }
         return trans.height;
     }
+
+    protected _func : any = null;
+
+    onLoad(){
+        super.onLoad && super.onLoad();
+        this.onChangeSize();
+    }
+
+    onEnable(){
+        super.onEnable && super.onEnable();
+        this.addEvents();
+    }
+
+    onDisable(){
+        this.removeEvents();
+        super.onDisable && super.onDisable();
+    }
+
+    onDestroy(){
+        this.removeEvents();
+        super.onDestroy && super.onDestroy();
+    }
+
+    protected addEvents(){
+        if ( this._func ){
+            return;
+        }
+        this._func = this.onChangeSize.bind(this);
+        window.addEventListener("resize",this._func);
+        window.addEventListener("orientationchange",this._func);
+    }
+
+    protected removeEvents(){
+        if ( this._func ){
+            window.removeEventListener("resize",this._func);
+            window.removeEventListener("orientationchange",this._func);
+        }
+        this._func = null;
+    }
+
+    /**
+     * @description 视图发生大小变化
+     */
+    protected onChangeSize(){
+        
+    }
 }
