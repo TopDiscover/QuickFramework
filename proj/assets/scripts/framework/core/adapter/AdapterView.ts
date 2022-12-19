@@ -1,11 +1,11 @@
 /**
  */
 
-import { sys, v3, view, _decorator,screen, Scene } from "cc";
-import { DEBUG, EDITOR, JSB } from "cc/env";
+import { sys, v3, view, _decorator, screen } from "cc";
+import { EDITOR, JSB } from "cc/env";
 import { Adapter, SafeArea } from "./Adapter";
 
-const { ccclass, property ,executeInEditMode,menu } = _decorator;
+const { ccclass, property, executeInEditMode, menu } = _decorator;
 /**
  * 安全区域适配组件
  *
@@ -60,7 +60,7 @@ export default class AdapterView extends Adapter {
             // 初始屏幕宽高像素
             let screenWidth = screen.windowSize.width;
             let screenHeight = screen.windowSize.height;
-            if ( EDITOR ){
+            if (EDITOR) {
                 screenWidth = view.getDesignResolutionSize().width;
                 screenHeight = view.getDesignResolutionSize().height;
             }
