@@ -36,26 +36,10 @@ const { ccclass, property ,executeInEditMode,menu} = cc._decorator;
 @menu("Quick适配组件/AdapterRoot")
 export default class AdapterRoot extends Adapter {
 
-    onLoad() {
-        this._onResize();
-    }
-
-    onEnable() {
-        let onResize = this._onResize.bind(this);
-        window.addEventListener("resize", onResize);
-        window.addEventListener("orientationchange", onResize);
-    }
-
-    onDisable() {
-        let onResize = this._onResize.bind(this);
-        window.removeEventListener("resize", onResize);
-        window.removeEventListener("orientationchange", onResize);
-    }
-
     /**
      * 窗口尺寸发生改变时，更新适配节点的宽高
      */
-    private _onResize() {
+    protected onChangeSize() {
         // if (CC_DEBUG) {
         //     Log.d(`-----------------------------适配信息-----------------------------------------------`);
         //     Log.d(`屏幕分辨率: ${Adapter.canvasSize.width} x ${Adapter.canvasSize.height}`);

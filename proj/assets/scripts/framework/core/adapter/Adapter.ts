@@ -1,5 +1,4 @@
 
-const { ccclass, property } = cc._decorator;
 /**
  * @description 该适配方案出处 https://forum.cocos.org/t/cocos-creator/74001
  */
@@ -7,7 +6,7 @@ const { ccclass, property } = cc._decorator;
 /**
  * 屏幕分辨率下 的像素值
  */
- export interface SafeArea {
+export interface SafeArea {
     /**
      * 屏幕分辨率下：画布（屏幕)宽度
      */
@@ -69,37 +68,83 @@ const { ccclass, property } = cc._decorator;
     designPxToScreenPxRatio: number;
 }
 
-const EDITOR_SIZI = cc.size(1280,720);
+const EDITOR_SIZI = cc.size(1280, 720);
 export class Adapter extends cc.Component {
 
     protected set width(value: number) {
         this.node.width = value;
     }
-    protected get width(){
+    protected get width() {
         return this.node.width;
     }
 
-    protected set height(value:number){
+    protected set height(value: number) {
         this.node.height = value;
     }
 
-    protected get height(){
+    protected get height() {
         return this.node.height;
     }
 
-    protected static get canvasSize(){
-        if ( CC_EDITOR ){
+    protected static get canvasSize() {
+        if (CC_EDITOR) {
             return EDITOR_SIZI;
-        }else{
+        } else {
             return cc.view.getCanvasSize();
         }
     }
 
-    protected static get visibleSize(){
-        if ( CC_EDITOR ){
+    protected static get visibleSize() {
+        if (CC_EDITOR) {
             return EDITOR_SIZI;
-        }else{
+        } else {
             return cc.view.getVisibleSize();
         }
+    }
+
+    protected _func: any = null;
+
+    onLoad() {
+        super.onLoad && super.onLoad();
+        this.onChangeSize();
+    }
+
+    onEnable() {
+        super.onEnable && super.onEnable();
+        this.addEvents();
+    }
+
+    onDisable() {
+        this.removeEvents();
+        super.onDisable && super.onDisable();
+    }
+
+    onDestroy() {
+        this.removeEvents();
+        super.onDestroy && super.onDestroy();
+    }
+
+    protected addEvents() {
+        if (this._func) {
+            return;
+        }
+        this._func = this.onChangeSize.bind(this);
+        window.addEventListener("resize", this._func);
+        window.addEventListener("orientationchange", this._func);
+    }
+
+    protected removeEvents() {
+        if (this._func) {
+            window.removeEventListener("resize", this._func);
+            window.removeEventListener("orientationchange", this._func);
+        }
+        this._func = null;
+    }
+
+    /**
+     * @description 视图发生大小变化
+     */
+    protected onChangeSize() {
+
     }
 }
