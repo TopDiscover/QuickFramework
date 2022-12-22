@@ -1,4 +1,4 @@
-import { _decorator, Component, Camera, RenderTexture, view, UITransform, ImageAsset, Texture2D, SpriteFrame, Sprite, sys, Size, native, assetManager, instantiate, Vec3 } from 'cc';
+import { _decorator, Component, Camera, RenderTexture, view, UITransform, ImageAsset, Texture2D, SpriteFrame, Sprite, sys, Size, native, assetManager, instantiate, Vec3, size } from 'cc';
 const { ccclass, property } = _decorator;
 
 /**
@@ -51,13 +51,9 @@ export class Snapshot extends Component {
         let width = trans.width;
         let height = trans.height;
         let worldPos = this.node.getWorldPosition();
-        let x = worldPos.x + ( 0 - trans.anchorX ) * trans.width;
-        let y = worldPos.y + ( 0 - trans.anchorY ) * trans.height;
+        let x = worldPos.x + (0 - trans.anchorX) * trans.width;
+        let y = worldPos.y + (0 - trans.anchorY) * trans.height;
         this._buffer = this._texture.readPixels(Math.round(x), Math.round(y), width, height) as Uint8Array;
-        if (this.onCaptureComplete) {
-            let sp = this.genSpriteFrame(width, height);
-            this.onCaptureComplete(sp,new Size(width,height));
-        }
         this.saveImage();
         this.destroy();
     }
@@ -113,6 +109,10 @@ export class Snapshot extends Component {
             //@ts-ignore
             Manager.canvasHelper.saveAsPNG(this._canvas, width, height);
             Manager.tips.show(`保存图片成功`);
+            if (this.onCaptureComplete) {
+                let sp = this.genSpriteFrame(width, height);
+                this.onCaptureComplete(sp, new Size(width, height));
+            }
         } else if (sys.isNative) {
             // console.log("原生平台暂不支持图片下载");
             // return;
@@ -126,41 +126,35 @@ export class Snapshot extends Component {
                 //@ts-ignore
                 let success = native.saveImageData(this._buffer, width, height, filePath);
                 if (success) {
-                    // 用于测试图片是否正确保存到本地设备路径下
-                    assetManager.loadRemote<ImageAsset>(filePath, (err, imageAsset) => {
-                        if (err) {
-                            Log.d("show image error")
-                        } else {
-                            var newNode = instantiate(this.node);
-                            newNode.setPosition(new Vec3(-newNode.position.x, newNode.position.y, newNode.position.z));
-                            if (this.node.parent) {
-                                this.node.parent.addChild(newNode);
+                    if (this.onCaptureComplete) {
+                        // 用于测试图片是否正确保存到本地设备路径下
+                        assetManager.loadRemote<ImageAsset>(filePath, (err, imageAsset) => {
+                            if (err) {
+                                Log.d("show image error")
+                            } else {
+                                const spriteFrame = new SpriteFrame();
+                                const texture = new Texture2D();
+                                texture.image = imageAsset;
+                                spriteFrame.texture = texture
+                                spriteFrame.packable = false;
+                                spriteFrame.flipUVY = true;
+                                if (sys.isNative && (sys.os === sys.OS.IOS || sys.os === sys.OS.OSX)) {
+                                    spriteFrame.flipUVY = false;
+                                }
+                                this.onCaptureComplete && this.onCaptureComplete(spriteFrame, new Size(width, height));
+                                Manager.tips.show(`成功保存在设备目录并加载成功: ${filePath}`);
                             }
-
-                            const spriteFrame = new SpriteFrame();
-                            const texture = new Texture2D();
-                            texture.image = imageAsset;
-                            spriteFrame.texture = texture;
-                            let comp = newNode.getComponent(Sprite);
-                            if (comp) {
-                                comp.spriteFrame = spriteFrame;
-                            }
-
-                            spriteFrame.packable = false;
-                            spriteFrame.flipUVY = true;
-                            if (sys.isNative && (sys.os === sys.OS.IOS || sys.os === sys.OS.OSX)) {
-                                spriteFrame.flipUVY = false;
-                            }
-                            Manager.tips.show(`成功保存在设备目录并加载成功: ${filePath}`);
-                        }
-                    });
+                        });
+                    }
                     Log.d("save image data success, file: " + filePath);
                     Manager.tips.show(`成功保存在设备目录: ${filePath}`);
                 }
                 else {
-                    Log.e("save image data failed!,需要>=3.6.1版本");
+                    Log.e("save image data failed!");
                     Manager.tips.show(`保存图片失败`);
                 }
+            }else{
+                Log.e("该版本不支持，creator版本需要>=3.6.1")
             }
         } else if (sys.platform === sys.Platform.WECHAT_GAME) {
             if (!this._canvas) {
@@ -224,6 +218,11 @@ export class Snapshot extends Component {
                     Manager.tips.show("截图失败");
                 }
             })
+
+            if (this.onCaptureComplete) {
+                let sp = this.genSpriteFrame(width, height);
+                this.onCaptureComplete(sp, new Size(width, height));
+            }
         }
     }
 
