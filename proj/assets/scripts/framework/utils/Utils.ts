@@ -2,7 +2,8 @@
  * @description 公共工具
  */
 
-import { Tween, Node, tween, Label, Vec3, UITransform, safeMeasureText } from "cc";
+import { Tween, Node, tween, Label, Vec3, UITransform, safeMeasureText, SpriteFrame, Size, isValid } from "cc";
+import { Snapshot } from "../componects/Snapshot";
 
 const VIEW_ACTION_TAG = 999;
 
@@ -238,5 +239,17 @@ export class Utils implements ISingleton {
             return true;
         }
         return false;
+    }
+
+    /**
+     * @description 截图
+     * @param node 需要截图的节点
+     * @param onCaptureComplete 截图完成回调
+     */
+    snapshot(node: Node, onCaptureComplete?: (sp: SpriteFrame, size: Size) => void) {
+        if (isValid(node)) {
+            let snapshot = node.addComponent(Snapshot);
+            snapshot.onCaptureComplete = onCaptureComplete;
+        }
     }
 }

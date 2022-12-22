@@ -61,6 +61,10 @@ export let LanguageEN = {
                 name: "快上车",
                 sort: 1
             },
+            snapshot: {
+                name: "截图",
+                sort: 8
+            },
             resources: {
                 name: "主包",
                 sort: 0

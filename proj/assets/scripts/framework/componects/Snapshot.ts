@@ -29,7 +29,7 @@ export class Snapshot extends Component {
     private _canvas: HTMLCanvasElement = null!;
     private _buffer: Uint8Array = null!;
 
-    start() {
+    protected start() {
         this._camera = Manager.uiManager.screenShotCamera;
         super.start && super.start();
         this._texture = new RenderTexture();
@@ -43,7 +43,7 @@ export class Snapshot extends Component {
         }, 0.2)
     }
 
-    capture() {
+    private capture() {
         let trans = this.node.getComponent(UITransform);
         if (!trans) {
             return;
