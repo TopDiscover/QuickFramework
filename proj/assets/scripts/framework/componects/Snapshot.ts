@@ -118,44 +118,62 @@ export class Snapshot extends Component {
             // return;
             let filePath = native.fileUtils.getWritablePath() + 'render_to_sprite_image.png';
 
+            let success = native.fileUtils.writeDataToFile(this._buffer, filePath);
+
+            if (success) {
+                this._buffer = native.fileUtils.getDataFromFile(filePath) as any;
+
+                if (this.onCaptureComplete) {
+                    let sp = this.genSpriteFrame(width, height);
+                    this.onCaptureComplete(sp, new Size(width, height));
+                }
+                Log.d("save image data success, file: " + filePath);
+                Manager.tips.show(`成功保存在设备目录: ${filePath}`);
+            } else {
+                Log.e("save image data failed!");
+                Manager.tips.show(`保存图片失败`);
+            }
             // 目前 3.0.0 ~ 3.4.0 版本还不支持 jsb.saveImageData ,引擎计划在 3.5.0 支持, 要保存 imageData 为本地 png 文件需要参考下方的 pr 定制引擎
             // https://gitee.com/zzf2019/engine-native/commit/1ddb6ec9627a8320cd3545d353d8861da33282a8
-
+            // if (this.onCaptureComplete) {
+            //     let sp = this.genSpriteFrame(width, height);
+            //     this.onCaptureComplete(sp, new Size(width, height));
+            // }
             //@ts-ignore
-            if (native.saveImageData) {
-                //@ts-ignore
-                let success = native.saveImageData(this._buffer, width, height, filePath);
-                if (success) {
-                    if (this.onCaptureComplete) {
-                        // 用于测试图片是否正确保存到本地设备路径下
-                        assetManager.loadRemote<ImageAsset>(filePath, (err, imageAsset) => {
-                            if (err) {
-                                Log.d("show image error")
-                            } else {
-                                const spriteFrame = new SpriteFrame();
-                                const texture = new Texture2D();
-                                texture.image = imageAsset;
-                                spriteFrame.texture = texture
-                                spriteFrame.packable = false;
-                                spriteFrame.flipUVY = true;
-                                if (sys.isNative && (sys.os === sys.OS.IOS || sys.os === sys.OS.OSX)) {
-                                    spriteFrame.flipUVY = false;
-                                }
-                                this.onCaptureComplete && this.onCaptureComplete(spriteFrame, new Size(width, height));
-                                Manager.tips.show(`成功保存在设备目录并加载成功: ${filePath}`);
-                            }
-                        });
-                    }
-                    Log.d("save image data success, file: " + filePath);
-                    Manager.tips.show(`成功保存在设备目录: ${filePath}`);
-                }
-                else {
-                    Log.e("save image data failed!");
-                    Manager.tips.show(`保存图片失败`);
-                }
-            }else{
-                Log.e("该版本不支持，creator版本需要>=3.6.1")
-            }
+            // if (native.saveImageData) {
+            //     //@ts-ignore
+            //     native.saveImageData(this._buffer, width, height, filePath)
+            //     .then(()=>{
+            //         if (this.onCaptureComplete) {
+            //             // 用于测试图片是否正确保存到本地设备路径下
+            //             assetManager.loadRemote<ImageAsset>(filePath, (err, imageAsset) => {
+            //                 if (err) {
+            //                     Log.d("show image error")
+            //                 } else {
+            //                     const spriteFrame = new SpriteFrame();
+            //                     const texture = new Texture2D();
+            //                     texture.image = imageAsset;
+            //                     spriteFrame.texture = texture
+            //                     spriteFrame.packable = false;
+            //                     spriteFrame.flipUVY = true;
+            //                     if (sys.isNative && (sys.os === sys.OS.IOS || sys.os === sys.OS.OSX)) {
+            //                         spriteFrame.flipUVY = false;
+            //                     }
+            //                     this.onCaptureComplete && this.onCaptureComplete(spriteFrame, new Size(width, height));
+            //                     Manager.tips.show(`成功保存在设备目录并加载成功: ${filePath}`);
+            //                 }
+            //             });
+            //         }
+            //         Log.d("save image data success, file: " + filePath);
+            //         Manager.tips.show(`成功保存在设备目录: ${filePath}`);
+            //     })
+            //     .catch(()=>{
+            //         Log.e("save image data failed!");
+            //         Manager.tips.show(`保存图片失败`);
+            //     })
+            // }else{
+            //     Log.e("该版本不支持，creator版本需要>=3.6.1")
+            // }
         } else if (sys.platform === sys.Platform.WECHAT_GAME) {
             if (!this._canvas) {
                 //@ts-ignore
