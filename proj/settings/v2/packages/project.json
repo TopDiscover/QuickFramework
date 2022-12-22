@@ -11,6 +11,10 @@
     {
       "name": "Default",
       "value": 1
+    },
+    {
+      "name": "Snapshot",
+      "value": 2
     }
   ],
   "physics": {

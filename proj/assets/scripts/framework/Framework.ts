@@ -22,6 +22,7 @@ import { LayoutManager } from "./core/layout/LayoutManager";
 import { SenderManager } from "./core/net/service/SenderManager";
 import { HandlerManager } from "./core/net/service/HandlerManager";
 import { Utils } from "./utils/Utils";
+import { CanvasHelper } from "./utils/CanvasHelper";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
@@ -183,6 +184,10 @@ export class Framewok {
 
     get layout(){
         return Singleton.instance.get(LayoutManager) as LayoutManager;
+    }
+
+    get canvasHelper(){
+        return Singleton.instance.get(CanvasHelper) as CanvasHelper;
     }
 
     /**@description 当前游戏GameView, GameView进入onLoad赋值 */

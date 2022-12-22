@@ -500,6 +500,13 @@ export class UIManager implements ISingleton{
         return find("Camera3D",this.canvas.parent as Node)?.getComponent(Camera) as Camera;
     }
 
+    /**@description 截图cavans */
+    public get screenShotCamera(){
+        return find("ScreenShot/Camera",this.canvas.parent as Node)?.getComponent(Camera) as Camera;
+    }
+
+
+
     /**@description 获取主场景预置节点 */
     getScenePrefab(name: string) {
         return find(name, this.prefabs);

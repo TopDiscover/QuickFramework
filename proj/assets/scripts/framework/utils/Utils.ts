@@ -103,8 +103,8 @@ export class Utils implements ISingleton {
             let subString = content.substring(0, content.length - overCount) + suffix;
             if (label.assemblerData && label.assemblerData.context) {
                 let safeWidth = safeMeasureText(label.assemblerData.context, subString)
-                while( safeWidth > width ){
-                    subString = subString.substring(0,subString.length-suffix.length-1) + suffix;
+                while (safeWidth > width) {
+                    subString = subString.substring(0, subString.length - suffix.length - 1) + suffix;
                     safeWidth = safeMeasureText(label.assemblerData.context, subString)
                 }
             }
