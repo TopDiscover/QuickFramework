@@ -101,8 +101,8 @@ export class Snapshot extends cc.Component {
         this.destroy();
     }
 
-    private flipImageY(data:Uint8Array,width:number,height:number){
-        let pixels = new Uint8Array(width*height*4);
+    private flipImageY(data: Uint8Array, width: number, height: number) {
+        let pixels = new Uint8Array(width * height * 4);
         let rowBytes = width * 4;
         let maxRow = height - 1;
         for (let row = 0; row < height; row++) {
@@ -127,14 +127,14 @@ export class Snapshot extends cc.Component {
             this.createImageData(width, height, arrayBuffer);
             //@ts-ignore
             Manager.canvasHelper.saveAsPNG(this._canvas, width, height);
-            Manager.tips.show(`保存图片成功`);
+            Manager.tips.show(Manager.getLanguage("capture_success"));
             this.onCaptureFinish(width, height);
         } else if (cc.sys.isNative) {
             let date = new Date()
             let fileName = date.format("yyyy_MM_dd_hh_mm_ss_SS") + ".png";
             let filePath = `${Manager.platform.screenshotsPath}/${fileName}`;
             //@ts-ignore
-            let buffer = this.flipImageY(this._buffer,width,height);
+            let buffer = this.flipImageY(this._buffer, width, height);
             let success = jsb.saveImageData(buffer, width, height, filePath);
             if (success) {
                 if (this.onCaptureComplete) {
@@ -143,18 +143,18 @@ export class Snapshot extends cc.Component {
                         if (err) {
                             Log.d("show image error")
                         } else {
-                            Manager.tips.show(`成功保存在设备目录并加载成功: ${filePath}`);
+                            Manager.tips.show(Manager.getLanguage("capture_save_local_success1", [filePath]));
                             let spriteFrame = new cc.SpriteFrame(texture);
                             this.onCaptureFinish(width, height, spriteFrame);
                         }
                     });
                 }
                 Log.d("save image data success, file: " + filePath);
-                Manager.tips.show(`成功保存在设备目录: ${filePath}`);
+                Manager.tips.show(Manager.getLanguage("capture_save_local_success2", [filePath]));
             }
             else {
                 Log.e("save image data failed!");
-                Manager.tips.show(`保存图片失败`);
+                Manager.tips.show(Manager.getLanguage("capture_save_failed"));
             }
         } else if (cc.sys.platform === cc.sys.WECHAT_GAME) {
             this.createImageData(width, height, arrayBuffer);
@@ -170,30 +170,30 @@ export class Snapshot extends cc.Component {
                 success: (res: any) => {
                     //@ts-ignore
                     wx.showToast({
-                        title: "截图成功"
+                        title: Manager.getLanguage("capture_success")
                     });
-                    Manager.tips.show(`截图成功`);
+                    Manager.tips.show(Manager.getLanguage("capture_success"));
                     //@ts-ignore
                     wx.saveImageToPhotosAlbum({
                         filePath: res.tempFilePath,
                         success: (res: any) => {
                             //@ts-ignore              
                             wx.showToast({
-                                title: "成功保存到设备相册",
+                                title: Manager.getLanguage("capture_save_photo_album"),
                             });
-                            Manager.tips.show(`成功保存在设备目录: ${res.tempFilePath}`);
+                            Manager.tips.show(Manager.getLanguage("capture_save_local_success2", [res.tempFilePath]));
                         },
                         fail: () => {
-                            Manager.tips.show(`保存图片失败`);
+                            Manager.tips.show(Manager.getLanguage("capture_failed"));
                         }
                     })
                 },
                 fail: () => {
                     //@ts-ignore
                     wx.showToast({
-                        title: "截图失败"
+                        title: Manager.getLanguage("capture_failed")
                     });
-                    Manager.tips.show("截图失败");
+                    Manager.tips.show(Manager.getLanguage("capture_failed"));
                 }
             })
             this.onCaptureFinish(width, height);
