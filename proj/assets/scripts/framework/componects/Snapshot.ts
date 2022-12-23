@@ -101,6 +101,21 @@ export class Snapshot extends cc.Component {
         this.destroy();
     }
 
+    private flipImageY(data:Uint8Array,width:number,height:number){
+        let pixels = new Uint8Array(width*height*4);
+        let rowBytes = width * 4;
+        let maxRow = height - 1;
+        for (let row = 0; row < height; row++) {
+            let srow = maxRow - row;
+            let start = srow * rowBytes;
+            let reStart = row * rowBytes;
+            for (let i = 0; i < rowBytes; i++) {
+                pixels[i + reStart] = data[start + i];
+            }
+        }
+        return pixels;
+    }
+
     /**
      * @description 保存图片到本地
      * @param width 
@@ -119,7 +134,8 @@ export class Snapshot extends cc.Component {
             let fileName = date.format("yyyy_MM_dd_hh_mm_ss_SS") + ".png";
             let filePath = `${Manager.platform.screenshotsPath}/${fileName}`;
             //@ts-ignore
-            let success = jsb.saveImageData(this._buffer, width, height, filePath);
+            let buffer = this.flipImageY(this._buffer,width,height);
+            let success = jsb.saveImageData(buffer, width, height, filePath);
             if (success) {
                 if (this.onCaptureComplete) {
                     // 用于测试图片是否正确保存到本地设备路径下
