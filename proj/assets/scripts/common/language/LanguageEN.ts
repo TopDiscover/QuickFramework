@@ -75,13 +75,21 @@ export let LanguageEN = {
             },
         },
 
+        capture_save_success: "保存图片成功",
+        capture_save_failed: "保存图片失败",
+        capture_success: "截图成功",
+        capture_failed: "截图成功",
+        capture_save_photo_album: "成功保存到设备相册",
+        capture_save_local_success1: "成功保存在设备目录并加载成功: {0}",
+        capture_save_local_success2: "成功保存在设备目录: {0}",
+
         /**@description 图件多语言配置 */
 
         pic_background: "common/images/com_bg_start2",
 
-        richtext : "<color=#00ff00>Rich</c><color=#0fffff>Text</color>",
-        pic_atlas : ["common/images/lobby_texture"],
-        pic_key : "update_status_new",
-        pic_remote : "https://www.baidu.com/img/flexible/logo/pc/index_gray.png",
+        richtext: "<color=#00ff00>Rich</c><color=#0fffff>Text</color>",
+        pic_atlas: ["common/images/lobby_texture"],
+        pic_key: "update_status_new",
+        pic_remote: "https://www.baidu.com/img/flexible/logo/pc/index_gray.png",
     }
 }

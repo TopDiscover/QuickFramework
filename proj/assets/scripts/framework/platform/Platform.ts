@@ -53,4 +53,21 @@ export class Platform implements ISingleton {
             snapshot.onCaptureComplete = onCaptureComplete;
         }
     }
+
+    /**
+     * @description 截图文件保存路径
+     */
+    private _screenshotsPath: string = null!;
+    get screenshotsPath() {
+        if (this._screenshotsPath) {
+            return this._screenshotsPath;
+        }
+        if (sys.isNative) {
+            this._screenshotsPath = native.fileUtils.getWritablePath() + "Screenshots";
+            if (!native.fileUtils.isDirectoryExist(this._screenshotsPath)) {
+                native.fileUtils.createDirectory(this._screenshotsPath);
+            }
+        }
+        return this._screenshotsPath;
+    }
 }

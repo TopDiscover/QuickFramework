@@ -55,7 +55,6 @@ export class Snapshot extends Component {
         let y = worldPos.y + (0 - trans.anchorY) * trans.height;
         this._buffer = this._texture.readPixels(Math.round(x), Math.round(y), width, height) as Uint8Array;
         this.saveImage();
-        this.destroy();
     }
 
     /**@description 生成SpriteFrame */
@@ -80,14 +79,8 @@ export class Snapshot extends Component {
         return sf;
     }
 
-    /**
-     * @description 保存图片到本地
-     * @param width 
-     * @param height 
-     * @param arrayBuffer 
-     */
-    private savaAsImage(width: number, height: number, arrayBuffer: Uint8Array) {
-        if (sys.isBrowser) {
+    private createImageData(width: number, height: number, arrayBuffer: Uint8Array) {
+        if (sys.isBrowser || sys.platform === sys.Platform.WECHAT_GAME) {
             if (!this._canvas) {
                 this._canvas = document.createElement('canvas');
                 this._canvas.width = width;
@@ -106,98 +99,108 @@ export class Snapshot extends Component {
                 }
                 ctx.putImageData(imageData, 0, row);
             }
+        }
+    }
+
+    private onCaptureFinish(width: number, height: number, spriteFrame?: SpriteFrame) {
+        if (this.onCaptureComplete) {
+            if (spriteFrame == undefined) {
+                spriteFrame = this.genSpriteFrame(width, height);
+            }
+            this.onCaptureComplete(spriteFrame, new Size(width, height));
+        }
+        this.destroy();
+    }
+
+    private flipImageY(data: Uint8Array, width: number, height: number) {
+        let pixels = new Uint8Array(width * height * 4);
+        let rowBytes = width * 4;
+        let maxRow = height - 1;
+        for (let row = 0; row < height; row++) {
+            let srow = maxRow - row;
+            let start = srow * rowBytes;
+            let reStart = row * rowBytes;
+            for (let i = 0; i < rowBytes; i++) {
+                pixels[i + reStart] = data[start + i];
+            }
+        }
+        return pixels;
+    }
+
+    /**
+     * @description 保存图片到本地
+     * @param width 
+     * @param height 
+     * @param arrayBuffer 
+     */
+    private savaAsImage(width: number, height: number, arrayBuffer: Uint8Array) {
+        if (sys.isBrowser) {
+            this.createImageData(width, height, arrayBuffer);
             //@ts-ignore
             Manager.canvasHelper.saveAsPNG(this._canvas, width, height);
-            Manager.tips.show(`保存图片成功`);
-            if (this.onCaptureComplete) {
-                let sp = this.genSpriteFrame(width, height);
-                this.onCaptureComplete(sp, new Size(width, height));
-            }
+            Manager.tips.show(Manager.getLanguage("capture_success"));
+            this.onCaptureFinish(width, height);
         } else if (sys.isNative) {
-            // console.log("原生平台暂不支持图片下载");
-            // return;
-            let filePath = native.fileUtils.getWritablePath() + 'render_to_sprite_image.png';
+            let date = new Date()
+            let fileName = date.format("yyyy_MM_dd_hh_mm_ss_SS") + ".png";
+            let filePath = `${Manager.platform.screenshotsPath}/${fileName}`;
 
-            let success = native.fileUtils.writeDataToFile(this._buffer, filePath);
+            // let success = native.fileUtils.writeDataToFile(this._buffer, filePath);
 
-            if (success) {
-                this._buffer = native.fileUtils.getDataFromFile(filePath) as any;
+            // if (success) {
+            //     this._buffer = native.fileUtils.getDataFromFile(filePath) as any;
 
-                if (this.onCaptureComplete) {
-                    let sp = this.genSpriteFrame(width, height);
-                    this.onCaptureComplete(sp, new Size(width, height));
-                }
-                Log.d("save image data success, file: " + filePath);
-                Manager.tips.show(`成功保存在设备目录: ${filePath}`);
-            } else {
-                Log.e("save image data failed!");
-                Manager.tips.show(`保存图片失败`);
-            }
+            //     if (this.onCaptureComplete) {
+            //         let sp = this.genSpriteFrame(width, height);
+            //         this.onCaptureComplete(sp, new Size(width, height));
+            //     }
+            //     Log.d("save image data success, file: " + filePath);
+            //     Manager.tips.show(`成功保存在设备目录: ${filePath}`);
+            // } else {
+            //     Log.e("save image data failed!");
+            //     Manager.tips.show(`保存图片失败`);
+            // }
+
             // 目前 3.0.0 ~ 3.4.0 版本还不支持 jsb.saveImageData ,引擎计划在 3.5.0 支持, 要保存 imageData 为本地 png 文件需要参考下方的 pr 定制引擎
             // https://gitee.com/zzf2019/engine-native/commit/1ddb6ec9627a8320cd3545d353d8861da33282a8
-            // if (this.onCaptureComplete) {
-            //     let sp = this.genSpriteFrame(width, height);
-            //     this.onCaptureComplete(sp, new Size(width, height));
-            // }
             //@ts-ignore
-            // if (native.saveImageData) {
-            //     //@ts-ignore
-            //     native.saveImageData(this._buffer, width, height, filePath)
-            //     .then(()=>{
-            //         if (this.onCaptureComplete) {
-            //             // 用于测试图片是否正确保存到本地设备路径下
-            //             assetManager.loadRemote<ImageAsset>(filePath, (err, imageAsset) => {
-            //                 if (err) {
-            //                     Log.d("show image error")
-            //                 } else {
-            //                     const spriteFrame = new SpriteFrame();
-            //                     const texture = new Texture2D();
-            //                     texture.image = imageAsset;
-            //                     spriteFrame.texture = texture
-            //                     spriteFrame.packable = false;
-            //                     spriteFrame.flipUVY = true;
-            //                     if (sys.isNative && (sys.os === sys.OS.IOS || sys.os === sys.OS.OSX)) {
-            //                         spriteFrame.flipUVY = false;
-            //                     }
-            //                     this.onCaptureComplete && this.onCaptureComplete(spriteFrame, new Size(width, height));
-            //                     Manager.tips.show(`成功保存在设备目录并加载成功: ${filePath}`);
-            //                 }
-            //             });
-            //         }
-            //         Log.d("save image data success, file: " + filePath);
-            //         Manager.tips.show(`成功保存在设备目录: ${filePath}`);
-            //     })
-            //     .catch(()=>{
-            //         Log.e("save image data failed!");
-            //         Manager.tips.show(`保存图片失败`);
-            //     })
-            // }else{
-            //     Log.e("该版本不支持，creator版本需要>=3.6.1")
-            // }
-        } else if (sys.platform === sys.Platform.WECHAT_GAME) {
-            if (!this._canvas) {
+            if (native.saveImageData) {
                 //@ts-ignore
-                this._canvas = wx.createCanvas();
-                this._canvas.width = width;
-                this._canvas.height = height;
-            } else {
-                this.clearCanvas();
+                let buffer = this.flipImageY(this._buffer,width,height);
+                (native as any).saveImageData(buffer, width, height, filePath)
+                .then(()=>{
+                    if (this.onCaptureComplete) {
+                        // 用于测试图片是否正确保存到本地设备路径下
+                        assetManager.loadRemote<ImageAsset>(filePath, (err, imageAsset) => {
+                            if (err) {
+                                Log.d("show image error")
+                            } else {
+                                const spriteFrame = new SpriteFrame();
+                                const texture = new Texture2D();
+                                texture.image = imageAsset;
+                                spriteFrame.texture = texture
+                                spriteFrame.packable = false;
+                                spriteFrame.flipUVY = true;
+                                if (sys.isNative && (sys.os === sys.OS.IOS || sys.os === sys.OS.OSX)) {
+                                    spriteFrame.flipUVY = false;
+                                }
+                                this.onCaptureComplete && this.onCaptureComplete(spriteFrame, new Size(width, height));
+                                Manager.tips.show(Manager.getLanguage("capture_save_local_success1", [filePath]));
+                            }
+                        });
+                    }
+                    Log.d("save image data success, file: " + filePath);
+                    Manager.tips.show(Manager.getLanguage("capture_save_local_success2", [filePath]));
+                })
+                .catch(()=>{
+                    Log.e("save image data failed!");
+                    Manager.tips.show(Manager.getLanguage("capture_save_failed"));
+                })
+            }else{
+                Log.e("该版本不支持，creator版本需要>=3.6.1")
             }
-            var ctx = this._canvas.getContext('2d')!;
-
-            var rowBytes = width * 4;
-
-            for (var row = 0; row < height; row++) {
-                var sRow = height - 1 - row;
-                var imageData = ctx.createImageData(width, 1);
-                var start = sRow * width * 4;
-
-                for (var i = 0; i < rowBytes; i++) {
-                    imageData.data[i] = arrayBuffer[start + i];
-                }
-
-                ctx.putImageData(imageData, 0, row);
-            }
+        } else if (sys.platform === sys.Platform.WECHAT_GAME) {
+            this.createImageData(width, height, arrayBuffer);
             //@ts-ignore
             this._canvas.toTempFilePath({
                 x: 0,
@@ -210,37 +213,33 @@ export class Snapshot extends Component {
                 success: (res: any) => {
                     //@ts-ignore
                     wx.showToast({
-                        title: "截图成功"
+                        title: Manager.getLanguage("capture_success")
                     });
-                    Manager.tips.show(`截图成功`);
+                    Manager.tips.show(Manager.getLanguage("capture_success"));
                     //@ts-ignore
                     wx.saveImageToPhotosAlbum({
                         filePath: res.tempFilePath,
                         success: (res: any) => {
                             //@ts-ignore              
                             wx.showToast({
-                                title: "成功保存到设备相册",
+                                title: Manager.getLanguage("capture_save_photo_album"),
                             });
-                            Manager.tips.show(`成功保存在设备目录: ${res.tempFilePath}`);
+                            Manager.tips.show(Manager.getLanguage("capture_save_local_success2", [res.tempFilePath]));
                         },
                         fail: () => {
-                            Manager.tips.show(`保存图片失败`);
+                            Manager.tips.show(Manager.getLanguage("capture_save_failed"));
                         }
                     })
                 },
                 fail: () => {
                     //@ts-ignore
                     wx.showToast({
-                        title: "截图失败"
+                        title: Manager.getLanguage("capture_failed")
                     });
-                    Manager.tips.show("截图失败");
+                    Manager.tips.show(Manager.getLanguage("capture_failed"));
                 }
             })
-
-            if (this.onCaptureComplete) {
-                let sp = this.genSpriteFrame(width, height);
-                this.onCaptureComplete(sp, new Size(width, height));
-            }
+            this.onCaptureFinish(width, height);
         }
     }
 
