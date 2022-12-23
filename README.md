@@ -1,10 +1,10 @@
 # CocosCreator 快速开发轻量级游戏框架
 # 项目说明
-本项目基于 cocos creator 3.6.0版本
+本项目基于 cocos creator 3.6.2版本
 以Asset Bundle为基础的大厅+子游戏示例
 提供一个轻量级的游戏开发框架,让你的开发更加简单
 # cocos creator 升级
-引擎修正插件可直接对 3.6.0~3.6.2版本，3.5.0开始，引擎源码结构发生变化，由于个人时间有限
+引擎修正插件可直接对 3.6.2版本
 **3.3.1分支**停止维护
 项目中示例工程可自行按自己项目进行裁剪
 
@@ -21,7 +21,7 @@
 然后在tools目录下执行 npm run main 
 
 # 详细文档
-更为详细的文档，[请在本项目的doc中查看](https://gitee.com/top-discover/QuickFramework/tree/3.6.0/doc)，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
+更为详细的文档，[请在本项目的doc中查看](https://gitee.com/top-discover/QuickFramework/tree/3.6.2/doc)，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
 同时也希望有更多的人参与，一起让creator的开发更加的简单。
 
 
@@ -70,8 +70,8 @@
 # 分支说明
 ## [2.4.7](https://gitee.com/top-discover/QuickFramework/tree/2.4.7)
 2.4.7 分支为 creator 版本在>=2.4.7版本以上使用，为2.4.x的对外分支
-## [3.6.0](https://gitee.com/top-discover/QuickFramework/tree/3.6.0)
-3.6.0 分支为 creator 版本在>=3.6.0版本以上使用，为3.x的对外分支
+## [3.6.2](https://gitee.com/top-discover/QuickFramework/tree/3.6.2)
+3.6.2 分支为 creator 版本在>=3.6.2版本以上使用，为3.x的对外分支
 ## 其它分支为开发中的分支，请不要轻易使用
 
 **如果您觉得我们的开源框架对你有所帮助，请扫下方二维码进群讨论**
