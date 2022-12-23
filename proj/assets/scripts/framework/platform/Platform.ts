@@ -1,4 +1,5 @@
-import { native, sys } from "cc";
+import { isValid, native, Size, SpriteFrame, sys, Node } from "cc";
+import { Snapshot } from "../componects/Snapshot";
 
 /**
  * @description 平台相关代码处理
@@ -28,7 +29,7 @@ export class Platform implements ISingleton {
      * @en Get the network type of current device, return `sys.NetworkType.LAN` if failure.
      * @zh 获取当前设备的网络类型, 如果网络类型无法获取，默认将返回 `sys.NetworkType.LAN`
      */
-    getNetworkType(){
+    getNetworkType() {
         return sys.getNetworkType();
     }
 
@@ -37,7 +38,19 @@ export class Platform implements ISingleton {
      * @zh 获取当前设备的电池电量，如果电量无法获取，默认将返回 1
      * @return - 0.0 ~ 1.0
      */
-    getBatteryLevel(){
+    getBatteryLevel() {
         return sys.getBatteryLevel();
+    }
+
+    /**
+     * @description 截图
+     * @param node 需要截图的节点
+     * @param onCaptureComplete 截图完成回调
+     */
+    snapshot(node: Node, onCaptureComplete?: (sp: SpriteFrame, size: Size) => void) {
+        if (isValid(node)) {
+            let snapshot = node.addComponent(Snapshot);
+            snapshot.onCaptureComplete = onCaptureComplete;
+        }
     }
 }

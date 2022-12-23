@@ -23,17 +23,18 @@ import { SenderManager } from "./core/net/service/SenderManager";
 import { HandlerManager } from "./core/net/service/HandlerManager";
 import { Utils } from "./utils/Utils";
 import { CanvasHelper } from "./utils/CanvasHelper";
+import { Platform } from "./platform/Platform";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
 
     /**@description 资源是否懒释放，true时，只有收到平台的内存警告才会释放资源，还有在更新时才分释放,否则不会释放资源 */
-    get isLazyRelease(){
+    get isLazyRelease() {
         return false;
     }
 
     /**@description 资源释放管理 */
-    get releaseManger(){
+    get releaseManger() {
         return Singleton.instance.get(ReleaseManager) as ReleaseManager;
     }
 
@@ -41,43 +42,43 @@ export class Framewok {
     get serviceManager() {
         return Singleton.instance.get(ServiceManager) as ServiceManager;
     }
-    
+
     /**@description 网络消息发送管理器 */
-    get senderManager(){
+    get senderManager() {
         return Singleton.instance.get(SenderManager) as SenderManager;
     }
 
     /**@description 网络消息处理管理器 */
-    get handlerManager(){
+    get handlerManager() {
         return Singleton.instance.get(HandlerManager) as HandlerManager;
     }
 
     /**@description 日志 */
-    get logger(){
+    get logger() {
         return Singleton.instance.get(LoggerImpl) as LoggerImpl;
     }
 
     /**@description 逻辑管理器 */
-    get logicManager(){
+    get logicManager() {
         return Singleton.instance.get(LogicManager) as LogicManager;
     }
 
     /**@description 数据中心 */
-    get dataCenter(){
+    get dataCenter() {
         return Singleton.instance.get(DataCenter) as DataCenter;
     }
 
     /**@description 入口管理器 */
-    get entryManager(){
+    get entryManager() {
         return Singleton.instance.get(EntryManager) as EntryManager;
     }
 
-    get utils(){
+    get utils() {
         return Singleton.instance.get(Utils) as Utils;
     }
 
     /**@description protobuf类型管理 */
-    get protoManager(){
+    get protoManager() {
         return Singleton.instance.get(ProtoManager) as ProtoManager;
     }
 
@@ -87,13 +88,13 @@ export class Framewok {
     }
 
     /**@description 热更新管理器 */
-    get updateManager() { 
+    get updateManager() {
         return Singleton.instance.get(UpdateManager) as UpdateManager;
     }
 
     /**@description 常驻资源指定的模拟view */
-    get retainMemory() : any { 
-        return this.uiManager.retainMemory; 
+    get retainMemory(): any {
+        return this.uiManager.retainMemory;
     }
 
     /**@description 语言包 */
@@ -159,21 +160,21 @@ export class Framewok {
     }
 
     /**@description 对象池管理器 */
-    get pool(){
+    get pool() {
         return Singleton.instance.get(NodePoolManager) as NodePoolManager;
     }
 
-    get http(){
+    get http() {
         return Singleton.instance.get(HttpClient) as HttpClient;
     }
 
     /**@description 小提示 */
-    get tips() : any{
+    get tips(): any {
         return null;
     }
 
     /**@description 界面加载时的全屏Loading,显示加载进度 */
-    get uiLoading():any {
+    get uiLoading(): any {
         return null;
     }
 
@@ -182,18 +183,24 @@ export class Framewok {
         return "";
     }
 
-    get layout(){
+    get layout() {
         return Singleton.instance.get(LayoutManager) as LayoutManager;
     }
 
-    get canvasHelper(){
+    get canvasHelper() {
         return Singleton.instance.get(CanvasHelper) as CanvasHelper;
     }
 
+    /**
+     * @description 区分平台相关处理
+     */
+    get platform() {
+        return Singleton.instance.get(Platform) as Platform;
+    }
     /**@description 当前游戏GameView, GameView进入onLoad赋值 */
     gameView: GameView | null = null;
 
-    getGameView<T extends GameView>(){
+    getGameView<T extends GameView>() {
         return <T>this.gameView;
     }
 
@@ -201,22 +208,22 @@ export class Framewok {
      * @description 获取语言包 
      * 
      */
-    getLanguage<K extends string & keyof LanguageData["data"]>(key: K ,params : (string|number)[] = [], bundle: BUNDLE_TYPE | null = null): LanguageData["data"][K] {
-        if ( !bundle ){
+    getLanguage<K extends string & keyof LanguageData["data"]>(key: K, params: (string | number)[] = [], bundle: BUNDLE_TYPE | null = null): LanguageData["data"][K] {
+        if (!bundle) {
             bundle = Macro.BUNDLE_RESOURCES;
         }
-        let configs : (string | number)[] = [];
+        let configs: (string | number)[] = [];
         configs.push(`${Macro.USING_LAN_KEY}${bundle}.${key}`);
         configs.push(...params);
         return this.language.get(configs);
     }
 
-    init(){
+    init() {
         //引擎扩展初始化
         CocosExtentionInit();
     }
 
-    onLowMemory(){
+    onLowMemory() {
         this.releaseManger.onLowMemory();
     }
 }

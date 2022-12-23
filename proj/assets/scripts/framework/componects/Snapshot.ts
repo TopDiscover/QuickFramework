@@ -1,4 +1,4 @@
-import { _decorator, Component, Camera, RenderTexture, view, UITransform, ImageAsset, Texture2D, SpriteFrame, Sprite, sys, Size, native, assetManager, instantiate, Vec3, size } from 'cc';
+import { _decorator, Component, Camera, RenderTexture, view, UITransform, ImageAsset, Texture2D, SpriteFrame, Sprite, sys, Size, native, assetManager, instantiate, Vec3, size, gfx } from 'cc';
 const { ccclass, property } = _decorator;
 
 /**
@@ -35,7 +35,7 @@ export class Snapshot extends Component {
         this._texture = new RenderTexture();
         this._texture.reset({
             width: view.getVisibleSize().width,
-            height: view.getVisibleSize().height
+            height: view.getVisibleSize().height,
         });
         this._camera.targetTexture = this._texture;
         this.scheduleOnce(() => {
