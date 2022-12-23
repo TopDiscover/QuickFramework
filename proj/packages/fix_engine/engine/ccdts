@@ -226,6 +226,10 @@ declare namespace dragonBones{
 	}
 }
 
+declare namespace jsb {
+	export function saveImageData(data:Uint8Array,width:number,height:number,path:string):boolean;
+}
+
 declare type BUNDLE_TYPE = string | cc.AssetManager.Bundle;
 
 declare function require(any);
