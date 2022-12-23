@@ -58,6 +58,10 @@ export let LanguageZH = {
         name: "shaders",
         sort: 3
       },
+      snapshot : {
+        name: "截图",
+        sort: 8
+      },
       resources: {
         name: "主包",
         sort: 0

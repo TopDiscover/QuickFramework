@@ -487,6 +487,18 @@ export class UIManager implements ISingleton{
         return this._prefabs;
     }
 
+    /**@description 主摄像机 */
+    public get camera(){
+        return cc.find("Camera",this.canvas)?.getComponent(cc.Camera);
+    }
+
+    /**
+     * @description 截图摄像机
+     */
+    public get screenShotCamera(){
+        return cc.find("SnapshotCamera",this.canvas)?.getComponent(cc.Camera);
+    }
+
     /**@description 获取主场景预置节点 */
     getScenePrefab(name: string) {
         return cc.find(name, this.prefabs);
@@ -496,7 +508,7 @@ export class UIManager implements ISingleton{
         this._canvas = node;
     }
 
-    private get canvas(): cc.Node {
+    get canvas(): cc.Node {
         return this._canvas;
     }
 

@@ -59,6 +59,10 @@ export let LanguageEN = {
                 name: "shaders",
                 sort: 3
             },
+            snapshot : {
+                name: "Snapshot",
+                sort: 8
+            },
             resources: {
                 name: "主包",
                 sort: 0
