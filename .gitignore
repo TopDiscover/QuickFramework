@@ -6,3 +6,16 @@ package-lock.json
 tools/dist/
 proj/zips/
 release/
+proj/assets/bundles
+proj/extensions/fix_engine/@types
+proj/extensions/fix_engine/src/core
+proj/extensions/fix_engine/src/impl
+proj/extensions/hotupdate/@types
+proj/extensions/hotupdate/src/core
+proj/extensions/hotupdate/src/impl
+proj/extensions/png-compress/@types
+proj/extensions/png-compress/src/core
+proj/extensions/png-compress/src/impl
+proj/extensions/test-server/@types
+proj/extensions/test-server/src/core
+proj/extensions/test-server/src/impl
