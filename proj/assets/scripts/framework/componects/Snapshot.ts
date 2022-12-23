@@ -184,7 +184,7 @@ export class Snapshot extends cc.Component {
                             Manager.tips.show(Manager.getLanguage("capture_save_local_success2", [res.tempFilePath]));
                         },
                         fail: () => {
-                            Manager.tips.show(Manager.getLanguage("capture_failed"));
+                            Manager.tips.show(Manager.getLanguage("capture_save_failed"));
                         }
                     })
                 },
