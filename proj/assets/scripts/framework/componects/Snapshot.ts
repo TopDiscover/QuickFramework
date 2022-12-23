@@ -161,44 +161,35 @@ export class Snapshot extends Component {
             //     Manager.tips.show(`保存图片失败`);
             // }
 
-            // 目前 3.0.0 ~ 3.4.0 版本还不支持 jsb.saveImageData ,引擎计划在 3.5.0 支持, 要保存 imageData 为本地 png 文件需要参考下方的 pr 定制引擎
-            // https://gitee.com/zzf2019/engine-native/commit/1ddb6ec9627a8320cd3545d353d8861da33282a8
             //@ts-ignore
-            if (native.saveImageData) {
-                //@ts-ignore
-                let buffer = this.flipImageY(this._buffer,width,height);
-                (native as any).saveImageData(buffer, width, height, filePath)
-                .then(()=>{
-                    if (this.onCaptureComplete) {
-                        // 用于测试图片是否正确保存到本地设备路径下
-                        assetManager.loadRemote<ImageAsset>(filePath, (err, imageAsset) => {
-                            if (err) {
-                                Log.d("show image error")
-                            } else {
-                                const spriteFrame = new SpriteFrame();
-                                const texture = new Texture2D();
-                                texture.image = imageAsset;
-                                spriteFrame.texture = texture
-                                spriteFrame.packable = false;
-                                spriteFrame.flipUVY = true;
-                                if (sys.isNative && (sys.os === sys.OS.IOS || sys.os === sys.OS.OSX)) {
-                                    spriteFrame.flipUVY = false;
-                                }
-                                this.onCaptureComplete && this.onCaptureComplete(spriteFrame, new Size(width, height));
-                                Manager.tips.show(Manager.getLanguage("capture_save_local_success1", [filePath]));
+            let buffer = this.flipImageY(this._buffer, width, height);
+            native.saveImageData(buffer, width, height, filePath).then(() => {
+                if (this.onCaptureComplete) {
+                    // 用于测试图片是否正确保存到本地设备路径下
+                    assetManager.loadRemote<ImageAsset>(filePath, (err, imageAsset) => {
+                        if (err) {
+                            Log.d("show image error")
+                        } else {
+                            const spriteFrame = new SpriteFrame();
+                            const texture = new Texture2D();
+                            texture.image = imageAsset;
+                            spriteFrame.texture = texture
+                            spriteFrame.packable = false;
+                            spriteFrame.flipUVY = true;
+                            if (sys.isNative && (sys.os === sys.OS.IOS || sys.os === sys.OS.OSX)) {
+                                spriteFrame.flipUVY = false;
                             }
-                        });
-                    }
-                    Log.d("save image data success, file: " + filePath);
-                    Manager.tips.show(Manager.getLanguage("capture_save_local_success2", [filePath]));
-                })
-                .catch(()=>{
-                    Log.e("save image data failed!");
-                    Manager.tips.show(Manager.getLanguage("capture_save_failed"));
-                })
-            }else{
-                Log.e("该版本不支持，creator版本需要>=3.6.1")
-            }
+                            this.onCaptureComplete && this.onCaptureComplete(spriteFrame, new Size(width, height));
+                            Manager.tips.show(Manager.getLanguage("capture_save_local_success1", [filePath]));
+                        }
+                    });
+                }
+                Log.d("save image data success, file: " + filePath);
+                Manager.tips.show(Manager.getLanguage("capture_save_local_success2", [filePath]));
+            }).catch(() => {
+                Log.e("save image data failed!");
+                Manager.tips.show(Manager.getLanguage("capture_save_failed"));
+            })
         } else if (sys.platform === sys.Platform.WECHAT_GAME) {
             this.createImageData(width, height, arrayBuffer);
             //@ts-ignore
