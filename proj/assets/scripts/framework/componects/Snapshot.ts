@@ -38,9 +38,15 @@ export class Snapshot extends Component {
             height: view.getVisibleSize().height,
         });
         this._camera.targetTexture = this._texture;
+        this._camera.node.active = true;
         this.scheduleOnce(() => {
             this.capture();
         }, 0.2)
+    }
+
+    protected onDestroy(): void {
+        this._camera.node.active = false;
+        super.onDestroy && super.onDestroy();
     }
 
     private capture() {
@@ -53,6 +59,7 @@ export class Snapshot extends Component {
         let worldPos = trans.getBoundingBoxToWorld();
         let x = worldPos.x;
         let y = worldPos.y;
+
         this._buffer = this._texture.readPixels(Math.round(x), Math.round(y), width, height) as Uint8Array;
         this.saveImage();
     }

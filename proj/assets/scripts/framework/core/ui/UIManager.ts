@@ -502,10 +502,12 @@ export class UIManager implements ISingleton{
 
     /**@description 截图cavans */
     public get screenShotCamera(){
-        return find("ScreenShot/Camera",this.canvas.parent as Node)?.getComponent(Camera) as Camera;
+        return find("ScreenShotCamera",this.canvas as Node)?.getComponent(Camera) as Camera;
     }
 
-
+    public get uiCamera(){
+        return find("UICamera",this.canvas as Node)?.getComponent(Camera) as Camera;
+    }
 
     /**@description 获取主场景预置节点 */
     getScenePrefab(name: string) {
@@ -516,7 +518,7 @@ export class UIManager implements ISingleton{
         this._canvas = node;
     }
 
-    private get canvas(): Node {
+    get canvas(): Node {
         return this._canvas;
     }
 
