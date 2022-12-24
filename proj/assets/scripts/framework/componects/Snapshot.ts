@@ -50,9 +50,9 @@ export class Snapshot extends Component {
         }
         let width = trans.width;
         let height = trans.height;
-        let worldPos = this.node.getWorldPosition();
-        let x = worldPos.x + (0 - trans.anchorX) * trans.width;
-        let y = worldPos.y + (0 - trans.anchorY) * trans.height;
+        let worldPos = trans.getBoundingBoxToWorld();
+        let x = worldPos.x;
+        let y = worldPos.y;
         this._buffer = this._texture.readPixels(Math.round(x), Math.round(y), width, height) as Uint8Array;
         this.saveImage();
     }
@@ -73,9 +73,6 @@ export class Snapshot extends Component {
         sf.texture = texture;
         sf.packable = false;
         sf.flipUVY = true;
-        if (sys.isNative && (sys.os == sys.OS.IOS || sys.os == sys.OS.OSX)) {
-            sf.flipUVY = false;
-        }
         return sf;
     }
 
@@ -141,26 +138,10 @@ export class Snapshot extends Component {
             Manager.tips.show(Manager.getLanguage("capture_success"));
             this.onCaptureFinish(width, height);
         } else if (sys.isNative) {
+            //原生win32平台调度运行会造成崩溃，请直接用release模式打开，可正常工作
             let date = new Date()
             let fileName = date.format("yyyy_MM_dd_hh_mm_ss_SS") + ".png";
             let filePath = `${Manager.platform.screenshotsPath}/${fileName}`;
-
-            // let success = native.fileUtils.writeDataToFile(this._buffer, filePath);
-
-            // if (success) {
-            //     this._buffer = native.fileUtils.getDataFromFile(filePath) as any;
-
-            //     if (this.onCaptureComplete) {
-            //         let sp = this.genSpriteFrame(width, height);
-            //         this.onCaptureComplete(sp, new Size(width, height));
-            //     }
-            //     Log.d("save image data success, file: " + filePath);
-            //     Manager.tips.show(`成功保存在设备目录: ${filePath}`);
-            // } else {
-            //     Log.e("save image data failed!");
-            //     Manager.tips.show(`保存图片失败`);
-            // }
-
             //@ts-ignore
             let buffer = this.flipImageY(this._buffer, width, height);
             native.saveImageData(buffer, width, height, filePath).then(() => {
@@ -175,12 +156,8 @@ export class Snapshot extends Component {
                             texture.image = imageAsset;
                             spriteFrame.texture = texture
                             spriteFrame.packable = false;
-                            spriteFrame.flipUVY = true;
-                            if (sys.isNative && (sys.os === sys.OS.IOS || sys.os === sys.OS.OSX)) {
-                                spriteFrame.flipUVY = false;
-                            }
-                            this.onCaptureComplete && this.onCaptureComplete(spriteFrame, new Size(width, height));
                             Manager.tips.show(Manager.getLanguage("capture_save_local_success1", [filePath]));
+                            this.onCaptureFinish(width,height,spriteFrame);
                         }
                     });
                 }
