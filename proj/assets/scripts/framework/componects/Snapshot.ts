@@ -5,6 +5,8 @@ const { ccclass, property } = _decorator;
  * @description 快照节点
  * 注意，只会截图快照摄像头下的可见节点
  * 如果需要拍照全部分，请设置screenShotCamera的Visibility
+ * 
+ * 目前有个bug未解决，当屏幕大小比例比设计分辨率窄时，截图底部会被截断一部分,暂时未找到原因
  * @example
  * ```ts
  *  let snapshot = girl.addComponent(Snapshot)
