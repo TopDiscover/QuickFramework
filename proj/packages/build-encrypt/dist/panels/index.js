@@ -14,6 +14,7 @@ module.exports = Editor.Panel.extend({
     $: {
         btnSrcChoice: '#btnSrcChoice',
         srcLabel: '#srcLabel',
+        // textFileName : '#text_file_name',
         encriptSign: '#input_encriptSign',
         encriptKey: '#input_encriptKey',
         checkboxRemember: '#checkboxRemember',
@@ -26,6 +27,7 @@ module.exports = Editor.Panel.extend({
         if (null != encryptObject) {
             Helper_1.helper.config = JSON.parse(encryptObject);
         }
+        // slef.$textFileName.innerText = helper.encript_ignore_extList.toString();
         slef.$encriptSign.value = Helper_1.helper.config.encriptSign;
         slef.$encriptKey.value = Helper_1.helper.config.encriptKey;
         slef.$srcLabel.value = Helper_1.helper.config.srcLabel;
@@ -37,7 +39,7 @@ module.exports = Editor.Panel.extend({
             });
             if (res !== -1) {
                 let dir = res[0];
-                if (Helper_1.helper.checkBuildDir(dir)) {
+                if (Helper_1.helper.checkBuildDir(dir) > 0) {
                     slef.$srcLabel.value = dir;
                 }
                 else {

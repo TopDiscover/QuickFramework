@@ -67,43 +67,42 @@ class Helper{
     }
 
     checkBuildDir(fullPath: string) {
-        let is = false;
+        let is = -1;
         if (existsSync(fullPath)) {
             // 检查目录后缀是否符合
             let path = fullPath.split("\\");
-            let rootPath = path[path.length-1];
-            for(let i = 0; i < this.root_path_List.length ; i++){
-                if(rootPath == this.root_path_List[i]){
-                    is = true;
-                    this._config.buildType = i;
-                    if(this._config.buildType==BuildTypeEnum.jsb_link){
-                        ///jsb
-                        this.encript_ignore_extList = [
-                            "mp3","ogg","wav","m4a","jsc","bin"
-                        ];
-                    }else if(this._config.buildType == BuildTypeEnum.web_desktop||this._config.buildType==BuildTypeEnum.web_mobile){
-                        ///web平台，只加密文本、图片
-                        this.encript_ignore_extList = [
-                            "js","jsc",
-                            "mp3","ogg","wav","m4a",
-                            "font","eot","ttf","woff","svg","ttc",
-                            "mp4","avi","mov","mpg","mpeg","rm","rmvb"
-                        ];
-                    }
-                    break;
-                }   
-            }
+            is = this.root_path_List.indexOf(path[path.length-1]);
         }
-        if(!is){
+        if(is < 0 ){
             this.log(`选择目录错误`);
         }
         return is;
     }
 
+    setBuildType(fullPath: string){
+        this._config.buildType = this.checkBuildDir(fullPath);
+        if(this._config.buildType==BuildTypeEnum.jsb_link){
+            ///jsb
+            this.encript_ignore_extList = [
+                "mp3","ogg","wav","m4a","jsc","bin"
+            ];
+        }else if(this._config.buildType == BuildTypeEnum.web_desktop||this._config.buildType==BuildTypeEnum.web_mobile){
+            ///web平台，只加密文本、图片
+            this.encript_ignore_extList = [
+                "js","jsc",
+                "mp3","ogg","wav","m4a",
+                "font","eot","ttf","woff","svg","ttc",
+                "mp4","avi","mov","mpg","mpeg","rm","rmvb",
+                "bin",
+            ];
+        }
+    }
+
     replaceResources() {
-        this.log(`开始进行资源加密,加密指定目录：`+this.config.srcLabel);
-        this._encriptTool.setKeySign(this.config.encriptKey,this.config.encriptSign);
-        let assetsPath = path.join(this.config.srcLabel,"assets");
+        this.log(`开始进行资源加密,加密指定目录：`+ this.config.srcLabel);
+        this.setBuildType(this._config.srcLabel);
+        this._encriptTool.setKeySign(this._config.encriptKey,this._config.encriptSign);
+        let assetsPath = path.join(this._config.srcLabel,"assets");
         this.encriptDir(assetsPath);
         if(this._config.buildType ==BuildTypeEnum.jsb_link){
             new ApplyJsb(this._config.encriptSign,this._config.encriptKey);
@@ -114,8 +113,8 @@ class Helper{
             this.encriptDir(srcPath)
             this.encodeFile(mainJsPath)
         }else if(this._config.buildType==BuildTypeEnum.web_desktop||this._config.buildType==BuildTypeEnum.web_mobile){
-            //web 晚点写
-            new ApplyWeb(this._config.encriptSign,this._config.encriptKey,this.config.srcLabel);
+            //web
+            new ApplyWeb(this._config.encriptSign,this._config.encriptKey,this._config.srcLabel);
         }
         this.log("加密结束，累计加密："+ this.encriptFinishNum + "个文件");
     }
@@ -155,6 +154,7 @@ class Helper{
         unlinkSync(filePath);
         writeFileSync(filePath,outBuffer);
         this.encriptFinishNum = this.encriptFinishNum + 1;
+        this.log("加密文件个数："+this.encriptFinishNum);
     }
 
 }
