@@ -1,0 +1,21 @@
+{
+  "__type__": "cc.Material",
+  "_name": "quick_avator_circle",
+  "_objFlags": 0,
+  "_native": "",
+  "_effectAsset": {
+    "__uuid__": "e3929118-b2bc-4b1f-915b-0c30c2f41cbd"
+  },
+  "_techniqueIndex": 0,
+  "_techniqueData": {
+    "0": {
+      "props": {
+        "feather": 0.01,
+        "round": 0.5
+      },
+      "defines": {
+        "USE_TEXTURE": false
+      }
+    }
+  }
+}
