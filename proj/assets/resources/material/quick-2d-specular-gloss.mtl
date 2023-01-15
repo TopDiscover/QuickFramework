@@ -11,6 +11,9 @@
     "0": {
       "defines": {
         "USE_TEXTURE": true
+      },
+      "props": {
+        "width": 0.2
       }
     }
   }

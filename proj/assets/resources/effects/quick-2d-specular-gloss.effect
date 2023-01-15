@@ -20,8 +20,8 @@ CCEffect %{
         cullMode: none
       properties:
         texture: { value: white }
-        width : { value : 0.1 }
-        strength : { value : 1.2 }
+        width : { value : 0.1 , editor: { tooltip: '光泽宽度,取值0~1' } }
+        strength : { value : 1.2 , editor: { tooltip: '光泽亮度' }}
 }%
 
 
