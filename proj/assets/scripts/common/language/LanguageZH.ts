@@ -62,6 +62,10 @@ export let LanguageZH = {
         name: "截图",
         sort: 8
       },
+      scratchTicket: {
+        name: "刮奖",
+        sort: 9,
+      },
       resources: {
         name: "主包",
         sort: 0
@@ -80,6 +84,7 @@ export let LanguageZH = {
     capture_save_local_success1: "成功保存在设备目录并加载成功: {0}",
     capture_save_local_success2: "成功保存在设备目录: {0}",
 
+    scratch_ticket_progress :"已经刮开了 {0}%",
 
     /**@description 图件多语言配置 */
 

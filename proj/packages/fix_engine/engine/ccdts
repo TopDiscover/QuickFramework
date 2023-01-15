@@ -8,6 +8,10 @@ declare module cc {
 		userData: any;
 	}
 
+	export interface Mask{
+		_graphics : Graphics;
+	}
+
 	/**@description 这些接口是TableView中使用到的接口，需要声明引擎内部的接口 */
 	export interface ScrollView{
 
