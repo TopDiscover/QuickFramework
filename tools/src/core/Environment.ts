@@ -18,7 +18,7 @@ class _Environment {
     readonly creatorVerion: string = "3.6.0";
 
     /**@description 支持版本 */
-    readonly supportVersions = ["3.6.0","3.6.1","3.6.2"];
+    readonly supportVersions = ["3.6.0","3.6.1","3.6.2","3.6.3"];
 
     /**@description 扩展插件目录名 */
     readonly extensionsName = "extensions";
