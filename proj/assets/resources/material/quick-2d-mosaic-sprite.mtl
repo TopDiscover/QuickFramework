@@ -10,7 +10,8 @@
   "_techniqueData": {
     "0": {
       "defines": {
-        "USE_TEXTURE": true
+        "USE_TEXTURE": true,
+        "USE_MASAIC": false
       }
     }
   }
