@@ -22,4 +22,8 @@ export class TableViewCell extends cc.Component {
     init() {
 
     }
+
+    willRecycle() {
+        
+    }
 }
