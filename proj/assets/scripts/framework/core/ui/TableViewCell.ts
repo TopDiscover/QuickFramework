@@ -24,4 +24,8 @@ export class TableViewCell extends Component {
     init() {
 
     }
+
+    willRecycle(){
+        
+    }
 }
