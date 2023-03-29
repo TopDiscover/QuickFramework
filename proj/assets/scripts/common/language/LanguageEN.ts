@@ -65,6 +65,10 @@ export let LanguageEN = {
                 name: "截图",
                 sort: 8
             },
+            chat: {
+                name: "聊天室",
+                sort: 9
+            },
             resources: {
                 name: "主包",
                 sort: 0
