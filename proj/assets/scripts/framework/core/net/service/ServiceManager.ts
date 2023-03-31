@@ -212,7 +212,7 @@ export class ServiceManager implements GameEventInterface , ISingleton {
             }
         }
         if (!this.curReconnect) {
-            Manager.uiReconnect.hide();
+            App.uiReconnect.hide();
         }
     }
 

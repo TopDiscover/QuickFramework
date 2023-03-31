@@ -41,22 +41,22 @@ class AudioData implements ISingleton{
     init() {
 
         //音量开关读取
-        this.isMusicOn = Manager.storage.getItem(this._storeMusicKey, this.isMusicOn);
-        this.isEffectOn = Manager.storage.getItem(this._storeEffectKey, this.isEffectOn);
+        this.isMusicOn = App.storage.getItem(this._storeMusicKey, this.isMusicOn);
+        this.isEffectOn = App.storage.getItem(this._storeEffectKey, this.isEffectOn);
 
         //音量读取
-        this.musicVolume = Manager.storage.getItem(this._storeMusicVolumeKey, this.musicVolume);
-        this.effectVolume = Manager.storage.getItem(this._storeEffectVolumeKey, this.effectVolume);
+        this.musicVolume = App.storage.getItem(this._storeMusicVolumeKey, this.musicVolume);
+        this.effectVolume = App.storage.getItem(this._storeEffectVolumeKey, this.effectVolume);
     }
 
     /**@description 存储 */
     public save() {
         try {
-            Manager.storage.setItem(this._storeMusicKey, this.isMusicOn);
-            Manager.storage.setItem(this._storeMusicVolumeKey, this.musicVolume);
+            App.storage.setItem(this._storeMusicKey, this.isMusicOn);
+            App.storage.setItem(this._storeMusicVolumeKey, this.musicVolume);
 
-            Manager.storage.setItem(this._storeEffectKey, this.isEffectOn);
-            Manager.storage.setItem(this._storeEffectVolumeKey, this.effectVolume);
+            App.storage.setItem(this._storeEffectKey, this.isEffectOn);
+            App.storage.setItem(this._storeEffectVolumeKey, this.effectVolume);
         } catch (error) {
         }
     }
@@ -186,7 +186,7 @@ export default class AudioComponent extends EventComponent {
             this.curBundle = bundle;
             this.curLoop = loop;
             if (this.audioData.isMusicOn) {
-                Manager.cache.getCacheByAsync(url, cc.AudioClip, bundle).then((data) => {
+                App.cache.getCacheByAsync(url, cc.AudioClip, bundle).then((data) => {
                     if (data) {
                         let info = new Resource.Info;
                         info.url = url;
@@ -194,9 +194,9 @@ export default class AudioComponent extends EventComponent {
                         info.data = data;
                         info.bundle = bundle;
                         if (this.owner) {
-                            Manager.uiManager.addLocal(info, this.owner.className);
+                            App.uiManager.addLocal(info, this.owner.className);
                         } else {
-                            Manager.uiManager.garbage.addLocal(info);
+                            App.uiManager.garbage.addLocal(info);
                         }
                         if ( !(this.isPlaying && this.curMusicUrl == this.prevMusiUrl) ){
                             //停掉当前播放音乐
@@ -226,7 +226,7 @@ export default class AudioComponent extends EventComponent {
                 }
             }
             if (this.audioData.isEffectOn) {
-                Manager.cache.getCacheByAsync(url, cc.AudioClip, bundle).then((data) => {
+                App.cache.getCacheByAsync(url, cc.AudioClip, bundle).then((data) => {
                     if (data) {
                         let info = new Resource.Info;
                         info.url = url;
@@ -234,9 +234,9 @@ export default class AudioComponent extends EventComponent {
                         info.data = data;
                         info.bundle = bundle;
                         if (this.owner) {
-                            Manager.uiManager.addLocal(info, this.owner.className);
+                            App.uiManager.addLocal(info, this.owner.className);
                         } else {
-                            Manager.uiManager.garbage.addLocal(info);
+                            App.uiManager.garbage.addLocal(info);
                         }
                         this.audioData.curEffectId = cc.audioEngine.playEffect(data, loop);
                         resolve(this.audioData.curEffectId);

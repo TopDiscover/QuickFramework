@@ -37,10 +37,10 @@ export default class UILoading implements ISingleton{
      */
     private _show() {
         if (!this.node){
-            this.node = cc.instantiate(Manager.uiManager.getScenePrefab("UILoading"));
+            this.node = cc.instantiate(App.uiManager.getScenePrefab("UILoading"));
         }
         this.node.removeFromParent();
-        Manager.uiManager.addView(this.node, ViewZOrder.UILoading);
+        App.uiManager.addView(this.node, ViewZOrder.UILoading);
         this.node.position = cc.Vec3.ZERO;
         this.content = cc.find("content", this.node);
         cc.Tween.stopAllByTarget(this.content);
@@ -60,7 +60,7 @@ export default class UILoading implements ISingleton{
         this.stopTimeOutTimer();
         if (timeout) {
             this._timerId = setTimeout(() => {
-                Manager.tips.show(`加载界面${this._uiName ? this._uiName : ""}超时，请重试`);
+                App.tips.show(`加载界面${this._uiName ? this._uiName : ""}超时，请重试`);
                 this.hide();
             }, timeout * 1000);
         }

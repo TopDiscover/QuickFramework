@@ -30,14 +30,14 @@ export class BundleManager implements ISingleton{
          let bundle = loaded[i];
          if (excludeBundles.indexOf(bundle) == -1) {
             //在排除bundle中找不到，直接删除
-            if ( !Manager.releaseManger.isExistBunble(bundle) ){
-               Manager.entryManager.onUnloadBundle(bundle);
+            if ( !App.releaseManger.isExistBunble(bundle) ){
+               App.entryManager.onUnloadBundle(bundle);
             }
             
             let result = this.getBundle(bundle);
             if (result) {
-               Manager.cache.removeBundle(bundle);
-               Manager.releaseManger.removeBundle(result);
+               App.cache.removeBundle(bundle);
+               App.releaseManger.removeBundle(result);
             }
          }
       }
@@ -75,7 +75,7 @@ export class BundleManager implements ISingleton{
     */
    public enterBundle(config: UpdateItem | null) {
       if ( config ){
-         Manager.updateManager.dowonLoad(config);
+         App.updateManager.dowonLoad(config);
       }else{
          Log.e(`无效的入口信息`);
       }
@@ -85,7 +85,7 @@ export class BundleManager implements ISingleton{
       let bundle = this.getBundle(item.bundle);
       if (bundle) {
          Log.d(`${item.bundle}已经加载在缓存中，直接使用`);
-         Manager.releaseManger.onLoadBundle(item.bundle);
+         App.releaseManger.onLoadBundle(item.bundle);
          item.handler.onLoadBundleComplete(item);
          return;
       }
@@ -96,7 +96,7 @@ export class BundleManager implements ISingleton{
             Log.e(`load bundle : ${item.bundle} fail !!!`);
             item.handler.onLoadBundleError(item,err);
          } else {
-            Manager.releaseManger.onLoadBundle(item.bundle);
+            App.releaseManger.onLoadBundle(item.bundle);
             Log.d(`load bundle : ${item.bundle} success !!!`);
             item.handler.onLoadBundleComplete(item);
          }

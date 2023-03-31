@@ -11,7 +11,7 @@ import { ReconnectHandler } from "./ReconnectHandler";
 export class CommonService extends Service {
 
     private get data() {
-        return Manager.stageData;
+        return App.stageData;
     }
     protected ip = "localhost";
     protected port = 3000;
@@ -72,7 +72,7 @@ export class CommonService extends Service {
     protected onHeartbeatTimeOut() {
         Log.w(`${this.module} 心跳超时，您已经断开网络`);
         this.close();
-        Manager.serviceManager.reconnect(this);
+        App.serviceManager.reconnect(this);
     }
     /**
      * @description 是否为心跳消息
@@ -91,7 +91,7 @@ export class CommonService extends Service {
             //进入后台超时，主动关闭网络
             Log.d(`进入后台时间过长，主动关闭网络，等玩家切回前台重新连接网络`);
             me.close();
-            Manager.alert.close(Config.RECONNECT_ALERT_TAG);
+            App.alert.close(Config.RECONNECT_ALERT_TAG);
         }, me.maxEnterBackgroundTime * 1000);
     }
 
@@ -107,8 +107,8 @@ export class CommonService extends Service {
             if (inBackgroundTime > this.maxEnterBackgroundTime) {
                 Log.d(`从回台切换，显示重新连接网络`);
                 this.close();
-                Manager.alert.close(Config.RECONNECT_ALERT_TAG);
-                Manager.serviceManager.reconnect(this);
+                App.alert.close(Config.RECONNECT_ALERT_TAG);
+                App.serviceManager.reconnect(this);
             }
         }
     }

@@ -81,7 +81,7 @@ export class EntryManager implements ISingleton{
                 this.delegate.onEnterMain(entry,userData);
             } else {
                 config.userData = userData;
-                Manager.bundleManager.enterBundle(config);
+                App.bundleManager.enterBundle(config);
             }
         }
     }
@@ -90,7 +90,7 @@ export class EntryManager implements ISingleton{
      * @description 返回上一场景 
      * */
     backBundle( userData ?: any ){
-        let bundle = Manager.stageData.prevWhere;
+        let bundle = App.stageData.prevWhere;
         if ( bundle ){
             this.enterBundle(bundle,userData);
         }else{
@@ -143,7 +143,7 @@ export class EntryManager implements ISingleton{
 
     /**@description 获取bundle入口 */
     getEntry(bundle: BUNDLE_TYPE) {
-        let name = Manager.bundleManager.getBundleName(bundle);
+        let name = App.bundleManager.getBundleName(bundle);
         let entry = this._entrys.get(name)
         if (entry) {
             return entry;

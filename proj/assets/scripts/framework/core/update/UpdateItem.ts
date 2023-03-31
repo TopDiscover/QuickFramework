@@ -38,7 +38,7 @@ export class UpdateItem {
     /**@description 更新项名字,如果大厅 */
     private _name = "";
     get name(){
-        return Manager.getLanguage(this._name as any);
+        return App.getLanguage(this._name as any);
     };
     /**@description 更新项bundle名 */
     bundle: string = "";
@@ -49,7 +49,7 @@ export class UpdateItem {
 
     /**@description 下载管理器，请不要从外面进行设置,管理器专用 */
     private get assetsManager() {
-        return Manager.updateManager.getAssetsManager(this);
+        return App.updateManager.getAssetsManager(this);
     }
 
     private _code: Update.Code = Update.Code.UNINITED;
@@ -86,7 +86,7 @@ export class UpdateItem {
 
     /**@description 是否是预览或浏览器 */
     private get isBrowser() {
-        return Manager.updateManager.isBrowser;
+        return App.updateManager.isBrowser;
     }
 
     /**@description 是否跳过热更新 */
@@ -95,7 +95,7 @@ export class UpdateItem {
             //预览及浏览器下，不需要有更新的操作
             return true;
         } else {
-            return Manager.updateManager.isSkipCheckUpdate;
+            return App.updateManager.isSkipCheckUpdate;
         }
     }
 
@@ -116,11 +116,11 @@ export class UpdateItem {
      * @returns 
      */
     convertBundle(bundle: string) {
-        return Manager.updateManager.convertBundle(bundle);
+        return App.updateManager.convertBundle(bundle);
     }
 
     private getProjectString() {
-        return Manager.updateManager.getProjectString(this.bundle);
+        return App.updateManager.getProjectString(this.bundle);
     }
 
     /**@description 检测更新 */
@@ -139,11 +139,11 @@ export class UpdateItem {
     }
 
     private get storagePath() {
-        return Manager.updateManager.storagePath;
+        return App.updateManager.storagePath;
     }
 
     private get hotUpdateUrl() {
-        return Manager.updateManager.hotUpdateUrl;
+        return App.updateManager.hotUpdateUrl;
     }
 
     /**@description 当前是否正在检测更新或更新过程中 */
@@ -247,16 +247,16 @@ export class UpdateItem {
             case Update.Code.ALREADY_UP_TO_DATE:
                 Log.d(`${this.bundle} Already up to date with the latest remote version.`);
                 if (this.isMain) {
-                    Manager.updateManager.savePreVersions();
+                    App.updateManager.savePreVersions();
                 } else if (this.bundle == Macro.BUNDLE_HALL) {
                     //如果大厅已经没有更新，但此时主包有更新，需要检测升级主包
-                    code = Manager.updateManager.checkMainMd5(this, code);
+                    code = App.updateManager.checkMainMd5(this, code);
                 }
                 break;
             case Update.Code.NEW_VERSION_FOUND:
                 Log.d(`${this.bundle} New version found, please try to update.`);
                 if (!this.isMain) {
-                    code = Manager.updateManager.checkAllowUpdate(this, code);
+                    code = App.updateManager.checkAllowUpdate(this, code);
                 }
                 break;
             default:
@@ -322,14 +322,14 @@ export class UpdateItem {
                 Log.d(`${this.bundle} Already up to date with the latest remote version`);
                 failed = true;
                 if (this.isMain) {
-                    Manager.updateManager.savePreVersions();
+                    App.updateManager.savePreVersions();
                 }
                 break;
             case Update.Code.UPDATE_FINISHED:
                 Log.d(`${this.bundle} Update finished. ${event.getMessage()}`);
                 isUpdateFinished = true;
                 if (this.isMain) {
-                    Manager.updateManager.savePreVersions();
+                    App.updateManager.savePreVersions();
                 }
                 break;
             case Update.Code.UPDATE_FAILED:

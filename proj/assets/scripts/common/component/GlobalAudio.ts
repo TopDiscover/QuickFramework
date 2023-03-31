@@ -30,9 +30,9 @@ export default class GlobalAudio extends AudioComponent {
             this.audioData.curMusicUrl = url;
             this.audioData.curBundle = bundle;
             if (this.audioData.isMusicOn) {
-                Manager.cache.getCacheByAsync(url, cc.AudioClip,bundle).then((data) => {
+                App.cache.getCacheByAsync(url, cc.AudioClip,bundle).then((data) => {
                     if (data) {
-                        Manager.asset.addPersistAsset(url,data,bundle);
+                        App.asset.addPersistAsset(url,data,bundle);
                         me.stopMusic();
                         cc.audioEngine.playMusic(data, loop);
                         this.isPlaying = true;
@@ -54,9 +54,9 @@ export default class GlobalAudio extends AudioComponent {
                 return;
             }
             if (this.audioData.isEffectOn) {
-                Manager.cache.getCacheByAsync(url, cc.AudioClip,bundle).then((data) => {
+                App.cache.getCacheByAsync(url, cc.AudioClip,bundle).then((data) => {
                     if (data) {
-                        Manager.asset.addPersistAsset(url,data,bundle);
+                        App.asset.addPersistAsset(url,data,bundle);
                         this.audioData.curEffectId = cc.audioEngine.playEffect(data, loop);
                         resolve(this.audioData.curEffectId);
                     } else {

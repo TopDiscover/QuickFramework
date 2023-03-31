@@ -18,14 +18,14 @@ export default class MainController extends EventComponent {
 
     onLoad() {
         super.onLoad();
-        Manager.onLoad(this.node);
+        App.onLoad(this.node);
         if (this.wssCacert) {
-            Manager.wssCacertUrl = this.wssCacert.nativeUrl;
+            App.wssCacertUrl = this.wssCacert.nativeUrl;
         }
         let debug = cc.find("debug", this.node);
         this.debugView = cc.find("debugView",this.node);
         if (debug&&this.debugView) {
-            let isVisibleDebugInfo = Manager.storage.getItem(Config.SHOW_DEBUG_INFO_KEY,true);
+            let isVisibleDebugInfo = App.storage.getItem(Config.SHOW_DEBUG_INFO_KEY,true);
             cc.debug.setDisplayStats(isVisibleDebugInfo);
             if ( Config.isShowDebugButton ){
                 debug.active = true;
@@ -54,7 +54,7 @@ export default class MainController extends EventComponent {
     }
 
     update(dt:number) {
-        Manager.update(this.node);
+        App.update(this.node);
     }
 
     onDestroy() {
@@ -63,19 +63,19 @@ export default class MainController extends EventComponent {
         //移除游戏事件注册
         cc.game.off(cc.game.EVENT_HIDE);
         cc.game.off(cc.game.EVENT_SHOW);
-        Manager.onDestroy(this.node);
+        App.onDestroy(this.node);
         super.onDestroy();
     }
 
     private onEnterBackground() {
-        Manager.onEnterBackground();
+        App.onEnterBackground();
     }
 
     private onEnterForgeground() {
-        Manager.onEnterForgeground();
+        App.onEnterForgeground();
     }
 
     private onLowMemory(){
-        Manager.onLowMemory();
+        App.onLowMemory();
     }
 }

@@ -5,7 +5,7 @@ import { getBundle, setLabelFont } from "../../plugin/CocosUtils";
  */
 const { ccclass, property, menu } = cc._decorator;
 
-const Bundles = cc.Enum(Manager.Bundles);
+const Bundles = cc.Enum(App.Bundles);
 
 @ccclass
 @menu("Quick渲染组件/UILabel")
@@ -106,12 +106,12 @@ export default class UILabel extends cc.Label {
         if (super.onLoad) {
             super.onLoad();
         }
-        Manager.language.add(this);
+        App.language.add(this);
         this.update(0);
     }
 
     protected onDestroy(): void {
-        Manager.language.remove(this);
+        App.language.remove(this);
         if (super.onDestroy) {
             super.onDestroy();
         }
@@ -131,7 +131,7 @@ export default class UILabel extends cc.Label {
         if (this.isUseMultilingual) {
             let bundle = this.bundle;
             let realBundle = Bundles[bundle]
-            let str = Manager.getLanguage(this.language as any,this.params, realBundle)
+            let str = App.getLanguage(this.language as any,this.params, realBundle)
             this.string = str;
         }
         super.forceDoLayout();

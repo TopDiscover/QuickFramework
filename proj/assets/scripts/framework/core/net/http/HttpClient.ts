@@ -74,7 +74,7 @@ export class HttpPackage {
      * @param errorcb 
      */
     public send(cb?: (data: any) => void, errorcb?: (errorData: Http.Error) => void) {
-        Manager.http.request(this, cb, errorcb);
+        App.http.request(this, cb, errorcb);
     }
 }
 

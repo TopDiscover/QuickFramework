@@ -53,10 +53,10 @@ export default class Loading implements ISingleton{
 
     protected _show(timeout: number) {
         if ( !this.node ){
-            this.node = cc.instantiate(Manager.uiManager.getScenePrefab("Loading"));
+            this.node = cc.instantiate(App.uiManager.getScenePrefab("Loading"));
         }
         this.node.removeFromParent();
-        Manager.uiManager.addView(this.node, ViewZOrder.Loading);
+        App.uiManager.addView(this.node, ViewZOrder.Loading);
         this.node.position = cc.Vec3.ZERO;
         this.text = cc.find("content/text", this.node).getComponent(cc.Label);
         this._showContentIndex = 0;

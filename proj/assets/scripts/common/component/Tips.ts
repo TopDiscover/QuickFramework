@@ -17,7 +17,7 @@ class ToastItem extends cc.Component {
     private runTimeOut(time: number) {
         let self = this;
         cc.tween(this._content).delay(time).call(() => {
-            Manager.tips.finishShowItem(self.node);
+            App.tips.finishShowItem(self.node);
         }).start();
     }
 
@@ -52,7 +52,7 @@ export default class Tips implements ISingleton{
     isResident = true;
 
     private get prefab(){
-        return Manager.uiManager.getScenePrefab("Tips");
+        return App.uiManager.getScenePrefab("Tips");
     }
 
     private _queue: cc.Node[] = [];
@@ -71,7 +71,7 @@ export default class Tips implements ISingleton{
             itemComp.fadeIn();
             node.userData = this._id++;
             node.name = `Tips${node.userData}`;
-            Manager.uiManager.addView(node, ViewZOrder.Tips)
+            App.uiManager.addView(node, ViewZOrder.Tips)
             //整体上移
             let length = this._queue.length;
             for (let i = 0; i < length; i++) {

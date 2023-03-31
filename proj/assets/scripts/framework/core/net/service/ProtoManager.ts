@@ -33,7 +33,7 @@ export class ProtoManager implements ISingleton{
                 return;
             }
             this._loadDir[`${bundle}/${path}`] = false;
-            Manager.asset.loadDir(bundle, path, cc.TextAsset, (finish, total, item) => { }, (cacheData) => {
+            App.asset.loadDir(bundle, path, cc.TextAsset, (finish, total, item) => { }, (cacheData) => {
                 if (cacheData && cacheData.data && Array.isArray(cacheData.data)) {
 
                     //解析proto文件
@@ -48,7 +48,7 @@ export class ProtoManager implements ISingleton{
                     info.type = cc.TextAsset;
                     info.data = cacheData.data;
                     info.bundle = bundle;
-                    Manager.asset.releaseAsset(info);
+                    App.asset.releaseAsset(info);
                     this._loadDir[`${bundle}/${path}`] = true;
                     resolove(true);
                 } else {

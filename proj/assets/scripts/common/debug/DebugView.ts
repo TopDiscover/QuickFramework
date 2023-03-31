@@ -93,13 +93,13 @@ export class DebugView extends cc.Component {
                 if (node) {
                     let toggle = node.getComponent(cc.Toggle);
                     if (toggle) {
-                        toggle.isChecked = Manager.logger.isValid(this.getLogLevel(i));
+                        toggle.isChecked = App.logger.isValid(this.getLogLevel(i));
                     }
                     node.on("toggle", (toggle: cc.Toggle) => {
                         if (toggle.isChecked) {
-                            Manager.logger.attach(this.getLogLevel(i));
+                            App.logger.attach(this.getLogLevel(i));
                         } else {
-                            Manager.logger.detach(this.getLogLevel(i));
+                            App.logger.detach(this.getLogLevel(i));
                         }
                     });
                 }
@@ -118,27 +118,27 @@ export class DebugView extends cc.Component {
     }
 
     private onLogicManager() {
-        Manager.logicManager.debug();
+        App.logicManager.debug();
     }
 
     private onDataCenter() {
-        Manager.dataCenter.debug();
+        App.dataCenter.debug();
     }
 
     private onEntry() {
-        Manager.entryManager.debug();
+        App.entryManager.debug();
     }
 
     private onProto() {
-        Manager.protoManager.debug()
+        App.protoManager.debug()
     }
 
     private onBundleMgr() {
-        Manager.bundleManager.debug();
+        App.bundleManager.debug();
     }
 
     private onPool(){
-        Manager.pool.debug();
+        App.pool.debug();
     }
 
     private onLog(){
@@ -147,47 +147,47 @@ export class DebugView extends cc.Component {
 
     private onShowDebugInfo(){
         cc.debug.setDisplayStats(!cc.debug.isDisplayStats())
-        Manager.storage.setItem(Config.SHOW_DEBUG_INFO_KEY,cc.debug.isDisplayStats());
+        App.storage.setItem(Config.SHOW_DEBUG_INFO_KEY,cc.debug.isDisplayStats());
     }
 
     private onShowUI(){
-        Manager.uiManager.debug({showViews:true});
+        App.uiManager.debug({showViews:true});
     }
 
     private onShowNode(){
-        Manager.uiManager.debug({showChildren:true});
+        App.uiManager.debug({showChildren:true});
     }
 
     private onShowRes(){
-        Manager.cache.debug();
+        App.cache.debug();
     }
 
     private onShowComp() {
-        Manager.uiManager.debug({showComp:true});
+        App.uiManager.debug({showComp:true});
     }
 
     private onSender() {
-        Manager.senderManager.debug();
+        App.senderManager.debug();
     }
 
     private onHandler(){
-        Manager.handlerManager.debug();
+        App.handlerManager.debug();
     }
 
     private onServiceManager() {
-        Manager.serviceManager.debug();
+        App.serviceManager.debug();
     }
 
     private onHotUpdate() {
-        Manager.updateManager.debug()
+        App.updateManager.debug()
     }
 
     private onLowMemory(){
-        Manager.onLowMemory();
+        App.onLowMemory();
     }
 
     private onReleaseManager() {
-        Manager.releaseManger.debug()
+        App.releaseManger.debug()
     }
 
     private onAdaptor() {

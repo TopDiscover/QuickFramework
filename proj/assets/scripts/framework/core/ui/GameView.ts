@@ -32,11 +32,11 @@ export default class GameView extends UIView {
 
     show(args ?: any[] | any){
         super.show(args);
-        Manager.entryManager.onShowGameView(this.bundle,this);
+        App.entryManager.onShowGameView(this.bundle,this);
     }
 
     protected onEnterGameView(){
-        Manager.entryManager.onEnterGameView(this.bundle,this);
+        App.entryManager.onEnterGameView(this.bundle,this);
     }
 
     /**
@@ -45,7 +45,7 @@ export default class GameView extends UIView {
      * @param userData 用户自定义数据
      */
     enterBundle( bundle : BUNDLE_TYPE , userData ?: any){
-        Manager.entryManager.enterBundle(bundle , userData);
+        App.entryManager.enterBundle(bundle , userData);
     }
 
     /**
@@ -53,7 +53,7 @@ export default class GameView extends UIView {
      * @param userData 用户自定义数据
      */
     backBundle(userData?:any){
-        Manager.entryManager.backBundle(userData);
+        App.entryManager.backBundle(userData);
     }
 
     onDestroy(){
@@ -63,9 +63,9 @@ export default class GameView extends UIView {
             this.audioHelper.stopAllEffects();
         }
         if ( this.logic ){
-            Manager.logicManager.destory(this.logic.bundle);
+            App.logicManager.destory(this.logic.bundle);
         }
-        Manager.entryManager.onDestroyGameView(this.bundle,this);
+        App.entryManager.onDestroyGameView(this.bundle,this);
         super.onDestroy();
     }
 

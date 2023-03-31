@@ -13,12 +13,12 @@ export class EntryDelegate {
         }
 
         //进入下一场景，关闭掉当前的场景
-        if (Manager.gameView) {
-            Manager.gameView.close();
+        if (App.gameView) {
+            App.gameView.close();
         }
-        Manager.gameView = gameView;
+        App.gameView = gameView;
 
-        Manager.bundleManager.removeLoadedBundle(excludeBundles);
+        App.bundleManager.removeLoadedBundle(excludeBundles);
     }
 
     onShowGameView(entry: Entry | null, gameView: GameView) {
@@ -29,7 +29,7 @@ export class EntryDelegate {
     onCheckUpdate() {
         Log.d(`主包检测更新`);
         let config = this.getEntryConfig(Macro.BUNDLE_RESOURCES);
-        Manager.bundleManager.enterBundle(config);
+        App.bundleManager.enterBundle(config);
     }
 
     /**@description 获取常驻于内存不释放的bundle */
@@ -39,8 +39,8 @@ export class EntryDelegate {
 
     onEnterMain(mainEntry: Entry | null , userData ?: any) {
         if (mainEntry) {
-            if (Manager.gameView) {
-                Manager.gameView.close();
+            if (App.gameView) {
+                App.gameView.close();
             }
             mainEntry.onEnter(userData);
         }

@@ -66,7 +66,7 @@ export class Process {
             this._isDoingMessage = false;
         }
         else {
-            Manager.uiManager.mainController?.scheduleOnce(() => {
+            App.uiManager.mainController?.scheduleOnce(() => {
                 this._isDoingMessage = false;
             }, handleTime);
         }
@@ -204,9 +204,9 @@ export class Process {
         let obj: Message = null!;
         if ( this.serviceType == Net.ServiceType.Proto ){
             if ( o.type && typeof o.type == "string" ){
-                let type = Manager.protoManager.lookup(o.type) as protobuf.Type;
+                let type = App.protoManager.lookup(o.type) as protobuf.Type;
                 if( type ){
-                    obj = Manager.protoManager.decode({
+                    obj = App.protoManager.decode({
                         className : o.type,
                         buffer : header.buffer as Uint8Array,
                     }) as any;

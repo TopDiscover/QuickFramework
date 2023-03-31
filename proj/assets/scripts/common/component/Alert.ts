@@ -35,13 +35,13 @@ class AlertDialog extends cc.Component {
 
     public show(config: AlertConfig) {
         if (!config.title) {
-            config.title = Manager.getLanguage("alert_title");
+            config.title = App.getLanguage("alert_title");
         }
         if (!config.confirmString) {
-            config.confirmString = Manager.getLanguage("alert_confirm");
+            config.confirmString = App.getLanguage("alert_confirm");
         }
         if (!config.cancelString) {
-            config.cancelString = Manager.getLanguage("alert_cancel");
+            config.cancelString = App.getLanguage("alert_cancel");
         }
         this._config = config;
         this.writeContent(config)
@@ -158,7 +158,7 @@ class AlertDialog extends cc.Component {
                 .to(0.2, { scale: 1.15 })
                 .to(0.1, { scale: 0.3 })
                 .call(() => {
-                    Manager.alert.finishAlert();
+                    App.alert.finishAlert();
                     if (complete) complete();
                 })
                 .start();
@@ -185,7 +185,7 @@ export default class Alert implements ISingleton{
     private queue: AlertConfig[] = [];
 
     private get prefab(){
-        return Manager.uiManager.getScenePrefab("Alert");
+        return App.uiManager.getScenePrefab("Alert");
     }
 
     private getConfig(config: AlertConfig) {
@@ -323,7 +323,7 @@ export default class Alert implements ISingleton{
         if (!this.curPanel) {
             this.curPanel = cc.instantiate(this.prefab);
             let dialog = this.curPanel.addComponent(AlertDialog);
-            Manager.uiManager.addView(this.curPanel, ViewZOrder.Alert)
+            App.uiManager.addView(this.curPanel, ViewZOrder.Alert)
             dialog.show(config);
         }
     }

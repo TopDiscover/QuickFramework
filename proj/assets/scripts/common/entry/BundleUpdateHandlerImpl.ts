@@ -10,9 +10,9 @@ export class BundleUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleto
         item.doUpdate();
     }
     onUpdateFailed(item: UpdateItem): void {
-        Manager.tips.show(Manager.getLanguage("updateFaild",[item.name]));
+        App.tips.show(App.getLanguage("updateFaild",[item.name]));
         //更新大厅图片状态到可更新,让用户再二次点击
-        Manager.uiManager.getView("HallView").then((view: HallView) => {
+        App.uiManager.getView("HallView").then((view: HallView) => {
             if (view) {
                 view.toUpdateStatus(item);
             }
@@ -22,14 +22,14 @@ export class BundleUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleto
         this.onUpdateFailed(item);
     }
     onShowUpdating(item: UpdateItem): void {
-        Manager.tips.show(Manager.getLanguage("checkingUpdate"));
+        App.tips.show(App.getLanguage("checkingUpdate"));
     }
     onNeedUpdateMain(item: UpdateItem): void {
-        let content = Manager.getLanguage("mainPackVersionIsTooLow") as string;
-        Manager.alert.show({
+        let content = App.getLanguage("mainPackVersionIsTooLow") as string;
+        App.alert.show({
             text: content,
             confirmCb: (isOK) => {
-                Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
+                App.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
             }
         });
     }
@@ -37,14 +37,14 @@ export class BundleUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleto
 
     }
     onDownloading(item: UpdateItem, info: Update.DownLoadInfo): void {
-        Manager.uiManager.getView("HallView").then((view: HallView) => {
+        App.uiManager.getView("HallView").then((view: HallView) => {
             if (view) {
                 view.onDownloadProgess(info);
             }
         });
     }
     onAreadyUpToData(item: UpdateItem): void {
-        Manager.tips.show(Manager.getLanguage("alreadyRemoteVersion",[item.name]));
+        App.tips.show(App.getLanguage("alreadyRemoteVersion",[item.name]));
     }
 
     onStarCheckUpdate(item: UpdateItem): void {
@@ -54,19 +54,19 @@ export class BundleUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleto
         //子游戏加载，不做处理
     }
     onLoadBundleError(item: UpdateItem, err: Error | null): void {
-        Manager.tips.show(Manager.getLanguage("loadFailed",[item.name]));
+        App.tips.show(App.getLanguage("loadFailed",[item.name]));
     }
     onLoadBundleComplete(item: UpdateItem): void {
-        Manager.entryManager.onLoadBundleComplete(item);
+        App.entryManager.onLoadBundleComplete(item);
     }
 
     onLoadBundle(item: UpdateItem): void {
-        Manager.bundleManager.loadBundle(item);
+        App.bundleManager.loadBundle(item);
     }
 
     onDownloadComplete(item: UpdateItem): void {
         //子游戏下载完成，不进入游戏，需要玩家二次点击进入
         //尝试先释放掉当前的bundle的资源，重新加载
-        Manager.releaseManger.tryRemoveBundle(item.bundle);
+        App.releaseManger.tryRemoveBundle(item.bundle);
     }
 }

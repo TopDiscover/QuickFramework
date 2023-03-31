@@ -10,27 +10,27 @@ export class MainUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleton 
         item.doUpdate();
     }
     onUpdateFailed(item: UpdateItem): void {
-        let content = Manager.getLanguage("downloadFailed");
-        Manager.alert.show({
+        let content = App.getLanguage("downloadFailed");
+        App.alert.show({
             text: content,
             confirmCb: (isOK) => {
                 item.checkUpdate();
             }
         });
-        Manager.updateLoading.hide();
+        App.updateLoading.hide();
     }
     onPreVersionFailed(item: UpdateItem): void {
-        let content = Manager.getLanguage("downloadFailed");
-        Manager.alert.show({
+        let content = App.getLanguage("downloadFailed");
+        App.alert.show({
             text: content,
             confirmCb: (isOK) => {
                 item.checkUpdate();
             }
         });
-        Manager.updateLoading.hide();
+        App.updateLoading.hide();
     }
     onShowUpdating(item: UpdateItem): void {
-        Manager.updateLoading.show(Manager.getLanguage("loading"));
+        App.updateLoading.show(App.getLanguage("loading"));
     }
     onNeedUpdateMain(item: UpdateItem): void {
 
@@ -39,30 +39,30 @@ export class MainUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleton 
 
     }
     onDownloading(item: UpdateItem, info: Update.DownLoadInfo): void {
-        Manager.updateLoading.updateProgress(info.progress);
+        App.updateLoading.updateProgress(info.progress);
     }
     onAreadyUpToData(item: UpdateItem): void {
-        Manager.updateLoading.hide();
+        App.updateLoading.hide();
     }
     onStarCheckUpdate(item: UpdateItem): void {
-        Manager.updateLoading.show(Manager.getLanguage("loading"));
+        App.updateLoading.show(App.getLanguage("loading"));
     }
     onStartLoadBundle(item: UpdateItem): void {
 
     }
     onLoadBundleError(item: UpdateItem, err: Error | null): void {
         //主包原则上说是不可能加载错误的
-        Manager.updateLoading.hide();
-        Manager.tips.show(Manager.getLanguage("loadFailed",[item.name]));
+        App.updateLoading.hide();
+        App.tips.show(App.getLanguage("loadFailed",[item.name]));
         Log.dump(err, "onLoadBundleError");
     }
     onLoadBundleComplete(item: UpdateItem): void {
-        Manager.updateLoading.hide();
-        Manager.entryManager.onLoadBundleComplete(item);
+        App.updateLoading.hide();
+        App.entryManager.onLoadBundleComplete(item);
     }
     onLoadBundle(item: UpdateItem): void {
         //主包不会释放，直接隐藏loading
-        Manager.updateLoading.hide();
+        App.updateLoading.hide();
     }
     onDownloadComplete(item: UpdateItem): void {
 
