@@ -32,7 +32,7 @@ export class Snapshot extends Component {
     private _buffer: Uint8Array = null!;
 
     protected start() {
-        this._camera = Manager.uiManager.screenShotCamera;
+        this._camera = App.uiManager.screenShotCamera;
         super.start && super.start();
         this._texture = new RenderTexture();
         this._texture.reset({
@@ -143,14 +143,14 @@ export class Snapshot extends Component {
         if (sys.isBrowser) {
             this.createImageData(width, height, arrayBuffer);
             //@ts-ignore
-            Manager.canvasHelper.saveAsPNG(this._canvas, width, height);
-            Manager.tips.show(Manager.getLanguage("capture_success"));
+            App.canvasHelper.saveAsPNG(this._canvas, width, height);
+            App.tips.show(App.getLanguage("capture_success"));
             this.onCaptureFinish(width, height);
         } else if (sys.isNative) {
             //原生win32平台调度运行会造成崩溃，请直接用release模式打开，可正常工作
             let date = new Date()
             let fileName = date.format("yyyy_MM_dd_hh_mm_ss_SS") + ".png";
-            let filePath = `${Manager.platform.screenshotsPath}/${fileName}`;
+            let filePath = `${App.platform.screenshotsPath}/${fileName}`;
             //@ts-ignore
             let buffer = this.flipImageY(this._buffer, width, height);
             native.saveImageData(buffer, width, height, filePath).then(() => {
@@ -165,16 +165,16 @@ export class Snapshot extends Component {
                             texture.image = imageAsset;
                             spriteFrame.texture = texture
                             spriteFrame.packable = false;
-                            Manager.tips.show(Manager.getLanguage("capture_save_local_success1", [filePath]));
+                            App.tips.show(App.getLanguage("capture_save_local_success1", [filePath]));
                             this.onCaptureFinish(width,height,spriteFrame);
                         }
                     });
                 }
                 Log.d("save image data success, file: " + filePath);
-                Manager.tips.show(Manager.getLanguage("capture_save_local_success2", [filePath]));
+                App.tips.show(App.getLanguage("capture_save_local_success2", [filePath]));
             }).catch(() => {
                 Log.e("save image data failed!");
-                Manager.tips.show(Manager.getLanguage("capture_save_failed"));
+                App.tips.show(App.getLanguage("capture_save_failed"));
             })
         } else if (sys.platform === sys.Platform.WECHAT_GAME) {
             this.createImageData(width, height, arrayBuffer);
@@ -190,30 +190,30 @@ export class Snapshot extends Component {
                 success: (res: any) => {
                     //@ts-ignore
                     wx.showToast({
-                        title: Manager.getLanguage("capture_success")
+                        title: App.getLanguage("capture_success")
                     });
-                    Manager.tips.show(Manager.getLanguage("capture_success"));
+                    App.tips.show(App.getLanguage("capture_success"));
                     //@ts-ignore
                     wx.saveImageToPhotosAlbum({
                         filePath: res.tempFilePath,
                         success: (res: any) => {
                             //@ts-ignore              
                             wx.showToast({
-                                title: Manager.getLanguage("capture_save_photo_album"),
+                                title: App.getLanguage("capture_save_photo_album"),
                             });
-                            Manager.tips.show(Manager.getLanguage("capture_save_local_success2", [res.tempFilePath]));
+                            App.tips.show(App.getLanguage("capture_save_local_success2", [res.tempFilePath]));
                         },
                         fail: () => {
-                            Manager.tips.show(Manager.getLanguage("capture_save_failed"));
+                            App.tips.show(App.getLanguage("capture_save_failed"));
                         }
                     })
                 },
                 fail: () => {
                     //@ts-ignore
                     wx.showToast({
-                        title: Manager.getLanguage("capture_failed")
+                        title: App.getLanguage("capture_failed")
                     });
-                    Manager.tips.show(Manager.getLanguage("capture_failed"));
+                    App.tips.show(App.getLanguage("capture_failed"));
                 }
             })
             this.onCaptureFinish(width, height);

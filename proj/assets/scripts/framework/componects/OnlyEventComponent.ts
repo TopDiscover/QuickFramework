@@ -15,14 +15,14 @@ export default class OnlyEventComponent {
             Log.e(`${name} 重复注册`);
             return;
         }
-        Manager.dispatcher.add(name, func, this);
+        App.dispatcher.add(name, func, this);
         this._events.set(name, func);
     }
 
     protected removeEvent(eventName: string) {
         if (this._events.has(eventName)) {
             //事件移除
-            Manager.dispatcher.remove(eventName, this);
+            App.dispatcher.remove(eventName, this);
             //删除本地事件
             this._events.delete(eventName);
         }
@@ -37,7 +37,7 @@ export default class OnlyEventComponent {
 
     onDestroy(...args : any[]) {
         this._events.forEach((func, name) => {
-            Manager.dispatcher.remove(name, this);
+            App.dispatcher.remove(name, this);
         });
         this._events.clear();
     }

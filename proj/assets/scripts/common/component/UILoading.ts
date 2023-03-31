@@ -11,7 +11,7 @@ export default class UILoading implements ISingleton{
     /**@description 当前loading节点 */
     private node: Node = null!;
     private get prefab(){
-        return Manager.uiManager.getScenePrefab("UILoading");
+        return App.uiManager.getScenePrefab("UILoading");
     }
     private delay: number = 0;
     private content: Node = null!;
@@ -53,7 +53,7 @@ export default class UILoading implements ISingleton{
             this.node = instantiate(this.prefab) as any;
         }
         this.node.removeFromParent();
-        Manager.uiManager.addView(this.node, ViewZOrder.UILoading);
+        App.uiManager.addView(this.node, ViewZOrder.UILoading);
         this.node.position = Vec3.ZERO;
         this.content = find("content", this.node) as Node;
         Tween.stopAllByTarget(this.contentOpacity);
@@ -73,7 +73,7 @@ export default class UILoading implements ISingleton{
         this.stopTimeOutTimer();
         if (timeout) {
             this._timerId = setTimeout(() => {
-                Manager.tips.show(`加载界面${this._uiName ? this._uiName : ""}超时，请重试`);
+                App.tips.show(`加载界面${this._uiName ? this._uiName : ""}超时，请重试`);
                 this.hide();
             }, timeout * 1000);
         }

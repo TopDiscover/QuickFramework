@@ -93,10 +93,10 @@ export default class WebSocketClinet {
 
 
         if (JSB && protocol == "wss") {
-            if (!Manager.wssCacertUrl) {
+            if (!App.wssCacertUrl) {
                 Log.e(`请先设置wss的证书url,MainController脚本中直接挂载证书`);
             }
-            this._ws = new (<any>(WebSocket))(fullUrl, [], Manager.wssCacertUrl);
+            this._ws = new (<any>(WebSocket))(fullUrl, [], App.wssCacertUrl);
         } else {
             this._ws = new WebSocket(fullUrl);
         }

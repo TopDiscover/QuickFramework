@@ -25,7 +25,7 @@ export class ReconnectHandler extends Handler {
     }
 
     protected get data() {
-        return Manager.stageData;
+        return App.stageData;
     }
 
     protected _enabled = false;
@@ -58,7 +58,7 @@ export class ReconnectHandler extends Handler {
         this.stopActions();
         this.isConnecting = false;
         this._connectCount = 0;
-        Manager.alert.close(Config.RECONNECT_ALERT_TAG);
+        App.alert.close(Config.RECONNECT_ALERT_TAG);
     }
 
     protected delayConnect() {
@@ -81,10 +81,10 @@ export class ReconnectHandler extends Handler {
 
     protected connect() {
         if (this.isInvalid) return;
-        Manager.alert.close(Config.RECONNECT_ALERT_TAG);
+        App.alert.close(Config.RECONNECT_ALERT_TAG);
         //说明进入了登录界面
         if (this.data.isLoginStage()) {
-            Manager.uiReconnect.hide();
+            App.uiReconnect.hide();
             Log.w(`重连处于登录界面，停止重连`);
             return;
         }
@@ -93,7 +93,7 @@ export class ReconnectHandler extends Handler {
             this.showReconnectDialog();
             return;
         }
-        Manager.uiReconnect.show(Manager.getLanguage("tryReconnect",[this.service.module, this._connectCount]));
+        App.uiReconnect.show(App.getLanguage("tryReconnect",[this.service.module, this._connectCount]));
         this.service.connect();
 
         //启用连接超时处理
@@ -116,26 +116,26 @@ export class ReconnectHandler extends Handler {
 
     protected showReconnectDialog() {
         if (this.isInvalid) return;
-        Manager.uiReconnect.hide();
+        App.uiReconnect.hide();
         Log.d(`${this.service.module} 断开`)
         this.stopAction(this.connectTimeOutID);
-        Manager.alert.show({
+        App.alert.show({
             tag: Config.RECONNECT_ALERT_TAG,
             isRepeat: false,
-            text: Manager.getLanguage("warningReconnect",[this.service.module]) as string,
+            text: App.getLanguage("warningReconnect",[this.service.module]) as string,
             confirmCb: (isOK) => {
                 if (isOK) {
                     Log.d(`${this.service?.module} 重连连接网络`);
                     this.stop();
-                    Manager.serviceManager.reconnect(this.service);
+                    App.serviceManager.reconnect(this.service);
                 } else {
                     Log.d(`${this.service?.module} 玩家网络不好，不重连，退回到登录界面`);
-                    Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
+                    App.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
                 }
             },
             cancelCb: () => {
                 Log.d(`${this.service?.module} 玩家网络不好，不重连，退回到登录界面`);
-                Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
+                App.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
             }
         });
     }

@@ -44,6 +44,6 @@ export abstract class LanguageDelegate{
 export function injectLanguageData( type : any ){
     if ( EDITOR ){
         let data = new (type as any);
-        Manager.language.addDelegate(data);
+        App.language.addDelegate(data);
     }
 }

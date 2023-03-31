@@ -48,7 +48,7 @@ export abstract class Entry {
     /**@description 管理器通知自己进入GameView */
     onEnter(userData?: any): void {
         //语言包初始化
-        Manager.language.addDelegate(this.language);
+        App.language.addDelegate(this.language);
         //初始化游戏数据
         this.initData();
         //添加网络事件
@@ -64,11 +64,11 @@ export abstract class Entry {
     /**@description 这个位置说明自己GameView 进入onLoad完成 */
     onEnterGameView(gameViw: GameView): void {
         this._gameView = gameViw;
-        let viewType = Manager.uiManager.getViewType(gameViw);
+        let viewType = App.uiManager.getViewType(gameViw);
         if (viewType) {
             if (viewType.logicType) {
                 viewType.logicType.module = gameViw.bundle as string;
-                let logic = Manager.logicManager.get(viewType.logicType, true);
+                let logic = App.logicManager.get(viewType.logicType, true);
                 if (logic) {
                     gameViw.setLogic(logic);
                 }
@@ -91,9 +91,9 @@ export abstract class Entry {
     /**@description 卸载bundle,即在自己bundle删除之前最后的一条消息 */
     onUnloadBundle(): void {
         //自己bundle初始卸载前要关闭当前bundle的所有界面
-        Manager.uiManager.closeBundleView(this.bundle);
+        App.uiManager.closeBundleView(this.bundle);
         //移除入口语言包数据
-        Manager.language.removeDelegate(this.language);
+        App.language.removeDelegate(this.language);
         //移除本模块网络事件
         this.removeNetHandler();
         //卸载资源

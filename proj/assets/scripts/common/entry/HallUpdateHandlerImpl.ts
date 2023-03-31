@@ -12,39 +12,39 @@ export class HallUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleton 
         item.doUpdate();
     }
     onUpdateFailed(item: UpdateItem): void {
-        let content = Manager.getLanguage("downloadFailed");
-        Manager.alert.show({
+        let content = App.getLanguage("downloadFailed");
+        App.alert.show({
             text: content,
             confirmCb: (isOK) => {
                 item.checkUpdate();
             }
         });
-        Manager.updateLoading.hide();
+        App.updateLoading.hide();
     }
     onPreVersionFailed(item: UpdateItem): void {
-        let content = Manager.getLanguage("downloadFailed");
-        Manager.alert.show({
+        let content = App.getLanguage("downloadFailed");
+        App.alert.show({
             text: content,
             confirmCb: (isOK) => {
                 item.checkUpdate();
             }
         });
-        Manager.updateLoading.hide();
+        App.updateLoading.hide();
     }
     onShowUpdating(item: UpdateItem): void {
-        Manager.updateLoading.show(Manager.getLanguage("loading"));
+        App.updateLoading.show(App.getLanguage("loading"));
     }
     onNeedUpdateMain(item: UpdateItem): void {
-        Manager.updateLoading.hide();
-        let content = Manager.getLanguage("mainPackVersionIsTooLow") as string;
-        Manager.alert.show({
+        App.updateLoading.hide();
+        let content = App.getLanguage("mainPackVersionIsTooLow") as string;
+        App.alert.show({
             text: content,
             confirmCb: (isOK) => {
-                if (Manager.stageData.isLoginStage()) {
+                if (App.stageData.isLoginStage()) {
                     //如果是在登录界面，直接检测更新
-                    Manager.entryManager.onCheckUpdate();
+                    App.entryManager.onCheckUpdate();
                 } else {
-                    Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
+                    App.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
                 }
             }
         });
@@ -53,31 +53,31 @@ export class HallUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleton 
 
     }
     onDownloading(item: UpdateItem, info: Update.DownLoadInfo): void {
-        Manager.updateLoading.updateProgress(info.progress);
+        App.updateLoading.updateProgress(info.progress);
     }
     onAreadyUpToData(item: UpdateItem): void {
         //大厅更新，直接进入
-        Manager.bundleManager.loadBundle(item);
+        App.bundleManager.loadBundle(item);
     }
     onStarCheckUpdate(item: UpdateItem): void {
-        Manager.updateLoading.show(Manager.getLanguage("loading"));
+        App.updateLoading.show(App.getLanguage("loading"));
     }
     onStartLoadBundle(item: UpdateItem): void {
 
     }
     onLoadBundleError(item: UpdateItem, err: Error | null): void {
-        Manager.updateLoading.hide();
-        Manager.tips.show(Manager.getLanguage("loadFailed",[item.name]));
+        App.updateLoading.hide();
+        App.tips.show(App.getLanguage("loadFailed",[item.name]));
     }
     onLoadBundleComplete(item: UpdateItem): void {
-        Manager.updateLoading.hide();
-        Manager.entryManager.onLoadBundleComplete(item);
+        App.updateLoading.hide();
+        App.entryManager.onLoadBundleComplete(item);
     }
     onLoadBundle(item: UpdateItem): void {
-        Manager.bundleManager.loadBundle(item);
+        App.bundleManager.loadBundle(item);
     }
     onDownloadComplete(item: UpdateItem): void {
-        Manager.releaseManger.tryRemoveBundle(item.bundle);
+        App.releaseManger.tryRemoveBundle(item.bundle);
         this.onLoadBundle(item);
     }
 }

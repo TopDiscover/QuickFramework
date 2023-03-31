@@ -4,7 +4,7 @@ import { CCString, Enum, RichText, _decorator } from "cc";
  * @description 支持多语言
  */
 const { ccclass, property, menu } = _decorator;
-const Bundles = Enum(Manager.Bundles);
+const Bundles = Enum(App.Bundles);
 
 @ccclass
 @menu("Quick渲染组件/UIRichText")
@@ -103,12 +103,12 @@ export default class UIRichText extends RichText {
 
     onLoad(): void {
         super.onLoad();
-        Manager.language.add(this);
+        App.language.add(this);
         this.update(0);
     }
 
     onDestroy(): void {
-        Manager.language.remove(this);
+        App.language.remove(this);
         super.onDestroy();
     }
 
@@ -126,7 +126,7 @@ export default class UIRichText extends RichText {
         if (this.isUseMultilingual) {
             let bundle = this.bundle;
             let realBundle = Bundles[bundle]
-            let str = Manager.getLanguage(this.language as any,this.params, realBundle)
+            let str = App.getLanguage(this.language as any,this.params, realBundle)
             this.string = str;
         }
     }

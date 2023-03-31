@@ -142,7 +142,7 @@ class CellInfo {
             }
         }
 
-        Manager.layout.align(layoutParam);
+        App.layout.align(layoutParam);
         return layoutParam.result.position;
     }
 

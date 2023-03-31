@@ -25,9 +25,9 @@ export class ViewDynamicLoadData {
             if (this.name == DYNAMIC_LOAD_GARBAGE) {
                 Log.e(`找不到资源持有者: ${info.url}`);
             }
-            if (DEBUG) Manager.uiManager.checkView(info.url, className);
+            if (DEBUG) App.uiManager.checkView(info.url, className);
             if (!this.local.has(info.url)) {
-                Manager.asset.retainAsset(info);
+                App.asset.retainAsset(info);
                 this.local.set(info.url, info);
             }
         }
@@ -39,8 +39,8 @@ export class ViewDynamicLoadData {
             if (this.name == DYNAMIC_LOAD_GARBAGE) {
                 Log.e(`找不到资源持有者 : ${info.url}`);
             }
-            if (DEBUG) Manager.uiManager.checkView(info.url, className);
-            Manager.cache.remoteCaches.retainAsset(info);
+            if (DEBUG) App.uiManager.checkView(info.url, className);
+            App.cache.remoteCaches.retainAsset(info);
             this.remote.set(info.url, info);
         }
     }
@@ -74,13 +74,13 @@ export class ViewDynamicLoadData {
             //先清除当前资源的引用关系
             if (this.local) {
                 this.local.forEach((info) => {
-                    Manager.asset.releaseAsset(info);
+                    App.asset.releaseAsset(info);
                 });
                 this.local.clear();
             }
             if (this.remote) {
                 this.remote.forEach((info, url) => {
-                    Manager.cache.remoteCaches.releaseAsset(info);
+                    App.cache.remoteCaches.releaseAsset(info);
                 });
                 this.remote.clear();
             }
@@ -290,7 +290,7 @@ export class UIManager implements ISingleton{
                 else {
                     viewData.status = ViewStatus.WAITTING_NONE;
                     if (!openOption.preload) {
-                        Manager.uiLoading.show(openOption.delay, openOption.name);
+                        App.uiLoading.show(openOption.delay, openOption.name);
                     }
                     //正在加载中
                     if (DEBUG) Log.w(`${this.module}${className} 正在加载中...`);
@@ -321,11 +321,11 @@ export class UIManager implements ISingleton{
                 let progressCallback: (completedCount: number, totalCount: number, item: any) => void = null!;
 
                 if (!openOption.preload) {
-                    Manager.uiLoading.show(openOption.delay, openOption.name);
+                    App.uiLoading.show(openOption.delay, openOption.name);
                     //预加载界面不显示进度
                     progressCallback = (completedCount: number, totalCount: number, item: any) => {
                         let progress = Math.ceil((completedCount / totalCount) * 100);
-                        Manager.uiLoading.updateProgress(progress);
+                        App.uiLoading.updateProgress(progress);
                     };
                 }
                 this.loadPrefab(openOption.bundle, prefabUrl, progressCallback)
@@ -335,9 +335,9 @@ export class UIManager implements ISingleton{
                         viewData.info.type = Prefab;
                         viewData.info.data = prefab;
                         viewData.info.bundle = openOption.bundle;
-                        Manager.asset.retainAsset(viewData.info);
+                        App.asset.retainAsset(viewData.info);
                         this.createNode(viewData, reslove, openOption);
-                        Manager.uiLoading.hide();
+                        App.uiLoading.hide();
                     }).catch((reason) => {
                         viewData.isLoaded = true;
                         Log.e(reason);
@@ -351,8 +351,8 @@ export class UIManager implements ISingleton{
                         if (openOption.name) {
                             uiName = openOption.name;
                         }
-                        Manager.tips.show(`加载界面${uiName}失败，请重试`);
-                        Manager.uiLoading.hide();
+                        App.tips.show(`加载界面${uiName}失败，请重试`);
+                        App.uiLoading.hide();
                     });
             }
         });
@@ -438,7 +438,7 @@ export class UIManager implements ISingleton{
 
     private loadPrefab(bundle: BUNDLE_TYPE, url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
         return new Promise<Prefab>((resolove, reject) => {
-            Manager.asset.load(bundle, url, Prefab, progressCallback, (data) => {
+            App.asset.load(bundle, url, Prefab, progressCallback, (data) => {
                 if (data && data.data && data.data instanceof Prefab) {
                     resolove(data.data);
                 }
@@ -564,7 +564,7 @@ export class UIManager implements ISingleton{
             }
             viewData.loadData.clear();
             if ( viewData.isPrefab ){
-                Manager.asset.releaseAsset(viewData.info);
+                App.asset.releaseAsset(viewData.info);
             }
             this._viewDatas.delete(className);
             Log.d(`${this.module} close view : ${className}`);

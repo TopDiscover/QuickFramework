@@ -12,7 +12,7 @@ import { Resource } from "../asset/Resource";
 
 const { ccclass, property, menu } = _decorator;
 
-const Bundles = Enum(Manager.Bundles);
+const Bundles = Enum(App.Bundles);
 
 @ccclass
 @menu("Quick渲染组件/UISprite")
@@ -168,12 +168,12 @@ export default class UISprite extends Sprite {
 
     onLoad(): void {
         super.onLoad();
-        Manager.language.add(this);
+        App.language.add(this);
         this.update(0);
     }
 
     onDestroy(): void {
-        Manager.language.remove(this);
+        App.language.remove(this);
         super.onDestroy();
     }
 
@@ -191,20 +191,20 @@ export default class UISprite extends Sprite {
         if (this.isUseMultilingual) {
             let bundle = this.bundle;
             let realBundle = Bundles[bundle]
-            let loaded = Manager.bundleManager.getBundle(realBundle);
+            let loaded = App.bundleManager.getBundle(realBundle);
             if (!loaded) {
                 // Log.d(`${realBundle}未加载`);
                 return;
             }
 
-            let url = Manager.getLanguage(this.language as any,this.params, realBundle)
+            let url = App.getLanguage(this.language as any,this.params, realBundle)
             if (!url) {
                 return;
             }
-            let view = await Manager.uiManager.getView(this.user);
+            let view = await App.uiManager.getView(this.user);
             if (this.isRemote) {
                 // Log.d("加载远程图片")
-                Manager.asset.remote.loadImage(url, true).then((data) => {
+                App.asset.remote.loadImage(url, true).then((data) => {
                     if (data) {
                         setSpriteSpriteFrame(view, url, this, data, (data) => {
                             if (this.onLoadComplete) {
@@ -217,8 +217,8 @@ export default class UISprite extends Sprite {
                 if (this.languageAtlas.length > 0) {
                     // Log.d("设置图集",this.languageAtlas);
                     //在纹理图集中查找
-                    let urls = Manager.getLanguage(this.languageAtlas as any,[], realBundle)
-                    Manager.cache.getSpriteFrameByAsync(urls, url, view, addExtraLoadResource, realBundle).then((data) => {
+                    let urls = App.getLanguage(this.languageAtlas as any,[], realBundle)
+                    App.cache.getSpriteFrameByAsync(urls, url, view, addExtraLoadResource, realBundle).then((data) => {
                         if (data && data.isTryReload) {
                             //来到这里面程序已经崩溃了，无意义在处理了
                         } else if (data && data.spriteFrame) {
@@ -232,7 +232,7 @@ export default class UISprite extends Sprite {
                 } else {
                     url = url + "/spriteFrame";
                     // Log.d(`资源路径：${realBundle}/${url}`);
-                    Manager.cache.getCacheByAsync(url, SpriteFrame, realBundle)
+                    App.cache.getCacheByAsync(url, SpriteFrame, realBundle)
                         .then(spriteFrame => {
                             setSpriteSpriteFrame(view, url, this, spriteFrame, (data) => {
                                 if (this.onLoadComplete) {

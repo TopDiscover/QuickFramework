@@ -19,14 +19,14 @@ export default class MainController extends EventComponent {
 
     onLoad() {
         super.onLoad();
-        Manager.onLoad(this.node);
+        App.onLoad(this.node);
         if (this.wssCacert) {
-            Manager.wssCacertUrl = this.wssCacert.nativeUrl;
+            App.wssCacertUrl = this.wssCacert.nativeUrl;
         }
         let debug = find("debug", this.node);
         this.debugView = find("debugView",this.node);
         if (debug&&this.debugView) {
-            let isVisibleDebugInfo = Manager.storage.getItem(Config.SHOW_DEBUG_INFO_KEY,true);
+            let isVisibleDebugInfo = App.storage.getItem(Config.SHOW_DEBUG_INFO_KEY,true);
             if ( isVisibleDebugInfo ) {
                 profiler.showStats();
             }else{
@@ -59,7 +59,7 @@ export default class MainController extends EventComponent {
     }
 
     update(dt:number) {
-        Manager.update(this.node);
+        App.update(this.node);
     }
 
     onDestroy() {
@@ -70,19 +70,19 @@ export default class MainController extends EventComponent {
         game.off(Game.EVENT_HIDE);
         game.off(Game.EVENT_SHOW);
         game.off(Game.EVENT_LOW_MEMORY);
-        Manager.onDestroy(this.node);
+        App.onDestroy(this.node);
         super.onDestroy();
     }
 
     private onEnterBackground() {
-        Manager.onEnterBackground();
+        App.onEnterBackground();
     }
 
     private onEnterForgeground() {
-        Manager.onEnterForgeground();
+        App.onEnterForgeground();
     }
 
     private onLowMemory(){
-        Manager.onLowMemory();
+        App.onLowMemory();
     }
 }

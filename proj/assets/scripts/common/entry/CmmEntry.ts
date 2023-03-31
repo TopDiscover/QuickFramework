@@ -10,18 +10,18 @@ export class CmmEntry extends EntryDelegate {
 
     /**@description 进入bundle完成 */
     onEnterGameView(entry: Entry, gameView: GameView) {
-        let data = Manager.stageData;
+        let data = App.stageData;
         data.where = entry.bundle;
         super.onEnterGameView(entry, gameView);
-        Manager.loading.hide();
+        App.loading.hide();
     }
 
     onShowGameView(entry: Entry | null, gameView: GameView) {
-        Manager.stageData.where = gameView.bundle as string;
+        App.stageData.where = gameView.bundle as string;
     }
 
     getEntryConfig(bundle: string): UpdateItem | null {
-        let config = Manager.stageData.getEntry(bundle)
+        let config = App.stageData.getEntry(bundle)
         if (config) {
             let item = new UpdateItem(config);
             if (bundle == Macro.BUNDLE_RESOURCES) {

@@ -119,7 +119,7 @@ class LazyInfo {
 
     /**@description 尝试释放长时间未使用资源 */
     tryRemoveTimeoutResources(){
-        if ( Manager.isLazyRelease && Manager.isAutoReleaseUnuseResources ){
+        if ( App.isLazyRelease && App.isAutoReleaseUnuseResources ){
             this._assets.forEach((info,url,source)=>{
                 if ( info.retain ){
                     return;
@@ -129,7 +129,7 @@ class LazyInfo {
                 }
                 let now = Date.timeNow();
                 let pass = now - info.stamp;
-                if ( pass >= Manager.autoReleaseUnuseResourcesTimeout ){
+                if ( pass >= App.autoReleaseUnuseResourcesTimeout ){
                     if ( this.name == Macro.BUNDLE_REMOTE){
                         if (info.data instanceof Asset) {
                             Log.d(`${LOG_TAG}bundle : ${this.name} 释放远程加载资源${info.url}`);
@@ -139,7 +139,7 @@ class LazyInfo {
                         return;
                     }
                     //释放长时间未使用资源
-                    let bundle = Manager.bundleManager.getBundle(info.bundle)!;
+                    let bundle = App.bundleManager.getBundle(info.bundle)!;
                     if (Array.isArray(info.data)) {
                         for (let i = 0; i < info.data.length; i++) {
                             let path = `${info.url}/${info.data[i].name}`;
@@ -175,17 +175,17 @@ export class ReleaseManager implements ISingleton {
     private _actionTag = 999;
 
     private getBundle(bundle: BUNDLE_TYPE) {
-        return Manager.bundleManager.getBundle(bundle);
+        return App.bundleManager.getBundle(bundle);
     }
 
     private getBundleName(bundle: BUNDLE_TYPE) {
-        return Manager.bundleManager.getBundleName(bundle);
+        return App.bundleManager.getBundleName(bundle);
     }
 
     release(info: Resource.Info) {
         let bundle = this.getBundle(info.bundle);
         if (bundle) {
-            if (Manager.isLazyRelease) {
+            if (App.isLazyRelease) {
                 let name = bundle.name
                 //如果是懒释放，记录一下就行了
                 let lazyInfo: LazyInfo | undefined;
@@ -233,7 +233,7 @@ export class ReleaseManager implements ISingleton {
 
     removeBundle(bundle: BUNDLE_TYPE) {
         let temp = this.getBundle(bundle);
-        if (Manager.isLazyRelease) {
+        if (App.isLazyRelease) {
             if (temp) {
                 Log.d(`${LOG_TAG}向释放管理器中添加待释放bundle : ${temp?.name}`);
                 this._bundles.set(temp?.name, false);
@@ -252,7 +252,7 @@ export class ReleaseManager implements ISingleton {
      * @description 判断bundle是否存在于释放管理器中
      */
     isExistBunble( bundle : BUNDLE_TYPE ){
-        if ( Manager.isLazyRelease ){
+        if ( App.isLazyRelease ){
             //开启了懒释放功能
             let name = this.getBundleName(bundle);
             if ( this._bundles.has(name) ){
@@ -275,7 +275,7 @@ export class ReleaseManager implements ISingleton {
         this._bundles.forEach((value, bundle) => {
             let temp = assetManager.getBundle(bundle);
             if (temp) {
-                if ( Manager.bundleManager.isEngineBundle(bundle) ){
+                if ( App.bundleManager.isEngineBundle(bundle) ){
                     Log.d(`${bundle} : 引擎bundle，跳过处理`)
                     return;
                 }
@@ -291,7 +291,7 @@ export class ReleaseManager implements ISingleton {
 
     onAutoReleaseUnuseResources(){
         Log.d(`${LOG_TAG}------------释放长时间未使用资源开始------------`);
-        let curBundle = Manager.stageData.where;
+        let curBundle = App.stageData.where;
         //排除当前bundle的资源，当前bundle正在运行，没有必要释放当前bundle资源
         this._lazyInfos.forEach((info, bundle, source) => {
             if ( bundle == curBundle ){
@@ -326,7 +326,7 @@ export class ReleaseManager implements ISingleton {
     }
 
     releaseRemote(info: Resource.Info) {
-        if (Manager.isLazyRelease) {
+        if (App.isLazyRelease) {
             this._remote.add(info);
         } else {
             if (info.data instanceof Asset) {
@@ -337,7 +337,7 @@ export class ReleaseManager implements ISingleton {
 
     onLoad(node: Node) {
         tween(node).repeatForever(tween(node)
-        .delay(Manager.autoReleaseUnuseResourcesTimeout)
+        .delay(App.autoReleaseUnuseResourcesTimeout)
         .call(()=>{
             this.onAutoReleaseUnuseResources();
         }))
@@ -360,7 +360,7 @@ export class ReleaseManager implements ISingleton {
             remote: this._remote
         }
         Log.d(`--------------${this.module}调试信息如下--------------`)
-        if (Manager.isLazyRelease) {
+        if (App.isLazyRelease) {
             if (data.bundles.length > 0) {
                 Log.d(`待释放Bundle : ${data.bundles.toString()}`);
             }

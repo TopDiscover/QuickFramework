@@ -109,7 +109,7 @@ export default class ResourceLoader {
         this._loadedCount = 0;
         this._resources.forEach((value, key, source) => {
             if (value.preloadView) {
-                Manager.uiManager.preload(value.preloadView, value.bundle as BUNDLE_TYPE).then((view) => {
+                App.uiManager.preload(value.preloadView, value.bundle as BUNDLE_TYPE).then((view) => {
                     let cache = new Resource.CacheData();
                     cache.isLoaded = true;
                     cache.data = <any>view;
@@ -118,9 +118,9 @@ export default class ResourceLoader {
                     this._onLoadResourceComplete(cache);
                 })
             } else if (value.dir) {
-                Manager.asset.loadDir(value.bundle as BUNDLE_TYPE, value.dir, <any>(value.type), <any>null, this._onLoadResourceComplete.bind(this));
+                App.asset.loadDir(value.bundle as BUNDLE_TYPE, value.dir, <any>(value.type), <any>null, this._onLoadResourceComplete.bind(this));
             } else {
-                Manager.asset.load(value.bundle as BUNDLE_TYPE, value.url as string, <any>(value.type), <any>null, this._onLoadResourceComplete.bind(this));
+                App.asset.load(value.bundle as BUNDLE_TYPE, value.url as string, <any>(value.type), <any>null, this._onLoadResourceComplete.bind(this));
             }
         });
     }
@@ -146,7 +146,7 @@ export default class ResourceLoader {
                     if (this._loadedResource.has(value.url)) {
                         let data = this._loadedResource.get(value.url);
                         if (data) {
-                            Manager.asset.releaseAsset(data);
+                            App.asset.releaseAsset(data);
                         }
                         this._loadedResource.delete(value.url);
                     }
@@ -154,7 +154,7 @@ export default class ResourceLoader {
                     if (this._loadedResource.has(value.dir)) {
                         let data = this._loadedResource.get(value.dir);
                         if (data) {
-                            Manager.asset.releaseAsset(data);
+                            App.asset.releaseAsset(data);
                         }
                         this._loadedResource.delete(value.dir);
                     }
@@ -185,7 +185,7 @@ export default class ResourceLoader {
             info.type = data.info.type;
             info.data = data.data;
             info.bundle = data.info.bundle;
-            Manager.asset.retainAsset(info);
+            App.asset.retainAsset(info);
             this._loadedResource.set(info.url, info);
         }
 

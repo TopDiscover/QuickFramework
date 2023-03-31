@@ -65,7 +65,7 @@ export class Language implements ISingleton {
             });
         }
         Log.d(this.module, `当前语言:${this._data.language}`);
-        Manager.storage.setItem(LANG_KEY, this._data.language);
+        App.storage.setItem(LANG_KEY, this._data.language);
     }
 
     public get(args: (string | number)[]) {
@@ -123,7 +123,7 @@ export class Language implements ISingleton {
 
     /**@description 获取语言包名 */
     public getLanguage() {
-        return Manager.storage.getItem(LANG_KEY, sys.Language.CHINESE);
+        return App.storage.getItem(LANG_KEY, sys.Language.CHINESE);
     }
 
     /**

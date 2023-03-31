@@ -40,9 +40,9 @@ export default class GlobalAudio extends AudioComponent {
                 this.audioData.musicInfos.set(key, audioInfo);
             }
             this.audioData.curMusic = audioInfo;
-            Manager.cache.getCacheByAsync(url, AudioClip, bundle).then((data) => {
+            App.cache.getCacheByAsync(url, AudioClip, bundle).then((data) => {
                 if (data) {
-                    Manager.asset.addPersistAsset(url, data, bundle);
+                    App.asset.addPersistAsset(url, data, bundle);
                     me.stopMusic();
                     if (audioInfo && audioInfo.source) {
                         audioInfo.source.clip = data;
@@ -75,9 +75,9 @@ export default class GlobalAudio extends AudioComponent {
                 audioInfo.source.name = key;
                 this.audioData.effectInfos.set(key, audioInfo);
             }
-            Manager.cache.getCacheByAsync(url, AudioClip, bundle).then((data) => {
+            App.cache.getCacheByAsync(url, AudioClip, bundle).then((data) => {
                 if (data) {
-                    Manager.asset.addPersistAsset(url, data, bundle);
+                    App.asset.addPersistAsset(url, data, bundle);
                     if (audioInfo && audioInfo.source) {
                         audioInfo.source.clip = data;
                         audioInfo.source.loop = loop;

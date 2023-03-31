@@ -86,22 +86,22 @@ class AudioData implements ISingleton{
 
     init() {
         //音量开关读取
-        this.isMusicOn = Manager.storage.getItem(this._storeMusicKey, this.isMusicOn);
-        this.isEffectOn = Manager.storage.getItem(this._storeEffectKey, this.isEffectOn);
+        this.isMusicOn = App.storage.getItem(this._storeMusicKey, this.isMusicOn);
+        this.isEffectOn = App.storage.getItem(this._storeEffectKey, this.isEffectOn);
 
         //音量读取
-        this.musicVolume = Manager.storage.getItem(this._storeMusicVolumeKey, this.musicVolume);
-        this.effectVolume = Manager.storage.getItem(this._storeEffectVolumeKey, this.effectVolume);
+        this.musicVolume = App.storage.getItem(this._storeMusicVolumeKey, this.musicVolume);
+        this.effectVolume = App.storage.getItem(this._storeEffectVolumeKey, this.effectVolume);
     }
 
     /**@description 存储 */
     public save() {
         try {
-            Manager.storage.setItem(this._storeMusicKey, this.isMusicOn);
-            Manager.storage.setItem(this._storeMusicVolumeKey, this.musicVolume);
+            App.storage.setItem(this._storeMusicKey, this.isMusicOn);
+            App.storage.setItem(this._storeMusicVolumeKey, this.musicVolume);
 
-            Manager.storage.setItem(this._storeEffectKey, this.isEffectOn);
-            Manager.storage.setItem(this._storeEffectVolumeKey, this.effectVolume);
+            App.storage.setItem(this._storeEffectKey, this.isEffectOn);
+            App.storage.setItem(this._storeEffectVolumeKey, this.effectVolume);
         } catch (error) {
         }
     }
@@ -172,7 +172,7 @@ class AudioData implements ISingleton{
     }
 
     public makeKey(url: string, bundle: BUNDLE_TYPE) {
-        return `${Manager.bundleManager.getBundleName(bundle)}_${url}`;
+        return `${App.bundleManager.getBundleName(bundle)}_${url}`;
     }
 
     public stopEffect(url: string, bundle: BUNDLE_TYPE) {
@@ -270,7 +270,7 @@ export default class AudioComponent extends EventComponent {
                 this.audioData.musicInfos.set(key, audioInfo);
             }
             this.audioData.curMusic = audioInfo;
-            Manager.cache.getCacheByAsync(url, AudioClip, bundle).then((data) => {
+            App.cache.getCacheByAsync(url, AudioClip, bundle).then((data) => {
                 if (data) {
                     let info = new Resource.Info;
                     info.url = url;
@@ -278,9 +278,9 @@ export default class AudioComponent extends EventComponent {
                     info.data = data;
                     info.bundle = bundle;
                     if (this.owner) {
-                        Manager.uiManager.addLocal(info, this.owner.className);
+                        App.uiManager.addLocal(info, this.owner.className);
                     } else {
-                        Manager.uiManager.garbage.addLocal(info);
+                        App.uiManager.garbage.addLocal(info);
                     }
                     //停掉当前播放音乐
                     this.stopMusic();
@@ -321,7 +321,7 @@ export default class AudioComponent extends EventComponent {
                 audioInfo.source.playOnAwake = true;
                 this.audioData.effectInfos.set(key, audioInfo);
             }
-            Manager.cache.getCacheByAsync(url, AudioClip, bundle).then((data) => {
+            App.cache.getCacheByAsync(url, AudioClip, bundle).then((data) => {
                 if (data) {
                     let info = new Resource.Info;
                     info.url = url;
@@ -329,9 +329,9 @@ export default class AudioComponent extends EventComponent {
                     info.data = data;
                     info.bundle = bundle;
                     if (this.owner) {
-                        Manager.uiManager.addLocal(info, this.owner.className);
+                        App.uiManager.addLocal(info, this.owner.className);
                     } else {
-                        Manager.uiManager.garbage.addLocal(info);
+                        App.uiManager.garbage.addLocal(info);
                     }
                     if (audioInfo && audioInfo.source) {
                         audioInfo.source.clip = data;

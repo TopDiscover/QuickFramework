@@ -67,10 +67,10 @@ export default class UIView extends EventComponent {
     public close( ) {
         if ( this.closeAction ){
             this.closeAction(()=>{
-                Manager.uiManager.close(this.className);
+                App.uiManager.close(this.className);
             });
         }else{
-            Manager.uiManager.close(this.className);
+            App.uiManager.close(this.className);
         }
     }
 

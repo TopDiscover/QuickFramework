@@ -50,7 +50,7 @@ class ToastItem extends Component {
     private runTimeOut(time: number) {
         let self = this;
         tween(this._content).delay(time).call(() => {
-            Manager.tips.finishShowItem(self.node);
+            App.tips.finishShowItem(self.node);
         }).start();
     }
 
@@ -104,7 +104,7 @@ export default class Tips implements ISingleton{
     public startPosition = new Vec3(0, 100);
 
     private async _show(msg: string) {
-        let node = instantiate(Manager.uiManager.getScenePrefab("Tips"));
+        let node = instantiate(App.uiManager.getScenePrefab("Tips"));
         if (node) {
             let itemComp = node.addComponent(ToastItem);
             itemComp.init(msg, this.FADE_TIME);
@@ -112,7 +112,7 @@ export default class Tips implements ISingleton{
             itemComp.fadeIn();
             node.userData = this._id++;
             node.name = `Tips${node.userData}`;
-            Manager.uiManager.addView(node, ViewZOrder.Tips);
+            App.uiManager.addView(node, ViewZOrder.Tips);
 
             //整体上移
             let length = this._queue.length;

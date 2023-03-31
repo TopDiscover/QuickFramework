@@ -32,8 +32,8 @@ export default class SettingView extends UIView {
         effect.on('slide', this.onEffectVolumeChange, this);
         this.musicVolume = music.getComponent(Slider) as Slider;
         this.effectVolume = effect.getComponent(Slider) as Slider;
-        this.musicVolume.progress = Manager.globalAudio.musicVolume;
-        this.effectVolume.progress = Manager.globalAudio.effectVolume;
+        this.musicVolume.progress = App.globalAudio.musicVolume;
+        this.effectVolume.progress = App.globalAudio.effectVolume;
         this.onMusicVolumeChange(this.musicVolume);
         this.onEffectVolumeChange(this.effectVolume);
 
@@ -43,8 +43,8 @@ export default class SettingView extends UIView {
         this.effectStatus = effectStatusNode.getComponent(Toggle) as Toggle;
         musicStatusNode.on("toggle", this.onMusicStatusChange, this);
         effectStatusNode.on("toggle", this.onEffectStatusChange, this);
-        this.musicStatus.isChecked = Manager.globalAudio.isMusicOn;
-        this.effectStatus.isChecked = Manager.globalAudio.isEffectOn;
+        this.musicStatus.isChecked = App.globalAudio.isMusicOn;
+        this.effectStatus.isChecked = App.globalAudio.isEffectOn;
         this.onMusicStatusChange(this.musicStatus, false);
         this.onEffectStatusChange(this.effectStatus, false);
 
@@ -53,13 +53,13 @@ export default class SettingView extends UIView {
 
     protected get showAction(){
         return ( complete : ()=>void )=>{
-            Manager.utils.showView(this.content,complete);
+            App.utils.showView(this.content,complete);
         }
     }
 
     protected get closeAction(){
         return ( complete : ()=>void )=>{
-            Manager.utils.hideView(this.content,complete);
+            App.utils.hideView(this.content,complete);
         };
     }
 
@@ -69,36 +69,36 @@ export default class SettingView extends UIView {
 
     private onQuit() {
         this.close();
-        Manager.alert.show({
+        App.alert.show({
             immediatelyCallback: true,
-            text: Manager.getLanguage("quitGame"),
+            text: App.getLanguage("quitGame"),
             confirmCb: (isOk) => {
                 if (isOk) {
-                    Manager.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
+                    App.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
                 }
             },
         });
     }
 
     private onMusicVolumeChange(target: Slider) {
-        Manager.globalAudio.musicVolume = target.progress;
+        App.globalAudio.musicVolume = target.progress;
         (target.node.getComponent(ProgressBar) as ProgressBar).progress = target.progress;
     }
 
     private onEffectVolumeChange(target: Slider) {
-        Manager.globalAudio.effectVolume = target.progress;
+        App.globalAudio.effectVolume = target.progress;
         (target.node.getComponent(ProgressBar) as ProgressBar).progress = target.progress;
     }
 
     private onMusicStatusChange(target: Toggle, isPlay: boolean) {
-        if( isPlay == undefined ) Manager.globalAudio.playButtonClick();
+        if( isPlay == undefined ) App.globalAudio.playButtonClick();
         (target.node.getChildByName("off") as Node).active = !target.isChecked;
-        Manager.globalAudio.isMusicOn = target.isChecked;
+        App.globalAudio.isMusicOn = target.isChecked;
     }
 
     private onEffectStatusChange(target: Toggle, isPlay: boolean) {
-        if( isPlay == undefined ) Manager.globalAudio.playButtonClick();
+        if( isPlay == undefined ) App.globalAudio.playButtonClick();
         (target.node.getChildByName("off") as Node).active = !target.isChecked;
-        Manager.globalAudio.isEffectOn = target.isChecked;
+        App.globalAudio.isEffectOn = target.isChecked;
     }
 }

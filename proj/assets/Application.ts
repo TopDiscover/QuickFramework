@@ -17,7 +17,7 @@ import { Framewok } from "./scripts/framework/Framework";
 import { Singleton } from "./scripts/framework/utils/Singleton";
 
 /**@description 游戏所有运行单例的管理 */
-export class _Manager extends Framewok implements GameEventInterface {
+export class Application extends Framewok implements GameEventInterface {
 
     get isLazyRelease(){
         return true;
@@ -113,47 +113,47 @@ export class _Manager extends Framewok implements GameEventInterface {
 
     onLoad(node: Node) {
         //预先加载下loading预置体
-        Manager.uiManager.onLoad(node);
+        App.uiManager.onLoad(node);
         //Service onLoad
-        Manager.serviceManager.onLoad();
+        App.serviceManager.onLoad();
         //入口管理器
-        Manager.entryManager.onLoad(node);
+        App.entryManager.onLoad(node);
         //释放管理器
-        Manager.releaseManger.onLoad(node);
+        App.releaseManger.onLoad(node);
     }
 
     update(node: Node) {
         //Service 网络调试
-        Manager.serviceManager.update();
+        App.serviceManager.update();
 
         //远程资源下载任务调度
-        Manager.asset.remote.update();
+        App.asset.remote.update();
     }
 
     onDestroy(node: Node) {
-        Manager.serviceManager.onDestroy();
+        App.serviceManager.onDestroy();
         //入口管理器
-        Manager.entryManager.onDestroy(node);
+        App.entryManager.onDestroy(node);
         //释放管理器
-        Manager.releaseManger.onDestroy(node);
+        App.releaseManger.onDestroy(node);
     }
 
     onEnterBackground(): void {
         this._enterBackgroundTime = Date.timeNow();
         Log.d(`[MainController]`, `onEnterBackground ${this._enterBackgroundTime}`);
-        Manager.globalAudio.onEnterBackground();
-        Manager.serviceManager.onEnterBackground();
+        App.globalAudio.onEnterBackground();
+        App.serviceManager.onEnterBackground();
     }
     onEnterForgeground(): void {
         let now = Date.timeNow();
         let inBackgroundTime = now - this._enterBackgroundTime;
         Log.d(`[MainController]`, `onEnterForgeground ${now} background total time : ${inBackgroundTime}`);
-        Manager.globalAudio.onEnterForgeground(inBackgroundTime);
-        Manager.serviceManager.onEnterForgeground(inBackgroundTime);
+        App.globalAudio.onEnterForgeground(inBackgroundTime);
+        App.serviceManager.onEnterForgeground(inBackgroundTime);
     }
 }
 
-let mgr = new _Manager();
-mgr.logger.level = LogLevel.ALL;
-(<any>window)["Manager"] = mgr;
-mgr.init();
+let app = new Application();
+app.logger.level = LogLevel.ALL;
+(<any>window)["App"] = app;
+app.init();

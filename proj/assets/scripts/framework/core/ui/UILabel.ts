@@ -5,7 +5,7 @@ import { CCString, Enum, Label, _decorator } from "cc";
  */
 const { ccclass, property, menu } = _decorator;
 
-const Bundles = Enum(Manager.Bundles);
+const Bundles = Enum(App.Bundles);
 
 @ccclass
 @menu("Quick渲染组件/UILabel")
@@ -104,12 +104,12 @@ export default class UILabel extends Label {
 
     onLoad(): void {
         super.onLoad();
-        Manager.language.add(this);
+        App.language.add(this);
         this.update(0);
     }
 
     onDestroy(): void {
-        Manager.language.remove(this);
+        App.language.remove(this);
         super.onDestroy();
     }
 
@@ -127,7 +127,7 @@ export default class UILabel extends Label {
         if (this.isUseMultilingual) {
             let bundle = this.bundle;
             let realBundle = Bundles[bundle]
-            let str = Manager.getLanguage(this.language as any,this.params, realBundle)
+            let str = App.getLanguage(this.language as any,this.params, realBundle)
             this.string = str;
         }
         super.forceDoLayout();

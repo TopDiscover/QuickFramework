@@ -24,11 +24,11 @@ class LoginEntry extends Entry {
        completeCb();
     }
     protected openGameView(): void {
-        Manager.uiManager.open({ type: LoginView, zIndex: ViewZOrder.zero, bundle: this.bundle });
-        Manager.entryManager.onCheckUpdate();
+        App.uiManager.open({ type: LoginView, zIndex: ViewZOrder.zero, bundle: this.bundle });
+        App.entryManager.onCheckUpdate();
     }
     protected closeGameView(): void {
-        Manager.uiManager.close(LoginView);
+        App.uiManager.close(LoginView);
     }
     protected initData(): void {
     }
@@ -50,7 +50,7 @@ class LoginEntry extends Entry {
     onEnterGameView(gameView:GameView) {
         super.onEnterGameView(gameView);
         //关闭除登录之外的界面
-        Manager.uiManager.closeExcept([LoginView]);
+        App.uiManager.closeExcept([LoginView]);
         Singleton.instance.destory();
     }
 
@@ -62,4 +62,4 @@ class LoginEntry extends Entry {
         this.unloadResources();
     }
 }
-Manager.entryManager.register(LoginEntry);
+App.entryManager.register(LoginEntry);

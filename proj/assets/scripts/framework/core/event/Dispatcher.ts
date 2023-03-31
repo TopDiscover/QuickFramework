@@ -102,8 +102,8 @@ export class Dispatcher implements ISingleton {
 
 window.dispatch = function () {
     //向自己封闭的管理器中也分发
-    if ( Manager ){
-        Reflect.apply(Manager.dispatcher.dispatch,Manager.dispatcher,arguments);
+    if ( App ){
+        Reflect.apply(App.dispatcher.dispatch,App.dispatcher,arguments);
     }else{
         Reflect.apply(Dispatcher.instance.dispatch,Dispatcher.instance,arguments);
     }

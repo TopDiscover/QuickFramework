@@ -232,7 +232,7 @@ class RemoteCaches {
             if (DEBUG) Log.d(`释放加载的本地远程资源:${cache.info.url}`);
             cache.data.decRef(false);
             cache.info.data = cache.data;
-            Manager.releaseManger.releaseRemote(cache.info);
+            App.releaseManger.releaseRemote(cache.info);
         }
         if (DEBUG) Log.d(`remove remote cache url : ${url}`);
         return this._caches.delete(url);
@@ -307,7 +307,7 @@ export class CacheManager implements ISingleton{
     public get remoteCaches() { return this._remoteCaches; }
 
     public getBundleName(bundle: BUNDLE_TYPE) {
-        return Manager.bundleManager.getBundleName(bundle);
+        return App.bundleManager.getBundleName(bundle);
     }
 
     /**
@@ -483,7 +483,7 @@ export class CacheManager implements ISingleton{
                     resolve(data);
                 } else {
                     //加载资源
-                    Manager.asset.load(args.bundle, args.url, args.type, <any>null, (cache) => {
+                    App.asset.load(args.bundle, args.url, args.type, <any>null, (cache) => {
                         args = args as { url: string, type: typeof Asset, bundle: BUNDLE_TYPE };
                         if (cache && cache.data && cache.data instanceof args.type) {
                             resolve(cache.data);
@@ -517,7 +517,7 @@ export class CacheManager implements ISingleton{
                             } else {
                                 //来到这里面，其实程序已经崩溃了，已经没什么意思，也不知道写这个有啥用，尽量安慰,哈哈哈
                                 Log.e(`精灵帧被释放，释放当前无法的图集资源 url ：${url} key : ${key}`);
-                                Manager.asset.releaseAsset(info);
+                                App.asset.releaseAsset(info);
                                 resolve({ url: url, spriteFrame: null, isTryReload: true });
                             }
                         } else {

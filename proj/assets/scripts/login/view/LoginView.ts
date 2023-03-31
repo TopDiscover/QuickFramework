@@ -19,11 +19,11 @@ export default class LoginView extends GameView {
         let version = find("version",this.node)?.getComponent(Label);
         let md5 = find("md5",this.node)?.getComponent(Label);
         if ( version ){
-            version.string = `v${Manager.updateManager.appVersion}(${Manager.updateManager.getVersion(this.bundle)})`;
+            version.string = `v${App.updateManager.appVersion}(${App.updateManager.getVersion(this.bundle)})`;
         }
 
         if ( md5 ){
-            md5.string = `MD5:${Manager.updateManager.getMd5(this.bundle)}`;
+            md5.string = `MD5:${App.updateManager.getMd5(this.bundle)}`;
         }
 
         this._login.on(Node.EventType.TOUCH_END, () => {

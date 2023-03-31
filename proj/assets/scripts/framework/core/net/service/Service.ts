@@ -68,16 +68,16 @@ export abstract class Service extends ServerConnector implements IService {
 
     protected onOpen(ev: Event) {
         super.onOpen(ev);
-        Manager.serviceManager.onOpen(ev,this);
+        App.serviceManager.onOpen(ev,this);
     }
 
     protected onClose(ev: Event) {
         super.onClose(ev);
-        Manager.serviceManager.onClose(ev,this);
+        App.serviceManager.onClose(ev,this);
     }
     protected onError(ev: Event) {
         super.onError(ev);
-        Manager.serviceManager.onError(ev,this);
+        App.serviceManager.onError(ev,this);
     }
 
     protected onMessage(data: MessageEvent) {

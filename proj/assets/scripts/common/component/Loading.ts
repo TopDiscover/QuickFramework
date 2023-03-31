@@ -11,7 +11,7 @@ export default class Loading implements ISingleton{
     /**@description 当前loading节点 */
     protected node: Node = null!;
     protected get prefab(){
-        return Manager.uiManager.getScenePrefab("Loading");
+        return App.uiManager.getScenePrefab("Loading");
     }
     private _timeOutCb?: () => void;
     /**@description 显示超时回调 */
@@ -58,7 +58,7 @@ export default class Loading implements ISingleton{
             this.node = instantiate(this.prefab);
         }
         this.node.removeFromParent();
-        Manager.uiManager.addView(this.node, ViewZOrder.Loading);
+        App.uiManager.addView(this.node, ViewZOrder.Loading);
         this.node.position = Vec3.ZERO;
         this.text = find("content/text", this.node)?.getComponent(Label) as Label;
         this._showContentIndex = 0;
