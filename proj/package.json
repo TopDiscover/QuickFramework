@@ -11,8 +11,7 @@
     "protobufjs-cli": "^1.1.1"
   },
   "scripts": {
-    "build-proto:pbjs1": "node ./node_modules/protobufjs-cli/bin/pbjs --dependency protobufjs/minimal.js --target static-module --wrap commonjs --out ./@types/Proto.js ./assets/bundles/hall/proto/userInfo.proto ./assets/bundles/hall/proto/roomInfo.proto",
-    "build-proto:pbjs": "node ./node_modules/protobufjs-cli/bin/pbjs --target static-module --wrap commonjs --out ./@types/Proto.js ./assets/bundles/hall/proto/userInfo.proto ./assets/bundles/hall/proto/roomInfo.proto",
+    "build-proto:pbjs": "node ./node_modules/protobufjs-cli/bin/pbjs --target static-module --wrap commonjs --out ./@types/Proto.js ./assets/bundles/hall/proto/*.proto",
     "build-proto:pbts": "node ./node_modules/protobufjs-cli/bin/pbts -o ./@types/Proto.d.ts ./@types/Proto.js"
   }
 }
