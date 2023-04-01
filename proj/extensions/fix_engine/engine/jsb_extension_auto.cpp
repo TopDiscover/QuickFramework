@@ -2566,7 +2566,7 @@ static bool js_cc_extension_AssetsManager_reset(se::State& s)
 }
 SE_BIND_FUNC(js_cc_extension_AssetsManager_reset)
 
-static bool js_cc_extension_AssetsManager_setMainBundle(se::State& s)
+static bool js_cc_extension_AssetsManager_setMainBundles(se::State& s)
 {
     CC_UNUSED bool ok = true;
     const auto& args = s.args();
@@ -2591,7 +2591,7 @@ static bool js_cc_extension_AssetsManager_setMainBundle(se::State& s)
 
     return true;
 }
-SE_BIND_FUNC(js_cc_extension_AssetsManager_setMainBundle)
+SE_BIND_FUNC(js_cc_extension_AssetsManager_setMainBundles)
 
 static bool js_cc_extension_AssetsManager_setDownloadAgainZip(se::State& s)
 {
@@ -2644,7 +2644,7 @@ bool js_register_cc_extension_AssetsManagerEx(se::Object* obj) {
     cls->defineFunction("setEventCallback", _SE(js_cc_extension_AssetsManager_setEventCallback));
     cls->defineFunction("setPackageUrl", _SE(js_cc_extension_AssetsManager_setPackageUrl));
     cls->defineFunction("reset", _SE(js_cc_extension_AssetsManager_reset));
-    cls->defineFunction("setMainBundle", _SE(js_cc_extension_AssetsManager_setMainBundle));
+    cls->defineFunction("setMainBundles", _SE(js_cc_extension_AssetsManager_setMainBundles));
     cls->defineFunction("setDownloadAgainZip", _SE(js_cc_extension_AssetsManager_setDownloadAgainZip));
     
     cls->defineStaticProperty("VERSION_ID", _SE(js_cc_extension_AssetsManagerEx_VERSION_ID_get), nullptr); 

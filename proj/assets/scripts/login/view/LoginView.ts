@@ -26,8 +26,10 @@ export default class LoginView extends GameView {
             md5.string = `MD5:${App.updateManager.getMd5(this.bundle)}`;
         }
 
-        this._login.on(Node.EventType.TOUCH_END, () => {
-            this.enterBundle(Macro.BUNDLE_HALL);
-        });
+        this._login.on(Node.EventType.TOUCH_END,this.onClick,this);
+    }
+
+    private onClick(){
+        this.enterBundle(Macro.BUNDLE_HALL);
     }
 }
