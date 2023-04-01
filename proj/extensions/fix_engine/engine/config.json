@@ -29,11 +29,6 @@
         "from" : "jsb_extension_auto.cpp",
         "desc" : "执更新修改,jsb_extension_auto.cpp"
     },
-    "jsb_extension_auto.h":{
-        "to" : "resources/3d/engine/native/cocos/bindings/auto/jsb_extension_auto.h",
-        "from" : "jsb_extension_auto.h",
-        "desc" : "执更新修改,jsb_extension_auto.h"
-    },
     "ccdts":{
         "to" : "resources/3d/engine/bin/.declarations/cc.d.ts",
         "from" : "ccdts",
