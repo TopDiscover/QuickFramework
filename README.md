@@ -70,8 +70,8 @@
 # 分支说明
 ## [2.4.7](https://gitee.com/top-discover/QuickFramework/tree/2.4.7)
 2.4.7 分支为 creator 版本在>=2.4.7版本以上使用，为2.4.x的对外分支
-## [3.3.1](https://gitee.com/top-discover/QuickFramework/tree/3.3.1)
-3.3.1 分支为 creator 版本在>=3.3.1版本以上使用，为3.x的对外分支
+## [3.7.2](https://gitee.com/top-discover/QuickFramework/tree/3.7.2)
+3.7.2 分支为 creator 版本在>=3.7.2版本以上使用，为3.x的对外分支
 ## 其它分支为开发中的分支，请不要轻易使用
 
 **如果您觉得我们的开源框架对你有所帮助，请扫下方二维进群讨论**
