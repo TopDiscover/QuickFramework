@@ -18,260 +18,6 @@ $root.tp = (function() {
      */
     var tp = {};
 
-    tp.RoomInfo = (function() {
-
-        /**
-         * Properties of a RoomInfo.
-         * @memberof tp
-         * @interface IRoomInfo
-         * @property {number|null} [roomID] RoomInfo roomID
-         * @property {string|null} [name] RoomInfo name
-         * @property {Array.<tp.IUserInfo>|null} [players] RoomInfo players
-         */
-
-        /**
-         * Constructs a new RoomInfo.
-         * @memberof tp
-         * @classdesc Represents a RoomInfo.
-         * @implements IRoomInfo
-         * @constructor
-         * @param {tp.IRoomInfo=} [properties] Properties to set
-         */
-        function RoomInfo(properties) {
-            this.players = [];
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * RoomInfo roomID.
-         * @member {number} roomID
-         * @memberof tp.RoomInfo
-         * @instance
-         */
-        RoomInfo.prototype.roomID = 0;
-
-        /**
-         * RoomInfo name.
-         * @member {string} name
-         * @memberof tp.RoomInfo
-         * @instance
-         */
-        RoomInfo.prototype.name = "";
-
-        /**
-         * RoomInfo players.
-         * @member {Array.<tp.IUserInfo>} players
-         * @memberof tp.RoomInfo
-         * @instance
-         */
-        RoomInfo.prototype.players = $util.emptyArray;
-
-        /**
-         * Creates a new RoomInfo instance using the specified properties.
-         * @function create
-         * @memberof tp.RoomInfo
-         * @static
-         * @param {tp.IRoomInfo=} [properties] Properties to set
-         * @returns {tp.RoomInfo} RoomInfo instance
-         */
-        RoomInfo.create = function create(properties) {
-            return new RoomInfo(properties);
-        };
-
-        /**
-         * Encodes the specified RoomInfo message. Does not implicitly {@link tp.RoomInfo.verify|verify} messages.
-         * @function encode
-         * @memberof tp.RoomInfo
-         * @static
-         * @param {tp.IRoomInfo} message RoomInfo message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        RoomInfo.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.roomID != null && Object.hasOwnProperty.call(message, "roomID"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.roomID);
-            if (message.name != null && Object.hasOwnProperty.call(message, "name"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.name);
-            if (message.players != null && message.players.length)
-                for (var i = 0; i < message.players.length; ++i)
-                    $root.tp.UserInfo.encode(message.players[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-            return writer;
-        };
-
-        /**
-         * Encodes the specified RoomInfo message, length delimited. Does not implicitly {@link tp.RoomInfo.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof tp.RoomInfo
-         * @static
-         * @param {tp.IRoomInfo} message RoomInfo message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        RoomInfo.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a RoomInfo message from the specified reader or buffer.
-         * @function decode
-         * @memberof tp.RoomInfo
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {tp.RoomInfo} RoomInfo
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        RoomInfo.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.tp.RoomInfo();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1:
-                    message.roomID = reader.int32();
-                    break;
-                case 2:
-                    message.name = reader.string();
-                    break;
-                case 3:
-                    if (!(message.players && message.players.length))
-                        message.players = [];
-                    message.players.push($root.tp.UserInfo.decode(reader, reader.uint32()));
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a RoomInfo message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof tp.RoomInfo
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {tp.RoomInfo} RoomInfo
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        RoomInfo.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a RoomInfo message.
-         * @function verify
-         * @memberof tp.RoomInfo
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        RoomInfo.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.roomID != null && message.hasOwnProperty("roomID"))
-                if (!$util.isInteger(message.roomID))
-                    return "roomID: integer expected";
-            if (message.name != null && message.hasOwnProperty("name"))
-                if (!$util.isString(message.name))
-                    return "name: string expected";
-            if (message.players != null && message.hasOwnProperty("players")) {
-                if (!Array.isArray(message.players))
-                    return "players: array expected";
-                for (var i = 0; i < message.players.length; ++i) {
-                    var error = $root.tp.UserInfo.verify(message.players[i]);
-                    if (error)
-                        return "players." + error;
-                }
-            }
-            return null;
-        };
-
-        /**
-         * Creates a RoomInfo message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof tp.RoomInfo
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {tp.RoomInfo} RoomInfo
-         */
-        RoomInfo.fromObject = function fromObject(object) {
-            if (object instanceof $root.tp.RoomInfo)
-                return object;
-            var message = new $root.tp.RoomInfo();
-            if (object.roomID != null)
-                message.roomID = object.roomID | 0;
-            if (object.name != null)
-                message.name = String(object.name);
-            if (object.players) {
-                if (!Array.isArray(object.players))
-                    throw TypeError(".tp.RoomInfo.players: array expected");
-                message.players = [];
-                for (var i = 0; i < object.players.length; ++i) {
-                    if (typeof object.players[i] !== "object")
-                        throw TypeError(".tp.RoomInfo.players: object expected");
-                    message.players[i] = $root.tp.UserInfo.fromObject(object.players[i]);
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a RoomInfo message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof tp.RoomInfo
-         * @static
-         * @param {tp.RoomInfo} message RoomInfo
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        RoomInfo.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.arrays || options.defaults)
-                object.players = [];
-            if (options.defaults) {
-                object.roomID = 0;
-                object.name = "";
-            }
-            if (message.roomID != null && message.hasOwnProperty("roomID"))
-                object.roomID = message.roomID;
-            if (message.name != null && message.hasOwnProperty("name"))
-                object.name = message.name;
-            if (message.players && message.players.length) {
-                object.players = [];
-                for (var j = 0; j < message.players.length; ++j)
-                    object.players[j] = $root.tp.UserInfo.toObject(message.players[j], options);
-            }
-            return object;
-        };
-
-        /**
-         * Converts this RoomInfo to JSON.
-         * @function toJSON
-         * @memberof tp.RoomInfo
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        RoomInfo.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        return RoomInfo;
-    })();
-
     /**
      * GenderType enum.
      * @name tp.GenderType
@@ -422,21 +168,26 @@ $root.tp = (function() {
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
-                case 1:
-                    message.name = reader.string();
-                    break;
-                case 2:
-                    message.gender = reader.int32();
-                    break;
-                case 3:
-                    message.id = reader.int64();
-                    break;
-                case 4:
-                    message.level = reader.int32();
-                    break;
-                case 5:
-                    message.money = reader.int64();
-                    break;
+                case 1: {
+                        message.name = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.gender = reader.int32();
+                        break;
+                    }
+                case 3: {
+                        message.id = reader.int64();
+                        break;
+                    }
+                case 4: {
+                        message.level = reader.int32();
+                        break;
+                    }
+                case 5: {
+                        message.money = reader.int64();
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -510,6 +261,12 @@ $root.tp = (function() {
             if (object.name != null)
                 message.name = String(object.name);
             switch (object.gender) {
+            default:
+                if (typeof object.gender === "number") {
+                    message.gender = object.gender;
+                    break;
+                }
+                break;
             case "male":
             case 1:
                 message.gender = 1;
@@ -573,7 +330,7 @@ $root.tp = (function() {
             if (message.name != null && message.hasOwnProperty("name"))
                 object.name = message.name;
             if (message.gender != null && message.hasOwnProperty("gender"))
-                object.gender = options.enums === String ? $root.tp.GenderType[message.gender] : message.gender;
+                object.gender = options.enums === String ? $root.tp.GenderType[message.gender] === undefined ? message.gender : $root.tp.GenderType[message.gender] : message.gender;
             if (message.id != null && message.hasOwnProperty("id"))
                 if (typeof message.id === "number")
                     object.id = options.longs === String ? String(message.id) : message.id;
@@ -600,7 +357,294 @@ $root.tp = (function() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
+        /**
+         * Gets the default type url for UserInfo
+         * @function getTypeUrl
+         * @memberof tp.UserInfo
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        UserInfo.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tp.UserInfo";
+        };
+
         return UserInfo;
+    })();
+
+    tp.RoomInfo = (function() {
+
+        /**
+         * Properties of a RoomInfo.
+         * @memberof tp
+         * @interface IRoomInfo
+         * @property {number|null} [roomID] RoomInfo roomID
+         * @property {string|null} [name] RoomInfo name
+         * @property {Array.<tp.IUserInfo>|null} [players] RoomInfo players
+         */
+
+        /**
+         * Constructs a new RoomInfo.
+         * @memberof tp
+         * @classdesc Represents a RoomInfo.
+         * @implements IRoomInfo
+         * @constructor
+         * @param {tp.IRoomInfo=} [properties] Properties to set
+         */
+        function RoomInfo(properties) {
+            this.players = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * RoomInfo roomID.
+         * @member {number} roomID
+         * @memberof tp.RoomInfo
+         * @instance
+         */
+        RoomInfo.prototype.roomID = 0;
+
+        /**
+         * RoomInfo name.
+         * @member {string} name
+         * @memberof tp.RoomInfo
+         * @instance
+         */
+        RoomInfo.prototype.name = "";
+
+        /**
+         * RoomInfo players.
+         * @member {Array.<tp.IUserInfo>} players
+         * @memberof tp.RoomInfo
+         * @instance
+         */
+        RoomInfo.prototype.players = $util.emptyArray;
+
+        /**
+         * Creates a new RoomInfo instance using the specified properties.
+         * @function create
+         * @memberof tp.RoomInfo
+         * @static
+         * @param {tp.IRoomInfo=} [properties] Properties to set
+         * @returns {tp.RoomInfo} RoomInfo instance
+         */
+        RoomInfo.create = function create(properties) {
+            return new RoomInfo(properties);
+        };
+
+        /**
+         * Encodes the specified RoomInfo message. Does not implicitly {@link tp.RoomInfo.verify|verify} messages.
+         * @function encode
+         * @memberof tp.RoomInfo
+         * @static
+         * @param {tp.IRoomInfo} message RoomInfo message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        RoomInfo.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.roomID != null && Object.hasOwnProperty.call(message, "roomID"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.roomID);
+            if (message.name != null && Object.hasOwnProperty.call(message, "name"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.name);
+            if (message.players != null && message.players.length)
+                for (var i = 0; i < message.players.length; ++i)
+                    $root.tp.UserInfo.encode(message.players[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified RoomInfo message, length delimited. Does not implicitly {@link tp.RoomInfo.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tp.RoomInfo
+         * @static
+         * @param {tp.IRoomInfo} message RoomInfo message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        RoomInfo.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a RoomInfo message from the specified reader or buffer.
+         * @function decode
+         * @memberof tp.RoomInfo
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tp.RoomInfo} RoomInfo
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        RoomInfo.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.tp.RoomInfo();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        message.roomID = reader.int32();
+                        break;
+                    }
+                case 2: {
+                        message.name = reader.string();
+                        break;
+                    }
+                case 3: {
+                        if (!(message.players && message.players.length))
+                            message.players = [];
+                        message.players.push($root.tp.UserInfo.decode(reader, reader.uint32()));
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a RoomInfo message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tp.RoomInfo
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tp.RoomInfo} RoomInfo
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        RoomInfo.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a RoomInfo message.
+         * @function verify
+         * @memberof tp.RoomInfo
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        RoomInfo.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.roomID != null && message.hasOwnProperty("roomID"))
+                if (!$util.isInteger(message.roomID))
+                    return "roomID: integer expected";
+            if (message.name != null && message.hasOwnProperty("name"))
+                if (!$util.isString(message.name))
+                    return "name: string expected";
+            if (message.players != null && message.hasOwnProperty("players")) {
+                if (!Array.isArray(message.players))
+                    return "players: array expected";
+                for (var i = 0; i < message.players.length; ++i) {
+                    var error = $root.tp.UserInfo.verify(message.players[i]);
+                    if (error)
+                        return "players." + error;
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a RoomInfo message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tp.RoomInfo
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tp.RoomInfo} RoomInfo
+         */
+        RoomInfo.fromObject = function fromObject(object) {
+            if (object instanceof $root.tp.RoomInfo)
+                return object;
+            var message = new $root.tp.RoomInfo();
+            if (object.roomID != null)
+                message.roomID = object.roomID | 0;
+            if (object.name != null)
+                message.name = String(object.name);
+            if (object.players) {
+                if (!Array.isArray(object.players))
+                    throw TypeError(".tp.RoomInfo.players: array expected");
+                message.players = [];
+                for (var i = 0; i < object.players.length; ++i) {
+                    if (typeof object.players[i] !== "object")
+                        throw TypeError(".tp.RoomInfo.players: object expected");
+                    message.players[i] = $root.tp.UserInfo.fromObject(object.players[i]);
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a RoomInfo message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tp.RoomInfo
+         * @static
+         * @param {tp.RoomInfo} message RoomInfo
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        RoomInfo.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.players = [];
+            if (options.defaults) {
+                object.roomID = 0;
+                object.name = "";
+            }
+            if (message.roomID != null && message.hasOwnProperty("roomID"))
+                object.roomID = message.roomID;
+            if (message.name != null && message.hasOwnProperty("name"))
+                object.name = message.name;
+            if (message.players && message.players.length) {
+                object.players = [];
+                for (var j = 0; j < message.players.length; ++j)
+                    object.players[j] = $root.tp.UserInfo.toObject(message.players[j], options);
+            }
+            return object;
+        };
+
+        /**
+         * Converts this RoomInfo to JSON.
+         * @function toJSON
+         * @memberof tp.RoomInfo
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        RoomInfo.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for RoomInfo
+         * @function getTypeUrl
+         * @memberof tp.RoomInfo
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        RoomInfo.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tp.RoomInfo";
+        };
+
+        return RoomInfo;
     })();
 
     return tp;
