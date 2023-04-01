@@ -12,20 +12,20 @@ class _Environment {
     }
 
     /**@description cocos creator 安装目录 */
-    readonly creatorPath: string = "D:/Creator/Creator/3.6.0/resources";
+    readonly creatorPath: string = "D:/Creator/Creator/3.7.2/resources";
 
     /**@description cocos creator 版本 */
-    readonly creatorVerion: string = "3.6.0";
+    readonly creatorVerion: string = "3.7.2";
 
     /**@description 支持版本 */
-    readonly supportVersions = ["3.6.0","3.6.1","3.6.2","3.6.3"];
+    readonly supportVersions = ["3.7.2"];
 
     /**@description 扩展插件目录名 */
     readonly extensionsName = "extensions";
 
     readonly build : BuilderOptions = {
         platform : "windows",
-        dest : "D:/workspace/QuickFramework331/proj/build/windows",
+        dest : "D:/workspace/QuickFramework372/proj/build/windows",
         md5Cache: false,
     }
 

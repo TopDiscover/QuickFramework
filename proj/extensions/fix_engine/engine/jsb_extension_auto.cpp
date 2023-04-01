@@ -1582,6 +1582,38 @@ static bool js_new_cc_extension_Manifest__SWIG_2(se::State& s) // NOLINT(readabi
     return true;
 }
 
+static bool js_new_cc_extension_Manifest__SWIG_3(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    const auto& args = s.args();
+    CC_UNUSED bool ok = true;
+    std::string *arg1 = 0;
+    std::string *arg2 = 0;
+    std::string *arg3 = 0;
+    std::string temp1;
+    std::string temp2;
+    std::string temp3;
+    cc::extension::Manifest *result;
+
+    ok &= sevalue_to_native(args[0], &temp1, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg1 = &temp1;
+
+
+    ok &= sevalue_to_native(args[1], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+
+    ok &= sevalue_to_native(args[2], &temp3, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = &temp3;
+
+    result = (cc::extension::Manifest *)new cc::extension::Manifest((std::string const &)*arg1, (std::string const &)*arg2,(std::string const&)*arg3);
+
+
+    auto *ptr = JSB_MAKE_PRIVATE_OBJECT_WITH_INSTANCE(result);
+    s.thisObject()->setPrivateObject(ptr);
+    return true;
+}
 
 static bool js_new_Manifest(se::State& s) // NOLINT(readability-identifier-naming)
 {
@@ -1606,6 +1638,15 @@ static bool js_new_Manifest(se::State& s) // NOLINT(readability-identifier-namin
         ret = js_new_cc_extension_Manifest__SWIG_2(s);
         if (ret) {
             return ret; 
+        } /* reset exception and return */
+    }
+
+    if (argc == 3)
+    {
+        ret = js_new_cc_extension_Manifest__SWIG_3(s);
+        if (ret)
+        {
+            return ret;
         } /* reset exception and return */
     }
     
@@ -1720,7 +1761,32 @@ static bool js_cc_extension_Manifest_setUpdating(se::State& s)
     
     return true;
 }
-SE_BIND_FUNC(js_cc_extension_Manifest_setUpdating) 
+SE_BIND_FUNC(js_cc_extension_Manifest_setUpdating)
+
+static bool js_cc_extension_Manifest_getMd5(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::extension::Manifest *arg1 = (cc::extension::Manifest *) NULL;
+    std::string *result = 0;
+
+    if (argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::extension::Manifest>(s);
+    if (nullptr == arg1) return true;
+    result = (std::string *) &((cc::extension::Manifest const *)arg1)->getMd5();
+
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval());
+
+
+    return true;
+}
+SE_BIND_FUNC(js_cc_extension_Manifest_getMd5)
 
 static bool js_delete_cc_extension_Manifest(se::State& s)
 {
@@ -1744,7 +1810,8 @@ bool js_register_cc_extension_Manifest(se::Object* obj) {
     cls->defineFunction("parseFile", _SE(js_cc_extension_Manifest_parseFile)); 
     cls->defineFunction("parseJSONString", _SE(js_cc_extension_Manifest_parseJSONString)); 
     cls->defineFunction("isUpdating", _SE(js_cc_extension_Manifest_isUpdating)); 
-    cls->defineFunction("setUpdating", _SE(js_cc_extension_Manifest_setUpdating)); 
+    cls->defineFunction("setUpdating", _SE(js_cc_extension_Manifest_setUpdating));
+    cls->defineFunction("getMd5", _SE(js_cc_extension_Manifest_getMd5));
     
     
     
@@ -2452,7 +2519,103 @@ static bool js_cc_extension_AssetsManager_setEventCallback(se::State& s)
     
     return true;
 }
-SE_BIND_FUNC(js_cc_extension_AssetsManager_setEventCallback) 
+SE_BIND_FUNC(js_cc_extension_AssetsManager_setEventCallback)
+
+static bool js_cc_extension_AssetsManager_setPackageUrl(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::extension::AssetsManagerEx *arg1 = (cc::extension::AssetsManagerEx *) NULL;
+    std::string *arg2 = 0;
+    std::string temp2;
+
+    if (argc != 1) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::extension::AssetsManagerEx>(s);
+    if (nullptr == arg1) return true;
+
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+
+    (arg1)->setPackageUrl((std::string const &)*arg2);
+
+
+    return true;
+}
+SE_BIND_FUNC(js_cc_extension_AssetsManager_setPackageUrl)
+
+static bool js_cc_extension_AssetsManager_reset(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::extension::AssetsManagerEx *arg1 = (cc::extension::AssetsManagerEx *) NULL;
+
+    if (argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::extension::AssetsManagerEx>(s);
+    if (nullptr == arg1) return true;
+    arg1->reset();
+    return true;
+}
+SE_BIND_FUNC(js_cc_extension_AssetsManager_reset)
+
+static bool js_cc_extension_AssetsManager_setMainBundle(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::extension::AssetsManagerEx *arg1 = (cc::extension::AssetsManagerEx *) NULL;
+    ccstd::vector< ccstd::string > *arg2 = 0;
+    ccstd::vector< ccstd::string > temp2;
+
+    if (argc != 1) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::extension::AssetsManagerEx>(s);
+    if (nullptr == arg1) return true;
+
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+
+    (arg1)->setMainBundles((ccstd::vector< ccstd::string > const &)*arg2);
+
+
+    return true;
+}
+SE_BIND_FUNC(js_cc_extension_AssetsManager_setMainBundle)
+
+static bool js_cc_extension_AssetsManager_setDownloadAgainZip(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::extension::AssetsManagerEx *arg1 = (cc::extension::AssetsManagerEx *) NULL;
+    int arg2;
+
+    if (argc != 1) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::extension::AssetsManagerEx>(s);
+    if (nullptr == arg1) return true;
+
+    ok &= sevalue_to_native(args[0], &arg2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    (arg1)->setDownloadAgainZip(arg2);
+
+
+    return true;
+}
+SE_BIND_FUNC(js_cc_extension_AssetsManager_setDownloadAgainZip)
 
 bool js_register_cc_extension_AssetsManagerEx(se::Object* obj) {
     auto* cls = se::Class::create("AssetsManager", obj, nullptr, _SE(js_new_AssetsManager)); 
@@ -2478,7 +2641,11 @@ bool js_register_cc_extension_AssetsManagerEx(se::Object* obj) {
     cls->defineFunction("setMaxConcurrentTask", _SE(js_cc_extension_AssetsManager_setMaxConcurrentTask)); 
     cls->defineFunction("setVersionCompareHandle", _SE(js_cc_extension_AssetsManager_setVersionCompareHandle)); 
     cls->defineFunction("setVerifyCallback", _SE(js_cc_extension_AssetsManager_setVerifyCallback)); 
-    cls->defineFunction("setEventCallback", _SE(js_cc_extension_AssetsManager_setEventCallback)); 
+    cls->defineFunction("setEventCallback", _SE(js_cc_extension_AssetsManager_setEventCallback));
+    cls->defineFunction("setPackageUrl", _SE(js_cc_extension_AssetsManager_setPackageUrl));
+    cls->defineFunction("reset", _SE(js_cc_extension_AssetsManager_reset));
+    cls->defineFunction("setMainBundle", _SE(js_cc_extension_AssetsManager_setMainBundle));
+    cls->defineFunction("setDownloadAgainZip", _SE(js_cc_extension_AssetsManager_setDownloadAgainZip));
     
     cls->defineStaticProperty("VERSION_ID", _SE(js_cc_extension_AssetsManagerEx_VERSION_ID_get), nullptr); 
     cls->defineStaticProperty("MANIFEST_ID", _SE(js_cc_extension_AssetsManagerEx_MANIFEST_ID_get), nullptr); 
