@@ -13,7 +13,7 @@ export default class BuilderHelper extends Config<BuilderOptions>{
     readonly defaultData = Environment.build;
 
     get path() {
-        return join(this.localPath, `builder_cache.json`);
+        return join(this.configPath, `builder_cache.json`);
     }
 
 

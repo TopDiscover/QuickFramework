@@ -198,7 +198,7 @@ export default class Helper extends Config<PngCompressConfig> {
                 failed: this.records.failedAssets
             }
 
-            let path = join(this.localPath, `${Extensions.PngCompress}_${this.date}_cache.json`);
+            let path = join(this.configPath, `${Extensions.PngCompress}_${this.date}_cache.json`);
             this.logger.log(`${this.module}写入日志到${path}`);
             writeFileSync(path, JSON.stringify(data), "utf-8");
         }
@@ -348,7 +348,7 @@ export default class Helper extends Config<PngCompressConfig> {
 
     /**@description 测试用 */
     protected saveAllAssets(assets: AssetInfo[]) {
-        let path = join(this.localPath,"assets_cache.json");
+        let path = join(this.configPath,"assets_cache.json");
         writeFileSync(path,JSON.stringify(assets),"utf-8");
     }
 

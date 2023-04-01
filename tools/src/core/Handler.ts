@@ -57,9 +57,6 @@ export class Handler {
     /**@description 构建目录 */
     readonly buildPath = join(this.projPath, "proj/build");
 
-    /**@description local目录 */
-    readonly localPath = join(this.projPath, "proj/local");
-
     /**@description 当前插件路径 */
     get curExtensionPath() {
         return "";

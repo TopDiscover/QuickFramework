@@ -203,7 +203,7 @@ class Helper extends Config_1.default {
                 success: this.records.successAssets,
                 failed: this.records.failedAssets
             };
-            let path = (0, path_1.join)(this.localPath, `${Defines_1.Extensions.PngCompress}_${this.date}_cache.json`);
+            let path = (0, path_1.join)(this.configPath, `${Defines_1.Extensions.PngCompress}_${this.date}_cache.json`);
             this.logger.log(`${this.module}写入日志到${path}`);
             (0, fs_1.writeFileSync)(path, JSON.stringify(data), "utf-8");
         }
@@ -342,7 +342,7 @@ class Helper extends Config_1.default {
     }
     /**@description 测试用 */
     saveAllAssets(assets) {
-        let path = (0, path_1.join)(this.localPath, "assets_cache.json");
+        let path = (0, path_1.join)(this.configPath, "assets_cache.json");
         (0, fs_1.writeFileSync)(path, JSON.stringify(assets), "utf-8");
     }
     async onAfterBuild(options) {

@@ -29,8 +29,6 @@ class Handler {
         this.node_modules = (0, path_1.join)(this.projPath, "tools/node_modules");
         /**@description 构建目录 */
         this.buildPath = (0, path_1.join)(this.projPath, "proj/build");
-        /**@description local目录 */
-        this.localPath = (0, path_1.join)(this.projPath, "proj/local");
     }
     get logger() {
         if (!this._logger) {
