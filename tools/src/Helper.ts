@@ -147,6 +147,12 @@ export class Helper extends Handler {
         this.log(`链接扩展插件代码`, true);
     }
 
+    async installProtobufJS(){
+        this.log("安装 protobufjs",false);
+        this.chdir(join(this.projPath,"proj"));
+        await this.exec("npm install");
+        this.log("安装 protobufjs",true);
+    }
 
     /**@description 引擎修改 */
     async fixEngine() {

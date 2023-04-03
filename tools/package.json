@@ -12,7 +12,8 @@
     "linkGulp": "node -r ts-node/register src/Index.ts -linkGulp",
     "assets": "node -r ts-node/register src/Index.ts -assets",
     "pngquant": "node -r ts-node/register src/Index.ts -pngquant",
-    "hotupdate": "node -r ts-node/register src/Index.ts -hotupdate"
+    "hotupdate": "node -r ts-node/register src/Index.ts -hotupdate",
+    "protobufjs": "node -r ts-node/register src/Index.ts -protobufjs"
   },
   "devDependencies": {
     "@types/archiver": "^5.3.1",

@@ -43,6 +43,8 @@ export enum CmdType {
     Pngquant = "-pngquant",
     /**@description 热更新 */
     Hotupdate = "-hotupdate",
+    /**@description protobufjs */
+    ProtobufJS = "-protobufjs",
 }
 
 /**@description 命令行执行结果 */

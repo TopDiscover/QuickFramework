@@ -25,6 +25,7 @@ async function main() {
         await Helper.instance.gitBundles();
         await Helper.instance.symlinkSyncCode();
         await Helper.instance.symlinkSyncExtensions();
+        await Helper.instance.installProtobufJS();
     }
     else{
 
@@ -48,6 +49,8 @@ async function main() {
                 await Helper.instance.pngCompress();
             }else if( type == CmdType.Hotupdate){
                 await Helper.instance.hotupdate();
+            }else if( type == CmdType.ProtobufJS ){
+                await Helper.instance.installProtobufJS();
             }
             type = argv.shift();
         }
