@@ -4,16 +4,15 @@
  */
 
 import LoginView from "./view/LoginView";
-import { ViewZOrder } from "../common/config/Config";
 import { Macro } from "../framework/defines/Macros";
 import { Entry } from "../framework/core/entry/Entry";
 import { Singleton } from "../framework/utils/Singleton";
+import { registerEntry } from "../framework/defines/Decorators";
 
+@registerEntry("LoginEntry",Macro.BUNDLE_RESOURCES,LoginView)
 class LoginEntry extends Entry {
-    static bundle = Macro.BUNDLE_RESOURCES;
     /**@description 是否是主包入口，只能有一个主包入口 */
     isMain = true;
-
     protected addNetHandler(): void {
         
     }
@@ -24,11 +23,8 @@ class LoginEntry extends Entry {
        completeCb();
     }
     protected openGameView(): void {
-        App.uiManager.open({ type: LoginView, zIndex: ViewZOrder.zero, bundle: this.bundle });
+        super.openGameView();
         App.entryManager.onCheckUpdate();
-    }
-    protected closeGameView(): void {
-        App.uiManager.close(LoginView);
     }
     protected initData(): void {
     }
@@ -62,4 +58,3 @@ class LoginEntry extends Entry {
         this.unloadResources();
     }
 }
-App.entryManager.register(LoginEntry);
