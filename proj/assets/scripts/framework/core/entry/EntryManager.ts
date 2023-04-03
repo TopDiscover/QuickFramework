@@ -3,6 +3,7 @@ import { Node } from "cc";
 import { DEBUG } from "cc/env";
 import { Macro } from "../../defines/Macros";
 import { UpdateItem } from "../update/UpdateItem";
+import GameView from "../ui/GameView";
 
 /**@description 入口管理 */
 export class EntryManager implements ISingleton{
@@ -17,7 +18,7 @@ export class EntryManager implements ISingleton{
     private node: Node | null = null;
 
     /**@description 注册入口 */
-    register(entryClass: EntryClass<Entry>) {
+    register(entryClass: EntryClass<Entry>,type:typeof GameView) {
         let entry = this.getEntry(entryClass.bundle);
         if (entry) {
             if ( DEBUG ){
@@ -27,6 +28,7 @@ export class EntryManager implements ISingleton{
         }
         entry = new entryClass;
         entry.bundle = entryClass.bundle;
+        entry.gameViewType = type;
         this._entrys.set(entry.bundle, entry);
         if (this.node) {
             if ( DEBUG ){
