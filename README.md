@@ -22,7 +22,7 @@
 然后在tools目录下执行 npm run main 
 
 # 详细文档
-更为详细的文档，[请在本项目的doc中查看](https://gitee.com/top-discover/QuickFramework/tree/2.4.7/doc)，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
+更为详细的文档，[请在本项目的doc中查看](doc)，由于个人原因，文档会逐步完成中，也同时欢迎进入我们的交流群中讨论，相互学习
 同时也希望有更多的人参与，一起让creator的开发更加的简单。
 
 # 关于QuickFramework
