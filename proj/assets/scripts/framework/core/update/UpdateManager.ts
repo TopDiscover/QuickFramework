@@ -124,10 +124,22 @@ export class UpdateManager implements ISingleton {
         }
     }
 
-    private getItem(item: UpdateItem) {
+    getItem(item: UpdateItem | Update.Config) {
+        if (item instanceof UpdateItem) {
+            return this._getItem(item.bundle);
+        } else {
+            let temp = this._getItem(item.bundle);
+            if (temp == null) {
+                temp = new UpdateItem(item);
+            }
+            return temp;
+        }
+    }
+
+    private _getItem(bundle: string) {
         for (let i = 0; i < this.items.length; i++) {
-            if (item.bundle == this.items[i].bundle) {
-                return item;
+            if (bundle == this.items[i].bundle) {
+                return this.items[i];
             }
         }
         return null;

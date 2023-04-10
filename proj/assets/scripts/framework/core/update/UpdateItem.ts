@@ -32,6 +32,12 @@ export interface UpdateHandlerDelegate {
     onLoadBundleError(item: UpdateItem, err: Error | null): void;
     /**@description 加载bundle完成 */
     onLoadBundleComplete(item: UpdateItem): void;
+
+    /**
+     * @description 更新完成，需要重启 
+     * @param onComplete 完成回调，收到此消息，玩家必须重启App，为了比较友好，结玩家一个提示
+     * */
+    onNeedRestartApp(item : UpdateItem , onComplete : (isDelayRestart : boolean)=>void): void;
 }
 
 export class UpdateItem {
@@ -46,6 +52,9 @@ export class UpdateItem {
     handler: UpdateHandlerDelegate = null!;
     /**@description 更新用户自定义数据,多次点击，以最新数据为主 */
     userData: any = null;
+
+    /**@description 是否已经加载完成过 */
+    isLoaded: boolean = false;
 
     /**@description 下载管理器，请不要从外面进行设置,管理器专用 */
     private get assetsManager() {
@@ -356,28 +365,17 @@ export class UpdateItem {
                 //当只提升了版本号，而并未对代码进行修改时，此时的只下载了一个project.manifest文件，
                 //不需要对游戏进行重启的操作
                 if (event.getDownloadedFiles() > 0) {
-                    Log.d(`${this.bundle} 主包更新完成，有下载文件，需要重启更新`);
-                    jsb.fileUtils.purgeCachedEntries();
-                    setTimeout(() => {
-                        Log.d(`${this.bundle} 重启游戏`);
-                        cc.game.restart();
-                    }, 1);
                     isRestartApp = true;
-                } else {
-                    Log.d(`${this.bundle} 主包更新完成，写入远程版本信息到本地`);
-                    jsb.fileUtils.purgeCachedEntries();
-                    //下载完成 重置热更新管理器，在游戏期间如果有发热更新，可以再次检测
-                    this.reset();
                 }
             }
         } else {
             //子游戏更新
             if (isUpdateFinished) {
-                Log.d(`${this.bundle} 下载资源数 : ${event.getDownloadedFiles()}`)
-                //清除搜索路径缓存
-                jsb.fileUtils.purgeCachedEntries();
-                //下载完成 重置热更新管理器，在游戏期间如果有发热更新，可以再次检测
-                this.reset();
+                Log.d(`${this.bundle} 更新前是否加载过 : ${this.isLoaded}`)
+                if (this.isLoaded && event.getDownloadedFiles() > 0) {
+                    Log.d(`${this.bundle} 已经加载过，需要重启`)
+                    isRestartApp = true;
+                }
             }
         }
 
@@ -422,7 +420,25 @@ export class UpdateItem {
             this.handler.onUpdateFailed(this);
         }
         if (isUpdateFinished) {
-            if (!isRestartApp) {
+            Log.d(`${this.bundle} 更新完成,下载资源数 : ${event.getDownloadedFiles()}`)
+            if (isRestartApp) {
+                Log.d(`${this.bundle} 更新完成，需要重启游戏`)
+                this.handler.onNeedRestartApp(this,(isDelayRestart : boolean)=>{
+                    jsb.fileUtils.purgeCachedEntries();
+                    let delay = 0.5;
+                    if ( isDelayRestart ){
+                        delay = 1;
+                    }
+                    setTimeout(() => {
+                        Log.d(`${this.bundle} 重启游戏`);
+                        cc.game.restart();
+                    }, delay);
+                })
+            }else{
+                //清除搜索路径缓存
+                jsb.fileUtils.purgeCachedEntries();
+                //下载完成 重置热更新管理器，在游戏期间如果有发热更新，可以再次检测
+                this.reset();
                 this.handler.onDownloadComplete(this);
             }
         }

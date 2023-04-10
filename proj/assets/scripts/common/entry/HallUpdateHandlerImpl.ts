@@ -80,4 +80,19 @@ export class HallUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleton 
         App.releaseManger.tryRemoveBundle(item.bundle);
         this.onLoadBundle(item);
     }
+    onNeedRestartApp(item: UpdateItem, onComplete: (isDelayRestart : boolean)=>void): void {
+        let where = App.stageData.where;
+        Log.d(`重启游戏,当前位置 :${where},之前位置 : ${App.stageData.prevWhere}`);
+        if ( where == Macro.BUNDLE_RESOURCES ){
+            onComplete(true);
+        }else{
+            let content = App.getLanguage("restartApp",[item.name])
+            App.alert.show({
+                text: content,
+                confirmCb: (isOK) => {
+                    onComplete(false);
+                }
+            });
+        }
+    }
 }
