@@ -62,7 +62,7 @@ export class UpdateManager implements ISingleton {
     readonly mainBundles: string[] = ["src", "jsb-adapter", "assets/resources", "assets/main", "main.js"];
 
     /**@description 是否使用了自动版本 */
-    isAutoVersion : boolean = true;
+    isAutoVersion: boolean = true;
 
     /**@description 获取资源管理器，默认为hall 大厅的资源管理器 */
     getAssetsManager(item: UpdateItem) {
@@ -126,10 +126,22 @@ export class UpdateManager implements ISingleton {
         }
     }
 
-    private getItem(item: UpdateItem) {
+    getItem(item: UpdateItem | Update.Config) {
+        if (item instanceof UpdateItem) {
+            return this._getItem(item.bundle);
+        } else {
+            let temp = this._getItem(item.bundle);
+            if (temp == null) {
+                temp = new UpdateItem(item);
+            }
+            return temp;
+        }
+    }
+
+    private _getItem(bundle: string) {
         for (let i = 0; i < this.items.length; i++) {
-            if (item.bundle == this.items[i].bundle) {
-                return item;
+            if (bundle == this.items[i].bundle) {
+                return this.items[i];
             }
         }
         return null;
@@ -254,7 +266,7 @@ export class UpdateManager implements ISingleton {
             return this.defaultVersion;
         } else {
             bundle = this.convertBundle(bundle as string);
-            if ( this.isAutoVersion ){
+            if (this.isAutoVersion) {
                 ///如果使用了自动版本，所有的版本号都是一致的,都使用主包版本号
                 bundle = Macro.MAIN_PACK_BUNDLE_NAME;
             }

@@ -21,6 +21,7 @@ export let LanguageEN = {
         manifestError: "Manifest decode error!!!",
         checkingUpdate: "Checking update...",
         alreadyRemoteVersion: "{0}已升级到最新",
+        restartApp : "{0}更新完成，需要重启游戏",
         reconnect: "Reconnect ... ",
         warningReconnect: "{0}网络已断开，是否重新连接？",
         tryReconnect: "{0}网络:正在尝试第{1}次连接...",

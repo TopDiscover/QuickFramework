@@ -23,7 +23,7 @@ export class CmmEntry extends EntryDelegate {
     getEntryConfig(bundle: string): UpdateItem | null {
         let config = App.stageData.getEntry(bundle)
         if (config) {
-            let item = new UpdateItem(config);
+            let item = App.updateManager.getItem(config)!;
             if (bundle == Macro.BUNDLE_RESOURCES) {
                 item.handler = Singleton.instance.get(MainUpdateHandlerImpl) as MainUpdateHandlerImpl;
             } else if (bundle == Macro.BUNDLE_HALL) {

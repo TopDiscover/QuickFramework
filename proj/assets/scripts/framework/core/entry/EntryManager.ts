@@ -104,6 +104,8 @@ export class EntryManager implements ISingleton{
 
     /**@description 加载bundle完成 */
     onLoadBundleComplete(item:UpdateItem) {
+        // 加载完成后，记录加载过的标识
+        item.isLoaded = true;
         //通知入口管理进入bundle
         let entry = this.getEntry(item.bundle);
         if (entry) {

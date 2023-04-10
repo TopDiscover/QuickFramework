@@ -69,4 +69,13 @@ export class BundleUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleto
         //尝试先释放掉当前的bundle的资源，重新加载
         App.releaseManger.tryRemoveBundle(item.bundle);
     }
+    onNeedRestartApp(item: UpdateItem, onComplete: Function): void {
+        let content = App.getLanguage("restartApp",App.getLanguage(item.name))
+        App.alert.show({
+            text: content,
+            confirmCb: (isOK) => {
+                onComplete();
+            }
+        });
+    }
 }
