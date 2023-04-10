@@ -38,7 +38,7 @@ export interface UpdateHandlerDelegate {
      * @description 更新完成，需要重启 
      * @param onComplete 完成回调，收到此消息，玩家必须重启App，为了比较友好，结玩家一个提示
      * */
-    onNeedRestartApp(item : UpdateItem , onComplete : Function): void;
+    onNeedRestartApp(item : UpdateItem , onComplete : (isDelayRestart : boolean)=>void): void;
 }
 
 export class UpdateItem {
@@ -424,12 +424,16 @@ export class UpdateItem {
             Log.d(`${this.bundle} 更新完成,下载资源数 : ${event.getDownloadedFiles()}`)
             if (isRestartApp) {
                 Log.d(`${this.bundle} 更新完成，需要重启游戏`)
-                this.handler.onNeedRestartApp(this,()=>{
+                this.handler.onNeedRestartApp(this,(isDelayRestart : boolean)=>{
                     native.fileUtils.purgeCachedEntries();
+                    let delay = 0.5;
+                    if ( isDelayRestart ){
+                        delay = 1;
+                    }
                     setTimeout(() => {
                         Log.d(`${this.bundle} 重启游戏`);
                         game.restart();
-                    }, 1);
+                    }, delay);
                 })
             }else{
                 //清除搜索路径缓存

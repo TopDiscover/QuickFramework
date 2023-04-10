@@ -67,7 +67,7 @@ export class MainUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleton 
     onDownloadComplete(item: UpdateItem): void {
 
     }
-    onNeedRestartApp(item: UpdateItem, onComplete: Function): void {
-        onComplete();
+    onNeedRestartApp(item: UpdateItem, onComplete: (isDelayRestart : boolean)=>void): void {
+        onComplete(true);
     }
 }
