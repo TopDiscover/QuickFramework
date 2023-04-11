@@ -2,7 +2,6 @@ import { sys, TextAsset } from "cc";
 import { DEBUG } from "cc/env";
 import { Resource } from "../../asset/Resource";
 import { Net } from "../Net";
-import protobuf from "protobufjs"
 export class ProtoManager implements ISingleton{
     
     /**@description 记录已经加载过的目录，加载过的proto将不会重新加载 */

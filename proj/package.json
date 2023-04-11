@@ -6,10 +6,6 @@
   "creator": {
     "version": "3.7.2"
   },
-  "dependencies": {
-    "protobufjs": "^7.2.3",
-    "protobufjs-cli": "^1.1.1"
-  },
   "scripts": {
     "build-proto:pbjs": "node ./node_modules/protobufjs-cli/bin/pbjs --target static-module --wrap commonjs --out ./@types/Proto.js ./assets/bundles/hall/proto/*.proto",
     "build-proto:pbts": "node ./node_modules/protobufjs-cli/bin/pbts -o ./@types/Proto.d.ts ./@types/Proto.js"
