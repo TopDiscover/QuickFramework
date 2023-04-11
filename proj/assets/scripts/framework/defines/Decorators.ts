@@ -4,13 +4,15 @@
 
 import GameView from "../core/ui/GameView";
 
-const __FIND_OPTIONS__ = "__FIND_OPTIONS__"
+const finddataKey = "[[Finddata]]"
+const findOptions = "[[Findoption]]"
 
 type FindOptionType = typeof cc.Component | typeof cc.Node;
 
 interface FindOption {
     path: string;
     type: FindOptionType;
+    member: string;
 }
 
 /**
@@ -41,48 +43,55 @@ export function inject(path: string, type: FindOptionType) {
             return;
         }
         let obj: any = target;
-        if (Reflect.getOwnPropertyDescriptor(target, __FIND_OPTIONS__) === undefined) {
-            Reflect.defineProperty(target, __FIND_OPTIONS__, {
-                value: {}
-            });
-            //重写onLoad函数
-            let __onLoad = obj.onLoad;
-            obj.onLoad = function () {
-                let desc = Reflect.getOwnPropertyDescriptor(target, __FIND_OPTIONS__);
-                if (desc) {
-                    let keys = Object.keys(desc.value);
-                    keys.forEach(v => {
-                        let key = v;
-                        let option = desc?.value[key] as FindOption;
-                        let node = cc.find(option.path, this.node);
-                        if (cc.js.isChildClassOf(option.type, cc.Component)) {
-                            this[key] = node?.getComponent(option.type as any);
-                            if (CC_DEBUG) {
-                                if (!this[key]) {
-                                    Log.w(`${cc.js.getClassName(this)}.${member}无法找到${path}${cc.js.getClassName(option.type)}组件`)
+        if (!Reflect.has(target, findOptions)) {
+            let funName = "onLoad"
+            let aHookFun = obj[funName];
+            obj[funName] = function () {
+                // Log.d(this, this.node.name)
+                if (!Reflect.has(this, finddataKey)) {
+                    Reflect.defineProperty(this, finddataKey, { value: {} })
+                }
+                let self: any = this
+                let fOption = Reflect.get(self, findOptions)
+                for (let key in fOption) {
+                    let ele : FindOption = Reflect.get(fOption, key)
+                    self.__defineGetter__(ele.member, function () {
+                        if (!Reflect.has(self[finddataKey], key)) {
+                            let node = cc.find(ele.path,self.node);
+                            if ( cc.js.isChildClassOf(ele.type,cc.Component)){
+                                let comp = node?.getComponent(ele.type as any);
+                                if ( Reflect.has(self[finddataKey],key) ){
+                                    self[finddataKey][key] = comp;
+                                }else{
+                                    Reflect.defineProperty(self[finddataKey],key,{ value : comp , writable : true});
                                 }
-                            }
-                        } else {
-                            this[key] = node;
-                            if (CC_DEBUG) {
-                                if (!this[key]) {
-                                    Log.w(`${cc.js.getClassName(this)}.${member}无法找到${path}节点`)
+                            }else{
+                                if ( Reflect.has(self[finddataKey],key) ){
+                                    self[finddataKey][key] = node;
+                                }else{
+                                    Reflect.defineProperty(self[finddataKey],key,{ value : node , writable : true});
                                 }
                             }
                         }
+                        return self[finddataKey][key]
+                    })
+
+                    self.__defineSetter__(ele.member, function (val: any) {
+                        if (Reflect.has(self[finddataKey], key)) {
+                            self[finddataKey][key] = val
+                        } else {
+                            Reflect.defineProperty(self[finddataKey], key, { value: val, writable: true })
+                        }
                     })
                 }
-                __onLoad && Reflect.apply(__onLoad, this, arguments);
+                aHookFun && Reflect.apply(aHookFun, this, arguments);
             }
+            Reflect.defineProperty(target, findOptions, { value: {} })
         }
 
-        if (obj[__FIND_OPTIONS__][member]) {
-            throw `${cc.js.getClassName(target)}.${member}注入已经存在!!!`;
-        }
-        let option: FindOption = {
-            path,
-            type
-        };
-        obj[__FIND_OPTIONS__][member] = option;
+        let option: FindOption = { path: path, type: type, member: member }
+        let attribute = "__" + member + "__"
+        let fOption = Reflect.get(target, findOptions)
+        Reflect.defineProperty(fOption, attribute, { value: option, enumerable: true })
     }
 }
