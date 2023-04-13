@@ -6,7 +6,7 @@ import GameView from "../core/ui/GameView";
 const _FIND_OPTIONS_ = "_FIND_OPTIONS_"
 
 interface FIND_TYPE<T> {
-	new(): T;
+    new(): T;
 }
 
 interface FindOption<T> {
@@ -31,9 +31,9 @@ export function registerEntry(className: string, bundle: string, type: typeof Ga
 }
 
 
-function __find<T>( path : string , node : cc.Node , type : FIND_TYPE<T> ){
-    let temp = cc.find(path,node);
-    if ( cc.js.isChildClassOf(type,cc.Component) ){
+function __find<T>(path: string, node: cc.Node, type: FIND_TYPE<T>) {
+    let temp = cc.find(path, node);
+    if (cc.js.isChildClassOf(type, cc.Component)) {
         let comp = temp?.getComponent(type)
         return comp;
     }
@@ -59,18 +59,18 @@ export function inject<T extends cc.Component | cc.Node>(path: string, type: FIN
                 let self = this;
                 let fOption = Reflect.get(self, _FIND_OPTIONS_)
                 for (let key in fOption) {
-                    let ele : FindOption<T> = Reflect.get(fOption, key)
-                    if ( !Reflect.get(self,ele.member) ){
-                        Reflect.defineProperty(self,ele.member,{
-                            enumerable : true,
-                            configurable : true,
-                            get(){
-                                if ( !cc.isValid(self[key]) ){
-                                    self[key] = __find(ele.path,self.node,ele.type);
+                    let ele: FindOption<T> = Reflect.get(fOption, key)
+                    if (!Reflect.get(self, ele.member)) {
+                        Reflect.defineProperty(self, ele.member, {
+                            enumerable: true,
+                            configurable: true,
+                            get() {
+                                if (!cc.isValid(self[key])) {
+                                    self[key] = __find(ele.path, self.node, ele.type);
                                 }
                                 return self[key];
                             },
-                            set(v){
+                            set(v) {
                                 self[key] = v;
                             }
                         })
