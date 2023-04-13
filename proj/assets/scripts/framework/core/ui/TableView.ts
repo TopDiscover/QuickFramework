@@ -592,7 +592,7 @@ export default class TableView extends cc.ScrollView {
             this._cellsFreed.push(cell);
             cell.reset();
             if (cell.node.parent == this.content) {
-                this.content?.removeChild(cell.node);
+                this.content?.removeChild(cell.node,false);
             }
         }
 
@@ -961,7 +961,7 @@ export default class TableView extends cc.ScrollView {
         this._indices.delete(cell.index);
         cell.reset();
         if (cell.node.parent == this.content) {
-            this.content?.removeChild(cell.node);
+            this.content?.removeChild(cell.node,false);
         }
         this._isUsedCellsDirty = true;
     }
