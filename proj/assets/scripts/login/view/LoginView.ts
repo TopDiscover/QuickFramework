@@ -1,5 +1,6 @@
 import { _decorator,Node, find, Label } from "cc";
 import GameView from "../../framework/core/ui/GameView";
+import { inject } from "../../framework/defines/Decorators";
 import { Macro } from "../../framework/defines/Macros";
 
 const {ccclass, property} = _decorator;
@@ -11,22 +12,18 @@ export default class LoginView extends GameView {
         return `@LoginView`;
     }
 
-    private _login : Node = null!;
+    @inject("login",Node)
+    private login : Node = null!;
+    @inject("version",Label)
+    private version : Label = null!;
+    @inject("md5",Label)
+    private md5 : Label = null!;
 
     onLoad(){
         super.onLoad();
-        this._login = find("login", this.node) as Node;
-        let version = find("version",this.node)?.getComponent(Label);
-        let md5 = find("md5",this.node)?.getComponent(Label);
-        if ( version ){
-            version.string = `v${App.updateManager.appVersion}(${App.updateManager.getVersion(this.bundle)})`;
-        }
-
-        if ( md5 ){
-            md5.string = `MD5:${App.updateManager.getMd5(this.bundle)}`;
-        }
-
-        this._login.on(Node.EventType.TOUCH_END,this.onClick,this);
+        this.version.string = `${App.updateManager.appVersion}(${App.updateManager.getVersion(this.bundle)})`;
+        this.md5.string = `MD5:${App.updateManager.getMd5(this.bundle)}`;
+        this.login.on(Node.EventType.TOUCH_END,this.onClick,this);
     }
 
     private onClick(){
