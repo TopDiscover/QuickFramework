@@ -13,6 +13,7 @@ interface FindOption<T> {
     path: string;
     type: FIND_TYPE<T>;
     member: string;
+    root?: string;
 }
 
 /**
@@ -41,12 +42,13 @@ function __find<T>(path: string, node: cc.Node, type: FIND_TYPE<T>) {
 }
 
 /**
- * @description 当onLoad时，按指定节点搜索路径，注入节点或组件到指定成员变量
- * @param path 相对于当前脚本this.node的搜索路径
+ * @description 当onLoad时，自动对所有注入的成员变量设置set&get方法,当成员变量首次调用时对成员变量赋值
+ * @param path 相对于当前脚本this.node的搜索路径,当rootPath非空，则以rootPath为根节点查找
  * @param type 查找组件类型
+ * @param rootPath 相对于this.node 的搜索路径，不传入时，以当的this.node为根节点进行查找
  * @returns 
  */
-export function inject<T extends cc.Component | cc.Node>(path: string, type: FIND_TYPE<T>) {
+export function inject<T extends cc.Component | cc.Node>(path: string, type: FIND_TYPE<T>, rootPath?: string) {
     return function (target: any, member: string) {
         if (!(target instanceof cc.Component)) {
             Log.e("无法注入,仅支持 Component 组件")
@@ -65,8 +67,20 @@ export function inject<T extends cc.Component | cc.Node>(path: string, type: FIN
                             enumerable: true,
                             configurable: true,
                             get() {
+                                let node = self.node;
+                                if (ele.root) {
+                                    let rootMemberName = `__${ele.root.replace(/\//g, "_")}`
+                                    if (!cc.isValid(self[rootMemberName])) {
+                                        self[rootMemberName] = __find(ele.root, node, cc.Node);
+                                    }
+                                    node = self[rootMemberName];
+                                    if (CC_DEBUG && !cc.isValid(node)) {
+                                        Log.e(`${cc.js.getClassName(self)}.${ele.root}节点不存在!!!`)
+                                    }
+                                }
+
                                 if (!cc.isValid(self[key])) {
-                                    self[key] = __find(ele.path, self.node, ele.type);
+                                    self[key] = __find(ele.path, node, ele.type);
                                 }
                                 return self[key];
                             },
@@ -81,7 +95,7 @@ export function inject<T extends cc.Component | cc.Node>(path: string, type: FIN
             Reflect.defineProperty(target, _FIND_OPTIONS_, { value: {} })
         }
 
-        let option: FindOption<T> = { path: path, type: type, member: member }
+        let option: FindOption<T> = { path: path, type: type, member: member, root: rootPath }
         let attribute = `__${member}`
         let fOption = Reflect.get(target, _FIND_OPTIONS_)
         Reflect.defineProperty(fOption, attribute, { value: option, enumerable: true })
