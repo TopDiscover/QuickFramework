@@ -68,7 +68,7 @@ const PLAY_MUSIC = "AudioComponent_PLAY_MUSIC";
 export default class AudioComponent extends EventComponent {
 
 
-    protected addEvents() {
+    addEvents() {
         super.addEvents();
         this.addEvent(PLAY_MUSIC, this.onPlayMusic);
     }

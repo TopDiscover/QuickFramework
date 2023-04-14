@@ -1,7 +1,19 @@
 /**
  * @description 事件处理组件
  */
-export default class OnlyEventComponent {
+
+export interface QuickEvent {
+    /**
+     * 注册事件 ，在onLoad中注册，在onDestroy自动移除
+     * @param name 
+     * @param func 
+     */
+    addEvent(name: string, func: Function): void;
+    removeEvent(eventName: string): void;
+    addEvents(): void;
+}
+
+export default class EventProcessor implements QuickEvent {
 
     private _events: Map<string, Function> = new Map();
 
@@ -10,7 +22,7 @@ export default class OnlyEventComponent {
      * @param name 
      * @param func 
      */
-    protected addEvent(name: string, func: Function) {
+    addEvent(name: string, func: Function) {
         if (this._events.has(name)) {
             Log.e(`${name} 重复注册`);
             return;
@@ -19,7 +31,7 @@ export default class OnlyEventComponent {
         this._events.set(name, func);
     }
 
-    protected removeEvent(eventName: string) {
+    removeEvent(eventName: string) {
         if (this._events.has(eventName)) {
             //事件移除
             App.dispatcher.remove(eventName, this);
@@ -27,15 +39,15 @@ export default class OnlyEventComponent {
             this._events.delete(eventName);
         }
     }
-    protected addEvents() {
+    addEvents() {
 
     }
 
-    onLoad( ...args : any[] ) {
+    onLoad(...args: any[]) {
         this.addEvents();
     }
 
-    onDestroy(...args : any[]) {
+    onDestroy(...args: any[]) {
         this._events.forEach((func, name) => {
             App.dispatcher.remove(name, this);
         });
