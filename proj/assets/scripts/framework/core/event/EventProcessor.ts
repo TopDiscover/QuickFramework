@@ -3,17 +3,16 @@
  */
 
 import { Node, NodeEventType } from "cc";
-import { BindEventType } from "../../defines/Enums";
 
 export interface EventAgrs{
     /**
      * @description 绑定事件类型
      */
-    bindType : BindEventType;
+    bind : "Dispatcher" | "Game" | "Input" | "Node";
     /**@description 事件类型名 */
     type : string | NodeEventType;
     /**
-     * @description 绑定事件的节点，bindType 为 BindEventType.NODE,必选参数,其它可以不用
+     * @description 绑定事件的节点，bindType 为 NODE,必选参数,其它可以不用
      */
     node ?: Node;
     /**@description 绑定回调 */
@@ -81,7 +80,7 @@ export class EventProcessor implements IEventProcessor {
      */
     onD(name: string, func: Function) {
         this.on({
-            bindType : BindEventType.DISPATCHER,
+            bind : "Dispatcher",
             type : name,
             cb:func
         });
@@ -89,14 +88,14 @@ export class EventProcessor implements IEventProcessor {
 
     onceD(eventName: string, func: Function): void {
         this.once({
-            bindType : BindEventType.DISPATCHER,
+            bind : "Dispatcher",
             type : eventName,
             cb : func,
         });
     }
     offD(eventName: string, func: Function): void {
         this.off({
-            bindType : BindEventType.DISPATCHER,
+            bind : "Dispatcher",
             type : eventName,
         });
     }
@@ -117,8 +116,8 @@ export class EventProcessor implements IEventProcessor {
     }
 
     on(args:EventAgrs): void {
-        switch(args.bindType){
-            case BindEventType.DISPATCHER:{
+        switch(args.bind){
+            case "Dispatcher":{
                 if( !args.target){
                     args.target = this;
                 }
@@ -136,8 +135,8 @@ export class EventProcessor implements IEventProcessor {
         }
     }
     once(args:EventAgrs): void {
-        switch(args.bindType){
-            case BindEventType.DISPATCHER:{
+        switch(args.bind){
+            case "Dispatcher":{
                 if (!args.target){
                     args.target = this;
                 }
@@ -154,9 +153,10 @@ export class EventProcessor implements IEventProcessor {
             }
         }
     }
+    
     off(args:EventAgrs): void {
-        switch(args.bindType){
-            case BindEventType.DISPATCHER:{
+        switch(args.bind){
+            case "Dispatcher":{
                 if ( !args.target ){
                     args.target = this;
                 }

@@ -4,7 +4,6 @@
 
 import { Component, NodeEventType, _decorator } from "cc";
 import { IEventProcessor, EventAgrs, EventProcessor } from "../core/event/EventProcessor";
-import { BindEventType } from "../defines/Enums";
 
 const { ccclass, property } = _decorator;
 
@@ -35,7 +34,7 @@ export default class EventComponent extends Component implements IEventProcessor
 
     onD(eventName: string, func: Function): void {
         this.on({
-            bindType : BindEventType.DISPATCHER,
+            bind : "Dispatcher",
             type : eventName,
             cb : func,
         });
@@ -43,7 +42,7 @@ export default class EventComponent extends Component implements IEventProcessor
 
     onceD(eventName: string, func: Function): void {
         this.once({
-            bindType : BindEventType.DISPATCHER,
+            bind : "Dispatcher",
             type : eventName,
             cb : func,
         });
@@ -51,7 +50,7 @@ export default class EventComponent extends Component implements IEventProcessor
 
     offD(eventName: string, func: Function): void {
         this.off({
-            bindType : BindEventType.DISPATCHER,
+            bind : "Dispatcher",
             type : eventName,
         });
     }
