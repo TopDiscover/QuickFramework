@@ -168,7 +168,6 @@ export default class UIView extends EventComponent {
     onDestroy() {
         this.enabledKeyDown = false;
         this.enabledKeyUp = false;
-        this.enableFrontAndBackgroundSwitch = false;
         super.onDestroy();
     }
 
@@ -177,11 +176,11 @@ export default class UIView extends EventComponent {
     protected set enableFrontAndBackgroundSwitch(value) {
         this._enableFrontAndBackgroundSwitch = value;
         if (value) {
-            game.on(Game.EVENT_SHOW, this._onEnterForgeGround, this);
-            game.on(Game.EVENT_HIDE, this._onEnterBackground, this);
+            this.onG(Game.EVENT_SHOW, this._onEnterForgeGround);
+            this.onG(Game.EVENT_HIDE, this._onEnterBackground);
         } else {
-            game.off(Game.EVENT_SHOW, this._onEnterForgeGround, this);
-            game.off(Game.EVENT_HIDE, this._onEnterBackground, this);
+            this.offG(Game.EVENT_SHOW, this._onEnterForgeGround);
+            this.offG(Game.EVENT_HIDE, this._onEnterBackground);
         }
     }
     protected get enableFrontAndBackgroundSwitch() {

@@ -1,4 +1,4 @@
-import { Asset, find, Game, game, _decorator , Node, Input, input, profiler } from "cc";
+import { Asset, find, Game, _decorator , Node, Input, input, profiler } from "cc";
 import { Config } from "./scripts/common/config/Config";
 import { DebugView } from "./scripts/common/debug/DebugView";
 import EventComponent from "./scripts/framework/componects/EventComponent";
@@ -52,10 +52,10 @@ export default class MainController extends EventComponent {
             
         }
         //游戏事件注册
-        game.on(Game.EVENT_HIDE, this.onEnterBackground, this);
-        game.on(Game.EVENT_SHOW, this.onEnterForgeground, this);
+        this.onG(Game.EVENT_HIDE, this.onEnterBackground);
+        this.onG(Game.EVENT_SHOW, this.onEnterForgeground);
         //内存警告事件
-        game.on(Game.EVENT_LOW_MEMORY,this.onLowMemory,this);
+        this.onG(Game.EVENT_LOW_MEMORY,this.onLowMemory);
     }
 
     update(dt:number) {
@@ -65,11 +65,6 @@ export default class MainController extends EventComponent {
     onDestroy() {
         //移除键盘事件
         input.off(Input.EventType.KEY_UP);
-
-        //移除游戏事件注册
-        game.off(Game.EVENT_HIDE);
-        game.off(Game.EVENT_SHOW);
-        game.off(Game.EVENT_LOW_MEMORY);
         App.onDestroy(this.node);
         super.onDestroy();
     }
