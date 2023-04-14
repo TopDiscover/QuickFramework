@@ -1,5 +1,6 @@
 
 import { _decorator, Component, Node, find, Toggle, view, Input, profiler ,screen } from 'cc';
+import { inject } from '../../framework/defines/Decorators';
 import { LogLevel } from '../../framework/defines/Enums';
 import { Singleton } from '../../framework/utils/Singleton';
 import { Config } from '../config/Config';
@@ -8,11 +9,15 @@ const { ccclass, property } = _decorator;
 @ccclass('DebugView')
 export class DebugView extends Component {
 
+    @inject("logView",Node)
     private logView: Node = null!;
+    @inject("content",Node)
     private content: Node = null!;
+    @inject("background",Node)
+    private background : Node = null!;
+    @inject("background",Node,"logView")
+    private logViewBackground : Node = null!;
     onLoad() {
-
-        this.content = find("content", this.node) as Node;
         //显示界面信息
         this.bindEvent("showUI", this.onShowUI);
         //显示节点信息
@@ -56,20 +61,14 @@ export class DebugView extends Component {
     debug: Node = null!;
 
     private doOther() {
-        let logView = find("logView", this.node);
-        if (logView) {
-            logView.active = false;
-            this.logView = logView;
+        if (this.logView) {
+            this.logView.active = false;
             this.initLogView();
         }
-
-        let background = find("background", this.node);
-        if (background) {
-            background.on(Input.EventType.TOUCH_END, () => {
-                this.node.active = false;
-                if (this.debug) this.debug.active = true;
-            });
-        }
+        this.background?.on(Input.EventType.TOUCH_END, () => {
+            this.node.active = false;
+            if (this.debug) this.debug.active = true;
+        });
     }
 
     private bindEvent(path: string, cb: Function) {
@@ -80,12 +79,9 @@ export class DebugView extends Component {
     }
 
     private initLogView() {
-        let background = find("background", this.logView);
-        if (background) {
-            background.on(Input.EventType.TOUCH_END, () => {
-                this.logView.active = false;
-            });
-        }
+        this.logViewBackground?.on(Input.EventType.TOUCH_END, () => {
+            this.logView.active = false;
+        });
 
         let level = find("level", this.logView);
         if (level) {
