@@ -24,21 +24,53 @@ export interface EventAgrs{
     useCapture?:any;
 }
 
-export interface QuickEvent {
+export interface IEventProcessor {
     /**
      * 注册事件 ，在onLoad中注册，在onDestroy自动移除
      * @param name 
      * @param func 
      */
-    addEvent(name: string, func: Function): void;
-    removeEvent(eventName: string): void;
+    onD(name: string, func: Function): void;
     addEvents(): void;
+    /**
+     * @description 注册事件
+     * @param args 
+     */
     on(args:EventAgrs):void;
+    /**
+     * @description 注册只响应一次的事件
+     * @param args 
+     */
     once(args:EventAgrs):void;
+    /**
+     * @description 反注册事件
+     * @param args 
+     */
     off(args:EventAgrs):void;
+    
+    /**
+     * @description 注册绑定到 App.dispatcher 的事件
+     * @param eventName 
+     * @param func 
+     */
+    onD(eventName : string , func : Function):void;
+    /**
+     * @description 注册绑定到 App.dispatcher 只响应一次的事件
+     * @param eventName 
+     * @param func 
+     */
+    onceD(eventName:string , func : Function):void;
+    /**
+     * @description 反注册绑定到 App.dispatcher 的事件
+     * @param eventName 
+     * @param func 
+     */
+    offD(eventName:string , func : Function):void;
+
 }
 
-export default class EventProcessor implements QuickEvent {
+export class EventProcessor implements IEventProcessor {
+   
     
     private _events: Map<string, EventAgrs> = new Map();
 
@@ -47,20 +79,28 @@ export default class EventProcessor implements QuickEvent {
      * @param name 
      * @param func 
      */
-    addEvent(name: string, func: Function) {
+    onD(name: string, func: Function) {
         this.on({
-            bindType : BindEventType.CUSTOM,
+            bindType : BindEventType.DISPATCHER,
             type : name,
             cb:func
         });
     }
 
-    removeEvent(eventName: string) {
-        this.off({
-            bindType : BindEventType.CUSTOM,
-            type : eventName
+    onceD(eventName: string, func: Function): void {
+        this.once({
+            bindType : BindEventType.DISPATCHER,
+            type : eventName,
+            cb : func,
         });
     }
+    offD(eventName: string, func: Function): void {
+        this.off({
+            bindType : BindEventType.DISPATCHER,
+            type : eventName,
+        });
+    }
+
     addEvents() {
 
     }
@@ -78,7 +118,7 @@ export default class EventProcessor implements QuickEvent {
 
     on(args:EventAgrs): void {
         switch(args.bindType){
-            case BindEventType.CUSTOM:{
+            case BindEventType.DISPATCHER:{
                 if( !args.target){
                     args.target = this;
                 }
@@ -97,7 +137,7 @@ export default class EventProcessor implements QuickEvent {
     }
     once(args:EventAgrs): void {
         switch(args.bindType){
-            case BindEventType.CUSTOM:{
+            case BindEventType.DISPATCHER:{
                 if (!args.target){
                     args.target = this;
                 }
@@ -116,7 +156,7 @@ export default class EventProcessor implements QuickEvent {
     }
     off(args:EventAgrs): void {
         switch(args.bindType){
-            case BindEventType.CUSTOM:{
+            case BindEventType.DISPATCHER:{
                 if ( !args.target ){
                     args.target = this;
                 }

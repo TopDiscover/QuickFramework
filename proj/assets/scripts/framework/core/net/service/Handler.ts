@@ -1,5 +1,5 @@
 import { DEBUG } from "cc/env";
-import EventProcessor from "../../event/EventProcessor";
+import { EventProcessor } from "../../event/EventProcessor";
 import { Macro } from "../../../defines/Macros";
 
 /**

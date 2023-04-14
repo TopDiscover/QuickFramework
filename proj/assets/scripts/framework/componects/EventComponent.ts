@@ -3,35 +3,16 @@
  */
 
 import { Component, NodeEventType, _decorator } from "cc";
-import EventProcessor, { QuickEvent, EventAgrs } from "../core/event/EventProcessor";
+import { IEventProcessor, EventAgrs, EventProcessor } from "../core/event/EventProcessor";
 import { BindEventType } from "../defines/Enums";
 
 const { ccclass, property } = _decorator;
 
 @ccclass
-export default class EventComponent extends Component implements QuickEvent{
+export default class EventComponent extends Component implements IEventProcessor{
+    
 
     private _eventProcessor = new EventProcessor;
-
-    /**
-     * 注册事件 ，在onLoad中注册，在onDestroy自动移除
-     * @param name 
-     * @param func 
-     */
-    addEvent(name: string, func: Function) {
-        this.on({
-            bindType : BindEventType.CUSTOM,
-            type : name,
-            cb : func,
-        });
-    }
-
-    removeEvent(eventName: string) {
-        this.off({
-            bindType : BindEventType.CUSTOM,
-            type : eventName,
-        });
-    }
     
     on(args: EventAgrs): void {
         if( !args.target ){
@@ -50,6 +31,29 @@ export default class EventComponent extends Component implements QuickEvent{
             args.target = this;
         }
         this._eventProcessor.off(args);
+    }
+
+    onD(eventName: string, func: Function): void {
+        this.on({
+            bindType : BindEventType.DISPATCHER,
+            type : eventName,
+            cb : func,
+        });
+    }
+
+    onceD(eventName: string, func: Function): void {
+        this.once({
+            bindType : BindEventType.DISPATCHER,
+            type : eventName,
+            cb : func,
+        });
+    }
+
+    offD(eventName: string, func: Function): void {
+        this.off({
+            bindType : BindEventType.DISPATCHER,
+            type : eventName,
+        });
     }
 
     addEvents() {

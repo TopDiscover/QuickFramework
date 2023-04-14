@@ -1,5 +1,5 @@
 import { js } from "cc";
-import EventProcessor from "../event/EventProcessor";
+import { EventProcessor } from "../event/EventProcessor";
 import { Macro } from "../../defines/Macros";
 
 export class Logic extends EventProcessor {
