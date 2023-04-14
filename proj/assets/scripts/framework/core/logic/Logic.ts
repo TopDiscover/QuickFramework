@@ -1,8 +1,8 @@
 import { js } from "cc";
-import OnlyEventComponent from "../../componects/OnlyEventComponent";
+import EventProcessor from "../event/EventProcessor";
 import { Macro } from "../../defines/Macros";
 
-export class Logic extends OnlyEventComponent {
+export class Logic extends EventProcessor {
     /**@description 所属模块,管理器设置，GameView中的bundle的值 */
     static module = Macro.UNKNOWN;
     /**@description 所属模块,管理器设置，GameView中的bundle的值 */

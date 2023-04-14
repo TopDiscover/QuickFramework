@@ -1,11 +1,11 @@
 import { DEBUG } from "cc/env";
-import OnlyEventComponent from "../../../componects/OnlyEventComponent";
+import EventProcessor from "../../event/EventProcessor";
 import { Macro } from "../../../defines/Macros";
 
 /**
  * @description 该模块只负责对网络消息的返回处理
  */
-export abstract class Handler extends OnlyEventComponent implements ISingleton{
+export abstract class Handler extends EventProcessor implements ISingleton{
 
     /**@description Sender所属模块，如聊天,vip, */
     static module: string = Macro.UNKNOWN;

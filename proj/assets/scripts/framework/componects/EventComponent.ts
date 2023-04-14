@@ -3,37 +3,29 @@
  */
 
 import { Component, _decorator } from "cc";
+import EventProcessor, { QuickEvent } from "../core/event/EventProcessor";
 
 const { ccclass, property } = _decorator;
 
 @ccclass
-export default class EventComponent extends Component {
+export default class EventComponent extends Component implements QuickEvent{
 
-    private _events: Map<string, Function> = new Map();
+    private _eventProcessor = new EventProcessor;
 
     /**
      * 注册事件 ，在onLoad中注册，在onDestroy自动移除
      * @param name 
      * @param func 
      */
-    protected addEvent(name: string, func: Function) {
-        if (this._events.has(name)) {
-            Log.e(`${name} 重复注册`);
-            return;
-        }
-        App.dispatcher.add(name,func,this);
-        this._events.set(name, func);
+    addEvent(name: string, func: Function) {
+        this._eventProcessor.addEvent(name,func);
     }
 
-    protected removeEvent(eventName: string) {
-        if (this._events.has(eventName)) {
-            //事件移除
-            App.dispatcher.remove(eventName, this);
-            //删除本地事件
-            this._events.delete(eventName);
-        }
+    removeEvent(eventName: string) {
+        this._eventProcessor.removeEvent(eventName);
     }
-    protected addEvents() {
+    
+    addEvents() {
 
     }
 
@@ -42,9 +34,6 @@ export default class EventComponent extends Component {
     }
 
     onDestroy() {
-        this._events.forEach((func,name)=>{
-            App.dispatcher.remove(name,this);
-        });
-        this._events.clear();
+        this._eventProcessor.onDestroy();
     }
 }
