@@ -30,3 +30,15 @@ export enum ButtonSpriteType {
     Hover = "hoverSprite",
     Disable = "disabledSprite",
 }
+
+/**@description 事件类型 */
+export enum BindEventType{
+    /**@description 绑定到Dispatcher的事件 相当于App.dispatcher.add(name, func, this);*/
+    CUSTOM,
+    /**@description 绑定到game的事件 相当于game.on(Game.EVENT_SHOW, this._onEnterForgeGround, this); */
+    GAME,
+    /**@description 绑定到input的事件 相当于input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);*/
+    INPUT,
+    /**@description 绑定到node的节点事件 */
+    NODE,
+}

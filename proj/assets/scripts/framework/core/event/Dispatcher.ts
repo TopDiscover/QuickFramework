@@ -7,6 +7,7 @@ interface IEvent {
     type: string, // 事件类型
     target: any, //事件target
     callback: Function;//事件回调
+    once? : boolean;//是否只调用一次
 }
 
 export class Dispatcher implements ISingleton {
@@ -29,7 +30,7 @@ export class Dispatcher implements ISingleton {
      * @param callback 事件回调
      * @param target target
      */
-    public add(type: string, callback: Function, target: any) {
+    public add(type: string, callback: Function, target: any,once ?:boolean) {
         if (!type || !callback || !target) return;
         let eventCaches: Array<IEvent> = this._eventCaches[type] || [];
         let hasSame = false;
@@ -42,7 +43,7 @@ export class Dispatcher implements ISingleton {
         if (hasSame) {
             return;
         }
-        let newEvent: IEvent = { type: type, callback: callback, target: target };
+        let newEvent: IEvent = { type: type, callback: callback, target: target , once : once };
         eventCaches.push(newEvent);
         this._eventCaches[type] = eventCaches;
     }
@@ -85,6 +86,7 @@ export class Dispatcher implements ISingleton {
         Array.prototype.shift.apply(arguments);
         let eventCaches: Array<IEvent> = this._eventCaches[type];
         if (!eventCaches) return;
+        let onceEvent : IEvent[] = [];
         for (let i = 0; i < eventCaches.length; i++) {
             let event = eventCaches[i];
             try {
@@ -93,9 +95,16 @@ export class Dispatcher implements ISingleton {
                 } else {
                     event.callback.apply(event.target, arguments);
                 }
+                if ( event.once ){
+                    onceEvent.push(event);
+                }
             } catch (err) {
                 Log.e(err);
             }
+        }
+        for(let i = 0 ; i < onceEvent.length ; i++){
+            const ele = onceEvent[i];
+            this.remove(ele.type,ele.target);
         }
     }
 }
