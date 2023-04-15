@@ -110,10 +110,9 @@ export default class UIView extends EventComponent {
     protected set enabledKeyUp(value) {
         this._enabledKeyUp = value;
         if (value) {
-            input.off(Input.EventType.KEY_UP, this.onKeyUp, this);
-            input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
+            this.onI(Input.EventType.KEY_UP, this.onKeyUp);
         } else {
-            input.off(Input.EventType.KEY_UP, this.onKeyUp, this);
+            this.offI(Input.EventType.KEY_UP, this.onKeyUp);
         }
     }
 
@@ -125,10 +124,9 @@ export default class UIView extends EventComponent {
     protected set enabledKeyDown(value) {
         this._enabledKeyUp = value;
         if (value) {
-            input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
-            input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
+            this.onI(Input.EventType.KEY_DOWN, this.onKeyDown);
         } else {
-            input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
+            this.offI(Input.EventType.KEY_DOWN, this.onKeyDown);
         }
     }
 
@@ -163,12 +161,6 @@ export default class UIView extends EventComponent {
         this.audioHelper = <AudioComponent>(this.addComponent(AudioComponent));
         this.audioHelper.owner = this;
         super.onLoad();
-    }
-
-    onDestroy() {
-        this.enabledKeyDown = false;
-        this.enabledKeyUp = false;
-        super.onDestroy();
     }
 
     private _enterBackgroundTime = 0;

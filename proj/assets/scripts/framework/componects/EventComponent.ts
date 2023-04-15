@@ -2,7 +2,7 @@
  * @description 事件处理组件
  */
 
-import { Component, NodeEventType, _decorator } from "cc";
+import { Component, NodeEventType, _decorator, __private } from "cc";
 import { IEventProcessor, EventAgrs, EventProcessor, EventCallback } from "../core/event/EventProcessor";
 
 const { ccclass, property } = _decorator;
@@ -74,6 +74,28 @@ export default class EventComponent extends Component implements IEventProcessor
             type: type,
             cb: cb
         });
+    }
+
+    onI<K extends keyof __private._cocos_input_input__InputEventMap>(eventType: K, cb: EventCallback): void {
+        this.on({
+            bind : "Input",
+            type : eventType,
+            cb : cb
+        })
+    }
+    onceI<K extends keyof __private._cocos_input_input__InputEventMap>(eventType: K, cb: EventCallback): void {
+        this.once({
+            bind : "Input",
+            type : eventType,
+            cb : cb
+        })
+    }
+    offI<K extends keyof __private._cocos_input_input__InputEventMap>(eventType: K, cb: EventCallback): void {
+        this.off({
+            bind : "Input",
+            type : eventType,
+            cb : cb
+        })
     }
 
     addEvents() {

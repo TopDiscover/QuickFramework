@@ -63,8 +63,6 @@ export default class MainController extends EventComponent {
     }
 
     onDestroy() {
-        //移除键盘事件
-        input.off(Input.EventType.KEY_UP);
         App.onDestroy(this.node);
         super.onDestroy();
     }

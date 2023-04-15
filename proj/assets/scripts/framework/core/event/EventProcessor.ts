@@ -2,7 +2,7 @@
  * @description 事件处理组件
  */
 
-import { game, Node, NodeEventType } from "cc";
+import { game, input, Node, NodeEventType, __private } from "cc";
 
 export type EventCallback = (...any: any[]) => void;
 export interface EventAgrs {
@@ -81,6 +81,25 @@ export interface IEventProcessor {
      * @param cb 
      */
     offG(type: string, cb: EventCallback): void;
+
+    /**
+     * @description 注册 输入事件。
+     * @param type 
+     * @param cb 
+     */
+    onI<K extends keyof __private._cocos_input_input__InputEventMap>(eventType: K, cb: EventCallback): void;
+    /**
+     * @description 注册 输入事件，回调会在第一时间被触发后删除自身。
+     * @param type 
+     * @param cb 
+     */
+    onceI<K extends keyof __private._cocos_input_input__InputEventMap>(eventType: K, cb: EventCallback): void;
+    /**
+     * @description 反注册 输入事件
+     * @param type 
+     * @param cb 
+     */
+    offI<K extends keyof __private._cocos_input_input__InputEventMap>(eventType: K, cb: EventCallback): void;
 }
 
 export class EventProcessor implements IEventProcessor {
@@ -90,6 +109,8 @@ export class EventProcessor implements IEventProcessor {
 
     /**@description game 注册事件缓存 */
     private _eventsG: EventAgrs[] = [];
+    /**@description  输入事件*/
+    private _eventsI: EventAgrs[] = [];
 
     /**
      * 注册事件 ，在onLoad中注册，在onDestroy自动移除
@@ -140,6 +161,29 @@ export class EventProcessor implements IEventProcessor {
         });
     }
 
+    onI<K extends keyof __private._cocos_input_input__InputEventMap>(eventType: K, cb: EventCallback): void {
+        this.on({
+            bind: "Input",
+            type: eventType,
+            cb: cb,
+        })
+    }
+    onceI<K extends keyof __private._cocos_input_input__InputEventMap>(eventType: K, cb: EventCallback): void {
+        this.once({
+            bind: "Input",
+            type: eventType,
+            cb: cb,
+        });
+    }
+
+    offI<K extends keyof __private._cocos_input_input__InputEventMap>(eventType: K, cb: EventCallback): void {
+        this.off({
+            bind: "Input",
+            type: eventType,
+            cb: cb
+        });
+    }
+
     addEvents() {
 
     }
@@ -151,12 +195,14 @@ export class EventProcessor implements IEventProcessor {
     onDestroy(...args: any[]) {
         this._cleanD();
         this._cleanG();
+        this._cleanI();
     }
 
     on(args: EventAgrs): void {
         switch (args.bind) {
             case "Dispatcher": this._onD(args); break;
             case "Game": this._onG(args); break;
+            case "Input": this._onI(args); break;
             default: Log.e(`on ${args.bind} 未知事件类型`)
         }
     }
@@ -169,6 +215,7 @@ export class EventProcessor implements IEventProcessor {
         switch (args.bind) {
             case "Dispatcher": this._offD(args); break;
             case "Game": this._offG(args); break;
+            case "Input": this._offI(args); break;
             default: Log.e(`off ${args.bind} 未知事件类型`)
         }
     }
@@ -235,5 +282,43 @@ export class EventProcessor implements IEventProcessor {
             game.off(ele.type, ele.cb, ele.target);
         }
         this._eventsG = [];
+    }
+
+    private _onI(args: EventAgrs) {
+        if (!args.target) {
+            args.target = this;
+        }
+        for (let index = 0; index < this._eventsI.length; index++) {
+            const element = this._eventsI[index];
+            if (element.type == args.type &&
+                element.cb == args.cb &&
+                element.target == args.target) {
+                return;
+            }
+        }
+        input.on(args.type as unknown as any, args.cb!, args.target);
+        this._eventsI.push(args);
+    }
+
+    private _offI(args: EventAgrs) {
+        if (!args.target) {
+            args.target = this;
+        }
+        input.off(args.type as unknown as any, args.cb, args.target);
+        for (let i = 0; i < this._eventsI.length; i++) {
+            const ele = this._eventsI[i];
+            if (ele.type == args.type && ele.cb == args.cb && ele.target == ele.target) {
+                this._eventsI.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    private _cleanI() {
+        for (let i = 0; i < this._eventsI.length; i++) {
+            const ele = this._eventsI[i];
+            input.off(ele.type as unknown as any, ele.cb, ele.target);
+        }
+        this._eventsI = [];
     }
 }
