@@ -34,7 +34,7 @@ export default class MainController extends EventComponent {
                     view.debug = debug;
                 }
                 this.debugView.active = false;
-                debug.on(cc.Node.EventType.TOUCH_END,()=>{
+                this.onN(debug,cc.Node.EventType.TOUCH_END,()=>{
                     if ( debug ) debug.active = false;
                     if ( this.debugView ){
                         this.debugView.active = true;
@@ -47,10 +47,10 @@ export default class MainController extends EventComponent {
             
         }
         //游戏事件注册
-        cc.game.on(cc.game.EVENT_HIDE, this.onEnterBackground, this);
-        cc.game.on(cc.game.EVENT_SHOW, this.onEnterForgeground, this);
-        //内存警告事件//Ts层已经同步，需要自己去导出事件上来
-        // cc.game.on(cc.game.EVENT_LOW_MEMORY,this.onLowMemory,this);
+        this.onG(cc.game.EVENT_HIDE, this.onEnterBackground);
+        this.onG(cc.game.EVENT_SHOW, this.onEnterForgeground);
+        //内存警告事件//TS层已经同步，需要自己去导出事件上来
+        // this.onG(cc.game.EVENT_LOW_MEMORY,this.onLowMemory);
     }
 
     update(dt:number) {
@@ -58,11 +58,6 @@ export default class MainController extends EventComponent {
     }
 
     onDestroy() {
-        //移除键盘事件
-        cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP);
-        //移除游戏事件注册
-        cc.game.off(cc.game.EVENT_HIDE);
-        cc.game.off(cc.game.EVENT_SHOW);
         App.onDestroy(this.node);
         super.onDestroy();
     }

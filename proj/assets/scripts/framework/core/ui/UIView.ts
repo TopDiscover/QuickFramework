@@ -12,8 +12,8 @@ const { ccclass, property, menu } = cc._decorator;
 export default class UIView extends EventComponent {
 
     /**
-     *@description 视图prefab 地址 resources目录下如z_panels/WeiZoneLayer,如果是在主场景上的节点，使用Canvas:xx/xx
-     */
+	 *@description 视图prefab 地址 resources目录下如z_panels/WeiZoneLayer,如果是在主场景上的节点，使用Canvas:xx/xx
+	 */
     public static getPrefabUrl(): string {
         Log.e(`请求实现public static getPrefabUrl`);
         return Macro.UNKNOWN;
@@ -27,17 +27,6 @@ export default class UIView extends EventComponent {
     }
     public set args(args) {
         this._args = args;
-    }
-
-    /**
-     * @description 统一定义一个显示内容节点
-     * */
-    private _content: cc.Node = null;
-    protected set content(value) {
-        this._content = value;
-    }
-    protected get content() {
-        return this._content;
     }
 
     /**本组件的类名 */
@@ -59,44 +48,44 @@ export default class UIView extends EventComponent {
     }
 
     /**@description 关闭界面动画 */
-    protected get closeAction(): ViewAction | null {
+    protected get closeAction() : ViewAction | null{
         return null;
-    }
+    } 
 
-    public close() {
-        if (this.closeAction) {
-            this.closeAction(() => {
+    public close( ) {
+        if ( this.closeAction ){
+            this.closeAction(()=>{
                 App.uiManager.close(this.className);
             });
-        } else {
+        }else{
             App.uiManager.close(this.className);
         }
     }
 
-    protected get showAction(): ViewAction | null {
+    protected get showAction() : ViewAction | null{
         return null;
     }
 
     /**@description args为open代入的参数 */
-    public show(args?: any[] | any) {
+    public show( args ?: any[] | any) {
         //再如果界面已经存在于界面管理器中，此时传入新的参数，只从show里面过来,这里重新对_args重新赋值
         this._args = args;
         if (this.node) this.node.active = true;
-        if (this.showAction) {
-            this.showAction(() => { });
+        if ( this.showAction ){
+            this.showAction(()=>{});
         }
     }
 
-    protected get hideAction(): ViewAction | null {
+    protected get hideAction() : ViewAction | null{
         return null;
     }
 
-    public hide() {
-        if (this.hideAction) {
-            this.hideAction(() => {
+    public hide( ) {
+        if ( this.hideAction ){
+            this.hideAction(()=>{
                 if (this.node) this.node.removeFromParent();
             });
-        } else {
+        }else{
             if (this.node) this.node.removeFromParent();
         }
     }
@@ -109,10 +98,9 @@ export default class UIView extends EventComponent {
     protected set enabledKeyUp(value) {
         this._enabledKeyUp = value;
         if (value) {
-            cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
-            cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
+            this.onI(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp);
         } else {
-            cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
+            this.offI(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp);
         }
     }
 
@@ -124,10 +112,9 @@ export default class UIView extends EventComponent {
     protected set enabledKeyDown(value) {
         this._enabledKeyUp = value;
         if (value) {
-            cc.systemEvent.off(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
-            cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
+            this.onI(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown);
         } else {
-            cc.systemEvent.off(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
+            this.offI(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown);
         }
     }
 
@@ -164,23 +151,16 @@ export default class UIView extends EventComponent {
         super.onLoad();
     }
 
-    onDestroy() {
-        this.enabledKeyDown = false;
-        this.enabledKeyUp = false;
-        this.enableFrontAndBackgroundSwitch = false;
-        super.onDestroy();
-    }
-
     private _enterBackgroundTime = 0;
     private _enableFrontAndBackgroundSwitch = false;
     protected set enableFrontAndBackgroundSwitch(value) {
         this._enableFrontAndBackgroundSwitch = value;
         if (value) {
-            cc.game.on(cc.game.EVENT_SHOW, this._onEnterForgeGround, this);
-            cc.game.on(cc.game.EVENT_HIDE, this._onEnterBackground, this);
+            this.onG(cc.game.EVENT_SHOW, this._onEnterForgeGround);
+            this.onG(cc.game.EVENT_HIDE, this._onEnterBackground);
         } else {
-            cc.game.off(cc.game.EVENT_SHOW, this._onEnterForgeGround, this);
-            cc.game.off(cc.game.EVENT_HIDE, this._onEnterBackground, this);
+            this.offG(cc.game.EVENT_SHOW, this._onEnterForgeGround);
+            this.offG(cc.game.EVENT_HIDE, this._onEnterBackground);
         }
     }
     protected get enableFrontAndBackgroundSwitch() {

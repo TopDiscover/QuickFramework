@@ -1,4 +1,5 @@
 
+import EventComponent from '../../framework/componects/EventComponent';
 import { inject } from '../../framework/defines/Decorators';
 import { LogLevel } from '../../framework/defines/Enums';
 import { Singleton } from '../../framework/utils/Singleton';
@@ -6,7 +7,7 @@ import { Config } from '../config/Config';
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export class DebugView extends cc.Component {
+export class DebugView extends EventComponent {
 
     @inject("logView",cc.Node)
     private logView: cc.Node = null!;
@@ -64,21 +65,19 @@ export class DebugView extends cc.Component {
             this.logView.active = false;
             this.initLogView();
         }
-        this.background?.on(cc.Node.EventType.TOUCH_END, () => {
+        this.onN(this.background,cc.Node.EventType.TOUCH_END, () => {
             this.node.active = false;
             if (this.debug) this.debug.active = true;
         });
     }
 
-    private bindEvent(path : string ,cb:Function){
+    private bindEvent(path : string ,cb:()=>void){
         let node = cc.find(path,this.content);
-        if( node ){
-            node.on(cc.Node.EventType.TOUCH_END,cb,this);
-        }
+        this.onN(node,cc.Node.EventType.TOUCH_END,cb,this);
     }
 
     private initLogView() {
-        this.logViewBackground?.on(cc.Node.EventType.TOUCH_END, () => {
+        this.onN(this.logViewBackground,cc.Node.EventType.TOUCH_END, () => {
             this.logView.active = false;
         });
 
@@ -91,7 +90,7 @@ export class DebugView extends cc.Component {
                     if (toggle) {
                         toggle.isChecked = App.logger.isValid(this.getLogLevel(i));
                     }
-                    node.on("toggle", (toggle: cc.Toggle) => {
+                    this.onN(node,"toggle", (toggle: cc.Toggle) => {
                         if (toggle.isChecked) {
                             App.logger.attach(this.getLogLevel(i));
                         } else {

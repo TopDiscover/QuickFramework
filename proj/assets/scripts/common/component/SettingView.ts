@@ -1,4 +1,5 @@
 import UIView from "../../framework/core/ui/UIView";
+import { inject } from "../../framework/defines/Decorators";
 import { Macro } from "../../framework/defines/Macros";
 
 const { ccclass, property } = cc._decorator;
@@ -14,22 +15,19 @@ export default class SettingView extends UIView {
     private effectStatus: cc.Toggle = null;
     private musicVolume: cc.Slider = null;
     private effectVolume: cc.Slider = null;
-
+    @inject("content",cc.Node)
+    private content : cc.Node = null!;
     onLoad() {
         super.onLoad();
+        this.onN(cc.find("close",this.content),cc.Node.EventType.TOUCH_END, this.onClose);
 
-        this.content = cc.find("content", this.node);
-        let close = cc.find("close",this.content);
-        close.on(cc.Node.EventType.TOUCH_END, this.onClose, this);
-
-        let quit = cc.find("background/quit",this.content);
-        quit.on(cc.Node.EventType.TOUCH_END, this.onQuit, this);
+        this.onN(cc.find("background/quit",this.content),cc.Node.EventType.TOUCH_END, this.onQuit);
 
         let music = cc.find("background/musicVolume",this.content);
-        music.on("slide", this.onMusicVolumeChange, this);
+        this.onN(music,"slide", this.onMusicVolumeChange);
 
         let effect = cc.find("background/effectVolume",this.content);
-        effect.on('slide', this.onEffectVolumeChange, this);
+        this.onN(effect,'slide', this.onEffectVolumeChange);
         this.musicVolume = music.getComponent(cc.Slider);
         this.effectVolume = effect.getComponent(cc.Slider);
         this.musicVolume.progress = App.globalAudio.musicVolume;
@@ -41,8 +39,8 @@ export default class SettingView extends UIView {
         this.musicStatus = musicStatusNode.getComponent(cc.Toggle);
         let effectStatusNode = cc.find("background/effectStatus",this.content);
         this.effectStatus = effectStatusNode.getComponent(cc.Toggle);
-        musicStatusNode.on("toggle", this.onMusicStatusChange, this);
-        effectStatusNode.on("toggle", this.onEffectStatusChange, this);
+        this.onN(musicStatusNode,"toggle", this.onMusicStatusChange);
+        this.onN(effectStatusNode,"toggle", this.onEffectStatusChange);
         this.musicStatus.isChecked = App.globalAudio.isMusicOn;
         this.effectStatus.isChecked = App.globalAudio.isEffectOn;
         this.onMusicStatusChange(this.musicStatus, false);
