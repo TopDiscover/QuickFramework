@@ -30,17 +30,6 @@ export default class UIView extends EventComponent {
         this._args = args;
     }
 
-    /**
-     * @description 统一定义一个显示内容节点
-     * */
-    private _content: Node | null = null;
-    protected set content(value) {
-        this._content = value;
-    }
-    protected get content() {
-        return this._content;
-    }
-
     /**本组件的类名 */
     private _className: string = "unknow";
     public set className(value: string) {

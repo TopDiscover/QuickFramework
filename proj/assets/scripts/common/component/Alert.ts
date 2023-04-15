@@ -1,36 +1,36 @@
-import { Component, find, Input, instantiate, isValid, Label, Node, RichText, tween, Vec3 } from "cc";
+import { find, input, Input, instantiate, isValid, Label, Node, RichText, tween, Vec3 } from "cc";
+import EventComponent from "../../framework/componects/EventComponent";
+import { inject } from "../../framework/defines/Decorators";
 import { ViewZOrder } from "../config/Config";
 
-class AlertDialog extends Component {
+class AlertDialog extends EventComponent {
 
     /**@description 关闭按钮 */
+    @inject("close",Node,"content")
     private _closeBtn: Node = null!;
     /**@description 显示内容 */
+    @inject("content",Node)
     private _content: Node = null!;
     /**@description 常规显示文字 */
+    @inject("content",Label,"content")
     private _textContent: Label = null!;
     /**@description 富文本显示文字 */
+    @inject("richContent",RichText,"content")
     private _richTextContent: RichText = null!;
     /**@description 标题 */
+    @inject("title",Label,"content")
     private _title: Label = null!;
     /**@description 确定按钮 */
+    @inject("confirm",Node,"content")
     private _confirm: Node = null!;
     /**@description 取消按钮 */
+    @inject("cancel",Node,"content")
     private _cancel: Node = null!;
     /**@description 配置信息 */
     private _config: AlertConfig = null!;
 
     public get config() {
         return this._config;
-    }
-    onLoad() {
-        this._content = find("content", this.node) as Node;
-        this._closeBtn = find("close", this._content) as Node;
-        this._title = find("title", this._content)?.getComponent(Label) as Label;
-        this._textContent = find("content", this._content)?.getComponent(Label) as Label;
-        this._richTextContent = find("richContent", this._content)?.getComponent(RichText) as RichText;
-        this._confirm = find("confirm", this._content) as Node;
-        this._cancel = find("cancel", this._content) as Node;
     }
 
     public show(config: AlertConfig) {
@@ -107,13 +107,13 @@ class AlertDialog extends Component {
         if (this._confirm && this._cancel && this._closeBtn) {
 
             //关闭按钮
-            this._closeBtn.on(Input.EventType.TOUCH_END, this.close.bind(this));
+            this.onN(this._closeBtn,Input.EventType.TOUCH_END, this.close.bind(this));
 
             //确定按钮
             if (config.confirmCb) {
                 this._confirm.active = true;
-                this._confirm.on(Input.EventType.TOUCH_END, this.onClick.bind(this, config.confirmCb, true));
-                this._closeBtn.on(Input.EventType.TOUCH_END, this.onClick.bind(this, config.confirmCb, false));
+                this.onN(this._confirm,Input.EventType.TOUCH_END, this.onClick.bind(this, config.confirmCb, true));
+                this.onN(this._closeBtn,Input.EventType.TOUCH_END, this.onClick.bind(this, config.confirmCb, false));
             }
             else {
                 this._confirm.active = false;
@@ -122,7 +122,7 @@ class AlertDialog extends Component {
             //取消按钮
             if (config.cancelCb) {
                 this._cancel.active = true;
-                this._cancel.on(Input.EventType.TOUCH_END, this.onClick.bind(this, config.cancelCb, false));
+                this.onN(this._cancel,Input.EventType.TOUCH_END, this.onClick.bind(this, config.cancelCb, false));
             } else {
                 this._cancel.active = false;
             }
@@ -303,7 +303,7 @@ export default class Alert implements ISingleton{
 
     public finishAlert() {
         if (this.curPanel) {
-            this.curPanel.removeFromParent();
+            this.curPanel.destroy();
             this.curPanel = <any>null;
         }
 

@@ -39,7 +39,7 @@ export default class MainController extends EventComponent {
                     view.debug = debug;
                 }
                 this.debugView.active = false;
-                debug.on(Input.EventType.TOUCH_END,()=>{
+                this.onN(debug,Input.EventType.TOUCH_END,()=>{
                     if ( debug ) debug.active = false;
                     if ( this.debugView ){
                         this.debugView.active = true;

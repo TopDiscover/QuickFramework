@@ -2,7 +2,7 @@
  * @description 事件处理组件
  */
 
-import { Component, NodeEventType, _decorator, __private } from "cc";
+import { Component, Node, NodeEventType, _decorator, __private } from "cc";
 import { IEventProcessor, EventAgrs, EventProcessor, EventCallback } from "../core/event/EventProcessor";
 
 const { ccclass, property } = _decorator;
@@ -78,23 +78,54 @@ export default class EventComponent extends Component implements IEventProcessor
 
     onI<K extends keyof __private._cocos_input_input__InputEventMap>(eventType: K, cb: EventCallback): void {
         this.on({
-            bind : "Input",
-            type : eventType,
-            cb : cb
+            bind: "Input",
+            type: eventType,
+            cb: cb
         })
     }
     onceI<K extends keyof __private._cocos_input_input__InputEventMap>(eventType: K, cb: EventCallback): void {
         this.once({
-            bind : "Input",
-            type : eventType,
-            cb : cb
+            bind: "Input",
+            type: eventType,
+            cb: cb
         })
     }
     offI<K extends keyof __private._cocos_input_input__InputEventMap>(eventType: K, cb: EventCallback): void {
         this.off({
-            bind : "Input",
-            type : eventType,
-            cb : cb
+            bind: "Input",
+            type: eventType,
+            cb: cb
+        })
+    }
+
+    onN(node: Node, type: string | NodeEventType, cb: EventCallback, target?: unknown, useCapture?: any): void {
+        this.on({
+            bind:"Node",
+            type:type,
+            cb:cb,
+            target : target,
+            useCapture : useCapture,
+            node : node
+        })
+    }
+    onceN(node: Node, type: string | NodeEventType, cb: EventCallback, target?: unknown, useCapture?: any): void {
+        this.once({
+            bind:"Node",
+            type:type,
+            cb:cb,
+            target : target,
+            useCapture : useCapture,
+            node : node
+        })
+    }
+    offN(node: Node, type: string | NodeEventType, cb: EventCallback, target?: unknown, useCapture?: any): void {
+        this.off({
+            bind:"Node",
+            type:type,
+            cb:cb,
+            target : target,
+            useCapture : useCapture,
+            node : node
         })
     }
 

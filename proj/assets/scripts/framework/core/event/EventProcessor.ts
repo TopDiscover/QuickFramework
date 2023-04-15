@@ -2,7 +2,7 @@
  * @description 事件处理组件
  */
 
-import { game, input, Node, NodeEventType, __private } from "cc";
+import { game, input, isValid, Node, NodeEventType, __private } from "cc";
 
 export type EventCallback = (...any: any[]) => void;
 export interface EventAgrs {
@@ -100,17 +100,46 @@ export interface IEventProcessor {
      * @param cb 
      */
     offI<K extends keyof __private._cocos_input_input__InputEventMap>(eventType: K, cb: EventCallback): void;
+
+    /**
+     * @description 注册节点事件
+     * @param node 
+     * @param type 
+     * @param cb 
+     * @param target
+     * @param useCapture 
+     */
+    onN(node: Node | null | undefined, type: string | NodeEventType, cb: EventCallback, target?: unknown, useCapture?: any): void;
+    /**
+     * @description 注册节点事件，回调会在第一时间被触发后删除自身。
+     * @param node 
+     * @param type 
+     * @param cb 
+     * @param target
+     * @param useCapture 
+     */
+    onceN(node: Node | null | undefined, type: string | NodeEventType, cb: EventCallback, target?: unknown, useCapture?: any): void;
+    /**
+     * @description 反注册 注册节点事件
+     * @param node 
+     * @param type 
+     * @param cb 
+     * @param target
+     * @param useCapture 
+     */
+    offN(node: Node | null | undefined, type: string | NodeEventType, cb: EventCallback, target?: unknown, useCapture?: any): void;
 }
 
 export class EventProcessor implements IEventProcessor {
 
-    /**@description Dispatcher 注册事件缓存 */
+    /**@description Dispatcher 事件 */
     private _eventsD: Map<string, EventAgrs> = new Map();
-
-    /**@description game 注册事件缓存 */
+    /**@description game 事件 */
     private _eventsG: EventAgrs[] = [];
     /**@description  输入事件*/
     private _eventsI: EventAgrs[] = [];
+    /**@description  节点事件*/
+    private _eventsN: EventAgrs[] = [];
 
     /**
      * 注册事件 ，在onLoad中注册，在onDestroy自动移除
@@ -184,6 +213,37 @@ export class EventProcessor implements IEventProcessor {
         });
     }
 
+    onN(node: Node, type: string | NodeEventType, cb: EventCallback, target?: unknown, useCapture?: any): void {
+        this.on({
+            bind: "Node",
+            type: type,
+            cb: cb,
+            target: target,
+            useCapture: useCapture,
+            node: node,
+        });
+    }
+    onceN(node: Node, type: string | NodeEventType, cb: EventCallback, target?: unknown, useCapture?: any): void {
+        this.once({
+            bind: "Node",
+            type: type,
+            cb: cb,
+            target: target,
+            useCapture: useCapture,
+            node: node
+        })
+    }
+    offN(node: Node, type: string | NodeEventType, cb: EventCallback, target?: unknown, useCapture?: any): void {
+        this.off({
+            bind: "Node",
+            type: type,
+            cb: cb,
+            target: target,
+            useCapture: useCapture,
+            node: node
+        });
+    }
+
     addEvents() {
 
     }
@@ -196,6 +256,7 @@ export class EventProcessor implements IEventProcessor {
         this._cleanD();
         this._cleanG();
         this._cleanI();
+        this._cleanN();
     }
 
     on(args: EventAgrs): void {
@@ -203,6 +264,7 @@ export class EventProcessor implements IEventProcessor {
             case "Dispatcher": this._onD(args); break;
             case "Game": this._onG(args); break;
             case "Input": this._onI(args); break;
+            case "Node": this._onN(args); break;
             default: Log.e(`on ${args.bind} 未知事件类型`)
         }
     }
@@ -216,6 +278,7 @@ export class EventProcessor implements IEventProcessor {
             case "Dispatcher": this._offD(args); break;
             case "Game": this._offG(args); break;
             case "Input": this._offI(args); break;
+            case "Node": this._offN(args); break;
             default: Log.e(`off ${args.bind} 未知事件类型`)
         }
     }
@@ -296,7 +359,11 @@ export class EventProcessor implements IEventProcessor {
                 return;
             }
         }
-        input.on(args.type as unknown as any, args.cb!, args.target);
+        if (args.once) {
+            input.once(args.type as unknown as any, args.cb!, args.target);
+        } else {
+            input.on(args.type as unknown as any, args.cb!, args.target);
+        }
         this._eventsI.push(args);
     }
 
@@ -320,5 +387,50 @@ export class EventProcessor implements IEventProcessor {
             input.off(ele.type as unknown as any, ele.cb, ele.target);
         }
         this._eventsI = [];
+    }
+
+    private _onN(args: EventAgrs) {
+        if (!args.target) {
+            args.target = this;
+        }
+        if (!isValid(args.node)) {
+            return;
+        }
+        if (args.node?.hasEventListener(args.type, args.cb, args.target)) {
+            return;
+        }
+        if (args.once) {
+            args.node?.once(args.type, args.cb!, args.target, args.useCapture);
+        } else {
+            args.node?.on(args.type, args.cb!, args.target, args.useCapture);
+        }
+        this._eventsN.push(args);
+    }
+
+    private _offN(args: EventAgrs) {
+        if (!args.target) {
+            args.target = this;
+        }
+        if (!isValid(args.node)) {
+            return;
+        }
+        args.node?.off(args.type, args.cb, args.target, args.useCapture);
+        for (let i = 0; i < this._eventsN.length; i++) {
+            const ele = this._eventsN[i];
+            if (ele.type == args.type && ele.cb == args.cb && ele.target == ele.target) {
+                this._eventsN.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    private _cleanN() {
+        for (let i = 0; i < this._eventsN.length; i++) {
+            const ele = this._eventsN[i];
+            if (isValid(ele.node)) {
+                ele.node?.off(ele.type, ele.cb, ele.target, ele.useCapture);
+            }
+        }
+        this._eventsN = [];
     }
 }

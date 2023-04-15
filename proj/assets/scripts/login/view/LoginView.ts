@@ -23,7 +23,7 @@ export default class LoginView extends GameView {
         super.onLoad();
         this.version.string = `${App.updateManager.appVersion}(${App.updateManager.getVersion(this.bundle)})`;
         this.md5.string = `MD5:${App.updateManager.getMd5(this.bundle)}`;
-        this.login.on(Node.EventType.TOUCH_END,this.onClick,this);
+        this.onN(this.login,Node.EventType.TOUCH_END,this.onClick);
     }
 
     private onClick(){

@@ -124,6 +124,7 @@ class AudioData implements ISingleton{
             info.volume = volume;
         });
         this.musicVolume = volume;
+        this.save();
     }
 
     public setEffectVolume(volume: number) {
@@ -131,6 +132,7 @@ class AudioData implements ISingleton{
             info.volume = volume;
         });
         this.effectVolume = volume;
+        this.save();
     }
 
     public setMusicStatus(isOn: boolean) {

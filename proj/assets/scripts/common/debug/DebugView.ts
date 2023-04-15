@@ -1,5 +1,6 @@
 
-import { _decorator, Component, Node, find, Toggle, view, Input, profiler ,screen } from 'cc';
+import { _decorator, Component, Node, find, Toggle, view, Input, profiler ,screen, input } from 'cc';
+import EventComponent from '../../framework/componects/EventComponent';
 import { inject } from '../../framework/defines/Decorators';
 import { LogLevel } from '../../framework/defines/Enums';
 import { Singleton } from '../../framework/utils/Singleton';
@@ -7,7 +8,7 @@ import { Config } from '../config/Config';
 const { ccclass, property } = _decorator;
 
 @ccclass('DebugView')
-export class DebugView extends Component {
+export class DebugView extends EventComponent {
 
     @inject("logView",Node)
     private logView: Node = null!;
@@ -65,21 +66,19 @@ export class DebugView extends Component {
             this.logView.active = false;
             this.initLogView();
         }
-        this.background?.on(Input.EventType.TOUCH_END, () => {
+        this.onN(this.background,Input.EventType.TOUCH_END, () => {
             this.node.active = false;
             if (this.debug) this.debug.active = true;
         });
     }
 
-    private bindEvent(path: string, cb: Function) {
+    private bindEvent(path: string, cb: ()=>void) {
         let node = find(path, this.content);
-        if (node) {
-            node.on(Input.EventType.TOUCH_END, cb, this);
-        }
+        this.onN(node!,Input.EventType.TOUCH_END,cb);
     }
 
     private initLogView() {
-        this.logViewBackground?.on(Input.EventType.TOUCH_END, () => {
+        this.onN(this.logViewBackground,Input.EventType.TOUCH_END, () => {
             this.logView.active = false;
         });
 
@@ -92,7 +91,7 @@ export class DebugView extends Component {
                     if (toggle) {
                         toggle.isChecked = App.logger.isValid(this.getLogLevel(i));
                     }
-                    node.on("toggle", (toggle: Toggle) => {
+                    this.onN(node,"toggle", (toggle: Toggle) => {
                         if (toggle.isChecked) {
                             App.logger.attach(this.getLogLevel(i));
                         } else {
