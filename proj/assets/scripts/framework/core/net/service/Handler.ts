@@ -28,7 +28,7 @@ export abstract class Handler extends EventProcessor implements ISingleton{
      * @param handleType 处理数据类型
      * @param isQueue 接收到消息，是否进行队列处理
      */
-    protected register(cmd: string, func: (data: any) => void, handleType?: any, isQueue = true) {
+    protected onS(cmd: string, func: (data: any) => void, handleType?: any, isQueue = true) {
         let service : IService = this.service;
         if (service && service.addListener ) {
             service.addListener(cmd, handleType, func, isQueue, this);
@@ -43,7 +43,7 @@ export abstract class Handler extends EventProcessor implements ISingleton{
      * @description 反注册网络消息处理
      * @param cmd 如果为null，则反注册当前对象注册过的所有处理过程，否则对特定cmd反注册
      **/
-    protected unregister(cmd?: string) {
+    protected offS(cmd?: string) {
         let service : IService = this.service;
         if (service && service.removeListeners) {
             service.removeListeners(this, cmd)
@@ -59,7 +59,7 @@ export abstract class Handler extends EventProcessor implements ISingleton{
      */
     onDestroy(): void {
         //移除当前Handler绑定事件
-        this.unregister();
+        this.offS();
         super.onDestroy();
     }
 
