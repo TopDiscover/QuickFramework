@@ -351,13 +351,8 @@ export class EventProcessor implements IEventProcessor {
         if (!args.target) {
             args.target = this;
         }
-        for (let index = 0; index < this._eventsI.length; index++) {
-            const element = this._eventsI[index];
-            if (element.type == args.type &&
-                element.cb == args.cb &&
-                element.target == args.target) {
-                return;
-            }
+        if ( this._has(this._eventsI,args) ){
+            return;
         }
         if (args.once) {
             input.once(args.type as unknown as any, args.cb!, args.target);
@@ -432,5 +427,17 @@ export class EventProcessor implements IEventProcessor {
             }
         }
         this._eventsN = [];
+    }
+
+    private _has(datas:EventAgrs[],args:EventAgrs){
+        for( let i = 0 ; i < datas.length ; i++ ){
+            const element = datas[i];
+            if (element.type == args.type &&
+                element.cb == args.cb &&
+                element.target == args.target) {
+                return true;
+            }
+        }
+        return false;
     }
 }
