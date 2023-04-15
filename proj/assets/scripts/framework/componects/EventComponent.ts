@@ -7,8 +7,8 @@ import { IEventProcessor, EventAgrs, EventProcessor, EventCallback } from "../co
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class EventComponent extends cc.Component implements IEventProcessor{
-    
+export default class EventComponent extends cc.Component implements IEventProcessor {
+
 
     private _eventProcessor = new EventProcessor;
 
@@ -98,34 +98,34 @@ export default class EventComponent extends cc.Component implements IEventProces
         })
     }
 
-    onN(node: cc.Node, type: string , cb: EventCallback, target?: unknown, useCapture?: any): void {
+    onN(node: cc.Node, type: string, cb: EventCallback, target?: unknown, useCapture?: any): void {
         this.on({
-            bind:"Node",
-            type:type,
-            cb:cb,
-            target : target,
-            useCapture : useCapture,
-            node : node
+            bind: "Node",
+            type: type,
+            cb: cb,
+            target: target,
+            useCapture: useCapture,
+            node: node
         })
     }
-    onceN(node: cc.Node, type: string , cb: EventCallback, target?: unknown, useCapture?: any): void {
+    onceN(node: cc.Node, type: string, cb: EventCallback, target?: unknown, useCapture?: any): void {
         this.once({
-            bind:"Node",
-            type:type,
-            cb:cb,
-            target : target,
-            useCapture : useCapture,
-            node : node
+            bind: "Node",
+            type: type,
+            cb: cb,
+            target: target,
+            useCapture: useCapture,
+            node: node
         })
     }
-    offN(node: cc.Node, type: string , cb: EventCallback, target?: unknown, useCapture?: any): void {
+    offN(node: cc.Node, type: string, cb: EventCallback, target?: unknown, useCapture?: any): void {
         this.off({
-            bind:"Node",
-            type:type,
-            cb:cb,
-            target : target,
-            useCapture : useCapture,
-            node : node
+            bind: "Node",
+            type: type,
+            cb: cb,
+            target: target,
+            useCapture: useCapture,
+            node: node
         })
     }
 

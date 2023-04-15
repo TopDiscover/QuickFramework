@@ -3,13 +3,14 @@
  */
 
 export type EventCallback = (...any: any[]) => void;
+
 export interface EventAgrs {
     /**
      * @description 绑定事件类型
      */
     bind: "Dispatcher" | "Game" | "Input" | "Node";
     /**@description 事件类型名 */
-    type : string;
+    type: string;
     /**
      * @description 绑定事件的节点，bindType 为 NODE,必选参数,其它可以不用
      */
@@ -23,6 +24,8 @@ export interface EventAgrs {
     /**@description 回调会在第一时间被触发后删除自身*/
     once?: boolean;
 }
+
+
 
 export interface IEventProcessor {
     addEvents(): void;
@@ -107,7 +110,7 @@ export interface IEventProcessor {
      * @param target
      * @param useCapture 
      */
-    onN(node: cc.Node | null | undefined, type: string , cb: EventCallback, target?: unknown, useCapture?: any): void;
+    onN(node: cc.Node, type: string, cb: EventCallback, target?: unknown, useCapture?: any): void;
     /**
      * @description 注册节点事件，回调会在第一时间被触发后删除自身。
      * @param node 
@@ -116,7 +119,7 @@ export interface IEventProcessor {
      * @param target
      * @param useCapture 
      */
-    onceN(node: cc.Node | null | undefined, type: string , cb: EventCallback, target?: unknown, useCapture?: any): void;
+    onceN(node: cc.Node, type: string, cb: EventCallback, target?: unknown, useCapture?: any): void;
     /**
      * @description 反注册 注册节点事件
      * @param node 
@@ -125,7 +128,7 @@ export interface IEventProcessor {
      * @param target
      * @param useCapture 
      */
-    offN(node: cc.Node | null | undefined, type: string , cb: EventCallback, target?: unknown, useCapture?: any): void;
+    offN(node: cc.Node, type: string, cb: EventCallback, target?: unknown, useCapture?: any): void;
 }
 
 export class EventProcessor implements IEventProcessor {
@@ -136,8 +139,6 @@ export class EventProcessor implements IEventProcessor {
     private _eventsG: EventAgrs[] = [];
     /**@description  输入事件*/
     private _eventsI: EventAgrs[] = [];
-    /**@description  节点事件*/
-    private _eventsN: EventAgrs[] = [];
 
     /**
      * 注册事件 ，在onLoad中注册，在onDestroy自动移除
@@ -211,7 +212,7 @@ export class EventProcessor implements IEventProcessor {
         });
     }
 
-    onN(node: cc.Node, type: string , cb: EventCallback, target?: unknown, useCapture?: any): void {
+    onN(node: cc.Node, type: string, cb: EventCallback, target?: unknown, useCapture?: any): void {
         this.on({
             bind: "Node",
             type: type,
@@ -221,7 +222,7 @@ export class EventProcessor implements IEventProcessor {
             node: node,
         });
     }
-    onceN(node: cc.Node, type: string , cb: EventCallback, target?: unknown, useCapture?: any): void {
+    onceN(node: cc.Node, type: string, cb: EventCallback, target?: unknown, useCapture?: any): void {
         this.once({
             bind: "Node",
             type: type,
@@ -231,7 +232,7 @@ export class EventProcessor implements IEventProcessor {
             node: node
         })
     }
-    offN(node: cc.Node, type: string , cb: EventCallback, target?: unknown, useCapture?: any): void {
+    offN(node: cc.Node, type: string, cb: EventCallback, target?: unknown, useCapture?: any): void {
         this.off({
             bind: "Node",
             type: type,
@@ -316,10 +317,14 @@ export class EventProcessor implements IEventProcessor {
         if (!args.target) {
             args.target = this;
         }
-        if ( this._has(this._eventsG,args) ){
+        if (this._has(this._eventsG, args)) {
             return;
         }
-        cc.game.on(args.type, args.cb!, args.target, args.once);
+        if (args.once) {
+            cc.game.once(args.type, args.cb!, args.target);
+        } else {
+            cc.game.on(args.type, args.cb!, args.target);
+        }
         this._eventsG.push(args);
     }
 
@@ -349,7 +354,7 @@ export class EventProcessor implements IEventProcessor {
         if (!args.target) {
             args.target = this;
         }
-        if ( this._has(this._eventsI,args) ){
+        if (this._has(this._eventsI, args)) {
             return;
         }
         if (args.once) {
@@ -389,15 +394,11 @@ export class EventProcessor implements IEventProcessor {
         if (!cc.isValid(args.node)) {
             return;
         }
-        if (args.node?.hasEventListener(args.type)) {
-            return;
-        }
         if (args.once) {
-            args.node?.once(args.type, args.cb!, args.target, args.useCapture);
+            args.node?.once(args.type,args.cb,args.target,args.useCapture);
         } else {
             args.node?.on(args.type, args.cb!, args.target, args.useCapture);
         }
-        this._eventsN.push(args);
     }
 
     private _offN(args: EventAgrs) {
@@ -407,28 +408,15 @@ export class EventProcessor implements IEventProcessor {
         if (!cc.isValid(args.node)) {
             return;
         }
-        args.node?.off(args.type, args.cb, args.target, args.useCapture);
-        for (let i = 0; i < this._eventsN.length; i++) {
-            const ele = this._eventsN[i];
-            if (ele.type == args.type && ele.cb == args.cb && ele.target == ele.target) {
-                this._eventsN.splice(i, 1);
-                break;
-            }
-        }
+        args.node?.off(args.type,args.cb,args.target,args.useCapture);
     }
 
     private _cleanN() {
-        for (let i = 0; i < this._eventsN.length; i++) {
-            const ele = this._eventsN[i];
-            if (cc.isValid(ele.node)) {
-                ele.node?.off(ele.type, ele.cb, ele.target, ele.useCapture);
-            }
-        }
-        this._eventsN = [];
+        
     }
 
-    private _has(datas:EventAgrs[],args:EventAgrs){
-        for( let i = 0 ; i < datas.length ; i++ ){
+    private _has(datas: EventAgrs[], args: EventAgrs) {
+        for (let i = 0; i < datas.length; i++) {
             const element = datas[i];
             if (element.type == args.type &&
                 element.cb == args.cb &&

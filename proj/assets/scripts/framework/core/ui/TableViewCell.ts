@@ -1,3 +1,5 @@
+import EventComponent from "../../componects/EventComponent";
+
 const { ccclass, property, menu } = cc._decorator;
 
 const INVALID_INDEX = -1;
@@ -8,7 +10,7 @@ export type CellType = number | string;
  */
 @ccclass
 @menu("QuickUI组件/TableViewCell")
-export class TableViewCell extends cc.Component {
+export class TableViewCell extends EventComponent {
     static INVALID_INDEX = INVALID_INDEX;
     view: TableView = null!;
     index: number = INVALID_INDEX;

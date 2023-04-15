@@ -306,7 +306,7 @@ export default class Alert implements ISingleton{
 
     public finishAlert() {
         if (this.curPanel) {
-            this.curPanel.destroy();
+            this.curPanel.destroy()
             this.curPanel = null;
         }
 
