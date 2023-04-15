@@ -138,8 +138,6 @@ export class EventProcessor implements IEventProcessor {
     private _eventsG: EventAgrs[] = [];
     /**@description  输入事件*/
     private _eventsI: EventAgrs[] = [];
-    /**@description  节点事件*/
-    private _eventsN: EventAgrs[] = [];
 
     /**
      * 注册事件 ，在onLoad中注册，在onDestroy自动移除
@@ -391,15 +389,11 @@ export class EventProcessor implements IEventProcessor {
         if (!isValid(args.node)) {
             return;
         }
-        if (args.node?.hasEventListener(args.type, args.cb, args.target)) {
-            return;
-        }
         if (args.once) {
             args.node?.once(args.type, args.cb!, args.target, args.useCapture);
         } else {
             args.node?.on(args.type, args.cb!, args.target, args.useCapture);
         }
-        this._eventsN.push(args);
     }
 
     private _offN(args: EventAgrs) {
@@ -410,23 +404,10 @@ export class EventProcessor implements IEventProcessor {
             return;
         }
         args.node?.off(args.type, args.cb, args.target, args.useCapture);
-        for (let i = 0; i < this._eventsN.length; i++) {
-            const ele = this._eventsN[i];
-            if (ele.type == args.type && ele.cb == args.cb && ele.target == ele.target) {
-                this._eventsN.splice(i, 1);
-                break;
-            }
-        }
     }
 
     private _cleanN() {
-        for (let i = 0; i < this._eventsN.length; i++) {
-            const ele = this._eventsN[i];
-            if (isValid(ele.node)) {
-                ele.node?.off(ele.type, ele.cb, ele.target, ele.useCapture);
-            }
-        }
-        this._eventsN = [];
+        
     }
 
     private _has(datas:EventAgrs[],args:EventAgrs){
