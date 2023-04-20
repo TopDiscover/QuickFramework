@@ -269,7 +269,7 @@ export class EventProcessor implements IEventProcessor {
     }
     once(args: EventAgrs): void {
         args.once = true;
-        this.once(args);
+        this.on(args);
     }
 
     off(args: EventAgrs): void {
