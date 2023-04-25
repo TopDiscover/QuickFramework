@@ -1,6 +1,6 @@
 import UIView from "../ui/UIView";
 import { DEBUG } from "cc/env";
-import { Asset, assetManager, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D, ImageAsset, ISocketData } from "cc";
+import { Asset, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D, ImageAsset } from "cc";
 import { Resource } from "./Resource";
 import { Macro } from "../../defines/Macros";
 class ResourceCache {
