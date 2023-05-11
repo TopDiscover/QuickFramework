@@ -16,7 +16,7 @@ export namespace Config {
     export const isSkipCheckUpdate = false;
 
     /**@description 测试热更新服务器地址 */
-    export const HOT_UPDATE_URL = "http://172.21.192.1/hotupdate";
+    export const HOT_UPDATE_URL = "http://172.20.11.130/hotupdate";
 
     /**@description 是否使用了自动版本 */
     export const USE_AUTO_VERSION = true;

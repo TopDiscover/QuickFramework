@@ -59,7 +59,7 @@ export class UpdateManager implements ISingleton {
     }
 
     /**@description 主包包含资源目录,固定的，请勿修改 */
-    readonly mainBundles: string[] = ["src", "jsb-adapter", "assets/resources", "assets/main", "main.js"];
+    readonly mainBundles: string[] = ["src", "jsb-adapter", "assets/resources", "assets/main", "assets/internal", "main.js"];
 
     /**@description 是否使用了自动版本 */
     isAutoVersion: boolean = true;
