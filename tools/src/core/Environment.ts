@@ -36,7 +36,7 @@ class _Environment {
     readonly privateBundlesUrl = "https://gitee.com/top-discover/quick-framework-private-bundles.git";
 
     /**@description 是否启用私有代码 */
-    readonly isPrivate = true;
+    readonly isPrivate = false;
 
     /**@description 是否在tools目录下执行命令 */
     isCommand = false;
