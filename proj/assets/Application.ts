@@ -40,7 +40,7 @@ export class Application extends Framewok implements GameEventInterface {
     }
 
     get utils(){
-        return Singleton.instance.get(CmmUtils) as CmmUtils;
+        return Singleton.get(CmmUtils)!;
     }
 
     /**@description 进入后台的时间 */
@@ -48,31 +48,31 @@ export class Application extends Framewok implements GameEventInterface {
 
     /**@description 重连专用提示UI部分 */
     get uiReconnect( ){
-        return Singleton.instance.get(UIReconnect) as UIReconnect;
+        return Singleton.get(UIReconnect)!;
     }
 
     /**@description 小提示 */
     get tips() {
-        return Singleton.instance.get(Tips) as Tips;
+        return Singleton.get(Tips)!;
     }
 
     /**@description 界面加载时的全屏Loading,显示加载进度 */
     get uiLoading(): UILoading {
-        return Singleton.instance.get(UILoading) as UILoading;
+        return Singleton.get(UILoading)!;
     }
 
     /**@description 弹出提示框,带一到两个按钮 */
     get alert() {
-        return Singleton.instance.get(Alert) as Alert;
+        return Singleton.get(Alert)!;
     }
 
     /**@description 公共loading */
     get loading() {
-        return Singleton.instance.get(Loading) as Loading;
+        return Singleton.get(Loading)!;
     }
 
     get updateLoading(){
-        return Singleton.instance.get(UpdateLoading) as UpdateLoading;
+        return Singleton.get(UpdateLoading)!;
     }
 
     /**@description 获取Stage数据 */
@@ -95,7 +95,7 @@ export class Application extends Framewok implements GameEventInterface {
         if (this._globalAudio) {
             return this._globalAudio;
         }
-        this._globalAudio = this.uiManager.canvas.getComponent(GlobalAudio);
+        this._globalAudio = this.uiManager.canvas.getComponent(GlobalAudio) as GlobalAudio;
         return this._globalAudio;
     }
 

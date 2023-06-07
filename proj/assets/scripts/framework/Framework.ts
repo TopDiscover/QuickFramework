@@ -35,61 +35,61 @@ export class Framewok {
 
     /**@description 资源释放管理 */
     get releaseManger() {
-        return Singleton.instance.get(ReleaseManager) as ReleaseManager;
+        return Singleton.get(ReleaseManager)!;
     }
 
     /**@description 网络Service管理器 */
     get serviceManager() {
-        return Singleton.instance.get(ServiceManager) as ServiceManager;
+        return Singleton.get(ServiceManager)!;
     }
 
     /**@description 网络消息发送管理器 */
     get senderManager() {
-        return Singleton.instance.get(SenderManager) as SenderManager;
+        return Singleton.get(SenderManager)!;
     }
 
     /**@description 网络消息处理管理器 */
     get handlerManager() {
-        return Singleton.instance.get(HandlerManager) as HandlerManager;
+        return Singleton.get(HandlerManager)!;
     }
 
     /**@description 日志 */
     get logger() {
-        return Singleton.instance.get(LoggerImpl) as LoggerImpl;
+        return Singleton.get(LoggerImpl)!;
     }
 
     /**@description 逻辑管理器 */
     get logicManager() {
-        return Singleton.instance.get(LogicManager) as LogicManager;
+        return Singleton.get(LogicManager)!;
     }
 
     /**@description 数据中心 */
     get dataCenter() {
-        return Singleton.instance.get(DataCenter) as DataCenter;
+        return Singleton.get(DataCenter)!;
     }
 
     /**@description 入口管理器 */
     get entryManager() {
-        return Singleton.instance.get(EntryManager) as EntryManager;
+        return Singleton.get(EntryManager)!;
     }
 
     get utils() {
-        return Singleton.instance.get(Utils) as Utils;
+        return Singleton.get(Utils)!;
     }
 
     /**@description protobuf类型管理 */
     get protoManager() {
-        return Singleton.instance.get(ProtoManager) as ProtoManager;
+        return Singleton.get(ProtoManager)!;
     }
 
     /**@description bundle管理器 */
     get bundleManager() {
-        return Singleton.instance.get(BundleManager) as BundleManager;
+        return Singleton.get(BundleManager)!;
     }
 
     /**@description 热更新管理器 */
     get updateManager() {
-        return Singleton.instance.get(UpdateManager) as UpdateManager;
+        return Singleton.get(UpdateManager)!;
     }
 
     /**@description 常驻资源指定的模拟view */
@@ -99,17 +99,17 @@ export class Framewok {
 
     /**@description 语言包 */
     get language() {
-        return Singleton.instance.get(Language) as Language;
+        return Singleton.get(Language)!;
     }
 
     /**@description 事件派发器 */
     get dispatcher() {
-        return Singleton.instance.get(Dispatcher) as Dispatcher;
+        return Singleton.get(Dispatcher)!;
     }
 
     /**@description 界面管理器 */
     get uiManager() {
-        return Singleton.instance.get(UIManager) as UIManager;
+        return Singleton.get(UIManager)!;
     }
 
     /**
@@ -122,7 +122,7 @@ export class Framewok {
 
     /**@description 本地仓库 */
     get storage() {
-        return Singleton.instance.get(LocalStorage) as LocalStorage;
+        return Singleton.get(LocalStorage)!;
     }
 
     /**
@@ -135,7 +135,7 @@ export class Framewok {
 
     /**@description 资源管理器 */
     get asset() {
-        return Singleton.instance.get(AssetManager) as AssetManager;
+        return Singleton.get(AssetManager)!;
     }
 
     /**
@@ -148,7 +148,7 @@ export class Framewok {
 
     /**@description 资源缓存管理器 */
     get cache() {
-        return Singleton.instance.get(CacheManager) as CacheManager;
+        return Singleton.get(CacheManager)!;
     }
 
     /**
@@ -161,11 +161,11 @@ export class Framewok {
 
     /**@description 对象池管理器 */
     get pool() {
-        return Singleton.instance.get(NodePoolManager) as NodePoolManager;
+        return Singleton.get(NodePoolManager)!;
     }
 
     get http() {
-        return Singleton.instance.get(HttpClient) as HttpClient;
+        return Singleton.get(HttpClient)!;
     }
 
     /**@description 小提示 */
@@ -184,18 +184,18 @@ export class Framewok {
     }
 
     get layout() {
-        return Singleton.instance.get(LayoutManager) as LayoutManager;
+        return Singleton.get(LayoutManager)!;
     }
 
     get canvasHelper() {
-        return Singleton.instance.get(CanvasHelper) as CanvasHelper;
+        return Singleton.get(CanvasHelper)!;
     }
 
     /**
      * @description 区分平台相关处理
      */
     get platform() {
-        return Singleton.instance.get(Platform) as Platform;
+        return Singleton.get(Platform)!;
     }
     /**@description 当前游戏GameView, GameView进入onLoad赋值 */
     gameView: GameView | null = null;

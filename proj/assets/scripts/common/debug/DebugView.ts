@@ -200,7 +200,7 @@ export class DebugView extends EventComponent {
     }
 
     private onSingleton() {
-        Singleton.instance.debug();
+        Singleton.debug();
     }
 }
 

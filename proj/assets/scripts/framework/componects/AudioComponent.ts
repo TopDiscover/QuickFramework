@@ -80,7 +80,7 @@ export default class AudioComponent extends EventComponent {
     }
 
     protected get audioData(){
-        return Singleton.instance.get(AudioData);
+        return Singleton.get(AudioData);
     }
 
     /**@description 音频控件资源拥有者，该对象由UIManager打开的界面 */

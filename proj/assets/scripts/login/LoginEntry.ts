@@ -47,7 +47,7 @@ class LoginEntry extends Entry {
         super.onEnterGameView(gameView);
         //关闭除登录之外的界面
         App.uiManager.closeExcept([LoginView]);
-        Singleton.instance.destory();
+        Singleton.destory();
     }
 
     /**@description 卸载bundle,即在自己bundle删除之前最后的一条消息 */
