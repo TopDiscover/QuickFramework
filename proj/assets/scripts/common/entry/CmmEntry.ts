@@ -25,11 +25,11 @@ export class CmmEntry extends EntryDelegate {
         if (config) {
             let item = App.updateManager.getItem(config)!;
             if (bundle == Macro.BUNDLE_RESOURCES) {
-                item.handler = Singleton.instance.get(MainUpdateHandlerImpl) as MainUpdateHandlerImpl;
+                item.handler = Singleton.get(MainUpdateHandlerImpl)!;
             } else if (bundle == Macro.BUNDLE_HALL) {
-                item.handler = Singleton.instance.get(HallUpdateHandlerImpl) as HallUpdateHandlerImpl;
+                item.handler = Singleton.get(HallUpdateHandlerImpl)!;
             } else {
-                item.handler = Singleton.instance.get(BundleUpdateHandlerImpl) as BundleUpdateHandlerImpl;
+                item.handler = Singleton.get(BundleUpdateHandlerImpl)!;
             }
             return item;
         }
