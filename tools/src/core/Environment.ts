@@ -29,6 +29,15 @@ class _Environment {
         md5Cache: false,
     }
 
+    /**@description 对外公布示例地址*/
+    readonly publicBundlesUrl = "https://gitee.com/top-discover/QuickFrameworkBundles.git";
+
+    /**@description 私有代码地址 */
+    readonly privateBundlesUrl = "https://gitee.com/top-discover/quick-framework-private-bundles.git";
+
+    /**@description 是否启用私有代码 */
+    readonly isPrivate = false;
+
     /**@description 是否在tools目录下执行命令 */
     isCommand = false;
 
