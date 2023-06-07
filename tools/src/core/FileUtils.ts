@@ -88,6 +88,32 @@ export default class FileUtils extends Handler {
     }
 
     /**
+     * @description 获取当前目前下所有文件
+     * @param path 
+     */
+    getCurFiles(path:string){
+        let result: FileResult[] = [];
+        if (!existsSync(path)) {
+            return result;
+        }
+        let readDir = readdirSync(path);
+        for (let i = 0; i < readDir.length; i++) {
+            let file = readDir[i];
+            let fullPath = join(path, file);
+            if (fullPath[0] === '.') {
+                continue;
+            }
+            let stat = statSync(fullPath);
+            if (stat.isFile()) {
+                let info = { relative: relative(path, fullPath), path: fullPath, name: file, size: stat.size }
+                result.push(info);
+            }
+        }
+
+        return result;
+    }
+
+    /**
      * @description 获取path下的所有目录
      * @param path 
      */

@@ -1,5 +1,5 @@
 import { existsSync } from "fs";
-import { join } from "path";
+import { join, parse } from "path";
 import FileUtils from "./core/FileUtils";
 import { Handler } from "./core/Handler";
 import * as FixEngine from "./fix_engine/Helper";
@@ -20,7 +20,10 @@ export class Helper extends Handler {
     }
 
     /**@description Bunldes 地址 */
-    private readonly bundlesUrl = "https://gitee.com/top-discover/QuickFrameworkBundles.git";
+    private readonly bundlesUrl = Environment.publicBundlesUrl;
+
+    /**@description 私有 Bunldes 地址 */
+    private readonly privateBundlesUrl = Environment.privateBundlesUrl;
 
     /**@description 引擎修正 */
     private _fixEngine = new FixEngine.default;
@@ -61,47 +64,85 @@ export class Helper extends Handler {
         return null;
     }
 
-    /**@description 摘取远程bundles */
-    async gitBundles() {
-        this.log("摘取远程bundles", false);
+    /**
+     * @description 拉取Bundles代码
+     * @param savePath 保存目录名
+     * @param url 项目地址
+     * @returns 
+     */
+    private async _gitBundles(savePath : string , url : string) {
+        let name = parse(savePath).name;
+        this.log(`拉取远程${name}`, false);
         let branch = await this.gitCurBranch();
-
-        if (existsSync(this.bundlesPath)) {
-            this.logger.log(`已经存在 : ${this.bundlesPath}`);
-            this.chdir(this.bundlesPath);
+        
+        if (existsSync(savePath)) {
+            this.logger.log(`已经存在 : ${savePath}`);
+            this.chdir(savePath);
             let result = await this.exec("git pull");
-            this.logger.log(`正在更新 : ${this.bundleName}`)
+            this.logger.log(`正在更新 : ${name}`)
             if (!result.isSuccess) {
                 return;
             }
             result = await this.exec(`git checkout ${branch}`);
             if (result.isSuccess) {
-                this.logger.log(`切换分支${branch}成功 : ${this.bundleName}`)
+                this.logger.log(`切换分支${branch}成功 : ${name}`)
             }
         } else {
-            this.logger.log(`不存在 : ${this.bundlesPath}`);
+            this.logger.log(`不存在 : ${savePath}`);
             this.chdir(this.projPath);
-            this.logger.log(`拉取远程 : ${this.bundleName}`)
-            let result = await this.exec(`git clone ${this.bundlesUrl} ${this.bundleName}`);
+            this.logger.log(`拉取远程 : ${name}`)
+            let result = await this.exec(`git clone ${url} ${name}`);
             if (!result.isSuccess) {
                 return;
             }
-            this.logger.log(`摘取成功 : ${this.bundleName}`);
-            this.chdir(this.bundlesPath);
+            this.logger.log(`拉取成功 : ${name}`);
+            this.chdir(savePath);
             result = await this.exec(`git checkout ${branch}`);
             if (result.isSuccess) {
-                this.logger.log(`切换分支${branch}成功 : ${this.bundleName}`)
+                this.logger.log(`切换分支${branch}成功 : ${name}`)
             }
         }
-        this.log("摘取远程bundles", true);
+        this.log(`拉取远程${name}`, true);
+    }
+
+    /**@description 摘取远程bundles */
+    async gitBundles() {
+        await this._gitBundles(this.bundlesPath,this.bundlesUrl)
+        if ( Environment.isPrivate ) {
+            await this._gitBundles(this.privateBundlesPath,this.privateBundlesUrl);
+        }
     }
 
     /**@description 链接代码 */
     symlinkSyncCode() {
-        this.log("链接代码", false);
+        //链接公用bundles代码
+        let name = parse(this.bundlesPath).name;
+        this.log(`链接${name}目录`, false);
         let fromPath = join(this.bundlesPath, this.bundleName);
         FileUtils.instance.symlinkSync(fromPath, this.assetsBundlesPath)
-        this.log("链接代码", true);
+        this.log(`链接${name}目录`, true);
+        //链接私有bundles代码
+        if ( Environment.isPrivate ){
+            name = parse(this.privateBundlesPath).name;
+            this.log(`链接${name}目录`,false);
+            fromPath = join(this.privateBundlesPath,this.bundleName);
+            //链接bundle目录
+            let result = FileUtils.instance.getDirs(fromPath);
+            result.forEach(v=>{
+                fromPath = v.path;
+                FileUtils.instance.symlinkSync(fromPath,join(this.assetsBundlesPath,v.name));
+            })
+            this.log(`链接${name}目录`,true);
+            this.log(`链接${name}.meta文件`,false);
+            //链接bundle.meta文件
+            fromPath = join(this.privateBundlesPath,this.bundleName);
+            let files = FileUtils.instance.getCurFiles(fromPath)
+            files.forEach(v=>{
+                fromPath = v.path;
+                FileUtils.instance.symlinkSync(fromPath,join(this.assetsBundlesPath,v.name));
+            })
+            this.log(`链接${name}.meta文件`,true);
+        }
     }
 
     /**

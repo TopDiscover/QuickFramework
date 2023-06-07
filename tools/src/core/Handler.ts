@@ -24,6 +24,9 @@ export class Handler {
     /**@description 保存bundles的名称 */
     readonly bundleName = "bundles";
 
+    /**@description 私有bundles的名称 */
+    readonly privateBundleName = "privateBundles";
+
     /**@description 当前项目路径 */
     get projPath() {
         if (Environment.isCommand) {
@@ -35,6 +38,9 @@ export class Handler {
 
     /**@description bundles保存路径 */
     readonly bundlesPath = join(this.projPath, this.bundleName);
+
+    /**@description 私有bundles保存路径 */
+    readonly privateBundlesPath = join(this.projPath, this.privateBundleName);
 
     /**@description 项目 assets 目录 */
     readonly assetsDBPath = join(this.projPath,"proj/assets");
