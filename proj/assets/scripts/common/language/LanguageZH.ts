@@ -32,53 +32,7 @@ export let LanguageZH = {
     downloadFailed: "下载文件失败，请重试!!!",
     loadFailed: "{0}加载失败!!",
     loadingProgress: "加载资源中({0}%)...",
-    bundles: {
-      aimLine: {
-        name: "瞄准线",
-        sort: 4,
-      },
-      eliminate: {
-        name: "爱消除",
-        sort: 3
-      },
-      loadTest: {
-        name: "加载示例",
-        sort: 5
-      },
-      netTest: {
-        name: "网络示例",
-        sort: 6
-      },
-      nodePoolTest: {
-        name: "对象池示例",
-        sort: 7
-      },
-      tankBattle: {
-        name: "坦克大战",
-        sort: 2
-      },
-      taxi: {
-        name: "快上车",
-        sort: 1
-      },
-      snapshot: {
-        name: "截图",
-        sort: 8
-      },
-      chat: {
-        name: "聊天室",
-        sort: 9
-      },
-      resources: {
-        name: "主包",
-        sort: 0
-      },
-      hall: {
-        name: "游戏大厅",
-        sort: 0
-      },
-    },
-
+    bundles: {},//程序写入
     capture_save_success: "保存图片成功",
     capture_save_failed: "保存图片失败",
     capture_success: "截图成功",

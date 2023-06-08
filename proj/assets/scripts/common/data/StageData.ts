@@ -1,19 +1,7 @@
 import { Update } from "../../framework/core/update/Update";
 import { GameData } from "../../framework/data/GameData"
 import { Macro } from "../../framework/defines/Macros"
-
-interface BundleData {
-    /**@description 名称 */
-    name: string;
-    /**@description 排序 */
-    sort: number;
-    /**@description 语言包路径 */
-    language: string;
-    /**@description Bundle名 */
-    bundle: string;
-}
-
-type TYPEBUNDLE = { [key: string]: BundleData };
+import { Bundles } from "./Bundles";
 
 /**
  * @description Stage数据
@@ -40,26 +28,15 @@ export class StageData extends GameData {
     }
     /**@description 所有入口配置信息 */
     private _entrys: Map<string, Update.Config> = new Map();
-    /**@description 所有子游戏配置 */
-    private _games: BundleData[] = [];
 
     init() {
         super.init();
+        Bundles.init();
         //初始化游戏入口配置
-        let games = App.getLanguage("bundles") as any as TYPEBUNDLE;
-        let keys = Object.keys(games);
         this._entrys.clear();
-        keys.forEach(v => {
-            let data = games[v];
-            let entry = new Update.Config(`bundles.${v}.name`, v);
-            this._entrys.set(v, entry);
-            if (!(v == Macro.BUNDLE_HALL || v == Macro.BUNDLE_RESOURCES)) {
-                this._games.push({ name: data.name, sort: data.sort, language: `bundles.${v}.name`, bundle: v });
-            }
-        })
-
-        this._games.sort((a, b) => {
-            return a.sort - b.sort;
+        Bundles.datas.forEach(v=>{
+            let data = new Update.Config(Bundles.getLanguage(v.bundle),v.bundle);
+            this._entrys.set(v.bundle,data);
         })
     }
 
@@ -96,7 +73,7 @@ export class StageData extends GameData {
 
     /**@description 获取当前所有游戏 */
     get games() {
-        return this._games;
+        return Bundles.games;
     }
 
     /**
