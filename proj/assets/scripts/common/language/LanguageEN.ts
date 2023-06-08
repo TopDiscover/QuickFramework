@@ -31,53 +31,7 @@ export let LanguageEN = {
         downloadFailed: "下载文件失败，请重试!!!",
         loadFailed: "{0}加载失败!!",
         loadingProgress: "加载资源中({0}%)...",
-        bundles: {
-            aimLine: {
-                name: "Aim Line",
-                sort: 4,
-            },
-            eliminate: {
-                name: "爱消除",
-                sort: 2
-            },
-            loadTest: {
-                name: "Load Test",
-                sort: 5
-            },
-            netTest: {
-                name: "Net Test",
-                sort: 6
-            },
-            nodePoolTest: {
-                name: "Node Pool",
-                sort: 7
-            },
-            tankBattle: {
-                name: "BATTLE\nCITY",
-                sort: 1
-            },
-            shaders: {
-                name: "shaders",
-                sort: 3
-            },
-            snapshot: {
-                name: "Snapshot",
-                sort: 8
-            },
-            scratchTicket: {
-                name: "Scratch Ticket",
-                sort: 9,
-            },
-            resources: {
-                name: "主包",
-                sort: 0
-            },
-            hall: {
-                name: "游戏大厅",
-                sort: 0
-            },
-        },
-
+        bundles: {},//程序写入
         capture_save_success: "保存图片成功",
         capture_save_failed: "保存图片失败",
         capture_success: "截图成功",

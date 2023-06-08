@@ -26,7 +26,7 @@ export class Application extends Framewok implements GameEventInterface {
     }
 
     get Bundles(){
-        return Bundles;
+        return Bundles.bundles;
     }
 
     /**@description 是否开启自动释放长时间未使用资源 */

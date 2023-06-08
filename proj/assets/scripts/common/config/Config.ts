@@ -1,7 +1,5 @@
 /**@description 全局配置 */
 
-import { Update } from "../../framework/core/update/Update";
-
 export namespace Config {
     /**@description 是否显示调试按钮 */
     export const isShowDebugButton = true;
