@@ -43,6 +43,8 @@ export enum CmdType {
     Pngquant = "-pngquant",
     /**@description 热更新 */
     Hotupdate = "-hotupdate",
+    /**@description 上帝模式，功能全开 */
+    God = "-god",
 }
 
 /**@description 命令行执行结果 */

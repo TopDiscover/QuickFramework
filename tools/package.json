@@ -7,6 +7,7 @@
     "sync": "node -r ts-node/register src/Index.ts -sync",
     "extensions": "node -r ts-node/register src/Index.ts -extensions",
     "main": "node -r ts-node/register src/Index.ts",
+    "god": "node -r ts-node/register src/Index.ts -god",
     "fixEngine": "node -r ts-node/register src/Index.ts -fixEngine",
     "gulp": "node dist/Index.js -gulp",
     "linkGulp": "node -r ts-node/register src/Index.ts -linkGulp",

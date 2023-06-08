@@ -20,11 +20,15 @@ async function main() {
     // argv.push(CmdType.FixEngine);
     // argv.push(CmdType.Hotupdate);
 
-    console.log(`输入参数为 : `,argv);
-    if (argv.length <= 0) {
+    let doProcess = async ()=>{
         await Helper.instance.gitBundles();
         await Helper.instance.symlinkSyncCode();
         await Helper.instance.symlinkSyncExtensions();
+    }
+
+    console.log(`输入参数为 : `,argv);
+    if (argv.length <= 0) {
+        await doProcess();
     }
     else{
 
@@ -48,6 +52,9 @@ async function main() {
                 await Helper.instance.pngCompress();
             }else if( type == CmdType.Hotupdate){
                 await Helper.instance.hotupdate();
+            }else if( type == CmdType.God){
+                Environment.isPrivate = true;
+                await doProcess();
             }
             type = argv.shift();
         }
