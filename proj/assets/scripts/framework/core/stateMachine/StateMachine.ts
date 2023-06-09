@@ -25,7 +25,7 @@ interface STOptions<T, State> {
 }
 
 export function BuildTransition<State>(from: State | State[] | '*', to: EToState<State>, onTransition?: (from: State, to: State) => boolean): ITransitionDir<State> {
-    return {from, to, onTransition};
+    return { from, to, onTransition };
 }
 
 enum Code {
@@ -35,9 +35,9 @@ enum Code {
 }
 
 const reason = {
-    [Code.NoFoundTransition] : `You can not {0} now. Current state is {1}`,
-    [Code.Transiting] : `This is transiting now. You cannot transition more times at one time.`,
-    [Code.ChangeStateFailure] : `From {0} to {1} state failure`,
+    [Code.NoFoundTransition]: `You can not {0} now. Current state is {1}`,
+    [Code.Transiting]: `This is transiting now. You cannot transition more times at one time.`,
+    [Code.ChangeStateFailure]: `From {0} to {1} state failure`,
 }
 
 /**
@@ -56,13 +56,13 @@ export default class StateMachine<T, State> {
     onError?: (code: number, reason: string) => void;
 
     constructor(option: STOptions<T, State>) {
-        const {init, transitions} = option;
+        const { init, transitions } = option;
 
         this._curState = init;
-        
+
         this.setupTransitions(transitions);
     }
-    
+
     protected setupTransitions(transitions: ITransitions<T, State>) {
         this._originTransitions = transitions;
         this._transitions = {} as any;
@@ -73,14 +73,14 @@ export default class StateMachine<T, State> {
             const value: ITransitionDir<State> | ITransitionDir<State>[] = transitions[key];
 
             let self = this;
-            this._transitions[key] = function(){
+            this._transitions[key] = function () {
                 if (!self.exist(key)) {
-                    self.postError(Code.NoFoundTransition, String.format(reason[Code.NoFoundTransition],key,self._curState));
+                    self.postError(Code.NoFoundTransition, String.format(reason[Code.NoFoundTransition], key, self._curState));
                     return;
                 }
 
                 if (self._isTransiting) {
-                    self.postError(Code.Transiting,reason[Code.Transiting])
+                    self.postError(Code.Transiting, reason[Code.Transiting])
                     return;
                 }
 
@@ -88,25 +88,25 @@ export default class StateMachine<T, State> {
                 const dir = self._findDir(curState, value);
 
                 if (dir == null) {
-                    self.postError(Code.NoFoundTransition, String.format(reason[Code.NoFoundTransition],key,self._curState));
+                    self.postError(Code.NoFoundTransition, String.format(reason[Code.NoFoundTransition], key, self._curState));
                     return;
                 }
-                const {to, onTransition} = dir;
-                const toState = ((typeof to === 'function') ? ( Reflect.apply(to,this,arguments) /*(to as EGoToStateFunc<State>)(...arguments)*/) : to);
+                const { to, onTransition } = dir;
+                const toState = ((typeof to === 'function') ? (Reflect.apply(to, this, arguments)) : to);
 
                 self._isTransiting = true;
                 self.onBefore && self.onBefore(curState, toState);
                 let result = true;
-                if ( onTransition ){
+                if (onTransition) {
                     result = onTransition(curState, toState);
                 }
-                if ( result ){
+                if (result) {
                     self._curState = toState;
-                }else{
-                    self.postError(Code.ChangeStateFailure,String.format(reason[Code.ChangeStateFailure],curState,toState));
+                } else {
+                    self.postError(Code.ChangeStateFailure, String.format(reason[Code.ChangeStateFailure], curState, toState));
                     self.onAfter && self.onAfter(curState, toState);
                     self._isTransiting = false;
-                    return ;
+                    return;
                 }
                 self.onAfter && self.onAfter(curState, toState);
                 self._isTransiting = false;
