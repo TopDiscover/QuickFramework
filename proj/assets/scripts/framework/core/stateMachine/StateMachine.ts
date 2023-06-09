@@ -4,7 +4,11 @@ type EToState<State> = State | EGoToStateFunc<State>;
 export interface ITransitionDir<State> {
     from: State | State[] | '*';
     to: EToState<State>;
-    onTransition?: (from: State, to: State) => void;
+    /**
+     * @description 过渡回调
+     * @returns true 成功过度 false 失败，则不会对状态进行变更
+     * */
+    onTransition?: (from: State, to: State) => boolean;
 }
 
 type ITransitions<T, State> = {
@@ -20,18 +24,20 @@ interface STOptions<T, State> {
     transitions: ITransitions<T, State>;
 }
 
-export function BuildTransition<State>(from: State | State[] | '*', to: EToState<State>, onTransition?: (from: State, to: State) => void): ITransitionDir<State> {
+export function BuildTransition<State>(from: State | State[] | '*', to: EToState<State>, onTransition?: (from: State, to: State) => boolean): ITransitionDir<State> {
     return {from, to, onTransition};
 }
 
 enum Code {
     NoFoundTransition,//找不到对应Transition
     Transiting,//正在执行
+    ChangeStateFailure,//转换状态失败
 }
 
 const reason = {
     [Code.NoFoundTransition] : `You can not {0} now. Current state is {1}`,
     [Code.Transiting] : `This is transiting now. You cannot transition more times at one time.`,
+    [Code.ChangeStateFailure] : `From {0} to {1} state failure`,
 }
 
 /**
@@ -90,11 +96,19 @@ export default class StateMachine<T, State> {
 
                 self._isTransiting = true;
                 self.onBefore && self.onBefore(curState, toState);
-                onTransition && onTransition(curState, toState);
-                self._curState = toState;
+                let result = true;
+                if ( onTransition ){
+                    result = onTransition(curState, toState);
+                }
+                if ( result ){
+                    self._curState = toState;
+                }else{
+                    self.postError(Code.ChangeStateFailure,String.format(reason[Code.ChangeStateFailure],curState,toState));
+                    self.onAfter && self.onAfter(curState, toState);
+                    self._isTransiting = false;
+                    return ;
+                }
                 self.onAfter && self.onAfter(curState, toState);
-
-
                 self._isTransiting = false;
             };
         });
