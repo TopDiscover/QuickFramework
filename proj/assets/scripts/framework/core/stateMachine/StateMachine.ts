@@ -1,7 +1,7 @@
 type EGoToStateFunc<State> = (from: State) => State;
 type EToState<State> = State | EGoToStateFunc<State>;
 
-interface ITransitionDir<State> {
+export interface ITransitionDir<State> {
     from: State | State[] | '*';
     to: EToState<State>;
     onTransition?: (from: State, to: State) => void;
@@ -20,7 +20,7 @@ interface STOptions<T, State> {
     transitions: ITransitions<T, State>;
 }
 
-function BuildTransition<State>(from: State | State[] | '*', to: EToState<State>, onTransition?: (from: State, to: State) => void): ITransitionDir<State> {
+export function BuildTransition<State>(from: State | State[] | '*', to: EToState<State>, onTransition?: (from: State, to: State) => void): ITransitionDir<State> {
     return {from, to, onTransition};
 }
 
@@ -38,7 +38,6 @@ const reason = {
  * @description 状态机
  */
 export default class StateMachine<T, State> {
-    static Bind = BuildTransition;
     static Code = Code;
     private _transitions: TransitionCall<T, State> = null!;
     private _curState: State;
