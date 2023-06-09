@@ -16,6 +16,7 @@ enum Types {
     scratchTicket,
     slot,
     snapshot,
+    stateMachine,
 }
 
 const eTypes = cc.Enum(Types)
@@ -48,6 +49,7 @@ enum Sort {
     nodePoolTest,
     scratchTicket,
     snapshot,
+    stateMachine,
     //私有项目
     private,
     slot,
@@ -66,6 +68,7 @@ const _datas: DataT[] = [
     { sort: Sort.scratchTicket, name: { CN: "刮奖", EN: "Scratch\nTicket" }, bundle: eTypes[Types.scratchTicket] },
     { sort: Sort.snapshot, name: { CN: "截图", EN: "Snapshot" }, bundle: eTypes[Types.snapshot] },
     { sort: Sort.slot, name: { CN: "水果机", EN: "Slot" }, bundle: eTypes[Types.slot] },
+    { sort: Sort.stateMachine, name: { CN: "状态机", EN: "State\nMachine" }, bundle: eTypes[Types.stateMachine] },
 ];
 
 // console.log(_datas);
