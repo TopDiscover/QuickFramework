@@ -15,6 +15,7 @@ enum Types {
     tankBattle,
     taxi,
     slot,
+    stateMachine,
 }
 
 const eTypes = Enum(Types)
@@ -45,6 +46,7 @@ enum Sort {
     netTest,
     nodePoolTest,
     tankBattle,
+    stateMachine,
     //私有项目
     private,
     slot,
@@ -61,6 +63,7 @@ const _datas: DataT[] = [
     { sort: Sort.resources, name: { CN: "主包", EN: "Main" }, bundle: eTypes[Types.resources] },
     { sort: Sort.hall, name: { CN: "大厅", EN: "Hall" }, bundle: eTypes[Types.hall] },
     { sort: Sort.slot, name: { CN: "水果机", EN: "Slot" }, bundle: eTypes[Types.slot] },
+    { sort: Sort.stateMachine, name: { CN: "状态机", EN: "State\nMachine" }, bundle: eTypes[Types.stateMachine] },
 ];
 
 // console.log(_datas);
