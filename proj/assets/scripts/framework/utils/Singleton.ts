@@ -12,8 +12,8 @@ export class Singleton extends SingletonT<ISingleton> implements ISingleton {
      * @param typeOrkey 具体数据的实现类型或key
      * @param isCreate 
      */
-    public static get<T extends ISingleton>(typeOrkey: SingletonClass<T> | string, isCreate: boolean = true): T | null {
-        return this.instance.get(typeOrkey, isCreate);
+    public static get<T extends ISingleton>(typeOrkey: SingletonClass<T> | string, isCreate: boolean = true,...args:any[]): T | null {
+        return this.instance.get(typeOrkey, isCreate,...args);
     }
     /**
     * @description 销毁

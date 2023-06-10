@@ -11,7 +11,7 @@ export class SingletonT<TYPE extends ISingleton> {
      * @param typeOrkey 具体数据的实现类型或key
      * @param isCreate 
      */
-    get<T extends TYPE>(typeOrkey: SingletonClass<T> | string, isCreate: boolean = true): T | null {
+    get<T extends TYPE>(typeOrkey: SingletonClass<T> | string, isCreate: boolean = true,...args:any[]): T | null {
         let key = this.getKey(typeOrkey)
         if (key == Macro.UNKNOWN) {
             return null;
@@ -28,7 +28,7 @@ export class SingletonT<TYPE extends ISingleton> {
             }
             data.module = typeOrkey.module;
             Log.d(`${data.module}初始化`);
-            data.init && data.init();
+            data.init && data.init(...args);
             this._datas.set(typeOrkey.module, data);
             return data;
         }

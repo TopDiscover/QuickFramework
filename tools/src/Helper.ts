@@ -142,6 +142,17 @@ export class Helper extends Handler {
                 FileUtils.instance.symlinkSync(fromPath,join(this.assetsBundlesPath,v.name));
             })
             this.log(`链接${name}.meta文件`,true);
+
+            //链接声明文件
+            let types = "@types";
+            fromPath = join(this.privateBundlesPath,types);
+            const toRootPath = join(this.projPath,`proj/${types}`);
+            files = FileUtils.instance.getCurFiles(fromPath);
+            files.forEach(v=>{
+                fromPath = v.path;
+                FileUtils.instance.symlinkSync(fromPath,join(toRootPath,v.name))
+            })
+            
         }
     }
 

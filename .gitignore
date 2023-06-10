@@ -19,3 +19,5 @@ proj/packages/png-compress/src/impl
 proj/packages/test-server/@types
 proj/packages/test-server/src/core
 proj/packages/test-server/src/impl
+proj/@types/EscapeStation.d.ts
+proj/@types/slot.d.ts

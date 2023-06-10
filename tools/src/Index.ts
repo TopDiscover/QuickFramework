@@ -21,9 +21,9 @@ async function main() {
     // argv.push(CmdType.Hotupdate);
 
     let doProcess = async ()=>{
-        await Helper.instance.gitBundles();
+        // await Helper.instance.gitBundles();
         await Helper.instance.symlinkSyncCode();
-        await Helper.instance.symlinkSyncExtensions();
+        // await Helper.instance.symlinkSyncExtensions();
     }
 
     console.log(`输入参数为 : `,argv);
