@@ -14,7 +14,7 @@ enum Types {
     resources,
     hall,
     scratchTicket,
-    slot,
+    escapeStation,
     snapshot,
     stateMachine,
 }
@@ -52,7 +52,7 @@ enum Sort {
     stateMachine,
     //私有项目
     private,
-    slot,
+    escapeStation,
 }
 
 const _datas: DataT[] = [
@@ -67,7 +67,7 @@ const _datas: DataT[] = [
     { sort: Sort.hall, name: { CN: "大厅", EN: "Hall" }, bundle: eTypes[Types.hall] },
     { sort: Sort.scratchTicket, name: { CN: "刮奖", EN: "Scratch\nTicket" }, bundle: eTypes[Types.scratchTicket] },
     { sort: Sort.snapshot, name: { CN: "截图", EN: "Snapshot" }, bundle: eTypes[Types.snapshot] },
-    { sort: Sort.slot, name: { CN: "水果机", EN: "Slot" }, bundle: eTypes[Types.slot] },
+    { sort: Sort.escapeStation, name: { CN: "逃离车站", EN: "Escape\nStation" }, bundle: eTypes[Types.escapeStation] },
     { sort: Sort.stateMachine, name: { CN: "状态机", EN: "State\nMachine" }, bundle: eTypes[Types.stateMachine] },
 ];
 
