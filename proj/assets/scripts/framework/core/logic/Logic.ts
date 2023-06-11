@@ -13,6 +13,10 @@ export class Logic extends EventProcessor {
 
     protected gameView: GameView = null!;
 
+    get view(){
+        return this.gameView;
+    }
+
     /**@description 重置游戏逻辑 */
     reset(gameView: GameView) {
 

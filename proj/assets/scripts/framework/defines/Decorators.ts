@@ -3,6 +3,8 @@
  */
 
 import GameView from "../core/ui/GameView";
+import { GameData } from "../data/GameData";
+import { Singleton } from "../utils/Singleton";
 const _FIND_OPTIONS_ = "_FIND_OPTIONS_"
 
 interface FIND_TYPE<T> {
@@ -100,4 +102,80 @@ export function inject<T extends cc.Component | cc.Node>(path: string, type: FIN
         let fOption = Reflect.get(target, _FIND_OPTIONS_)
         Reflect.defineProperty(fOption, attribute, { value: option, enumerable: true })
     }
+}
+
+const __MEMBER_INJECT__ = "__MEMBER_INJECT__";
+
+function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | string), tag: "logic" | "data" | "singleton") {
+    return function (target: any, member: string) {
+        let obj: any = target;
+        let __onLoad = obj.onLoad;
+        if (!__onLoad) {
+            Log.e("无法注入")
+            return;
+        }
+        if (!Reflect.has(target, __MEMBER_INJECT__)) {
+            let self = this;
+            obj.onLoad = function () {
+                let self = this;
+                let fOption = Reflect.get(self, __MEMBER_INJECT__);
+                for (let key in fOption) {
+                    const ele = Reflect.get(fOption, key)
+                    if (!Reflect.get(self, ele.member)) {
+                        Reflect.defineProperty(self, ele.member, {
+                            enumerable: true,
+                            configurable: true,
+                            get() {
+                                if (ele.tag == "logic") {
+                                    return App.logicManager.get(ele.type,false);
+                                } else if (ele.tag == "singleton") {
+                                    return Singleton.get(ele.type,false);
+                                } else if (ele.tag == "data") {
+                                    return App.dataCenter.get(ele.type,false);
+                                }
+                            },
+                        })
+                    }
+                }
+                __onLoad && Reflect.apply(__onLoad, this, arguments);
+            };
+
+            Reflect.defineProperty(target, __MEMBER_INJECT__, { value: {} });
+        }
+
+        let option = { type, member, tag };
+        let attribute = `__member_inject_${member}`;
+        let fOption = Reflect.get(target, __MEMBER_INJECT__)
+        Reflect.defineProperty(fOption, attribute, {
+            value: option,
+            enumerable: true,
+        });
+    }
+}
+
+/**
+ * @description 注入Logic,要先创建了，才能注入
+ * @param type 
+ * @returns 
+ */
+export function injectLogic<T extends Logic>(type: ({ new(): T } | string) ) {
+    return _inject(type,"logic");
+}
+
+/**
+ * @description 注入Data,要先创建了，才能注入
+ * @param type 
+ * @returns 
+ */
+export function injectData<T extends GameData>(type: ({ new(): T } | string) ) {
+   return _inject(type,"data");
+}
+
+/**
+ * @description 单列注入，需要先创建，才能注入
+ * @param type 
+ * @returns 
+ */
+export function injectSingleton<T extends ISingleton>(type: ({ new(): T } | string)) {
+    return _inject(type,"singleton")
 }
