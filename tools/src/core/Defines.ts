@@ -211,3 +211,12 @@ export type VersionJson = {[key: string]: { md5: string, version: string }};
 export type ApkJson = { version: string };
 
 export type CopyData = { from : string , to : string}[];
+
+export enum SyncType{
+    /**@description 当前目录及.meta文件 */
+    CUR_DIR_AND_META,
+    /**@description 当前目录下所有文件 */
+    CUR_ALL_FILES,
+    /**@description bundles目录 */
+    Bunldes,
+}

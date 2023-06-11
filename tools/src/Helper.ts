@@ -8,6 +8,7 @@ import * as Assets from "./core/AssetsHelper";
 import * as PngCompress from "./png-compress/Helper";
 import * as Hotupdate from "./hotupdate/Helper";
 import { Environment } from "./core/Environment";
+import { SyncType } from "./core/Defines";
 
 /**
  * @description 辅助类
@@ -109,7 +110,7 @@ export class Helper extends Handler {
     async gitBundles() {
         await this._gitBundles(this.bundlesPath,this.bundlesUrl)
         if ( Environment.isPrivate ) {
-            await this._gitBundles(this.privateBundlesPath,this.privateBundlesUrl);
+            await this._gitBundles(this.privateProjPath,this.privateBundlesUrl);
         }
     }
 
@@ -123,25 +124,45 @@ export class Helper extends Handler {
         this.log(`链接${name}目录`, true);
         //链接私有bundles代码
         if ( Environment.isPrivate ){
-            name = parse(this.privateBundlesPath).name;
-            this.log(`链接${name}目录`,false);
-            fromPath = join(this.privateBundlesPath,this.bundleName);
-            //链接bundle目录
-            let result = FileUtils.instance.getDirs(fromPath);
-            result.forEach(v=>{
-                fromPath = v.path;
-                FileUtils.instance.symlinkSync(fromPath,join(this.assetsBundlesPath,v.name));
+            Environment.privateCode.forEach(v=>{
+                if ( v.type == SyncType.Bunldes ){
+                    fromPath = join(this.privateProjPath,v.from);
+                    //目录
+                    let result = FileUtils.instance.getDirs(fromPath);
+                    result.forEach(info=>{
+                        fromPath = info.path;
+                        FileUtils.instance.symlinkSync(fromPath,join(this.projPath,`${v.to}/${info.name}`));
+                    })
+                    //.meta文件
+                    fromPath = join(this.privateProjPath,v.from);
+                    let files = FileUtils.instance.getCurFiles(fromPath);
+                    files.forEach(info=>{
+                        fromPath = info.path;
+                        FileUtils.instance.symlinkSync(fromPath,join(this.projPath,`${v.to}/${info.name}`))
+                    })
+                }else if( v.type == SyncType.CUR_ALL_FILES ){
+                    fromPath = join(this.privateProjPath,v.from)
+                    let files = FileUtils.instance.getCurFiles(fromPath);
+                    files.forEach(info=>{
+                        fromPath = info.path;
+                        FileUtils.instance.symlinkSync(fromPath,join(this.projPath,`${v.to}/${info.name}`));
+                    })
+                }else if ( v.type == SyncType.CUR_DIR_AND_META ){
+                    fromPath = join(this.privateProjPath,v.from);
+                    let result = FileUtils.instance.getDirs(fromPath);
+                    result.forEach(info=>{
+                        fromPath = info.path;
+                        FileUtils.instance.symlinkSync(fromPath,join(this.projPath,`${v.to}/${info.name}`));
+                    })
+
+                    fromPath = join(this.privateProjPath,v.from);
+                    let files = FileUtils.instance.getCurFiles(fromPath);
+                    files.forEach(info=>{
+                        fromPath = info.path;
+                        FileUtils.instance.symlinkSync(fromPath,join(this.projPath,`${v.to}/${info.name}`));
+                    }) 
+                }
             })
-            this.log(`链接${name}目录`,true);
-            this.log(`链接${name}.meta文件`,false);
-            //链接bundle.meta文件
-            fromPath = join(this.privateBundlesPath,this.bundleName);
-            let files = FileUtils.instance.getCurFiles(fromPath)
-            files.forEach(v=>{
-                fromPath = v.path;
-                FileUtils.instance.symlinkSync(fromPath,join(this.assetsBundlesPath,v.name));
-            })
-            this.log(`链接${name}.meta文件`,true);
         }
     }
 
