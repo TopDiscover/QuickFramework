@@ -92,7 +92,7 @@ class _Environment {
     }
 
     get privateProj(){
-        return "privateBundles";
+        return "privateProj";
     }
 
     get bundleName(){
