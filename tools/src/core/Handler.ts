@@ -22,10 +22,10 @@ export class Handler {
     }
 
     /**@description 保存bundles的名称 */
-    readonly bundleName = "bundles";
+    readonly bundleName = Environment.bundleName;
 
-    /**@description 私有bundles的名称 */
-    readonly privateBundleName = "privateBundles";
+    /**@description 私有项目的名称 */
+    readonly privateProj = Environment.privateProj;
 
     /**@description 当前项目路径 */
     get projPath() {
@@ -39,8 +39,8 @@ export class Handler {
     /**@description bundles保存路径 */
     readonly bundlesPath = join(this.projPath, this.bundleName);
 
-    /**@description 私有bundles保存路径 */
-    readonly privateBundlesPath = join(this.projPath, this.privateBundleName);
+    /**@description 私有项目保存路径 */
+    readonly privateProjPath = join(this.projPath, this.privateProj);
 
     /**@description 项目 assets 目录 */
     readonly assetsDBPath = join(this.projPath,"proj/assets");

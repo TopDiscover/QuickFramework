@@ -21,3 +21,5 @@ proj/packages/test-server/src/core
 proj/packages/test-server/src/impl
 proj/@types/EscapeStation.d.ts
 proj/@types/slot.d.ts
+proj/assets/scripts/framework/slot
+proj/assets/scripts/framework/slot.meta
