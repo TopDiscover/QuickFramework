@@ -18,7 +18,7 @@ export abstract class Handler extends EventProcessor implements ISingleton{
     }
 
     /**@description 绑定Service对象 */
-    protected abstract get service(): any;
+    protected abstract service : any;
 
     /**
      * @description 注册网络事件

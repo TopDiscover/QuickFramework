@@ -11,7 +11,7 @@ export abstract class Sender extends EventProcessor implements ISingleton{
     /**@description 该字段由NetHelper指定 */
     module: string = "";
     /**@description 绑定Service对象 */
-    protected abstract get service(): any;
+    protected abstract service: any;
 
     protected send(msg: Message) {
         if (this.service && this.service.send) {

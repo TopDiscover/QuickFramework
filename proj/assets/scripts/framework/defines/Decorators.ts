@@ -106,7 +106,7 @@ export function inject<T extends cc.Component | cc.Node>(path: string, type: FIN
 
 const __MEMBER_INJECT__ = "__MEMBER_INJECT__";
 
-function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | string), tag: "logic" | "data" | "singleton") {
+function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | string), tag: "logic" | "data" | "singleton" | "service") {
     return function (target: any, member: string) {
         let obj: any = target;
         let __onLoad = obj.onLoad;
@@ -132,6 +132,8 @@ function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | 
                                     return Singleton.get(ele.type,false);
                                 } else if (ele.tag == "data") {
                                     return App.dataCenter.get(ele.type,false);
+                                } else if (ele.tag == "service"){
+                                    return App.serviceManager.get(ele.type,false);
                                 }
                             },
                         })
@@ -178,4 +180,8 @@ export function injectData<T extends GameData>(type: ({ new(): T } | string) ) {
  */
 export function injectSingleton<T extends ISingleton>(type: ({ new(): T } | string)) {
     return _inject(type,"singleton")
+}
+
+export function injectService< T extends Service >( type : ({ new(): T } | string)){
+    return _inject(type,"service")
 }
