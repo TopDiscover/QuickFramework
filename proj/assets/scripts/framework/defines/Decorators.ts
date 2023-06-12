@@ -105,8 +105,14 @@ export function inject<T extends cc.Component | cc.Node>(path: string, type: FIN
 }
 
 const __MEMBER_INJECT__ = "__MEMBER_INJECT__";
+type TAG_TYPE = "logic" | "data" | "singleton" | "service" | "sender" | "handler";
+interface INJECT_OPTION {
+    type: any,
+    member: string,
+    tag: TAG_TYPE,
+}
 
-function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | string), tag: "logic" | "data" | "singleton" | "service") {
+function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | string), tag: TAG_TYPE) {
     return function (target: any, member: string) {
         let obj: any = target;
         let __onLoad = obj.onLoad;
@@ -120,20 +126,24 @@ function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | 
                 let self = this;
                 let fOption = Reflect.get(self, __MEMBER_INJECT__);
                 for (let key in fOption) {
-                    const ele = Reflect.get(fOption, key)
+                    const ele: INJECT_OPTION = Reflect.get(fOption, key)
                     if (!Reflect.get(self, ele.member)) {
                         Reflect.defineProperty(self, ele.member, {
                             enumerable: true,
                             configurable: true,
                             get() {
                                 if (ele.tag == "logic") {
-                                    return App.logicManager.get(ele.type,false);
+                                    return App.logicManager.get(ele.type, false);
                                 } else if (ele.tag == "singleton") {
-                                    return Singleton.get(ele.type,false);
+                                    return Singleton.get(ele.type, false);
                                 } else if (ele.tag == "data") {
-                                    return App.dataCenter.get(ele.type,false);
-                                } else if (ele.tag == "service"){
-                                    return App.serviceManager.get(ele.type,false);
+                                    return App.dataCenter.get(ele.type, false);
+                                } else if (ele.tag == "service") {
+                                    return App.serviceManager.get(ele.type, false);
+                                } else if (ele.tag == "handler") {
+                                    return App.handlerManager.get(ele.type, false);
+                                } else if (ele.tag == "sender") {
+                                    return App.senderManager.get(ele.type, false);
                                 }
                             },
                         })
@@ -145,7 +155,7 @@ function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | 
             Reflect.defineProperty(target, __MEMBER_INJECT__, { value: {} });
         }
 
-        let option = { type, member, tag };
+        let option: INJECT_OPTION = { type, member, tag };
         let attribute = `__member_inject_${member}`;
         let fOption = Reflect.get(target, __MEMBER_INJECT__)
         Reflect.defineProperty(fOption, attribute, {
@@ -160,8 +170,8 @@ function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | 
  * @param type 
  * @returns 
  */
-export function injectLogic<T extends Logic>(type: ({ new(): T } | string) ) {
-    return _inject(type,"logic");
+export function injectLogic<T extends Logic>(type: ({ new(): T } | string)) {
+    return _inject(type, "logic");
 }
 
 /**
@@ -169,8 +179,8 @@ export function injectLogic<T extends Logic>(type: ({ new(): T } | string) ) {
  * @param type 
  * @returns 
  */
-export function injectData<T extends GameData>(type: ({ new(): T } | string) ) {
-   return _inject(type,"data");
+export function injectData<T extends GameData>(type: ({ new(): T } | string)) {
+    return _inject(type, "data");
 }
 
 /**
@@ -179,9 +189,17 @@ export function injectData<T extends GameData>(type: ({ new(): T } | string) ) {
  * @returns 
  */
 export function injectSingleton<T extends ISingleton>(type: ({ new(): T } | string)) {
-    return _inject(type,"singleton")
+    return _inject(type, "singleton")
 }
 
-export function injectService< T extends Service >( type : ({ new(): T } | string)){
-    return _inject(type,"service")
+export function injectService<T extends Service>(type: ({ new(): T } | string)) {
+    return _inject(type, "service")
+}
+
+export function injectSender<T extends Sender>(type: ({ new(): T } | string)) {
+    return _inject(type, "sender")
+}
+
+export function injectHandler<T extends Handler>(type: ({ new(): T } | string)) {
+    return _inject(type, "handler")
 }
