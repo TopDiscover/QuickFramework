@@ -138,6 +138,8 @@ export class Application extends Framewok implements GameEventInterface {
         App.entryManager.onDestroy(node);
         //释放管理器
         App.releaseManger.onDestroy(node);
+        //ui管理器
+        App.uiManager.onDestroy(node);
     }
 
     onEnterBackground(): void {

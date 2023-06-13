@@ -893,8 +893,8 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_string": "测试版本999",
-    "_N$string": "测试版本999",
+    "_string": "测试版本666",
+    "_N$string": "测试版本666",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -1076,8 +1076,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 540,
-      "height": 258
+      "width": 198,
+      "height": 62
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
