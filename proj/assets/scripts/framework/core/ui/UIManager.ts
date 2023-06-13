@@ -518,6 +518,14 @@ export class UIManager implements ISingleton{
         this._canvas = node;
     }
 
+    /**
+     * @description 走到这里面，说明游戏结束，或都重启游戏，直接清空,避免double free
+     * @param node 
+     */
+    onDestroy(node : Node){
+        this._viewDatas.clear();
+    }
+
     get canvas(): Node {
         return this._canvas;
     }
