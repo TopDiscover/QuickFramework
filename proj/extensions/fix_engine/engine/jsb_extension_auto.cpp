@@ -1400,7 +1400,7 @@ static bool js_cc_extension_Manifest_getManifestFileUrl(se::State& s)
     const auto& args = s.args();
     size_t argc = args.size();
     cc::extension::Manifest *arg1 = (cc::extension::Manifest *) NULL ;
-    std::string *result = 0 ;
+    std::string result;
     
     if(argc != 0) {
         SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
@@ -1408,11 +1408,11 @@ static bool js_cc_extension_Manifest_getManifestFileUrl(se::State& s)
     }
     arg1 = SE_THIS_OBJECT<cc::extension::Manifest>(s);
     if (nullptr == arg1) return true;
-    result = (std::string *) &((cc::extension::Manifest const *)arg1)->getManifestFileUrl();
+    result = ((cc::extension::Manifest const *)arg1)->getManifestFileUrl();
     
-    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
     SE_PRECONDITION2(ok, false, "Error processing arguments");
-    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    SE_HOLD_RETURN_VALUE(result, s.thisObject(), s.rval()); 
     
     
     return true;
@@ -1425,7 +1425,7 @@ static bool js_cc_extension_Manifest_getVersionFileUrl(se::State& s)
     const auto& args = s.args();
     size_t argc = args.size();
     cc::extension::Manifest *arg1 = (cc::extension::Manifest *) NULL ;
-    std::string *result = 0 ;
+    std::string result;
     
     if(argc != 0) {
         SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
@@ -1433,11 +1433,11 @@ static bool js_cc_extension_Manifest_getVersionFileUrl(se::State& s)
     }
     arg1 = SE_THIS_OBJECT<cc::extension::Manifest>(s);
     if (nullptr == arg1) return true;
-    result = (std::string *) &((cc::extension::Manifest const *)arg1)->getVersionFileUrl();
+    result = ((cc::extension::Manifest const *)arg1)->getVersionFileUrl();
     
-    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
     SE_PRECONDITION2(ok, false, "Error processing arguments");
-    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    SE_HOLD_RETURN_VALUE(result, s.thisObject(), s.rval()); 
     
     
     return true;
