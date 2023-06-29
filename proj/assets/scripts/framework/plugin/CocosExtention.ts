@@ -291,6 +291,10 @@ if( !cc.randomRange ){
     }
 }
 
+(cc.Tween as any).getfinalAction = function(tween:any){
+    return tween._finalAction;
+}
+
 export function CocosExtentionInit() {
     if (CC_EDITOR) {
         Log.d("Cocos扩展初始化");
