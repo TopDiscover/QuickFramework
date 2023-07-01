@@ -16,6 +16,8 @@ export default class MainController extends EventComponent {
 
     private debugView : cc.Node | null = null!;
 
+    private startPos : cc.Vec3 = null!;
+
     onLoad() {
         super.onLoad();
         App.onLoad(this.node);
@@ -34,12 +36,22 @@ export default class MainController extends EventComponent {
                     view.debug = debug;
                 }
                 this.debugView.active = false;
-                this.onN(debug,cc.Node.EventType.TOUCH_END,()=>{
+                this.onN(debug,cc.Node.EventType.TOUCH_START,(ev : cc.Event.EventTouch)=>{
+                    this.startPos = debug.position;
+                });
+                this.onN(debug,cc.Node.EventType.TOUCH_END,(ev : cc.Event.EventTouch)=>{
+                    if ( cc.Vec3.distance(this.startPos,debug.position) > 5 ){
+                        return;
+                    }
                     if ( debug ) debug.active = false;
                     if ( this.debugView ){
                         this.debugView.active = true;
                     }
                 });
+                this.onN(debug,cc.Node.EventType.TOUCH_MOVE,(ev : cc.Event.EventTouch)=>{
+                    let pos = this.node.convertToNodeSpaceAR(ev.getLocation())
+                    debug.position = cc.v3(pos);
+                })
             }else{
                 debug.destroy();
                 this.debugView.destroy();
