@@ -133,7 +133,6 @@ function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | 
             return;
         }
         if (!Reflect.has(target, __MEMBER_INJECT__)) {
-            let self = this;
             obj.onLoad = function () {
                 let self = this;
                 let fOption = Reflect.get(self, __MEMBER_INJECT__);
@@ -195,18 +194,18 @@ function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | 
  * @param rootPath 相对于this.node 的搜索路径，不传入时，以当的this.node为根节点进行查找
  * @returns 
  */
-export function inject<T extends cc.Component | cc.Node>(path: string, type: FIND_TYPE<T>, rootPath?: string);
+export function inject<T extends cc.Component | cc.Node>(path: string, type: FIND_TYPE<T>, rootPath?: string):Function;
 /**
  * @description 注入
  * @param data 
  */
-export function inject<T extends Logic>(data: InjectParam<T>);
-export function inject<T extends GameData>(data: InjectParam<T>);
-export function inject<T extends ISingleton>(data: InjectParam<T>);
-export function inject<T extends Service>(data: InjectParam<T>);
-export function inject<T extends Sender>(data: InjectParam<T>);
-export function inject<T extends Handler>(data: InjectParam<T>);
-export function inject() {
+export function inject<T extends Logic>(data: InjectParam<T>):Function;
+export function inject<T extends GameData>(data: InjectParam<T>):Function;
+export function inject<T extends ISingleton>(data: InjectParam<T>):Function;
+export function inject<T extends Service>(data: InjectParam<T>):Function;
+export function inject<T extends Sender>(data: InjectParam<T>):Function;
+export function inject<T extends Handler>(data: InjectParam<T>):Function;
+export function inject() : Function{
     if (typeof arguments[0] == "string") {
         let path = arguments[0];
         let type = arguments[1];
