@@ -313,6 +313,13 @@ declare type Bundles = import("../assets/scripts/common/data/Bundles").Bundles;
 
 declare let App: import("../assets/Application").Application;
 
+/**@description 注入类型 */
+type InjectType = "logic" | "data" | "singleton" | "service" | "sender" | "handler";
+interface InjectParam<T> {
+	type: ({ new(): T } | string);
+	name: InjectType;
+}
+
 declare type LanguageZH = typeof import("../assets/scripts/common/language/LanguageZH").LanguageZH;
 declare type LanguageEN = typeof import("../assets/scripts/common/language/LanguageEN").LanguageEN;
 declare type TaxiLan = typeof import("../assets/bundles/taxi/script/data/TaxiLanguage").TaxiLan;
