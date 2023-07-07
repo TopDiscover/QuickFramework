@@ -94,6 +94,19 @@ export function inject<T extends cc.Component | cc.Node>(path: string, type: FIN
                 }
                 __onLoad && Reflect.apply(__onLoad, this, arguments);
             }
+
+            
+            let __onDestroy = obj.onDestroy
+            obj.onDestroy = function () {
+                let self = this;
+                let fOption = Reflect.get(self, _FIND_OPTIONS_)
+                for (let key in fOption) {
+                    let ele: FindOption<T> = Reflect.get(fOption, key)
+                    Reflect.deleteProperty(self,ele.member);
+                }
+                __onDestroy && Reflect.apply(__onDestroy, this, arguments);
+            }
+
             Reflect.defineProperty(target, _FIND_OPTIONS_, { value: {} })
         }
 
