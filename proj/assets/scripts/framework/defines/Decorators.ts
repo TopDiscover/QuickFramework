@@ -50,7 +50,7 @@ function __find<T>(path: string, node: cc.Node, type: FIND_TYPE<T>) {
  * @param rootPath 相对于this.node 的搜索路径，不传入时，以当的this.node为根节点进行查找
  * @returns 
  */
-export function inject<T extends cc.Component | cc.Node>(path: string, type: FIND_TYPE<T>, rootPath?: string) {
+function injectComp<T extends cc.Component | cc.Node>(path: string, type: FIND_TYPE<T>, rootPath?: string) {
     return function (target: any, member: string) {
         if (!(target instanceof cc.Component)) {
             Log.e("无法注入,仅支持 Component 组件")
@@ -95,14 +95,14 @@ export function inject<T extends cc.Component | cc.Node>(path: string, type: FIN
                 __onLoad && Reflect.apply(__onLoad, this, arguments);
             }
 
-            
+
             let __onDestroy = obj.onDestroy
             obj.onDestroy = function () {
                 let self = this;
                 let fOption = Reflect.get(self, _FIND_OPTIONS_)
                 for (let key in fOption) {
                     let ele: FindOption<T> = Reflect.get(fOption, key)
-                    Reflect.deleteProperty(self,ele.member);
+                    Reflect.deleteProperty(self, ele.member);
                 }
                 __onDestroy && Reflect.apply(__onDestroy, this, arguments);
             }
@@ -118,14 +118,13 @@ export function inject<T extends cc.Component | cc.Node>(path: string, type: FIN
 }
 
 const __MEMBER_INJECT__ = "__MEMBER_INJECT__";
-type TAG_TYPE = "logic" | "data" | "singleton" | "service" | "sender" | "handler";
 interface INJECT_OPTION {
     type: any,
     member: string,
-    tag: TAG_TYPE,
+    tag: InjectType,
 }
 
-function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | string), tag: TAG_TYPE) {
+function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | string), tag: InjectType) {
     return function (target: any, member: string) {
         let obj: any = target;
         let __onLoad = obj.onLoad;
@@ -165,6 +164,17 @@ function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | 
                 __onLoad && Reflect.apply(__onLoad, this, arguments);
             };
 
+            let __onDestroy = obj.onDestroy
+            obj.onDestroy = function () {
+                let self = this;
+                let fOption = Reflect.get(self, __MEMBER_INJECT__)
+                for (let key in fOption) {
+                    let ele: FindOption<T> = Reflect.get(fOption, key)
+                    Reflect.deleteProperty(self, ele.member);
+                }
+                __onDestroy && Reflect.apply(__onDestroy, this, arguments);
+            }
+
             Reflect.defineProperty(target, __MEMBER_INJECT__, { value: {} });
         }
 
@@ -179,40 +189,34 @@ function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | 
 }
 
 /**
- * @description 注入Logic,要先创建了，才能注入
- * @param type 
+ * @description 当onLoad时，自动对所有注入的成员变量设置set&get方法,当成员变量首次调用时对成员变量赋值
+ * @param path 相对于当前脚本this.node的搜索路径,当rootPath非空，则以rootPath为根节点查找
+ * @param type 查找组件类型
+ * @param rootPath 相对于this.node 的搜索路径，不传入时，以当的this.node为根节点进行查找
  * @returns 
  */
-export function injectLogic<T extends Logic>(type: ({ new(): T } | string)) {
-    return _inject(type, "logic");
-}
-
+export function inject<T extends cc.Component | cc.Node>(path: string, type: FIND_TYPE<T>, rootPath?: string);
 /**
- * @description 注入Data,要先创建了，才能注入
- * @param type 
- * @returns 
+ * @description 注入
+ * @param data 
  */
-export function injectData<T extends GameData>(type: ({ new(): T } | string)) {
-    return _inject(type, "data");
-}
-
-/**
- * @description 单列注入，需要先创建，才能注入
- * @param type 
- * @returns 
- */
-export function injectSingleton<T extends ISingleton>(type: ({ new(): T } | string)) {
-    return _inject(type, "singleton")
-}
-
-export function injectService<T extends Service>(type: ({ new(): T } | string)) {
-    return _inject(type, "service")
-}
-
-export function injectSender<T extends Sender>(type: ({ new(): T } | string)) {
-    return _inject(type, "sender")
-}
-
-export function injectHandler<T extends Handler>(type: ({ new(): T } | string)) {
-    return _inject(type, "handler")
+export function inject<T extends Logic>(data: InjectParam<T>);
+export function inject<T extends GameData>(data: InjectParam<T>);
+export function inject<T extends ISingleton>(data: InjectParam<T>);
+export function inject<T extends Service>(data: InjectParam<T>);
+export function inject<T extends Sender>(data: InjectParam<T>);
+export function inject<T extends Handler>(data: InjectParam<T>);
+export function inject() {
+    if (typeof arguments[0] == "string") {
+        let path = arguments[0];
+        let type = arguments[1];
+        let root = undefined;
+        if (arguments.length >= 3) {
+            root = arguments[2];
+        }
+        return injectComp(path, type, root);
+    } else {
+        let data: InjectParam<unknown> = arguments[0];
+        return _inject(data.type as any, data.name);
+    }
 }
