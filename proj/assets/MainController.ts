@@ -1,4 +1,4 @@
-import { Asset, find, Game, _decorator , Node, Input, input, profiler } from "cc";
+import { Asset, find, Game, _decorator , Node, Input, input, profiler, Vec3, UITransform, EventTouch, Vec2 } from "cc";
 import { Config } from "./scripts/common/config/Config";
 import { DebugView } from "./scripts/common/debug/DebugView";
 import EventComponent from "./scripts/framework/componects/EventComponent";
@@ -39,12 +39,23 @@ export default class MainController extends EventComponent {
                     view.debug = debug;
                 }
                 this.debugView.active = false;
-                this.onN(debug,Input.EventType.TOUCH_END,()=>{
+                this.onN(debug,Input.EventType.TOUCH_END,(ev:EventTouch)=>{
+                    let start = ev.getUIStartLocation();
+                    let end = ev.getUILocation();
+                    if ( Vec2.distance(start,end) > 5 ){
+                        return;
+                    }
+
                     if ( debug ) debug.active = false;
                     if ( this.debugView ){
                         this.debugView.active = true;
                     }
                 });
+                this.onN(debug,Input.EventType.TOUCH_MOVE,(ev:EventTouch)=>{
+                    let location = ev.getUILocation();
+                    let pos = this.node.getComponent(UITransform)?.convertToNodeSpaceAR( new Vec3( location.x,location.y));
+                    debug?.setPosition(pos!);
+                })
             }else{
                 debug.destroy();
                 this.debugView.destroy();
