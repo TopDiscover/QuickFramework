@@ -102,7 +102,7 @@ export abstract class ServerConnector {
     public set enabled(value: boolean) {
         this._enabled = value;
         if (value == false) {
-            this.close();
+            this.close(true);
         }
     }
 
