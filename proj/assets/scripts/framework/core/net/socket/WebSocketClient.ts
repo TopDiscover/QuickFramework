@@ -250,13 +250,12 @@ export default class WebSocketClinet {
         }
     }
 
-    /**@description 关闭网络 
-     * @param isEnd 只有在程序的关闭销毁时调用，
-     * 在MainController.onDestroy中使用
+    /**
+     * @description 关闭网络
      */
-    public close(isEnd: boolean) {
+    public close() {
         if (this._ws) {
-            this._closeEvent = { type: Macro.ON_CUSTOM_CLOSE, isEnd: isEnd };
+            this._closeEvent = { type: Macro.ON_CUSTOM_CLOSE};
             this._ws.close();
         }
         //清空发送

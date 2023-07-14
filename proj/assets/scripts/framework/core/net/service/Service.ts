@@ -139,12 +139,12 @@ export abstract class Service extends ServerConnector implements IService {
      */
     public reset() { this._Process.reset() }
 
-    public close(isEnd: boolean = false) {
+    public close() {
         //清空消息处理队列
         this._Process.close()
         //不能恢复这个队列，可能在重新连接网络时，如游戏的Logic层暂停掉了处理队列去加载资源，期望加载完成资源后再恢复队列的处理
         //this.resumeMessageQueue();
-        super.close(isEnd);
+        super.close();
     }
 
 
