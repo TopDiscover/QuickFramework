@@ -102,7 +102,7 @@ export abstract class ServerConnector {
     public set enabled(value: boolean) {
         this._enabled = value;
         if (value == false) {
-            this.close(true);
+            this.close();
         }
     }
 
@@ -165,9 +165,9 @@ export abstract class ServerConnector {
         this._wsClient && this._wsClient.send(buffer);
     }
 
-    public close(isEnd: boolean = false) {
+    public close() {
         this.stopSendHartSchedule();
-        this._wsClient && this._wsClient.close(isEnd);
+        this._wsClient && this._wsClient.close();
     }
 
     /**@description 网络是否连接成功 */
