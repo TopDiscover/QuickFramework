@@ -9,7 +9,7 @@ import WebSocketClinet from "./WebSocketClient";
 export abstract class ServerConnector {
 
     /**
-     * @description websocket实例由外部设置方可使用
+     * @description websocket实例
      */
     private _wsClient: WebSocketClinet = null!;
 
