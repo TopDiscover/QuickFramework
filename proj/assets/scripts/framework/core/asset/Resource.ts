@@ -1,4 +1,4 @@
-import { Asset, isValid } from "cc";
+import { Asset, isValid, js } from "cc";
 
 /**@description 资源相关 */
 export namespace Resource {
@@ -36,7 +36,16 @@ export namespace Resource {
         /**@description 默认为本地资源 */
         resourceType: Type = Type.Local;
         /**@description 加入释放资源的時間戳 */
-        stamp : number | null = null;
+        stamp: number | null = null;
+        debug() {
+            if (Array.isArray(this.data)) {
+                this.data.forEach(v => {
+                    Log.d(`url : ${this.url}/${v.name} , refCount : ${v.refCount} `)
+                })
+            } else {
+                Log.d(`url : ${this.url} , refCount : ${this.data.refCount} `)
+            }
+        }
     }
     export class CacheData {
         /**@description 是否已经加载完成 */
@@ -80,6 +89,41 @@ export namespace Resource {
 
         public get isInvalid() {
             return this.isLoaded && this.data && !isValid(this.data);
+        }
+        debug() {
+
+            let info = (data: Asset | Asset[] | null) => {
+                if (!data){
+                    return [];
+                }
+                if (Array.isArray(data)) {
+                    let datas: { url: string, isValid: boolean, refCount: number }[] = [];
+                    data.forEach(v => {
+                        let temp = isValid(v);
+                        datas.push({
+                            url: `${this.info.url}/${temp ? v.name : "unknown"}`,
+                            isValid: temp,
+                            refCount: temp ? v.refCount : -1
+                        })
+                    })
+                    return datas;
+                } else {
+                    let temp = isValid(data);
+                    return [{
+                        url: this.info.url,
+                        isValid: temp,
+                        refCount: temp ? data.refCount : -1
+                    }];
+                }
+            };
+
+            let data = {
+                isLoaded: this.isLoaded,
+                info: info(this.data),
+                type: js.getClassName(this.info.type),
+                status: this.status,
+            }
+            return data;
         }
     }
 
