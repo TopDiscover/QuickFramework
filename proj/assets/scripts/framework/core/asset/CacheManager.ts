@@ -238,12 +238,10 @@ class RemoteCaches {
         let content: any[] = [];
         let invalidContent: any[] = [];
         spCaches.forEach((data, key, source) => {
-            let itemContent = { url: data.info.url, isLoaded: data.isLoaded, isValid: isValid(data.data), assetType: js.getClassName(data.info.type), data: data.data ? js.getClassName(data.data) : null, status: data.status };
-            let item = { url: key, data: itemContent };
             if (data.isLoaded && ((data.data && !isValid(data.data)) || !data.data)) {
-                invalidContent.push(item);
+                invalidContent.push(data.debug());
             } else {
-                content.push(item);
+                content.push(data.debug());
             }
         });
 
@@ -260,12 +258,10 @@ class RemoteCaches {
         content = [];
         invalidContent = [];
         caches.forEach((data, key, source) => {
-            let itemContent = { url: data.info.url, isLoaded: data.isLoaded, isValid: isValid(data.data), assetType: js.getClassName(data.info.type), data: data.data ? js.getClassName(data.data) : null, status: data.status }
-            let item = { url: key, data: itemContent };
             if (data.isLoaded && data.data && !isValid(data.data)) {
-                invalidContent.push(item);
+                invalidContent.push(data.debug());
             } else {
-                content.push(item);
+                content.push(data.debug());
             }
         });
         if (content.length > 0) {
