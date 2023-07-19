@@ -369,14 +369,14 @@ export class ReleaseManager implements ISingleton {
                 data.lazyInfo.forEach((value, key, source) => {
                     Log.d(`--------------${key}待释放资源--------------`);
                     value.assets.forEach((info, key, source) => {
-                        Log.d(`${info.url}`);
+                        info.debug();
                     })
                 });
             }
 
             Log.d(`远程待释放资源`);
             data.remote.assets.forEach((info, key, source) => {
-                Log.d(`${info.url}`);
+                info.debug();
             });
 
         } else {

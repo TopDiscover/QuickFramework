@@ -34,7 +34,16 @@ export namespace Resource {
         /**@description 默认为本地资源 */
         resourceType: Type = Type.Local;
         /**@description 加入释放资源的時間戳 */
-        stamp : number | null = null;
+        stamp: number | null = null;
+        debug() {
+            if (Array.isArray(this.data)) {
+                this.data.forEach(v => {
+                    Log.d(`url : ${this.url}/${v.name} , refCount : ${v.refCount} `)
+                })
+            } else {
+                Log.d(`url : ${this.url} , refCount : ${this.data.refCount} `)
+            }
+        }
     }
     export class CacheData {
         /**@description 是否已经加载完成 */
@@ -62,14 +71,14 @@ export namespace Resource {
         /**@description 完成回调，在资源正在加载过程中，又有其它地方调用加载同一个资源，此时需要等待资源加载完成，统一回调 */
         finishCb: ((data: any) => void)[] = [];
 
-        public doGet(data:any) {
+        public doGet(data: any) {
             for (let i = 0; i < this.getCb.length; i++) {
                 if (this.getCb[i]) this.getCb[i](data);
             }
             this.getCb = [];
         }
 
-        public doFinish(data:any) {
+        public doFinish(data: any) {
             for (let i = 0; i < this.finishCb.length; i++) {
                 if (this.finishCb[i]) this.finishCb[i](data);
             }
@@ -78,6 +87,38 @@ export namespace Resource {
 
         public get isInvalid() {
             return this.isLoaded && this.data && !cc.isValid(this.data);
+        }
+
+        debug() {
+
+            let info = (data: cc.Asset | cc.Asset[]) => {
+                if (Array.isArray(data)) {
+                    let datas: { url: string, isValid: boolean, refCount: number }[] = [];
+                    data.forEach(v => {
+                        let isValid = cc.isValid(v);
+                        datas.push({
+                            url: `${this.info.url}/${isValid ? v.name : "unknown"}`,
+                            isValid: isValid,
+                            refCount: isValid ? v.refCount : -1
+                        })
+                    })
+                } else {
+                    let isValid = cc.isValid(data);
+                    return [{
+                        url: this.info.url,
+                        isValid: isValid,
+                        refCount: isValid ? data.refCount : -1
+                    }];
+                }
+            };
+
+            let data = {
+                isLoaded: this.isLoaded,
+                info: info(this.data),
+                type: cc.js.getClassName(this.info.type),
+                status: this.status,
+            }
+            return data;
         }
     }
 
