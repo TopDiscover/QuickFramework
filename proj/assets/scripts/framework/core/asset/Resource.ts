@@ -91,23 +91,27 @@ export namespace Resource {
 
         debug() {
 
-            let info = (data: cc.Asset | cc.Asset[]) => {
+            let info = (data: cc.Asset | cc.Asset[] | null) => {
+                if (!data){
+                    return [];
+                }
                 if (Array.isArray(data)) {
                     let datas: { url: string, isValid: boolean, refCount: number }[] = [];
                     data.forEach(v => {
-                        let isValid = cc.isValid(v);
+                        let temp = cc.isValid(v);
                         datas.push({
-                            url: `${this.info.url}/${isValid ? v.name : "unknown"}`,
-                            isValid: isValid,
-                            refCount: isValid ? v.refCount : -1
+                            url: `${this.info.url}/${temp ? v.name : "unknown"}`,
+                            isValid: temp,
+                            refCount: temp ? v.refCount : -1
                         })
                     })
+                    return datas;
                 } else {
-                    let isValid = cc.isValid(data);
+                    let temp = cc.isValid(data);
                     return [{
                         url: this.info.url,
-                        isValid: isValid,
-                        refCount: isValid ? data.refCount : -1
+                        isValid: temp,
+                        refCount: temp ? data.refCount : -1
                     }];
                 }
             };
