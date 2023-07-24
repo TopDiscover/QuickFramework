@@ -310,7 +310,7 @@ export class CacheManager implements ISingleton {
         return false;
     }
 
-    public removeWithInfo(info: Resource.Info , bundle : cc.AssetManager.Bundle) {
+    public removeWithInfo(info: Resource.Info, bundle: cc.AssetManager.Bundle) {
         if (info && info.data) {
             if (Array.isArray(info.data)) {
                 for (let i = 0; i < info.data.length; i++) {

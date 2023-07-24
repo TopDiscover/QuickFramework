@@ -92,18 +92,18 @@ export namespace Resource {
         debug() {
 
             let info = (data: cc.Asset | cc.Asset[] | null) => {
-                if (!data){
+                if (!data) {
                     return [];
                 }
                 if (Array.isArray(data)) {
-                    let datas: { url: string, isValid: boolean, refCount: number , type : string }[] = [];
+                    let datas: { url: string, isValid: boolean, refCount: number, type: string }[] = [];
                     data.forEach(v => {
                         let temp = cc.isValid(v);
                         datas.push({
                             url: `${this.info.url}/${temp ? v.name : "unknown"}`,
                             isValid: temp,
                             refCount: temp ? v.refCount : -1,
-                            type : cc.js.getClassName(v),
+                            type: cc.js.getClassName(v),
                         })
                     })
                     return datas;
@@ -113,7 +113,7 @@ export namespace Resource {
                         url: this.info.url,
                         isValid: temp,
                         refCount: temp ? data.refCount : -1,
-                        type : cc.js.getClassName(data),
+                        type: cc.js.getClassName(data),
                     }];
                 }
             };
