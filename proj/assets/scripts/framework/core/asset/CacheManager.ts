@@ -372,6 +372,7 @@ export class CacheManager implements ISingleton{
                 this._removeUnuseCaches();
                 if (data && data.size > 0) {
                     Log.e(`移除bundle ${bundleName} 还有未释放的缓存`);
+                    data.debug();
                 }
             }
             this._bundles.delete(bundleName);

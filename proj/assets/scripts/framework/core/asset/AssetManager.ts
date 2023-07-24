@@ -12,27 +12,27 @@ class RemoteLoader {
                 resolve(null);
                 return;
             }
-            if ( isNeedCache ){
+            if (isNeedCache) {
                 //如果存在缓存 ，直接取出
                 let spCache = App.cache.remoteCaches.getSpriteFrame(url);
                 if (spCache && spCache.data) {
                     if (CC_DEBUG) Log.d(this._logTag, `从缓存精灵帧中获取:${url}`);
                     resolve(<cc.SpriteFrame>(spCache.data));
                     return;
-                }else{
+                } else {
                     //错误处理
                     if (CC_DEBUG) {
-                        if ( spCache ) Log.d(this._logTag,`错误资源，删除缓存信息，重新加载:${url}`);
+                        if (spCache) Log.d(this._logTag, `错误资源，删除缓存信息，重新加载:${url}`);
                     }
                     App.cache.remoteCaches.remove(url);
                 }
-            }else{
+            } else {
                 //不需要缓存，先删除之前的,再重新加载
-                if (CC_DEBUG) Log.d(this._logTag,`不需要缓存信息，删除缓存，重新加载${url}`);
+                if (CC_DEBUG) Log.d(this._logTag, `不需要缓存信息，删除缓存，重新加载${url}`);
                 App.cache.remoteCaches.remove(url);
             }
 
-            me._loadRemoteRes(url,cc.Texture2D , isNeedCache).then((data: any) => {
+            me._loadRemoteRes(url, cc.Texture2D, isNeedCache).then((data: any) => {
                 //改变缓存类型
                 let cache = App.cache.remoteCaches.get(url);
                 if (data && cache) {
@@ -67,7 +67,7 @@ class RemoteLoader {
                         cache.info.url = url;
                         resolve(<sp.SkeletonData>(cache.data));
                         cache.doFinish(cache.data);
-                    }else{
+                    } else {
                         cache = new Resource.CacheData();
                         cache.info.resourceType = Resource.Type.Remote;
                         cache.info.type = sp.SkeletonData;
@@ -84,9 +84,9 @@ class RemoteLoader {
                 }
                 let cache = App.cache.remoteCaches.get(url);
                 if (cache) {
-                    if ( cache.isLoaded ){
+                    if (cache.isLoaded) {
                         resolve(<sp.SkeletonData>(cache.data));
-                    }else{
+                    } else {
                         cache.finishCb.push(resolve);
                     }
                 } else {
@@ -94,12 +94,12 @@ class RemoteLoader {
                     cache.info.resourceType = Resource.Type.Remote;
                     cache.info.type = sp.SkeletonData;
                     cache.info.bundle = Macro.BUNDLE_REMOTE;
-                    App.cache.remoteCaches.set(url,cache);
-                    me._loadRemoteRes(spinePng,cc.Texture2D, isNeedCache).then((texture:cc.Texture2D) => {
+                    App.cache.remoteCaches.set(url, cache);
+                    me._loadRemoteRes(spinePng, cc.Texture2D, isNeedCache).then((texture: cc.Texture2D) => {
                         if (texture) {
-                            me._loadRemoteRes(spineJson,cc.JsonAsset, isNeedCache).then((json:cc.JsonAsset) => {
+                            me._loadRemoteRes(spineJson, cc.JsonAsset, isNeedCache).then((json: cc.JsonAsset) => {
                                 if (json) {
-                                    me._loadRemoteRes(spineAtlas,cc.JsonAsset, isNeedCache).then((atlas:cc.TextAsset) => {
+                                    me._loadRemoteRes(spineAtlas, cc.JsonAsset, isNeedCache).then((atlas: cc.TextAsset) => {
                                         if (atlas) {
                                             //生成SkeletonData数据
                                             let asset = new sp.SkeletonData;
@@ -140,7 +140,7 @@ class RemoteLoader {
         });
     }
 
-    private _loadRemoteRes(url: string,type : typeof cc.Asset ,isNeedCache: boolean) {
+    private _loadRemoteRes(url: string, type: typeof cc.Asset, isNeedCache: boolean) {
         return new Promise<any>((resolve) => {
             let cache = App.cache.remoteCaches.get(url);
             if (cache) {
@@ -168,7 +168,7 @@ class RemoteLoader {
                     resolve(cache.data);
                     return;
                 }
-                cc.assetManager.loadRemote(url,(error,data)=>{
+                cc.assetManager.loadRemote(url, (error, data) => {
                     if (cache) {
                         cache.isLoaded = true;
                         if (data) {
@@ -194,7 +194,7 @@ class RemoteLoader {
     }
 }
 
-export class AssetManager implements ISingleton{
+export class AssetManager implements ISingleton {
     isResident?: boolean = true;
     static module: string = "【AssetManager】";
     module: string = null!;
@@ -358,9 +358,17 @@ export class AssetManager implements ISingleton{
                 return;
             }
             if (onProgress) {
-                _bundle.loadDir(path, type, onProgress, this._onLoadComplete.bind(this, cache, onComplete));
+                if (type) {
+                    _bundle.loadDir(path, type, onProgress, this._onLoadComplete.bind(this, cache, onComplete));
+                } else {
+                    _bundle.loadDir(path, onProgress, this._onLoadComplete.bind(this, cache, onComplete));
+                }
             } else {
-                _bundle.loadDir(path, type, this._onLoadComplete.bind(this, cache, onComplete));
+                if (type) {
+                    _bundle.loadDir(path, type, this._onLoadComplete.bind(this, cache, onComplete));
+                } else {
+                    _bundle.loadDir(path, this._onLoadComplete.bind(this, cache, onComplete));
+                }
             }
         }
     }
@@ -388,7 +396,7 @@ export class AssetManager implements ISingleton{
                     if (CC_DEBUG) {
                         if (Array.isArray(info.data)) {
                             for (let i = 0; i < info.data.length; i++) {
-                                if( info.data[i].refCount > 0 ){
+                                if (info.data[i].refCount > 0) {
                                     Log.w(`资源bundle : ${info.bundle} url : ${info.url}/${info.data[i].name} 被其它界面引用 refCount : ${info.data[i].refCount}`)
                                 }
                             }
@@ -437,7 +445,7 @@ export class AssetManager implements ISingleton{
      * @description 添加常驻资源
      * @param prefab 
      */
-    public addPersistAsset(url: string, data: cc.Asset , bundle : BUNDLE_TYPE ) {
+    public addPersistAsset(url: string, data: cc.Asset, bundle: BUNDLE_TYPE) {
         let info = new Resource.Info;
         info.url = url;
         info.data = data;

@@ -241,6 +241,7 @@ export class ReleaseManager implements ISingleton {
             }
         } else {
             Log.d(`${LOG_TAG}释放Bundle : ${temp?.name}`);
+            temp.releaseAll();
             if (temp) cc.assetManager.removeBundle(temp);
         }
     }
@@ -281,6 +282,7 @@ export class ReleaseManager implements ISingleton {
                     return;
                 }
                 Log.d(`释放无用bundle : ${bundle}`);
+                temp.releaseAll();
                 cc.assetManager.removeBundle(temp);
                 this._bundles.delete(bundle);
             }
@@ -317,6 +319,7 @@ export class ReleaseManager implements ISingleton {
         let temp = cc.assetManager.getBundle(name);
         if (temp) {
             Log.d(`释放无用bundle : ${name}`);
+            temp.releaseAll();
             cc.assetManager.removeBundle(temp);
             this._bundles.delete(name);
         }
