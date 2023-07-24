@@ -390,21 +390,7 @@ export class AssetManager implements ISingleton {
                     return;
                 }
 
-                if (App.cache.removeWithInfo(info)) {
-                    App.releaseManger.release(info);
-                } else {
-                    if (CC_DEBUG) {
-                        if (Array.isArray(info.data)) {
-                            for (let i = 0; i < info.data.length; i++) {
-                                if (info.data[i].refCount > 0) {
-                                    Log.w(`资源bundle : ${info.bundle} url : ${info.url}/${info.data[i].name} 被其它界面引用 refCount : ${info.data[i].refCount}`)
-                                }
-                            }
-                        } else {
-                            Log.w(`资源bundle : ${info.bundle} url : ${info.url} 被其它界面引用 refCount : ${info.data.refCount}`)
-                        }
-                    }
-                }
+                App.releaseManger.release(info);
             } else {
                 cache.status = Resource.CacheStatus.WAITTING_FOR_RELEASE;
                 if (CC_DEBUG) Log.w(`${cache.info.url} 正在加载，等待加载完成后进行释放`);

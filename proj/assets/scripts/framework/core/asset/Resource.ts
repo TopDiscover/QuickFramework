@@ -130,7 +130,7 @@ export namespace Resource {
     export interface Data {
         /**@description resources 目录url 与 type 必须成对出现*/
         url?: string,
-        /**@description 资源类型 与 url 必须成对出现 目前支持预加载的资源有cc.Prefab | cc.SpriteFrame | sp.SkeletonData*/
+        /**@description 资源类型 与 url 必须成对出现*/
         type?: typeof cc.Asset,
         /**
          * @description 预加载界面，不需要对url type赋值 
@@ -140,7 +140,7 @@ export namespace Resource {
          * */
         preloadView?: UIClass<UIView>,
         bundle?: BUNDLE_TYPE,
-        /**@description 如果是加载的目录，请用dir字段 */
+        /**@description 如果是加载的目录，请用dir字段,必须指定类型，否则无法正确的释放资源 */
         dir?: string,
     }
 }
