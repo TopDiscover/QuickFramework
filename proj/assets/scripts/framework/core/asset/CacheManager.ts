@@ -1,6 +1,6 @@
 import UIView from "../ui/UIView";
 import { DEBUG } from "cc/env";
-import { Asset, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D, ImageAsset } from "cc";
+import { Asset, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D, ImageAsset, AssetManager } from "cc";
 import { Resource } from "./Resource";
 import { Macro } from "../../defines/Macros";
 class ResourceCache {
@@ -33,33 +33,11 @@ class ResourceCache {
         return this._caches.delete(path);
     }
 
-    public removeUnuseCaches() {
-        this._caches.forEach((value, key, origin) => {
-            if (Array.isArray(value.data)) {
-                let isAllDelete = true;
-                for( let i = 0 ; i < value.data.length ; i++){
-                    if( value.data[i] && value.data[i].refCount > 0 ){
-                        isAllDelete = false;
-                    }
-                }
-                if (isAllDelete) {
-                    this._caches.delete(key);
-                    if (DEBUG) Log.d(`删除不使用的资源目录 bundle : ${this.name} dir : ${key}`);
-                }
-            }else{
-                if( value.data && value.data.refCount <= 0 ){
-                    this._caches.delete(key);
-                    if (DEBUG) Log.d(`删除不使用的资源 bundle : ${this.name} url : ${key}`);
-                }
-            }
-        });
-    }
-
     public get size() {
         return this._caches.size;
     }
 
-    debug(){
+    debug() {
         let key = this.name;
         let caches = this._caches;
         if (DEBUG) Log.d(`----------------Bundle ${key} 资源缓存信息开始----------------`)
@@ -285,7 +263,7 @@ class RemoteCaches {
     }
 }
 
-export class CacheManager implements ISingleton{
+export class CacheManager implements ISingleton {
     isResident?: boolean = true;
     static module: string = "【缓存管理器】";
     module: string = null!;
@@ -338,58 +316,41 @@ export class CacheManager implements ISingleton{
         return false;
     }
 
-    public removeWithInfo(info: Resource.Info) {
-        if (info) {
-            if (info.data) {
-                if (Array.isArray(info.data)) {
-                    let isAllDelete = true;
-                    for (let i = 0; i < info.data.length; i++) {
-                        info.data[i].decRef(false);
-                        if (info.data[i].refCount != 0) {
-                            isAllDelete = false;
-                        }
-                    }
-                    if (isAllDelete) {
-                        this.remove(info.bundle, info.url);
-                        return true;
-                    }
-                } else {
-                    info.data.decRef(false);
-                    if (info.data.refCount == 0) {
-                        this.remove(info.bundle, info.url);
-                        return true;
+    public removeWithInfo(info: Resource.Info, bundle: AssetManager.Bundle) {
+        if (info && info.data) {
+            if (Array.isArray(info.data)) {
+                for (let i = 0; i < info.data.length; i++) {
+                    const data = info.data[i];
+                    data.decRef(false);
+                    const path = `${info.url}/${info.data[i].name}`;
+                    if (data.refCount <= 0) {
+                        bundle.release(path, info.type);
+                        DEBUG && Log.d(`${this.module} bundle : ${info.bundle} 释放资源成功 : ${path}`);
+                    } else {
+                        DEBUG && Log.w(`${this.module} bundle : ${info.bundle} 释放资源失败 : ${path} , 引用计数 : ${data.refCount}`);
                     }
                 }
+                this.remove(info.bundle, info.url);
+                DEBUG && Log.d(`${this.module} 成功释放资源目录 bundle : ${info.bundle} : ${info.bundle}.${info.url}`);
             } else {
-                Log.e(`info.data is null , bundle : ${info.bundle} url : ${info.url}`);
+                const data = info.data;
+                data.decRef(false);
+                if (data.refCount <= 0) {
+                    bundle.release(info.url, info.type);
+                    DEBUG && Log.d(`${this.module} bundle : ${info.bundle} 释放资源成功 : ${info.url}`);
+                } else {
+                    DEBUG && Log.w(`${this.module} bundle : ${info.bundle} 释放资源失败 : ${info.url} , 引用计数 : ${data.refCount}`);
+                }
+                this.remove(info.bundle, info.url);
             }
-        } else {
-            Log.e(`info is null`);
         }
-        return false;
     }
 
     public removeBundle(bundle: BUNDLE_TYPE) {
         let bundleName = this.getBundleName(bundle);
         if (bundleName && this._bundles.has(bundleName)) {
-            if (DEBUG) {
-                Log.d(`移除bundle cache : ${bundleName}`)
-                let data = this._bundles.get(bundleName);
-                this._removeUnuseCaches();
-                if (data && data.size > 0) {
-                    Log.e(`移除bundle ${bundleName} 还有未释放的缓存`);
-                }
-            }
             this._bundles.delete(bundleName);
         }
-    }
-
-    private _removeUnuseCaches() {
-        this._bundles.forEach((value, key, origin) => {
-            if (value) {
-                value.removeUnuseCaches();
-            }
-        });
     }
 
     private _getGetCacheByAsyncArgs(): { url: string, type: typeof Asset, bundle: BUNDLE_TYPE } | null {
@@ -525,7 +486,7 @@ export class CacheManager implements ISingleton{
         });
     }
 
-    debug(){
+    debug() {
         this._bundles.forEach(v => {
             v.debug();
         });

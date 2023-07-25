@@ -68,7 +68,7 @@ class RemoteLoader {
                         cache.info.url = url;
                         resolve(<sp.SkeletonData>(cache.data));
                         cache.doFinish(cache.data);
-                    }else{
+                    } else {
                         cache = new Resource.CacheData();
                         cache.info.resourceType = Resource.Type.Remote;
                         cache.info.type = sp.SkeletonData;
@@ -104,7 +104,7 @@ class RemoteLoader {
                                         if (atlas) {
                                             //生成SkeletonData数据
                                             let asset = new sp.SkeletonData;
-                                            asset.skeletonJson = json.json;
+                                            asset.skeletonJson = json.json as any;
                                             asset.atlasText = atlas.text;
                                             let texture = new Texture2D();
                                             texture.image = image;
@@ -365,9 +365,17 @@ export class _AssetManager implements ISingleton{
                 return;
             }
             if (onProgress) {
-                _bundle.loadDir(path, type, onProgress, this._onLoadComplete.bind(this, cache, onComplete));
+                if (type) {
+                    _bundle.loadDir(path, type, onProgress, this._onLoadComplete.bind(this, cache, onComplete));
+                } else {
+                    _bundle.loadDir(path, onProgress, this._onLoadComplete.bind(this, cache, onComplete));
+                }
             } else {
-                _bundle.loadDir(path, type, this._onLoadComplete.bind(this, cache, onComplete));
+                if (type) {
+                    _bundle.loadDir(path, type, this._onLoadComplete.bind(this, cache, onComplete));
+                } else {
+                    _bundle.loadDir(path, this._onLoadComplete.bind(this, cache, onComplete));
+                }
             }
         }
     }
@@ -389,21 +397,7 @@ export class _AssetManager implements ISingleton{
                     return;
                 }
 
-                if (App.cache.removeWithInfo(info)) {
-                    App.releaseManger.release(info);
-                } else {
-                    if (DEBUG) {
-                        if (Array.isArray(info.data)) {
-                            for (let i = 0; i < info.data.length; i++) {
-                                if (info.data[i].refCount > 0) {
-                                    Log.w(`资源bundle : ${info.bundle} url : ${info.url}/${info.data[i].name} 被其它界面引用 refCount : ${info.data[i].refCount}`)
-                                }
-                            }
-                        } else {
-                            Log.w(`资源bundle : ${info.bundle} url : ${info.url} 被其它界面引用 refCount : ${info.data.refCount}`)
-                        }
-                    }
-                }
+                App.releaseManger.release(info);
             } else {
                 cache.status = Resource.CacheStatus.WAITTING_FOR_RELEASE;
                 if (DEBUG) Log.w(`${cache.info.url} 正在加载，等待加载完成后进行释放`);

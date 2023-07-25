@@ -5,7 +5,7 @@
  * Author = zheng_fasheng
  */
 
-import { Asset, assetManager, Node, isValid, tween, Tween } from "cc";
+import { Asset, assetManager, Node, isValid, tween, Tween, Prefab, AssetManager } from "cc";
 import { Macro } from "../../defines/Macros";
 import { Resource } from "./Resource";
 
@@ -29,13 +29,15 @@ class LazyInfo {
             Log.d(`${LOG_TAG}向${this.name}加入待释放目录:${info.url}`);
             for (let i = 0; i < info.data.length; i++) {
                 if (info.data[i]) {
-                    info.data[i].addRef();
+                    info.data[i].addRef();//为释放管理器添加引用计数
+                    info.data[i].decRef(false);//资源引用计数-1
                 }
             }
         } else {
             if (info.data) {
                 Log.d(`${LOG_TAG}向${this.name}加入待释放资源:${info.url}`);
-                info.data.addRef();
+                info.data.addRef();//为释放管理器添加引用计数
+                info.data.decRef(false);//资源引用计数-1
             }
         }
         info.stamp = Date.timeNow();
@@ -82,25 +84,24 @@ class LazyInfo {
             }
             let bundle = assetManager.getBundle(this.name);
             if (bundle) {
-                this._assets.forEach((info, url, source) => {
+                //先释放预置，再释放资源
+                //不然再释放资源的时候，预置有可能在使用该资源，导致资源得不到释放
+                this._assets.forEach((info, url) => {
                     if (Array.isArray(info.data)) {
-                        Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载目录${info.url}`);
-                        for (let i = 0; i < info.data.length; i++) {
-                            if (info.data[i]) {
-                                info.data[i].decRef(false);
-                                let path = `${info.url}/${info.data[i].name}`;
-                                bundle?.release(path, info.type);
-                                Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载资源${path}`);
-                            }
+                        if (info.type == Prefab) {
+                            this.release(info, bundle!);
+                            this._assets.delete(info.url);
                         }
                     } else {
-                        if (isValid(info.data)) {
-                            //获取后删除当前管理器的引用
-                            info.data.decRef(false);
-                            bundle?.release(info.url, info.type);
-                            Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载资源${info.url}`);
+                        if (info.data instanceof Prefab) {
+                            this.release(info, bundle!);
+                            this._assets.delete(url);
                         }
                     }
+                })
+
+                this._assets.forEach((info, url, source) => {
+                    this.release(info, bundle!);
                 });
                 this._assets.clear();
             } else {
@@ -110,27 +111,57 @@ class LazyInfo {
         }
     }
 
-    tryRemove(bundle:BUNDLE_TYPE){
-        if ( this.name != bundle ){
+    tryRemove(bundle: BUNDLE_TYPE) {
+        if (this.name != bundle) {
             return;
         }
         this.onLowMemory();
     }
 
+    protected release(info: Resource.Info, bundle: AssetManager.Bundle) {
+        if (Array.isArray(info.data)) {
+            Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载目录${info.url}`);
+            for (let i = 0; i < info.data.length; i++) {
+                if (info.data[i]) {
+                    info.data[i].decRef(false);
+                    let path = `${info.url}/${info.data[i].name}`;
+                    if (info.data[i].refCount <= 0) {
+                        bundle?.release(path, info.type);
+                        Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载资源${path}`);
+                    } else {
+                        Log.w(`${LOG_TAG}bundle : ${this.name} 资源${path}正使用中引用计数为:${info.data[i].refCount}`)
+                    }
+                }
+            }
+        } else {
+            if (isValid(info.data)) {
+                //获取后删除当前管理器的引用
+                info.data.decRef(false);
+                if (info.data.refCount <= 0) {
+                    bundle?.release(info.url, info.type);
+                    Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载资源${info.url}`);
+                } else {
+                    Log.w(`${LOG_TAG}bundle : ${this.name} 资源${info.url}正使用中引用计数为:${info.data.refCount}`)
+                }
+            }
+        }
+    }
+
     /**@description 尝试释放长时间未使用资源 */
-    tryRemoveTimeoutResources(){
-        if ( App.isLazyRelease && App.isAutoReleaseUnuseResources ){
-            this._assets.forEach((info,url,source)=>{
-                if ( info.retain ){
+    tryRemoveTimeoutResources() {
+        if (App.isLazyRelease && App.isAutoReleaseUnuseResources) {
+            this._assets.forEach((info, url, source) => {
+                if (info.retain) {
                     return;
                 }
-                if ( info.stamp == null ){
+                if (info.stamp == null) {
                     return;
                 }
                 let now = Date.timeNow();
                 let pass = now - info.stamp;
-                if ( pass >= App.autoReleaseUnuseResourcesTimeout ){
-                    if ( this.name == Macro.BUNDLE_REMOTE){
+                if (pass >= App.autoReleaseUnuseResourcesTimeout) {
+
+                    if (this.name == Macro.BUNDLE_REMOTE) {
                         if (info.data instanceof Asset) {
                             Log.d(`${LOG_TAG}bundle : ${this.name} 释放远程加载资源${info.url}`);
                             assetManager.releaseAsset(info.data as Asset);
@@ -138,18 +169,10 @@ class LazyInfo {
                         this._assets.delete(url);
                         return;
                     }
+
                     //释放长时间未使用资源
-                    let bundle = App.bundleManager.getBundle(info.bundle)!;
-                    if (Array.isArray(info.data)) {
-                        for (let i = 0; i < info.data.length; i++) {
-                            let path = `${info.url}/${info.data[i].name}`;
-                            bundle.release(path, info.type);
-                        }
-                        Log.d(`${LOG_TAG}成功释放长时间未使用资源目录 : ${info.bundle}.${info.url}`);
-                    } else {
-                        bundle.release(info.url, info.type);
-                        Log.d(`${LOG_TAG}成功释放长时间未使用资源 : ${info.bundle}.${info.url}`);
-                    }
+                    let bundle = App.bundleManager.getBundle(info.bundle);
+                    this.release(info, bundle!);
                     this._assets.delete(url);
                 }
             })
@@ -198,17 +221,9 @@ export class ReleaseManager implements ISingleton {
                 if (lazyInfo) {
                     lazyInfo.add(info);
                 }
+                App.cache.remove(info.bundle, info.url);
             } else {
-                if (Array.isArray(info.data)) {
-                    for (let i = 0; i < info.data.length; i++) {
-                        let path = `${info.url}/${info.data[i].name}`;
-                        bundle.release(path, info.type);
-                    }
-                    Log.d(`${LOG_TAG}成功释放资源目录 : ${info.bundle}.${info.url}`);
-                } else {
-                    bundle.release(info.url, info.type);
-                    Log.d(`${LOG_TAG}成功释放资源 : ${info.bundle}.${info.url}`);
-                }
+                App.cache.removeWithInfo(info, bundle!);
             }
         } else {
             Log.e(`${LOG_TAG}${info.bundle} no found`);
@@ -240,6 +255,7 @@ export class ReleaseManager implements ISingleton {
             }
         } else {
             Log.d(`${LOG_TAG}释放Bundle : ${temp?.name}`);
+            temp?.releaseAll();
             if (temp) assetManager.removeBundle(temp);
         }
     }
@@ -251,15 +267,15 @@ export class ReleaseManager implements ISingleton {
     /**
      * @description 判断bundle是否存在于释放管理器中
      */
-    isExistBunble( bundle : BUNDLE_TYPE ){
-        if ( App.isLazyRelease ){
+    isExistBunble(bundle: BUNDLE_TYPE) {
+        if (App.isLazyRelease) {
             //开启了懒释放功能
             let name = this.getBundleName(bundle);
-            if ( this._bundles.has(name) ){
+            if (this._bundles.has(name)) {
                 return true;
             }
             return false;
-        }else{
+        } else {
             //未开启，在释放之前已经获取过了，严格来说，不可能走到这里
             return false;
         }
@@ -275,11 +291,12 @@ export class ReleaseManager implements ISingleton {
         this._bundles.forEach((value, bundle) => {
             let temp = assetManager.getBundle(bundle);
             if (temp) {
-                if ( App.bundleManager.isEngineBundle(bundle) ){
+                if (App.bundleManager.isEngineBundle(bundle)) {
                     Log.d(`${bundle} : 引擎bundle，跳过处理`)
                     return;
                 }
                 Log.d(`释放无用bundle : ${bundle}`);
+                temp.releaseAll();
                 assetManager.removeBundle(temp);
                 this._bundles.delete(bundle);
             }
@@ -289,12 +306,12 @@ export class ReleaseManager implements ISingleton {
         this._remote.onLowMemory();
     }
 
-    onAutoReleaseUnuseResources(){
+    onAutoReleaseUnuseResources() {
         Log.d(`${LOG_TAG}------------释放长时间未使用资源开始------------`);
         let curBundle = App.stageData.where;
         //排除当前bundle的资源，当前bundle正在运行，没有必要释放当前bundle资源
         this._lazyInfos.forEach((info, bundle, source) => {
-            if ( bundle == curBundle ){
+            if (bundle == curBundle) {
                 return;
             }
             info.tryRemoveTimeoutResources()
@@ -307,15 +324,16 @@ export class ReleaseManager implements ISingleton {
     }
 
     /**@description 尝试释放指定bundel的资源 */
-    tryRemoveBundle(bundle:BUNDLE_TYPE){
+    tryRemoveBundle(bundle: BUNDLE_TYPE) {
         Log.d(`${LOG_TAG}--------------尝试释放${bundle}加载资源------------`);
-        this._lazyInfos.forEach((info,key,source)=>{
+        this._lazyInfos.forEach((info, key, source) => {
             info.tryRemove(bundle);
         });
         let name = this.getBundleName(bundle);
         let temp = assetManager.getBundle(name);
         if (temp) {
             Log.d(`释放无用bundle : ${name}`);
+            temp.releaseAll();
             assetManager.removeBundle(temp);
             this._bundles.delete(name);
         }

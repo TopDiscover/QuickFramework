@@ -97,13 +97,14 @@ export namespace Resource {
                     return [];
                 }
                 if (Array.isArray(data)) {
-                    let datas: { url: string, isValid: boolean, refCount: number }[] = [];
+                    let datas: { url: string, isValid: boolean, refCount: number, type: string }[] = [];
                     data.forEach(v => {
                         let temp = isValid(v);
                         datas.push({
                             url: `${this.info.url}/${temp ? v.name : "unknown"}`,
                             isValid: temp,
-                            refCount: temp ? v.refCount : -1
+                            refCount: temp ? v.refCount : -1,
+                            type: js.getClassName(v),
                         })
                     })
                     return datas;
@@ -112,7 +113,8 @@ export namespace Resource {
                     return [{
                         url: this.info.url,
                         isValid: temp,
-                        refCount: temp ? data.refCount : -1
+                        refCount: temp ? data.refCount : -1,
+                        type: js.getClassName(data),
                     }];
                 }
             };
@@ -120,7 +122,6 @@ export namespace Resource {
             let data = {
                 isLoaded: this.isLoaded,
                 info: info(this.data),
-                type: js.getClassName(this.info.type),
                 status: this.status,
             }
             return data;
@@ -130,7 +131,7 @@ export namespace Resource {
     export interface Data {
         /**@description resources 目录url 与 type 必须成对出现*/
         url?: string,
-        /**@description 资源类型 与 url 必须成对出现 目前支持预加载的资源有cc.Prefab | cc.SpriteFrame | sp.SkeletonData*/
+        /**@description 资源类型 与 url 必须成对出现*/
         type?: typeof Asset,
         /**
          * @description 预加载界面，不需要对url type赋值 
@@ -140,7 +141,7 @@ export namespace Resource {
          * */
         preloadView?: UIClass<UIView>,
         bundle?: BUNDLE_TYPE,
-        /**@description 如果是加载的目录，请用dir字段 */
+        /**@description 如果是加载的目录，请用dir字段,必须指定类型，否则无法正确的释放资源 */
         dir?: string,
     }
 }
