@@ -96,9 +96,9 @@ class QRCode {
     static PAD1 = 0x11;
     typeNumber = 0;
     errorCorrectLevel = 0;
-    modules: boolean[][] = null;
+    modules: boolean[][] = null!;
     moduleCount = 0;
-    dataCache: number[] = null;
+    dataCache: number[] = null!;
     dataList: QR8bitByte[] = [];
 
     constructor(typeNumber: number, errorCorrectLevel: number) {
@@ -109,7 +109,7 @@ class QRCode {
     addData(data: string) {
         let newData = new QR8bitByte(data);
         this.dataList.push(newData);
-        this.dataCache = null;
+        this.dataCache = null!;
     }
 
     isDark(row: number, col: number) {
@@ -158,7 +158,7 @@ class QRCode {
             this.modules[row] = new Array(this.moduleCount);
 
             for (let col = 0; col < this.moduleCount; col++) {
-                this.modules[row][col] = null;//(col + row) % 3;
+                this.modules[row][col] = null!;//(col + row) % 3;
             }
         }
 
@@ -603,7 +603,7 @@ class QRUtil {
     static G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
     static G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
 
-    static getBCHTypeInfo(data) {
+    static getBCHTypeInfo(data: number) {
         let d = data << 10;
         while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
             d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15)));
@@ -611,7 +611,7 @@ class QRUtil {
         return ((data << 10) | d) ^ QRUtil.G15_MASK;
     }
 
-    static getBCHTypeNumber(data) {
+    static getBCHTypeNumber(data: number) {
         let d = data << 12;
         while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
             d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18)));
@@ -619,7 +619,7 @@ class QRUtil {
         return (data << 12) | d;
     }
 
-    static getBCHDigit(data) {
+    static getBCHDigit(data: number) {
 
         let digit = 0;
 
@@ -631,11 +631,11 @@ class QRUtil {
         return digit;
     }
 
-    static getPatternPosition(typeNumber) {
+    static getPatternPosition(typeNumber: number) {
         return QRUtil.PATTERN_POSITION_TABLE[typeNumber - 1];
     }
 
-    static getMask(maskPattern, i, j) {
+    static getMask(maskPattern: number, i: number, j: number) {
 
         switch (maskPattern) {
 
@@ -653,7 +653,7 @@ class QRUtil {
         }
     }
 
-    static getErrorCorrectPolynomial(errorCorrectLength) {
+    static getErrorCorrectPolynomial(errorCorrectLength: number) {
 
         let a = new QRPolynomial([1], 0);
 
@@ -664,7 +664,7 @@ class QRUtil {
         return a;
     }
 
-    static getLengthInBits(mode, type) {
+    static getLengthInBits(mode: number, type: number) {
 
         if (1 <= type && type < 10) {
 
@@ -710,7 +710,7 @@ class QRUtil {
         }
     }
 
-    static getLostPoint(qrCode) {
+    static getLostPoint(qrCode: QRCode) {
 
         let moduleCount = qrCode.getModuleCount();
 
@@ -825,7 +825,7 @@ class QRUtil {
 
 class QRMath {
 
-    static glog(n) {
+    static glog(n: number) {
 
         if (n < 1) {
             throw new Error("glog(" + n + ")");
@@ -834,7 +834,7 @@ class QRMath {
         return QRMath.LOG_TABLE[n];
     }
 
-    static gexp(n) {
+    static gexp(n: number) {
 
         while (n < 0) {
             n += 255;
@@ -873,7 +873,7 @@ for (let i = 0; i < 255; i++) {
 class QRPolynomial {
 
     num: number[] = []
-    constructor(num, shift) {
+    constructor(num: number[], shift: number) {
         if (num.length == undefined) {
             throw new Error(num.length + "/" + shift);
         }
@@ -890,7 +890,7 @@ class QRPolynomial {
         }
     }
 
-    get(index) {
+    get(index: number) {
         return this.num[index];
     }
 
@@ -898,7 +898,7 @@ class QRPolynomial {
         return this.num.length;
     }
 
-    multiply(e) {
+    multiply(e: QRPolynomial) {
 
         let num = new Array(this.getLength() + e.getLength() - 1);
 
@@ -911,7 +911,7 @@ class QRPolynomial {
         return new QRPolynomial(num, 0);
     }
 
-    mod(e) {
+    mod(e: QRPolynomial): QRPolynomial {
 
         if (this.getLength() - e.getLength() < 0) {
             return this;
@@ -1220,7 +1220,7 @@ class QRRSBlock {
         return list;
     }
 
-    static getRsBlockTable(typeNumber, errorCorrectLevel) {
+    static getRsBlockTable(typeNumber: number, errorCorrectLevel: number) {
 
         switch (errorCorrectLevel) {
             case QRErrorCorrectLevel.L:
@@ -1238,7 +1238,7 @@ class QRRSBlock {
 }
 
 
-const { ccclass, property, menu ,requireComponent } = cc._decorator;
+const { ccclass, property, menu, requireComponent } = cc._decorator;
 /**
  * 二维码组件
  */
