@@ -1237,7 +1237,7 @@ class QRRSBlock {
     }
 }
 
-import { _decorator , Graphics , Color, UITransform , Component } from "cc";
+import { _decorator , Graphics , Color, UITransform , Component, color } from "cc";
 const { ccclass, property, menu } = _decorator;
 /**
  * 二维码组件
@@ -1270,7 +1270,7 @@ export default class UIQRCode extends Component {
     }
 
     @property
-    protected _backColor = Color.WHITE;
+    protected _backColor = new Color(Color.WHITE);
 
     @property({ displayName: "背景颜色", tooltip: "设置背景颜色" })
     get backColor() {
@@ -1285,7 +1285,7 @@ export default class UIQRCode extends Component {
     }
 
     @property
-    protected _foreColor = Color.BLACK;
+    protected _foreColor = new Color(Color.BLACK);
 
     @property({ displayName: "前景颜色", tooltip: "设置前景颜色" })
     get foreColor() {
