@@ -17,6 +17,7 @@ enum Types {
     escapeStation,
     snapshot,
     stateMachine,
+    qrcode,
 }
 
 const eTypes = cc.Enum(Types)
@@ -50,6 +51,7 @@ enum Sort {
     scratchTicket,
     snapshot,
     stateMachine,
+    qrcode,
     //私有项目
     private,
     escapeStation,
@@ -69,6 +71,7 @@ const _datas: DataT[] = [
     { sort: Sort.snapshot, name: { CN: "截图", EN: "Snapshot" }, bundle: eTypes[Types.snapshot] },
     { sort: Sort.escapeStation, name: { CN: "逃离车站", EN: "Escape\nStation" }, bundle: eTypes[Types.escapeStation] },
     { sort: Sort.stateMachine, name: { CN: "状态机", EN: "State\nMachine" }, bundle: eTypes[Types.stateMachine] },
+    { sort: Sort.qrcode, name: { CN: "二维码", EN: "QR Code" }, bundle: eTypes[Types.qrcode] },
 ];
 
 // console.log(_datas);
