@@ -1244,7 +1244,6 @@ const { ccclass, property, menu ,requireComponent } = cc._decorator;
  */
 @ccclass
 @menu("Quick渲染组件/UIQRCode")
-@requireComponent(cc.Graphics)
 export default class UIQRCode extends cc.Graphics {
 
     @property
