@@ -14,7 +14,7 @@ enum Types {
     nodePoolTest,
     tankBattle,
     taxi,
-    slot,
+    qrcode,
     stateMachine,
 }
 
@@ -47,9 +47,9 @@ enum Sort {
     nodePoolTest,
     tankBattle,
     stateMachine,
+    qrcode,
     //私有项目
     private,
-    slot,
 }
 
 const _datas: DataT[] = [
@@ -62,7 +62,7 @@ const _datas: DataT[] = [
     { sort: Sort.taxi, name: { CN: "快上车", EN: "Taxi" }, bundle: eTypes[Types.taxi] },
     { sort: Sort.resources, name: { CN: "主包", EN: "Main" }, bundle: eTypes[Types.resources] },
     { sort: Sort.hall, name: { CN: "大厅", EN: "Hall" }, bundle: eTypes[Types.hall] },
-    { sort: Sort.slot, name: { CN: "水果机", EN: "Slot" }, bundle: eTypes[Types.slot] },
+    { sort: Sort.qrcode, name: { CN: "二维码", EN: "QR Code" }, bundle: eTypes[Types.qrcode] },
     { sort: Sort.stateMachine, name: { CN: "状态机", EN: "State\nMachine" }, bundle: eTypes[Types.stateMachine] },
 ];
 
