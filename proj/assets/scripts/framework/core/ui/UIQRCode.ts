@@ -1238,13 +1238,22 @@ class QRRSBlock {
 }
 
 
-const { ccclass, property, menu, requireComponent } = cc._decorator;
+const { ccclass, property, menu, executeInEditMode } = cc._decorator;
 /**
  * 二维码组件
  */
 @ccclass
 @menu("Quick渲染组件/UIQRCode")
-export default class UIQRCode extends cc.Graphics {
+@executeInEditMode
+export default class UIQRCode extends cc.Component {
+
+    protected get graphics() {
+        let comp = this.getComponent(cc.Graphics);
+        if (comp) {
+            return comp;
+        }
+        return this.addComponent(cc.Graphics);
+    }
 
     @property
     protected _str: string = "Hello World!"
@@ -1327,20 +1336,21 @@ export default class UIQRCode extends cc.Graphics {
     }
 
     setContent() {
-        this.clear();
+        const graphics = this.graphics;
+        graphics.clear();
         //背景色
-        this.fillColor = this.backColor;
+        graphics.fillColor = this.backColor;
         let width = this.node.width;
         let offsetX = -width * this.node.anchorX;
         let offsetY = -width * this.node.anchorY;
-        this.rect(offsetX, offsetY, width, width);
-        this.fill();
-        this.close();
+        graphics.rect(offsetX, offsetY, width, width);
+        graphics.fill();
+        graphics.close();
         //生成二维码数据
         let qrcode = new QRCode(-1, 2);
         qrcode.addData(this.string);
         qrcode.make();
-        this.fillColor = this.foreColor;
+        graphics.fillColor = this.foreColor;
         let size = width - this.margin * 2;
         let num = qrcode.getModuleCount();
 
@@ -1351,18 +1361,10 @@ export default class UIQRCode extends cc.Graphics {
         for (let row = 0; row < num; row++) {
             for (let col = 0; col < num; col++) {
                 if (qrcode.isDark(row, col)) {
-                    this.rect(offsetX + this.margin + col * tileW, offsetX + size - tileH - Math.round(row * tileH) + this.margin, w, h);
-                    this.fill();
+                    graphics.rect(offsetX + this.margin + col * tileW, offsetX + size - tileH - Math.round(row * tileH) + this.margin, w, h);
+                    graphics.fill();
                 }
             }
         }
     }
 };
-
-let setClassAttr: (type: any, member: string, key: string, value: any) => void = (cc.Class as any).Attr.setClassAttr;
-setClassAttr(UIQRCode, "lineWidth", "visible", false);
-setClassAttr(UIQRCode, 'lineJoin', 'visible', false);
-setClassAttr(UIQRCode, 'lineCap', 'visible', false);
-setClassAttr(UIQRCode, 'strokeColor', 'visible', false);
-setClassAttr(UIQRCode, 'miterLimit', 'visible', false);
-setClassAttr(UIQRCode, 'fillColor', 'visible', false);
