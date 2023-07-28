@@ -3,7 +3,7 @@
  * @description 项目扩展声明
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Extensions = exports.CmdType = void 0;
+exports.SyncType = exports.Extensions = exports.CmdType = void 0;
 var CmdType;
 (function (CmdType) {
     /**@description 拉取 Bunldes 代码 */
@@ -24,6 +24,8 @@ var CmdType;
     CmdType["Pngquant"] = "-pngquant";
     /**@description 热更新 */
     CmdType["Hotupdate"] = "-hotupdate";
+    /**@description 上帝模式，功能全开 */
+    CmdType["God"] = "-god";
 })(CmdType = exports.CmdType || (exports.CmdType = {}));
 var Extensions;
 (function (Extensions) {
@@ -42,3 +44,12 @@ var Extensions;
     /**@description 确定删除bundle */
     Extensions["ConfirmDelSubgames"] = "confirm_del_subgames";
 })(Extensions = exports.Extensions || (exports.Extensions = {}));
+var SyncType;
+(function (SyncType) {
+    /**@description 当前目录及.meta文件 */
+    SyncType[SyncType["CUR_DIR_AND_META"] = 0] = "CUR_DIR_AND_META";
+    /**@description 当前目录下所有文件 */
+    SyncType[SyncType["CUR_ALL_FILES"] = 1] = "CUR_ALL_FILES";
+    /**@description bundles目录 */
+    SyncType[SyncType["Bunldes"] = 2] = "Bunldes";
+})(SyncType = exports.SyncType || (exports.SyncType = {}));

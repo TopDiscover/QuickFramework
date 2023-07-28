@@ -328,7 +328,7 @@ export default class FileUtils extends Handler {
                 return;
             }
             await this.delDir(dest);
-            if ( Environment.isCommand ){
+            if ( Environment.isCommand && cp ){
                 cp(source, dest, {
                     recursive: true
                 }, (err) => {
