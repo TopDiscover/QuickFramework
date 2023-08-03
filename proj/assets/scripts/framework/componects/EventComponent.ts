@@ -134,10 +134,13 @@ export default class EventComponent extends cc.Component implements IEventProces
     }
 
     onLoad() {
+        super.onLoad && super.onLoad();
         this.addEvents();
     }
 
     onDestroy() {
         this._eventProcessor.onDestroy();
+        this.node.targetOff(this);
+        super.onDestroy && super.onDestroy();
     }
 }

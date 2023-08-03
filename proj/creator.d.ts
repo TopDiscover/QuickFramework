@@ -7,29 +7,40 @@ Cocos 引擎的主要命名空间，引擎代码中所有的类，函数，属�
 declare type UIView = import("./assets/scripts/framework/core/ui/UIView").default;
 declare module cc {
 
-	export interface ActionInterval{
-		 /**
-		 * !#en
-		 * Changes the speed of an action, making it take longer (speed>1)
-		 * or less (speed<1) time. <br/>
-		 * Useful to simulate 'slow motion' or 'fast forward' effect.
-		 * !#zh
-		 * 改变一个动作的速度，使它的执行使用更长的时间（speed > 1）<br/>
-		 * 或更少（speed < 1）可以有效得模拟“慢动作”或“快进”的效果。
-		 * @param {Number} speed
-		 * @returns {Action}
-		 */
-		speed(v:number):ActionInterval;
-
-		getSpeed():number;
-
-		
-	}
-
 	export interface Node {
 		/**@description 用户自定义数据 */
 		userData: any;
+		/**@description 引擎未导出 */
+		_renderFlag: number;
+		/**@description 引擎未导出 */
+        _touchListener?: TouchOneByOne;
+		/**@description 引擎未导出 */
+        setLocalDirty(flag: Node._LocalDirtyFlag): void;
 	}
+
+	interface TouchOneByOne {
+
+        _claimedTouches: Array;
+
+        swallowTouches: boolean;
+
+        onTouchBegan: Function;
+
+        onTouchMoved: Function;
+
+        onTouchEnded: Function;
+
+        onTouchCancelled: Function;
+
+        setSwallowTouches(needSwallow: boolean): void;
+
+        isSwallowTouches(): boolean;
+
+        clone(): TouchOneByOne;
+
+        checkAvailable(): boolean;
+
+    }
 
 	export interface Mask{
 		_graphics : Graphics;
@@ -2260,7 +2271,6 @@ declare namespace cc {
 		@param target target 
 		*/
 		static stopAllByTarget(target: any): void;		
-		static getfinalAction( tween : Tween<T>):ActionInterval;
 		/**
 		!#en
 		Insert an action or tween to this sequence

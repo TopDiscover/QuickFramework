@@ -6,7 +6,37 @@ declare module cc {
 	export interface Node {
 		/**@description 用户自定义数据 */
 		userData: any;
+		/**@description 引擎未导出 */
+		_renderFlag: number;
+		/**@description 引擎未导出 */
+        _touchListener?: TouchOneByOne;
+		/**@description 引擎未导出 */
+        setLocalDirty(flag: Node._LocalDirtyFlag): void;
 	}
+
+	interface TouchOneByOne {
+
+        _claimedTouches: Array;
+
+        swallowTouches: boolean;
+
+        onTouchBegan: Function;
+
+        onTouchMoved: Function;
+
+        onTouchEnded: Function;
+
+        onTouchCancelled: Function;
+
+        setSwallowTouches(needSwallow: boolean): void;
+
+        isSwallowTouches(): boolean;
+
+        clone(): TouchOneByOne;
+
+        checkAvailable(): boolean;
+
+    }
 
 	export interface Mask{
 		_graphics : Graphics;
