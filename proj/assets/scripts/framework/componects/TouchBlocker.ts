@@ -11,6 +11,7 @@ export default class TouchBlocker extends EventComponent {
     @property
     protected _target : cc.Node = null!;
 
+    /**@description 可点击的目标节点 */
     @property({ type: cc.Node, tooltip: CC_DEV && "可被点击的节点" })
     get target(){
         return this._target;
