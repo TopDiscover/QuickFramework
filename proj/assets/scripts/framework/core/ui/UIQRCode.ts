@@ -1334,6 +1334,11 @@ export default class UIQRCode extends Component {
         this.setContent();
     }
 
+    resetInEditor(): void {
+        this.node.getComponent(UITransform)?.setContentSize(this._size, this._size);
+        this.setContent();
+    }
+
     setContent() {
         const graphics = this.graphics;
         graphics.clear();
