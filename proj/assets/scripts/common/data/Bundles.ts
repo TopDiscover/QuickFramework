@@ -18,6 +18,7 @@ enum Types {
     snapshot,
     stateMachine,
     qrcode,
+    hollowOut,
 }
 
 const eTypes = cc.Enum(Types)
@@ -52,6 +53,7 @@ enum Sort {
     snapshot,
     stateMachine,
     qrcode,
+    hollowOut,
     //私有项目
     private,
     escapeStation,
@@ -72,6 +74,7 @@ const _datas: DataT[] = [
     { sort: Sort.escapeStation, name: { CN: "逃离车站", EN: "Escape\nStation" }, bundle: eTypes[Types.escapeStation] },
     { sort: Sort.stateMachine, name: { CN: "状态机", EN: "State\nMachine" }, bundle: eTypes[Types.stateMachine] },
     { sort: Sort.qrcode, name: { CN: "二维码", EN: "QR Code" }, bundle: eTypes[Types.qrcode] },
+    { sort: Sort.hollowOut, name: { CN: "挖孔引导", EN: "Hollow Out" }, bundle: eTypes[Types.hollowOut] },
 ];
 
 // console.log(_datas);

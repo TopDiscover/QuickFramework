@@ -1335,6 +1335,11 @@ export default class UIQRCode extends cc.Component {
         this.setContent();
     }
 
+    protected resetInEditor(): void {
+        this.node.setContentSize(this._size,this._size);
+        this.setContent();
+    }
+
     setContent() {
         const graphics = this.graphics;
         graphics.clear();
