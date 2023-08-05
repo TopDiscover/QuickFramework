@@ -5,7 +5,7 @@
 
 import { Macro } from "../defines/Macros";
 
-const { ccclass, property, menu } = cc._decorator;
+const { ccclass, property, menu , executionOrder , executeInEditMode , disallowMultiple } = cc._decorator;
 
 enum TYPE {
     /**@description 矩形 */
@@ -16,6 +16,9 @@ enum TYPE {
 
 @ccclass
 @menu("QuickUI组件/HollowOut")
+@executeInEditMode
+@disallowMultiple
+@executionOrder(-10)
 export default class HollowOut extends cc.Component {
     static TYPE = TYPE;
 
@@ -29,9 +32,6 @@ export default class HollowOut extends cc.Component {
         this._type = v;
         this.updateProperties();
     }
-
-    @property({ tooltip: CC_DEV && "资源持有者" })
-    protected view: string = "";
 
     @property
     protected _center: cc.Vec2 = cc.v2();
@@ -141,11 +141,8 @@ export default class HollowOut extends cc.Component {
             this.sprite = this.node.addComponent(cc.Sprite);
         }
 
-        if (!(this.sprite.spriteFrame && this.sprite.spriteFrame.name.startsWith("singleColor_unpackable"))) {
+        if ( CC_EDITOR && !(this.sprite.spriteFrame && this.sprite.spriteFrame.name.startsWith("singleColor_unpackable"))) {
             let view = App.retainMemory;
-            if (!CC_EDITOR) {
-                view = App.uiManager.getView(this.view);
-            }
             this.sprite.loadImage({
                 url: "images/singleColor_unpackable",
                 view: view,
@@ -162,16 +159,14 @@ export default class HollowOut extends cc.Component {
 
     /**@description 加载 Sprite 完成 */
     protected onLoadSpriteComplete(data: cc.SpriteFrame) {
-        if (data) {
-            data.getTexture().packable = false;
+        if ( !cc.isValid(data) ){
+            return;
         }
+        data.getTexture().packable = false;
 
         let material = this.sprite.getMaterial(0);
-        if (!(material && material.name.startsWith("quick-2d-hollowout-sprite"))) {
+        if ( CC_EDITOR && !(material && material.name.startsWith("quick-2d-hollowout-sprite"))) {
             let view = App.retainMemory;
-            if (!CC_EDITOR) {
-                view = App.uiManager.getView(this.view);
-            }
             //加载材质
             loadRes({
                 bundle: Macro.BUNDLE_RESOURCES,
