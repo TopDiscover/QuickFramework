@@ -32,8 +32,9 @@ export default class UpdateLoading extends Loading {
                 this.hide();
                 return;
             }
+            progress = progress * 100;
             if (progress >= 0 && progress <= 100) {
-                this.text.string = App.getLanguage("loadingProgress",[progress]);
+                this.text.string = App.getLanguage("loadingProgress",[progress.toFixed(2)]);
             }
         }
     }
