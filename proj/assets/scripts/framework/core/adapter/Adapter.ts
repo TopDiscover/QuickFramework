@@ -10,12 +10,12 @@ export interface SafeArea {
     /**
      * 屏幕分辨率下：画布（屏幕)宽度
      */
-    screenWidth: number;
+    width: number;
 
     /**
      * 屏幕分辨率下：画布（屏幕）高度
      */
-    screenHeight: number;
+    height: number;
 
     /**
      * 屏幕分辨率下：安全区域宽度像素
@@ -30,32 +30,32 @@ export interface SafeArea {
     /**
      * 屏幕分辨率下：安全区域距离画布（屏幕）上边缘的距离像素
      */
-    safeAreaMarginTop: number;
+    top: number;
 
     /**
      * 屏幕分辨率下：安全区域距离画布（屏幕）下边缘的距离像素
      */
-    safeAreaMarginBottom: number;
+    bottom: number;
 
     /**
      * 屏幕分辨率下：安全区域距离画布（屏幕）左边缘的距离像素
      */
-    safeAreaMarginLeft: number;
+    left: number;
 
     /**
      * 屏幕分辨率下：安全区域距离画布（屏幕）右边缘的距离像素
      */
-    safeAreaMarginRight: number;
+    right: number;
 
     /**
      * 屏幕分辨率下：安全区域 X 偏移像素（相对于 Cocos 坐标系，X轴正方向往右，Y轴正方向往上）
      */
-    safeAreaXOffset: number;
+    offsetX: number;
 
     /**
      * 屏幕分辨率下：安全区域 Y 偏移像素（相对于 Cocos 坐标系，X轴正方向往右，Y轴正方向往上）
      */
-    safeAreaYOffset: number;
+    offsetY: number;
 
     /**
      * 「设计分辨率」像素值转换到 「屏幕分辨率」 下的像素比
@@ -68,8 +68,24 @@ export interface SafeArea {
     designPxToScreenPxRatio: number;
 }
 
+/**@description 设备方向 */
+enum DeviceDirection{
+    /**@description 未知*/
+    Unknown,
+    /**@description 横屏(即摄像头向左) */
+    LandscapeLeft,
+    /**@description 横屏(即摄像头向右) */
+    LandscapeRight,
+    /**@description 竖屏(即摄像头向上) */
+    Portrait,
+    /**@description 竖屏(即摄像头向下) */
+    UpsideDown,
+}
+
 const EDITOR_SIZI = cc.size(1280, 720);
 export class Adapter extends cc.Component {
+
+    static direction = DeviceDirection;
 
     protected set width(value: number) {
         this.node.width = value;
@@ -145,6 +161,29 @@ export class Adapter extends cc.Component {
      * @description 视图发生大小变化
      */
     protected onChangeSize() {
+        
+    }
 
+    /**@description 获取当前设备方向 */
+    get direction(){
+        let str = "未知"
+        let result = DeviceDirection.Unknown;
+        if ( window.orientation ){
+            if ( window.orientation == 90 ){
+                str = `横屏向左`
+                result = DeviceDirection.LandscapeLeft;
+            }else if ( window.orientation == -90 ){
+                str = `横屏向右`
+                result = DeviceDirection.LandscapeLeft;
+            }else if ( window.orientation == 0 ){
+                str = "竖屏向上"
+                result = DeviceDirection.Portrait;
+            }else if ( window.orientation == 180 ){
+                str = "竖屏向下"
+                result = DeviceDirection.UpsideDown;
+            }
+        }
+        Log.d(`设备方向 : ${str}`)
+        return result;
     }
 }

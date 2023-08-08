@@ -48,25 +48,25 @@ export default class AdapterSafeArea extends Adapter {
         // 如果对齐上边界，并且包含安全区域到屏幕上边界的缝隙
         if (widget.isAlignTop && this.withInsertTop) {
             widget.isAbsoluteTop = true;
-            widget.top = -AdapterView.screenPxToDesignPx(AdapterView.safeArea.safeAreaMarginTop);
+            widget.top = -AdapterView.screenPxToDesignPx(AdapterView.safeArea.top);
             this.height += Math.abs(widget.top);
         }
         // 如果对齐下边界，并且包含安全区域到屏幕下边界的缝隙
         if (widget.isAlignBottom && this.withInsertBottom) {
             widget.isAbsoluteBottom = true;
-            widget.bottom = -AdapterView.screenPxToDesignPx(AdapterView.safeArea.safeAreaMarginBottom);
+            widget.bottom = -AdapterView.screenPxToDesignPx(AdapterView.safeArea.bottom);
             this.height += Math.abs(widget.bottom);
         }
         // 如果对齐左边界，并且包含安全区域到屏幕左边界的缝隙
         if (widget.isAlignLeft && this.withInsertLeft) {
             widget.isAbsoluteLeft = true;
-            widget.left = -AdapterView.screenPxToDesignPx(AdapterView.safeArea.safeAreaMarginLeft);
+            widget.left = -AdapterView.screenPxToDesignPx(AdapterView.safeArea.left);
             this.width += Math.abs(widget.left);
         }
         // 如果对齐右边界，并且包含安全区域到屏幕右边界的缝隙
         if (widget.isAlignRight && this.withInsertRight) {
             widget.isAbsoluteRight = true;
-            widget.right = -AdapterView.screenPxToDesignPx(AdapterView.safeArea.safeAreaMarginRight);
+            widget.right = -AdapterView.screenPxToDesignPx(AdapterView.safeArea.right);
             this.width += Math.abs(widget.right);
         }
         widget.updateAlignment();

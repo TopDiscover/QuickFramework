@@ -3,7 +3,7 @@
 
 import { Adapter, SafeArea } from "./Adapter";
 
-const { ccclass, property ,executeInEditMode,menu } = cc._decorator;
+const { ccclass, property, executeInEditMode, menu } = cc._decorator;
 /**
  * 安全区域适配组件
  *
@@ -14,6 +14,7 @@ const { ccclass, property ,executeInEditMode,menu } = cc._decorator;
  * 用法：
  *
  * 1. 将本组件挂载在节点上即可（注意该节点不能挂在 Widget 组件）
+ * 2. 构建时请尽量只设置一个方向，以避免造成旋转后选配异常
  *
  * 适配原理：
  *
@@ -28,18 +29,24 @@ export default class AdapterView extends Adapter {
         AdapterView.safeArea = null as any;
         if (this.node) {
 
-            // 将屏幕尺寸下的安全区域大小，转换为设计分辨率下的大小，重新给节点设置大小
-            this.width = AdapterView.safeArea.safeAreaWidth / AdapterView.safeArea.designPxToScreenPxRatio;
-            this.height = AdapterView.safeArea.safeAreaHeight / AdapterView.safeArea.designPxToScreenPxRatio;
+            if (true) {
+                // 将屏幕尺寸下的安全区域大小，转换为设计分辨率下的大小，重新给节点设置大小
+                this.width = AdapterView.safeArea.width / AdapterView.safeArea.designPxToScreenPxRatio;
+                this.height = AdapterView.safeArea.height / AdapterView.safeArea.designPxToScreenPxRatio;
+            } else {
+                // 将屏幕尺寸下的安全区域大小，转换为设计分辨率下的大小，重新给节点设置大小
+                this.width = AdapterView.safeArea.safeAreaWidth / AdapterView.safeArea.designPxToScreenPxRatio;
+                this.height = AdapterView.safeArea.safeAreaHeight / AdapterView.safeArea.designPxToScreenPxRatio;
 
-            // 根据安全区域的 margin 设置节点的偏移，使重置宽高后的节点位置在安全中心
-            // 需要将屏幕尺寸下的像素值转换为设计费分辨率下的像素值
-            this.node.setPosition(
-                cc.v2(
-                    AdapterView.safeArea.safeAreaXOffset / AdapterView.safeArea.designPxToScreenPxRatio,
-                    AdapterView.safeArea.safeAreaYOffset / AdapterView.safeArea.designPxToScreenPxRatio
-                )
-            );
+                // 根据安全区域的 margin 设置节点的偏移，使重置宽高后的节点位置在安全中心
+                // 需要将屏幕尺寸下的像素值转换为设计费分辨率下的像素值
+                this.node.setPosition(
+                    cc.v2(
+                        AdapterView.safeArea.offsetX / AdapterView.safeArea.designPxToScreenPxRatio,
+                        AdapterView.safeArea.offsetY / AdapterView.safeArea.designPxToScreenPxRatio
+                    )
+                );
+            }
         }
     }
 
@@ -140,16 +147,16 @@ export default class AdapterView extends Adapter {
             let safeAreaYOffset = (safeAreaMarginBottom - safeAreaMarginTop) * 0.5;
 
             this._safeArea = {
-                screenWidth: screenWidth,
-                screenHeight: screenHeight,
+                width: screenWidth,
+                height: screenHeight,
                 safeAreaWidth: safeAreaWidth,
                 safeAreaHeight: safeAreaHeight,
-                safeAreaMarginTop: safeAreaMarginTop,
-                safeAreaMarginBottom: safeAreaMarginBottom,
-                safeAreaMarginLeft: safeAreaMarginLeft,
-                safeAreaMarginRight: safeAreaMarginRight,
-                safeAreaXOffset: safeAreaXOffset,
-                safeAreaYOffset: safeAreaYOffset,
+                top: safeAreaMarginTop,
+                bottom: safeAreaMarginBottom,
+                left: safeAreaMarginLeft,
+                right: safeAreaMarginRight,
+                offsetX: safeAreaXOffset,
+                offsetY: safeAreaYOffset,
                 designPxToScreenPxRatio: designPxToScreenPxRatio,
             };
         }
