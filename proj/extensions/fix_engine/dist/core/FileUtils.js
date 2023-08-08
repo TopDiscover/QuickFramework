@@ -89,6 +89,30 @@ class FileUtils extends Handler_1.Handler {
         return out;
     }
     /**
+     * @description 获取当前目前下所有文件
+     * @param path
+     */
+    getCurFiles(path) {
+        let result = [];
+        if (!(0, fs_1.existsSync)(path)) {
+            return result;
+        }
+        let readDir = (0, fs_1.readdirSync)(path);
+        for (let i = 0; i < readDir.length; i++) {
+            let file = readDir[i];
+            let fullPath = (0, path_1.join)(path, file);
+            if (fullPath[0] === '.') {
+                continue;
+            }
+            let stat = (0, fs_1.statSync)(fullPath);
+            if (stat.isFile()) {
+                let info = { relative: (0, path_1.relative)(path, fullPath), path: fullPath, name: file, size: stat.size };
+                result.push(info);
+            }
+        }
+        return result;
+    }
+    /**
      * @description 获取path下的所有目录
      * @param path
      */
@@ -291,7 +315,7 @@ class FileUtils extends Handler_1.Handler {
                 return;
             }
             await this.delDir(dest);
-            if (Environment_1.Environment.isCommand) {
+            if (Environment_1.Environment.isCommand && fs_1.cp) {
                 (0, fs_1.cp)(source, dest, {
                     recursive: true
                 }, (err) => {

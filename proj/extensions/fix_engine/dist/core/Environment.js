@@ -12,7 +12,7 @@ class _Environment {
         /**@description cocos creator 版本 */
         this.creatorVerion = "3.7.2";
         /**@description 支持版本 */
-        this.supportVersions = ["3.7.2"];
+        this.supportVersions = ["3.7.2", "3.7.3"];
         /**@description 扩展插件目录名 */
         this.extensionsName = "extensions";
         this.build = {
@@ -20,6 +20,12 @@ class _Environment {
             dest: "D:/workspace/QuickFramework372/proj/build/windows",
             md5Cache: false,
         };
+        /**@description 对外公布示例地址*/
+        this.publicBundlesUrl = "https://gitee.com/top-discover/QuickFrameworkBundles.git";
+        /**@description 私有代码地址 */
+        this.privateBundlesUrl = "https://gitee.com/top-discover/quick-framework-private-bundles.git";
+        /**@description 是否启用私有代码 */
+        this.isPrivate = false;
         /**@description 是否在tools目录下执行命令 */
         this.isCommand = false;
         /**@description 项目插件 */
@@ -72,6 +78,19 @@ class _Environment {
      */
     get isVersion3X() {
         return true;
+    }
+    get privateProj() {
+        return "privateProj";
+    }
+    get bundleName() {
+        return "bundles";
+    }
+    get privateCode() {
+        return [
+            { from: this.bundleName, to: `proj/assets/${this.bundleName}`, type: Defines_1.SyncType.Bunldes },
+            // { from : "framework/slot" , to : `proj/assets/scripts/framework` , type : SyncType.CUR_DIR_AND_META},
+            // { from : "@types" , to : `proj/@types` , type : SyncType.CUR_ALL_FILES},
+        ];
     }
 }
 _Environment._instance = null;

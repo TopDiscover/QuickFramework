@@ -12,9 +12,13 @@ class Handler {
         /**@description 日志 */
         this._logger = null;
         /**@description 保存bundles的名称 */
-        this.bundleName = "bundles";
+        this.bundleName = Environment_1.Environment.bundleName;
+        /**@description 私有项目的名称 */
+        this.privateProj = Environment_1.Environment.privateProj;
         /**@description bundles保存路径 */
         this.bundlesPath = (0, path_1.join)(this.projPath, this.bundleName);
+        /**@description 私有项目保存路径 */
+        this.privateProjPath = (0, path_1.join)(this.projPath, this.privateProj);
         /**@description 项目 assets 目录 */
         this.assetsDBPath = (0, path_1.join)(this.projPath, "proj/assets");
         /**@description 项目 bundles 路径 */
