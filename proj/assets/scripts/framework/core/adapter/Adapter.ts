@@ -17,15 +17,11 @@ interface SafeArea {
      */
     height: number;
 
-    /**
-     * 屏幕分辨率下：安全区域宽度像素
-     */
-    safeAreaWidth: number;
+    /**@description 屏幕分辨率下：安全区域大小(像素) */
+    safe: cc.Size;
 
-    /**
-     * 屏幕分辨率下：安全区域高度像素
-     */
-    safeAreaHeight: number;
+    /**@description 「设计分辨率」 非安全区域的大小(像素)即刘海单边的大小 */
+    outside: cc.Size;
 
     /**
      * 「设计分辨率」像素值转换到 「屏幕分辨率」 下的像素比
@@ -51,6 +47,9 @@ enum DeviceDirection {
     /**@description 竖屏(即摄像头向下) */
     UpsideDown,
 }
+
+let SAFE_SIZE = cc.size(0, 0);
+let OUTSIDE_SIZE = cc.size(0, 0);
 
 const EDITOR_SIZI = cc.size(1280, 720);
 export class Adapter extends cc.Component {
@@ -138,7 +137,7 @@ export class Adapter extends cc.Component {
     get direction() {
         let str = "未知"
         let result = DeviceDirection.Unknown;
-        if (window.orientation) {
+        if (window.orientation != undefined || window.orientation != null) {
             if (window.orientation == 90) {
                 str = `横屏向左`
                 result = DeviceDirection.LandscapeLeft;
@@ -188,14 +187,19 @@ export class Adapter extends cc.Component {
 
             // 计算安全区域的宽高像素
             let rect = cc.sys.getSafeAreaRect();
-            let safeAreaWidth = (Math.abs(designWidth - rect.width) / 2) / designPxToScreenPxRatio
-            let safeAreaHeight = (Math.abs(designHeight - rect.height) / 2) / designPxToScreenPxRatio
+            let safeAreaWith = Math.abs(designWidth - rect.width);
+            let safeAreaHeight = Math.abs(designHeight - rect.height);
+            OUTSIDE_SIZE.width = (safeAreaWith / 2) / designPxToScreenPxRatio
+            OUTSIDE_SIZE.height = (safeAreaHeight / 2) / designPxToScreenPxRatio
+
+            SAFE_SIZE.width = rect.width * designPxToScreenPxRatio;
+            SAFE_SIZE.height = rect.height * designPxToScreenPxRatio;
 
             this._safeArea = {
                 width: screenWidth,
                 height: screenHeight,
-                safeAreaWidth: safeAreaWidth,
-                safeAreaHeight: safeAreaHeight,
+                outside: OUTSIDE_SIZE,
+                safe: SAFE_SIZE,
                 designPxToScreenPxRatio: designPxToScreenPxRatio,
             };
         }

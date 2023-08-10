@@ -3,7 +3,7 @@ import { Adapter } from "./Adapter";
 const { ccclass, property, executeInEditMode, menu } = cc._decorator;
 
 /**
- * @classdesc  安全区域适配Widget
+ * @classdesc  安全区域适配Widget , App.isFullScreenAdaption = true 时有效
  * @description
  *
  * 用法：
@@ -160,6 +160,9 @@ export default class AdapterSafeArea extends Adapter {
                 widget.isAlignBottom = this.isAlignBottom;
                 return;
             }
+            if ( !App.isFullScreenAdaption ){
+                return;
+            }
             if (!widget || !widget.enabled) {
                 return;
             }
@@ -167,7 +170,7 @@ export default class AdapterSafeArea extends Adapter {
             if (widget.isAlignTop && this.isAlignTop) {
                 widget.isAbsoluteTop = true;
                 if (this.direction == Adapter.direction.Portrait) {
-                    widget.top = this.top + Adapter.safeArea.safeAreaHeight;
+                    widget.top = this.top + Adapter.safeArea.outside.height;
                 } else {
                     widget.top = this.top;
                 }
@@ -176,7 +179,7 @@ export default class AdapterSafeArea extends Adapter {
             if (widget.isAlignBottom && this.isAlignBottom) {
                 widget.isAbsoluteBottom = true;
                 if (this.direction == Adapter.direction.UpsideDown) {
-                    widget.bottom = this.bottom + Adapter.safeArea.safeAreaHeight;
+                    widget.bottom = this.bottom + Adapter.safeArea.outside.height;
                 } else {
                     widget.bottom = this.bottom;
                 }
@@ -185,7 +188,7 @@ export default class AdapterSafeArea extends Adapter {
             if (widget.isAlignLeft && this.isAlignLeft) {
                 widget.isAbsoluteLeft = true;
                 if (this.direction == Adapter.direction.LandscapeLeft) {
-                    widget.left = this.left + Adapter.safeArea.safeAreaWidth;
+                    widget.left = this.left + Adapter.safeArea.outside.width;
                 } else {
                     widget.left = this.left;
                 }
@@ -195,7 +198,7 @@ export default class AdapterSafeArea extends Adapter {
             if (widget.isAlignRight && this.isAlignRight) {
                 widget.isAbsoluteRight = true;
                 if (this.direction == Adapter.direction.LandscapeRight) {
-                    widget.right = this.right + Adapter.safeArea.safeAreaWidth;
+                    widget.right = this.right + Adapter.safeArea.outside.width;
                 } else {
                     widget.right = this.right;
                 }

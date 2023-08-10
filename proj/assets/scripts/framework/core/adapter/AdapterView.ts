@@ -23,9 +23,34 @@ export default class AdapterView extends Adapter {
     protected onChangeSize() {
         Adapter.safeArea = null as any;
         if (this.node) {
-            // 将屏幕尺寸下的安全区域大小，转换为设计分辨率下的大小，重新给节点设置大小
-            this.width = Adapter.safeArea.width / Adapter.safeArea.designPxToScreenPxRatio;
-            this.height = Adapter.safeArea.height / Adapter.safeArea.designPxToScreenPxRatio;
+            if (App.isFullScreenAdaption) {
+                // 将屏幕尺寸下的大小，转换为设计分辨率下的大小，重新给节点设置大小
+                this.width = Adapter.safeArea.width / Adapter.safeArea.designPxToScreenPxRatio;
+                this.height = Adapter.safeArea.height / Adapter.safeArea.designPxToScreenPxRatio;
+            } else {
+                // 将屏幕尺寸下的安全区域大小，转换为设计分辨率下的大小，重新给节点设置大小
+                this.width = Adapter.safeArea.safe.width / Adapter.safeArea.designPxToScreenPxRatio;
+                this.height = Adapter.safeArea.safe.height / Adapter.safeArea.designPxToScreenPxRatio;
+
+                switch (this.direction) {
+                    case Adapter.direction.LandscapeLeft:
+                        this.node.setPosition(cc.v2(Adapter.safeArea.outside.width / Adapter.safeArea.designPxToScreenPxRatio, 0));
+                        break;
+                    case Adapter.direction.LandscapeRight:
+                        this.node.setPosition(cc.v2(-Adapter.safeArea.outside.width / Adapter.safeArea.designPxToScreenPxRatio, 0));
+                        break;
+                    case Adapter.direction.Portrait:
+                        this.node.setPosition(cc.v2(0, -Adapter.safeArea.outside.height / Adapter.safeArea.designPxToScreenPxRatio));
+                        break;
+                    case Adapter.direction.UpsideDown:
+                        this.node.setPosition(cc.v2(0, Adapter.safeArea.outside.height / Adapter.safeArea.designPxToScreenPxRatio));
+                        break;
+                    default:
+                        Log.e(`获取不到设备方向，直接居中处理`);
+                        this.node.setPosition(cc.v2(0, 0));
+                        break;
+                }
+            }
         }
     }
 }

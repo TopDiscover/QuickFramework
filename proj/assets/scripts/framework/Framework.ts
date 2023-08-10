@@ -28,6 +28,11 @@ import { Platform } from "./platform/Platform";
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok {
 
+    /**@description 是否采用全屏适配方案 */
+    get isFullScreenAdaption(){
+        return true;
+    }
+
     /**@description 资源是否懒释放，true时，只有收到平台的内存警告才会释放资源，还有在更新时才分释放,否则不会释放资源 */
     get isLazyRelease() {
         return false;
