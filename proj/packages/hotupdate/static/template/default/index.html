@@ -4,7 +4,7 @@
         <ui-box-container>
             <div class="layout vertical start-justified">
                 <ui-prop name='自动生成版本号' tooltip="当构建完成后，自动生成版本号">
-                    <ui-checkbox id = "uiAutoVersion" v-bind:value="isAutoVersion" @confirm="onChangeAutoVersion($event.target.value)" tooltip="当构建完成后，自动生成版本控制文件" >是否自动创建版本文件</ui-checkbox>
+                    <ui-checkbox id = "uiAutoVersion" v-bind:value="isAutoVersion" @confirm="onChangeAutoVersion($event.target.value)" tooltip="当构建完成后，自动生成版本号" >是否自动生成版本号</ui-checkbox>
                 </ui-prop>
                 <ui-prop name="App版本号" tooltip="APP的版本号设置，内置在包内的版本号，不会发生变化">
                     <div class="flex-1 layout horizontal center">
