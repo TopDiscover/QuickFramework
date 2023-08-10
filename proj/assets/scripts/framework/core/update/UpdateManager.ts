@@ -219,7 +219,7 @@ export class UpdateManager implements ISingleton {
         if (this.isBrowser) {
             return this.defaultVersion;
         } else {
-            let path = `${Update.MANIFEST_ROOT}$apk.json`;
+            let path = `${Update.MANIFEST_ROOT}apk.json`;
             let dataStr = this.getString(path);
             if (dataStr) {
                 let data = JSON.parse(dataStr);
