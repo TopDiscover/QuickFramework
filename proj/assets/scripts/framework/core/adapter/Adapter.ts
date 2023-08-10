@@ -1,12 +1,12 @@
 
 /**
- * @description 该适配方案出处 https://forum.cocos.org/t/cocos-creator/74001
+ * @description 该适配方案参考 https://forum.cocos.org/t/cocos-creator/74001
  */
 
 /**
  * 屏幕分辨率下 的像素值
  */
-export interface SafeArea {
+interface SafeArea {
     /**
      * 屏幕分辨率下：画布（屏幕)宽度
      */
@@ -28,36 +28,6 @@ export interface SafeArea {
     safeAreaHeight: number;
 
     /**
-     * 屏幕分辨率下：安全区域距离画布（屏幕）上边缘的距离像素
-     */
-    top: number;
-
-    /**
-     * 屏幕分辨率下：安全区域距离画布（屏幕）下边缘的距离像素
-     */
-    bottom: number;
-
-    /**
-     * 屏幕分辨率下：安全区域距离画布（屏幕）左边缘的距离像素
-     */
-    left: number;
-
-    /**
-     * 屏幕分辨率下：安全区域距离画布（屏幕）右边缘的距离像素
-     */
-    right: number;
-
-    /**
-     * 屏幕分辨率下：安全区域 X 偏移像素（相对于 Cocos 坐标系，X轴正方向往右，Y轴正方向往上）
-     */
-    offsetX: number;
-
-    /**
-     * 屏幕分辨率下：安全区域 Y 偏移像素（相对于 Cocos 坐标系，X轴正方向往右，Y轴正方向往上）
-     */
-    offsetY: number;
-
-    /**
      * 「设计分辨率」像素值转换到 「屏幕分辨率」 下的像素比
      *
      * e.g.
@@ -69,7 +39,7 @@ export interface SafeArea {
 }
 
 /**@description 设备方向 */
-enum DeviceDirection{
+enum DeviceDirection {
     /**@description 未知*/
     Unknown,
     /**@description 横屏(即摄像头向左) */
@@ -161,29 +131,74 @@ export class Adapter extends cc.Component {
      * @description 视图发生大小变化
      */
     protected onChangeSize() {
-        
+
     }
 
     /**@description 获取当前设备方向 */
-    get direction(){
+    get direction() {
         let str = "未知"
         let result = DeviceDirection.Unknown;
-        if ( window.orientation ){
-            if ( window.orientation == 90 ){
+        if (window.orientation) {
+            if (window.orientation == 90) {
                 str = `横屏向左`
                 result = DeviceDirection.LandscapeLeft;
-            }else if ( window.orientation == -90 ){
+            } else if (window.orientation == -90) {
                 str = `横屏向右`
-                result = DeviceDirection.LandscapeLeft;
-            }else if ( window.orientation == 0 ){
+                result = DeviceDirection.LandscapeRight;
+            } else if (window.orientation == 0) {
                 str = "竖屏向上"
                 result = DeviceDirection.Portrait;
-            }else if ( window.orientation == 180 ){
+            } else if (window.orientation == 180) {
                 str = "竖屏向下"
                 result = DeviceDirection.UpsideDown;
             }
         }
         Log.d(`设备方向 : ${str}`)
         return result;
+    }
+
+    private static _safeArea: SafeArea = null!;
+
+    static set safeArea(value: SafeArea) {
+        this._safeArea = value as any;
+    }
+
+    static screenPxToDesignPx(screenPx: number) {
+        return screenPx / this.safeArea.designPxToScreenPxRatio;
+    }
+
+    static designPxToScreenPx(designPx: number) {
+        return designPx * this.safeArea.designPxToScreenPxRatio;
+    }
+
+    /**
+     * 基于屏幕尺寸的安全区域
+     *
+     * 可以通过 screenPxToDesignPx 转换为基于设计画布尺寸的像素大小
+     */
+    static get safeArea() {
+        if (this._safeArea == null || this._safeArea == undefined) {
+            // 初始屏幕宽高像素
+            let screenWidth = Adapter.canvasSize.width;
+            let screenHeight = Adapter.canvasSize.height;
+            // 「设计分辨率」像素值转换到 「屏幕分辨率」 下的像素比
+            let designWidth = Adapter.visibleSize.width;
+            let designHeight = Adapter.visibleSize.height;
+            let designPxToScreenPxRatio = Math.min(screenWidth / designWidth, screenHeight / designHeight);
+
+            // 计算安全区域的宽高像素
+            let rect = cc.sys.getSafeAreaRect();
+            let safeAreaWidth = (Math.abs(designWidth - rect.width) / 2) / designPxToScreenPxRatio
+            let safeAreaHeight = (Math.abs(designHeight - rect.height) / 2) / designPxToScreenPxRatio
+
+            this._safeArea = {
+                width: screenWidth,
+                height: screenHeight,
+                safeAreaWidth: safeAreaWidth,
+                safeAreaHeight: safeAreaHeight,
+                designPxToScreenPxRatio: designPxToScreenPxRatio,
+            };
+        }
+        return this._safeArea;
     }
 }

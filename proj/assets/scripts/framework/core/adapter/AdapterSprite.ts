@@ -1,6 +1,6 @@
 import { Adapter } from "./Adapter";
 
-const { ccclass, property , executeInEditMode,menu} = cc._decorator;
+const { ccclass, property, executeInEditMode, menu } = cc._decorator;
 
 /**
  * 缩放方式
@@ -49,9 +49,6 @@ export enum SpriteAlignType {
 
 /**
  * Sprite 适配组件
- *
- * @author caizhitao
- * @created 2020-12-27 21:22:43
  */
 @ccclass
 @executeInEditMode
@@ -63,13 +60,13 @@ export default class AdapterSprite extends Adapter {
         -FILL: 缩放到填满父节点（如果父节点有裁剪，图像可能会被裁剪，节点可能会超出父节点）
         -SUIT: 缩放到刚好在父节点内部最大化显示（图像会完整显示，但父节点上下或者左右可能会留空）`,
     })
-    get scaleType(){
+    get scaleType() {
         return this._scaleType;
     }
-    set scaleType(value){
+    set scaleType(value) {
         this._scaleType = value;
-        if ( CC_EDITOR ){
-            this.updateSprite(this._scaleType,this.alignType);
+        if (CC_EDITOR) {
+            this.updateSprite(this._scaleType, this.alignType);
         }
     }
     private _scaleType: SpriteScaleType = SpriteScaleType.SUIT;
@@ -83,13 +80,13 @@ export default class AdapterSprite extends Adapter {
         -BOTTOM: 缩放后靠下对齐
         -CENTER: 缩放后居中对齐`,
     })
-    get alignType(){
+    get alignType() {
         return this._alignType;
     }
-    set alignType(value){
+    set alignType(value) {
         this._alignType = value;
-        if ( CC_EDITOR ){
-            this.updateSprite(this._scaleType,this._alignType);
+        if (CC_EDITOR) {
+            this.updateSprite(this._scaleType, this._alignType);
         }
     }
     private _alignType: SpriteAlignType = SpriteAlignType.CENTER;
@@ -158,7 +155,7 @@ export default class AdapterSprite extends Adapter {
         }
     }
 
-    private get parentTrans(){
+    private get parentTrans() {
         return this.node.parent;
     }
 }
