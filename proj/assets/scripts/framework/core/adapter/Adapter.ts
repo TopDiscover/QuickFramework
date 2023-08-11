@@ -51,7 +51,6 @@ enum DeviceDirection {
 let SAFE_SIZE = cc.size(0, 0);
 let OUTSIDE_SIZE = cc.size(0, 0);
 
-const EDITOR_SIZI = cc.size(1280, 720);
 export class Adapter extends cc.Component {
 
     static direction = DeviceDirection;
@@ -73,7 +72,7 @@ export class Adapter extends cc.Component {
 
     protected static get canvasSize() {
         if (CC_EDITOR) {
-            return EDITOR_SIZI;
+            return cc.view.getDesignResolutionSize();
         } else {
             return cc.view.getCanvasSize();
         }
@@ -81,7 +80,7 @@ export class Adapter extends cc.Component {
 
     protected static get visibleSize() {
         if (CC_EDITOR) {
-            return EDITOR_SIZI;
+            return cc.view.getDesignResolutionSize();
         } else {
             return cc.view.getVisibleSize();
         }
