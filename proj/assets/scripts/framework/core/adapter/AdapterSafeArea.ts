@@ -1,12 +1,11 @@
 import { Widget, _decorator } from "cc";
+import { EDITOR } from "cc/env";
 import { Adapter } from "./Adapter";
-import AdapterView from "./AdapterView";
 
-const { ccclass, property,executeInEditMode,menu } = _decorator;
+const { ccclass, property, executeInEditMode, menu } = _decorator;
 
 /**
- * @author zhitaocai
- * @classdesc  安全区域适配Widget
+ * @classdesc  安全区域适配Widget , App.isFullScreenAdaption = true 时有效
  * @description
  *
  * 用法：
@@ -16,60 +15,207 @@ const { ccclass, property,executeInEditMode,menu } = _decorator;
  * 适配原理：
  *
  * 1. 根据安全区域范围，修改widget组件属性
+ * 自动添加刘海宽度，以避免显示到安全区域之外
  */
 @ccclass
-@executeInEditMode(true)
+@executeInEditMode
 @menu("Quick适配组件/AdapterSafeArea")
 export default class AdapterSafeArea extends Adapter {
-    @property({
-        tooltip: "是否包含安全区域和屏幕上边界之间的缝隙",
-    })
-    withInsertTop: boolean = false;
-
-    @property({
-        tooltip: "是否包含安全区域和屏幕下边界之间的缝隙",
-    })
-    withInsertBottom: boolean = false;
-
-    @property({
-        tooltip: "是否包含安全区域和屏幕左边界之间的缝隙",
-    })
-    withInsertLeft: boolean = false;
-
-    @property({
-        tooltip: "是否包含安全区域和屏幕右边界之间的缝隙",
-    })
-    withInsertRight: boolean = false;
-
-    protected onChangeSize() {
-        let widget = this.getComponent(Widget);
-        if (!widget || !widget.enabled) {
+    @property
+    protected _isTop = false;
+    @property({ tooltip: EDITOR ? "是否对齐上边" : "" })
+    get isAlignTop() {
+        return this._isTop;
+    }
+    set isAlignTop(v) {
+        if (this._isTop == v) {
             return;
         }
-        // 如果对齐上边界，并且包含安全区域到屏幕上边界的缝隙
-        if (widget.isAlignTop && this.withInsertTop) {
-            widget.isAbsoluteTop = true;
-            widget.top = -AdapterView.screenPxToDesignPx(AdapterView.safeArea.safeAreaMarginTop);
-            this.height += Math.abs(widget.top);
+        this._isTop = v;
+        this._isDirty = true;
+    }
+
+    @property
+    protected _isBottom = false;
+    @property({ tooltip: EDITOR ? "是否对齐下边" : "" })
+    get isAlignBottom() {
+        return this._isBottom;
+    }
+    set isAlignBottom(v) {
+        if (this._isBottom == v) {
+            return;
         }
-        // 如果对齐下边界，并且包含安全区域到屏幕下边界的缝隙
-        if (widget.isAlignBottom && this.withInsertBottom) {
-            widget.isAbsoluteBottom = true;
-            widget.bottom = -AdapterView.screenPxToDesignPx(AdapterView.safeArea.safeAreaMarginBottom);
-            this.height += Math.abs(widget.bottom);
+        this._isBottom = v;
+        this._isDirty = true;
+    }
+
+    @property
+    protected _isLeft = false;
+    @property({ tooltip: EDITOR ? "是否对齐左边" : "" })
+    get isAlignLeft() {
+        return this._isLeft;
+    }
+    set isAlignLeft(v) {
+        if (this._isLeft == v) {
+            return;
         }
-        // 如果对齐左边界，并且包含安全区域到屏幕左边界的缝隙
-        if (widget.isAlignLeft && this.withInsertLeft) {
-            widget.isAbsoluteLeft = true;
-            widget.left = -AdapterView.screenPxToDesignPx(AdapterView.safeArea.safeAreaMarginLeft);
-            this.width += Math.abs(widget.left);
+        this._isLeft = v;
+        this._isDirty = true;
+    }
+
+    @property
+    protected _isRight = false;
+    @property({ tooltip: EDITOR ? "是否对齐右边" : "" })
+    get isAlignRight() {
+        return this._isRight;
+    }
+    set isAlignRight(v) {
+        if (this._isRight == v) {
+            return;
         }
-        // 如果对齐右边界，并且包含安全区域到屏幕右边界的缝隙
-        if (widget.isAlignRight && this.withInsertRight) {
-            widget.isAbsoluteRight = true;
-            widget.right = -AdapterView.screenPxToDesignPx(AdapterView.safeArea.safeAreaMarginRight);
-            this.width += Math.abs(widget.right);
+        this._isRight = v;
+        this._isDirty = true;
+    }
+
+    @property
+    _top = 0;
+    @property({ tooltip: EDITOR ? "本节点顶边和父节点顶边的距离，可填写负值，只有在 isAlignTop 开启时才有作用" : "" })
+    get top() {
+        return this._top;
+    }
+    set top(v) {
+        if (this._top == v) {
+            return;
         }
-        widget.updateAlignment();
+        this._top = v;
+        this._isDirty = true;
+    }
+
+    @property
+    _bottom = 0;
+    @property({ tooltip: EDITOR ? "本节点顶边和父节点底边的距离，可填写负值，只有在 isAlignBottom 开启时才有作用" : "" })
+    get bottom() {
+        return this._bottom;
+    }
+    set bottom(v) {
+        if (this._bottom == v) {
+            return;
+        }
+        this._bottom = v;
+        this._isDirty = true;
+    }
+
+    @property
+    _left = 0;
+    @property({ tooltip: EDITOR ? "本节点顶边和父节点左边的距离，可填写负值，只有在 isAlignLeft 开启时才有作用" : "" })
+    get left() {
+        return this._left;
+    }
+    set left(v) {
+        if (this._left == v) {
+            return;
+        }
+        this._left = v;
+        this._isDirty = true;
+    }
+
+    @property
+    _right = 0;
+    @property({ tooltip: EDITOR ? "本节点顶边和父节点右边的距离，可填写负值，只有在 isAlignRight 开启时才有作用" : "" })
+    get right() {
+        return this._right;
+    }
+    set right(v) {
+        if (this._right == v) {
+            return;
+        }
+        this._right = v;
+        this._isDirty = true;
+    }
+
+    protected _isDirty = false;
+
+    protected get widget() {
+        let comp = this.getComponent(Widget);
+        if (comp) {
+            return comp;
+        }
+        return this.addComponent(Widget);
+    }
+
+    resetInEditor() {
+        this.doLayout(true);
+    }
+
+    protected doLayout(isForce = false) {
+        if (this._isDirty || isForce) {
+            let widget = this.widget!;
+            if (EDITOR) {
+                widget.left = this.left;
+                widget.right = this.right;
+                widget.top = this.top;
+                widget.bottom = this.bottom;
+
+                widget.isAlignLeft = this.isAlignLeft;
+                widget.isAlignRight = this.isAlignRight;
+                widget.isAlignTop = this.isAlignTop;
+                widget.isAlignBottom = this.isAlignBottom;
+                return;
+            }
+            if (!App.isFullScreenAdaption) {
+                return;
+            }
+            if (!widget || !widget.enabled) {
+                return;
+            }
+            // 如果对齐上边界，并且包含安全区域到屏幕上边界的缝隙
+            if (widget.isAlignTop && this.isAlignTop) {
+                widget.isAbsoluteTop = true;
+                if (this.direction == Adapter.direction.Portrait) {
+                    widget.top = this.top + Adapter.safeArea.outside.height;
+                } else {
+                    widget.top = this.top;
+                }
+            }
+            // 如果对齐下边界，并且包含安全区域到屏幕下边界的缝隙
+            if (widget.isAlignBottom && this.isAlignBottom) {
+                widget.isAbsoluteBottom = true;
+                if (this.direction == Adapter.direction.UpsideDown) {
+                    widget.bottom = this.bottom + Adapter.safeArea.outside.height;
+                } else {
+                    widget.bottom = this.bottom;
+                }
+            }
+            // 如果对齐左边界，并且包含安全区域到屏幕左边界的缝隙
+            if (widget.isAlignLeft && this.isAlignLeft) {
+                widget.isAbsoluteLeft = true;
+                if (this.direction == Adapter.direction.LandscapeLeft) {
+                    widget.left = this.left + Adapter.safeArea.outside.width;
+                } else {
+                    widget.left = this.left;
+                }
+
+            }
+            // 如果对齐右边界，并且包含安全区域到屏幕右边界的缝隙
+            if (widget.isAlignRight && this.isAlignRight) {
+                widget.isAbsoluteRight = true;
+                if (this.direction == Adapter.direction.LandscapeRight) {
+                    widget.right = this.right + Adapter.safeArea.outside.width;
+                } else {
+                    widget.right = this.right;
+                }
+            }
+            widget.updateAlignment();
+            this._isDirty = false;
+        }
+    }
+
+    protected onChangeSize() {
+        this.doLayout(true);
+    }
+
+    protected update(dt: number) {
+        super.update && super.update(dt);
+        this.doLayout();
     }
 }

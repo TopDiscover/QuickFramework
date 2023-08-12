@@ -214,7 +214,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 640,
-      "y": 359.99999999999994,
+      "y": 360,
       "z": 0
     },
     "_lrot": {
@@ -297,7 +297,7 @@
     "_priority": 1073741824,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 360,
+    "_orthoHeight": 486.3436123348018,
     "_near": 1,
     "_far": 2000,
     "_color": {
@@ -537,7 +537,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1188,
+      "width": 1280,
       "height": 720
     },
     "_anchorPoint": {
@@ -10946,7 +10946,7 @@
     "_id": "1frNjfDCNPaa/2Nj8i7N+3"
   },
   {
-    "__type__": "32b0fpgPcJGb4F0BalFuE1g",
+    "__type__": "cc.Widget",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -10954,7 +10954,25 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "_id": "86RtEuM6FOBL9v7PefzrjR"
+    "_alignFlags": 45,
+    "_target": null,
+    "_left": 0,
+    "_right": 0,
+    "_top": 0,
+    "_bottom": 0,
+    "_horizontalCenter": 0,
+    "_verticalCenter": 0,
+    "_isAbsLeft": true,
+    "_isAbsRight": true,
+    "_isAbsTop": true,
+    "_isAbsBottom": true,
+    "_isAbsHorizontalCenter": true,
+    "_isAbsVerticalCenter": true,
+    "_originalWidth": 1280,
+    "_originalHeight": 972.6872246696036,
+    "_alignMode": 2,
+    "_lockFlags": 0,
+    "_id": "53fuwdSMFG847nuZhXk9jZ"
   },
   {
     "__type__": "cc.Node",
@@ -12060,8 +12078,8 @@
     "_target": null,
     "_left": 0,
     "_right": 0,
-    "_top": -5.684341886080802e-14,
-    "_bottom": -5.684341886080802e-14,
+    "_top": 0,
+    "_bottom": 0,
     "_horizontalCenter": 0,
     "_verticalCenter": 0,
     "_isAbsLeft": true,
@@ -12077,7 +12095,7 @@
     "_id": "d13oVT4blD3JbFElilQ+GS"
   },
   {
-    "__type__": "f32e31t7khMV4GDh7KIqIvX",
+    "__type__": "32b0fpgPcJGb4F0BalFuE1g",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -12085,7 +12103,7 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "_id": "27kAppT2pCjq/VKVCL5gVu"
+    "_id": "8c4VqVkSBJFI95fzEvUtd2"
   },
   {
     "__type__": "cc.Node",

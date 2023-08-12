@@ -19,3 +19,4 @@ proj/extensions/png-compress/src/impl
 proj/extensions/test-server/@types
 proj/extensions/test-server/src/core
 proj/extensions/test-server/src/impl
+proj/zips_temp
