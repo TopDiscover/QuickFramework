@@ -155,11 +155,6 @@ export default class AdapterSafeArea extends Adapter {
                 widget.right = this.right;
                 widget.top = this.top;
                 widget.bottom = this.bottom;
-
-                widget.isAlignLeft = this.isAlignLeft;
-                widget.isAlignRight = this.isAlignRight;
-                widget.isAlignTop = this.isAlignTop;
-                widget.isAlignBottom = this.isAlignBottom;
                 return;
             }
             //没有做好适配，计算安全区域有错误
