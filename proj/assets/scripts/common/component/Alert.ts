@@ -1,4 +1,4 @@
-import { find, input, Input, instantiate, isValid, Label, Node, RichText, tween, Vec3 } from "cc";
+import { find, input, Input, instantiate, isValid, Label, Node, RichText, ScrollView, tween, Vec3 } from "cc";
 import EventComponent from "../../framework/componects/EventComponent";
 import { inject } from "../../framework/defines/Decorators";
 import { ViewZOrder } from "../config/Config";
@@ -12,10 +12,10 @@ class AlertDialog extends EventComponent {
     @inject("content",Node)
     private _content: Node = null!;
     /**@description 常规显示文字 */
-    @inject("content",Label,"content")
+    @inject("content",Label,"content/scrollView/view/content")
     private _textContent: Label = null!;
     /**@description 富文本显示文字 */
-    @inject("richContent",RichText,"content")
+    @inject("richContent",RichText,"content/scrollView/view/content")
     private _richTextContent: RichText = null!;
     /**@description 标题 */
     @inject("title",Label,"content")
@@ -28,6 +28,8 @@ class AlertDialog extends EventComponent {
     private _cancel: Node = null!;
     /**@description 配置信息 */
     private _config: AlertConfig = null!;
+    @inject("content/scrollView",ScrollView)
+    private _view : ScrollView = null!;
 
     public get config() {
         return this._config;
@@ -100,6 +102,7 @@ class AlertDialog extends EventComponent {
                 if (lb) lb.string = config.cancelString;
             }
         }
+        this._view.scrollToTop();
     }
 
     /**@description 显示按钮 */
