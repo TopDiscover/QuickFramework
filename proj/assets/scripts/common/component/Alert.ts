@@ -11,10 +11,10 @@ class AlertDialog extends EventComponent {
     @inject("content",cc.Node)
     private _content: cc.Node = null;
     /**@description 常规显示文字 */
-    @inject("content",cc.Label,"content")
+    @inject("content",cc.Label,"content/scrollview/view/content")
     private _textContent: cc.Label = null;
     /**@description 富文本显示文字 */
-    @inject("richContent",cc.RichText,"content")
+    @inject("richContent",cc.RichText,"content/scrollview/view/content")
     private _richTextContent: cc.RichText = null;
     /**@description 标题 */
     @inject("title",cc.Label,"content")
@@ -27,6 +27,8 @@ class AlertDialog extends EventComponent {
     private _cancel: cc.Node = null;
     /**@description 配置信息 */
     private _config: AlertConfig = null;
+    @inject("content/scrollview",cc.ScrollView)
+    private _view : cc.ScrollView = null!;
 
     public get config() {
         return this._config;
@@ -97,6 +99,7 @@ class AlertDialog extends EventComponent {
                 title.getComponent(cc.Label).string = config.cancelString;
             }
         }
+        this._view.scrollToTop();
     }
 
     /**@description 显示按钮 */
