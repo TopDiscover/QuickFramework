@@ -153,11 +153,6 @@ export default class AdapterSafeArea extends Adapter {
                 widget.right = this.right;
                 widget.top = this.top;
                 widget.bottom = this.bottom;
-
-                widget.isAlignLeft = this.isAlignLeft;
-                widget.isAlignRight = this.isAlignRight;
-                widget.isAlignTop = this.isAlignTop;
-                widget.isAlignBottom = this.isAlignBottom;
                 return;
             }
             if ( !App.isFullScreenAdaption ){
