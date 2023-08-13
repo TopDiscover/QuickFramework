@@ -156,7 +156,6 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_useOriginalSize": false,
     "_string": "Label",
     "_N$string": "Label",
     "_fontSize": 24,
@@ -181,7 +180,7 @@
       "__id__": 1
     },
     "asset": {
-      "__uuid__": "7466c5de-41b7-4696-8677-fdd37d834dff"
+      "__id__": 0
     },
     "fileId": "51tO7vYZFIl6s5+SEONrQv",
     "sync": false
@@ -224,9 +223,9 @@
       "__id__": 1
     },
     "asset": {
-      "__uuid__": "7466c5de-41b7-4696-8677-fdd37d834dff"
+      "__id__": 0
     },
-    "fileId": "c0yNpqDe1BeZetI4EVqic0",
+    "fileId": "",
     "sync": false
   }
 ]
