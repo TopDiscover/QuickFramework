@@ -162,7 +162,8 @@ export default class AdapterSafeArea extends Adapter {
                 widget.isAlignBottom = this.isAlignBottom;
                 return;
             }
-            if (!App.isFullScreenAdaption) {
+            //没有做好适配，计算安全区域有错误
+            if (true || !App.isFullScreenAdaption) {
                 return;
             }
             if (!widget || !widget.enabled) {

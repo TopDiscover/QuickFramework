@@ -1,5 +1,5 @@
 
-import { _decorator, Component, UITransform, size, Size, screen, view, sys } from 'cc';
+import { _decorator, Component, UITransform, size, Size, screen, view, sys, math, native } from 'cc';
 import { EDITOR } from 'cc/env';
 const { ccclass, property } = _decorator;
 /**
@@ -95,7 +95,7 @@ export class Adapter extends Component {
         return screen.windowSize;
     }
 
-    protected static get designSize() {
+    protected static get visibleSize() {
         return view.getVisibleSize();
     }
 
@@ -193,34 +193,19 @@ export class Adapter extends Component {
             let screenWidth = Adapter.windowSize.width;
             let screenHeight = Adapter.windowSize.height;
             // 「设计分辨率」像素值转换到 「屏幕分辨率」 下的像素比
-            let designWidth = Adapter.designSize.width;
-            let designHeight = Adapter.designSize.height;
+            let designWidth = Adapter.visibleSize.width;
+            let designHeight = Adapter.visibleSize.height;
             let designPxToScreenPxRatio = Math.min(screenWidth / designWidth, screenHeight / designHeight);
-
-            // screenWidth = view.getVisibleSizeInPixel().width
-            // screenHeight = view.getVisibleSizeInPixel().height
-
+            
             // 计算安全区域的宽高像素
             let rect = sys.getSafeAreaRect();
-            let safeAreaWith = Math.abs(designWidth - rect.width);
+            let safeAreaWith = Math.abs(designWidth - rect.width );
             let safeAreaHeight = Math.abs(designHeight - rect.height);
             OUTSIDE_SIZE.width = safeAreaWith / designPxToScreenPxRatio
             OUTSIDE_SIZE.height = safeAreaHeight / designPxToScreenPxRatio
-
-            let str = "";
-            str += `window : ${screen.windowSize.width},${screen.windowSize.height}`;
-            str += `safe : ${rect.x.toFixed(0)},${rect.y.toFixed(0)},${rect.width.toFixed(0)},${rect.height.toFixed(0)}`;
-            str += `visible : ${view.getVisibleSize().width},${view.getVisibleSize().height},`;
-            str += `design : ${view.getDesignResolutionSize().width},${view.getDesignResolutionSize().height},`;
-            str += `Pixel : ${view.getVisibleSizeInPixel().width.toFixed(2)},${view.getVisibleSizeInPixel().height.toFixed(2)},`;
-            str += `Origin : ${view.getVisibleOrigin().x},${view.getVisibleOrigin().y},`;
-            // if ( !EDITOR ){
-            //     App.alert.show({
-            //         text : str
-            //     })
-            // }
+            
             SAFE_SIZE.width = rect.width * designPxToScreenPxRatio;
-            SAFE_SIZE.height = rect.height * designPxToScreenPxRatio;
+            SAFE_SIZE.height = rect.width  * designPxToScreenPxRatio;
 
             this._safeArea = {
                 width: screenWidth,
