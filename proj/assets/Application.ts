@@ -1,4 +1,4 @@
-import { Node } from "cc";
+import { find, Node } from "cc";
 import Alert from "./scripts/common/component/Alert";
 import GlobalAudio from "./scripts/common/component/GlobalAudio";
 import Loading from "./scripts/common/component/Loading";
@@ -9,6 +9,7 @@ import UpdateLoading from "./scripts/common/component/UpdateLoading";
 import { Config } from "./scripts/common/config/Config";
 import { Bundles } from "./scripts/common/data/Bundles";
 import { StageData } from "./scripts/common/data/StageData";
+import { DebugView } from "./scripts/common/debug/DebugView";
 import { CmmEntry } from "./scripts/common/entry/CmmEntry";
 import { CommonLanguage } from "./scripts/common/language/CommonLanguage";
 import { CmmUtils } from "./scripts/common/utils/CmmUtils";
@@ -121,6 +122,10 @@ export class Application extends Framewok implements GameEventInterface {
         //释放管理器
         App.releaseManger.onLoad(node);
     }
+
+    appendLog(text : string ){[
+        find("debugView",App.uiManager.canvas)?.getComponent(DebugView)?.append(text)
+    ]}
 
     update(node: Node) {
         //Service 网络调试

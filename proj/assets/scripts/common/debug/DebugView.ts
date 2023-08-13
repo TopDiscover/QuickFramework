@@ -1,5 +1,5 @@
 
-import { _decorator, Component, Node, find, Toggle, view, Input, profiler ,screen, input } from 'cc';
+import { _decorator, Component, Node, find, Toggle, view, Input, profiler, screen, input, ScrollView, instantiate, Label } from 'cc';
 import EventComponent from '../../framework/componects/EventComponent';
 import { inject } from '../../framework/defines/Decorators';
 import { LogLevel } from '../../framework/defines/Enums';
@@ -10,15 +10,19 @@ const { ccclass, property } = _decorator;
 @ccclass('DebugView')
 export class DebugView extends EventComponent {
 
-    @inject("logView",Node)
+    @inject("logView", Node)
     private logView: Node = null!;
-    @inject("content",Node)
+    @inject("content", Node)
     private content: Node = null!;
-    @inject("background",Node)
-    private background : Node = null!;
-    @inject("background",Node,"logView")
-    private logViewBackground : Node = null!;
+    @inject("background", Node)
+    private background: Node = null!;
+    @inject("background", Node, "logView")
+    private logViewBackground: Node = null!;
+    @inject("logView/ScrollView", ScrollView)
+    private view: ScrollView = null!;
+    private item : Node = null!;
     onLoad() {
+        super.onLoad();
         //显示界面信息
         this.bindEvent("showUI", this.onShowUI);
         //显示节点信息
@@ -58,6 +62,8 @@ export class DebugView extends EventComponent {
         //当前所有单例
         this.bindEvent("singleton", this.onSingleton);
         this.doOther();
+        this.item = this.view.content?.children[0]!;
+        this.item.removeFromParent();
     }
     debug: Node = null!;
 
@@ -66,19 +72,19 @@ export class DebugView extends EventComponent {
             this.logView.active = false;
             this.initLogView();
         }
-        this.onN(this.background,Input.EventType.TOUCH_END, () => {
+        this.onN(this.background, Input.EventType.TOUCH_END, () => {
             this.node.active = false;
             if (this.debug) this.debug.active = true;
         });
     }
 
-    private bindEvent(path: string, cb: ()=>void) {
+    private bindEvent(path: string, cb: () => void) {
         let node = find(path, this.content);
-        this.onN(node!,Input.EventType.TOUCH_END,cb);
+        this.onN(node!, Input.EventType.TOUCH_END, cb);
     }
 
     private initLogView() {
-        this.onN(this.logViewBackground,Input.EventType.TOUCH_END, () => {
+        this.onN(this.logViewBackground, Input.EventType.TOUCH_END, () => {
             this.logView.active = false;
         });
 
@@ -89,13 +95,21 @@ export class DebugView extends EventComponent {
                 if (node) {
                     let toggle = node.getComponent(Toggle);
                     if (toggle) {
-                        toggle.isChecked = App.logger.isValid(this.getLogLevel(i));
-                    }
-                    this.onN(node,"toggle", (toggle: Toggle) => {
-                        if (toggle.isChecked) {
-                            App.logger.attach(this.getLogLevel(i));
+                        if (i == 4) {
+                            this.view.node.active = toggle.isChecked;
                         } else {
-                            App.logger.detach(this.getLogLevel(i));
+                            toggle.isChecked = App.logger.isValid(this.getLogLevel(i));
+                        }
+                    }
+                    this.onN(node, "toggle", (toggle: Toggle) => {
+                        if (i == 4) {
+                            this.view.node.active = toggle.isChecked;
+                        } else {
+                            if (toggle.isChecked) {
+                                App.logger.attach(this.getLogLevel(i));
+                            } else {
+                                App.logger.detach(this.getLogLevel(i));
+                            }
                         }
                     });
                 }
@@ -142,20 +156,20 @@ export class DebugView extends EventComponent {
     }
 
     private onShowDebugInfo() {
-        if (profiler.isShowingStats() ){
+        if (profiler.isShowingStats()) {
             profiler.hideStats();
-        }else{
+        } else {
             profiler.showStats();
         }
         App.storage.setItem(Config.SHOW_DEBUG_INFO_KEY, profiler.isShowingStats());
     }
 
     private onShowUI() {
-        App.uiManager.debug({showViews:true});
+        App.uiManager.debug({ showViews: true });
     }
 
     private onShowNode() {
-        App.uiManager.debug({showChildren:true});
+        App.uiManager.debug({ showChildren: true });
     }
 
     private onShowRes() {
@@ -163,14 +177,14 @@ export class DebugView extends EventComponent {
     }
 
     private onShowComp() {
-        App.uiManager.debug({showComp:true});
+        App.uiManager.debug({ showComp: true });
     }
 
     private onSender() {
         App.senderManager.debug();
     }
 
-    private onHandler(){
+    private onHandler() {
         App.handlerManager.debug();
     }
 
@@ -198,10 +212,17 @@ export class DebugView extends EventComponent {
         Log.d(`设备或浏览器像素比例: ${screen.devicePixelRatio}`);
         Log.d(`返回视图窗口可见区域像素尺寸: ${view.getVisibleSizeInPixel().width} x ${view.getVisibleSizeInPixel().height}`);
         Log.d(`当前场景设计分辨率: ${view.getDesignResolutionSize().width} x ${view.getDesignResolutionSize().height}`);
-        let viewRate = screen.windowSize.width/screen.windowSize.height;
-        let designRate = view.getDesignResolutionSize().width/view.getDesignResolutionSize().height;
+        let viewRate = screen.windowSize.width / screen.windowSize.height;
+        let designRate = view.getDesignResolutionSize().width / view.getDesignResolutionSize().height;
         Log.d(`视图宽高比:${viewRate}`);
         Log.d(`设置分辨率宽高比:${designRate}`);
+    }
+
+    append(txt: string) {
+        let node = instantiate(this.item);
+        node.getComponent(Label)!.string = txt;
+        this.view.content?.addChild(node);
+        this.view.scrollToBottom();
     }
 
     private onSingleton() {

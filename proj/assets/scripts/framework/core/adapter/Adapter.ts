@@ -1,6 +1,6 @@
 
-import { _decorator, Component, UITransform, size, Size, screen, view, sys, math, native } from 'cc';
-import { EDITOR } from 'cc/env';
+import { _decorator, Component, UITransform, size, Size, screen, view, sys, math, native, js, CCObject, Vec2, v2, v4 } from 'cc';
+import { EDITOR, JSB } from 'cc/env';
 const { ccclass, property } = _decorator;
 /**
  * @description 该适配方案参考 https://forum.cocos.org/t/cocos-creator/74001
@@ -64,7 +64,7 @@ export class Adapter extends Component {
         }
         trans.width = value;
     }
-    protected get width(){
+    protected get width() {
         let trans = this.getComponent(UITransform);
         if (!trans) {
             return 0;
@@ -72,7 +72,7 @@ export class Adapter extends Component {
         return trans.width;
     }
 
-    protected set height(value:number){
+    protected set height(value: number) {
         let trans = this.getComponent(UITransform);
         if (!trans) {
             return;
@@ -80,7 +80,7 @@ export class Adapter extends Component {
         trans.height = value;
     }
 
-    protected get height(){
+    protected get height() {
         let trans = this.getComponent(UITransform);
         if (!trans) {
             return 0;
@@ -89,7 +89,7 @@ export class Adapter extends Component {
     }
 
     protected static get windowSize() {
-        if ( EDITOR ){
+        if (EDITOR) {
             return view.getDesignResolutionSize();
         }
         return screen.windowSize;
@@ -149,23 +149,35 @@ export class Adapter extends Component {
     get direction() {
         let str = "未知"
         let result = DeviceDirection.Unknown;
-        if (window.orientation != undefined || window.orientation != null) {
-            if (window.orientation == 90) {
+        let orientation = window.orientation;
+        if (JSB) {
+            orientation = jsb.device.getDeviceOrientation();
+        }
+        if (orientation != undefined || orientation != null) {
+            if (orientation == 90) {
                 str = `横屏向左`
                 result = DeviceDirection.LandscapeLeft;
-            } else if (window.orientation == -90) {
+            } else if (orientation == -90) {
                 str = `横屏向右`
                 result = DeviceDirection.LandscapeRight;
-            } else if (window.orientation == 0) {
+            } else if (orientation == 0) {
                 str = "竖屏向上"
                 result = DeviceDirection.Portrait;
-            } else if (window.orientation == 180) {
+            } else if (orientation == 180) {
                 str = "竖屏向下"
                 result = DeviceDirection.UpsideDown;
             }
         }
         Log.d(`设备方向 : ${str}`)
         return result;
+    }
+
+    static get safeAreaEdge(){
+        if( JSB ){
+            return jsb.device.getSafeAreaEdge();
+        }else{
+            return v4(0,0,0,0);
+        }
     }
 
     private static _safeArea: SafeArea = null!;
@@ -196,16 +208,19 @@ export class Adapter extends Component {
             let designWidth = Adapter.visibleSize.width;
             let designHeight = Adapter.visibleSize.height;
             let designPxToScreenPxRatio = Math.min(screenWidth / designWidth, screenHeight / designHeight);
-            
-            // 计算安全区域的宽高像素
-            let rect = sys.getSafeAreaRect();
-            let safeAreaWith = Math.abs(designWidth - rect.width );
-            let safeAreaHeight = Math.abs(designHeight - rect.height);
-            OUTSIDE_SIZE.width = safeAreaWith / designPxToScreenPxRatio
-            OUTSIDE_SIZE.height = safeAreaHeight / designPxToScreenPxRatio
-            
-            SAFE_SIZE.width = rect.width * designPxToScreenPxRatio;
-            SAFE_SIZE.height = rect.width  * designPxToScreenPxRatio;
+
+            OUTSIDE_SIZE.width = 0
+            OUTSIDE_SIZE.height = 0
+            SAFE_SIZE.width = screenWidth - OUTSIDE_SIZE.width;
+            SAFE_SIZE.height = screenHeight - OUTSIDE_SIZE.height
+            if (JSB) {
+                OUTSIDE_SIZE.width = (this.safeAreaEdge.y + this.safeAreaEdge.w)
+                OUTSIDE_SIZE.height = (this.safeAreaEdge.x + this.safeAreaEdge.z)
+                SAFE_SIZE.width = screenWidth - OUTSIDE_SIZE.width;
+                SAFE_SIZE.height = screenHeight - OUTSIDE_SIZE.height
+                OUTSIDE_SIZE.width = OUTSIDE_SIZE.width/2
+                OUTSIDE_SIZE.height = OUTSIDE_SIZE.height/2
+            }
 
             this._safeArea = {
                 width: screenWidth,

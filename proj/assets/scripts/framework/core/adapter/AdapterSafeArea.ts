@@ -163,7 +163,7 @@ export default class AdapterSafeArea extends Adapter {
                 return;
             }
             //没有做好适配，计算安全区域有错误
-            if (true || !App.isFullScreenAdaption) {
+            if (!App.isFullScreenAdaption) {
                 return;
             }
             if (!widget || !widget.enabled) {
