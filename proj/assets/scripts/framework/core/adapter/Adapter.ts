@@ -155,6 +155,14 @@ export class Adapter extends cc.Component {
         return result;
     }
 
+    static get safeAreaEdge(){
+        if( CC_JSB ){
+            return (jsb as any).Device.getSafeAreaEdge();
+        }else{
+            return new cc.Vec4(0,0,0,0);
+        }
+    }
+
     private static _safeArea: SafeArea = null!;
 
     static set safeArea(value: SafeArea) {
@@ -184,15 +192,18 @@ export class Adapter extends cc.Component {
             let designHeight = Adapter.visibleSize.height;
             let designPxToScreenPxRatio = Math.min(screenWidth / designWidth, screenHeight / designHeight);
 
-            // 计算安全区域的宽高像素
-            let rect = cc.sys.getSafeAreaRect();
-            let safeAreaWith = Math.abs(designWidth - rect.width);
-            let safeAreaHeight = Math.abs(designHeight - rect.height);
-            OUTSIDE_SIZE.width = (safeAreaWith / 2) / designPxToScreenPxRatio
-            OUTSIDE_SIZE.height = (safeAreaHeight / 2) / designPxToScreenPxRatio
-
-            SAFE_SIZE.width = rect.width * designPxToScreenPxRatio;
-            SAFE_SIZE.height = rect.height * designPxToScreenPxRatio;
+            OUTSIDE_SIZE.width = 0
+            OUTSIDE_SIZE.height = 0
+            SAFE_SIZE.width = screenWidth - OUTSIDE_SIZE.width;
+            SAFE_SIZE.height = screenHeight - OUTSIDE_SIZE.height
+            if (CC_JSB) {
+                OUTSIDE_SIZE.width = (this.safeAreaEdge.y + this.safeAreaEdge.w)
+                OUTSIDE_SIZE.height = (this.safeAreaEdge.x + this.safeAreaEdge.z)
+                SAFE_SIZE.width = screenWidth - OUTSIDE_SIZE.width;
+                SAFE_SIZE.height = screenHeight - OUTSIDE_SIZE.height
+                OUTSIDE_SIZE.width = OUTSIDE_SIZE.width/2
+                OUTSIDE_SIZE.height = OUTSIDE_SIZE.height/2
+            }
 
             this._safeArea = {
                 width: screenWidth,
