@@ -4,6 +4,14 @@ import { Adapter } from "./Adapter";
 
 const { ccclass, property, executeInEditMode, menu } = _decorator;
 
+enum Flags {
+    None   = 0,
+    TOP    = 1 << 0,
+    BOTTOM = 1 << 1,
+    LEFT   = 1 << 2,
+    RIGHT  = 1 << 3,
+}
+
 /**
  * @classdesc  安全区域适配Widget , App.isFullScreenAdaption = true 时有效
  * @description
@@ -21,60 +29,53 @@ const { ccclass, property, executeInEditMode, menu } = _decorator;
 @executeInEditMode
 @menu("Quick适配组件/AdapterSafeArea")
 export default class AdapterSafeArea extends Adapter {
+
     @property
-    protected _isTop = false;
+    protected _flags : number = Flags.None;
+
+    protected setFlag( flag : Flags , value : boolean){
+        const current = (this._flags & flag) > 0;
+        if ( value == current ){
+            return;
+        }
+        if ( value ){
+            this._flags |= flag;
+        }else{
+            this._flags &= ~flag;
+        }
+        this._isDirty = true;
+    }
+
     @property({ tooltip: EDITOR ? "是否对齐上边" : "" })
     get isAlignTop() {
-        return this._isTop;
+        return (this._flags & Flags.TOP) > 0;
     }
     set isAlignTop(v) {
-        if (this._isTop == v) {
-            return;
-        }
-        this._isTop = v;
-        this._isDirty = true;
+        this.setFlag(Flags.TOP,v);
     }
 
-    @property
-    protected _isBottom = false;
     @property({ tooltip: EDITOR ? "是否对齐下边" : "" })
     get isAlignBottom() {
-        return this._isBottom;
+        return (this._flags & Flags.BOTTOM) > 0;
     }
     set isAlignBottom(v) {
-        if (this._isBottom == v) {
-            return;
-        }
-        this._isBottom = v;
-        this._isDirty = true;
+        this.setFlag(Flags.BOTTOM,v);
     }
 
-    @property
-    protected _isLeft = false;
     @property({ tooltip: EDITOR ? "是否对齐左边" : "" })
     get isAlignLeft() {
-        return this._isLeft;
+        return (this._flags & Flags.LEFT) > 0;
     }
     set isAlignLeft(v) {
-        if (this._isLeft == v) {
-            return;
-        }
-        this._isLeft = v;
-        this._isDirty = true;
+        this.setFlag(Flags.LEFT,v);
     }
 
-    @property
-    protected _isRight = false;
     @property({ tooltip: EDITOR ? "是否对齐右边" : "" })
     get isAlignRight() {
-        return this._isRight;
+        return (this._flags & Flags.RIGHT) > 0;
     }
     set isAlignRight(v) {
-        if (this._isRight == v) {
-            return;
-        }
-        this._isRight = v;
-        this._isDirty = true;
+        this.setFlag(Flags.RIGHT,v);
     }
 
     @property
@@ -157,14 +158,13 @@ export default class AdapterSafeArea extends Adapter {
                 widget.bottom = this.bottom;
                 return;
             }
-            //没有做好适配，计算安全区域有错误
             if (!App.isFullScreenAdaption) {
                 return;
             }
             if (!widget || !widget.enabled) {
                 return;
             }
-            // 如果对齐上边界，并且包含安全区域到屏幕上边界的缝隙
+            // 屏幕向上时，加上安全区域高度
             if (widget.isAlignTop && this.isAlignTop) {
                 widget.isAbsoluteTop = true;
                 if (this.direction == Adapter.direction.Portrait) {
@@ -173,7 +173,7 @@ export default class AdapterSafeArea extends Adapter {
                     widget.top = this.top;
                 }
             }
-            // 如果对齐下边界，并且包含安全区域到屏幕下边界的缝隙
+            // 屏幕向下时，加上安全区域高度
             if (widget.isAlignBottom && this.isAlignBottom) {
                 widget.isAbsoluteBottom = true;
                 if (this.direction == Adapter.direction.UpsideDown) {
@@ -182,7 +182,7 @@ export default class AdapterSafeArea extends Adapter {
                     widget.bottom = this.bottom;
                 }
             }
-            // 如果对齐左边界，并且包含安全区域到屏幕左边界的缝隙
+            // 屏幕向左时，加上安全区域宽度
             if (widget.isAlignLeft && this.isAlignLeft) {
                 widget.isAbsoluteLeft = true;
                 if (this.direction == Adapter.direction.LandscapeLeft) {
@@ -192,7 +192,7 @@ export default class AdapterSafeArea extends Adapter {
                 }
 
             }
-            // 如果对齐右边界，并且包含安全区域到屏幕右边界的缝隙
+            // 屏幕向右时，加上安全区域宽度
             if (widget.isAlignRight && this.isAlignRight) {
                 widget.isAbsoluteRight = true;
                 if (this.direction == Adapter.direction.LandscapeRight) {
