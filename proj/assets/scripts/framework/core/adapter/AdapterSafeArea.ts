@@ -21,7 +21,7 @@ const { ccclass, property, executeInEditMode, menu } = cc._decorator;
 export default class AdapterSafeArea extends Adapter {
     @property
     protected _isTop = false;
-    @property({ tooltip: CC_EDITOR && "是否对齐上边" })
+    @property({ tooltip: CC_EDITOR ? "是否对齐上边" : ""})
     get isAlignTop() {
         return this._isTop;
     }
@@ -35,7 +35,7 @@ export default class AdapterSafeArea extends Adapter {
 
     @property
     protected _isBottom = false;
-    @property({ tooltip: CC_EDITOR && "是否对齐下边", })
+    @property({ tooltip: CC_EDITOR ? "是否对齐下边" : "" })
     get isAlignBottom() {
         return this._isBottom;
     }
@@ -49,7 +49,7 @@ export default class AdapterSafeArea extends Adapter {
 
     @property
     protected _isLeft = false;
-    @property({ tooltip: CC_EDITOR && "是否对齐左边", })
+    @property({ tooltip: CC_EDITOR ? "是否对齐左边" : "" })
     get isAlignLeft() {
         return this._isLeft;
     }
@@ -63,7 +63,7 @@ export default class AdapterSafeArea extends Adapter {
 
     @property
     protected _isRight = false;
-    @property({ tooltip: CC_EDITOR && "是否对齐右边", })
+    @property({ tooltip: CC_EDITOR ? "是否对齐右边" : "" })
     get isAlignRight() {
         return this._isRight;
     }
@@ -77,7 +77,7 @@ export default class AdapterSafeArea extends Adapter {
 
     @property
     _top = 0;
-    @property({ tooltip: CC_EDITOR && "本节点顶边和父节点顶边的距离，可填写负值，只有在 isAlignTop 开启时才有作用", })
+    @property({ tooltip: CC_EDITOR ? "本节点顶边和父节点顶边的距离，可填写负值，只有在 isAlignTop 开启时才有作用" : "" })
     get top() {
         return this._top;
     }
@@ -91,7 +91,7 @@ export default class AdapterSafeArea extends Adapter {
 
     @property
     _bottom = 0;
-    @property({ tooltip: CC_EDITOR && "本节点顶边和父节点底边的距离，可填写负值，只有在 isAlignBottom 开启时才有作用", })
+    @property({ tooltip: CC_EDITOR ? "本节点顶边和父节点底边的距离，可填写负值，只有在 isAlignBottom 开启时才有作用" : "" })
     get bottom() {
         return this._bottom;
     }
@@ -105,7 +105,7 @@ export default class AdapterSafeArea extends Adapter {
 
     @property
     _left = 0;
-    @property({ tooltip: CC_EDITOR && "本节点顶边和父节点左边的距离，可填写负值，只有在 isAlignLeft 开启时才有作用", })
+    @property({ tooltip: CC_EDITOR ? "本节点顶边和父节点左边的距离，可填写负值，只有在 isAlignLeft 开启时才有作用" : "" })
     get left() {
         return this._left;
     }
@@ -119,7 +119,7 @@ export default class AdapterSafeArea extends Adapter {
 
     @property
     _right = 0;
-    @property({ tooltip: CC_EDITOR && "本节点顶边和父节点右边的距离，可填写负值，只有在 isAlignRight 开启时才有作用", })
+    @property({ tooltip: CC_EDITOR ? "本节点顶边和父节点右边的距离，可填写负值，只有在 isAlignRight 开启时才有作用" : "" })
     get right() {
         return this._right;
     }
@@ -161,7 +161,7 @@ export default class AdapterSafeArea extends Adapter {
             if (!widget || !widget.enabled) {
                 return;
             }
-            // 如果对齐上边界，并且包含安全区域到屏幕上边界的缝隙
+            // 屏幕向上时，加上安全区域高度
             if (widget.isAlignTop && this.isAlignTop) {
                 widget.isAbsoluteTop = true;
                 if (this.direction == Adapter.direction.Portrait) {
@@ -170,7 +170,7 @@ export default class AdapterSafeArea extends Adapter {
                     widget.top = this.top;
                 }
             }
-            // 如果对齐下边界，并且包含安全区域到屏幕下边界的缝隙
+            // 屏幕向下时，加上安全区域高度
             if (widget.isAlignBottom && this.isAlignBottom) {
                 widget.isAbsoluteBottom = true;
                 if (this.direction == Adapter.direction.UpsideDown) {
@@ -179,7 +179,7 @@ export default class AdapterSafeArea extends Adapter {
                     widget.bottom = this.bottom;
                 }
             }
-            // 如果对齐左边界，并且包含安全区域到屏幕左边界的缝隙
+            // 屏幕向左时，加上安全区域高度
             if (widget.isAlignLeft && this.isAlignLeft) {
                 widget.isAbsoluteLeft = true;
                 if (this.direction == Adapter.direction.LandscapeLeft) {
@@ -189,7 +189,7 @@ export default class AdapterSafeArea extends Adapter {
                 }
 
             }
-            // 如果对齐右边界，并且包含安全区域到屏幕右边界的缝隙
+            // 屏幕向右时，加上安全区域高度
             if (widget.isAlignRight && this.isAlignRight) {
                 widget.isAbsoluteRight = true;
                 if (this.direction == Adapter.direction.LandscapeRight) {
