@@ -1,6 +1,13 @@
 import { Adapter } from "./Adapter";
 
 const { ccclass, property, executeInEditMode, menu } = cc._decorator;
+enum Flags {
+    None   = 0,
+    TOP    = 1 << 0,
+    BOTTOM = 1 << 1,
+    LEFT   = 1 << 2,
+    RIGHT  = 1 << 3,
+}
 
 /**
  * @classdesc  安全区域适配Widget , App.isFullScreenAdaption = true 时有效
@@ -19,60 +26,53 @@ const { ccclass, property, executeInEditMode, menu } = cc._decorator;
 @executeInEditMode
 @menu("Quick适配组件/AdapterSafeArea")
 export default class AdapterSafeArea extends Adapter {
+
     @property
-    protected _isTop = false;
-    @property({ tooltip: CC_EDITOR ? "是否对齐上边" : ""})
+    protected _flags : number = Flags.None;
+
+    protected setFlag( flag : Flags , value : boolean){
+        const current = (this._flags & flag) > 0;
+        if ( value == current ){
+            return;
+        }
+        if ( value ){
+            this._flags |= flag;
+        }else{
+            this._flags &= ~flag;
+        }
+        this._isDirty = true;
+    }
+
+    @property({ tooltip: CC_EDITOR ? "是否对齐上边" : "" })
     get isAlignTop() {
-        return this._isTop;
+        return (this._flags & Flags.TOP) > 0;
     }
     set isAlignTop(v) {
-        if (this._isTop == v) {
-            return;
-        }
-        this._isTop = v;
-        this._isDirty = true;
+        this.setFlag(Flags.TOP,v);
     }
 
-    @property
-    protected _isBottom = false;
     @property({ tooltip: CC_EDITOR ? "是否对齐下边" : "" })
     get isAlignBottom() {
-        return this._isBottom;
+        return (this._flags & Flags.BOTTOM) > 0;
     }
     set isAlignBottom(v) {
-        if (this._isBottom == v) {
-            return;
-        }
-        this._isBottom = v;
-        this._isDirty = true;
+        this.setFlag(Flags.BOTTOM,v);
     }
 
-    @property
-    protected _isLeft = false;
     @property({ tooltip: CC_EDITOR ? "是否对齐左边" : "" })
     get isAlignLeft() {
-        return this._isLeft;
+        return (this._flags & Flags.LEFT) > 0;
     }
     set isAlignLeft(v) {
-        if (this._isLeft == v) {
-            return;
-        }
-        this._isLeft = v;
-        this._isDirty = true;
+        this.setFlag(Flags.LEFT,v);
     }
 
-    @property
-    protected _isRight = false;
     @property({ tooltip: CC_EDITOR ? "是否对齐右边" : "" })
     get isAlignRight() {
-        return this._isRight;
+        return (this._flags & Flags.RIGHT) > 0;
     }
     set isAlignRight(v) {
-        if (this._isRight == v) {
-            return;
-        }
-        this._isRight = v;
-        this._isDirty = true;
+        this.setFlag(Flags.RIGHT,v);
     }
 
     @property
@@ -155,7 +155,7 @@ export default class AdapterSafeArea extends Adapter {
                 widget.bottom = this.bottom;
                 return;
             }
-            if ( !App.isFullScreenAdaption ){
+            if (!App.isFullScreenAdaption) {
                 return;
             }
             if (!widget || !widget.enabled) {
