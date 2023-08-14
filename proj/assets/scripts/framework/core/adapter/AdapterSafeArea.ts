@@ -179,7 +179,7 @@ export default class AdapterSafeArea extends Adapter {
                     widget.bottom = this.bottom;
                 }
             }
-            // 屏幕向左时，加上安全区域高度
+            // 屏幕向左时，加上安全区域宽度
             if (widget.isAlignLeft && this.isAlignLeft) {
                 widget.isAbsoluteLeft = true;
                 if (this.direction == Adapter.direction.LandscapeLeft) {
@@ -189,7 +189,7 @@ export default class AdapterSafeArea extends Adapter {
                 }
 
             }
-            // 屏幕向右时，加上安全区域高度
+            // 屏幕向右时，加上安全区域宽度
             if (widget.isAlignRight && this.isAlignRight) {
                 widget.isAbsoluteRight = true;
                 if (this.direction == Adapter.direction.LandscapeRight) {
