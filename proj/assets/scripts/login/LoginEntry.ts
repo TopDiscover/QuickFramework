@@ -50,12 +50,4 @@ class LoginEntry extends Entry {
         App.uiManager.closeExcept([LoginView]);
         Singleton.destory();
     }
-
-    /**@description 卸载bundle,即在自己bundle删除之前最后的一条消息 */
-    onUnloadBundle() {
-        //移除本模块网络事件
-        this.removeNetHandler();
-        //卸载资源
-        this.unloadResources();
-    }
 }

@@ -92,6 +92,7 @@ export abstract class Entry {
 
     /**@description 卸载bundle,即在自己bundle删除之前最后的一条消息 */
     onUnloadBundle(): void {
+        DEBUG && Log.d(`${this.bundle} : onUnloadBundle`)
         //自己bundle初始卸载前要关闭当前bundle的所有界面
         App.uiManager.closeBundleView(this.bundle);
         //移除入口语言包数据
