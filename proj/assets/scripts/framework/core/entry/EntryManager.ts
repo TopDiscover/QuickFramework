@@ -140,7 +140,6 @@ export class EntryManager implements ISingleton{
     onDestroyGameView(bundle: BUNDLE_TYPE, gameView: GameView) {
         let entry = this.getEntry(bundle);
         if (entry) {
-            entry.onUnloadBundle();
             entry.onDestroyGameView(gameView);
         }
     }
