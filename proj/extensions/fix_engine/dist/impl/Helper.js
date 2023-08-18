@@ -187,23 +187,35 @@ class Helper extends Handler_1.Handler {
                 }
             }
             else {
-                //查看本地是否有文件
-                let sourcePath = (0, path_1.join)(this.curExtensionPath, `engine/${data.from}`);
-                sourcePath = (0, path_1.normalize)(sourcePath);
-                let destPath = (0, path_1.join)(this.creatorPath, data.to);
-                destPath = (0, path_1.normalize)(destPath);
-                if ((0, fs_1.existsSync)(destPath)) {
-                    if ((0, fs_1.existsSync)(sourcePath)) {
-                        let sourceData = (0, fs_1.readFileSync)(sourcePath, "utf-8");
-                        (0, fs_1.writeFileSync)(destPath, sourceData, { encoding: "utf-8" });
-                        this.logger.log(`${this.module}${data.desc}`);
+                let copyTo = () => {
+                    let sourcePath = (0, path_1.join)(this.curExtensionPath, `engine/${data.from}`);
+                    sourcePath = (0, path_1.normalize)(sourcePath);
+                    let destPath = (0, path_1.join)(this.creatorPath, data.to);
+                    destPath = (0, path_1.normalize)(destPath);
+                    if ((0, fs_1.existsSync)(destPath)) {
+                        if ((0, fs_1.existsSync)(sourcePath)) {
+                            let sourceData = (0, fs_1.readFileSync)(sourcePath, "utf-8");
+                            (0, fs_1.writeFileSync)(destPath, sourceData, { encoding: "utf-8" });
+                            this.logger.log(`${this.module}${data.desc}`);
+                        }
+                        else {
+                            this.logger.error(`${this.module}找不到源文件:${sourcePath}`);
+                        }
                     }
                     else {
-                        this.logger.error(`${this.module}找不到源文件:${sourcePath}`);
+                        this.logger.error(`${this.module}找不到引擎目录下文件:${destPath}`);
+                    }
+                };
+                //查看本地是否有文件
+                if (data.versions) {
+                    let versions = data.versions.split("|");
+                    this.logger.log(`${this.module} 支持版本 : ${versions.toString()}`);
+                    if (versions.indexOf(this.creatorVerion) >= 0) {
+                        copyTo();
                     }
                 }
                 else {
-                    this.logger.error(`${this.module}找不到引擎目录下文件:${destPath}`);
+                    copyTo();
                 }
             }
         }

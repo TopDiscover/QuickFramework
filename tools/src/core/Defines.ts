@@ -12,6 +12,8 @@ export interface FixEngineData {
     from: string;
     /**@description 修正说明 */
     desc: string;
+    /**@description 支持版本，如果无，则支持所有版本，如果有值，则只在 versions 内的版本才生效 */
+    versions?:string;
 }
 
 /**@description 引擎修正插件config.json的结构定义 */
