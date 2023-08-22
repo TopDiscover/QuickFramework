@@ -2,11 +2,11 @@ import { Adapter } from "./Adapter";
 
 const { ccclass, property, executeInEditMode, menu } = cc._decorator;
 enum Flags {
-    None   = 0,
-    TOP    = 1 << 0,
+    None = 0,
+    TOP = 1 << 0,
     BOTTOM = 1 << 1,
-    LEFT   = 1 << 2,
-    RIGHT  = 1 << 3,
+    LEFT = 1 << 2,
+    RIGHT = 1 << 3,
 }
 
 /**
@@ -28,16 +28,16 @@ enum Flags {
 export default class AdapterSafeArea extends Adapter {
 
     @property
-    protected _flags : number = Flags.None;
+    protected _flags: number = Flags.None;
 
-    protected setFlag( flag : Flags , value : boolean){
+    protected setFlag(flag: Flags, value: boolean) {
         const current = (this._flags & flag) > 0;
-        if ( value == current ){
+        if (value == current) {
             return;
         }
-        if ( value ){
+        if (value) {
             this._flags |= flag;
-        }else{
+        } else {
             this._flags &= ~flag;
         }
         this._isDirty = true;
@@ -48,7 +48,7 @@ export default class AdapterSafeArea extends Adapter {
         return (this._flags & Flags.TOP) > 0;
     }
     set isAlignTop(v) {
-        this.setFlag(Flags.TOP,v);
+        this.setFlag(Flags.TOP, v);
     }
 
     @property({ tooltip: CC_EDITOR ? "是否对齐下边" : "" })
@@ -56,7 +56,7 @@ export default class AdapterSafeArea extends Adapter {
         return (this._flags & Flags.BOTTOM) > 0;
     }
     set isAlignBottom(v) {
-        this.setFlag(Flags.BOTTOM,v);
+        this.setFlag(Flags.BOTTOM, v);
     }
 
     @property({ tooltip: CC_EDITOR ? "是否对齐左边" : "" })
@@ -64,7 +64,7 @@ export default class AdapterSafeArea extends Adapter {
         return (this._flags & Flags.LEFT) > 0;
     }
     set isAlignLeft(v) {
-        this.setFlag(Flags.LEFT,v);
+        this.setFlag(Flags.LEFT, v);
     }
 
     @property({ tooltip: CC_EDITOR ? "是否对齐右边" : "" })
@@ -72,12 +72,16 @@ export default class AdapterSafeArea extends Adapter {
         return (this._flags & Flags.RIGHT) > 0;
     }
     set isAlignRight(v) {
-        this.setFlag(Flags.RIGHT,v);
+        this.setFlag(Flags.RIGHT, v);
     }
 
     @property
     _top = 0;
-    @property({ tooltip: CC_EDITOR ? "本节点顶边和父节点顶边的距离，可填写负值，只有在 isAlignTop 开启时才有作用" : "" })
+    @property({
+        visible() {
+            return this.isAlignTop;
+        }, tooltip: CC_EDITOR ? "本节点顶边和父节点顶边的距离，可填写负值，只有在 isAlignTop 开启时才有作用" : ""
+    })
     get top() {
         return this._top;
     }
@@ -91,7 +95,11 @@ export default class AdapterSafeArea extends Adapter {
 
     @property
     _bottom = 0;
-    @property({ tooltip: CC_EDITOR ? "本节点顶边和父节点底边的距离，可填写负值，只有在 isAlignBottom 开启时才有作用" : "" })
+    @property({
+        visible() {
+            return this.isAlignBottom;
+        }, tooltip: CC_EDITOR ? "本节点顶边和父节点底边的距离，可填写负值，只有在 isAlignBottom 开启时才有作用" : ""
+    })
     get bottom() {
         return this._bottom;
     }
@@ -105,7 +113,11 @@ export default class AdapterSafeArea extends Adapter {
 
     @property
     _left = 0;
-    @property({ tooltip: CC_EDITOR ? "本节点顶边和父节点左边的距离，可填写负值，只有在 isAlignLeft 开启时才有作用" : "" })
+    @property({
+        visible() {
+            return this.isAlignLeft;
+        }, tooltip: CC_EDITOR ? "本节点顶边和父节点左边的距离，可填写负值，只有在 isAlignLeft 开启时才有作用" : ""
+    })
     get left() {
         return this._left;
     }
@@ -119,7 +131,11 @@ export default class AdapterSafeArea extends Adapter {
 
     @property
     _right = 0;
-    @property({ tooltip: CC_EDITOR ? "本节点顶边和父节点右边的距离，可填写负值，只有在 isAlignRight 开启时才有作用" : "" })
+    @property({
+        visible() {
+            return this.isAlignRight;
+        }, tooltip: CC_EDITOR ? "本节点顶边和父节点右边的距离，可填写负值，只有在 isAlignRight 开启时才有作用" : ""
+    })
     get right() {
         return this._right;
     }
