@@ -54,7 +54,7 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
     me.loadUrl = config.url;
     let defaultBundle = getBundle({bundle:config.defaultBundle,view:config.view})
     App.asset.remote.loadImage(config.url, config.isNeedCache).then((data) => {
-        if ( me.loadUrl == data.nativeUrl ){
+        if ( me.loadUrl == data?.nativeUrl ){
             //防止时间调用加载不同url时，以当前记录的url为最终
             if (data) {
                 setSpriteSpriteFrame(config.view, config.url, me, data, config.complete,Macro.BUNDLE_REMOTE, Resource.Type.Remote, isRetain);
