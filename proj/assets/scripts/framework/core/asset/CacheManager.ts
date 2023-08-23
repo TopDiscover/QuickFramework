@@ -111,6 +111,8 @@ class RemoteCaches {
             let texture = new Texture2D();
             texture.image = data
             sp.texture = texture;
+            sp.name = url;
+            (<any>sp)._nativeUrl = url;
             cache.data = sp;
             cache.isLoaded = true;
             cache.info.url = url;

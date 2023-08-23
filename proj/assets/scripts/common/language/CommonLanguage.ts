@@ -10,8 +10,8 @@ export class CommonLanguage extends LanguageDelegate{
     init(): void {
 
         Bundles.datas.forEach(v=>{
-            LanguageEN.data.bundles[v.bundle] = v.name.EN;
-            LanguageZH.data.bundles[v.bundle] = v.name.CN;
+            (<any>LanguageEN.data.bundles)[v.bundle] = v.name.EN;
+            (<any>LanguageZH.data.bundles)[v.bundle] = v.name.CN;
         })
         this.add(LanguageEN);
         this.add(LanguageZH);
