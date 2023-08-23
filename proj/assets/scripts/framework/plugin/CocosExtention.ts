@@ -51,20 +51,24 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
     if (config.retain) {
         isRetain = true;
     }
+    me.loadUrl = config.url;
     let defaultBundle = getBundle({bundle:config.defaultBundle,view:config.view})
     App.asset.remote.loadImage(config.url, config.isNeedCache).then((data) => {
-        if (data) {
-            setSpriteSpriteFrame(config.view, config.url, me, data, config.complete,Macro.BUNDLE_REMOTE, Resource.Type.Remote, isRetain);
-        } else {
-            if (config.defaultSpriteFrame) {
-                if (typeof config.defaultSpriteFrame == "string") {
-                    //动态加载了一张图片，把资源通知管理器
-                    App.cache.getCacheByAsync(config.defaultSpriteFrame,cc.SpriteFrame,defaultBundle).then((spriteFrame) => {
-                        setSpriteSpriteFrame(config.view, config.defaultSpriteFrame, me, spriteFrame, config.complete,defaultBundle);
-                    });
+        if ( me.loadUrl == data.nativeUrl ){
+            //防止时间调用加载不同url时，以当前记录的url为最终
+            if (data) {
+                setSpriteSpriteFrame(config.view, config.url, me, data, config.complete,Macro.BUNDLE_REMOTE, Resource.Type.Remote, isRetain);
+            } else {
+                if (config.defaultSpriteFrame) {
+                    if (typeof config.defaultSpriteFrame == "string") {
+                        //动态加载了一张图片，把资源通知管理器
+                        App.cache.getCacheByAsync(config.defaultSpriteFrame,cc.SpriteFrame,defaultBundle).then((spriteFrame) => {
+                            setSpriteSpriteFrame(config.view, config.defaultSpriteFrame, me, spriteFrame, config.complete,defaultBundle);
+                        });
+                    }
                 }
+                if (config.complete && cc.isValid(me)) config.complete(data);
             }
-            if (config.complete && cc.isValid(me)) config.complete(data);
         }
     });
 };

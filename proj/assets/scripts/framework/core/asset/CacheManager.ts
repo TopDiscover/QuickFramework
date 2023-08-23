@@ -106,6 +106,9 @@ class RemoteCaches {
             }
             let cache = new Resource.CacheData();
             cache.data = new cc.SpriteFrame(data);
+            // cache.data.nativeUrl = url;
+            (<any>cache.data)._nativeUrl = url;
+            cache.data.name = url;
             cache.isLoaded = true;
             cache.info.url = url;
             this._spriteFrameCaches.set(url, cache);
