@@ -146,7 +146,16 @@ class RemoteLoader {
         });
     }
 
-    private _loadRemoteRes(url: string, type: typeof Asset, isNeedCache: boolean) {
+    private extname(url:string){
+        let value = url.match(/(\.[^\.\/\?\\]*)(\?.*)?$/);
+        //如果找
+        return value ? value[1] : ".png";
+    }
+
+    private _loadRemoteRes(url: string, type: typeof Asset, isNeedCache: boolean,options: {
+        [k: string]: any;
+        ext?: string;
+    } = {}) {
         return new Promise<any>((resolve) => {
             let cache = App.cache.remoteCaches.get(url);
             if (cache) {
@@ -174,7 +183,12 @@ class RemoteLoader {
                     resolve(cache.data);
                     return;
                 }
-                assetManager.loadRemote(url, { cacheAsset: true, reloadAsset: !isNeedCache }, (error, data) => {
+                options["cacheAsset"] = true;
+                options["reloadAsset"] = !isNeedCache;
+                if ( type == Texture2D ){
+                    options.ext = this.extname(url);
+                }
+                assetManager.loadRemote(url,options, (error, data) => {
                     if (cache) {
                         cache.isLoaded = true;
                         if (data) {
