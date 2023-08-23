@@ -223,14 +223,14 @@ export abstract class JsonMessage extends Message {
     }
 
     private deserializeNumber(memberName: any, value: any) {
-        if (value === null || value === undefined || value === NaN) {
+        if (value === null || value === undefined || Number.isNaN(value) ) {
             throw { message: `Invalid deserializeNumber member : ${memberName} value : ${value}`, data: 0 };
         }
         return Number(value);
     }
 
     private deserializeBool(memberName: any, value: any) {
-        if (value === null || value === undefined || value === NaN) {
+        if (value === null || value === undefined || Number.isNaN(value) ) {
             throw { message: `Invalid deserializeNumber member : ${memberName} value : ${value}`, data: 0 };
         }
         return Boolean(value);
