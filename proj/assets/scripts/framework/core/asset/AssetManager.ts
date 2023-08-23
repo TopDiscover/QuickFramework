@@ -32,7 +32,7 @@ class RemoteLoader {
                 App.cache.remoteCaches.remove(url);
             }
 
-            me._loadRemoteRes(url, cc.Texture2D).then((data: any) => {
+            me._loadRemoteRes(url, cc.Texture2D,isNeedCache).then((data: any) => {
                 //改变缓存类型
                 let cache = App.cache.remoteCaches.get(url);
                 if (data && cache) {
@@ -95,11 +95,11 @@ class RemoteLoader {
                     cache.info.type = sp.SkeletonData;
                     cache.info.bundle = Macro.BUNDLE_REMOTE;
                     App.cache.remoteCaches.set(url, cache);
-                    me._loadRemoteRes(spinePng, cc.Texture2D).then((texture: cc.Texture2D) => {
+                    me._loadRemoteRes(spinePng, cc.Texture2D,isNeedCache).then((texture: cc.Texture2D) => {
                         if (texture) {
-                            me._loadRemoteRes(spineJson, cc.JsonAsset).then((json: cc.JsonAsset) => {
+                            me._loadRemoteRes(spineJson, cc.JsonAsset,isNeedCache).then((json: cc.JsonAsset) => {
                                 if (json) {
-                                    me._loadRemoteRes(spineAtlas, cc.JsonAsset).then((atlas: cc.TextAsset) => {
+                                    me._loadRemoteRes(spineAtlas, cc.JsonAsset,isNeedCache).then((atlas: cc.TextAsset) => {
                                         if (atlas) {
                                             //生成SkeletonData数据
                                             let asset = new sp.SkeletonData;
@@ -146,7 +146,7 @@ class RemoteLoader {
         return value ? value[1] : ".png";
     }
 
-    private _loadRemoteRes(url: string, type: typeof cc.Asset,options: Record<string, any> = {}) {
+    private _loadRemoteRes(url: string, type: typeof cc.Asset,isNeedCache: boolean,options: Record<string, any> = {}) {
         return new Promise<any>((resolve) => {
             let cache = App.cache.remoteCaches.get(url);
             if (cache) {
@@ -174,6 +174,8 @@ class RemoteLoader {
                     resolve(cache.data);
                     return;
                 }
+                options["cacheAsset"] = true;
+                options["reloadAsset"] = !isNeedCache;
                 if ( type == cc.Texture2D ) {
                     options.ext = this.extname(url);
                 }
