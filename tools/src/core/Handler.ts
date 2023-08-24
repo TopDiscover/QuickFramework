@@ -84,14 +84,12 @@ export class Handler {
         }
         format = format.replace(/(y+)/i,replaceYear)
         
-        let replace = function(){
-            let $2:string = arguments[2];
-            let value = date[arguments[0]];
-            let str = $2.length == 1 ? `${value}` : `00${value}`.substring(value.toString().length);
-            return str
-        }
         for (let k in date) {
-            format = format.replace(new RegExp(`(${k})`),replace.bind(null,k))
+            format = format.replace(new RegExp(`(${k})`),(subFormat)=>{
+                let value = date[k];
+                let str = subFormat.length == 1 ? `${value}` : `00${value}`.substring(value.toString().length);
+                return str;
+            })
         }
         return format;
     };

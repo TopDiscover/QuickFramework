@@ -95,8 +95,14 @@ class _Environment {
         return "privateProj";
     }
 
+    /**@description 项目示例 Bunldes 目录名 */
     get bundleName(){
         return "bundles";
+    }
+
+    /**@description 项目基础包 resources 目录名 */
+    get resources(){
+        return "resources";
     }
 
     get privateCode(){

@@ -20,22 +20,8 @@ import { Singleton } from "./scripts/framework/utils/Singleton";
 /**@description 游戏所有运行单例的管理 */
 export class Application extends Framewok implements GameEventInterface {
 
-    get isLazyRelease(){
-        return true;
-    }
-
     get Bundles(){
         return Bundles.bundles;
-    }
-
-    /**@description 是否开启自动释放长时间未使用资源 */
-    get isAutoReleaseUnuseResources(){
-        return true;
-    }
-
-    /**@description 当isLazyRelease 为true时有效，当资源长时间未使用时自动释放 */
-    get autoReleaseUnuseResourcesTimeout(){
-        return 5 * 60;
     }
 
     get utils(){
