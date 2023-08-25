@@ -1,13 +1,11 @@
-import { Update } from "../../framework/core/update/Update";
-import { UpdateHandlerDelegate, UpdateItem } from "../../framework/core/update/UpdateItem";
-import { Macro } from "../../framework/defines/Macros";
+import { Update } from "../framework/core/update/Update";
+import { UpdateHandlerDelegate, UpdateItem } from "../framework/core/update/UpdateItem";
 
-/**@description 大厅更新代理 */
-export class HallUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleton {
-    static module = "【大厅热更新】"
+/**@description 主包更新代理 */
+export class MainUpdate implements UpdateHandlerDelegate, ISingleton {
+    static module: string = "【主包热更新】";
     module: string = null!;
     isResident = true;
-
     onNewVersionFund(item: UpdateItem): void {
         item.doUpdate();
     }
@@ -35,19 +33,7 @@ export class HallUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleton 
         App.updateLoading.show(App.getLanguage("loading"));
     }
     onNeedUpdateMain(item: UpdateItem): void {
-        App.updateLoading.hide();
-        let content = App.getLanguage("mainPackVersionIsTooLow") as string;
-        App.alert.show({
-            text: content,
-            confirmCb: (isOK) => {
-                if (App.stageData.isLoginStage()) {
-                    //如果是在登录界面，直接检测更新
-                    App.entryManager.onCheckUpdate();
-                } else {
-                    App.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
-                }
-            }
-        });
+
     }
     onOther(item: UpdateItem): void {
 
@@ -56,8 +42,7 @@ export class HallUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleton 
         App.updateLoading.updateProgress(info.progress);
     }
     onAreadyUpToData(item: UpdateItem): void {
-        //大厅更新，直接进入
-        App.bundleManager.loadBundle(item);
+        App.updateLoading.hide();
     }
     onStarCheckUpdate(item: UpdateItem): void {
         App.updateLoading.show(App.getLanguage("loading"));
@@ -66,33 +51,23 @@ export class HallUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleton 
 
     }
     onLoadBundleError(item: UpdateItem, err: Error | null): void {
+        //主包原则上说是不可能加载错误的
         App.updateLoading.hide();
         App.tips.show(App.getLanguage("loadFailed",[item.name]));
+        Log.dump(err, "onLoadBundleError");
     }
     onLoadBundleComplete(item: UpdateItem): void {
         App.updateLoading.hide();
         App.entryManager.onLoadBundleComplete(item);
     }
     onLoadBundle(item: UpdateItem): void {
-        App.bundleManager.loadBundle(item);
+        //主包不会释放，直接隐藏loading
+        App.updateLoading.hide();
     }
     onDownloadComplete(item: UpdateItem): void {
-        App.releaseManger.tryRemoveBundle(item.bundle);
-        this.onLoadBundle(item);
+
     }
     onNeedRestartApp(item: UpdateItem, onComplete: (isDelayRestart : boolean)=>void): void {
-        let where = App.stageData.where;
-        Log.d(`重启游戏,当前位置 :${where},之前位置 : ${App.stageData.prevWhere}`);
-        if ( where == Macro.BUNDLE_RESOURCES ){
-            onComplete(true);
-        }else{
-            let content = App.getLanguage("restartApp",[item.name])
-            App.alert.show({
-                text: content,
-                confirmCb: (isOK) => {
-                    onComplete(false);
-                }
-            });
-        }
+        onComplete(true);
     }
 }

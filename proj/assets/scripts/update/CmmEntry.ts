@@ -1,10 +1,10 @@
-import { EntryDelegate } from "../../framework/core/entry/EntryDelegate";
-import { UpdateItem } from "../../framework/core/update/UpdateItem";
-import { Macro } from "../../framework/defines/Macros";
-import { Singleton } from "../../framework/utils/Singleton";
-import { BundleUpdateHandlerImpl } from "./BundleUpdateHandlerImpl";
-import { HallUpdateHandlerImpl } from "./HallUpdateHandlerImpl";
-import { MainUpdateHandlerImpl } from "./MainUpdateHandlerImpl";
+import { EntryDelegate } from "../framework/core/entry/EntryDelegate";
+import { UpdateItem } from "../framework/core/update/UpdateItem";
+import { Macro } from "../framework/defines/Macros";
+import { Singleton } from "../framework/utils/Singleton";
+import { BundleUpdate } from "./BundleUpdate";
+import { HallUpdate } from "./HallUpdate";
+import { MainUpdate } from "./MainUpdate";
 
 export class CmmEntry extends EntryDelegate {
 
@@ -25,11 +25,11 @@ export class CmmEntry extends EntryDelegate {
         if (config) {
             let item = App.updateManager.getItem(config)!;
             if (bundle == Macro.BUNDLE_RESOURCES) {
-                item.handler = Singleton.get(MainUpdateHandlerImpl)!;
+                item.handler = Singleton.get(MainUpdate)!;
             } else if (bundle == Macro.BUNDLE_HALL) {
-                item.handler = Singleton.get(HallUpdateHandlerImpl)!;
+                item.handler = Singleton.get(HallUpdate)!;
             } else {
-                item.handler = Singleton.get(BundleUpdateHandlerImpl)!;
+                item.handler = Singleton.get(BundleUpdate)!;
             }
             return item;
         }

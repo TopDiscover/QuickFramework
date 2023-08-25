@@ -1,8 +1,8 @@
-import { Update } from "../../framework/core/update/Update";
-import { UpdateHandlerDelegate, UpdateItem } from "../../framework/core/update/UpdateItem";
-import { Macro } from "../../framework/defines/Macros";
+import { Update } from "../framework/core/update/Update";
+import { UpdateHandlerDelegate, UpdateItem } from "../framework/core/update/UpdateItem";
+import { Macro } from "../framework/defines/Macros";
 /**@description bundle更新下载代理 */
-export class BundleUpdateHandlerImpl implements UpdateHandlerDelegate, ISingleton {
+export class BundleUpdate implements UpdateHandlerDelegate, ISingleton {
     static module = "【Bundle热更新】";
     module: string = null!;
     isResident = true;

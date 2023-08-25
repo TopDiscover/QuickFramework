@@ -1,7 +1,7 @@
-import { Update } from "../../framework/core/update/Update";
-import { GameData } from "../../framework/data/GameData"
-import { Macro } from "../../framework/defines/Macros"
-import { Bundles } from "./Bundles";
+import { Update } from "../framework/core/update/Update";
+import { GameData } from "../framework/data/GameData"
+import { Macro } from "../framework/defines/Macros"
+import { Bundles } from "../common/data/Bundles";
 
 /**
  * @description Stage数据
