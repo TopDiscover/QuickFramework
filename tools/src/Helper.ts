@@ -10,6 +10,8 @@ import * as Hotupdate from "./hotupdate/Helper";
 import { Environment } from "./core/Environment";
 import { SyncData, SyncType } from "./core/Defines";
 
+const META = ".meta";
+
 /**
  * @description 辅助类
  */
@@ -142,10 +144,10 @@ export class Helper extends Handler {
     symlinkSyncResources() {
         let data: SyncData[] = [
             { from: `${this.resources}/${this.resources}`, to: `proj/assets/${this.resources}`, type: SyncType.SINGLE },
-            { from: `${this.resources}/${this.resources}.meta`, to: `proj/assets/${this.resources}.meta`, type: SyncType.SINGLE },
+            { from: `${this.resources}/${this.resources}${META}`, to: `proj/assets/${this.resources}${META}`, type: SyncType.SINGLE },
             { from: `${this.resources}/scripts`, to: `proj/assets/scripts`, type: SyncType.CUR_DIR_AND_META },
             { from: `${this.resources}/Application.ts`, to: `proj/assets/Application.ts`, type: SyncType.SINGLE },
-            { from: `${this.resources}/Application.ts.meta`, to: `proj/assets/Application.ts.meta`, type: SyncType.SINGLE },
+            { from: `${this.resources}/Application.ts${META}`, to: `proj/assets/Application.ts${META}`, type: SyncType.SINGLE },
             { from: `${this.resources}/@types`, to: `proj/@types`, type: SyncType.CUR_ALL_FILES },
         ]
         this.symlinkSync(data, this.resources);
@@ -155,6 +157,7 @@ export class Helper extends Handler {
     symlinkSync(data: SyncData[], tag: string) {
         this.log(`链接${tag}`, false);
         let fromPath = "";
+        let toPath = "";
         data.forEach(v => {
             if (v.type == SyncType.CUR_ALL_FILES) {
                 fromPath = join(this.projPath, v.from)
@@ -169,16 +172,9 @@ export class Helper extends Handler {
                 result.forEach(info => {
                     if (!info.name.startsWith(".")) {
                         fromPath = info.path;
-                        FileUtils.instance.symlinkSync(fromPath, join(this.projPath, `${v.to}/${info.name}`));
-                    }
-                })
-
-                fromPath = join(this.projPath, v.from);
-                let files = FileUtils.instance.getCurFiles(fromPath);
-                files.forEach(info => {
-                    if (parse(info.name).ext == ".meta") {
-                        fromPath = info.path;
-                        FileUtils.instance.symlinkSync(fromPath, join(this.projPath, `${v.to}/${info.name}`));
+                        toPath = join(this.projPath, `${v.to}/${info.name}`);
+                        FileUtils.instance.symlinkSync(fromPath, toPath);
+                        FileUtils.instance.symlinkSync(`${fromPath}${META}`, `${toPath}${META}`)
                     }
                 })
             } else if (v.type == SyncType.SINGLE) {
