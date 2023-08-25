@@ -24,8 +24,8 @@ class _Environment {
         this.publicBundlesUrl = "https://gitee.com/top-discover/QuickFrameworkBundles.git";
         /**@description 私有代码地址 */
         this.privateBundlesUrl = "https://gitee.com/top-discover/quick-framework-private-bundles.git";
-        /**@description 是否启用私有代码 */
-        this.isPrivate = false;
+        /**@description resources 地址 */
+        this.publicResourcesUrl = "https://gitee.com/top-discover/quick-framework-resources.git";
         /**@description 是否在tools目录下执行命令 */
         this.isCommand = false;
         /**@description 项目插件 */
@@ -82,15 +82,13 @@ class _Environment {
     get privateProj() {
         return "privateProj";
     }
+    /**@description 项目示例 Bunldes 目录名 */
     get bundleName() {
         return "bundles";
     }
-    get privateCode() {
-        return [
-            { from: this.bundleName, to: `proj/assets/${this.bundleName}`, type: Defines_1.SyncType.Bunldes },
-            // { from : "framework/slot" , to : `proj/assets/scripts/framework` , type : SyncType.CUR_DIR_AND_META},
-            // { from : "@types" , to : `proj/@types` , type : SyncType.CUR_ALL_FILES},
-        ];
+    /**@description 项目基础包 resources 目录名 */
+    get resources() {
+        return "resources";
     }
 }
 _Environment._instance = null;

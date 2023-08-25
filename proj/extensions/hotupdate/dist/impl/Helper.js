@@ -76,10 +76,7 @@ class Helper extends Config_1.default {
     /**@description 返回需要添加到主包版本的文件目录 */
     get mainBundleIncludes() {
         if (!this._mainBundleIncludes) {
-            this._mainBundleIncludes = ["src", "jsb-adapter", "assets/resources", "assets/main", this.mainJS];
-            if (Environment_1.Environment.isVersion3X) {
-                this._mainBundleIncludes.push("assets/internal");
-            }
+            this._mainBundleIncludes = ["src", "jsb-adapter", "assets/resources", "assets/main", this.mainJS, "assets/internal"];
         }
         return this._mainBundleIncludes;
     }

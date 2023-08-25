@@ -52,6 +52,6 @@ var SyncType;
     SyncType[SyncType["CUR_DIR_AND_META"] = 0] = "CUR_DIR_AND_META";
     /**@description 当前目录下所有文件 */
     SyncType[SyncType["CUR_ALL_FILES"] = 1] = "CUR_ALL_FILES";
-    /**@description bundles目录 */
-    SyncType[SyncType["Bunldes"] = 2] = "Bunldes";
+    /**@description 单个文件或目录 */
+    SyncType[SyncType["SINGLE"] = 2] = "SINGLE";
 })(SyncType = exports.SyncType || (exports.SyncType = {}));

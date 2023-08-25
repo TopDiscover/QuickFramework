@@ -29,7 +29,7 @@ class FileUtils extends Handler_1.Handler {
             (0, fs_1.unlinkSync)(path);
         }
         if (!(0, fs_1.existsSync)(target)) {
-            // this.logger.error(`不存在 : ${target}`);
+            this.logger.error(`不存在 : ${target}`);
             return;
         }
         (0, fs_1.symlinkSync)(target, path, type);
