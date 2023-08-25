@@ -71,7 +71,7 @@ export class Helper extends Handler {
      * @param url 项目地址
      * @returns 
      */
-    private async _gitBundles(savePath: string, url: string) {
+    private async gitUrl(savePath: string, url: string) {
         let name = parse(savePath).name;
         this.log(`拉取远程${name}`, false);
         let branch = await this.gitCurBranch();
@@ -108,10 +108,17 @@ export class Helper extends Handler {
 
     /**@description 摘取远程bundles */
     async gitBundles() {
-        await this._gitBundles(this.bundlesPath, this.bundlesUrl)
-        if (Environment.isPrivate) {
-            await this._gitBundles(this.privateProjPath, this.privateBundlesUrl);
-        }
+        await this.gitUrl(this.bundlesPath, this.bundlesUrl);
+    }
+
+    /**@description 摘取远程 私有项目 */
+    async gitPrivate() {
+        await this.gitUrl(this.privateProjPath, this.privateBundlesUrl);
+    }
+
+    /**@description 摘取远程 Resources */
+    async gitResources() {
+        await this.gitUrl(this.resourcesPath, Environment.publicResourcesUrl);
     }
 
     /**@description 链接 Bundles 示例 */
@@ -125,12 +132,10 @@ export class Helper extends Handler {
     /**@description 链接 私有 项目 */
     symlinkSyncPrivate() {
         //链接私有bundles代码
-        if (Environment.isPrivate) {
-            let data: SyncData[] = [
-                { from: `${this.privateProj}/${this.bundleName}`, to: `proj/assets/${this.bundleName}`, type: SyncType.CUR_DIR_AND_META },
-            ]
-            this.symlinkSync(data, "私有");
-        }
+        let data: SyncData[] = [
+            { from: `${this.privateProj}/${this.bundleName}`, to: `proj/assets/${this.bundleName}`, type: SyncType.CUR_DIR_AND_META },
+        ]
+        this.symlinkSync(data, "私有");
     }
 
     /**@description 链接 resources */
@@ -174,13 +179,6 @@ export class Helper extends Handler {
             }
         })
         this.log(`链接${tag}`, true);
-    }
-
-    /**@description 链接代码 */
-    symlinkSyncCode() {
-        this.symlinkSyncBundles();
-        this.symlinkSyncResources()
-        this.symlinkSyncPrivate();
     }
 
     /**
