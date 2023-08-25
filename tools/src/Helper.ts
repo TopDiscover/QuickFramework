@@ -1,4 +1,4 @@
-import { existsSync } from "fs";
+import { existsSync, symlink } from "fs";
 import { join, parse } from "path";
 import FileUtils from "./core/FileUtils";
 import { Handler } from "./core/Handler";
@@ -141,7 +141,9 @@ export class Helper extends Handler {
     /**@description 链接 resources */
     symlinkSyncResources() {
         let data: SyncData[] = [
-            { from: `${this.resources}`, to: "proj/assets/", type: SyncType.CUR_DIR_AND_META },
+            { from: `${this.resources}/${this.resources}`, to: `proj/assets/${this.resources}`, type: SyncType.SINGLE },
+            { from: `${this.resources}/${this.resources}.meta`, to: `proj/assets/${this.resources}.meta`, type: SyncType.SINGLE },
+            { from: `${this.resources}/scripts`, to: `proj/assets/scripts`, type: SyncType.CUR_DIR_AND_META },
         ]
         this.symlinkSync(data, this.resources);
     }
@@ -176,6 +178,9 @@ export class Helper extends Handler {
                         FileUtils.instance.symlinkSync(fromPath, join(this.projPath, `${v.to}/${info.name}`));
                     }
                 })
+            } else if (v.type == SyncType.SINGLE) {
+                fromPath = join(this.projPath, v.from)
+                FileUtils.instance.symlinkSync(fromPath, join(this.projPath, `${v.to}`));
             }
         })
         this.log(`链接${tag}`, true);

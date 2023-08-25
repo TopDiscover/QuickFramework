@@ -27,7 +27,7 @@ export default class FileUtils extends Handler {
             unlinkSync(path);
         }
         if (!existsSync(target)) {
-            // this.logger.error(`不存在 : ${target}`);
+            this.logger.error(`不存在 : ${target}`);
             return;
         }
         symlinkSync(target, path, type);

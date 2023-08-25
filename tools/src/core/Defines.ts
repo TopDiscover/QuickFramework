@@ -219,6 +219,8 @@ export enum SyncType{
     CUR_DIR_AND_META,
     /**@description 当前目录下所有文件 */
     CUR_ALL_FILES,
+    /**@description 单个文件或目录 */
+    SINGLE,
 }
 
 export type SyncData = { 
