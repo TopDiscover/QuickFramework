@@ -34,8 +34,21 @@ export class Framewok {
     }
 
     /**@description 资源是否懒释放，true时，只有收到平台的内存警告才会释放资源，还有在更新时才分释放,否则不会释放资源 */
-    get isLazyRelease() {
-        return false;
+    get isLazyRelease(){
+        if ( !this.isAutoReleaseUnuseResources ){
+            Log.w(`需要使用都自己导出cc.game.EVENT_LOW_MEMORY事件`);
+        }
+        return true;
+    }
+
+    /**@description 是否开启自动释放长时间未使用资源 */
+    get isAutoReleaseUnuseResources(){
+        return true;
+    }
+
+    /**@description 当isLazyRelease 为true时有效，当资源长时间未使用时自动释放 */
+    get autoReleaseUnuseResourcesTimeout(){
+        return 5 * 60;
     }
 
     /**@description 资源释放管理 */
@@ -204,10 +217,6 @@ export class Framewok {
     }
     /**@description 当前游戏GameView, GameView进入onLoad赋值 */
     gameView: GameView | null = null;
-
-    getGameView<T extends GameView>() {
-        return <T>this.gameView;
-    }
 
     /**
      * @description 获取语言包 
