@@ -27,6 +27,9 @@ export class Handler {
     /**@description 私有项目的名称 */
     readonly privateProj = Environment.privateProj;
 
+    /**@description resources 目录名 */
+    readonly resources = Environment.resources;
+
     /**@description 当前项目路径 */
     get projPath() {
         if (Environment.isCommand) {
@@ -39,6 +42,9 @@ export class Handler {
     /**@description bundles保存路径 */
     readonly bundlesPath = join(this.projPath, this.bundleName);
 
+    /**@description resources 保存路径 */
+    readonly resourcesPath = join(this.projPath, this.resources);
+
     /**@description 私有项目保存路径 */
     readonly privateProjPath = join(this.projPath, this.privateProj);
 
@@ -47,6 +53,9 @@ export class Handler {
 
     /**@description 项目 bundles 路径 */
     readonly assetsBundlesPath = join(this.projPath, `proj/assets/${this.bundleName}`);
+
+    /**@description 项目 resources 路径 */
+    readonly assetsResourcesPath = join(this.projPath, `proj/assets/${this.resources}`);
 
     /**@description 插件路径 */
     readonly extensionsPath = join(this.projPath, `proj/${Environment.extensionsName}`);

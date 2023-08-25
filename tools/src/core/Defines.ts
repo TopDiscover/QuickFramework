@@ -219,6 +219,13 @@ export enum SyncType{
     CUR_DIR_AND_META,
     /**@description 当前目录下所有文件 */
     CUR_ALL_FILES,
-    /**@description bundles目录 */
-    Bunldes,
 }
+
+export type SyncData = { 
+    /**@description 相对于当前项目根目录 */
+    from : string , 
+    /**@description 相对于当前项目根目录 */
+    to : string , 
+    /**@description 同步类型 */
+    type : SyncType 
+};

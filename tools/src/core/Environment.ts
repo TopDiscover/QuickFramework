@@ -2,7 +2,7 @@
  * @description 环境变更配置
  */
 
-import { BuilderOptions, Extensions, HotupdateConfig, SyncType } from "./Defines";
+import { BuilderOptions, Extensions, HotupdateConfig, SyncData, SyncType } from "./Defines";
 
 class _Environment {
 
@@ -103,14 +103,6 @@ class _Environment {
     /**@description 项目基础包 resources 目录名 */
     get resources(){
         return "resources";
-    }
-
-    get privateCode(){
-        return [
-            { from : this.bundleName , to : `proj/assets/${this.bundleName}` , type : SyncType.Bunldes},
-            // { from : "framework/slot" , to : `proj/assets/scripts/framework` , type : SyncType.CUR_DIR_AND_META},
-            // { from : "@types" , to : `proj/@types` , type : SyncType.CUR_ALL_FILES},
-        ]
     }
 
     /**@description 是否进行代码混淆 */
