@@ -19,7 +19,7 @@ export default class Helper extends Config<GulpConfig> {
     
     /**@description 配置文件路径 */
     get path() {
-        let out = join(this.localPath, `${Extensions.GulpCompress}.json`);
+        let out = join(this.configPath, `${Extensions.GulpCompress}.json`);
         return out;
     }
 

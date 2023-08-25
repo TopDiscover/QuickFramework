@@ -191,21 +191,33 @@ export default class Helper extends Handler {
                     this.logger.error(`${this.module}找不到引擎目录下文件:${destPath}`);
                 }
             } else {
-                //查看本地是否有文件
-                let sourcePath = join(this.curExtensionPath, `engine/${data.from}`);
-                sourcePath = normalize(sourcePath);
-                let destPath = join(this.creatorPath, data.to);
-                destPath = normalize(destPath);
-                if (existsSync(destPath)) {
-                    if (existsSync(sourcePath)) {
-                        let sourceData = readFileSync(sourcePath, "utf-8");
-                        writeFileSync(destPath, sourceData, { encoding: "utf-8" });
-                        this.logger.log(`${this.module}${data.desc}`);
+                let copyTo = ()=>{
+                    let sourcePath = join(this.curExtensionPath, `engine/${data.from}`);
+                    sourcePath = normalize(sourcePath);
+                    let destPath = join(this.creatorPath, data.to);
+                    destPath = normalize(destPath);
+                    if (existsSync(destPath)) {
+                        if (existsSync(sourcePath)) {
+                            let sourceData = readFileSync(sourcePath, "utf-8");
+                            writeFileSync(destPath, sourceData, { encoding: "utf-8" });
+                            this.logger.log(`${this.module}${data.desc}`);
+                        } else {
+                            this.logger.error(`${this.module}找不到源文件:${sourcePath}`);
+                        }
                     } else {
-                        this.logger.error(`${this.module}找不到源文件:${sourcePath}`);
+                        this.logger.error(`${this.module}找不到引擎目录下文件:${destPath}`);
                     }
-                } else {
-                    this.logger.error(`${this.module}找不到引擎目录下文件:${destPath}`);
+                }
+
+                //查看本地是否有文件
+                if ( data.versions ){
+                    let versions = data.versions.split("|");
+                    this.logger.log(`${this.module} 支持版本 : ${versions.toString()}`);
+                    if ( versions.indexOf(this.creatorVerion) >=0 ){
+                        copyTo();
+                    }
+                }else{
+                    copyTo();
                 }
             }
         }

@@ -29,13 +29,22 @@ class FileUtils extends Handler_1.Handler {
             (0, fs_1.unlinkSync)(path);
         }
         if (!(0, fs_1.existsSync)(target)) {
-            // this.logger.error(`不存在 : ${target}`);
+            this.logger.error(`不存在 : ${target}`);
             return;
         }
         (0, fs_1.symlinkSync)(target, path, type);
         this.logger.log(`创建链接 ${target} -> ${path}`);
     }
-    _getFiles(path, root, result, isInclude) {
+    /**
+     * @description
+     * @param path
+     * @param root
+     * @param result
+     * @param isInclude
+     * @param isCurrentDirFiles 是否只读取当前目录的文件
+     * @returns
+     */
+    _getFiles(path, root, result, isInclude, isCurrentDirFiles = false) {
         if (!(0, fs_1.existsSync)(path)) {
             return result;
         }
@@ -59,7 +68,9 @@ class FileUtils extends Handler_1.Handler {
                 }
             }
             else {
-                stat.isDirectory() && this._getFiles(fullPath, root, result, isInclude);
+                if (!isCurrentDirFiles) {
+                    stat.isDirectory() && this._getFiles(fullPath, root, result, isInclude);
+                }
             }
         }
     }
@@ -69,13 +80,37 @@ class FileUtils extends Handler_1.Handler {
      * @param isInclude 是否包含该文件
      * @returns
      */
-    getFiles(path, isInclude, root) {
+    getFiles(path, isInclude, root, isCurrentDirFiles = false) {
         let out = [];
         if (!root) {
             root = path;
         }
-        this._getFiles(path, root, out, isInclude);
+        this._getFiles(path, root, out, isInclude, isCurrentDirFiles);
         return out;
+    }
+    /**
+     * @description 获取当前目前下所有文件
+     * @param path
+     */
+    getCurFiles(path) {
+        let result = [];
+        if (!(0, fs_1.existsSync)(path)) {
+            return result;
+        }
+        let readDir = (0, fs_1.readdirSync)(path);
+        for (let i = 0; i < readDir.length; i++) {
+            let file = readDir[i];
+            let fullPath = (0, path_1.join)(path, file);
+            if (fullPath[0] === '.') {
+                continue;
+            }
+            let stat = (0, fs_1.statSync)(fullPath);
+            if (stat.isFile()) {
+                let info = { relative: (0, path_1.relative)(path, fullPath), path: fullPath, name: file, size: stat.size };
+                result.push(info);
+            }
+        }
+        return result;
     }
     /**
      * @description 获取path下的所有目录
@@ -154,7 +189,7 @@ class FileUtils extends Handler_1.Handler {
      * @param path 打包路径
      * @param outPath 输出zip目录全路径
      */
-    archive(path, outPath, root) {
+    archive(path, outPath, root, append) {
         return new Promise((resolve) => {
             let files = [];
             if (typeof path == "string") {
@@ -165,6 +200,9 @@ class FileUtils extends Handler_1.Handler {
                     let temp = this.getFiles(path[i], undefined, root);
                     files = files.concat(temp);
                 }
+            }
+            if (append) {
+                files = files.concat(append);
             }
             this.formatPaths(files);
             let arch = (0, archiver_1.default)("zip", {
@@ -213,8 +251,8 @@ class FileUtils extends Handler_1.Handler {
      * @param path
      * @param assets
      */
-    md5Dir(path, assets, root) {
-        let files = FileUtils.instance.getFiles(path, undefined, root);
+    md5Dir(path, assets, root, isCurrentDirFiles = false) {
+        let files = FileUtils.instance.getFiles(path, undefined, root, isCurrentDirFiles);
         files.forEach(v => {
             let md5 = this.md5((0, fs_1.readFileSync)(v.path));
             let relative = this.formatPath(v.relative);
@@ -272,8 +310,12 @@ class FileUtils extends Handler_1.Handler {
     copyDir(source, dest) {
         return new Promise(async (resolve) => {
             this.logger.log(`准备复制 : ${source}->${dest}`);
+            if (!(0, fs_1.existsSync)(source)) {
+                resolve(false);
+                return;
+            }
             await this.delDir(dest);
-            if (Environment_1.Environment.isCommand) {
+            if (Environment_1.Environment.isCommand && fs_1.cp) {
                 (0, fs_1.cp)(source, dest, {
                     recursive: true
                 }, (err) => {

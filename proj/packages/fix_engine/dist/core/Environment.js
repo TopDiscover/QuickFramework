@@ -20,6 +20,12 @@ class _Environment {
             dest: "D:/workspace/QuickFramework247/proj/build/jsb-link",
             md5Cache: false,
         };
+        /**@description 对外公布示例地址*/
+        this.publicBundlesUrl = "https://gitee.com/top-discover/QuickFrameworkBundles.git";
+        /**@description 私有代码地址 */
+        this.privateBundlesUrl = "https://gitee.com/top-discover/quick-framework-private-bundles.git";
+        /**@description resources 地址 */
+        this.publicResourcesUrl = "https://gitee.com/top-discover/quick-framework-resources.git";
         /**@description 是否在tools目录下执行命令 */
         this.isCommand = false;
         /**@description 项目插件 */
@@ -72,6 +78,17 @@ class _Environment {
      */
     get isVersion3X() {
         return false;
+    }
+    get privateProj() {
+        return "privateProj";
+    }
+    /**@description 项目示例 Bunldes 目录名 */
+    get bundleName() {
+        return "bundles";
+    }
+    /**@description 项目基础包 resources 目录名 */
+    get resources() {
+        return "resources";
     }
 }
 _Environment._instance = null;

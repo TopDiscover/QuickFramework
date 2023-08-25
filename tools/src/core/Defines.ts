@@ -12,6 +12,8 @@ export interface FixEngineData {
     from: string;
     /**@description 修正说明 */
     desc: string;
+    /**@description 支持版本，如果无，则支持所有版本，如果有值，则只在 versions 内的版本才生效 */
+    versions?:string;
 }
 
 /**@description 引擎修正插件config.json的结构定义 */
@@ -45,6 +47,8 @@ export enum CmdType {
     Hotupdate = "-hotupdate",
     /**@description 上帝模式，功能全开 */
     God = "-god",
+    /**@description protobufjs */
+    ProtobufJS = "-protobufjs",
 }
 
 /**@description 命令行执行结果 */
@@ -215,6 +219,15 @@ export enum SyncType{
     CUR_DIR_AND_META,
     /**@description 当前目录下所有文件 */
     CUR_ALL_FILES,
-    /**@description bundles目录 */
-    Bunldes,
+    /**@description 单个文件或目录 */
+    SINGLE,
 }
+
+export type SyncData = { 
+    /**@description 相对于当前项目根目录 */
+    from : string , 
+    /**@description 相对于当前项目根目录 */
+    to : string , 
+    /**@description 同步类型 */
+    type : SyncType 
+};

@@ -27,6 +27,9 @@ export class Handler {
     /**@description 私有项目的名称 */
     readonly privateProj = Environment.privateProj;
 
+    /**@description resources 目录名 */
+    readonly resources = Environment.resources;
+
     /**@description 当前项目路径 */
     get projPath() {
         if (Environment.isCommand) {
@@ -39,6 +42,9 @@ export class Handler {
     /**@description bundles保存路径 */
     readonly bundlesPath = join(this.projPath, this.bundleName);
 
+    /**@description resources 保存路径 */
+    readonly resourcesPath = join(this.projPath, this.resources);
+
     /**@description 私有项目保存路径 */
     readonly privateProjPath = join(this.projPath, this.privateProj);
 
@@ -47,6 +53,9 @@ export class Handler {
 
     /**@description 项目 bundles 路径 */
     readonly assetsBundlesPath = join(this.projPath, `proj/assets/${this.bundleName}`);
+
+    /**@description 项目 resources 路径 */
+    readonly assetsResourcesPath = join(this.projPath, `proj/assets/${this.resources}`);
 
     /**@description 插件路径 */
     readonly extensionsPath = join(this.projPath, `proj/${Environment.extensionsName}`);
@@ -62,9 +71,6 @@ export class Handler {
 
     /**@description 构建目录 */
     readonly buildPath = join(this.projPath, "proj/build");
-
-    /**@description local目录 */
-    readonly localPath = join(this.projPath, "proj/local");
 
     /**@description 当前插件路径 */
     get curExtensionPath() {
@@ -87,14 +93,12 @@ export class Handler {
         }
         format = format.replace(/(y+)/i,replaceYear)
         
-        let replace = function(){
-            let $2:string = arguments[2];
-            let value = date[arguments[0]];
-            let str = $2.length == 1 ? `${value}` : `00${value}`.substring(value.toString().length);
-            return str
-        }
         for (let k in date) {
-            format = format.replace(new RegExp(`(${k})`),replace.bind(null,k))
+            format = format.replace(new RegExp(`(${k})`),(subFormat)=>{
+                let value = date[k];
+                let str = subFormat.length == 1 ? `${value}` : `00${value}`.substring(value.toString().length);
+                return str;
+            })
         }
         return format;
     };

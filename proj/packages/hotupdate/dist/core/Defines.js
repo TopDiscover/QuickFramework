@@ -26,6 +26,8 @@ var CmdType;
     CmdType["Hotupdate"] = "-hotupdate";
     /**@description 上帝模式，功能全开 */
     CmdType["God"] = "-god";
+    /**@description protobufjs */
+    CmdType["ProtobufJS"] = "-protobufjs";
 })(CmdType = exports.CmdType || (exports.CmdType = {}));
 var Extensions;
 (function (Extensions) {
@@ -50,6 +52,6 @@ var SyncType;
     SyncType[SyncType["CUR_DIR_AND_META"] = 0] = "CUR_DIR_AND_META";
     /**@description 当前目录下所有文件 */
     SyncType[SyncType["CUR_ALL_FILES"] = 1] = "CUR_ALL_FILES";
-    /**@description bundles目录 */
-    SyncType[SyncType["Bunldes"] = 2] = "Bunldes";
+    /**@description 单个文件或目录 */
+    SyncType[SyncType["SINGLE"] = 2] = "SINGLE";
 })(SyncType = exports.SyncType || (exports.SyncType = {}));

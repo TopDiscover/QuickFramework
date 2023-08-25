@@ -12,13 +12,23 @@ class Handler {
         /**@description 日志 */
         this._logger = null;
         /**@description 保存bundles的名称 */
-        this.bundleName = "bundles";
+        this.bundleName = Environment_1.Environment.bundleName;
+        /**@description 私有项目的名称 */
+        this.privateProj = Environment_1.Environment.privateProj;
+        /**@description resources 目录名 */
+        this.resources = Environment_1.Environment.resources;
         /**@description bundles保存路径 */
         this.bundlesPath = (0, path_1.join)(this.projPath, this.bundleName);
+        /**@description resources 保存路径 */
+        this.resourcesPath = (0, path_1.join)(this.projPath, this.resources);
+        /**@description 私有项目保存路径 */
+        this.privateProjPath = (0, path_1.join)(this.projPath, this.privateProj);
         /**@description 项目 assets 目录 */
         this.assetsDBPath = (0, path_1.join)(this.projPath, "proj/assets");
         /**@description 项目 bundles 路径 */
         this.assetsBundlesPath = (0, path_1.join)(this.projPath, `proj/assets/${this.bundleName}`);
+        /**@description 项目 resources 路径 */
+        this.assetsResourcesPath = (0, path_1.join)(this.projPath, `proj/assets/${this.resources}`);
         /**@description 插件路径 */
         this.extensionsPath = (0, path_1.join)(this.projPath, `proj/${Environment_1.Environment.extensionsName}`);
         /**@description 需要安装依赖的目录 */
@@ -29,8 +39,6 @@ class Handler {
         this.node_modules = (0, path_1.join)(this.projPath, "tools/node_modules");
         /**@description 构建目录 */
         this.buildPath = (0, path_1.join)(this.projPath, "proj/build");
-        /**@description local目录 */
-        this.localPath = (0, path_1.join)(this.projPath, "proj/local");
     }
     get logger() {
         if (!this._logger) {
@@ -54,24 +62,34 @@ class Handler {
     get curExtensionPath() {
         return "";
     }
+    formatDate(format, input) {
+        let date = {
+            "M+": input.getMonth() + 1,
+            "d+": input.getDate(),
+            "h+": input.getHours(),
+            "m+": input.getMinutes(),
+            "s+": input.getSeconds(),
+            "q+": Math.floor((input.getMonth() + 3) / 3),
+            "S+": input.getMilliseconds()
+        };
+        let replaceYear = function () {
+            return input.getFullYear().toString();
+        };
+        format = format.replace(/(y+)/i, replaceYear);
+        for (let k in date) {
+            format = format.replace(new RegExp(`(${k})`), (subFormat) => {
+                let value = date[k];
+                let str = subFormat.length == 1 ? `${value}` : `00${value}`.substring(value.toString().length);
+                return str;
+            });
+        }
+        return format;
+    }
+    ;
     /**@description 获取当前的日期 */
     get date() {
         let date = new Date();
-        let localeDate = date.toLocaleDateString();
-        let replace = function () {
-            let monthStr = arguments[2];
-            let month = parseInt(monthStr.substring(1));
-            monthStr = month < 10 ? `0${month.toString()}` : month.toString();
-            let dayStr = arguments[3];
-            let day = parseInt(dayStr.substring(1));
-            dayStr = day < 10 ? `0${day.toString()}` : day.toString();
-            return arguments[1] + monthStr + dayStr;
-        };
-        localeDate = localeDate.replace(/(\d+)(\/\d+)(\/\d+)/g, replace);
-        let time = date.toLocaleTimeString();
-        time = time.replace(/(\d+)(\:\d+)(\:\d+)/g, replace);
-        let result = `${localeDate}${time}`;
-        return result;
+        return this.formatDate("yyyyMMddhhmmss", date);
     }
     /**@description 执行命令 */
     exec(cmd, isLog = true) {

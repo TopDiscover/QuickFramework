@@ -1,4 +1,4 @@
-import { existsSync } from "fs";
+import { existsSync, symlink } from "fs";
 import { join, parse } from "path";
 import FileUtils from "./core/FileUtils";
 import { Handler } from "./core/Handler";
@@ -8,7 +8,9 @@ import * as Assets from "./core/AssetsHelper";
 import * as PngCompress from "./png-compress/Helper";
 import * as Hotupdate from "./hotupdate/Helper";
 import { Environment } from "./core/Environment";
-import { SyncType } from "./core/Defines";
+import { SyncData, SyncType } from "./core/Defines";
+
+const META = ".meta";
 
 /**
  * @description 辅助类
@@ -71,11 +73,11 @@ export class Helper extends Handler {
      * @param url 项目地址
      * @returns 
      */
-    private async _gitBundles(savePath : string , url : string) {
+    private async gitUrl(savePath: string, url: string) {
         let name = parse(savePath).name;
         this.log(`拉取远程${name}`, false);
         let branch = await this.gitCurBranch();
-        
+
         if (existsSync(savePath)) {
             this.logger.log(`已经存在 : ${savePath}`);
             this.chdir(savePath);
@@ -108,62 +110,79 @@ export class Helper extends Handler {
 
     /**@description 摘取远程bundles */
     async gitBundles() {
-        await this._gitBundles(this.bundlesPath,this.bundlesUrl)
-        if ( Environment.isPrivate ) {
-            await this._gitBundles(this.privateProjPath,this.privateBundlesUrl);
-        }
+        await this.gitUrl(this.bundlesPath, this.bundlesUrl);
     }
 
-    /**@description 链接代码 */
-    symlinkSyncCode() {
-        //链接公用bundles代码
-        let name = parse(this.bundlesPath).name;
-        this.log(`链接${name}目录`, false);
-        let fromPath = join(this.bundlesPath, this.bundleName);
-        FileUtils.instance.symlinkSync(fromPath, this.assetsBundlesPath)
-        this.log(`链接${name}目录`, true);
-        //链接私有bundles代码
-        if ( Environment.isPrivate ){
-            Environment.privateCode.forEach(v=>{
-                if ( v.type == SyncType.Bunldes ){
-                    fromPath = join(this.privateProjPath,v.from);
-                    //目录
-                    let result = FileUtils.instance.getDirs(fromPath);
-                    result.forEach(info=>{
-                        fromPath = info.path;
-                        FileUtils.instance.symlinkSync(fromPath,join(this.projPath,`${v.to}/${info.name}`));
-                    })
-                    //.meta文件
-                    fromPath = join(this.privateProjPath,v.from);
-                    let files = FileUtils.instance.getCurFiles(fromPath);
-                    files.forEach(info=>{
-                        fromPath = info.path;
-                        FileUtils.instance.symlinkSync(fromPath,join(this.projPath,`${v.to}/${info.name}`))
-                    })
-                }else if( v.type == SyncType.CUR_ALL_FILES ){
-                    fromPath = join(this.privateProjPath,v.from)
-                    let files = FileUtils.instance.getCurFiles(fromPath);
-                    files.forEach(info=>{
-                        fromPath = info.path;
-                        FileUtils.instance.symlinkSync(fromPath,join(this.projPath,`${v.to}/${info.name}`));
-                    })
-                }else if ( v.type == SyncType.CUR_DIR_AND_META ){
-                    fromPath = join(this.privateProjPath,v.from);
-                    let result = FileUtils.instance.getDirs(fromPath);
-                    result.forEach(info=>{
-                        fromPath = info.path;
-                        FileUtils.instance.symlinkSync(fromPath,join(this.projPath,`${v.to}/${info.name}`));
-                    })
+    /**@description 摘取远程 私有项目 */
+    async gitPrivate() {
+        await this.gitUrl(this.privateProjPath, this.privateBundlesUrl);
+    }
 
-                    fromPath = join(this.privateProjPath,v.from);
-                    let files = FileUtils.instance.getCurFiles(fromPath);
-                    files.forEach(info=>{
+    /**@description 摘取远程 Resources */
+    async gitResources() {
+        await this.gitUrl(this.resourcesPath, Environment.publicResourcesUrl);
+    }
+
+    /**@description 链接 Bundles 示例 */
+    symlinkSyncBundles() {
+        let data: SyncData[] = [
+            { from: `${this.bundleName}`, to: `proj/assets/`, type: SyncType.CUR_DIR_AND_META }
+        ]
+        this.symlinkSync(data, this.bundleName);
+    }
+
+    /**@description 链接 私有 项目 */
+    symlinkSyncPrivate() {
+        //链接私有bundles代码
+        let data: SyncData[] = [
+            { from: `${this.privateProj}/${this.bundleName}`, to: `proj/assets/${this.bundleName}`, type: SyncType.CUR_DIR_AND_META },
+        ]
+        this.symlinkSync(data, "私有");
+    }
+
+    /**@description 链接 resources */
+    symlinkSyncResources() {
+        let data: SyncData[] = [
+            { from: `${this.resources}/${this.resources}`, to: `proj/assets/${this.resources}`, type: SyncType.SINGLE },
+            { from: `${this.resources}/${this.resources}${META}`, to: `proj/assets/${this.resources}${META}`, type: SyncType.SINGLE },
+            { from: `${this.resources}/scripts`, to: `proj/assets/scripts`, type: SyncType.CUR_DIR_AND_META },
+            { from: `${this.resources}/Application.ts`, to: `proj/assets/Application.ts`, type: SyncType.SINGLE },
+            { from: `${this.resources}/Application.ts${META}`, to: `proj/assets/Application.ts${META}`, type: SyncType.SINGLE },
+            { from: `${this.resources}/@types`, to: `proj/@types`, type: SyncType.CUR_ALL_FILES },
+        ]
+        this.symlinkSync(data, this.resources);
+    }
+
+    /**@description 链接 */
+    symlinkSync(data: SyncData[], tag: string) {
+        this.log(`链接${tag}`, false);
+        let fromPath = "";
+        let toPath = "";
+        data.forEach(v => {
+            if (v.type == SyncType.CUR_ALL_FILES) {
+                fromPath = join(this.projPath, v.from)
+                let files = FileUtils.instance.getCurFiles(fromPath);
+                files.forEach(info => {
+                    fromPath = info.path;
+                    FileUtils.instance.symlinkSync(fromPath, join(this.projPath, `${v.to}/${info.name}`));
+                })
+            } else if (v.type == SyncType.CUR_DIR_AND_META) {
+                fromPath = join(this.projPath, v.from);
+                let result = FileUtils.instance.getDirs(fromPath);
+                result.forEach(info => {
+                    if (!info.name.startsWith(".")) {
                         fromPath = info.path;
-                        FileUtils.instance.symlinkSync(fromPath,join(this.projPath,`${v.to}/${info.name}`));
-                    }) 
-                }
-            })
-        }
+                        toPath = join(this.projPath, `${v.to}/${info.name}`);
+                        FileUtils.instance.symlinkSync(fromPath, toPath);
+                        FileUtils.instance.symlinkSync(`${fromPath}${META}`, `${toPath}${META}`)
+                    }
+                })
+            } else if (v.type == SyncType.SINGLE) {
+                fromPath = join(this.projPath, v.from)
+                FileUtils.instance.symlinkSync(fromPath, join(this.projPath, `${v.to}`));
+            }
+        })
+        this.log(`链接${tag}`, true);
     }
 
     /**
@@ -177,22 +196,22 @@ export class Helper extends Handler {
             let toPath = join(this.extensionsPath, `${element}/src/core`);
             let formPath = join(__dirname, `core`);
             //core 部分代码
-            if ( Environment.isLinkCore(element)){
+            if (Environment.isLinkCore(element)) {
                 this.logger.log(`链接core`);
                 FileUtils.instance.symlinkSync(formPath, toPath);
             }
-            
+
             //node_modules 依赖
-            if ( Environment.isLinkNodeModules(element) ){
+            if (Environment.isLinkNodeModules(element)) {
                 this.logger.log(`链接node_modules`);
                 formPath = this.node_modules;
-                toPath = join(this.extensionsPath,`${element}/node_modules`);
-                FileUtils.instance.symlinkSync(formPath,toPath);
+                toPath = join(this.extensionsPath, `${element}/node_modules`);
+                FileUtils.instance.symlinkSync(formPath, toPath);
             }
-           
+
 
             //链接实现
-            if ( Environment.isLinkImpl(element) ){
+            if (Environment.isLinkImpl(element)) {
                 this.logger.log(`链接Impl`);
                 formPath = join(__dirname, element);
                 toPath = join(this.extensionsPath, `${element}/src/impl`);
@@ -201,33 +220,39 @@ export class Helper extends Handler {
 
             //链接声明部分
             this.logger.log(`链接声明部分`);
-            formPath = join(__dirname,`../@types`);
-            toPath = join(this.extensionsPath,`${element}/@types`);
-            FileUtils.instance.symlinkSync(formPath,toPath);
+            formPath = join(__dirname, `../@types`);
+            toPath = join(this.extensionsPath, `${element}/@types`);
+            FileUtils.instance.symlinkSync(formPath, toPath);
         }
 
         this.log(`链接扩展插件代码`, true);
     }
 
+    async installProtobufJS() {
+        this.log("安装 protobufjs", false);
+        this.chdir(join(this.projPath, "proj"));
+        await this.exec("npm install");
+        this.log("安装 protobufjs", true);
+    }
 
     /**@description 引擎修改 */
     async fixEngine() {
-        this.log(`引擎修正`,false);
+        this.log(`引擎修正`, false);
         this._fixEngine.run();
-        this.log(`引擎修正`,true);
+        this.log(`引擎修正`, true);
     }
 
-    async gulp(){
-        this.log(`Gulp`,false);
+    async gulp() {
+        this.log(`Gulp`, false);
         await this._gulp.run();
-        this.log(`Gulp`,true);
+        this.log(`Gulp`, true);
     }
 
-    async linkGulp(){
-        this.log(`链接 gulpfile.js`,false);
+    async linkGulp() {
+        this.log(`链接 gulpfile.js`, false);
         let path = "gulp-compress/gulpfile.js";
-        await FileUtils.instance.copyFile(join(__dirname,path),join(__dirname,`../dist/${path}`));
-        this.log(`链接 gulpfile.js`,true);
+        await FileUtils.instance.copyFile(join(__dirname, path), join(__dirname, `../dist/${path}`));
+        this.log(`链接 gulpfile.js`, true);
     }
 
     async getAssets() {
@@ -237,16 +262,16 @@ export class Helper extends Handler {
     /**
      * @description 图集压缩
      */
-    async pngCompress(){
-        this.log(`图片压缩`,false);
+    async pngCompress() {
+        this.log(`图片压缩`, false);
         await this._pngCompress.onAfterBuild(Environment.build);
-        this.log(`图片压缩`,true);
+        this.log(`图片压缩`, true);
     }
 
-    async hotupdate(){
-        this.log(`打包热更新`,false);
+    async hotupdate() {
+        this.log(`打包热更新`, false);
         await this._hotupdate.run();
-        this.log(`打包热更新`,true);
+        this.log(`打包热更新`, true);
     }
 
 }

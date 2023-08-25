@@ -76,10 +76,7 @@ class Helper extends Config_1.default {
     /**@description 返回需要添加到主包版本的文件目录 */
     get mainBundleIncludes() {
         if (!this._mainBundleIncludes) {
-            this._mainBundleIncludes = ["src", "jsb-adapter", "assets/resources", "assets/main", this.mainJS];
-            if (!Environment_1.Environment.isVersion3X) {
-                this._mainBundleIncludes.push("assets/internal");
-            }
+            this._mainBundleIncludes = ["src", "jsb-adapter", "assets/resources", "assets/main", this.mainJS, "assets/internal"];
         }
         return this._mainBundleIncludes;
     }
@@ -265,13 +262,12 @@ class Helper extends Config_1.default {
         // await this.deployToRemote();
         // return;
         let data = this.data;
-        // 插入热更新代码
-        if (Environment_1.Environment.isVersion3X) {
-            await this.insertHotupdate((0, path_1.join)(data.buildDir, "../"));
-        }
-        else {
-            await this.insertHotupdate(data.buildDir);
-        }
+        // 插入热更新代码 此步骤不再需要
+        // if (Environment.isVersion3X) {
+        //     await this.insertHotupdate(join(data.buildDir, "../"));
+        // } else {
+        //     await this.insertHotupdate(data.buildDir);
+        // }
         if (data.autoCreate) {
             //如果开启了自动创建 版本文件
             await this.createManifest();

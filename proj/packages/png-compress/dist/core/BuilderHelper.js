@@ -15,7 +15,7 @@ class BuilderHelper extends Config_1.default {
         return this._instance || (this._instance = new BuilderHelper);
     }
     get path() {
-        return (0, path_1.join)(this.localPath, `builder_cache.json`);
+        return (0, path_1.join)(this.configPath, `builder_cache.json`);
     }
 }
 exports.default = BuilderHelper;
