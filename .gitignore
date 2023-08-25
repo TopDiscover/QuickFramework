@@ -31,3 +31,10 @@ proj/assets/scripts/plugin
 proj/assets/scripts/plugin.meta
 proj/assets/Application.ts
 proj/assets/Application.ts.meta
+proj/@types/cryptojs.d.ts
+proj/@types/hall.d.ts
+proj/@types/Proto.d.ts
+proj/@types/Proto.js
+proj/@types/protobuf.d.ts
+proj/@types/TankBattleLogic.d.ts
+proj/@types/taxi.d.ts
