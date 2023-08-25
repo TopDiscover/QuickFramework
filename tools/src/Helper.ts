@@ -136,6 +136,8 @@ export class Helper extends Handler {
         //链接私有bundles代码
         let data: SyncData[] = [
             { from: `${this.privateProj}/${this.bundleName}`, to: `proj/assets/${this.bundleName}`, type: SyncType.CUR_DIR_AND_META },
+            { from: `${this.privateProj}/@types`, to: `proj/@types`, type: SyncType.CUR_ALL_FILES },
+            { from: `${this.privateProj}/framework`, to: `proj/assets/scripts/framework`, type: SyncType.CUR_DIR_AND_META },
         ]
         this.symlinkSync(data, "私有");
     }
@@ -149,6 +151,7 @@ export class Helper extends Handler {
             { from: `${this.resources}/Application.ts`, to: `proj/assets/Application.ts`, type: SyncType.SINGLE },
             { from: `${this.resources}/Application.ts${META}`, to: `proj/assets/Application.ts${META}`, type: SyncType.SINGLE },
             { from: `${this.resources}/@types`, to: `proj/@types`, type: SyncType.CUR_ALL_FILES },
+            { from: `${this.resources}/@types/proto`, to: `proj/@types/proto`, type: SyncType.SINGLE },
         ]
         this.symlinkSync(data, this.resources);
     }

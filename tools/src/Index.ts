@@ -30,11 +30,11 @@ async function main() {
             await Helper.instance.symlinkSyncPrivate();
             await Helper.instance.symlinkSyncExtensions();
         } else {
-            // await Helper.instance.gitBundles();
-            // await Helper.instance.gitResources();
+            await Helper.instance.gitBundles();
+            await Helper.instance.gitResources();
             await Helper.instance.symlinkSyncBundles();
-            // await Helper.instance.symlinkSyncResources();
-            // await Helper.instance.symlinkSyncExtensions();
+            await Helper.instance.symlinkSyncResources();
+            await Helper.instance.symlinkSyncExtensions();
         }
     }
 
