@@ -73,13 +73,7 @@ declare module cc {
 
 	export interface Sprite {
 		/**
-		 * @description 从网络加载图片，推荐使用第二种方式
-		 * @param url 网络地址，如 : http://tools.itharbors.com/res/logo.png
-		 * @param complete 加载完成回调
-		 * @param defaultSpriteFrame 加载图片失败后，使用的默认图片,当传入string时，会动态加载该默认图片
-		 * @param defaultBundle 若指定了defaultSpriteFrame，不指定defaultBundle ,优先使用view.bundle,否则则为resources目录
-		 * @param isNeedCache 是否需要缓存到本地,如果不需要，每次都会从网络拉取资源,默认都会缓存到本地
-		 * @param config.retain 远程加载的资源是否驻留在内存中,默认都不驻留内存
+		 * @description 从网络加载图片
 		 * @example
 		 * 示例1：
 		 * let sprite = imageNode.getComponent(cc.Sprite);
@@ -97,21 +91,24 @@ declare module cc {
 		 * }
 		 */
 		loadRemoteImage(config: {
+			/**@description url 网络地址，如 : http://tools.itharbors.com/res/logo.png*/
 			url: string,
+			/**@description 资源持有者 UIView 子类 */
 			view: UIView,
+			/**@description 完成回调 */
 			complete?: (data: cc.SpriteFrame) => void,
+			/**@description 默认资源 加载图片失败后，使用的默认图片,当传入string时，会动态加载该默认图片 */
 			defaultSpriteFrame?: string,
+			/**@description 默认资源所在 bundle 若指定了defaultSpriteFrame，不指定defaultBundle ,优先使用view.bundle,否则则为resources目录 */
 			defaultBundle?: BUNDLE_TYPE,
+			/**@description 是否需要缓存到本地,如果不需要，每次都会从网络拉取资源,默认都会缓存到本地*/
 			isNeedCache?: boolean,
+			/**@description 远程加载的资源是否驻留在内存中,默认都不驻留内存*/
 			retain?: boolean
 		});
 
 		/**
 		 * @description 加载本地图片
-		 * @param url 图片路径 {urls:string[],key:string} urls 为纹理名如果有此纹理会打包成多张，此时需要传入所有纹理的地址，key指纹理中名字
-		 * @param view 所属视图，UIView的子类
-		 * @param complete 完成回调
-		 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
 		 * @example
 		 * 示例1：
 		 * sprite.getComponent(cc.Sprite).loadImage({url:{urls:["plist/fish_30","plist/fish_30_1","plist/fish_30_2"],key:"fishMove_030_28"},view:this});
@@ -119,17 +116,22 @@ declare module cc {
 		 * sprite.getComponent(cc.Sprite).loadImage({url:"hall/a",view:this});
 		 */
 		loadImage(config: {
+			/**@description url 图片路径 {urls:string[],key:string} urls 为纹理名如果有此纹理会打包成多张，此时需要传入所有纹理的地址，key指纹理中名字 */
 			url: string | { urls: string[], key: string },
+			/**@description 资源持有者 UIView 子类 */
 			view: UIView,
+			/**@description 完成回调 */
 			complete?: (data: SpriteFrame) => void,
-			bundle?: BUNDLE_TYPE
+			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
+			bundle?: BUNDLE_TYPE,
+			/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
+			dir?: string
 		});
 	}
 
 	export interface Button {
 		/**
 		 * @description 加载按钮
-		 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
 		 * @example
 		 * 示例1：
 		 * let button = cc.find("button",this.node);
@@ -145,25 +147,44 @@ declare module cc {
 		 * complete.type => ButtonSpriteFrameType
 		 */
 		loadButton(config: {
+			/**@description normal 状态下 url 图片路径 {urls:string[],key:string} urls 为纹理名如果有此纹理会打包成多张，此时需要传入所有纹理的地址，key指纹理中名字 */
 			normalSprite?: string | { urls: string[], key: string },
-			view: UIView,//UIView的子类
+			/**@description 资源持有者 UIView 子类 */
+			view: UIView,
+			/**@description pressed 状态下 url 图片路径 {urls:string[],key:string} urls 为纹理名如果有此纹理会打包成多张，此时需要传入所有纹理的地址，key指纹理中名字 */
 			pressedSprite?: string | { urls: string[], key: string },
+			/**@description hover 状态下 url 图片路径 {urls:string[],key:string} urls 为纹理名如果有此纹理会打包成多张，此时需要传入所有纹理的地址，key指纹理中名字 */
 			hoverSprite?: string | { urls: string[], key: string },
+			/**@description disabled 状态下 url 图片路径 {urls:string[],key:string} urls 为纹理名如果有此纹理会打包成多张，此时需要传入所有纹理的地址，key指纹理中名字 */
 			disabledSprite?: string | { urls: string[], key: string },
+			/**@description 完成回调 */
 			complete?: (type: string, spriteFrame: SpriteFrame) => void,
+			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
 			bundle?: BUNDLE_TYPE
+			/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
+			dir?: string
 		});
 	}
 
 	export interface Label {
 		/**
 		  * @description 加载字体
-		  * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
 		  * @example
 		  * let content = cc.find("content",this.node); 
 		  * content.getComponent(cc.Label).loadFont({font:"font/DFYUANW7-GB2312",view:this});
 		  */
-		loadFont(config: { font: string, view: UIView, complete?: (font: Font) => void, bundle?: BUNDLE_TYPE });
+		loadFont(config: { 
+			/**@description 字体 url */
+			font: string, 
+			/**@description 资源持有者 UIView 子类 */
+			view: UIView, 
+			/**@description 完成回调 */
+			complete?: (font: Font) => void, 
+			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
+			bundle?: BUNDLE_TYPE,
+			/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
+			dir?: string
+		});
 
 		/**@description 强制label在当前帧进行绘制 */
 		forceDoLayout();
@@ -171,8 +192,8 @@ declare module cc {
 
 
 	/**
-	   * @description 强制节点在当前帧进行一次布局 
-	   * @example
+	 * @description 强制节点在当前帧进行一次布局 
+	 * @example
 	 * cc.updateAlignment(this.node);
 	 * */
 	export function updateAlignment(node: cc.Node): void;
@@ -180,15 +201,25 @@ declare module cc {
 	export interface ParticleSystem {
 
 		/**
-			 * @description 加载特效文件 view 为null时，加载之前不会释
-		 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
+		 * @description 加载特效文件
 		 * @example
 		 * let node = new cc.Node();
 		 * let par = node.addComponent(cc.ParticleSystem);
 		 * par.loadFile({url:GAME_RES( "res/action/DDZ_win_lizi" ),view:null});
 		 * this.node.addChild(node);
 		 */
-		loadFile(config: { url: string, view: UIView, complete?: (file: ParticleAsset) => void, bundle?: BUNDLE_TYPE });
+		loadFile(config: { 
+			/**@description 资源 url */
+			url: string, 
+			/**@description 资源持有者 UIView 子类 */
+			view: UIView, 
+			/**@description 完成回调 */
+			complete?: (file: ParticleAsset) => void, 
+			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
+			bundle?: BUNDLE_TYPE,
+			/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
+			dir?: string
+		});
 
 	}
 }
@@ -196,14 +227,9 @@ declare module cc {
 declare namespace sp {
 	export interface Skeleton {
 		/**
-			 * @description 扩展方法
-			 * @param remotePath 远程资源路径
-			 * @param name 远程Spine文件名，不再后缀
-			 * @param complete 完成回调
-		 * @param isNeedCache 是否需要缓存到本地,如果不需要，每次都会从网络拉取资源,默认都会缓存到本地
-		 * @param config.retain 远程加载的资源是否驻留在内存中,默认都不驻留内存
-			 * @example
-			 * var skeleton = node.addComponent(sp.Skeleton);
+		 * @description 加载远程 spine 动画
+		 * @example
+		 * var skeleton = node.addComponent(sp.Skeleton);
 		 *
 		 * let path = "https://bc-test1.oss-cn-shenzhen.aliyuncs.com/image/action";
 		 * let name = "nnoh_v4";
@@ -215,17 +241,22 @@ declare namespace sp {
 		 * }});
 		 */
 		loadRemoteSkeleton(config: {
+			/**@description 资源持有者 UIView 子类 */
 			view: UIView,
+			/**@description 远程资源路径,如: https://bc-test1.oss-cn-shenzhen.aliyuncs.com/image/action */
 			path: string,
+			/**@description name 远程Spine文件名，不再后缀 */
 			name: string,
+			/**@description 完成回调 */
 			complete: (data: sp.SkeletonData) => void,
+			/**@description 是否需要缓存到本地,如果不需要，每次都会从网络拉取资源,默认都会缓存到本地 */
 			isNeedCache?: boolean,
+			/**@description 远程加载的资源是否驻留在内存中,默认都不驻留内存 */
 			retain?: boolean
 		});
 
 		/**
 		 * @description 加载动画
-		 * @param config.bundle 可不填，默认为打开UIView时指向的Bundle
 		 * @example
 		 * action.loadSkeleton({url:"hall/vip/vipAction/vip_10",view:this,complete:(data)=>{
 		 *	if ( data ){
@@ -235,7 +266,18 @@ declare namespace sp {
 		 *	}
 		 * }});
 		 */
-		loadSkeleton(config: { url: string, view: UIView, complete: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE });
+		loadSkeleton(config: { 
+			/**@description 资源url */
+			url: string, 
+			/**@description 资源持有者 UIView 子类 */
+			view: UIView, 
+			/**@description 完成回调 */
+			complete: (data: sp.SkeletonData) => void, 
+			/**@description 资源所在bundle */
+			bundle?: BUNDLE_TYPE,
+			/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
+			dir?: string
+		});
 	}
 }
 
@@ -243,7 +285,6 @@ declare namespace dragonBones{
 	export interface ArmatureDisplay{
 		/**
 		 * @description 加载龙骨动画
-		 * @param config 可不填，默认为打开UIView时指向的Bundle
 		 * @example 
 		 * ani.loadDisplay({
          *   assetUrl : "dragonBones/NewDragonTest",
@@ -260,7 +301,20 @@ declare namespace dragonBones{
          *   }
          * })
 		 **/
-		loadDisplay(config:{ assetUrl : string , atlasUrl : string , view : UIView , complete : (asset : DragonBonesAsset , atlas : DragonBonesAtlasAsset)=>void,bundle?:BUNDLE_TYPE}):void;
+		loadDisplay(config:{ 
+			/**@description 资源 assetUrl */
+			assetUrl : string , 
+			/**@description 资源 atlasUrl */
+			atlasUrl : string , 
+			/**@description 资源持有者 UIView 子类 */
+			view : UIView , 
+			/**@description 完成回调 */
+			complete : (asset : DragonBonesAsset , atlas : DragonBonesAtlasAsset)=>void,
+			/**@description 资源所在bundle */
+			bundle?:BUNDLE_TYPE,
+			/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
+			dir?: string
+		}):void;
 	}
 }
 

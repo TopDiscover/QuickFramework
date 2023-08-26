@@ -29,14 +29,12 @@ class LazyInfo {
             for (let i = 0; i < info.data.length; i++) {
                 if (info.data[i]) {
                     info.data[i].addRef();//为释放管理器添加引用计数
-                    info.data[i].decRef(false);//资源引用计数-1
                 }
             }
         } else {
             if (info.data) {
                 Log.d(`${LOG_TAG}向${this.name}加入待释放资源:${info.url}`);
                 info.data.addRef();//为释放管理器添加引用计数
-                info.data.decRef(false);//资源引用计数-1
             }
         }
         info.stamp = Date.timeNow();
@@ -136,6 +134,7 @@ class LazyInfo {
             if (cc.isValid(info.data)) {
                 //获取后删除当前管理器的引用
                 info.data.decRef(false);
+
                 if (info.data.refCount <= 0) {
                     bundle?.release(info.url, info.type);
                     Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载资源${info.url}`);
@@ -217,10 +216,12 @@ export class ReleaseManager implements ISingleton {
                     lazyInfo = new LazyInfo(name);
                     this._lazyInfos.set(name, lazyInfo);
                 }
-                if (lazyInfo) {
-                    lazyInfo.add(info);
+                
+                if ( App.cache.removeWithInfo(info,bundle) ){
+                    if (lazyInfo) {
+                        lazyInfo.add(info);
+                    }
                 }
-                App.cache.remove(info.bundle, info.url);
             } else {
                 App.cache.removeWithInfo(info, bundle);
             }

@@ -143,4 +143,11 @@ export namespace Resource {
         /**@description 如果是加载的目录，请用dir字段,必须指定类型，否则无法正确的释放资源 */
         dir?: string,
     }
+
+    export function getKey( url : string , type : typeof cc.Asset | cc.Asset ){
+        if ( url.indexOf(cc.js.getClassName(type) ) >= 0 ){
+            return url;
+        }
+        return `${url}(${cc.js.getClassName(type)})`;
+    }
 }

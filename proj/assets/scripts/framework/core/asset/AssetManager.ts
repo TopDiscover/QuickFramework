@@ -32,7 +32,7 @@ class RemoteLoader {
                 App.cache.remoteCaches.remove(url);
             }
 
-            me._loadRemoteRes(url, cc.Texture2D,isNeedCache).then((data: any) => {
+            me._loadRemoteRes(url, cc.Texture2D, isNeedCache).then((data: any) => {
                 //改变缓存类型
                 let cache = App.cache.remoteCaches.get(url);
                 if (data && cache) {
@@ -95,11 +95,11 @@ class RemoteLoader {
                     cache.info.type = sp.SkeletonData;
                     cache.info.bundle = Macro.BUNDLE_REMOTE;
                     App.cache.remoteCaches.set(url, cache);
-                    me._loadRemoteRes(spinePng, cc.Texture2D,isNeedCache).then((texture: cc.Texture2D) => {
+                    me._loadRemoteRes(spinePng, cc.Texture2D, isNeedCache).then((texture: cc.Texture2D) => {
                         if (texture) {
-                            me._loadRemoteRes(spineJson, cc.JsonAsset,isNeedCache).then((json: cc.JsonAsset) => {
+                            me._loadRemoteRes(spineJson, cc.JsonAsset, isNeedCache).then((json: cc.JsonAsset) => {
                                 if (json) {
-                                    me._loadRemoteRes(spineAtlas, cc.JsonAsset,isNeedCache).then((atlas: cc.TextAsset) => {
+                                    me._loadRemoteRes(spineAtlas, cc.JsonAsset, isNeedCache).then((atlas: cc.TextAsset) => {
                                         if (atlas) {
                                             //生成SkeletonData数据
                                             let asset = new sp.SkeletonData;
@@ -140,13 +140,13 @@ class RemoteLoader {
         });
     }
 
-    private extname(url:string){
+    private extname(url: string) {
         let value = url.match(/(\.[^\.\/\?\\]*)(\?.*)?$/);
         //如果找
         return value ? value[1] : ".png";
     }
 
-    private _loadRemoteRes(url: string, type: typeof cc.Asset,isNeedCache: boolean,options: Record<string, any> = {}) {
+    private _loadRemoteRes(url: string, type: typeof cc.Asset, isNeedCache: boolean, options: Record<string, any> = {}) {
         return new Promise<any>((resolve) => {
             let cache = App.cache.remoteCaches.get(url);
             if (cache) {
@@ -176,10 +176,10 @@ class RemoteLoader {
                 }
                 options["cacheAsset"] = true;
                 options["reloadAsset"] = !isNeedCache;
-                if ( type == cc.Texture2D ) {
+                if (type == cc.Texture2D) {
                     options.ext = this.extname(url);
                 }
-                cc.assetManager.loadRemote(url,options, (error, data) => {
+                cc.assetManager.loadRemote(url, options, (error, data) => {
                     if (cache) {
                         cache.isLoaded = true;
                         if (data) {
@@ -225,22 +225,36 @@ export class AssetManager implements ISingleton {
         type: typeof cc.Asset,
         onProgress: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
         onComplete: (data: Resource.CacheData) => void): void {
+        let url = Resource.getKey(path, type);
         if (CC_DEBUG) {
-            Log.d(`load bundle : ${bundle} path : ${path}`)
+            Log.d(`load bundle : ${bundle} path : ${url}`)
         }
-        let cache = App.cache.get(bundle, path);
+        //先到释放管理器中查找 
+        let res = App.releaseManger.get(bundle, url);
+        if (res) {
+            console.time(`加载资源 : ${url}`);
+            let cache = new Resource.CacheData();
+            cache.info.url = url;
+            cache.info.type = type;
+            cache.info.bundle = bundle;
+            App.cache.set(bundle, url, cache);
+            this._onLoadComplete(cache, onComplete, null, res);
+            return;
+        }
+
+        let cache = App.cache.get(bundle, url, type);
         if (cache) {
             //存在缓存信息
             if (cache.isLoaded) {
                 //已经加载完成
                 if (CC_DEBUG && cache.status == Resource.CacheStatus.WAITTING_FOR_RELEASE) {
-                    Log.w(this.module, `资源:${path} 等待释放，但资源已经加载完成，此时有人又重新加载，不进行释放处理`);
+                    Log.w(this.module, `资源:${url} 等待释放，但资源已经加载完成，此时有人又重新加载，不进行释放处理`);
                 }
                 //加载完成
                 onComplete(cache);
             } else {
                 if (CC_DEBUG && cache.status == Resource.CacheStatus.WAITTING_FOR_RELEASE) {
-                    Log.w(this.module, `资源:${path}等待释放，但资源处理加载过程中，此时有人又重新加载，不进行释放处理`);
+                    Log.w(this.module, `资源:${url}等待释放，但资源处理加载过程中，此时有人又重新加载，不进行释放处理`);
                 }
                 cache.finishCb.push(onComplete);
             }
@@ -249,22 +263,22 @@ export class AssetManager implements ISingleton {
         } else {
             //无缓存信息
             cache = new Resource.CacheData();
-            cache.info.url = path;
+            cache.info.url = url;
             cache.info.type = type;
             cache.info.bundle = bundle;
-            App.cache.set(bundle, path, cache);
+            App.cache.set(bundle, url, cache);
             console.time(`加载资源 : ${cache.info.url}`);
 
-            //先到释放管理器中查找 
-            let res = App.releaseManger.get(bundle, path);
-            if (res) {
-                this._onLoadComplete(cache, onComplete, null, res);
-                return;
-            }
             let _bundle = this.getBundle(bundle);
             if (!_bundle) {
                 //如果bundle不存在
                 let error = new Error(`${this.module} ${bundle} 没有加载，请先加载`);
+                this._onLoadComplete(cache, onComplete, error, null);
+                return;
+            }
+            if (!type) {
+                //如果bundle不存在
+                let error = new Error(`${this.module} ${bundle} ${path} 加载没有指定资源类型`);
                 this._onLoadComplete(cache, onComplete, error, null);
                 return;
             }
@@ -325,22 +339,37 @@ export class AssetManager implements ISingleton {
         type: typeof cc.Asset,
         onProgress: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
         onComplete: (data: Resource.CacheData) => void): void {
+
+        let url = Resource.getKey(path, type);
         if (CC_DEBUG) {
-            Log.d(`load bundle : ${bundle} path : ${path}`)
+            Log.d(`load bundle : ${bundle} path : ${url}`)
         }
-        let cache = App.cache.get(bundle, path);
+        //先到释放管理器中查找 
+        let res = App.releaseManger.get(bundle, url);
+        if (res) {
+            console.time(`加载资源 : ${url}`);
+            let cache = new Resource.CacheData();
+            cache.info.url = url;
+            cache.info.type = type;
+            cache.info.bundle = bundle;
+            App.cache.set(bundle, url, cache);
+            this._onLoadComplete(cache, onComplete, null, res);
+            return;
+        }
+
+        let cache = App.cache.get(bundle, url, type);
         if (cache) {
             //存在缓存信息
             if (cache.isLoaded) {
                 //已经加载完成
                 if (CC_DEBUG && cache.status == Resource.CacheStatus.WAITTING_FOR_RELEASE) {
-                    Log.w(this.module, `资源:${path} 等待释放，但资源已经加载完成，此时有人又重新加载，不进行释放处理`);
+                    Log.w(this.module, `资源:${url} 等待释放，但资源已经加载完成，此时有人又重新加载，不进行释放处理`);
                 }
                 //加载完成
                 onComplete(cache);
             } else {
                 if (CC_DEBUG && cache.status == Resource.CacheStatus.WAITTING_FOR_RELEASE) {
-                    Log.w(this.module, `资源:${path}等待释放，但资源处理加载过程中，此时有人又重新加载，不进行释放处理`);
+                    Log.w(this.module, `资源:${url}等待释放，但资源处理加载过程中，此时有人又重新加载，不进行释放处理`);
                 }
                 cache.finishCb.push(onComplete);
             }
@@ -349,17 +378,11 @@ export class AssetManager implements ISingleton {
         } else {
             //无缓存信息
             cache = new Resource.CacheData();
-            cache.info.url = path;
+            cache.info.url = url;
             cache.info.type = type;
             cache.info.bundle = bundle;
-            App.cache.set(bundle, path, cache);
+            App.cache.set(bundle, url, cache);
             console.time(`加载资源 : ${cache.info.url}`);
-
-            let res = App.releaseManger.get(bundle, path);
-            if (res) {
-                this._onLoadComplete(cache, onComplete, null, res);
-                return;
-            }
 
             let _bundle = this.getBundle(bundle);
             if (!_bundle) {
@@ -368,25 +391,23 @@ export class AssetManager implements ISingleton {
                 this._onLoadComplete(cache, onComplete, error, null);
                 return;
             }
-            if (onProgress) {
-                if (type) {
+            if (type) {
+                if (onProgress) {
                     _bundle.loadDir(path, type, onProgress, this._onLoadComplete.bind(this, cache, onComplete));
                 } else {
-                    _bundle.loadDir(path, onProgress, this._onLoadComplete.bind(this, cache, onComplete));
+                    _bundle.loadDir(path, type, this._onLoadComplete.bind(this, cache, onComplete));
                 }
             } else {
-                if (type) {
-                    _bundle.loadDir(path, type, this._onLoadComplete.bind(this, cache, onComplete));
-                } else {
-                    _bundle.loadDir(path, this._onLoadComplete.bind(this, cache, onComplete));
-                }
+                //如果bundle不存在
+                let error = new Error(`${this.module} ${bundle} ${path} 加载没有指定资源类型`);
+                this._onLoadComplete(cache, onComplete, error, null);
             }
         }
     }
 
     public releaseAsset(info: Resource.Info) {
         if (info && info.bundle) {
-            let cache = App.cache.get(info.bundle, info.url, false);
+            let cache = App.cache.get(info.bundle, info.url, info.type, false);
             if (!cache) {
                 return;
             } else {
@@ -400,7 +421,6 @@ export class AssetManager implements ISingleton {
                     if (CC_DEBUG) Log.d(`常驻资源 url : ${cache.info.url}`);
                     return;
                 }
-
                 App.releaseManger.release(info);
             } else {
                 cache.status = Resource.CacheStatus.WAITTING_FOR_RELEASE;
@@ -412,13 +432,8 @@ export class AssetManager implements ISingleton {
 
     public retainAsset(info: Resource.Info) {
         if (info) {
-            let cache = App.cache.get(info.bundle, info.url)
+            let cache = App.cache.get(info.bundle, info.url, info.type)
             if (cache) {
-                if (CC_DEBUG) {
-                    if (info.data != cache.data) {
-                        Log.e(`错误的retainAsset :${info.url}`);
-                    }
-                }
                 if (!cache.info.retain) {
                     cache.info.retain = info.retain;
                 }
@@ -431,7 +446,7 @@ export class AssetManager implements ISingleton {
                     cache.data && cache.data.addRef();
                 }
             } else {
-                if (CC_DEBUG) Log.e(`retainAsset cache.data is null`);
+                if (CC_DEBUG) Log.e(`${info.url} retainAsset cache.data is null`);
             }
         } else {
             if (CC_DEBUG) Log.e(`retainAsset info is null`);
@@ -444,7 +459,7 @@ export class AssetManager implements ISingleton {
      */
     public addPersistAsset(url: string, data: cc.Asset, bundle: BUNDLE_TYPE) {
         let info = new Resource.Info;
-        info.url = url;
+        info.url = Resource.getKey(url, data);
         info.data = data;
         info.bundle = bundle;
         info.retain = true;

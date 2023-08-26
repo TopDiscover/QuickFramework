@@ -209,11 +209,19 @@ export default class UISprite extends cc.Sprite {
                 // Log.d("加载远程图片")
                 App.asset.remote.loadImage(url, true).then((data) => {
                     if (data) {
-                        setSpriteSpriteFrame(view, url, this, data, (data) => {
-                            if (this.onLoadComplete) {
-                                this.onLoadComplete(data);
-                            }
-                        }, Macro.BUNDLE_REMOTE, Resource.Type.Remote, false);
+                        setSpriteSpriteFrame({
+                            view : view,
+                            url : url,
+                            sprite : this,
+                            spriteFrame : data,
+                            complete :(data)=>{
+                                if (this.onLoadComplete) {
+                                    this.onLoadComplete(data);
+                                }
+                            },
+                            bundle : Macro.BUNDLE_REMOTE,
+                            resourceType : Resource.Type.Remote,
+                        });
                     }
                 });
             } else {
@@ -225,22 +233,37 @@ export default class UISprite extends cc.Sprite {
                         if (data && data.isTryReload) {
                             //来到这里面程序已经崩溃了，无意义在处理了
                         } else {
-                            setSpriteSpriteFrame(view, data.url, this, data.spriteFrame, (data) => {
-                                if (this.onLoadComplete) {
-                                    this.onLoadComplete(data);
-                                }
-                            }, realBundle, Resource.Type.Local, false, true);
+                            setSpriteSpriteFrame({
+                                view : view,
+                                url : data.url,
+                                sprite : this,
+                                spriteFrame : data.spriteFrame,
+                                complete : (data)=>{
+                                    if (this.onLoadComplete) {
+                                        this.onLoadComplete(data);
+                                    }
+                                },
+                                bundle : realBundle,
+                                isAtlas : true,
+                            });
                         }
                     });
                 } else {
                     // Log.d(`资源路径：${realBundle}/${url}`);
                     App.cache.getCacheByAsync(url, cc.SpriteFrame, realBundle)
                         .then(spriteFrame => {
-                            setSpriteSpriteFrame(view, url, this, spriteFrame, (data) => {
-                                if (this.onLoadComplete) {
-                                    this.onLoadComplete(data);
-                                }
-                            }, realBundle);
+                            setSpriteSpriteFrame({
+                                view : view,
+                                url : url,
+                                sprite : this,
+                                spriteFrame : spriteFrame,
+                                complete : (data)=>{
+                                    if (this.onLoadComplete) {
+                                        this.onLoadComplete(data);
+                                    }
+                                },
+                                bundle : realBundle
+                            });
                         })
                 }
             }

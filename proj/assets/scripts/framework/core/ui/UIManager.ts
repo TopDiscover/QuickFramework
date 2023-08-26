@@ -329,8 +329,8 @@ export class UIManager implements ISingleton{
                 this.loadPrefab(openOption.bundle, prefabUrl, progressCallback)
                     .then((prefab) => {
                         viewData.info = new Resource.Info;
-                        viewData.info.url = prefabUrl;
                         viewData.info.type = cc.Prefab;
+                        viewData.info.url = Resource.getKey(prefabUrl,viewData.info.type);
                         viewData.info.data = prefab;
                         viewData.info.bundle = openOption.bundle;
                         App.asset.retainAsset(viewData.info);

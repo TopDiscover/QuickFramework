@@ -6,12 +6,12 @@ import { Resource } from "./Resource";
 export default class ResourceLoader {
 
     /** @description 加载资源数据 */
-    private _resources: Map<string,Resource.Data> = new Map<string,Resource.Data>();
+    private _resources: Resource.Data[] = [];
     /**@description 当前已经加载的资源数量 */
     private _loadedCount: number = 0;
 
     /**@description 加载完成后的数据，为了方便释放时精准释放，没加载成功的资源，不在做释放的判断 */
-    private _loadedResource: Map<string,Resource.Info>  = new Map<string,Resource.Info>();
+    private _loadedResource: Map<string, Resource.Info> = new Map<string, Resource.Info>();
 
     /**@description 当前是否正在加载资源 */
     private _isLoading: boolean = false;
@@ -85,7 +85,7 @@ export default class ResourceLoader {
             return;
         }
 
-        if (this._resources.size > 0 && this.isLoadComplete()) {
+        if (this._resources.length > 0 && this.isLoadComplete()) {
             if (CC_DEBUG) Log.w(`资源已经加载完成，使用已经加载完成的资源`);
             this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.SUCCESS);
             this.onLoadResourceComplete();
@@ -93,17 +93,7 @@ export default class ResourceLoader {
         }
 
         this._isLoading = true;
-        //为防止重复，这里把资源放在一个map中
-        res.forEach((value, index) => {
-            if (value.url) {
-                this._resources.set(value.url, value);
-            } else if (value.dir) {
-                this._resources.set(value.dir, value);
-            } else {
-                if (value.preloadView) this._resources.set(value.preloadView.getPrefabUrl(), value);
-            }
-        });
-
+        this._resources = res;
         this._loadedCount = 0;
         this._resources.forEach((value, key, source) => {
             if (value.preloadView) {
@@ -131,52 +121,53 @@ export default class ResourceLoader {
     }
 
     private _unLoadResources() {
-        if (this._isLoading || this._resources.size <= 0) {
+        if (this._isLoading || this._resources.length <= 0) {
             //当前正在加载中
             if (this._isLoading) {
                 Log.d("resources is loading , waiting for unload!!!");
             }
             return;
         }
-        if (this._resources.size > 0) {
-            this._resources.forEach((value) => {
-                if (value.url) {
-                    if (this._loadedResource.has(value.url)) {
-                        let data = this._loadedResource.get(value.url);
-                        if (data) {
-                            App.asset.releaseAsset(data);
-                        }
-                        this._loadedResource.delete(value.url);
+
+        this._resources.forEach((value) => {
+            if (value.url) {
+                let url = Resource.getKey(value.url,value.type);
+                if (this._loadedResource.has(url)) {
+                    let data = this._loadedResource.get(url);
+                    if (data) {
+                        App.asset.releaseAsset(data);
                     }
-                } else if (value.dir) {
-                    if (this._loadedResource.has(value.dir)) {
-                        let data = this._loadedResource.get(value.dir);
-                        if (data) {
-                            App.asset.releaseAsset(data);
-                        }
-                        this._loadedResource.delete(value.dir);
-                    }
+                    this._loadedResource.delete(url);
                 }
-            });
-        }
+            } else if (value.dir) {
+                let url = Resource.getKey(value.dir,value.type);
+                if (this._loadedResource.has(url)) {
+                    let data = this._loadedResource.get(url);
+                    if (data) {
+                        App.asset.releaseAsset(data);
+                    }
+                    this._loadedResource.delete(url);
+                }
+            }
+        });
         //重置标记
         this._isLoading = false;
         this._loadedCount = 0;
-        this._resources.clear();
+        this._resources = []
     }
 
     private _onLoadResourceComplete(data: Resource.CacheData) {
         this._loadedCount++;
 
         if (this._onLoadProgress) {
-            if (this._loadedCount > this._resources.size) {
-                this._loadedCount = this._resources.size;
+            if (this._loadedCount > this._resources.length) {
+                this._loadedCount = this._resources.length;
             }
             //cc.log(`----------loadprogress ${this._loadedCount} / ${this._resources.length}--------------`);
-            this._onLoadProgress(this._loadedCount, this._resources.size, data);
+            this._onLoadProgress(this._loadedCount, this._resources.length, data);
         }
 
-        if (data && ( Array.isArray(data.data) || data.data instanceof cc.Asset ) ) {
+        if (data && (Array.isArray(data.data) || data.data instanceof cc.Asset)) {
             //排除掉界面管理器
             let info = new Resource.Info;
             info.url = data.info.url;
@@ -209,7 +200,7 @@ export default class ResourceLoader {
     }
 
     public isLoadComplete(): boolean {
-        return this._loadedCount >= this._resources.size;
+        return this._loadedCount >= this._resources.length;
     }
 
 }

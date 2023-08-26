@@ -279,10 +279,10 @@ export class CacheManager implements ISingleton {
      * @param isCheck 是否检查资源有效性，当为ture时，会检查资源是否有效，如果有效直接返回，如果无效，则返回nll
      * @returns 
      */
-    public get(bundle: BUNDLE_TYPE, path: string, isCheck: boolean = true) {
+    public get(bundle: BUNDLE_TYPE, path: string, type: typeof cc.Asset, isCheck: boolean = true) {
         let bundleName = this.getBundleName(bundle);
         if (bundleName && this._bundles.has(bundleName)) {
-            return (this._bundles.get(bundleName) as ResourceCache).get(path, isCheck);
+            return (this._bundles.get(bundleName) as ResourceCache).get(Resource.getKey(path, type), isCheck);
         }
         return null;
     }
@@ -313,34 +313,68 @@ export class CacheManager implements ISingleton {
         return false;
     }
 
+    /**@description 释放资源，引用计数减1  */
+    protected decRef( info : Resource.Info , assets : cc.Asset , bundle : cc.AssetManager.Bundle ){
+        const data = assets
+        data.decRef(false);
+        let isSuccess = true;
+        if (data.refCount <= 0) {
+            if ( App.isLazyRelease ){
+                CC_DEBUG && Log.d(`${this.module} bundle : ${info.bundle} 释放资源成功 : ${info.url} , 将加载到释放队列中`);
+            }else{
+                bundle.release(info.url, info.type);
+                CC_DEBUG && Log.d(`${this.module} bundle : ${info.bundle} 释放资源成功 : ${info.url}`);
+            }
+        } else {
+            if ( CC_DEBUG ){
+                if ( App.isLazyRelease ){
+                    Log.w(`${this.module} bundle : ${info.bundle} 释放资源失败 : ${info.url} , 引用计数 : ${data.refCount} , 不能加载到释放队列中`);
+                }else{
+                    Log.w(`${this.module} bundle : ${info.bundle} 释放资源失败 : ${info.url} , 引用计数 : ${data.refCount}`);
+                }
+            }
+            isSuccess = false;
+        }
+        return isSuccess; 
+    }
+
     public removeWithInfo(info: Resource.Info, bundle: cc.AssetManager.Bundle) {
+        let isSuccess = true;
         if (info && info.data) {
+
             if (Array.isArray(info.data)) {
                 for (let i = 0; i < info.data.length; i++) {
-                    const data = info.data[i];
-                    data.decRef(false);
-                    const path = `${info.url}/${info.data[i].name}`;
-                    if (data.refCount <= 0) {
-                        bundle.release(path, info.type);
-                        CC_DEBUG && Log.d(`${this.module} bundle : ${info.bundle} 释放资源成功 : ${path}`);
-                    } else {
-                        CC_DEBUG && Log.w(`${this.module} bundle : ${info.bundle} 释放资源失败 : ${path} , 引用计数 : ${data.refCount}`);
+                    let result = this.decRef(info,info.data[i],bundle);
+                    if ( !result ){
+                        isSuccess = false;
                     }
                 }
-                this.remove(info.bundle, info.url);
-                CC_DEBUG && Log.d(`${this.module} 成功释放资源目录 bundle : ${info.bundle} : ${info.bundle}.${info.url}`);
-            } else {
-                const data = info.data;
-                data.decRef(false);
-                if (data.refCount <= 0) {
-                    bundle.release(info.url, info.type);
-                    CC_DEBUG && Log.d(`${this.module} bundle : ${info.bundle} 释放资源成功 : ${info.url}`);
-                } else {
-                    CC_DEBUG && Log.w(`${this.module} bundle : ${info.bundle} 释放资源失败 : ${info.url} , 引用计数 : ${data.refCount}`);
+                if ( isSuccess ){
+                    if ( App.isLazyRelease ){
+                        CC_DEBUG && Log.d(`${this.module} 成功释放资源目录,将释放目录加入到释放队列中 bundle : ${info.bundle} : ${info.bundle}.${info.url}`);
+                    }else{
+                        this.remove(info.bundle, info.url);
+                        CC_DEBUG && Log.d(`${this.module} 成功释放资源目录 bundle : ${info.bundle} : ${info.bundle}.${info.url}`);
+                    }
+                }else{
+                    if ( App.isLazyRelease ){
+                        CC_DEBUG && Log.d(`${this.module} 释放资源目录失败，无法加入到释放队列中 bundle : ${info.bundle} : ${info.bundle}.${info.url}`);
+                    }else{
+                        CC_DEBUG && Log.d(`${this.module} 释放资源目录失败 bundle : ${info.bundle} : ${info.bundle}.${info.url}`);
+                    }
                 }
-                this.remove(info.bundle, info.url);
+                
+            } else {
+                if( this.decRef(info,info.data,bundle) ){
+                    if ( !App.isLazyRelease ){
+                        this.remove(info.bundle,info.url);
+                    }
+                }else{
+                    isSuccess = false;
+                }
             }
         }
+        return isSuccess;
     }
 
     public removeBundle(bundle: BUNDLE_TYPE) {
@@ -350,7 +384,7 @@ export class CacheManager implements ISingleton {
         }
     }
 
-    private _getGetCacheByAsyncArgs(): { url: string, type: typeof cc.Asset, bundle: BUNDLE_TYPE } | null {
+    private _getGetCacheByAsyncArgs(): { url: string, type: typeof cc.Asset, bundle: BUNDLE_TYPE, ignoreType: boolean } | null {
         if (arguments.length < 3) {
             if (CC_DEBUG) Log.e(`${this.module}参数传入有误，必须两个参数`);
             return null;
@@ -360,11 +394,12 @@ export class CacheManager implements ISingleton {
             return null;
         }
 
-        if (!cc.js.isChildClassOf(arguments[1], cc.Asset)) {
+        let ignoreType = arguments.length > 3 ? arguments[3] : false;
+        if (!ignoreType && !cc.js.isChildClassOf(arguments[1], cc.Asset)) {
             if (CC_DEBUG) Log.e(`${this.module}传入的第二个参数有误,必须是cc.Asset的子类`);
             return null;
         }
-        return { url: arguments[0], type: arguments[1], bundle: arguments[2] };
+        return { url: arguments[0], type: arguments[1], bundle: arguments[2], ignoreType: ignoreType };
     }
 
     /**
@@ -374,6 +409,7 @@ export class CacheManager implements ISingleton {
      * @param bundle
      */
     public getCache<T extends cc.Asset>(url: string, type: { prototype: T }, bundle: BUNDLE_TYPE): Promise<T>;
+    public getCache<T extends cc.Asset>(url: string, type: { prototype: T }, bundle: BUNDLE_TYPE, ignoreType: boolean): Promise<T>;
     public getCache() {
         let args = arguments;
         let me = this;
@@ -383,11 +419,11 @@ export class CacheManager implements ISingleton {
                 resolve(null);
                 return;
             }
-            let cache = me.get(_args.bundle, _args.url);
+            let cache = me.get(_args.bundle, _args.url, _args.type);
             if (cache) {
                 if (cache.isLoaded) {
                     //已经加载完成
-                    if (_args.type) {
+                    if (_args.type && !_args.ignoreType) {
                         if (cache.data instanceof _args.type) {
                             resolve(cache.data);
                         } else {
@@ -449,8 +485,8 @@ export class CacheManager implements ISingleton {
             let getFun = (url: string) => {
                 me.getCacheByAsync(url, cc.SpriteAtlas, bundle).then((atlas) => {
                     let info = new Resource.Info;
-                    info.url = url;
                     info.type = cc.SpriteAtlas;
+                    info.url = Resource.getKey(url,info.type);
                     info.data = atlas;
                     info.bundle = bundle;
                     addExtraLoadResource(view, info);

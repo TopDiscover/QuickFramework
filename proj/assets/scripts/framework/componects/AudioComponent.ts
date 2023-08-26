@@ -9,7 +9,7 @@ import { Singleton } from "../utils/Singleton";
 const { ccclass, property, menu } = cc._decorator;
 
 /**@description 框架内部使用，外部请不要调用 */
-class AudioData implements ISingleton{
+class AudioData implements ISingleton {
     static module = "【音效数据】";
     module: string;
     public musicVolume = 1;
@@ -17,10 +17,10 @@ class AudioData implements ISingleton{
     public isEffectOn = true;
     public isMusicOn = true;
     private _curMusicUrl = "";
-    public get curMusicUrl(){
+    public get curMusicUrl() {
         return this._curMusicUrl;
     }
-    public set curMusicUrl(v){
+    public set curMusicUrl(v) {
         this.prevMusicUrl = this._curMusicUrl;
         this._curMusicUrl = v;
     }
@@ -79,7 +79,7 @@ export default class AudioComponent extends EventComponent {
         }
     }
 
-    protected get audioData(){
+    protected get audioData() {
         return Singleton.get(AudioData);
     }
 
@@ -189,8 +189,8 @@ export default class AudioComponent extends EventComponent {
                 App.cache.getCacheByAsync(url, cc.AudioClip, bundle).then((data) => {
                     if (data) {
                         let info = new Resource.Info;
-                        info.url = url;
                         info.type = cc.AudioClip;
+                        info.url = Resource.getKey(url, info.type);
                         info.data = data;
                         info.bundle = bundle;
                         if (this.owner) {
@@ -198,13 +198,13 @@ export default class AudioComponent extends EventComponent {
                         } else {
                             App.uiManager.garbage.addLocal(info);
                         }
-                        if ( !(this.isPlaying && this.curMusicUrl == this.prevMusiUrl) ){
+                        if (!(this.isPlaying && this.curMusicUrl == this.prevMusiUrl)) {
                             //停掉当前播放音乐
                             this.stopMusic();
                             //播放新的背景音乐
                             cc.audioEngine.playMusic(data, loop);
                         }
-                        
+
                         this.isPlaying = true;
                         resolve({ url: url, isSuccess: true });
                     } else {
@@ -229,8 +229,8 @@ export default class AudioComponent extends EventComponent {
                 App.cache.getCacheByAsync(url, cc.AudioClip, bundle).then((data) => {
                     if (data) {
                         let info = new Resource.Info;
-                        info.url = url;
                         info.type = cc.AudioClip;
+                        info.url = Resource.getKey(url, info.type);
                         info.data = data;
                         info.bundle = bundle;
                         if (this.owner) {
