@@ -221,6 +221,7 @@ export class ReleaseManager implements ISingleton {
                     if (lazyInfo) {
                         lazyInfo.add(info);
                     }
+                    App.cache.remove(info.bundle, info.url);
                 }
             } else {
                 App.cache.removeWithInfo(info, bundle);
