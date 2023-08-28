@@ -233,7 +233,7 @@ declare function loadDirRes(config: {
 	/**@description 加载进度回调 */
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
 	/**@description 加载完成回调 */
-	onComplete: (data: import("../assets/scripts/framework/core/asset/Resource").Resource.CacheData) => void
+	onComplete: (data: import("../assets/scripts/framework/core/asset/Resource").Resource.Cache) => void
 }): void;
 
 /**

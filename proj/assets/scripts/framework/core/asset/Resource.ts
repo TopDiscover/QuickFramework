@@ -25,6 +25,9 @@ export namespace Resource {
     }
     /**@description 资源信息 */
     export class Info {
+        constructor() {
+
+        }
         url: string = "";
         type: typeof cc.Asset = null;
         data: cc.Asset | cc.Asset[] = null;
@@ -45,9 +48,65 @@ export namespace Resource {
             }
         }
     }
-    export class CacheData {
-        /**@description 是否已经加载完成 */
-        isLoaded: boolean = false;
+    export class Cache {
+
+        constructor(url: string, type: typeof cc.Asset, bundle: BUNDLE_TYPE, dir?: string) {
+            this.url = url;
+            this.type = type;
+            this.bundle = bundle;
+            if (dir) {
+                this.dir = dir;
+            }
+        }
+
+        /**@description 缓存的key值 */
+        get key() {
+            return getKey(this.url, this.type);
+        }
+
+        /**@description 描述 */
+        get description() {
+            let typeStr = cc.js.getClassName(this.type);
+            if ( this.resourceType == Resource.Type.Local ){
+                return `本地 : ${this.dir ? "目录" : ""}[${typeStr}]${this.fullUrl}`;
+            }
+            return `远程 : [${typeStr}]${this.fullUrl}`;
+        }
+
+        /**@description 资源全路径 */
+        get fullUrl(){
+            if ( this.resourceType == Resource.Type.Local ){
+                return `${this.bundle}/${this.url}`;
+            }else{
+                return this.url;
+            }
+        }
+
+        /**@description 如果是加载的目录，需要传dir目录 */
+        dir?: string = null;
+
+        /**@description 资源url */
+        url: string = "";
+        /**@description 资源类型 */
+        type: typeof cc.Asset = null!;
+        /**@description 资源所在bundle */
+        bundle: BUNDLE_TYPE = null!;
+        /**@description 是否常驻内存，远程加载资源有效 */
+        protected _retain: boolean = false;
+        set retain(v){
+            if ( this._retain ){
+                Log.w(`${this.fullUrl}已经是常驻资源，无需要重复设置`);
+                return;
+            }
+            this._retain = v;
+        }
+        get retain(){
+            return this._retain;
+        }
+
+        /**@description 目录资源有效 */
+        refCount = 0;
+
         /**@description 加载完成数据 
          * cc.Prefab 
          * cc.SpriteAtlas 
@@ -60,8 +119,13 @@ export namespace Resource {
          * cc.JsonAsset
          * */
         data: cc.Asset | cc.Asset[] = null;
+        /**@description 默认为本地资源 */
+        resourceType: Type = Type.Local;
+        /**@description 加入释放资源的時間戳 */
+        stamp: number | null = null;
 
-        info: Info = new Info();
+        /**@description 是否已经加载完成 */
+        isLoaded: boolean = false;
 
         status: CacheStatus = CacheStatus.NONE;
 
@@ -71,16 +135,16 @@ export namespace Resource {
         /**@description 完成回调，在资源正在加载过程中，又有其它地方调用加载同一个资源，此时需要等待资源加载完成，统一回调 */
         finishCb: ((data: any) => void)[] = [];
 
-        public doGet(data: any) {
+        public doGet() {
             for (let i = 0; i < this.getCb.length; i++) {
-                if (this.getCb[i]) this.getCb[i](data);
+                if (this.getCb[i]) this.getCb[i](this.data);
             }
             this.getCb = [];
         }
 
-        public doFinish(data: any) {
+        public doFinish() {
             for (let i = 0; i < this.finishCb.length; i++) {
-                if (this.finishCb[i]) this.finishCb[i](data);
+                if (this.finishCb[i]) this.finishCb[i](this.data);
             }
             this.finishCb = [];
         }
@@ -100,7 +164,7 @@ export namespace Resource {
                     data.forEach(v => {
                         let temp = cc.isValid(v);
                         datas.push({
-                            url: `${this.info.url}/${temp ? v.name : "unknown"}`,
+                            url: `${this.fullUrl}/${temp ? v.name : "unknown"}`,
                             isValid: temp,
                             refCount: temp ? v.refCount : -1,
                             type: cc.js.getClassName(v),
@@ -110,7 +174,7 @@ export namespace Resource {
                 } else {
                     let temp = cc.isValid(data);
                     return [{
-                        url: this.info.url,
+                        url: this.fullUrl,
                         isValid: temp,
                         refCount: temp ? data.refCount : -1,
                         type: cc.js.getClassName(data),
@@ -144,8 +208,8 @@ export namespace Resource {
         dir?: string,
     }
 
-    export function getKey( url : string , type : typeof cc.Asset | cc.Asset ){
-        if ( url.indexOf(cc.js.getClassName(type) ) >= 0 ){
+    export function getKey(url: string, type: typeof cc.Asset | cc.Asset) {
+        if (url.indexOf(cc.js.getClassName(type)) >= 0) {
             return url;
         }
         return `${url}(${cc.js.getClassName(type)})`;

@@ -1,34 +1,34 @@
 import UIView from "../ui/UIView";
 import { Resource } from "./Resource";
 import { Macro } from "../../defines/Macros";
-class ResourceCache {
+class BundleCache {
 
-    private _caches = new Map<string, Resource.CacheData>();
+    private _caches = new Map<string, Resource.Cache>();
     private name = Macro.UNKNOWN;
     constructor(name: string) {
         this.name = name;
     }
 
-    public get(path: string, isCheck: boolean) {
-        if (this._caches.has(path)) {
-            let cache = this._caches.get(path);
+    public get(key: string, isCheck: boolean) {
+        if (this._caches.has(key)) {
+            let cache = this._caches.get(key);
             if (isCheck && cache && cache.isInvalid) {
                 //资源已经释放
-                Log.w(`资源加载完成，但已经被释放 , 重新加载资源 : ${path}`);
-                this.remove(path);
+                Log.w(`资源加载完成，但已经被释放 , 重新加载资源 : ${key}`);
+                this.remove(key);
                 return null;
             }
-            return this._caches.get(path);
+            return this._caches.get(key);
         }
         return null;
     }
 
-    public set(path: string, data: Resource.CacheData) {
-        this._caches.set(path, data);
+    public set(data: Resource.Cache) {
+        this._caches.set(data.key, data);
     }
 
-    public remove(path: string) {
-        return this._caches.delete(path);
+    public remove(key: string) {
+        return this._caches.delete(key);
     }
 
     public get size() {
@@ -42,8 +42,7 @@ class ResourceCache {
         let content: any[] = [];
         let invalidContent: any[] = [];
         caches.forEach((data, key, source) => {
-
-            if (data.isLoaded && data.data && !cc.isValid(data.data)) {
+            if (data.isLoaded && data.data) {
                 invalidContent.push(data.debug());
             } else {
                 content.push(data.debug());
@@ -61,147 +60,125 @@ class ResourceCache {
     }
 }
 
-class CacheInfo {
-    refCount = 0;
-    url: string = "";
-    /**@description 是否常驻于内存中 */
-    retain: boolean = false;
-}
-
 class RemoteCaches {
-    private _caches = new Map<string, Resource.CacheData>();
-    private _spriteFrameCaches = new Map<string, Resource.CacheData>();
-    private _resMap = new Map<string, CacheInfo>();
+    private _caches = new Map<string, Resource.Cache>();
     /**
      * @description 获取远程缓存数据
      * @param type 远程奖状类型
-     * @param url 远程地址
+     * @param key 远程地址
      */
-    public get(url: string) {
-        if (this._caches.has(url)) {
-            return this._caches.get(url);
+    public get(key: string) {
+        if (this._caches.has(key)) {
+            return this._caches.get(key);
         }
         return null;
     }
 
     public getSpriteFrame(url: string) {
-        if (this._spriteFrameCaches.has(url)) {
-            let cache = this._spriteFrameCaches.get(url);
-            let texture2D = this.get(url);
-            if (texture2D) {
-                return cache;
+        let key = Resource.getKey(url, cc.SpriteFrame);
+        let cacheSpriteFrame = this.get(key);
+        if (cacheSpriteFrame) {
+            //检查纹理是否还在
+            let cacheTexture2D = this.get(Resource.getKey(url, cc.Texture2D));
+            if (cacheTexture2D) {
+                return cacheSpriteFrame;
             } else {
-                this.remove(url);
+                this.remove(url, cc.SpriteFrame);
                 return null;
             }
         }
         return null;
     }
-    public setSpriteFrame(url: string, data: any): cc.SpriteFrame {
+    public setSpriteFrame(url: string, data: any): [Resource.Cache,cc.SpriteFrame] {
         if (data && data instanceof cc.Texture2D) {
             //同一图片加载两次也会回调到这里，这里如果当前精灵缓存中有，不在重新创建
-            let spriteFrame = this.getSpriteFrame(url);
-            if (spriteFrame) {
-                return <cc.SpriteFrame>(spriteFrame.data);
+            let cache = this.getSpriteFrame(url);
+            if (cache) {
+                return [cache,<cc.SpriteFrame>(cache.data)];
             }
-            let cache = new Resource.CacheData();
+            cache = new Resource.Cache(url, cc.SpriteFrame, Macro.BUNDLE_REMOTE);
             cache.data = new cc.SpriteFrame(data);
+            data.addRef();
             // cache.data.nativeUrl = url;
             (<any>cache.data)._nativeUrl = url;
             cache.data.name = url;
             cache.isLoaded = true;
-            cache.info.url = url;
-            this._spriteFrameCaches.set(url, cache);
-            return <cc.SpriteFrame>(cache.data);
+            cache.url = url;
+            this.set(cache);
+            return [cache,<cc.SpriteFrame>(cache.data)];
         }
-        return null;
+        return [null,null];
     }
 
-    public set(url: string, data: Resource.CacheData) {
-        data.info.url = url;
-        this._caches.set(url, data);
+    public set(data: Resource.Cache) {
+        this._caches.set(data.key, data);
     }
 
-    private _getCacheInfo(info: Resource.Info, isNoFoundCreate: boolean = true) {
-        if (info && info.url && info.url.length > 0) {
-            if (!this._resMap.has(info.url)) {
-                if (isNoFoundCreate) {
-                    let cache = new CacheInfo;
-                    cache.url = info.url;
-                    this._resMap.set(info.url, cache);
+    public retainAsset(cache: Resource.Cache) {
+        if (cache) {
+            if (cache.retain) {
+                if (!cache.retain) {
+                    if (CC_DEBUG) Log.w(`资源 : ${cache.url} 已经被设置成常驻资源，不能改变其属性`);
                 }
-                else {
-                    return null;
-                }
+            } else {
+                cache.retain = cache.retain;
             }
-            return this._resMap.get(info.url);
+            (<cc.Asset>cache.data).addRef();
         }
-        return null;
     }
 
-    public retainAsset(info: Resource.Info) {
-        if (info && info.data) {
-            let cache = this._getCacheInfo(info);
+
+    public releaseAsset(cache: Resource.Cache) {
+        if (cache) {
+            if (cache.retain) {
+                //常驻内存中
+                return;
+            }
+            let data : cc.Asset = cache.data as any;
+            data.decRef(false);
+            if (data.refCount <= 0) {
+                this.remove(cache.url,cache.type);
+            }
+        }
+    }
+
+    public remove(url: string, type: typeof cc.Asset) {
+
+        if (type == cc.SpriteFrame) {
+            //先删除精灵帧
+            let key = Resource.getKey(url, cc.SpriteFrame);
+            let cache = this.get(key);
             if (cache) {
-                if (cache.retain) {
-                    if (!info.retain) {
-                        if (CC_DEBUG) Log.w(`资源 : ${info.url} 已经被设置成常驻资源，不能改变其属性`);
-                    }
-                } else {
-                    cache.retain = info.retain;
-                }
-
-                (<cc.Asset>info.data).addRef();
-                cache.refCount++;
-                if (cache.retain) {
-                    cache.refCount = 999999;
-                }
+                (<cc.Asset>cache.data).decRef(false);
+                this._caches.delete(key);
+                App.releaseManger.releaseRemote(cache);
             }
-        }
-    }
 
-    public releaseAsset(info: Resource.Info) {
-        if (info && info.data) {
-            let cache = this._getCacheInfo(info, false);
-            if (cache) {
-                if (cache.retain) {
-                    //常驻内存中
-                    return;
-                }
-                cache.refCount--;
-                if (cache.refCount <= 0) {
-                    this.remove(cache.url);
-                }
+
+            //删除贴图
+            key = Resource.getKey(url,cc.Texture2D);
+            cache = this.get(key);
+            if ( cache ){
+                (<cc.Asset>cache.data).decRef(false);
+                this._caches.delete(key);
+                App.releaseManger.releaseRemote(cache);
             }
-        }
-    }
 
-    public remove(url: string) {
-        this._resMap.delete(url);
-
-        //先删除精灵帧
-        if (this._spriteFrameCaches.has(url)) {
-            //先释放引用计数
-            (<cc.Asset>this._spriteFrameCaches.get(url).data).decRef(false);
-            this._spriteFrameCaches.delete(url);
-            if (CC_DEBUG) Log.d(`remove remote sprite frames resource url : ${url}`);
         }
 
-        let cache = this._caches.has(url) ? this._caches.get(url) : null;
-        if (cache && cache.data instanceof sp.SkeletonData) {
-            //这里面需要删除加载进去的三个文件缓存 
-            this.remove(`${cache.info.url}.atlas`);
-            this.remove(`${cache.info.url}.png`);
-            this.remove(`${cache.info.url}.json`);
-        }
-        if (cache && cache.data instanceof cc.Asset) {
-            if (CC_DEBUG) Log.d(`释放加载的本地远程资源:${cache.info.url}`);
-            cache.data.decRef(false);
-            cache.info.data = cache.data;
-            App.releaseManger.releaseRemote(cache.info);
-        }
-        if (CC_DEBUG) Log.d(`remove remote cache url : ${url}`);
-        return this._caches.delete(url);
+        // let cache = this._caches.has(url) ? this._caches.get(url) : null;
+        // if (cache && cache.data instanceof sp.SkeletonData) {
+        //     //这里面需要删除加载进去的三个文件缓存 
+        //     this.remove(`${cache.url}.atlas`);
+        //     this.remove(`${cache.url}.png`);
+        //     this.remove(`${cache.url}.json`);
+        // }
+        // if (cache && cache.data instanceof cc.Asset) {
+        //     if (CC_DEBUG) Log.d(`释放加载的本地远程资源:${cache.url}`);
+        //     cache.data.decRef(false);
+        //     cache.data = cache.data;
+        //     App.releaseManger.releaseRemote(cache);
+        // }
     }
 
     debug() {
@@ -264,7 +241,7 @@ export class CacheManager implements ISingleton {
     isResident?: boolean = true;
     static module: string = "【缓存管理器】";
     module: string = null!;
-    private _bundles = new Map<string, ResourceCache>();
+    private _bundles = new Map<string, BundleCache>();
     private _remoteCaches = new RemoteCaches();
     public get remoteCaches() { return this._remoteCaches; }
 
@@ -275,101 +252,100 @@ export class CacheManager implements ISingleton {
     /**
      * @description 同步获取资源缓存，此接口不会检查资源的状态，只要建立了缓存，就会立即返回
      * @param bundle bundle名
-     * @param path 资源路径
+     * @param url 资源url
      * @param isCheck 是否检查资源有效性，当为ture时，会检查资源是否有效，如果有效直接返回，如果无效，则返回nll
      * @returns 
      */
-    public get(bundle: BUNDLE_TYPE, path: string, type: typeof cc.Asset, isCheck: boolean = true) {
+    public get(bundle: BUNDLE_TYPE, url: string, type: typeof cc.Asset, isCheck: boolean = true) {
         let bundleName = this.getBundleName(bundle);
         if (bundleName && this._bundles.has(bundleName)) {
-            return (this._bundles.get(bundleName) as ResourceCache).get(Resource.getKey(path, type), isCheck);
+            return (this._bundles.get(bundleName) as BundleCache).get(Resource.getKey(url, type), isCheck);
         }
         return null;
     }
 
-    public set(bundle: BUNDLE_TYPE, path: string, data: Resource.CacheData) {
-        let bundleName = this.getBundleName(bundle);
+    public set(cache: Resource.Cache) {
+        let bundleName = this.getBundleName(cache.bundle);
         if (bundleName) {
             if (!this._bundles.has(bundleName)) {
-                let cache = new ResourceCache(bundleName);
-                cache.set(path, data);
-                this._bundles.set(bundleName, cache);
+                let bundleCache = new BundleCache(bundleName);
+                bundleCache.set(cache);
+                this._bundles.set(bundleName, bundleCache);
             } else {
-                (this._bundles.get(bundleName) as ResourceCache).set(path, data);
+                (this._bundles.get(bundleName)!).set(cache);
             }
         }
     }
 
     /**
      * @description 
-     * @param bundle bundle
-     * @param path path
+     * @param cache 缓存信息
      */
-    public remove(bundle: BUNDLE_TYPE, path: string) {
-        let bundleName = this.getBundleName(bundle);
+    public remove(cache: Resource.Cache) {
+        let bundleName = this.getBundleName(cache.bundle);
         if (bundleName && this._bundles.has(bundleName)) {
-            return (this._bundles.get(bundleName) as ResourceCache).remove(path);
+            return (this._bundles.get(bundleName) as BundleCache).remove(cache.key);
         }
         return false;
     }
 
     /**@description 释放资源，引用计数减1  */
-    protected decRef( info : Resource.Info , assets : cc.Asset , bundle : cc.AssetManager.Bundle ){
+    protected decRef(cache: Resource.Cache, assets: cc.Asset, bundle: cc.AssetManager.Bundle) {
         const data = assets
         data.decRef(false);
         let isSuccess = true;
         if (data.refCount <= 0) {
-            if ( App.isLazyRelease ){
-                CC_DEBUG && Log.d(`${this.module} bundle : ${info.bundle} 释放资源成功 : ${info.url} , 将加载到释放队列中`);
-            }else{
-                bundle.release(info.url, info.type);
-                CC_DEBUG && Log.d(`${this.module} bundle : ${info.bundle} 释放资源成功 : ${info.url}`);
+            if (App.isLazyRelease) {
+                CC_DEBUG && Log.d(`${this.module} bundle : ${cache.bundle} 释放资源成功 : ${cache.url} , 将加载到释放队列中`);
+            } else {
+                bundle.release(cache.url, cache.type);
+                CC_DEBUG && Log.d(`${this.module} bundle : ${cache.bundle} 释放资源成功 : ${cache.url}`);
             }
         } else {
-            if ( CC_DEBUG ){
-                if ( App.isLazyRelease ){
-                    Log.w(`${this.module} bundle : ${info.bundle} 释放资源失败 : ${info.url} , 引用计数 : ${data.refCount} , 不能加载到释放队列中`);
-                }else{
-                    Log.w(`${this.module} bundle : ${info.bundle} 释放资源失败 : ${info.url} , 引用计数 : ${data.refCount}`);
+            if (CC_DEBUG) {
+                if (App.isLazyRelease) {
+                    Log.w(`${this.module} bundle : ${cache.bundle} 释放资源失败 : ${cache.url} , 引用计数 : ${data.refCount} , 不能加载到释放队列中`);
+                } else {
+                    Log.w(`${this.module} bundle : ${cache.bundle} 释放资源失败 : ${cache.url} , 引用计数 : ${data.refCount}`);
                 }
             }
             isSuccess = false;
         }
-        return isSuccess; 
+        return isSuccess;
     }
 
-    public removeWithInfo(info: Resource.Info, bundle: cc.AssetManager.Bundle) {
+    public removeWithInfo(cache: Resource.Cache, bundle: cc.AssetManager.Bundle) {
         let isSuccess = true;
-        if (info && info.data) {
+        if (cache && cache.data) {
 
-            if (Array.isArray(info.data)) {
-                for (let i = 0; i < info.data.length; i++) {
-                    let result = this.decRef(info,info.data[i],bundle);
-                    if ( !result ){
+            if (Array.isArray(cache.data)) {
+                for (let i = 0; i < cache.data.length; i++) {
+                    let result = this.decRef(cache, cache.data[i], bundle);
+                    if (!result) {
                         isSuccess = false;
                     }
                 }
-                if ( isSuccess ){
-                    if ( App.isLazyRelease ){
-                        CC_DEBUG && Log.d(`${this.module} 成功释放资源目录,将释放目录加入到释放队列中 bundle : ${info.bundle} : ${info.bundle}.${info.url}`);
-                    }else{
-                        this.remove(info.bundle, info.url);
-                        CC_DEBUG && Log.d(`${this.module} 成功释放资源目录 bundle : ${info.bundle} : ${info.bundle}.${info.url}`);
+                if (isSuccess) {
+                    if (App.isLazyRelease) {
+                        CC_DEBUG && Log.d(`${this.module} 成功释放资源目录,将释放目录加入到释放队列中 bundle : ${cache.bundle} : ${cache.bundle}.${cache.url}`);
+                    } else {
+                        this.remove(cache);
+                        CC_DEBUG && Log.d(`${this.module} 成功释放资源目录 bundle : ${cache.bundle} : ${cache.bundle}.${cache.url}`);
                     }
-                }else{
-                    if ( App.isLazyRelease ){
-                        CC_DEBUG && Log.d(`${this.module} 释放资源目录失败，无法加入到释放队列中 bundle : ${info.bundle} : ${info.bundle}.${info.url}`);
-                    }else{
-                        CC_DEBUG && Log.d(`${this.module} 释放资源目录失败 bundle : ${info.bundle} : ${info.bundle}.${info.url}`);
+                } else {
+                    if (App.isLazyRelease) {
+                        CC_DEBUG && Log.d(`${this.module} 释放资源目录失败，无法加入到释放队列中 bundle : ${cache.bundle} : ${cache.bundle}.${cache.url}`);
+                    } else {
+                        CC_DEBUG && Log.d(`${this.module} 释放资源目录失败 bundle : ${cache.bundle} : ${cache.bundle}.${cache.url}`);
                     }
                 }
-                
+
             } else {
-                if( this.decRef(info,info.data,bundle) ){
-                    if ( !App.isLazyRelease ){
-                        this.remove(info.bundle,info.url);
+                if (this.decRef(cache, cache.data, bundle)) {
+                    if (!App.isLazyRelease) {
+                        this.remove(cache);
                     }
-                }else{
+                } else {
                     isSuccess = false;
                 }
             }
@@ -408,15 +384,15 @@ export class CacheManager implements ISingleton {
      * @param type 资源类型
      * @param bundle
      */
-    public getCache<T extends cc.Asset>(url: string, type: { prototype: T }, bundle: BUNDLE_TYPE): Promise<T>;
-    public getCache<T extends cc.Asset>(url: string, type: { prototype: T }, bundle: BUNDLE_TYPE, ignoreType: boolean): Promise<T>;
+    public getCache<T extends cc.Asset>(url: string, type: { prototype: T }, bundle: BUNDLE_TYPE): Promise<[Resource.Cache, T]>;
+    public getCache<T extends cc.Asset>(url: string, type: { prototype: T }, bundle: BUNDLE_TYPE, ignoreType: boolean): Promise<[Resource.Cache, T]>;
     public getCache() {
         let args = arguments;
         let me = this;
-        return new Promise<any>((resolve) => {
+        return new Promise<[Resource.Cache, any]>((resolve) => {
             let _args = me._getGetCacheByAsyncArgs.apply(me, args as any);
             if (!_args) {
-                resolve(null);
+                resolve([null, null]);
                 return;
             }
             let cache = me.get(_args.bundle, _args.url, _args.type);
@@ -425,20 +401,20 @@ export class CacheManager implements ISingleton {
                     //已经加载完成
                     if (_args.type && !_args.ignoreType) {
                         if (cache.data instanceof _args.type) {
-                            resolve(cache.data);
+                            resolve([cache, cache.data]);
                         } else {
-                            if (CC_DEBUG) Log.e(`${this.module}传入类型:${cc.js.getClassName(_args.type)}与资源实际类型: ${cc.js.getClassName(cache.data as any)}不同 url : ${cache.info.url}`);
-                            resolve(null);
+                            if (CC_DEBUG) Log.e(`${this.module}传入类型:${cc.js.getClassName(_args.type)}与资源实际类型: ${cc.js.getClassName(cache.data as any)}不同 url : ${cache.url}`);
+                            resolve([null, null]);
                         }
                     } else {
-                        resolve(cache.data);
+                        resolve([cache, cache.data]);
                     }
                 } else {
                     //加载中
                     cache.getCb.push(resolve);
                 }
             } else {
-                resolve(null);
+                resolve([null, null]);
             }
         });
     }
@@ -449,28 +425,28 @@ export class CacheManager implements ISingleton {
      * @param type 
      * @param bundle 
      */
-    public getCacheByAsync<T extends cc.Asset>(url: string, type: { prototype: T }, bundle: BUNDLE_TYPE): Promise<T>;
+    public getCacheByAsync<T extends cc.Asset>(url: string, type: { prototype: T }, bundle: BUNDLE_TYPE): Promise<[Resource.Cache, T]>;
     public getCacheByAsync() {
         let me = this;
         let args = this._getGetCacheByAsyncArgs.apply(this, <any>arguments);
-        return new Promise<any>((resolve) => {
+        return new Promise<[Resource.Cache, any]>((resolve) => {
             if (!args) {
-                resolve(null);
+                resolve([null, null]);
                 return;
             }
-            me.getCache(args.url, args.type, args.bundle).then((data) => {
+            me.getCache(args.url, args.type, args.bundle).then(([cache, data]) => {
                 args = args as { url: string, type: typeof cc.Asset, bundle: BUNDLE_TYPE };
                 if (data && data instanceof args.type) {
-                    resolve(data);
+                    resolve([cache, data]);
                 } else {
                     //加载资源
                     App.asset.load(args.bundle, args.url, args.type, <any>null, (cache) => {
                         args = args as { url: string, type: typeof cc.Asset, bundle: BUNDLE_TYPE };
                         if (cache && cache.data && cache.data instanceof args.type) {
-                            resolve(cache.data);
+                            resolve([cache, cache.data]);
                         } else {
                             Log.e(`${this.module}加载失败 : ${args.url}`);
-                            resolve(null);
+                            resolve([null, null]);
                         }
                     });
                 }
@@ -480,37 +456,32 @@ export class CacheManager implements ISingleton {
 
     public getSpriteFrameByAsync(urls: string[], key: string, view: UIView, addExtraLoadResource: (view: UIView, info: Resource.Info) => void, bundle: BUNDLE_TYPE) {
         let me = this;
-        return new Promise<{ url: string, spriteFrame: cc.SpriteFrame, isTryReload?: boolean }>((resolve) => {
+        return new Promise<{ url: string, spriteFrame: cc.SpriteFrame, isTryReload?: boolean, cache: Resource.Cache }>((resolve) => {
             let nIndex = 0;
             let getFun = (url: string) => {
-                me.getCacheByAsync(url, cc.SpriteAtlas, bundle).then((atlas) => {
-                    let info = new Resource.Info;
-                    info.type = cc.SpriteAtlas;
-                    info.url = Resource.getKey(url,info.type);
-                    info.data = atlas;
-                    info.bundle = bundle;
-                    addExtraLoadResource(view, info);
+                me.getCacheByAsync(url, cc.SpriteAtlas, bundle).then(([cache, atlas]) => {
+                    addExtraLoadResource(view, cache);
                     if (atlas) {
                         let spriteFrame = atlas.getSpriteFrame(key);
                         if (spriteFrame) {
                             if (cc.isValid(spriteFrame)) {
-                                resolve({ url: url, spriteFrame: spriteFrame });
+                                resolve({ url: url, spriteFrame: spriteFrame, cache: cache });
                             } else {
                                 //来到这里面，其实程序已经崩溃了，已经没什么意思，也不知道写这个有啥用，尽量安慰,哈哈哈
                                 Log.e(`精灵帧被释放，释放当前无法的图集资源 url ：${url} key : ${key}`);
-                                App.asset.releaseAsset(info);
-                                resolve({ url: url, spriteFrame: null, isTryReload: true });
+                                App.asset.releaseAsset(cache);
+                                resolve({ url: url, spriteFrame: null, isTryReload: true, cache: cache });
                             }
                         } else {
                             nIndex++;
                             if (nIndex >= urls.length) {
-                                resolve({ url: url, spriteFrame: null });
+                                resolve({ url: url, spriteFrame: null, cache: null });
                             } else {
                                 getFun(urls[nIndex]);
                             }
                         }
                     } else {
-                        resolve({ url: url, spriteFrame: null });
+                        resolve({ url: url, spriteFrame: null, cache: null });
                     }
                 })
             };

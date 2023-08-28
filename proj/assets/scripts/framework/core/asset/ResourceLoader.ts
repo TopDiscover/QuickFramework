@@ -11,7 +11,7 @@ export default class ResourceLoader {
     private _loadedCount: number = 0;
 
     /**@description 加载完成后的数据，为了方便释放时精准释放，没加载成功的资源，不在做释放的判断 */
-    private _loadedResource: Map<string, Resource.Info> = new Map<string, Resource.Info>();
+    private _loadedResource: Map<string, Resource.Cache> = new Map<string, Resource.Cache>();
 
     /**@description 当前是否正在加载资源 */
     private _isLoading: boolean = false;
@@ -35,7 +35,7 @@ export default class ResourceLoader {
     }
 
     /**@description 加载进度 */
-    public _onLoadProgress?: (loadedCount: number, toatl: number, data: Resource.CacheData) => void;
+    public _onLoadProgress?: (loadedCount: number, toatl: number, data: Resource.Cache) => void;
     public set onLoadProgress(value) {
         this._onLoadProgress = value;
     }
@@ -98,11 +98,11 @@ export default class ResourceLoader {
         this._resources.forEach((value, key, source) => {
             if (value.preloadView) {
                 App.uiManager.preload(value.preloadView, value.bundle as BUNDLE_TYPE).then((view) => {
-                    let cache = new Resource.CacheData();
+                    let cache = new Resource.Cache(value.url, value.type, value.bundle);
                     cache.isLoaded = true;
                     cache.data = <any>view;
-                    if (value.preloadView) cache.info.url = value.preloadView.getPrefabUrl();
-                    cache.info.bundle = value.bundle as BUNDLE_TYPE;
+                    if (value.preloadView) cache.url = value.preloadView.getPrefabUrl();
+                    cache.bundle = value.bundle as BUNDLE_TYPE;
                     this._onLoadResourceComplete(cache);
                 })
             } else if (value.dir) {
@@ -131,7 +131,7 @@ export default class ResourceLoader {
 
         this._resources.forEach((value) => {
             if (value.url) {
-                let url = Resource.getKey(value.url,value.type);
+                let url = Resource.getKey(value.url, value.type);
                 url = `${value.bundle}/${url}`;
                 if (this._loadedResource.has(url)) {
                     let data = this._loadedResource.get(url);
@@ -141,7 +141,7 @@ export default class ResourceLoader {
                     this._loadedResource.delete(url);
                 }
             } else if (value.dir) {
-                let url = Resource.getKey(value.dir,value.type);
+                let url = Resource.getKey(value.dir, value.type);
                 url = `${value.bundle}/${url}`;
                 if (this._loadedResource.has(url)) {
                     let data = this._loadedResource.get(url);
@@ -158,7 +158,7 @@ export default class ResourceLoader {
         this._resources = []
     }
 
-    private _onLoadResourceComplete(data: Resource.CacheData) {
+    private _onLoadResourceComplete(data: Resource.Cache) {
         this._loadedCount++;
 
         if (this._onLoadProgress) {
@@ -171,14 +171,8 @@ export default class ResourceLoader {
 
         if (data && (Array.isArray(data.data) || data.data instanceof cc.Asset)) {
             //排除掉界面管理器
-            let info = new Resource.Info;
-            info.url = data.info.url;
-            info.type = data.info.type;
-            info.data = data.data;
-            info.bundle = data.info.bundle;
-            App.asset.retainAsset(info);
-            let url = `${info.bundle}/${info.url}`;
-            this._loadedResource.set(url, info);
+            App.asset.retainAsset(data);
+            this._loadedResource.set(data.key, data);
         }
 
         this.checkLoadResourceComplete();

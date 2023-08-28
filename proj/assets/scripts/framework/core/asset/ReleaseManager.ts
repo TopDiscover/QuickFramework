@@ -18,92 +18,101 @@ class LazyInfo {
         this.name = name;
     }
 
-    private _assets: Map<string, Resource.Info> = new Map();
+    private _caches: Map<string, Resource.Cache> = new Map();
 
     /**@description 放入懒释放资源 */
-    add(info: Resource.Info) {
+    add(cache: Resource.Cache) {
 
         //管理器引用加1
-        if (Array.isArray(info.data)) {
-            Log.d(`${LOG_TAG}向${this.name}加入待释放目录:${info.url}`);
-            for (let i = 0; i < info.data.length; i++) {
-                if (info.data[i]) {
-                    info.data[i].addRef();//为释放管理器添加引用计数
+        if (Array.isArray(cache.data)) {
+            Log.d(`${LOG_TAG}向${this.name}加入待释放目录:${cache.key}`);
+            for (let i = 0; i < cache.data.length; i++) {
+                if (cache.data[i]) {
+                    cache.data[i].addRef();//为释放管理器添加引用计数
                 }
             }
         } else {
-            if (info.data) {
-                Log.d(`${LOG_TAG}向${this.name}加入待释放资源:${info.url}`);
-                info.data.addRef();//为释放管理器添加引用计数
+            if (cache.data) {
+                Log.d(`${LOG_TAG}向${this.name}加入待释放资源:${cache.key}`);
+                cache.data.addRef();//为释放管理器添加引用计数
             }
         }
-        info.stamp = Date.timeNow();
-        this._assets.set(info.url, info);
+        cache.stamp = Date.timeNow();
+        this._caches.set(cache.key, cache);
     }
 
-    get(url: string): cc.Asset | cc.Asset[] | null {
-        let info = this._assets.get(url);
-        let result: cc.Asset | cc.Asset[] | null = null;
-        if (info) {
-            if (Array.isArray(info.data)) {
-                for (let i = 0; i < info.data.length; i++) {
-                    if (info.data[i]) {
-                        info.data[i].decRef(false);
+    /**
+     * @description 获取缓存
+     * @param key  Resource.getKey(url,type) 的值
+     * @returns 
+     */
+    get(key: string) {
+        let cache = this._caches.get(key);
+        if (cache) {
+            if (Array.isArray(cache.data)) {
+                for (let i = 0; i < cache.data.length; i++) {
+                    if (cache.data[i]) {
+                        cache.data[i].decRef(false);
                     }
                 }
-                Log.d(`${LOG_TAG}向${this.name}获取待释放目录:${info.url}`);
-                result = info.data;
+                Log.d(`${LOG_TAG}向${this.name}获取待释放目录:${cache.url}`);
+                this._caches.delete(key);
+                return cache;
             } else {
-                if (cc.isValid(info.data)) {
+                if (cc.isValid(cache.data)) {
                     //获取后删除当前管理器的引用
-                    info.data.decRef(false);
-                    Log.d(`${LOG_TAG}向${this.name}获取待释放资源:${info.url}`);
-                    result = info.data;
+                    cache.data.decRef(false);
+                    Log.d(`${LOG_TAG}向${this.name}获取待释放资源:${cache.url}`);
+                    this._caches.delete(key);
+                    return cache;
+                } else {
+                    Log.w(`${LOG_TAG}向${this.name}获取待释放资源时，资源${cache.url}已经释放`);
+                    this._caches.delete(key);
+                    return null;
                 }
             }
         }
-        this._assets.delete(url);
-        return result;
+        return null;
     }
 
     onLowMemory() {
-        if (this._assets.size > 0) {
+        if (this._caches.size > 0) {
             Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载的资源`);
             if (this.name == Macro.BUNDLE_REMOTE) {
-                this._assets.forEach((info, key, source) => {
-                    if (info.data instanceof cc.Asset) {
-                        Log.d(`${LOG_TAG}bundle : ${this.name} 释放远程加载资源${info.url}`);
-                        cc.assetManager.releaseAsset(info.data as cc.Asset);
+                this._caches.forEach((cache, key, source) => {
+                    if (cache.data instanceof cc.Asset) {
+                        Log.d(`${LOG_TAG} 释放远程加载资源${cache.description}`);
+                        cc.assetManager.releaseAsset(cache.data as cc.Asset);
                     }
                 });
-                this._assets.clear();
+                this._caches.clear();
                 return;
             }
             let bundle = cc.assetManager.getBundle(this.name);
             if (bundle) {
                 //先释放预置，再释放资源
                 //不然再释放资源的时候，预置有可能在使用该资源，导致资源得不到释放
-                this._assets.forEach((info, url) => {
-                    if (Array.isArray(info.data)) {
-                        if (info.type == cc.Prefab) {
-                            this.release(info, bundle);
-                            this._assets.delete(info.url);
+                this._caches.forEach((cache, key) => {
+                    if (Array.isArray(cache.data)) {
+                        if (cache.type == cc.Prefab) {
+                            this.release(cache, bundle);
+                            this._caches.delete(cache.key);
                         }
                     } else {
-                        if (info.data instanceof cc.Prefab) {
-                            this.release(info, bundle);
-                            this._assets.delete(url);
+                        if (cache.data instanceof cc.Prefab) {
+                            this.release(cache, bundle);
+                            this._caches.delete(key);
                         }
                     }
                 })
 
-                this._assets.forEach((info, url, source) => {
+                this._caches.forEach(info => {
                     this.release(info, bundle);
                 });
-                this._assets.clear();
+                this._caches.clear();
             } else {
                 Log.w(`${LOG_TAG}释放bundle : ${this.name} 时，Bundle已经被释放，直接清空待释放数据`);
-                this._assets.clear();
+                this._caches.clear();
             }
         }
     }
@@ -115,31 +124,31 @@ class LazyInfo {
         this.onLowMemory();
     }
 
-    protected release(info: Resource.Info, bundle: cc.AssetManager.Bundle) {
-        if (Array.isArray(info.data)) {
-            Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载目录${info.url}`);
-            for (let i = 0; i < info.data.length; i++) {
-                if (info.data[i]) {
-                    info.data[i].decRef(false);
-                    let path = `${info.url}/${info.data[i].name}`;
-                    if (info.data[i].refCount <= 0) {
-                        bundle?.release(path, info.type);
+    protected release(cache: Resource.Cache, bundle: cc.AssetManager.Bundle) {
+        if (Array.isArray(cache.data)) {
+            Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载目录${cache.fullUrl}`);
+            for (let i = 0; i < cache.data.length; i++) {
+                if (cache.data[i]) {
+                    cache.data[i].decRef(false);
+                    let path = `${cache.fullUrl}/${cache.data[i].name}`;
+                    if (cache.data[i].refCount <= 0) {
+                        bundle?.release(path, cache.type);
                         Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载资源${path}`);
                     } else {
-                        Log.w(`${LOG_TAG}bundle : ${this.name} 资源${path}正使用中引用计数为:${info.data[i].refCount}`)
+                        Log.w(`${LOG_TAG}bundle : ${this.name} 资源${path}正使用中引用计数为:${cache.data[i].refCount}`)
                     }
                 }
             }
         } else {
-            if (cc.isValid(info.data)) {
+            if (cc.isValid(cache.data)) {
                 //获取后删除当前管理器的引用
-                info.data.decRef(false);
+                cache.data.decRef(false);
 
-                if (info.data.refCount <= 0) {
-                    bundle?.release(info.url, info.type);
-                    Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载资源${info.url}`);
+                if (cache.data.refCount <= 0) {
+                    bundle?.release(cache.url, cache.type);
+                    Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载资源${cache.url}`);
                 } else {
-                    Log.w(`${LOG_TAG}bundle : ${this.name} 资源${info.url}正使用中引用计数为:${info.data.refCount}`)
+                    Log.w(`${LOG_TAG}bundle : ${this.name} 资源${cache.url}正使用中引用计数为:${cache.data.refCount}`)
                 }
             }
         }
@@ -148,37 +157,37 @@ class LazyInfo {
     /**@description 尝试释放长时间未使用资源 */
     tryRemoveTimeoutResources() {
         if (App.isLazyRelease && App.isAutoReleaseUnuseResources) {
-            this._assets.forEach((info, url, source) => {
-                if (info.retain) {
+            this._caches.forEach((cache, key, source) => {
+                if (cache.retain) {
                     return;
                 }
-                if (info.stamp == null) {
+                if (cache.stamp == null) {
                     return;
                 }
                 let now = Date.timeNow();
-                let pass = now - info.stamp;
+                let pass = now - cache.stamp;
                 if (pass >= App.autoReleaseUnuseResourcesTimeout) {
 
                     if (this.name == Macro.BUNDLE_REMOTE) {
-                        if (info.data instanceof cc.Asset) {
-                            Log.d(`${LOG_TAG}bundle : ${this.name} 释放远程加载资源${info.url}`);
-                            cc.assetManager.releaseAsset(info.data as cc.Asset);
+                        if (cache.data instanceof cc.Asset) {
+                            Log.d(`${LOG_TAG}bundle : ${this.name} 释放远程加载资源${cache.url}`);
+                            cc.assetManager.releaseAsset(cache.data as cc.Asset);
                         }
-                        this._assets.delete(url);
+                        this._caches.delete(key);
                         return;
                     }
 
                     //释放长时间未使用资源
-                    let bundle = App.bundleManager.getBundle(info.bundle);
-                    this.release(info, bundle);
-                    this._assets.delete(url);
+                    let bundle = App.bundleManager.getBundle(cache.bundle);
+                    this.release(cache, bundle);
+                    this._caches.delete(key);
                 }
             })
         }
     }
 
     get assets() {
-        return this._assets;
+        return this._caches;
     }
 }
 
@@ -203,8 +212,8 @@ export class ReleaseManager implements ISingleton {
         return App.bundleManager.getBundleName(bundle);
     }
 
-    release(info: Resource.Info) {
-        let bundle = this.getBundle(info.bundle);
+    release(cache: Resource.Cache) {
+        let bundle = this.getBundle(cache.bundle);
         if (bundle) {
             if (App.isLazyRelease) {
                 let name = bundle.name
@@ -216,27 +225,27 @@ export class ReleaseManager implements ISingleton {
                     lazyInfo = new LazyInfo(name);
                     this._lazyInfos.set(name, lazyInfo);
                 }
-                
-                if ( App.cache.removeWithInfo(info,bundle) ){
+
+                if (App.cache.removeWithInfo(cache, bundle)) {
                     if (lazyInfo) {
-                        lazyInfo.add(info);
+                        lazyInfo.add(cache);
                     }
-                    App.cache.remove(info.bundle, info.url);
+                    App.cache.remove(cache);
                 }
             } else {
-                App.cache.removeWithInfo(info, bundle);
+                App.cache.removeWithInfo(cache, bundle);
             }
         } else {
-            Log.e(`${LOG_TAG}${info.bundle} no found`);
+            Log.e(`${LOG_TAG}${cache.bundle} no found`);
         }
     }
 
-    get(bundle: BUNDLE_TYPE, url: string) {
+    get(bundle: BUNDLE_TYPE, key: string) {
         let temp = this.getBundle(bundle);
         if (temp) {
             let info = this._lazyInfos.get(temp.name);
             if (info) {
-                return info.get(url);
+                return info.get(key);
             }
         } else {
             Log.w(`${LOG_TAG}${bundle}不存在，删除释放管理器中的缓存`);
@@ -344,12 +353,12 @@ export class ReleaseManager implements ISingleton {
         return this._remote.get(url);
     }
 
-    releaseRemote(info: Resource.Info) {
+    releaseRemote(cache: Resource.Cache) {
         if (App.isLazyRelease) {
-            this._remote.add(info);
+            this._remote.add(cache);
         } else {
-            if (info.data instanceof cc.Asset) {
-                cc.assetManager.releaseAsset(info.data as cc.Asset);
+            if (cache.data instanceof cc.Asset) {
+                cc.assetManager.releaseAsset(cache.data as cc.Asset);
             }
         }
     }

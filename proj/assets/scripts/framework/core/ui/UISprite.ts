@@ -207,9 +207,10 @@ export default class UISprite extends cc.Sprite {
             let view = await App.uiManager.getView(this.user);
             if (this.isRemote) {
                 // Log.d("加载远程图片")
-                App.asset.remote.loadImage(url, true).then((data) => {
+                App.asset.remote.loadImage(url, true).then(([cache,data]) => {
                     if (data) {
                         setSpriteSpriteFrame({
+                            cache : cache,
                             view : view,
                             url : url,
                             sprite : this,
@@ -245,13 +246,14 @@ export default class UISprite extends cc.Sprite {
                                 },
                                 bundle : realBundle,
                                 isAtlas : true,
+                                cache : data.cache,
                             });
                         }
                     });
                 } else {
                     // Log.d(`资源路径：${realBundle}/${url}`);
                     App.cache.getCacheByAsync(url, cc.SpriteFrame, realBundle)
-                        .then(spriteFrame => {
+                        .then(([cache,spriteFrame]) => {
                             setSpriteSpriteFrame({
                                 view : view,
                                 url : url,
@@ -262,7 +264,8 @@ export default class UISprite extends cc.Sprite {
                                         this.onLoadComplete(data);
                                     }
                                 },
-                                bundle : realBundle
+                                bundle : realBundle,
+                                cache : cache,
                             });
                         })
                 }

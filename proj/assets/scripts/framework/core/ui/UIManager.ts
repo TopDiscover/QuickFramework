@@ -9,8 +9,8 @@ const DYNAMIC_LOAD_GARBAGE = "DYNAMIC_LOAD_GARBAGE";
 /**@description 动画加载全局数据名 */
 const DYNAMIC_LOAD_RETAIN_MEMORY = "DYNAMIC_LOAD_RETAIN_MEMORY";
 export class ViewDynamicLoadData {
-    private local = new Map<string, Resource.Info>();
-    private remote = new Map<string, Resource.Info>();
+    private local = new Map<string, Resource.Cache>();
+    private remote = new Map<string, Resource.Cache>();
     public name: string | null;
 
     constructor(name: string | null = null) {
@@ -18,28 +18,26 @@ export class ViewDynamicLoadData {
     }
 
     /**@description 添加动态加载的本地资源 */
-    public addLocal(info: Resource.Info, className: string | null = null) {
-        if (info && info.url) {
-            if (this.name == DYNAMIC_LOAD_GARBAGE) {
-                Log.e(`找不到资源持有者: ${info.url}`);
-            }
-            if (CC_DEBUG) App.uiManager.checkView(info.url, className);
-            if (!this.local.has(info.url)) {
-                App.asset.retainAsset(info);
-                this.local.set(info.url, info);
-            }
+    public addLocal(cache : Resource.Cache, className: string | null = null) {
+        if (this.name == DYNAMIC_LOAD_GARBAGE) {
+            Log.e(`找不到资源持有者: ${cache.key}`);
+        }
+        if (CC_DEBUG) App.uiManager.checkView(cache.key, className);
+        if (!this.local.has(cache.key)) {
+            App.asset.retainAsset(cache);
+            this.local.set(cache.key, cache);
         }
     }
 
     /**@description 添加动态加载的远程资源 */
-    public addRemote(info: Resource.Info, className: string | null = null) {
-        if (info && info.data && !this.remote.has(info.url)) {
+    public addRemote(cache : Resource.Cache, className: string | null = null) {
+        if (!this.remote.has(cache.key)) {
             if (this.name == DYNAMIC_LOAD_GARBAGE) {
-                Log.e(`找不到资源持有者 : ${info.url}`);
+                Log.e(`找不到资源持有者 : ${cache.key}`);
             }
-            if (CC_DEBUG) App.uiManager.checkView(info.url, className);
-            App.cache.remoteCaches.retainAsset(info);
-            this.remote.set(info.url, info);
+            if (CC_DEBUG) App.uiManager.checkView(cache.key, className);
+            App.cache.remoteCaches.retainAsset(cache);
+            this.remote.set(cache.key, cache);
         }
     }
 
@@ -54,16 +52,16 @@ export class ViewDynamicLoadData {
             if (this.local && this.local.size > 0) {
                 Log.e("-----------local-----------");
                 if (this.local) {
-                    this.local.forEach((info) => {
-                        Log.e(info.url);
+                    this.local.forEach((value, key) => {
+                        Log.e(key);
                     });
                 }
             }
             if (this.remote && this.remote.size > 0) {
                 Log.e("-----------remote-----------");
                 if (this.remote) {
-                    this.remote.forEach((info, url) => {
-                        Log.e(info.url);
+                    this.remote.forEach((value, key) => {
+                        Log.e(key);
                     });
                 }
             }
@@ -71,14 +69,14 @@ export class ViewDynamicLoadData {
         } else {
             //先清除当前资源的引用关系
             if (this.local) {
-                this.local.forEach((info) => {
-                    App.asset.releaseAsset(info);
+                this.local.forEach((value, key) => {
+                    App.asset.releaseAsset(value);
                 });
                 this.local.clear();
             }
             if (this.remote) {
-                this.remote.forEach((info, url) => {
-                    App.cache.remoteCaches.releaseAsset(info);
+                this.remote.forEach((value, key) => {
+                    App.cache.remoteCaches.releaseAsset(value);
                 });
                 this.remote.clear();
             }
@@ -105,8 +103,8 @@ class ViewData {
     isPreload: boolean = false;
     /**@description 是否通过预置创建 */
     isPrefab: boolean = true;
-    /**@description 资源信息 */
-    info: Resource.Info = null!;
+    /**@description 资源缓存信息 */
+    cache: Resource.Cache = null!;
     /**@description 界面的类型 */
     viewType: UIClass<UIView> = null!;
     /**@description bundle */
@@ -146,7 +144,7 @@ class ViewData {
     }
 }
 
-export class UIManager implements ISingleton{
+export class UIManager implements ISingleton {
     isResident?: boolean = true;
     static module: string = "【UI管理器】";
     module: string = null!;
@@ -167,7 +165,7 @@ export class UIManager implements ISingleton{
      * @returns 
      */
     public getViewType<T extends UIView>(view: UIView): GameViewClass<T> {
-        if ( !cc.isValid(view) ){
+        if (!cc.isValid(view)) {
             return null as any;
         }
 
@@ -308,18 +306,15 @@ export class UIManager implements ISingleton{
                 this._viewDatas.set(className, viewData);
                 if (!result.isPrefab) {
                     //说明存在于主场景中
-                    viewData.info = new Resource.Info;
-                    viewData.info.url = result.url;
-                    viewData.info.type = cc.Prefab;
-                    viewData.info.data = this.getScenePrefab(result.url) as any;
-                    viewData.info.bundle = openOption.bundle;
+                    viewData.cache = new Resource.Cache(result.url, cc.Prefab, openOption.bundle);
+                    viewData.cache.data = this.getScenePrefab(result.url) as any;
                     this.createNode(viewData, reslove, openOption);
                     return;
                 }
                 let progressCallback: (completedCount: number, totalCount: number, item: any) => void = null!;
 
                 if (!openOption.preload) {
-                    App.uiLoading.show(openOption.delay,openOption.name);
+                    App.uiLoading.show(openOption.delay, openOption.name);
                     //预加载界面不显示进度
                     progressCallback = (completedCount: number, totalCount: number, item: any) => {
                         let progress = Math.ceil((completedCount / totalCount) * 100);
@@ -327,14 +322,10 @@ export class UIManager implements ISingleton{
                     };
                 }
                 this.loadPrefab(openOption.bundle, prefabUrl, progressCallback)
-                    .then((prefab) => {
-                        viewData.info = new Resource.Info;
-                        viewData.info.type = cc.Prefab;
-                        viewData.info.url = Resource.getKey(prefabUrl,viewData.info.type);
-                        viewData.info.data = prefab;
-                        viewData.info.bundle = openOption.bundle;
-                        App.asset.retainAsset(viewData.info);
-                        this.createNode(viewData,reslove,openOption);
+                    .then((cache) => {
+                        viewData.cache = cache;
+                        App.asset.retainAsset(cache);
+                        this.createNode(viewData, reslove, openOption);
                         App.uiLoading.hide();
                     }).catch((reason) => {
                         viewData.isLoaded = true;
@@ -343,7 +334,7 @@ export class UIManager implements ISingleton{
                         viewData.doCallback(null, className, "打开界面异常");
                         reslove(<any>null);
                         let uiName = "";
-                        if ( CC_DEBUG ){
+                        if (CC_DEBUG) {
                             uiName = className;
                         }
                         if (openOption.name) {
@@ -356,7 +347,7 @@ export class UIManager implements ISingleton{
         });
     }
 
-    private _addComponent(uiNode: cc.Node,viewData: ViewData,openOption : DefaultOpenOption ): UIView | null {
+    private _addComponent(uiNode: cc.Node, viewData: ViewData, openOption: DefaultOpenOption): UIView | null {
         if (uiNode) {
             let className = this.getClassName(viewData.viewType);
             //挂载脚本
@@ -408,7 +399,7 @@ export class UIManager implements ISingleton{
             return;
         }
 
-        let uiNode = cc.instantiate(viewData.info.data as cc.Prefab);
+        let uiNode = cc.instantiate(viewData.cache.data as cc.Prefab);
         viewData.node = uiNode;
         let view = this._addComponent(uiNode, viewData, openOptions);
         if (!view) {
@@ -435,10 +426,10 @@ export class UIManager implements ISingleton{
     }
 
     private loadPrefab(bundle: BUNDLE_TYPE, url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
-        return new Promise<cc.Prefab>((resolove, reject) => {
-            App.asset.load(bundle, url, cc.Prefab, progressCallback, (data) => {
-                if (data && data.data && data.data instanceof cc.Prefab) {
-                    resolove(data.data);
+        return new Promise<Resource.Cache>((resolove, reject) => {
+            App.asset.load(bundle, url, cc.Prefab, progressCallback, (cache) => {
+                if (cache && cache.data && cache.data instanceof cc.Prefab) {
+                    resolove(cache);
                 }
                 else {
                     reject(`加载prefab : ${url} 失败`)
@@ -488,15 +479,15 @@ export class UIManager implements ISingleton{
     }
 
     /**@description 主摄像机 */
-    public get camera(){
-        return cc.find("Camera",this.canvas)?.getComponent(cc.Camera);
+    public get camera() {
+        return cc.find("Camera", this.canvas)?.getComponent(cc.Camera);
     }
 
     /**
      * @description 截图摄像机
      */
-    public get screenShotCamera(){
-        return cc.find("SnapshotCamera",this.canvas)?.getComponent(cc.Camera);
+    public get screenShotCamera() {
+        return cc.find("SnapshotCamera", this.canvas)?.getComponent(cc.Camera);
     }
 
     /**@description 获取主场景预置节点 */
@@ -512,7 +503,7 @@ export class UIManager implements ISingleton{
      * @description 走到这里面，说明游戏结束，或都重启游戏，直接清空,避免double free
      * @param node 
      */
-    onDestroy(node : cc.Node){
+    onDestroy(node: cc.Node) {
         this._viewDatas.clear();
     }
 
@@ -526,24 +517,20 @@ export class UIManager implements ISingleton{
     }
 
     /**@description 添加动态加载的本地资源 */
-    public addLocal(info: Resource.Info, className: string) {
-        if (info) {
-            let viewData = this.getViewData(className);
-            if (viewData) {
-                viewData.loadData.addLocal(info, className);
-            }
+    public addLocal(cache: Resource.Cache, className: string) {
+        let viewData = this.getViewData(className);
+        if (viewData) {
+            viewData.loadData.addLocal(cache, className);
         }
     }
 
 
 
     /**@description 添加动态加载的远程资源 */
-    public addRemote(info: Resource.Info, className: string) {
-        if (info) {
-            let viewData = this.getViewData(className);
-            if (viewData) {
-                viewData.loadData.addRemote(info, className);
-            }
+    public addRemote(cache: Resource.Cache, className: string) {
+        let viewData = this.getViewData(className);
+        if (viewData) {
+            viewData.loadData.addRemote(cache, className);
         }
     }
 
@@ -560,8 +547,8 @@ export class UIManager implements ISingleton{
                 viewData.node.destroy();
             }
             viewData.loadData.clear();
-            if ( viewData.isPrefab ){
-                App.asset.releaseAsset(viewData.info);
+            if (viewData.isPrefab) {
+                App.asset.releaseAsset(viewData.cache);
             }
             this._viewDatas.delete(className);
             Log.d(`${this.module} close view : ${className}`);
@@ -716,20 +703,20 @@ export class UIManager implements ISingleton{
         }
     }
 
-    debug(config : {showViews ?: boolean,showChildren ?: boolean,showComp ?: boolean}){
-        if ( !config ){
+    debug(config: { showViews?: boolean, showChildren?: boolean, showComp?: boolean }) {
+        if (!config) {
             config = {};
             config.showChildren = true;
             config.showComp = true;
             config.showViews = true;
         }
-        if ( config.showViews ){
+        if (config.showViews) {
             Log.d(`-----------当前所有视图------------`);
             this._viewDatas.forEach((value, key) => {
                 Log.d(`[${key}] isLoaded : ${value.isLoaded} status : ${value.status} view : ${cc.js.getClassName(value.view)} active : ${value.view && value.view.node ? value.view.node.active : false}`);
             });
         }
-        if ( config.showChildren ){
+        if (config.showChildren) {
             let root = this.viewRoot;
             if (root) {
                 Log.d(`-----------当前所有节点信息------------`);
@@ -740,7 +727,7 @@ export class UIManager implements ISingleton{
                 }
             }
         }
-        if ( config.showComp ){
+        if (config.showComp) {
             let root: any = this.componentRoot;
             if (root) {
                 Log.d(`-----------当前所有组件信息------------`);
