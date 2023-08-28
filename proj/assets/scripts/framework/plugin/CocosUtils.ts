@@ -146,6 +146,9 @@ function _setSpriteFrame(data: setSpriteFrameParam) {
         info.type = cc.SpriteFrame;
         info.url = Resource.getKey(data.url, info.type);
         info.data = data.spriteFrame;
+        if (data.dirAsset) {
+            info.data = data.dirAsset;
+        }
         info.bundle = data.bundle;
         addExtraLoadResource(data.view, info);
     }
@@ -234,13 +237,13 @@ function _setButtonWithType(
             }
             App.cache.getCacheByAsync(url, cc.SpriteFrame, bundle).then((spriteFrame) => {
                 _setButtonSpriteFrame({
-                    button : button,
-                    memberName : memberName,
-                    view : view,
-                    url : url,
-                    spriteFrame : spriteFrame,
-                    complete : complete,
-                    bundle : bundle,
+                    button: button,
+                    memberName: memberName,
+                    view: view,
+                    url: url,
+                    spriteFrame: spriteFrame,
+                    complete: complete,
+                    bundle: bundle,
                 });
             });
         } else {
@@ -252,18 +255,18 @@ function _setButtonWithType(
                         let __bundle = App.bundleManager.getBundle(bundle);
                         let isSuccess = false;
                         for (let i = 0; i < urls.length; i++) {
-                            let atlas : cc.SpriteAtlas = __bundle.get(`${dir}/${urls[i]}`, cc.SpriteAtlas);
+                            let atlas: cc.SpriteAtlas = __bundle.get(`${dir}/${urls[i]}`, cc.SpriteAtlas);
                             if (atlas && atlas.getSpriteFrame(key)) {
                                 _setButtonSpriteFrame({
-                                    button : button,
-                                    memberName : memberName,
-                                    view : view,
-                                    url : dir,
-                                    spriteFrame : atlas.getSpriteFrame(key),
-                                    complete : complete,
-                                    bundle : bundle,
-                                    isAtlas : true,
-                                    dirAsset : data,
+                                    button: button,
+                                    memberName: memberName,
+                                    view: view,
+                                    url: dir,
+                                    spriteFrame: atlas.getSpriteFrame(key),
+                                    complete: complete,
+                                    bundle: bundle,
+                                    isAtlas: true,
+                                    dirAsset: data,
                                 });
                                 isSuccess = true;
                                 break;
@@ -272,29 +275,29 @@ function _setButtonWithType(
                         if (!isSuccess) {
                             Log.w(`加载的资源中未找到:${bundle}/${dir}/${url}`);
                             _setButtonSpriteFrame({
-                                button : button,
-                                memberName : memberName,
-                                view : view,
-                                url : dir,
-                                spriteFrame : null,
-                                complete : complete,
-                                bundle : bundle,
-                                isAtlas : true,
-                                dirAsset : null,
+                                button: button,
+                                memberName: memberName,
+                                view: view,
+                                url: dir,
+                                spriteFrame: null,
+                                complete: complete,
+                                bundle: bundle,
+                                isAtlas: true,
+                                dirAsset: null,
                             });
                         }
                     } else {
                         Log.w(`未加载资源${dir}`);
                         _setButtonSpriteFrame({
-                            button : button,
-                            memberName : memberName,
-                            view : view,
-                            url : dir,
-                            spriteFrame : null,
-                            complete : complete,
-                            bundle : bundle,
-                            isAtlas : true,
-                            dirAsset : null,
+                            button: button,
+                            memberName: memberName,
+                            view: view,
+                            url: dir,
+                            spriteFrame: null,
+                            complete: complete,
+                            bundle: bundle,
+                            isAtlas: true,
+                            dirAsset: null,
                         });
                     }
                 })
@@ -306,14 +309,14 @@ function _setButtonWithType(
                     //来到这里面，程序已经崩溃，无意义在处理
                 } else {
                     _setButtonSpriteFrame({
-                        button : button,
-                        memberName : memberName,
-                        view : view,
-                        url : data.url,
-                        spriteFrame : data.spriteFrame,
-                        complete : complete,
-                        bundle : bundle,
-                        isAtlas : true
+                        button: button,
+                        memberName: memberName,
+                        view: view,
+                        url: data.url,
+                        spriteFrame: data.spriteFrame,
+                        complete: complete,
+                        bundle: bundle,
+                        isAtlas: true
                     });
                 }
             });
@@ -352,12 +355,16 @@ export function setButtonSpriteFrame(button: cc.Button, config: {
 export function setParticleSystemFile(
     component: cc.ParticleSystem,
     config: { url: string, view: any, complete?: (file: cc.ParticleAsset) => void, bundle?: BUNDLE_TYPE },
-    data: cc.ParticleAsset
+    data: cc.ParticleAsset,
+    dirAsset?: cc.Asset | cc.Asset[],
 ) {
     let info = new Resource.Info;
     info.type = cc.ParticleAsset;
     info.url = Resource.getKey(config.url, info.type);
     info.data = data;
+    if (dirAsset) {
+        info.data = dirAsset;
+    }
     info.bundle = getBundle(config);
     addExtraLoadResource(config.view, info);
     if (data && isValidComponent(component)) {
@@ -420,54 +427,61 @@ export function setLabelFont(
 
 /**
  * @description 设置spine动画数据
- * @param component spine组件
- * @param config 配置信息
- * @param data 动画数据
  */
-export function setSkeletonSkeletonData(
+export function setSkeletonSkeletonData(data: {
     component: sp.Skeleton,
     config: { url: string, view: any, complete: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE } |
     { view: any, path: string, name: string, complete: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE, isNeedCache?: boolean, retain?: boolean },
     data: sp.SkeletonData,
-    resourceType: Resource.Type = Resource.Type.Local) {
+    resourceType?: Resource.Type,
+    dirAsset?: cc.Asset | cc.Asset[],
+}) {
+    if (data.resourceType == undefined || data.resourceType == null) {
+        data.resourceType = Resource.Type.Local;
+    }
+
     let url = "";
     let retain = false;
-    if (resourceType == Resource.Type.Remote) {
-        let realConfig: { view: any, path: string, name: string, complete: (data: sp.SkeletonData) => void, isNeedCache?: boolean, retain?: boolean } = <any>config;
+    if (data.resourceType == Resource.Type.Remote) {
+        let realConfig: { view: any, path: string, name: string, complete: (data: sp.SkeletonData) => void, isNeedCache?: boolean, retain?: boolean } = <any>data.config;
         url = `${realConfig.path}/${realConfig.name}`;
         retain = realConfig.retain ? true : false;
     } else {
-        let realConfig: { url: string, view: any, complete: (data: sp.SkeletonData) => void } = <any>config;
+        let realConfig: { url: string, view: any, complete: (data: sp.SkeletonData) => void } = <any>data.config;
         url = realConfig.url;
     }
     let info = new Resource.Info;
     info.type = sp.SkeletonData;
     info.url = Resource.getKey(url, info.type);
-    info.data = data;
-    info.retain = retain;
-    info.bundle = getBundle(config);
-    if (resourceType == Resource.Type.Remote) {
-        info.bundle = Macro.BUNDLE_REMOTE;
-        addRemoteLoadResource(config.view, info);
-    } else {
-        addExtraLoadResource(config.view, info);
+    info.data = data.data;
+    if ( data.dirAsset ){
+        info.data = data.dirAsset;
     }
-    if (data && isValidComponent(component)) {
-        let oldSkeletonData = component.skeletonData;
+    info.retain = retain;
+    info.bundle = getBundle(data.config);
+    if (data.resourceType == Resource.Type.Remote) {
+        info.bundle = Macro.BUNDLE_REMOTE;
+        info.url = url;
+        addRemoteLoadResource(data.config.view, info);
+    } else {
+        addExtraLoadResource(data.config.view, info);
+    }
+    if (data.data && isValidComponent(data.component)) {
+        let oldSkeletonData = data.component.skeletonData;
         try {
-            let replaceData = cc.isValid(data) ? data : null;
-            if (replaceData) component.skeletonData = replaceData;
-            if (config.complete) config.complete(replaceData);
+            let replaceData = cc.isValid(data.data) ? data.data : null;
+            if (replaceData) data.component.skeletonData = replaceData;
+            if (data.config.complete) data.config.complete(replaceData);
         } catch (err) {
             let temp = cc.isValid(oldSkeletonData) ? oldSkeletonData : null;
-            component.skeletonData = temp;
-            if (config.complete) config.complete(null);
+            data.component.skeletonData = temp;
+            if (data.config.complete) data.config.complete(null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
             Log.e(`${url} : ${err ? err : "replace skeletonData error"}`);
         }
     } else {
         //完成回调
-        if (config.complete && isValidComponent(component)) config.complete(data);
+        if (data.config.complete && isValidComponent(data.component)) data.config.complete(data.data);
     }
 }
 
@@ -534,9 +548,18 @@ export function _loadRes(config: {
     onProgress?: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
     onComplete: (data: any) => void,
     view: any,
+    dir?:string,
 }) {
     let bundle = getBundle(config);
     let cache = App.cache.get(bundle, config.url, config.type);
+    if ( config.dir ){
+        let __bundle = App.bundleManager.getBundle(bundle);
+        let asset = __bundle.get(`${config.dir}/${config.url}`, config.type);
+        if (config.onComplete) {
+            config.onComplete(asset);
+        }
+        return;
+    }
     App.asset.load(
         bundle,
         config.url,
@@ -552,7 +575,7 @@ export function _loadRes(config: {
                 addExtraLoadResource(config.view, info);
             }
             if (config.onComplete) {
-                config.onComplete(data);
+                config.onComplete(data ? data.data : null);
             }
         }
     )

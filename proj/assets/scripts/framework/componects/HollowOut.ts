@@ -168,14 +168,14 @@ export default class HollowOut extends cc.Component {
         if ( CC_EDITOR && !(material && material.name.startsWith("quick-2d-hollowout-sprite"))) {
             let view = App.retainMemory;
             //加载材质
-            loadRes({
+            loadRes<cc.Material>({
                 bundle: Macro.BUNDLE_RESOURCES,
                 url: "material/quick-2d-hollowout-sprite",
                 view: view,
                 type: cc.Material,
                 onComplete: (data) => {
                     if (data) {
-                        let material = data.data as cc.Material;
+                        let material = data;
                         this.sprite.setMaterial(0, material);
                         this.onLoadMaterialComplete(material)
                     }

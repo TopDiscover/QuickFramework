@@ -1,7 +1,7 @@
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
-    createNodeWithPrefab,getBundle,_loadDirRes,_loadRes, loadDragonDisplay
+    createNodeWithPrefab, getBundle, _loadDirRes, _loadRes, loadDragonDisplay
 } from "./CocosUtils";
 import { Resource } from "../core/asset/Resource";
 import { Macro } from "../defines/Macros";
@@ -52,33 +52,33 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
         isRetain = true;
     }
     me.loadUrl = config.url;
-    let defaultBundle = getBundle({bundle:config.defaultBundle,view:config.view})
+    let defaultBundle = getBundle({ bundle: config.defaultBundle, view: config.view })
     App.asset.remote.loadImage(config.url, config.isNeedCache).then((data) => {
-        if ( me.loadUrl == data?.nativeUrl ){
+        if (me.loadUrl == data?.nativeUrl) {
             //防止时间调用加载不同url时，以当前记录的url为最终
             if (data) {
                 setSpriteSpriteFrame({
-                    view : config.view,
-                    url : config.url,
-                    sprite : me,
-                    spriteFrame : data,
-                    complete : config.complete,
-                    bundle : Macro.BUNDLE_REMOTE,
-                    resourceType : Resource.Type.Remote,
-                    retain : isRetain
+                    view: config.view,
+                    url: config.url,
+                    sprite: me,
+                    spriteFrame: data,
+                    complete: config.complete,
+                    bundle: Macro.BUNDLE_REMOTE,
+                    resourceType: Resource.Type.Remote,
+                    retain: isRetain
                 });
             } else {
                 if (config.defaultSpriteFrame) {
                     if (typeof config.defaultSpriteFrame == "string") {
                         //动态加载了一张图片，把资源通知管理器
-                        App.cache.getCacheByAsync(config.defaultSpriteFrame,cc.SpriteFrame,defaultBundle).then((spriteFrame) => {
+                        App.cache.getCacheByAsync(config.defaultSpriteFrame, cc.SpriteFrame, defaultBundle).then((spriteFrame) => {
                             setSpriteSpriteFrame({
-                                view : config.view,
-                                url : config.defaultSpriteFrame,
-                                sprite : me,
-                                spriteFrame : spriteFrame,
-                                complete : config.complete,
-                                bundle : defaultBundle,
+                                view: config.view,
+                                url: config.defaultSpriteFrame,
+                                sprite: me,
+                                spriteFrame: spriteFrame,
+                                complete: config.complete,
+                                bundle: defaultBundle,
                             });
                         });
                     }
@@ -108,110 +108,110 @@ cc.Sprite.prototype.loadImage = function (config) {
     let url = config.url;
     let complete = config.complete;
     let bundle = getBundle(config);
-    
+
     if (typeof url == "string") {
-        if ( config.dir ){
-            App.cache.getCache(config.dir,cc.SpriteFrame,bundle,true).then(dirAsset=>{
+        if (config.dir) {
+            App.cache.getCache(config.dir, cc.SpriteFrame, bundle, true).then(dirAsset => {
                 let __bundle = App.bundleManager.getBundle(bundle);
-                let spriteframe : cc.SpriteFrame = __bundle.get(`${config.dir}/${url}`,cc.SpriteFrame);
-                if ( !dirAsset ){
+                let spriteframe: cc.SpriteFrame = __bundle.get(`${config.dir}/${url}`, cc.SpriteFrame);
+                if (!dirAsset) {
                     Log.e(`未加载资源${config.dir}`);
                 }
                 setSpriteSpriteFrame({
-                    view : view,
-                    url : config.dir,
-                    sprite : me,
-                    spriteFrame : spriteframe,
-                    complete : complete,
-                    bundle : bundle,
-                    dirAsset : dirAsset,
+                    view: view,
+                    url: config.dir,
+                    sprite: me,
+                    spriteFrame: spriteframe,
+                    complete: complete,
+                    bundle: bundle,
+                    dirAsset: dirAsset,
                 });
             })
             return;
         }
-        App.cache.getCacheByAsync(url, cc.SpriteFrame,bundle).then((spriteFrame) => {
+        App.cache.getCacheByAsync(url, cc.SpriteFrame, bundle).then((spriteFrame) => {
             setSpriteSpriteFrame({
-                view : view,
-                url : url as string,
-                sprite : me,
-                spriteFrame : spriteFrame,
-                complete : complete,
-                bundle : bundle,
+                view: view,
+                url: url as string,
+                sprite: me,
+                spriteFrame: spriteFrame,
+                complete: complete,
+                bundle: bundle,
             });
         });
     } else {
         let urls = url.urls;
         let key = url.key;
-        if ( config.dir ){
-            App.cache.getCache(config.dir,cc.SpriteAtlas,bundle,true).then(data=>{
-                if ( data ){
+        if (config.dir) {
+            App.cache.getCache(config.dir, cc.SpriteAtlas, bundle, true).then(data => {
+                if (data) {
                     let __bundle = App.bundleManager.getBundle(bundle);
                     let isSuccess = false;
-                    for( let i = 0 ; i < urls.length ; i++ ){
-                        let atlas : cc.SpriteAtlas = __bundle.get(`${config.dir}/${urls[i]}`,cc.SpriteAtlas);
-                        if ( atlas && atlas.getSpriteFrame(key)){
+                    for (let i = 0; i < urls.length; i++) {
+                        let atlas: cc.SpriteAtlas = __bundle.get(`${config.dir}/${urls[i]}`, cc.SpriteAtlas);
+                        if (atlas && atlas.getSpriteFrame(key)) {
                             let info = new Resource.Info;
                             info.type = cc.SpriteAtlas;
-                            info.url = Resource.getKey(config.dir,info.type);
+                            info.url = Resource.getKey(config.dir, info.type);
                             info.data = data;
                             info.bundle = bundle;
                             addExtraLoadResource(view, info);
                             setSpriteSpriteFrame({
-                                view : view,
-                                url : config.dir,
-                                sprite : me,
-                                spriteFrame : atlas.getSpriteFrame(key),
-                                complete : complete,
-                                bundle : bundle,
-                                isAtlas : true,
-                                dirAsset : data,
+                                view: view,
+                                url: config.dir,
+                                sprite: me,
+                                spriteFrame: atlas.getSpriteFrame(key),
+                                complete: complete,
+                                bundle: bundle,
+                                isAtlas: true,
+                                dirAsset: data,
                             });
                             isSuccess = true;
                             break;
                         }
                     }
-                    if ( !isSuccess ){
+                    if (!isSuccess) {
                         Log.w(`加载的资源中未找到:${bundle}/${config.dir}/${url}`);
                         setSpriteSpriteFrame({
-                            view : view,
-                            url : config.dir,
-                            sprite : me,
-                            spriteFrame : null,
-                            complete : complete,
-                            bundle : bundle,
-                            isAtlas : true,
-                            dirAsset : null,
+                            view: view,
+                            url: config.dir,
+                            sprite: me,
+                            spriteFrame: null,
+                            complete: complete,
+                            bundle: bundle,
+                            isAtlas: true,
+                            dirAsset: null,
                         });
                     }
-                }else{
+                } else {
                     Log.w(`未加载资源${config.dir}`);
                     setSpriteSpriteFrame({
-                        view : view,
-                        url : config.dir,
-                        sprite : me,
-                        spriteFrame : null,
-                        complete : complete,
-                        bundle : bundle,
-                        isAtlas : true,
-                        dirAsset : null,
+                        view: view,
+                        url: config.dir,
+                        sprite: me,
+                        spriteFrame: null,
+                        complete: complete,
+                        bundle: bundle,
+                        isAtlas: true,
+                        dirAsset: null,
                     });
                 }
             })
             return;
         }
         //在纹理图集中查找
-        App.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource,bundle).then((data) => {
-            if ( data && data.isTryReload ){
-               //来到这里面程序已经崩溃了，无意义在处理了
-            }else{
+        App.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle).then((data) => {
+            if (data && data.isTryReload) {
+                //来到这里面程序已经崩溃了，无意义在处理了
+            } else {
                 setSpriteSpriteFrame({
-                    view : view,
-                    url : data.url,
-                    sprite : me,
-                    spriteFrame : data.spriteFrame,
-                    complete : complete,
-                    bundle : bundle,
-                    isAtlas : true,
+                    view: view,
+                    url: data.url,
+                    sprite: me,
+                    spriteFrame: data.spriteFrame,
+                    complete: complete,
+                    bundle: bundle,
+                    isAtlas: true,
                 });
             }
         });
@@ -244,7 +244,12 @@ sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
         config.isNeedCache = true;
     }
     App.asset.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then((data) => {
-        setSkeletonSkeletonData(me, config, data, Resource.Type.Remote);
+        setSkeletonSkeletonData({
+            component: me,
+            config: config,
+            data: data,
+            resourceType: Resource.Type.Remote,
+        });
     });
 }
 
@@ -263,21 +268,29 @@ sp.Skeleton.prototype.loadSkeleton = function (config) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
-    if ( config.dir ){
-        App.cache.getCache(config.dir,sp.SkeletonData,bundle,true).then(data=>{
-            if ( data ){
-                let __bundle = App.bundleManager.getBundle(bundle);
-                data = __bundle.get(`${config.dir}/${url}`,sp.SkeletonData);
-            }else{
+    if (config.dir) {
+        App.cache.getCache(config.dir, sp.SkeletonData, bundle, true).then(dirAsset => {
+            let __bundle = App.bundleManager.getBundle(bundle);
+            let data: sp.SkeletonData = __bundle.get(`${config.dir}/${url}`, sp.SkeletonData);
+            if (!dirAsset) {
                 Log.w(`未加载资源${config.dir}`);
             }
             config.url = config.dir;
-            setSkeletonSkeletonData(me, config, data);
+            setSkeletonSkeletonData({
+                component: me,
+                config: config,
+                data: data,
+                dirAsset: dirAsset,
+            });
         })
         return;
     }
-    App.cache.getCacheByAsync(url, sp.SkeletonData,bundle).then((data) => {
-        setSkeletonSkeletonData(me, config, data);
+    App.cache.getCacheByAsync(url, sp.SkeletonData, bundle).then((data) => {
+        setSkeletonSkeletonData({
+            component: me,
+            config: config,
+            data: data,
+        });
     });
 }
 
@@ -295,8 +308,8 @@ cc.Button.prototype.loadButton = function (config) {
 /**
  * @description 加载龙骨动画
  */
-dragonBones.ArmatureDisplay.prototype.loadDisplay = function(config) {
-    loadDragonDisplay(this,config);
+dragonBones.ArmatureDisplay.prototype.loadDisplay = function (config) {
+    loadDragonDisplay(this, config);
 }
 
 /**
@@ -311,7 +324,19 @@ cc.ParticleSystem.prototype.loadFile = function (config) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
-    App.cache.getCacheByAsync(url, cc.ParticleAsset,bundle).then((data) => {
+    if (config.dir) {
+        App.cache.getCache(config.dir, cc.ParticleAsset, bundle, true).then(dirAsset => {
+            let __bundle = App.bundleManager.getBundle(bundle);
+            let data: cc.ParticleAsset = __bundle.get(`${config.dir}/${url}`, cc.ParticleAsset);
+            if (!dirAsset) {
+                Log.e(`未加载资源${config.dir}`);
+            }
+            config.url = config.dir;
+            setParticleSystemFile(me, config, data, dirAsset);
+        })
+        return;
+    }
+    App.cache.getCacheByAsync(url, cc.ParticleAsset, bundle).then((data) => {
         setParticleSystemFile(me, config, data);
     });
 }
@@ -333,23 +358,23 @@ cc.Label.prototype.forceDoLayout = function () {
  * let content = cc.find("content",this.node); 
  * content.getComponent(cc.Label).loadFont({font:roomPath + dfFont,view:this});
  */
- cc.Label.prototype.loadFont = function (config) {
+cc.Label.prototype.loadFont = function (config) {
     let font = config.font;
     let me = this;
     let bundle = getBundle(config);
-    if ( config.dir ){
-        App.cache.getCache(config.dir,cc.Font,bundle,true).then(dirAsset=>{
+    if (config.dir) {
+        App.cache.getCache(config.dir, cc.Font, bundle, true).then(dirAsset => {
             let __bundle = App.bundleManager.getBundle(bundle);
-            let fontData : cc.Font = __bundle.get(`${config.dir}/${config.font}`,cc.Font);
-            if ( !dirAsset ){
+            let fontData: cc.Font = __bundle.get(`${config.dir}/${config.font}`, cc.Font);
+            if (!dirAsset) {
                 Log.e(`未加载资源${config.dir}`);
             }
             config.font = config.dir;
-            setLabelFont(me, config, fontData,dirAsset);
+            setLabelFont(me, config, fontData, dirAsset);
         })
         return;
     }
-    App.cache.getCacheByAsync(font, cc.Font,bundle).then((data) => {
+    App.cache.getCacheByAsync(font, cc.Font, bundle).then((data) => {
         setLabelFont(me, config, data);
     });
 }
@@ -366,7 +391,7 @@ cc.Label.prototype.forceDoLayout = function () {
  *     }
  * }});
  */
-window.createPrefab = function (config:any) {
+window.createPrefab = function (config: any) {
     createNodeWithPrefab(config);
 }
 
@@ -380,7 +405,7 @@ window.createPrefab = function (config:any) {
  * @param config.bundle 可不填，默认为view指向的bundle
  * @param config.type 加载的资源类型
  * */
-window.loadDirRes = function (config:any) {
+window.loadDirRes = function (config: any) {
     _loadDirRes(config)
 }
 
@@ -394,7 +419,7 @@ window.loadDirRes = function (config:any) {
  * @param config.onComplete 加载完成回调 data为ResourceCacheData
  * @param config.view 资源持有者,继承自UIView
  */
-window.loadRes = function (config:any) {
+window.loadRes = function (config: any) {
     _loadRes(config);
 }
 
@@ -406,7 +431,7 @@ window.loadRes = function (config:any) {
 cc.updateAlignment = function (node) {
     if (node) {
         //强制当前节点进行本帧强制布局
-        let backcc : any = cc;
+        let backcc: any = cc;
         if (backcc._widgetManager) {
             backcc._widgetManager.updateAlignment(node);
         } else {
@@ -415,22 +440,22 @@ cc.updateAlignment = function (node) {
     }
 }
 
-if( !cc.randomRangeInt ){
-    cc.randomRangeInt = function ( min , max){
-        let value = (max- min) * Math.random() + min;
+if (!cc.randomRangeInt) {
+    cc.randomRangeInt = function (min, max) {
+        let value = (max - min) * Math.random() + min;
         let result = Math.floor(value);
         return result;
     }
 }
 
-if( !cc.randomRange ){
-    cc.randomRange = function ( min , max){
-        let value = (max- min) * Math.random() + min;
+if (!cc.randomRange) {
+    cc.randomRange = function (min, max) {
+        let value = (max - min) * Math.random() + min;
         return value;
     }
 }
 
-(cc.Tween as any).getfinalAction = function(tween:any){
+(cc.Tween as any).getfinalAction = function (tween: any) {
     return tween._finalAction;
 }
 

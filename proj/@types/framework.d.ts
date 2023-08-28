@@ -246,7 +246,7 @@ declare function loadDirRes(config: {
 * @param config.onComplete 加载完成回调 data为ResourceCacheData
 * @param config.view 资源持有者,继承自UIView
 */
-declare function loadRes(config: {
+declare function loadRes<T extends cc.Asset>(config: {
 	/**@description 资源所在bundle */
 	bundle?: BUNDLE_TYPE,
 	/**@description url */
@@ -256,9 +256,11 @@ declare function loadRes(config: {
 	/**@description 加载进度回调 */
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
 	/**@description 加载完成回调 */
-	onComplete: (data: import("../assets/scripts/framework/core/asset/Resource").Resource.CacheData) => void,
+	onComplete: (data: T) => void,
 	/**@description  资源持有者 UIView 子类 */
-	view: UIView
+	view: UIView,
+	/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
+	dir?: string,
 }): void;
 
 

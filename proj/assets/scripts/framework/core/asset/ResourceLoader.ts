@@ -132,6 +132,7 @@ export default class ResourceLoader {
         this._resources.forEach((value) => {
             if (value.url) {
                 let url = Resource.getKey(value.url,value.type);
+                url = `${value.bundle}/${url}`;
                 if (this._loadedResource.has(url)) {
                     let data = this._loadedResource.get(url);
                     if (data) {
@@ -141,6 +142,7 @@ export default class ResourceLoader {
                 }
             } else if (value.dir) {
                 let url = Resource.getKey(value.dir,value.type);
+                url = `${value.bundle}/${url}`;
                 if (this._loadedResource.has(url)) {
                     let data = this._loadedResource.get(url);
                     if (data) {
@@ -175,7 +177,8 @@ export default class ResourceLoader {
             info.data = data.data;
             info.bundle = data.info.bundle;
             App.asset.retainAsset(info);
-            this._loadedResource.set(info.url, info);
+            let url = `${info.bundle}/${info.url}`;
+            this._loadedResource.set(url, info);
         }
 
         this.checkLoadResourceComplete();
