@@ -48,6 +48,11 @@ function isValidComponent(component: cc.Component): boolean {
     return false;
 }
 
+export function getAsset<T extends cc.Asset>(dir: string, url: string, bundle: BUNDLE_TYPE, type: { prototype: T }) {
+    let __bundle = App.bundleManager.getBundle(bundle);
+    return __bundle.get(`${dir}/${url}`, type as any) as T;
+}
+
 /**
  * @description 设置cc.Sprite组件精灵帧
  * @param {*} view 持有视图
@@ -464,17 +469,17 @@ export function setSkeletonSkeletonData(data: {
  * @description 通过预置体创建Node
  * @param config 配置信息
  */
-export function createNodeWithPrefab(config: { 
-    bundle?: BUNDLE_TYPE, 
-    url: string, 
-    view: any, 
+export function createNodeWithPrefab(config: {
+    bundle?: BUNDLE_TYPE,
+    url: string,
+    view: any,
     complete: (node: cc.Node) => void,
     dir?: string,
 }) {
 
-    let onComplete = ([cache,data] : [Resource.Cache,cc.Prefab])=>{
-        if ( cache ){
-            addExtraLoadResource(config.view,cache);
+    let onComplete = ([cache, data]: [Resource.Cache, cc.Prefab]) => {
+        if (cache) {
+            addExtraLoadResource(config.view, cache);
         }
         if (data && isValidComponent(config.view) && config.complete) {
             let node = cc.instantiate(data);
@@ -485,16 +490,15 @@ export function createNodeWithPrefab(config: {
     }
     let url = config.url;
     let bundle = getBundle(config);
-    if ( config.dir ){
-        App.cache.getCache(config.dir,cc.Prefab,bundle,true).then(([cache,data])=>{
-            let __bundle = App.bundleManager.getBundle(bundle);
-            data = __bundle.get(`${config.dir}/${config.url}`, cc.Prefab);
-            onComplete([cache,data]);
+    if (config.dir) {
+        App.cache.getCache(config.dir, cc.Prefab, bundle, true).then(([cache, data]) => {
+            data = getAsset(config.dir,config.url,bundle,cc.Prefab);
+            onComplete([cache, data]);
         })
         return;
     }
     App.cache.getCacheByAsync(url, cc.Prefab, bundle).then(([cache, data]) => {
-        onComplete([cache,data]);
+        onComplete([cache, data]);
     });
 }
 
@@ -508,25 +512,24 @@ export function _loadDirRes(config: {
     dir?: string,
 }) {
     let bundle = getBundle(config);
-    if ( config.dir ){
-        App.cache.getCache(config.dir,config.type,bundle,true).then(([cache,data])=>{
-            if ( cache ){
-                addExtraLoadResource(config.view,cache);
-            }
-            if( config.onComplete ){
-                config.onComplete(cache);
-            }
+
+    let onComplete = (cache: Resource.Cache) => {
+        if (cache) {
+            addExtraLoadResource(config.view, cache);
+        }
+        if (config.onComplete) {
+            config.onComplete(cache);
+        }
+    }
+    if (config.dir) {
+        App.cache.getCache(config.dir, config.type, bundle, true).then(([cache, data]) => {
+            onComplete(cache);
         })
         return;
     }
     //这里要做一个防止重复加载操作，以免对加载完成后的引用计数多加次数
     App.asset.loadDir(bundle, config.url, config.type, config.onProgress, (cache) => {
-        if (cache) {
-            addExtraLoadResource(config.view, cache)
-        }
-        if (config.onComplete) {
-            config.onComplete(cache);
-        }
+        onComplete(cache);
     });
 }
 
@@ -540,7 +543,7 @@ export function _loadRes(config: {
     dir?: string,
 }) {
     let bundle = getBundle(config);
-    let onComplete = ([cache,data] : [Resource.Cache,cc.Asset])=>{
+    let onComplete = ([cache, data]: [Resource.Cache, cc.Asset]) => {
         if (cache) {
             addExtraLoadResource(config.view, cache);
         }
@@ -549,15 +552,14 @@ export function _loadRes(config: {
         }
     }
     if (config.dir) {
-        App.cache.getCache(config.dir, config.type, bundle,true).then(([cache,data])=>{
-            let __bundle = App.bundleManager.getBundle(bundle);
-            data = __bundle.get(`${config.dir}/${config.url}`, config.type);
-            onComplete([cache,data]);
+        App.cache.getCache(config.dir, config.type, bundle, true).then(([cache, data]) => {
+            data = getAsset(config.dir, config.url, bundle, config.type);
+            onComplete([cache, data]);
         })
         return;
     }
-    App.cache.getCacheByAsync(config.url,config.type,bundle).then(([cache,data])=>{
-        onComplete([cache,data])
+    App.cache.getCacheByAsync(config.url, config.type, bundle).then(([cache, data]) => {
+        onComplete([cache, data])
     })
 }
 
@@ -571,30 +573,38 @@ export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay,
         dir?: string,
     }) {
     let bundle = getBundle(config);
+
+    let onAssetComplete = ([assetCache, data]: [Resource.Cache, dragonBones.DragonBonesAsset]) => {
+        if (assetCache) {
+            addExtraLoadResource(config.view, assetCache);
+        }
+    }
+
+    let onAtlasComplete = ([atlasCache, atlas, asset]: [Resource.Cache, dragonBones.DragonBonesAtlasAsset, dragonBones.DragonBonesAsset]) => {
+        if (atlas) {
+            if (cc.sys.isBrowser) {
+                addExtraLoadResource(config.view, atlasCache);
+            }
+            comp.dragonAsset = asset;
+            comp.dragonAtlasAsset = atlas;
+            if (config.complete) {
+                config.complete(asset, atlas);
+            }
+        } else {
+            if (config.complete) {
+                config.complete(asset, null);
+            }
+        }
+    }
+
     if (config.dir) {
         App.cache.getCache(config.dir, dragonBones.DragonBonesAsset, bundle, true).then(([assetCache, asset]) => {
             if (asset) {
-                let __bundle = App.bundleManager.getBundle(bundle);
-                asset = __bundle.get(`${config.dir}/${config.assetUrl}`, dragonBones.DragonBonesAsset);
-                addExtraLoadResource(config.view, assetCache);
+                asset = getAsset(config.dir, config.assetUrl, bundle, dragonBones.DragonBonesAsset);
+                onAssetComplete([assetCache, asset]);
                 App.cache.getCache(config.dir, dragonBones.DragonBonesAtlasAsset, bundle, true).then(([atlasCache, atlas]) => {
-                    if (atlas) {
-                        let __bundle = App.bundleManager.getBundle(bundle);
-                        atlas = __bundle.get(`${config.dir}/${config.atlasUrl}`, dragonBones.DragonBonesAtlasAsset);
-                        if (cc.sys.isBrowser) {
-                            addExtraLoadResource(config.view, atlasCache);
-                            comp.dragonAsset = asset;
-                            comp.dragonAtlasAsset = atlas;
-                            if (config.complete) {
-                                config.complete(asset, atlas);
-                            }
-                        }
-                    } else {
-                        Log.w(`未加载资源${config.dir}`);
-                        if (config.complete) {
-                            config.complete(asset, null);
-                        }
-                    }
+                    atlas = getAsset(config.dir, config.atlasUrl, bundle, dragonBones.DragonBonesAtlasAsset);
+                    onAtlasComplete([atlasCache, atlas, asset])
                 })
             } else {
                 Log.w(`未加载资源${config.dir}`);
@@ -607,22 +617,9 @@ export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay,
     }
     App.cache.getCacheByAsync(config.assetUrl, dragonBones.DragonBonesAsset, bundle).then(([assetCache, asset]) => {
         if (asset) {
-            addExtraLoadResource(config.view, assetCache);
+            onAssetComplete([assetCache, asset]);
             App.cache.getCacheByAsync(config.atlasUrl, dragonBones.DragonBonesAtlasAsset, bundle).then(([atlasCache, atlas]) => {
-                if (atlas) {
-                    if (cc.sys.isBrowser) {
-                        addExtraLoadResource(config.view, atlasCache);
-                    }
-                    comp.dragonAsset = asset;
-                    comp.dragonAtlasAsset = atlas;
-                    if (config.complete) {
-                        config.complete(asset, atlas);
-                    }
-                } else {
-                    if (config.complete) {
-                        config.complete(asset, null);
-                    }
-                }
+                onAtlasComplete([atlasCache, atlas, asset])
             });
         } else {
             if (config.complete) {
