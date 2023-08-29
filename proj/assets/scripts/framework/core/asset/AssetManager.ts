@@ -91,7 +91,7 @@ class RemoteLoader {
                     cache = new Resource.Cache(url, sp.SkeletonData, Macro.BUNDLE_REMOTE);
                     cache.resourceType = Resource.Type.Remote;
                     App.cache.remoteCaches.set(cache);
-                    me._loadRemoteRes<ImageAsset>(spinePng, Asset, isNeedCache).then(([cacheTexture2D, image]) => {
+                    me._loadRemoteRes<ImageAsset>(spinePng, Texture2D, isNeedCache).then(([cacheTexture2D, image]) => {
                         if (image) {
                             me._loadRemoteRes<JsonAsset>(spineJson, JsonAsset, isNeedCache).then(([jsonCache, json]) => {
                                 if (json) {

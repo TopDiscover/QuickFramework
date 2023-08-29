@@ -224,14 +224,15 @@ function _setButtonWithType(
     }
     if (url) {
         if (typeof url == "string") {
+            url = `${url}/spriteFrame`;
             if (dir) {
                 App.cache.getCache(dir, SpriteFrame, bundle!, true).then(([cache, dirAsset]) => {
-                    onComplete([cache,getAsset(dir,url,bundle!,SpriteFrame),dir,false]);
+                    onComplete([cache,getAsset(dir,url as string,bundle!,SpriteFrame),dir,false]);
                 })
                 return;
             }
             App.cache.getCacheByAsync(url, SpriteFrame, bundle!).then(([cache, spriteFrame]) => {
-                onComplete([cache,spriteFrame,url,false]);
+                onComplete([cache,spriteFrame,url as string,false]);
             });
         } else {
             let urls = url.urls;

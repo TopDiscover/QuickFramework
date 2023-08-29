@@ -107,6 +107,7 @@ class RemoteCaches {
             (<any>sp)._nativeUrl = url;
             cache.isLoaded = true;
             cache.url = url;
+            cache.data = sp;
             this.set(cache);
             return [cache, <SpriteFrame>(cache.data)];
         }
