@@ -322,7 +322,7 @@ export class AssetManager implements ISingleton {
         //先到释放管理器中查找 
         let cache = App.releaseManger.get(bundle, key);
         if (cache) {
-            console.time(`加载资源 : ${key}`);
+            console.time(`加载资源 : ${bundle}/${key}`);
             App.cache.set(cache);
             this._onLoadComplete(cache, onComplete, null, cache.data);
             return;
@@ -350,7 +350,7 @@ export class AssetManager implements ISingleton {
             //无缓存信息
             cache = new Resource.Cache(key, type, bundle);
             App.cache.set(cache);
-            console.time(`加载资源 : ${cache.key}`);
+            console.time(`加载资源 : ${bundle}/${cache.key}`);
 
             let _bundle = this.getBundle(bundle);
             if (!_bundle) {

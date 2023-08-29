@@ -127,7 +127,6 @@ interface setSpriteFrameParam {
     complete: (type: string, data: cc.SpriteFrame) => void,
     bundle: BUNDLE_TYPE,
     isAtlas?: boolean,
-    dirAsset?: cc.Asset | cc.Asset[],
     cache: Resource.Cache,
 }
 
@@ -209,42 +208,29 @@ function _setButtonWithType(
     bundle?: BUNDLE_TYPE,
     dir?: string
 ) {
+    let onComplete = ([cache,data,url,isAtlas]:[Resource.Cache,cc.SpriteFrame,string,boolean])=>{
+        _setButtonSpriteFrame({
+            button: button,
+            memberName: memberName,
+            view: view,
+            url: url,
+            spriteFrame: data,
+            complete: complete,
+            bundle: bundle,
+            cache: cache,
+            isAtlas : isAtlas
+        });
+    }
     if (url) {
         if (typeof url == "string") {
             if (dir) {
                 App.cache.getCache(dir, cc.SpriteFrame, bundle, true).then(([cache, dirAsset]) => {
-                    let __bundle = App.bundleManager.getBundle(bundle);
-                    let spriteFrame: cc.SpriteFrame = __bundle.get(`${dir}/${url}`, cc.SpriteFrame);
-                    if (dirAsset) {
-
-                    } else {
-                        Log.w(`未加载资源${dir}`);
-                    }
-                    _setButtonSpriteFrame({
-                        button: button,
-                        memberName: memberName,
-                        view: view,
-                        url: dir,
-                        spriteFrame: spriteFrame,
-                        complete: complete,
-                        bundle: bundle,
-                        dirAsset: dirAsset,
-                        cache: cache,
-                    });
+                    onComplete([cache,getAsset(dir,url,bundle,cc.SpriteFrame),dir,false]);
                 })
                 return;
             }
             App.cache.getCacheByAsync(url, cc.SpriteFrame, bundle).then(([cache, spriteFrame]) => {
-                _setButtonSpriteFrame({
-                    button: button,
-                    memberName: memberName,
-                    view: view,
-                    url: url,
-                    spriteFrame: spriteFrame,
-                    complete: complete,
-                    bundle: bundle,
-                    cache: cache,
-                });
+                onComplete([cache,spriteFrame,url,false]);
             });
         } else {
             let urls = url.urls;
@@ -257,51 +243,18 @@ function _setButtonWithType(
                         for (let i = 0; i < urls.length; i++) {
                             let atlas: cc.SpriteAtlas = __bundle.get(`${dir}/${urls[i]}`, cc.SpriteAtlas);
                             if (atlas && atlas.getSpriteFrame(key)) {
-                                _setButtonSpriteFrame({
-                                    button: button,
-                                    memberName: memberName,
-                                    view: view,
-                                    url: dir,
-                                    spriteFrame: atlas.getSpriteFrame(key),
-                                    complete: complete,
-                                    bundle: bundle,
-                                    isAtlas: true,
-                                    dirAsset: data,
-                                    cache: cache,
-                                });
+                                onComplete([cache,atlas.getSpriteFrame(key),dir,true]);
                                 isSuccess = true;
                                 break;
                             }
                         }
                         if (!isSuccess) {
                             Log.w(`加载的资源中未找到:${bundle}/${dir}/${url}`);
-                            _setButtonSpriteFrame({
-                                button: button,
-                                memberName: memberName,
-                                view: view,
-                                url: dir,
-                                spriteFrame: null,
-                                complete: complete,
-                                bundle: bundle,
-                                isAtlas: true,
-                                dirAsset: null,
-                                cache: null,
-                            });
+                            onComplete([null,null,dir,true]);
                         }
                     } else {
                         Log.w(`未加载资源${dir}`);
-                        _setButtonSpriteFrame({
-                            button: button,
-                            memberName: memberName,
-                            view: view,
-                            url: dir,
-                            spriteFrame: null,
-                            complete: complete,
-                            bundle: bundle,
-                            isAtlas: true,
-                            dirAsset: null,
-                            cache: null,
-                        });
+                        onComplete([null,null,dir,true]);
                     }
                 })
                 return;
@@ -311,17 +264,7 @@ function _setButtonWithType(
                 if (data && data.isTryReload) {
                     //来到这里面，程序已经崩溃，无意义在处理
                 } else {
-                    _setButtonSpriteFrame({
-                        button: button,
-                        memberName: memberName,
-                        view: view,
-                        url: data.url,
-                        spriteFrame: data.spriteFrame,
-                        complete: complete,
-                        bundle: bundle,
-                        isAtlas: true,
-                        cache: data.cache,
-                    });
+                    onComplete([data.cache,data.spriteFrame,data.url,true]);
                 }
             });
         }
@@ -582,9 +525,7 @@ export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay,
 
     let onAtlasComplete = ([atlasCache, atlas, asset]: [Resource.Cache, dragonBones.DragonBonesAtlasAsset, dragonBones.DragonBonesAsset]) => {
         if (atlas) {
-            if (cc.sys.isBrowser) {
-                addExtraLoadResource(config.view, atlasCache);
-            }
+            addExtraLoadResource(config.view, atlasCache);
             comp.dragonAsset = asset;
             comp.dragonAtlasAsset = atlas;
             if (config.complete) {

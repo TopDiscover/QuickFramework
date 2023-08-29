@@ -1,7 +1,7 @@
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
-    createNodeWithPrefab, getBundle, _loadDirRes, _loadRes, loadDragonDisplay
+    createNodeWithPrefab, getBundle, _loadDirRes, _loadRes, loadDragonDisplay, getAsset
 } from "./CocosUtils";
 import { Resource } from "../core/asset/Resource";
 import { Macro } from "../defines/Macros";
@@ -111,36 +111,28 @@ cc.Sprite.prototype.loadImage = function (config) {
     let complete = config.complete;
     let bundle = getBundle(config);
 
+    let onComplete = ([cache,data,url,isAtlas]:[Resource.Cache,cc.SpriteFrame,string,boolean])=>{
+        setSpriteSpriteFrame({
+            view: view,
+            url: url,
+            sprite: me,
+            spriteFrame: data,
+            complete: complete,
+            bundle: bundle,
+            cache: cache,
+            isAtlas : isAtlas,
+        });
+    }
+
     if (typeof url == "string") {
         if (config.dir) {
-            App.cache.getCache(config.dir, cc.SpriteFrame, bundle, true).then(([cache, dirAsset]) => {
-                let __bundle = App.bundleManager.getBundle(bundle);
-                let spriteframe: cc.SpriteFrame = __bundle.get(`${config.dir}/${url}`, cc.SpriteFrame);
-                if (!dirAsset) {
-                    Log.e(`未加载资源${config.dir}`);
-                }
-                setSpriteSpriteFrame({
-                    view: view,
-                    url: config.dir,
-                    sprite: me,
-                    spriteFrame: spriteframe,
-                    complete: complete,
-                    bundle: bundle,
-                    cache: cache,
-                });
+            App.cache.getCache(config.dir, cc.SpriteFrame, bundle, true).then(([cache, data]) => {
+                onComplete([cache,getAsset(config.dir,url as string,bundle,cc.SpriteFrame),config.dir,false]);
             })
             return;
         }
         App.cache.getCacheByAsync(url, cc.SpriteFrame, bundle).then(([cache, spriteFrame]) => {
-            setSpriteSpriteFrame({
-                view: view,
-                url: url as string,
-                sprite: me,
-                spriteFrame: spriteFrame,
-                complete: complete,
-                bundle: bundle,
-                cache: cache,
-            });
+            onComplete([cache,spriteFrame,url as string,false]);
         });
     } else {
         let urls = url.urls;
@@ -154,45 +146,18 @@ cc.Sprite.prototype.loadImage = function (config) {
                         let atlas: cc.SpriteAtlas = __bundle.get(`${config.dir}/${urls[i]}`, cc.SpriteAtlas);
                         if (atlas && atlas.getSpriteFrame(key)) {
                             addExtraLoadResource(view, cache);
-                            setSpriteSpriteFrame({
-                                view: view,
-                                url: config.dir,
-                                sprite: me,
-                                spriteFrame: atlas.getSpriteFrame(key),
-                                complete: complete,
-                                bundle: bundle,
-                                isAtlas: true,
-                                cache: cache,
-                            });
+                            onComplete([cache,atlas.getSpriteFrame(key),config.dir,true]);
                             isSuccess = true;
                             break;
                         }
                     }
                     if (!isSuccess) {
                         Log.w(`加载的资源中未找到:${bundle}/${config.dir}/${url}`);
-                        setSpriteSpriteFrame({
-                            view: view,
-                            url: config.dir,
-                            sprite: me,
-                            spriteFrame: null,
-                            complete: complete,
-                            bundle: bundle,
-                            isAtlas: true,
-                            cache: null,
-                        });
+                        onComplete([null,null,config.dir,true]);
                     }
                 } else {
                     Log.w(`未加载资源${config.dir}`);
-                    setSpriteSpriteFrame({
-                        view: view,
-                        url: config.dir,
-                        sprite: me,
-                        spriteFrame: null,
-                        complete: complete,
-                        bundle: bundle,
-                        isAtlas: true,
-                        cache: null,
-                    });
+                    onComplete([null,null,config.dir,true]);
                 }
             })
             return;
@@ -202,16 +167,7 @@ cc.Sprite.prototype.loadImage = function (config) {
             if (data && data.isTryReload) {
                 //来到这里面程序已经崩溃了，无意义在处理了
             } else {
-                setSpriteSpriteFrame({
-                    view: view,
-                    url: data.url,
-                    sprite: me,
-                    spriteFrame: data.spriteFrame,
-                    complete: complete,
-                    bundle: bundle,
-                    isAtlas: true,
-                    cache: data.cache,
-                });
+                onComplete([data.cache,data.spriteFrame,data.url,true]);
             }
         });
     }
@@ -268,31 +224,23 @@ sp.Skeleton.prototype.loadSkeleton = function (config) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
-    if (config.dir) {
-        App.cache.getCache(config.dir, sp.SkeletonData, bundle, true).then(([cache, dirAsset]) => {
-            let __bundle = App.bundleManager.getBundle(bundle);
-            let data: sp.SkeletonData = __bundle.get(`${config.dir}/${url}`, sp.SkeletonData);
-            if (!dirAsset) {
-                Log.w(`未加载资源${config.dir}`);
-            }
-            config.url = config.dir;
-            setSkeletonSkeletonData({
-                component: me,
-                config: config,
-                data: data,
-                // dirAsset: dirAsset,
-                cache: cache,
-            });
-        })
-        return;
-    }
-    App.cache.getCacheByAsync(url, sp.SkeletonData, bundle).then(([cache, data]) => {
+    let onComplete = ([cache,data]:[Resource.Cache,sp.SkeletonData])=>{
         setSkeletonSkeletonData({
             component: me,
             config: config,
             data: data,
             cache: cache,
         });
+    }
+    if (config.dir) {
+        App.cache.getCache(config.dir, sp.SkeletonData, bundle, true).then(([cache, dirAsset]) => {
+            config.url = config.dir;
+            onComplete([cache,getAsset(config.dir,url,bundle,sp.SkeletonData)]);
+        })
+        return;
+    }
+    App.cache.getCacheByAsync(url, sp.SkeletonData, bundle).then(([cache, data]) => {
+        onComplete([cache,data]);
     });
 }
 
@@ -328,13 +276,8 @@ cc.ParticleSystem.prototype.loadFile = function (config) {
     let bundle = getBundle(config);
     if (config.dir) {
         App.cache.getCache(config.dir, cc.ParticleAsset, bundle, true).then(([cache, dirAsset]) => {
-            let __bundle = App.bundleManager.getBundle(bundle);
-            let data: cc.ParticleAsset = __bundle.get(`${config.dir}/${url}`, cc.ParticleAsset);
-            if (!dirAsset) {
-                Log.e(`未加载资源${config.dir}`);
-            }
             config.url = config.dir;
-            setParticleSystemFile(me, config, data, cache);
+            setParticleSystemFile(me, config, getAsset(config.dir,url,bundle,cc.ParticleAsset), cache);
         })
         return;
     }
@@ -366,13 +309,8 @@ cc.Label.prototype.loadFont = function (config) {
     let bundle = getBundle(config);
     if (config.dir) {
         App.cache.getCache(config.dir, cc.Font, bundle, true).then(([cache, dirAsset]) => {
-            let __bundle = App.bundleManager.getBundle(bundle);
-            let fontData: cc.Font = __bundle.get(`${config.dir}/${config.font}`, cc.Font);
-            if (!dirAsset) {
-                Log.e(`未加载资源${config.dir}`);
-            }
             config.font = config.dir;
-            setLabelFont(me, config, fontData, cache);
+            setLabelFont(me, config, getAsset(config.dir,config.font,bundle,cc.Font), cache);
         })
         return;
     }
