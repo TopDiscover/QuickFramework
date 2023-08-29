@@ -464,14 +464,17 @@ export function setSkeletonSkeletonData(data: {
  * @description 通过预置体创建Node
  * @param config 配置信息
  */
-export function createNodeWithPrefab(config: { bundle?: BUNDLE_TYPE, url: string, view: any, complete: (node: cc.Node) => void }) {
+export function createNodeWithPrefab(config: { 
+    bundle?: BUNDLE_TYPE, 
+    url: string, 
+    view: any, 
+    complete: (node: cc.Node) => void,
+    dir?: string,
+}) {
 
-    let url = config.url;
-    let bundle = getBundle(config);
-    let cache = App.cache.get(bundle, url, cc.Prefab);
-    App.cache.getCacheByAsync(url, cc.Prefab, bundle).then(([cache, data]) => {
-        if (!cache) {
-            addExtraLoadResource(config.view, cache);
+    let onComplete = ([cache,data] : [Resource.Cache,cc.Prefab])=>{
+        if ( cache ){
+            addExtraLoadResource(config.view,cache);
         }
         if (data && isValidComponent(config.view) && config.complete) {
             let node = cc.instantiate(data);
@@ -479,6 +482,19 @@ export function createNodeWithPrefab(config: { bundle?: BUNDLE_TYPE, url: string
         } else if (isValidComponent(config.view) && config.complete) {
             config.complete(null);
         }
+    }
+    let url = config.url;
+    let bundle = getBundle(config);
+    if ( config.dir ){
+        App.cache.getCache(config.dir,cc.Prefab,bundle,true).then(([cache,data])=>{
+            let __bundle = App.bundleManager.getBundle(bundle);
+            data = __bundle.get(`${config.dir}/${config.url}`, cc.Prefab);
+            onComplete([cache,data]);
+        })
+        return;
+    }
+    App.cache.getCacheByAsync(url, cc.Prefab, bundle).then(([cache, data]) => {
+        onComplete([cache,data]);
     });
 }
 
@@ -524,29 +540,25 @@ export function _loadRes(config: {
     dir?: string,
 }) {
     let bundle = getBundle(config);
-    let cache = App.cache.get(bundle, config.url, config.type);
-    if (config.dir) {
-        let __bundle = App.bundleManager.getBundle(bundle);
-        let asset = __bundle.get(`${config.dir}/${config.url}`, config.type);
-        if (config.onComplete) {
-            config.onComplete(asset);
+    let onComplete = ([cache,data] : [Resource.Cache,cc.Asset])=>{
+        if (cache) {
+            addExtraLoadResource(config.view, cache);
         }
+        if (config.onComplete) {
+            config.onComplete(data);
+        }
+    }
+    if (config.dir) {
+        App.cache.getCache(config.dir, config.type, bundle,true).then(([cache,data])=>{
+            let __bundle = App.bundleManager.getBundle(bundle);
+            data = __bundle.get(`${config.dir}/${config.url}`, config.type);
+            onComplete([cache,data]);
+        })
         return;
     }
-    App.asset.load(
-        bundle,
-        config.url,
-        config.type,
-        config.onProgress,
-        (data) => {
-            if (!cache) {
-                addExtraLoadResource(config.view, data);
-            }
-            if (config.onComplete) {
-                config.onComplete(data ? data.data : null);
-            }
-        }
-    )
+    App.cache.getCacheByAsync(config.url,config.type,bundle).then(([cache,data])=>{
+        onComplete([cache,data])
+    })
 }
 
 export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay,
