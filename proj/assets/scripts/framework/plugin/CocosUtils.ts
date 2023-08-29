@@ -488,19 +488,28 @@ export function _loadDirRes(config: {
     type: typeof cc.Asset,
     view: any,
     onProgress?: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
-    onComplete: (data: Resource.Cache) => void
+    onComplete: (data: Resource.Cache) => void,
+    dir?: string,
 }) {
     let bundle = getBundle(config);
-    let cache = App.cache.get(bundle, config.url, config.type);
+    if ( config.dir ){
+        App.cache.getCache(config.dir,config.type,bundle,true).then(([cache,data])=>{
+            if ( cache ){
+                addExtraLoadResource(config.view,cache);
+            }
+            if( config.onComplete ){
+                config.onComplete(cache);
+            }
+        })
+        return;
+    }
     //这里要做一个防止重复加载操作，以免对加载完成后的引用计数多加次数
-    App.asset.loadDir(bundle, config.url, config.type, config.onProgress, (data) => {
-
-        if (!cache) {
+    App.asset.loadDir(bundle, config.url, config.type, config.onProgress, (cache) => {
+        if (cache) {
             addExtraLoadResource(config.view, cache)
         }
-
         if (config.onComplete) {
-            config.onComplete(data);
+            config.onComplete(cache);
         }
     });
 }
@@ -592,7 +601,6 @@ export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay,
                     if (cc.sys.isBrowser) {
                         addExtraLoadResource(config.view, atlasCache);
                     }
-
                     comp.dragonAsset = asset;
                     comp.dragonAtlasAsset = atlas;
                     if (config.complete) {

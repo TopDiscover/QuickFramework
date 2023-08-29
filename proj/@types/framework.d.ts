@@ -234,6 +234,8 @@ declare function loadDirRes(config: {
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
 	/**@description 加载完成回调 */
 	onComplete: (data: import("../assets/scripts/framework/core/asset/Resource").Resource.Cache) => void
+	/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
+	dir?: string,
 }): void;
 
 /**
