@@ -12,7 +12,6 @@ const LOG_TAG = "[ReleaseManager] : ";
 
 class LazyInfo {
 
-
     private name: string = "";
     constructor(name: string) {
         this.name = name;
@@ -25,6 +24,7 @@ class LazyInfo {
 
         //管理器引用加1
         if (Array.isArray(cache.data)) {
+            cache.refCount++;
             Log.d(`${LOG_TAG}向${this.name}加入待释放目录:${cache.key}`);
             for (let i = 0; i < cache.data.length; i++) {
                 if (cache.data[i]) {
@@ -55,18 +55,18 @@ class LazyInfo {
                         cache.data[i].decRef(false);
                     }
                 }
-                Log.d(`${LOG_TAG}向${this.name}获取待释放目录:${cache.url}`);
+                Log.d(`${LOG_TAG}向${this.name}获取待释放目录:${cache.key}`);
                 this._caches.delete(key);
                 return cache;
             } else {
                 if (cc.isValid(cache.data)) {
                     //获取后删除当前管理器的引用
                     cache.data.decRef(false);
-                    Log.d(`${LOG_TAG}向${this.name}获取待释放资源:${cache.url}`);
+                    Log.d(`${LOG_TAG}向${this.name}获取待释放资源:${cache.key}`);
                     this._caches.delete(key);
                     return cache;
                 } else {
-                    Log.w(`${LOG_TAG}向${this.name}获取待释放资源时，资源${cache.url}已经释放`);
+                    Log.w(`${LOG_TAG}向${this.name}获取待释放资源时，资源${cache.key}已经释放`);
                     this._caches.delete(key);
                     return null;
                 }
@@ -349,12 +349,35 @@ export class ReleaseManager implements ISingleton {
         }
     }
 
-    getRemote(url: string) {
-        return this._remote.get(url);
+    getRemote(url: string, type: typeof cc.Asset) {
+        //返回的是数组
+        let caches: Resource.Cache[] = [];
+        if (type == cc.SpriteFrame) {
+            let spriteFrameCache = this._remote.get(Resource.getKey(url, type));
+            let texture2DCache = this._remote.get(Resource.getKey(url, cc.Texture2D));
+            caches.push(spriteFrameCache);
+            caches.push(texture2DCache);
+        } else if (type == sp.SkeletonData) {
+            let spineAtlas = `${url}.atlas`;
+            let spinePng = `${url}.png`;
+            let spineJson = `${url}.json`;
+            let data = this._remote.get(Resource.getKey(url, type));
+            let pngCache = this._remote.get(Resource.getKey(spinePng, cc.Texture2D));
+            let jsonCache = this._remote.get(Resource.getKey(spineJson, cc.JsonAsset));
+            let atlasCache = this._remote.get(Resource.getKey(spineAtlas, cc.TextAsset));
+            caches.push(data);
+            caches.push(pngCache);
+            caches.push(jsonCache);
+            caches.push(atlasCache);
+        } else {
+            let cache = this._remote.get(Resource.getKey(url, type));
+            caches.push(cache);
+        }
+        return caches;
     }
 
-    releaseRemote(cache: Resource.Cache) {
-        if (App.isLazyRelease) {
+    releaseRemote(cache: Resource.Cache, force: boolean = false) {
+        if (App.isLazyRelease && !force) {
             this._remote.add(cache);
         } else {
             if (cache.data instanceof cc.Asset) {
@@ -396,14 +419,14 @@ export class ReleaseManager implements ISingleton {
                 data.lazyInfo.forEach((value, key, source) => {
                     Log.d(`--------------${key}待释放资源--------------`);
                     value.assets.forEach((info, key, source) => {
-                        info.debug();
+                        Log.d(JSON.stringify(info.debug()));
                     })
                 });
             }
 
             Log.d(`远程待释放资源`);
             data.remote.assets.forEach((info, key, source) => {
-                info.debug();
+                Log.d(JSON.stringify(info.debug()));
             });
 
         } else {

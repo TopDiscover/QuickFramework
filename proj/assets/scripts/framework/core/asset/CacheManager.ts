@@ -43,9 +43,9 @@ class BundleCache {
         let invalidContent: any[] = [];
         caches.forEach((data, key, source) => {
             if (data.isLoaded && data.data) {
-                invalidContent.push(data.debug());
-            } else {
                 content.push(data.debug());
+            } else {
+                invalidContent.push(data.debug());
             }
         });
         if (content.length > 0) {
@@ -83,31 +83,49 @@ class RemoteCaches {
             if (cacheTexture2D) {
                 return cacheSpriteFrame;
             } else {
-                this.remove(url, cc.SpriteFrame);
+                this.remove(url, cc.SpriteFrame, true);
                 return null;
             }
         }
         return null;
     }
-    public setSpriteFrame(url: string, data: any): [Resource.Cache,cc.SpriteFrame] {
+    public makeSpriteFrame(url: string, data: any): [Resource.Cache, cc.SpriteFrame] {
         if (data && data instanceof cc.Texture2D) {
             //同一图片加载两次也会回调到这里，这里如果当前精灵缓存中有，不在重新创建
             let cache = this.getSpriteFrame(url);
             if (cache) {
-                return [cache,<cc.SpriteFrame>(cache.data)];
+                return [cache, <cc.SpriteFrame>(cache.data)];
             }
             cache = new Resource.Cache(url, cc.SpriteFrame, Macro.BUNDLE_REMOTE);
             cache.data = new cc.SpriteFrame(data);
-            data.addRef();
             // cache.data.nativeUrl = url;
             (<any>cache.data)._nativeUrl = url;
             cache.data.name = url;
             cache.isLoaded = true;
             cache.url = url;
             this.set(cache);
-            return [cache,<cc.SpriteFrame>(cache.data)];
+            return [cache, <cc.SpriteFrame>(cache.data)];
         }
-        return [null,null];
+        return [null, null];
+    }
+
+    makeSkeletonData(
+        cache: Resource.Cache,
+        texture2D: cc.Texture2D,
+        json: cc.JsonAsset,
+        atlas: cc.TextAsset,
+        name: string,
+    ) {
+        let asset = new sp.SkeletonData;
+        asset.skeletonJson = json.json;
+        asset.atlasText = atlas.text;
+        asset.textures = [texture2D];
+        let pngName = name + ".png"
+        asset["textureNames"] = [pngName];
+        asset.name = cache.url;
+        cache.data = asset;
+        cache.isLoaded = true;
+        return cache;
     }
 
     public set(data: Resource.Cache) {
@@ -123,7 +141,16 @@ class RemoteCaches {
             } else {
                 cache.retain = cache.retain;
             }
-            (<cc.Asset>cache.data).addRef();
+            this.addRef(cache.url, cache.type);
+            if (cache.type == cc.SpriteFrame) {
+                //贴图
+                this.addRef(cache.url, cc.Texture2D);
+            }
+            if (cache.type == sp.SkeletonData) {
+                this.addRef(`${cache.url}.png`, cc.Texture2D);
+                this.addRef(`${cache.url}.json`, cc.JsonAsset);
+                this.addRef(`${cache.url}.atlas`, cc.TextAsset);
+            }
         }
     }
 
@@ -134,86 +161,56 @@ class RemoteCaches {
                 //常驻内存中
                 return;
             }
-            let data : cc.Asset = cache.data as any;
+            this.remove(cache.url, cache.type);
+        }
+    }
+
+    protected addRef(url: string, type: typeof cc.Asset) {
+        let key = Resource.getKey(url, type);
+        let cache = this.get(key);
+        if (cache) {
+            let data: cc.Asset = cache.data as any;
+            data.addRef();
+        }
+    }
+
+    protected decRef(url: string, type: typeof cc.Asset, force: boolean = false) {
+        let key = Resource.getKey(url, type);
+        let cache = this.get(key);
+        if (cache) {
+            let data: cc.Asset = cache.data as any;
             data.decRef(false);
             if (data.refCount <= 0) {
-                this.remove(cache.url,cache.type);
+                this._caches.delete(key);
+                App.releaseManger.releaseRemote(cache, force);
             }
         }
     }
 
-    public remove(url: string, type: typeof cc.Asset) {
-
+    public remove(url: string, type: typeof cc.Asset, force: boolean = false) {
+        this.decRef(url, type, force);
         if (type == cc.SpriteFrame) {
-            //先删除精灵帧
-            let key = Resource.getKey(url, cc.SpriteFrame);
-            let cache = this.get(key);
-            if (cache) {
-                (<cc.Asset>cache.data).decRef(false);
-                this._caches.delete(key);
-                App.releaseManger.releaseRemote(cache);
-            }
-
-
             //删除贴图
-            key = Resource.getKey(url,cc.Texture2D);
-            cache = this.get(key);
-            if ( cache ){
-                (<cc.Asset>cache.data).decRef(false);
-                this._caches.delete(key);
-                App.releaseManger.releaseRemote(cache);
-            }
-
+            this.decRef(url, cc.Texture2D, force);
         }
-
-        // let cache = this._caches.has(url) ? this._caches.get(url) : null;
-        // if (cache && cache.data instanceof sp.SkeletonData) {
-        //     //这里面需要删除加载进去的三个文件缓存 
-        //     this.remove(`${cache.url}.atlas`);
-        //     this.remove(`${cache.url}.png`);
-        //     this.remove(`${cache.url}.json`);
-        // }
-        // if (cache && cache.data instanceof cc.Asset) {
-        //     if (CC_DEBUG) Log.d(`释放加载的本地远程资源:${cache.url}`);
-        //     cache.data.decRef(false);
-        //     cache.data = cache.data;
-        //     App.releaseManger.releaseRemote(cache);
-        // }
+        if (type == sp.SkeletonData) {
+            //删除三个文件缓存
+            this.decRef(`${url}.png`, cc.Texture2D, force);
+            this.decRef(`${url}.json`, cc.JsonAsset, force);
+            this.decRef(`${url}.atlas`, cc.TextAsset, force);
+        }
     }
 
     debug() {
-        let spCaches = this._spriteFrameCaches;
         let caches = this._caches;
-        let infos = this._resMap;
         Log.d(`---- 远程加载资源缓存信息 ----`);
-
         let content: any[] = [];
         let invalidContent: any[] = [];
-        spCaches.forEach((data, key, source) => {
-            if (data.isLoaded && ((data.data && !cc.isValid(data.data)) || !data.data)) {
-                invalidContent.push(data.debug());
-            } else {
-                content.push(data.debug());
-            }
-        });
-
-        if (content.length > 0) {
-            Log.d(`----------------有效 spriteFrame 缓存信息------------------`);
-            Log.d(JSON.stringify(content));
-        }
-        if (invalidContent.length > 0) {
-            Log.d(`----------------无效 spriteFrame 缓存信息------------------`);
-            Log.d(JSON.stringify(invalidContent));
-        }
-
-
-        content = [];
-        invalidContent = [];
         caches.forEach((data, key, source) => {
-            if (data.isLoaded && data.data && !cc.isValid(data.data)) {
-                invalidContent.push(data.debug());
-            } else {
+            if (data.isLoaded && data.data && cc.isValid(data.data)) {
                 content.push(data.debug());
+            } else {
+                invalidContent.push(data.debug());
             }
         });
         if (content.length > 0) {
@@ -223,16 +220,6 @@ class RemoteCaches {
         if (invalidContent.length > 0) {
             Log.d(`----------------无效缓存信息------------------`);
             Log.d(JSON.stringify(invalidContent));
-        }
-
-        if (infos.size > 0) {
-            Log.d(`----------------当前资源引用计数信息------------------`);
-            content = [];
-            infos.forEach((value, key) => {
-                let item = { url: key, data: { refCount: value.refCount, url: value.url, retain: value.retain } };
-                content.push(item);
-            });
-            Log.d(JSON.stringify(content));
         }
     }
 }
@@ -319,12 +306,11 @@ export class CacheManager implements ISingleton {
         if (cache && cache.data) {
 
             if (Array.isArray(cache.data)) {
+                cache.refCount--;
                 for (let i = 0; i < cache.data.length; i++) {
-                    let result = this.decRef(cache, cache.data[i], bundle);
-                    if (!result) {
-                        isSuccess = false;
-                    }
+                    this.decRef(cache, cache.data[i], bundle);
                 }
+                isSuccess = cache.refCount <= 0;
                 if (isSuccess) {
                     if (App.isLazyRelease) {
                         CC_DEBUG && Log.d(`${this.module} 成功释放资源目录,将释放目录加入到释放队列中 bundle : ${cache.bundle} : ${cache.bundle}.${cache.url}`);

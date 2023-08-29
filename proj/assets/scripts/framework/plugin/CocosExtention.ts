@@ -53,7 +53,7 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
     }
     me.loadUrl = config.url;
     let defaultBundle = getBundle({ bundle: config.defaultBundle, view: config.view })
-    App.asset.remote.loadImage(config.url, config.isNeedCache).then(([cache,data]) => {
+    App.asset.remote.loadImage(config.url, config.isNeedCache).then(([cache, data]) => {
         if (me.loadUrl == data?.nativeUrl) {
             //防止时间调用加载不同url时，以当前记录的url为最终
             if (data) {
@@ -66,13 +66,13 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
                     bundle: Macro.BUNDLE_REMOTE,
                     resourceType: Resource.Type.Remote,
                     retain: isRetain,
-                    cache : cache,
+                    cache: cache,
                 });
             } else {
                 if (config.defaultSpriteFrame) {
                     if (typeof config.defaultSpriteFrame == "string") {
                         //动态加载了一张图片，把资源通知管理器
-                        App.cache.getCacheByAsync(config.defaultSpriteFrame, cc.SpriteFrame, defaultBundle).then(([cache,spriteFrame]) => {
+                        App.cache.getCacheByAsync(config.defaultSpriteFrame, cc.SpriteFrame, defaultBundle).then(([cache, spriteFrame]) => {
                             setSpriteSpriteFrame({
                                 view: config.view,
                                 url: config.defaultSpriteFrame,
@@ -80,7 +80,7 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
                                 spriteFrame: spriteFrame,
                                 complete: config.complete,
                                 bundle: defaultBundle,
-                                cache : cache,
+                                cache: cache,
                             });
                         });
                     }
@@ -113,7 +113,7 @@ cc.Sprite.prototype.loadImage = function (config) {
 
     if (typeof url == "string") {
         if (config.dir) {
-            App.cache.getCache(config.dir, cc.SpriteFrame, bundle, true).then(([cache,dirAsset]) => {
+            App.cache.getCache(config.dir, cc.SpriteFrame, bundle, true).then(([cache, dirAsset]) => {
                 let __bundle = App.bundleManager.getBundle(bundle);
                 let spriteframe: cc.SpriteFrame = __bundle.get(`${config.dir}/${url}`, cc.SpriteFrame);
                 if (!dirAsset) {
@@ -126,13 +126,12 @@ cc.Sprite.prototype.loadImage = function (config) {
                     spriteFrame: spriteframe,
                     complete: complete,
                     bundle: bundle,
-                    dirAsset: dirAsset,
-                    cache : cache,
+                    cache: cache,
                 });
             })
             return;
         }
-        App.cache.getCacheByAsync(url, cc.SpriteFrame, bundle).then(([cache,spriteFrame]) => {
+        App.cache.getCacheByAsync(url, cc.SpriteFrame, bundle).then(([cache, spriteFrame]) => {
             setSpriteSpriteFrame({
                 view: view,
                 url: url as string,
@@ -140,14 +139,14 @@ cc.Sprite.prototype.loadImage = function (config) {
                 spriteFrame: spriteFrame,
                 complete: complete,
                 bundle: bundle,
-                cache : cache,
+                cache: cache,
             });
         });
     } else {
         let urls = url.urls;
         let key = url.key;
         if (config.dir) {
-            App.cache.getCache(config.dir, cc.SpriteAtlas, bundle, true).then(([cache,data]) => {
+            App.cache.getCache(config.dir, cc.SpriteAtlas, bundle, true).then(([cache, data]) => {
                 if (data) {
                     let __bundle = App.bundleManager.getBundle(bundle);
                     let isSuccess = false;
@@ -163,8 +162,7 @@ cc.Sprite.prototype.loadImage = function (config) {
                                 complete: complete,
                                 bundle: bundle,
                                 isAtlas: true,
-                                dirAsset: data,
-                                cache : cache,
+                                cache: cache,
                             });
                             isSuccess = true;
                             break;
@@ -180,8 +178,7 @@ cc.Sprite.prototype.loadImage = function (config) {
                             complete: complete,
                             bundle: bundle,
                             isAtlas: true,
-                            dirAsset: null,
-                            cache : null,
+                            cache: null,
                         });
                     }
                 } else {
@@ -194,8 +191,7 @@ cc.Sprite.prototype.loadImage = function (config) {
                         complete: complete,
                         bundle: bundle,
                         isAtlas: true,
-                        dirAsset: null,
-                        cache : null,
+                        cache: null,
                     });
                 }
             })
@@ -214,7 +210,7 @@ cc.Sprite.prototype.loadImage = function (config) {
                     complete: complete,
                     bundle: bundle,
                     isAtlas: true,
-                    cache : data.cache,
+                    cache: data.cache,
                 });
             }
         });
@@ -246,13 +242,13 @@ sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
     if (config.isNeedCache == undefined || config.isNeedCache == null) {
         config.isNeedCache = true;
     }
-    App.asset.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then(([cache,data]) => {
+    App.asset.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then(([cache, data]) => {
         setSkeletonSkeletonData({
             component: me,
             config: config,
             data: data,
             resourceType: Resource.Type.Remote,
-            cache : cache,
+            cache: cache,
         });
     });
 }
@@ -273,7 +269,7 @@ sp.Skeleton.prototype.loadSkeleton = function (config) {
     let url = config.url;
     let bundle = getBundle(config);
     if (config.dir) {
-        App.cache.getCache(config.dir, sp.SkeletonData, bundle, true).then(([cache,dirAsset]) => {
+        App.cache.getCache(config.dir, sp.SkeletonData, bundle, true).then(([cache, dirAsset]) => {
             let __bundle = App.bundleManager.getBundle(bundle);
             let data: sp.SkeletonData = __bundle.get(`${config.dir}/${url}`, sp.SkeletonData);
             if (!dirAsset) {
@@ -285,17 +281,17 @@ sp.Skeleton.prototype.loadSkeleton = function (config) {
                 config: config,
                 data: data,
                 // dirAsset: dirAsset,
-                cache : cache,
+                cache: cache,
             });
         })
         return;
     }
-    App.cache.getCacheByAsync(url, sp.SkeletonData, bundle).then(([cache,data]) => {
+    App.cache.getCacheByAsync(url, sp.SkeletonData, bundle).then(([cache, data]) => {
         setSkeletonSkeletonData({
             component: me,
             config: config,
             data: data,
-            cache : cache,
+            cache: cache,
         });
     });
 }
@@ -331,7 +327,7 @@ cc.ParticleSystem.prototype.loadFile = function (config) {
     let url = config.url;
     let bundle = getBundle(config);
     if (config.dir) {
-        App.cache.getCache(config.dir, cc.ParticleAsset, bundle, true).then(([cache,dirAsset]) => {
+        App.cache.getCache(config.dir, cc.ParticleAsset, bundle, true).then(([cache, dirAsset]) => {
             let __bundle = App.bundleManager.getBundle(bundle);
             let data: cc.ParticleAsset = __bundle.get(`${config.dir}/${url}`, cc.ParticleAsset);
             if (!dirAsset) {
@@ -342,8 +338,8 @@ cc.ParticleSystem.prototype.loadFile = function (config) {
         })
         return;
     }
-    App.cache.getCacheByAsync(url, cc.ParticleAsset, bundle).then(([cache,data]) => {
-        setParticleSystemFile(me, config, data,cache);
+    App.cache.getCacheByAsync(url, cc.ParticleAsset, bundle).then(([cache, data]) => {
+        setParticleSystemFile(me, config, data, cache);
     });
 }
 
@@ -369,7 +365,7 @@ cc.Label.prototype.loadFont = function (config) {
     let me = this;
     let bundle = getBundle(config);
     if (config.dir) {
-        App.cache.getCache(config.dir, cc.Font, bundle, true).then(([cache,dirAsset]) => {
+        App.cache.getCache(config.dir, cc.Font, bundle, true).then(([cache, dirAsset]) => {
             let __bundle = App.bundleManager.getBundle(bundle);
             let fontData: cc.Font = __bundle.get(`${config.dir}/${config.font}`, cc.Font);
             if (!dirAsset) {
@@ -380,8 +376,8 @@ cc.Label.prototype.loadFont = function (config) {
         })
         return;
     }
-    App.cache.getCacheByAsync(font, cc.Font, bundle).then(([cache,data]) => {
-        setLabelFont(me, config, data,cache);
+    App.cache.getCacheByAsync(font, cc.Font, bundle).then(([cache, data]) => {
+        setLabelFont(me, config, data, cache);
     });
 }
 

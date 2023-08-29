@@ -172,7 +172,7 @@ export default class ResourceLoader {
         if (data && (Array.isArray(data.data) || data.data instanceof cc.Asset)) {
             //排除掉界面管理器
             App.asset.retainAsset(data);
-            this._loadedResource.set(data.key, data);
+            this._loadedResource.set(`${data.bundle}/${data.key}`, data);
         }
 
         this.checkLoadResourceComplete();

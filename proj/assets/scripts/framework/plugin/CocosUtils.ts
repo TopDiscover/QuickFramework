@@ -69,9 +69,9 @@ export function setSpriteSpriteFrame(data: {
     resourceType?: Resource.Type,
     retain?: boolean,
     isAtlas?: boolean,
-    dirAsset?: cc.Asset[] | cc.Asset,
-    cache : Resource.Cache,
+    cache: Resource.Cache,
 }) {
+
     if (data.resourceType == undefined || data.resourceType == null) {
         data.resourceType = Resource.Type.Local;
     }
@@ -80,6 +80,11 @@ export function setSpriteSpriteFrame(data: {
     }
     if (data.isAtlas == undefined || data.isAtlas == null) {
         data.isAtlas = false;
+    }
+    if (!data.cache) {
+        Log.e(`加载${data.url}图片错误`);
+        if (data.complete && isValidComponent(data.sprite)) data.complete(null);
+        return;
     }
     if (!data.isAtlas) {
         if (data.resourceType == Resource.Type.Remote) {
@@ -118,7 +123,7 @@ interface setSpriteFrameParam {
     bundle: BUNDLE_TYPE,
     isAtlas?: boolean,
     dirAsset?: cc.Asset | cc.Asset[],
-    cache : Resource.Cache,
+    cache: Resource.Cache,
 }
 
 /**
@@ -133,6 +138,10 @@ interface setSpriteFrameParam {
  */
 function _setSpriteFrame(data: setSpriteFrameParam) {
 
+    if (!data.cache) {
+        if (data.complete && isValidComponent(data.button)) data.complete(data.memberName, null);
+        return;
+    }
     if (!data.isAtlas) {
         addExtraLoadResource(data.view, data.cache);
     }
@@ -198,7 +207,7 @@ function _setButtonWithType(
     if (url) {
         if (typeof url == "string") {
             if (dir) {
-                App.cache.getCache(dir, cc.SpriteFrame, bundle, true).then(([cache,dirAsset]) => {
+                App.cache.getCache(dir, cc.SpriteFrame, bundle, true).then(([cache, dirAsset]) => {
                     let __bundle = App.bundleManager.getBundle(bundle);
                     let spriteFrame: cc.SpriteFrame = __bundle.get(`${dir}/${url}`, cc.SpriteFrame);
                     if (dirAsset) {
@@ -215,12 +224,12 @@ function _setButtonWithType(
                         complete: complete,
                         bundle: bundle,
                         dirAsset: dirAsset,
-                        cache : cache,
+                        cache: cache,
                     });
                 })
                 return;
             }
-            App.cache.getCacheByAsync(url, cc.SpriteFrame, bundle).then(([cache,spriteFrame]) => {
+            App.cache.getCacheByAsync(url, cc.SpriteFrame, bundle).then(([cache, spriteFrame]) => {
                 _setButtonSpriteFrame({
                     button: button,
                     memberName: memberName,
@@ -229,14 +238,14 @@ function _setButtonWithType(
                     spriteFrame: spriteFrame,
                     complete: complete,
                     bundle: bundle,
-                    cache : cache,
+                    cache: cache,
                 });
             });
         } else {
             let urls = url.urls;
             let key = url.key;
             if (dir) {
-                App.cache.getCache(dir, cc.SpriteAtlas, bundle, true).then(([cache,data]) => {
+                App.cache.getCache(dir, cc.SpriteAtlas, bundle, true).then(([cache, data]) => {
                     if (data) {
                         let __bundle = App.bundleManager.getBundle(bundle);
                         let isSuccess = false;
@@ -253,7 +262,7 @@ function _setButtonWithType(
                                     bundle: bundle,
                                     isAtlas: true,
                                     dirAsset: data,
-                                    cache : cache,
+                                    cache: cache,
                                 });
                                 isSuccess = true;
                                 break;
@@ -271,7 +280,7 @@ function _setButtonWithType(
                                 bundle: bundle,
                                 isAtlas: true,
                                 dirAsset: null,
-                                cache : null,
+                                cache: null,
                             });
                         }
                     } else {
@@ -286,7 +295,7 @@ function _setButtonWithType(
                             bundle: bundle,
                             isAtlas: true,
                             dirAsset: null,
-                            cache : null,
+                            cache: null,
                         });
                     }
                 })
@@ -306,7 +315,7 @@ function _setButtonWithType(
                         complete: complete,
                         bundle: bundle,
                         isAtlas: true,
-                        cache : data.cache,
+                        cache: data.cache,
                     });
                 }
             });
@@ -348,6 +357,11 @@ export function setParticleSystemFile(
     data: cc.ParticleAsset,
     cache: Resource.Cache,
 ) {
+    if (!cache) {
+        //完成回调
+        if (config.complete && isValidComponent(component)) config.complete(null);
+        return;
+    }
     addExtraLoadResource(config.view, cache);
     if (data && isValidComponent(component)) {
         let oldFile = component.file;
@@ -379,6 +393,11 @@ export function setLabelFont(
     config: { font: string, view: any, complete?: (font: cc.Font) => void, bundle?: BUNDLE_TYPE },
     data: cc.Font,
     cache: Resource.Cache) {
+    if (!cache) {
+        //完成回调
+        if (config.complete && isValidComponent(component)) config.complete(null);
+        return;
+    }
     addExtraLoadResource(config.view, cache);
     if (data && isValidComponent(component)) {
         let oldFont = component.font;
@@ -410,19 +429,12 @@ export function setSkeletonSkeletonData(data: {
     resourceType?: Resource.Type,
     cache: Resource.Cache,
 }) {
+    if (!data.cache) {
+        if (data.config.complete && isValidComponent(data.component)) data.config.complete(null);
+        return;
+    }
     if (data.resourceType == undefined || data.resourceType == null) {
         data.resourceType = Resource.Type.Local;
-    }
-
-    let url = "";
-    let retain = false;
-    if (data.resourceType == Resource.Type.Remote) {
-        let realConfig: { view: any, path: string, name: string, complete: (data: sp.SkeletonData) => void, isNeedCache?: boolean, retain?: boolean } = <any>data.config;
-        url = `${realConfig.path}/${realConfig.name}`;
-        retain = realConfig.retain ? true : false;
-    } else {
-        let realConfig: { url: string, view: any, complete: (data: sp.SkeletonData) => void } = <any>data.config;
-        url = realConfig.url;
     }
     if (data.resourceType == Resource.Type.Remote) {
         addRemoteLoadResource(data.config.view, data.cache);
@@ -440,7 +452,7 @@ export function setSkeletonSkeletonData(data: {
             data.component.skeletonData = temp;
             if (data.config.complete) data.config.complete(null);
             //把数据放到全局的垃圾回收中 //好像有点不行，
-            Log.e(`${url} : ${err ? err : "replace skeletonData error"}`);
+            Log.e(`${data.cache.key} : ${err ? err : "replace skeletonData error"}`);
         }
     } else {
         //完成回调
@@ -457,7 +469,7 @@ export function createNodeWithPrefab(config: { bundle?: BUNDLE_TYPE, url: string
     let url = config.url;
     let bundle = getBundle(config);
     let cache = App.cache.get(bundle, url, cc.Prefab);
-    App.cache.getCacheByAsync(url, cc.Prefab, bundle).then(([cache,data]) => {
+    App.cache.getCacheByAsync(url, cc.Prefab, bundle).then(([cache, data]) => {
         if (!cache) {
             addExtraLoadResource(config.view, cache);
         }
@@ -500,11 +512,11 @@ export function _loadRes(config: {
     onProgress?: (finish: number, total: number, item: cc.AssetManager.RequestItem) => void,
     onComplete: (data: any) => void,
     view: any,
-    dir?:string,
+    dir?: string,
 }) {
     let bundle = getBundle(config);
     let cache = App.cache.get(bundle, config.url, config.type);
-    if ( config.dir ){
+    if (config.dir) {
         let __bundle = App.bundleManager.getBundle(bundle);
         let asset = __bundle.get(`${config.dir}/${config.url}`, config.type);
         if (config.onComplete) {
@@ -539,12 +551,12 @@ export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay,
     }) {
     let bundle = getBundle(config);
     if (config.dir) {
-        App.cache.getCache(config.dir, dragonBones.DragonBonesAsset, bundle, true).then(([assetCache,asset]) => {
+        App.cache.getCache(config.dir, dragonBones.DragonBonesAsset, bundle, true).then(([assetCache, asset]) => {
             if (asset) {
                 let __bundle = App.bundleManager.getBundle(bundle);
                 asset = __bundle.get(`${config.dir}/${config.assetUrl}`, dragonBones.DragonBonesAsset);
                 addExtraLoadResource(config.view, assetCache);
-                App.cache.getCache(config.dir, dragonBones.DragonBonesAtlasAsset, bundle, true).then(([atlasCache,atlas]) => {
+                App.cache.getCache(config.dir, dragonBones.DragonBonesAtlasAsset, bundle, true).then(([atlasCache, atlas]) => {
                     if (atlas) {
                         let __bundle = App.bundleManager.getBundle(bundle);
                         atlas = __bundle.get(`${config.dir}/${config.atlasUrl}`, dragonBones.DragonBonesAtlasAsset);
@@ -572,10 +584,10 @@ export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay,
         })
         return;
     }
-    App.cache.getCacheByAsync(config.assetUrl, dragonBones.DragonBonesAsset, bundle).then(([assetCache,asset]) => {
+    App.cache.getCacheByAsync(config.assetUrl, dragonBones.DragonBonesAsset, bundle).then(([assetCache, asset]) => {
         if (asset) {
             addExtraLoadResource(config.view, assetCache);
-            App.cache.getCacheByAsync(config.atlasUrl, dragonBones.DragonBonesAtlasAsset, bundle).then(([atlasCache,atlas]) => {
+            App.cache.getCacheByAsync(config.atlasUrl, dragonBones.DragonBonesAtlasAsset, bundle).then(([atlasCache, atlas]) => {
                 if (atlas) {
                     if (cc.sys.isBrowser) {
                         addExtraLoadResource(config.view, atlasCache);

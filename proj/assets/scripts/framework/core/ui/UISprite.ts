@@ -6,8 +6,6 @@
  */
 
 import { Macro } from "../../defines/Macros";
-import { addExtraLoadResource, setSpriteSpriteFrame } from "../../plugin/CocosUtils";
-import { Resource } from "../asset/Resource";
 
 const { ccclass, property, menu } = cc._decorator;
 
@@ -200,74 +198,35 @@ export default class UISprite extends cc.Sprite {
                 return;
             }
 
-            let url = App.getLanguage(this.language as any,this.params, realBundle)
+            let url = App.getLanguage(this.language as any, this.params, realBundle)
             if (!url) {
                 return;
             }
             let view = await App.uiManager.getView(this.user);
             if (this.isRemote) {
                 // Log.d("加载远程图片")
-                App.asset.remote.loadImage(url, true).then(([cache,data]) => {
-                    if (data) {
-                        setSpriteSpriteFrame({
-                            cache : cache,
-                            view : view,
-                            url : url,
-                            sprite : this,
-                            spriteFrame : data,
-                            complete :(data)=>{
-                                if (this.onLoadComplete) {
-                                    this.onLoadComplete(data);
-                                }
-                            },
-                            bundle : Macro.BUNDLE_REMOTE,
-                            resourceType : Resource.Type.Remote,
-                        });
-                    }
-                });
+                this.loadRemoteImage({
+                    url: url,
+                    view: view,
+                    isNeedCache: true,
+                })
             } else {
                 if (this.languageAtlas.length > 0) {
                     // Log.d("设置图集",this.languageAtlas);
                     //在纹理图集中查找
-                    let urls = App.getLanguage(this.languageAtlas as any,[], realBundle)
-                    App.cache.getSpriteFrameByAsync(urls, url, view, addExtraLoadResource, realBundle).then((data) => {
-                        if (data && data.isTryReload) {
-                            //来到这里面程序已经崩溃了，无意义在处理了
-                        } else {
-                            setSpriteSpriteFrame({
-                                view : view,
-                                url : data.url,
-                                sprite : this,
-                                spriteFrame : data.spriteFrame,
-                                complete : (data)=>{
-                                    if (this.onLoadComplete) {
-                                        this.onLoadComplete(data);
-                                    }
-                                },
-                                bundle : realBundle,
-                                isAtlas : true,
-                                cache : data.cache,
-                            });
-                        }
-                    });
+                    let urls = App.getLanguage(this.languageAtlas as any, [], realBundle)
+                    this.loadImage({
+                        url: { urls: urls, key: url },
+                        view: view,
+                        bundle: realBundle,
+                    })
                 } else {
                     // Log.d(`资源路径：${realBundle}/${url}`);
-                    App.cache.getCacheByAsync(url, cc.SpriteFrame, realBundle)
-                        .then(([cache,spriteFrame]) => {
-                            setSpriteSpriteFrame({
-                                view : view,
-                                url : url,
-                                sprite : this,
-                                spriteFrame : spriteFrame,
-                                complete : (data)=>{
-                                    if (this.onLoadComplete) {
-                                        this.onLoadComplete(data);
-                                    }
-                                },
-                                bundle : realBundle,
-                                cache : cache,
-                            });
-                        })
+                    this.loadImage({
+                        url: url,
+                        view: view,
+                        bundle: realBundle,
+                    })
                 }
             }
         }

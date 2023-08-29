@@ -50,13 +50,10 @@ export namespace Resource {
     }
     export class Cache {
 
-        constructor(url: string, type: typeof cc.Asset, bundle: BUNDLE_TYPE, dir?: string) {
+        constructor(url: string, type: typeof cc.Asset, bundle: BUNDLE_TYPE) {
             this.url = url;
             this.type = type;
             this.bundle = bundle;
-            if (dir) {
-                this.dir = dir;
-            }
         }
 
         /**@description 缓存的key值 */
@@ -67,23 +64,20 @@ export namespace Resource {
         /**@description 描述 */
         get description() {
             let typeStr = cc.js.getClassName(this.type);
-            if ( this.resourceType == Resource.Type.Local ){
-                return `本地 : ${this.dir ? "目录" : ""}[${typeStr}]${this.fullUrl}`;
+            if (this.resourceType == Resource.Type.Local) {
+                return `本地 : ${Array.isArray(this.data) ? "目录" : ""}[${typeStr}]${this.fullUrl}`;
             }
             return `远程 : [${typeStr}]${this.fullUrl}`;
         }
 
         /**@description 资源全路径 */
-        get fullUrl(){
-            if ( this.resourceType == Resource.Type.Local ){
+        get fullUrl() {
+            if (this.resourceType == Resource.Type.Local) {
                 return `${this.bundle}/${this.url}`;
-            }else{
+            } else {
                 return this.url;
             }
         }
-
-        /**@description 如果是加载的目录，需要传dir目录 */
-        dir?: string = null;
 
         /**@description 资源url */
         url: string = "";
@@ -93,14 +87,14 @@ export namespace Resource {
         bundle: BUNDLE_TYPE = null!;
         /**@description 是否常驻内存，远程加载资源有效 */
         protected _retain: boolean = false;
-        set retain(v){
-            if ( this._retain ){
+        set retain(v) {
+            if (this._retain) {
                 Log.w(`${this.fullUrl}已经是常驻资源，无需要重复设置`);
                 return;
             }
             this._retain = v;
         }
-        get retain(){
+        get retain() {
             return this._retain;
         }
 
@@ -137,14 +131,14 @@ export namespace Resource {
 
         public doGet() {
             for (let i = 0; i < this.getCb.length; i++) {
-                if (this.getCb[i]) this.getCb[i](this.data);
+                if (this.getCb[i]) this.getCb[i]([this, this.data]);
             }
             this.getCb = [];
         }
 
-        public doFinish() {
+        public doFinish(data: any) {
             for (let i = 0; i < this.finishCb.length; i++) {
-                if (this.finishCb[i]) this.finishCb[i](this.data);
+                if (this.finishCb[i]) this.finishCb[i](data);
             }
             this.finishCb = [];
         }
