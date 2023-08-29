@@ -440,7 +440,7 @@ export class CacheManager implements ISingleton {
         });
     }
 
-    public getSpriteFrameByAsync(urls: string[], key: string, view: UIView, addExtraLoadResource: (view: UIView, info: Resource.Info) => void, bundle: BUNDLE_TYPE) {
+    public getSpriteFrameByAsync(urls: string[], key: string, view: UIView, addExtraLoadResource: (view: UIView, info: Resource.Cache) => void, bundle: BUNDLE_TYPE) {
         let me = this;
         return new Promise<{ url: string, spriteFrame: cc.SpriteFrame, isTryReload?: boolean, cache: Resource.Cache }>((resolve) => {
             let nIndex = 0;

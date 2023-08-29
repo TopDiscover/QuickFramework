@@ -23,31 +23,6 @@ export namespace Resource {
         /**@description 远程资源 */
         Remote,
     }
-    /**@description 资源信息 */
-    export class Info {
-        constructor() {
-
-        }
-        url: string = "";
-        type: typeof cc.Asset = null;
-        data: cc.Asset | cc.Asset[] = null;
-        /**@description 是否常驻内存，远程加载资源有效 */
-        retain: boolean = false;
-        bundle: BUNDLE_TYPE = null;
-        /**@description 默认为本地资源 */
-        resourceType: Type = Type.Local;
-        /**@description 加入释放资源的時間戳 */
-        stamp: number | null = null;
-        debug() {
-            if (Array.isArray(this.data)) {
-                this.data.forEach(v => {
-                    Log.d(`url : ${this.url}/${v.name} , refCount : ${v.refCount} `)
-                })
-            } else {
-                Log.d(`url : ${this.url} , refCount : ${this.data.refCount} `)
-            }
-        }
-    }
     export class Cache {
 
         constructor(url: string, type: typeof cc.Asset, bundle: BUNDLE_TYPE) {

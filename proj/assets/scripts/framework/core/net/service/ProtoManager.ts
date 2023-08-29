@@ -41,14 +41,7 @@ export class ProtoManager implements ISingleton{
                         let asset = cacheData.data[i] as cc.TextAsset;
                         protobuf.parse(asset.text, this._root)
                     }
-
-                    //释放proto资源文件
-                    let info = new Resource.Info;
-                    info.type = cc.TextAsset;
-                    info.url = Resource.getKey(path,info.type);
-                    info.data = cacheData.data;
-                    info.bundle = bundle;
-                    App.asset.releaseAsset(info);
+                    App.asset.releaseAsset(cacheData);
                     this._loadDir[`${bundle}/${path}`] = true;
                     resolove(true);
                 } else {
