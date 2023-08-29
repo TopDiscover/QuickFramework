@@ -389,9 +389,9 @@ export class AssetManager implements ISingleton {
     }
 
 
-    public retainAsset(cache: Resource.Cache) {
-        if (cache) {
-            cache = App.cache.get(cache.bundle, cache.url, cache.type)
+    public retainAsset(input: Resource.Cache) {
+        if (input) {
+            let cache = App.cache.get(input.bundle, input.url, input.type)
             if (cache) {
                 if (!cache.retain) {
                     cache.retain = cache.retain;
@@ -407,7 +407,7 @@ export class AssetManager implements ISingleton {
                     cache.data && cache.data.addRef();
                 }
             } else {
-                if (CC_DEBUG) Log.e(`${cache.url} retainAsset cache.data is null`);
+                if (CC_DEBUG) Log.e(`${input.url} retainAsset cache.data is null`);
             }
         } else {
             if (CC_DEBUG) Log.e(`retainAsset info is null`);

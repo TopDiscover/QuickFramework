@@ -309,7 +309,6 @@ cc.Label.prototype.loadFont = function (config) {
     let bundle = getBundle(config);
     if (config.dir) {
         App.cache.getCache(config.dir, cc.Font, bundle, true).then(([cache, dirAsset]) => {
-            config.font = config.dir;
             setLabelFont(me, config, getAsset(config.dir,config.font,bundle,cc.Font), cache);
         })
         return;
