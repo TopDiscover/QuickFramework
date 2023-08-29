@@ -44,12 +44,7 @@ export class ProtoManager implements ISingleton{
                     }
 
                     //释放proto资源文件
-                    let info = new Resource.Info;
-                    info.url = path;
-                    info.type = TextAsset;
-                    info.data = cacheData.data;
-                    info.bundle = bundle;
-                    App.asset.releaseAsset(info);
+                    App.asset.releaseAsset(cacheData);
                     this._loadDir[`${bundle}/${path}`] = true;
                     resolove(true);
                 } else {

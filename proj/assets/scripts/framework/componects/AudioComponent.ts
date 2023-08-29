@@ -272,17 +272,12 @@ export default class AudioComponent extends EventComponent {
                 this.audioData.musicInfos.set(key, audioInfo);
             }
             this.audioData.curMusic = audioInfo;
-            App.cache.getCacheByAsync(url, AudioClip, bundle).then((data) => {
+            App.cache.getCacheByAsync(url, AudioClip, bundle).then(([cache,data]) => {
                 if (data) {
-                    let info = new Resource.Info;
-                    info.url = url;
-                    info.type = AudioClip;
-                    info.data = data;
-                    info.bundle = bundle;
                     if (this.owner) {
-                        App.uiManager.addLocal(info, this.owner.className);
+                        App.uiManager.addLocal(cache, this.owner.className);
                     } else {
-                        App.uiManager.garbage.addLocal(info);
+                        App.uiManager.garbage.addLocal(cache);
                     }
                     //停掉当前播放音乐
                     this.stopMusic();
@@ -323,17 +318,12 @@ export default class AudioComponent extends EventComponent {
                 audioInfo.source.playOnAwake = true;
                 this.audioData.effectInfos.set(key, audioInfo);
             }
-            App.cache.getCacheByAsync(url, AudioClip, bundle).then((data) => {
+            App.cache.getCacheByAsync(url, AudioClip, bundle).then(([cache,data]) => {
                 if (data) {
-                    let info = new Resource.Info;
-                    info.url = url;
-                    info.type = AudioClip;
-                    info.data = data;
-                    info.bundle = bundle;
                     if (this.owner) {
-                        App.uiManager.addLocal(info, this.owner.className);
+                        App.uiManager.addLocal(cache, this.owner.className);
                     } else {
-                        App.uiManager.garbage.addLocal(info);
+                        App.uiManager.garbage.addLocal(cache);
                     }
                     if (audioInfo && audioInfo.source) {
                         audioInfo.source.clip = data;

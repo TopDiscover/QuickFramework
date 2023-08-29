@@ -25,31 +25,59 @@ export namespace Resource {
         /**@description 远程资源 */
         Remote,
     }
-    /**@description 资源信息 */
-    export class Info {
-        url: string = "";
-        type: typeof Asset = null!;
-        data: Asset | Asset[] = null!;
-        /**@description 是否常驻内存，远程加载资源有效 */
-        retain: boolean = false;
-        bundle: BUNDLE_TYPE = null!;
-        /**@description 默认为本地资源 */
-        resourceType: Type = Type.Local;
-        /**@description 加入释放资源的時間戳 */
-        stamp: number | null = null;
-        debug() {
-            if (Array.isArray(this.data)) {
-                this.data.forEach(v => {
-                    Log.d(`url : ${this.url}/${v.name} , refCount : ${v.refCount} `)
-                })
+    export class Cache {
+
+        constructor(url: string, type: typeof Asset, bundle: BUNDLE_TYPE) {
+            this.url = url;
+            this.type = type;
+            this.bundle = bundle;
+        }
+
+        /**@description 缓存的key值 */
+        get key() {
+            return getKey(this.url, this.type);
+        }
+
+        /**@description 描述 */
+        get description() {
+            let typeStr = js.getClassName(this.type);
+            if (this.resourceType == Resource.Type.Local) {
+                return `本地 : ${Array.isArray(this.data) ? "目录" : ""}[${typeStr}]${this.fullUrl}`;
+            }
+            return `远程 : [${typeStr}]${this.fullUrl}`;
+        }
+
+        /**@description 资源全路径 */
+        get fullUrl() {
+            if (this.resourceType == Resource.Type.Local) {
+                return `${this.bundle}/${this.url}`;
             } else {
-                Log.d(`url : ${this.url} , refCount : ${this.data.refCount} `)
+                return this.url;
             }
         }
-    }
-    export class CacheData {
-        /**@description 是否已经加载完成 */
-        isLoaded: boolean = false;
+
+        /**@description 资源url */
+        url: string = "";
+        /**@description 资源类型 */
+        type: typeof Asset = null!;
+        /**@description 资源所在bundle */
+        bundle: BUNDLE_TYPE = null!;
+        /**@description 是否常驻内存，远程加载资源有效 */
+        protected _retain: boolean = false;
+        set retain(v) {
+            if (this._retain) {
+                Log.w(`${this.fullUrl}已经是常驻资源，无需要重复设置`);
+                return;
+            }
+            this._retain = v;
+        }
+        get retain() {
+            return this._retain;
+        }
+
+        /**@description 目录资源有效 */
+        refCount = 0;
+
         /**@description 加载完成数据 
          * cc.Prefab 
          * cc.SpriteAtlas 
@@ -61,9 +89,14 @@ export namespace Resource {
          * cc.Texture2D
          * cc.JsonAsset
          * */
-        data: Asset | Asset[] | null = null;
+        data: Asset | Asset[] = null!;
+        /**@description 默认为本地资源 */
+        resourceType: Type = Type.Local;
+        /**@description 加入释放资源的時間戳 */
+        stamp: number | null = null;
 
-        info: Info = new Info();
+        /**@description 是否已经加载完成 */
+        isLoaded: boolean = false;
 
         status: CacheStatus = CacheStatus.NONE;
 
@@ -73,14 +106,14 @@ export namespace Resource {
         /**@description 完成回调，在资源正在加载过程中，又有其它地方调用加载同一个资源，此时需要等待资源加载完成，统一回调 */
         finishCb: ((data: any) => void)[] = [];
 
-        public doGet(data:any) {
+        public doGet() {
             for (let i = 0; i < this.getCb.length; i++) {
-                if (this.getCb[i]) this.getCb[i](data);
+                if (this.getCb[i]) this.getCb[i]([this, this.data]);
             }
             this.getCb = [];
         }
 
-        public doFinish(data:any) {
+        public doFinish(data: any) {
             for (let i = 0; i < this.finishCb.length; i++) {
                 if (this.finishCb[i]) this.finishCb[i](data);
             }
@@ -90,10 +123,11 @@ export namespace Resource {
         public get isInvalid() {
             return this.isLoaded && this.data && !isValid(this.data);
         }
+
         debug() {
 
             let info = (data: Asset | Asset[] | null) => {
-                if (!data){
+                if (!data) {
                     return [];
                 }
                 if (Array.isArray(data)) {
@@ -101,7 +135,7 @@ export namespace Resource {
                     data.forEach(v => {
                         let temp = isValid(v);
                         datas.push({
-                            url: `${this.info.url}/${temp ? v.name : "unknown"}`,
+                            url: `${this.fullUrl}/${temp ? v.name : "unknown"}`,
                             isValid: temp,
                             refCount: temp ? v.refCount : -1,
                             type: js.getClassName(v),
@@ -111,7 +145,7 @@ export namespace Resource {
                 } else {
                     let temp = isValid(data);
                     return [{
-                        url: this.info.url,
+                        url: this.fullUrl,
                         isValid: temp,
                         refCount: temp ? data.refCount : -1,
                         type: js.getClassName(data),
@@ -143,5 +177,12 @@ export namespace Resource {
         bundle?: BUNDLE_TYPE,
         /**@description 如果是加载的目录，请用dir字段,必须指定类型，否则无法正确的释放资源 */
         dir?: string,
+    }
+
+    export function getKey(url: string, type: typeof Asset | Asset) {
+        if (url.indexOf(js.getClassName(type)) >= 0) {
+            return url;
+        }
+        return `${url}(${js.getClassName(type)})`;
     }
 }

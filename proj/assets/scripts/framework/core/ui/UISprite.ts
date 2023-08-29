@@ -5,10 +5,8 @@
  * 代码运行时框架替换
  */
 
-import { assetManager, CCString, Enum, Sprite, SpriteFrame, _decorator } from "cc";
+import { CCString, Enum, Sprite, SpriteFrame, _decorator } from "cc";
 import { Macro } from "../../defines/Macros";
-import { addExtraLoadResource, setSpriteSpriteFrame } from "../../plugin/CocosUtils";
-import { Resource } from "../asset/Resource";
 
 const { ccclass, property, menu } = _decorator;
 
@@ -197,49 +195,35 @@ export default class UISprite extends Sprite {
                 return;
             }
 
-            let url = App.getLanguage(this.language as any,this.params, realBundle)
+            let url = App.getLanguage(this.language as any, this.params, realBundle)
             if (!url) {
                 return;
             }
             let view = await App.uiManager.getView(this.user);
             if (this.isRemote) {
                 // Log.d("加载远程图片")
-                App.asset.remote.loadImage(url, true).then((data) => {
-                    if (data) {
-                        setSpriteSpriteFrame(view, url, this, data, (data) => {
-                            if (this.onLoadComplete) {
-                                this.onLoadComplete(data);
-                            }
-                        }, Macro.BUNDLE_REMOTE, Resource.Type.Remote, false);
-                    }
-                });
+                this.loadRemoteImage({
+                    url: url,
+                    view: view,
+                    isNeedCache: true,
+                })
             } else {
                 if (this.languageAtlas.length > 0) {
                     // Log.d("设置图集",this.languageAtlas);
                     //在纹理图集中查找
-                    let urls = App.getLanguage(this.languageAtlas as any,[], realBundle)
-                    App.cache.getSpriteFrameByAsync(urls, url, view, addExtraLoadResource, realBundle).then((data) => {
-                        if (data && data.isTryReload) {
-                            //来到这里面程序已经崩溃了，无意义在处理了
-                        } else if (data && data.spriteFrame) {
-                            setSpriteSpriteFrame(view, data.url, this, data.spriteFrame, (data) => {
-                                if (this.onLoadComplete) {
-                                    this.onLoadComplete(data);
-                                }
-                            }, realBundle, Resource.Type.Local, false, true);
-                        }
-                    });
+                    let urls = App.getLanguage(this.languageAtlas as any, [], realBundle)
+                    this.loadImage({
+                        url: { urls: urls, key: url },
+                        view: view,
+                        bundle: realBundle,
+                    })
                 } else {
-                    url = url + "/spriteFrame";
                     // Log.d(`资源路径：${realBundle}/${url}`);
-                    App.cache.getCacheByAsync(url, SpriteFrame, realBundle)
-                        .then(spriteFrame => {
-                            setSpriteSpriteFrame(view, url, this, spriteFrame, (data) => {
-                                if (this.onLoadComplete) {
-                                    this.onLoadComplete(data);
-                                }
-                            }, realBundle);
-                        })
+                    this.loadImage({
+                        url: url,
+                        view: view,
+                        bundle: realBundle,
+                    })
                 }
             }
         }

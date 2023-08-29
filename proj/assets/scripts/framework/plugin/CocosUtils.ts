@@ -1,32 +1,32 @@
-import { Asset, AssetManager, BUNDLE_TYPE, Component, instantiate, isValid, Sprite, SpriteFrame, Node, Button, ParticleSystem2D, ParticleAsset, Label, Font, sp, Prefab, dragonBones, sys } from "cc";
+import { Asset, AssetManager, BUNDLE_TYPE, Component, instantiate, isValid, Sprite, SpriteFrame, Node, Button, ParticleSystem2D, ParticleAsset, Label, Font, sp, Prefab, dragonBones, sys, SpriteAtlas } from "cc";
 import { Resource } from "../core/asset/Resource";
 import UIView from "../core/ui/UIView";
 import { ButtonSpriteType } from "../defines/Enums";
 import { Macro } from "../defines/Macros";
 
 /**@description 添加加载本地的资源 */
-export function addExtraLoadResource(view: UIView, info: Resource.Info) {
+export function addExtraLoadResource(view: UIView, cache: Resource.Cache) {
     let uiManager = App.uiManager;
     if (view == <any>(uiManager.retainMemory)) {
-        uiManager.retainMemory.addLocal(info);
+        uiManager.retainMemory.addLocal(cache);
     }
     else if (view && view instanceof UIView) {
-        uiManager.addLocal(info, view.className);
+        uiManager.addLocal(cache, view.className);
     } else {
-        uiManager.garbage.addLocal(info);
+        uiManager.garbage.addLocal(cache);
     }
 }
 
 /**@description 添加加载远程的资源 */
-export function addRemoteLoadResource(view: UIView, info: Resource.Info) {
+export function addRemoteLoadResource(view: UIView, cache: Resource.Cache) {
     let uiManager = App.uiManager;
     if (view == <any>(uiManager.retainMemory)) {
-        uiManager.retainMemory.addRemote(info);
+        uiManager.retainMemory.addRemote(cache);
     }
     else if (view && view instanceof UIView) {
-        uiManager.addRemote(info, view.className);
+        uiManager.addRemote(cache, view.className);
     } else {
-        uiManager.garbage.addRemote(info);
+        uiManager.garbage.addRemote(cache);
     }
 }
 
@@ -49,6 +49,11 @@ function isValidComponent(component: Component): boolean {
     return false;
 }
 
+export function getAsset<T extends Asset>(dir: string, url: string, bundle: BUNDLE_TYPE, type: { prototype: T }) {
+    let __bundle = App.bundleManager.getBundle(bundle)!;
+    return __bundle.get(`${dir}/${url}`, type as any) as T;
+}
+
 /**
  * @description 设置cc.Sprite组件精灵帧
  * @param {*} view 持有视图
@@ -60,49 +65,70 @@ function isValidComponent(component: Component): boolean {
  * @param {*} retain 是否常驻内存 默认为false
  * @param {*} isAtlas 是否是大纹理图集加载 默认为false
  */
-export function setSpriteSpriteFrame(
+export function setSpriteSpriteFrame(data: {
     view: UIView,
     url: string,
     sprite: Sprite,
     spriteFrame: SpriteFrame,
-    complete: (data: SpriteFrame | null) => void,
+    complete: (data: SpriteFrame) => void,
     bundle: BUNDLE_TYPE,
-    resourceType: Resource.Type = Resource.Type.Local,
-    retain: boolean = false,
-    isAtlas: boolean = false) {
+    resourceType?: Resource.Type,
+    retain?: boolean,
+    isAtlas?: boolean,
+    cache: Resource.Cache,
+}) {
 
-    if (!isAtlas) {
-        //纹理只需要把纹理单独添加引用，不需要把spirteFrame也添加引用
-        let info = new Resource.Info;
-        info.url = url;
-        info.type = SpriteFrame;
-        info.data = spriteFrame;
-        info.retain = retain;
-        info.bundle = bundle;
-        if (resourceType == Resource.Type.Remote) {
-            addRemoteLoadResource(view, info);
+    if (data.resourceType == undefined || data.resourceType == null) {
+        data.resourceType = Resource.Type.Local;
+    }
+    if (data.retain == undefined || data.retain == null) {
+        data.retain = false;
+    }
+    if (data.isAtlas == undefined || data.isAtlas == null) {
+        data.isAtlas = false;
+    }
+    if (!data.cache) {
+        Log.e(`加载${data.url}图片错误`);
+        if (data.complete && isValidComponent(data.sprite)) data.complete(null!);
+        return;
+    }
+    if (!data.isAtlas) {
+        if (data.resourceType == Resource.Type.Remote) {
+            addRemoteLoadResource(data.view, data.cache);
         } else {
-            addExtraLoadResource(view, info);
+            addExtraLoadResource(data.view, data.cache);
         }
     }
 
-    if (spriteFrame && isValidComponent(sprite)) {
-        let oldSpriteFrame = sprite.spriteFrame;
-        let replaceData = isValid(spriteFrame) ? spriteFrame : null;
+    if (data.spriteFrame && isValidComponent(data.sprite)) {
+        let oldSpriteFrame = data.sprite.spriteFrame;
+        let replaceData = isValid(data.spriteFrame) ? data.spriteFrame : null;
         try {
-            if (replaceData) sprite.spriteFrame = replaceData;
-            if (complete) complete(replaceData);
+            if (replaceData) data.sprite.spriteFrame = replaceData;
+            if (data.complete) data.complete(replaceData!);
         } catch (err) {
             let temp = isValid(oldSpriteFrame) ? oldSpriteFrame : null;
-            sprite.spriteFrame = temp;
-            if (complete) complete(null);
+            data.sprite.spriteFrame = temp;
+            if (data.complete) data.complete(null!);
             //把数据放到全局的垃圾回收中 //好像有点不行，
-            Log.e(`${url} : ${err ? err : "replace spriteframe error"}`);
+            Log.e(`${data.url} : ${err ? err : "replace spriteframe error"}`);
         }
     } else {
         //完成回调
-        if (complete && isValidComponent(sprite)) complete(spriteFrame);
+        if (data.complete && isValidComponent(data.sprite)) data.complete(data.spriteFrame);
     }
+}
+
+interface setSpriteFrameParam {
+    button: Button,
+    memberName: ButtonSpriteType,
+    view: UIView,
+    url: string,
+    spriteFrame: SpriteFrame,
+    complete: (type: string, data: SpriteFrame) => void,
+    bundle: BUNDLE_TYPE,
+    isAtlas?: boolean,
+    cache: Resource.Cache,
 }
 
 /**
@@ -115,40 +141,31 @@ export function setSpriteSpriteFrame(
  * @param complete 完成回调
  * @param isAtlas 是否是从大纹理图集中加载的
  */
-function _setSpriteFrame(
-    view: UIView,
-    url: string,
-    button: Button,
-    spriteFrame: SpriteFrame,
-    memberName: string,
-    complete: (type: string, data: SpriteFrame | null) => void,
-    isAtlas: boolean,
-    bundle: BUNDLE_TYPE) {
+function _setSpriteFrame(data: setSpriteFrameParam) {
 
-    if (!isAtlas) {
-        let info = new Resource.Info;
-        info.url = url;
-        info.type = SpriteFrame;
-        info.data = spriteFrame;
-        info.bundle = bundle;
-        addExtraLoadResource(view, info);
+    if (!data.cache) {
+        if (data.complete && isValidComponent(data.button)) data.complete(data.memberName, null!);
+        return;
+    }
+    if (!data.isAtlas) {
+        addExtraLoadResource(data.view, data.cache);
     }
 
-    if (spriteFrame && isValidComponent(button)) {
-        let oldSpriteFrame: SpriteFrame = (<any>button)[memberName];
+    if (data.spriteFrame && isValidComponent(data.button)) {
+        let oldSpriteFrame: SpriteFrame = data.button[data.memberName]!;
         try {
-            let replaceData = isValid(spriteFrame) ? spriteFrame : null;
-            if (replaceData) (<any>button)[memberName] = replaceData;
-            if (complete) complete(memberName, replaceData);
+            let replaceData = isValid(data.spriteFrame) ? data.spriteFrame : null;
+            if (replaceData) data.button[data.memberName] = replaceData;
+            if (data.complete) data.complete(data.memberName, replaceData!);
         } catch (err) {
             let temp = isValid(oldSpriteFrame) ? oldSpriteFrame : null;
-            (<any>button)[memberName] = temp;
-            if (complete) complete(memberName, null);
+            data.button[data.memberName] = temp;
+            if (data.complete) data.complete(data.memberName, null!);
             //把数据放到全局的垃圾回收中 //好像有点不行，
-            Log.e(`${url} : ${err ? err : "replace spriteframe error"}`);
+            Log.e(`${data.url} : ${err ? err : "replace spriteframe error"}`);
         }
     } else {
-        if (complete && isValidComponent(button)) complete(memberName, spriteFrame);
+        if (data.complete && isValidComponent(data.button)) data.complete(data.memberName, data.spriteFrame);
     }
 
 };
@@ -163,21 +180,15 @@ function _setSpriteFrame(
  * @param complete 完成回调
  * @param isAtlas 是否是从大纹理图集中加载的 默认为false
  */
-function _setButtonSpriteFrame(
-    button: Button,
-    memberName: ButtonSpriteType,
-    view: UIView,
-    url: string,
-    spriteFrame: SpriteFrame,
-    complete: (type: string, data: SpriteFrame | null) => void,
-    bundle: BUNDLE_TYPE,
-    isAtlas: boolean = false) {
-
-    if (spriteFrame && isValidComponent(button)) {
-        _setSpriteFrame(view, url, button, spriteFrame, memberName, complete, isAtlas, bundle);
+function _setButtonSpriteFrame(data: setSpriteFrameParam) {
+    if (data.isAtlas == undefined || data.isAtlas == null) {
+        data.isAtlas = false;
+    }
+    if (data.spriteFrame && isValidComponent(data.button)) {
+        _setSpriteFrame(data);
     } else {
         //完成回调
-        if (complete && isValidComponent(button)) complete(memberName, spriteFrame);
+        if (data.complete && isValidComponent(data.button)) data.complete(data.memberName, data.spriteFrame);
     }
 }
 
@@ -194,22 +205,67 @@ function _setButtonWithType(
     memberName: ButtonSpriteType,
     view: UIView,
     url: string | { urls: string[], key: string },
-    complete?: (type: string, spriteFrame: SpriteFrame | null) => void,
-    bundle?: BUNDLE_TYPE
+    complete?: (type: string, spriteFrame: SpriteFrame) => void,
+    bundle?: BUNDLE_TYPE,
+    dir?: string
 ) {
+    let onComplete = ([cache,data,url,isAtlas]:[Resource.Cache,SpriteFrame,string,boolean])=>{
+        _setButtonSpriteFrame({
+            button: button,
+            memberName: memberName,
+            view: view,
+            url: url,
+            spriteFrame: data,
+            complete: complete!,
+            bundle: bundle!,
+            cache: cache,
+            isAtlas : isAtlas
+        });
+    }
     if (url) {
         if (typeof url == "string") {
-            url = url + "/spriteFrame";
-            App.cache.getCacheByAsync(url, SpriteFrame, bundle as BUNDLE_TYPE).then((spriteFrame) => {
-                _setButtonSpriteFrame(button, memberName, view, url as string, spriteFrame, complete as any, bundle as BUNDLE_TYPE);
+            if (dir) {
+                App.cache.getCache(dir, SpriteFrame, bundle!, true).then(([cache, dirAsset]) => {
+                    onComplete([cache,getAsset(dir,url,bundle!,SpriteFrame),dir,false]);
+                })
+                return;
+            }
+            App.cache.getCacheByAsync(url, SpriteFrame, bundle!).then(([cache, spriteFrame]) => {
+                onComplete([cache,spriteFrame,url,false]);
             });
         } else {
+            let urls = url.urls;
+            let key = url.key;
+            if (dir) {
+                App.cache.getCache(dir, SpriteAtlas, bundle!, true).then(([cache, data]) => {
+                    if (data) {
+                        let __bundle = App.bundleManager.getBundle(bundle!)!;
+                        let isSuccess = false;
+                        for (let i = 0; i < urls.length; i++) {
+                            let atlas: SpriteAtlas = __bundle.get(`${dir}/${urls[i]}`, SpriteAtlas)!;
+                            if (atlas && atlas.getSpriteFrame(key)) {
+                                onComplete([cache,atlas.getSpriteFrame(key)!,dir,true]);
+                                isSuccess = true;
+                                break;
+                            }
+                        }
+                        if (!isSuccess) {
+                            Log.w(`加载的资源中未找到:${bundle}/${dir}/${url}`);
+                            onComplete([null!,null!,dir,true]);
+                        }
+                    } else {
+                        Log.w(`未加载资源${dir}`);
+                        onComplete([null!,null!,dir,true]);
+                    }
+                })
+                return;
+            }
             //在纹理图集中查找
-            App.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle as BUNDLE_TYPE).then((data) => {
+            App.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle!).then((data) => {
                 if (data && data.isTryReload) {
                     //来到这里面，程序已经崩溃，无意义在处理
                 } else {
-                    _setButtonSpriteFrame(button, memberName, view, data.url, data.spriteFrame as SpriteFrame, complete as any, bundle as BUNDLE_TYPE, true);
+                    onComplete([data.cache,data.spriteFrame,data.url,true]);
                 }
             });
         }
@@ -227,14 +283,15 @@ export function setButtonSpriteFrame(button: Button, config: {
     pressedSprite?: string | { urls: string[], key: string },
     hoverSprite?: string | { urls: string[], key: string },
     disabledSprite?: string | { urls: string[], key: string },
-    complete?: (type: string, spriteFrame: SpriteFrame | null) => void,
-    bundle?: BUNDLE_TYPE
+    complete?: (type: string, spriteFrame: SpriteFrame) => void,
+    bundle?: BUNDLE_TYPE,
+    dir?: string
 }) {
     let bundle = getBundle(config);
-    _setButtonWithType(button, ButtonSpriteType.Norml, config.view, config.normalSprite as any, config.complete, bundle);
-    _setButtonWithType(button, ButtonSpriteType.Pressed, config.view, config.pressedSprite as any, config.complete, bundle);
-    _setButtonWithType(button, ButtonSpriteType.Hover, config.view, config.hoverSprite as any, config.complete, bundle);
-    _setButtonWithType(button, ButtonSpriteType.Disable, config.view, config.disabledSprite as any, config.complete, bundle);
+    _setButtonWithType(button, ButtonSpriteType.Norml, config.view, config.normalSprite!, config.complete, bundle, config.dir);
+    _setButtonWithType(button, ButtonSpriteType.Pressed, config.view, config.pressedSprite!, config.complete, bundle, config.dir);
+    _setButtonWithType(button, ButtonSpriteType.Hover, config.view, config.hoverSprite!, config.complete, bundle, config.dir);
+    _setButtonWithType(button, ButtonSpriteType.Disable, config.view, config.disabledSprite!, config.complete, bundle, config.dir);
 }
 
 /**
@@ -245,25 +302,26 @@ export function setButtonSpriteFrame(button: Button, config: {
  */
 export function setParticleSystemFile(
     component: ParticleSystem2D,
-    config: { url: string, view: any, complete?: (file: ParticleAsset | null) => void, bundle: BUNDLE_TYPE },
-    data: ParticleAsset
+    config: { url: string, view: any, complete?: (file: ParticleAsset) => void, bundle?: BUNDLE_TYPE },
+    data: ParticleAsset,
+    cache: Resource.Cache,
 ) {
-    let info = new Resource.Info;
-    info.url = config.url;
-    info.type = ParticleAsset;
-    info.data = data;
-    info.bundle = getBundle(config);
-    addExtraLoadResource(config.view, info);
+    if (!cache) {
+        //完成回调
+        if (config.complete && isValidComponent(component)) config.complete(null!);
+        return;
+    }
+    addExtraLoadResource(config.view, cache);
     if (data && isValidComponent(component)) {
         let oldFile = component.file;
         try {
             let replaceData = isValid(data) ? data : null;
             if (replaceData) component.file = replaceData;
-            if (config.complete) config.complete(replaceData);
+            if (config.complete) config.complete(replaceData!);
         } catch (err) {
             let temp = isValid(oldFile) ? oldFile : null;
             component.file = temp;
-            if (config.complete) config.complete(null);
+            if (config.complete) config.complete(null!);
             //把数据放到全局的垃圾回收中 //好像有点不行，
             Log.e(`${config.url} : ${err ? err : "replace file error"}`);
         }
@@ -281,24 +339,25 @@ export function setParticleSystemFile(
  */
 export function setLabelFont(
     component: Label,
-    config: { font: string, view: any, complete?: (font: Font | null) => void, bundle: BUNDLE_TYPE },
-    data: Font) {
-    let info = new Resource.Info;
-    info.url = config.font;
-    info.type = Font;
-    info.data = data;
-    info.bundle = getBundle(config);
-    addExtraLoadResource(config.view, info);
+    config: { font: string, view: any, complete?: (font: Font) => void, bundle?: BUNDLE_TYPE },
+    data: Font,
+    cache: Resource.Cache) {
+    if (!cache) {
+        //完成回调
+        if (config.complete && isValidComponent(component)) config.complete(null!);
+        return;
+    }
+    addExtraLoadResource(config.view, cache);
     if (data && isValidComponent(component)) {
         let oldFont = component.font;
         try {
             let replaceData = isValid(data) ? data : null;
             if (replaceData) component.font = replaceData;
-            if (config.complete) config.complete(replaceData);
+            if (config.complete) config.complete(replaceData!);
         } catch (err) {
             let temp = isValid(oldFont) ? oldFont : null;
             component.font = temp;
-            if (config.complete) config.complete(null);
+            if (config.complete) config.complete(null!);
             //把数据放到全局的垃圾回收中 //好像有点不行，
             Log.e(`${config.font} : ${err ? err : "replace font error"}`);
         }
@@ -310,54 +369,43 @@ export function setLabelFont(
 
 /**
  * @description 设置spine动画数据
- * @param component spine组件
- * @param config 配置信息
- * @param data 动画数据
  */
-export function setSkeletonSkeletonData(
+export function setSkeletonSkeletonData(data: {
     component: sp.Skeleton,
-    config: { url: string, view: any, complete: (data: sp.SkeletonData | null) => void, bundle: BUNDLE_TYPE } |
-    { view: any, path: string, name: string, complete: (data: sp.SkeletonData | null) => void, bundle: BUNDLE_TYPE, isNeedCache?: boolean, retain?: boolean },
+    config: { url: string, view: any, complete: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE } |
+    { view: any, path: string, name: string, complete: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE, isNeedCache?: boolean, retain?: boolean },
     data: sp.SkeletonData,
-    resourceType: Resource.Type = Resource.Type.Local) {
-    let url = "";
-    let retain = false;
-    if (resourceType == Resource.Type.Remote) {
-        let realConfig: { view: any, path: string, name: string, complete: (data: sp.SkeletonData | null) => void, isNeedCache?: boolean, retain?: boolean } = <any>config;
-        url = `${realConfig.path}/${realConfig.name}`;
-        retain = realConfig.retain ? true : false;
-    } else {
-        let realConfig: { url: string, view: any, complete: (data: sp.SkeletonData | null) => void } = <any>config;
-        url = realConfig.url;
+    resourceType?: Resource.Type,
+    cache: Resource.Cache,
+}) {
+    if (!data.cache) {
+        if (data.config.complete && isValidComponent(data.component)) data.config.complete(null!);
+        return;
     }
-    let info = new Resource.Info;
-    info.url = url;
-    info.type = sp.SkeletonData;
-    info.data = data;
-    info.retain = retain;
-    info.bundle = getBundle(config);
-    if (resourceType == Resource.Type.Remote) {
-        info.bundle = Macro.BUNDLE_REMOTE;
-        addRemoteLoadResource(config.view, info);
-    } else {
-        addExtraLoadResource(config.view, info);
+    if (data.resourceType == undefined || data.resourceType == null) {
+        data.resourceType = Resource.Type.Local;
     }
-    if (data && isValidComponent(component)) {
-        let oldSkeletonData = component.skeletonData;
+    if (data.resourceType == Resource.Type.Remote) {
+        addRemoteLoadResource(data.config.view, data.cache);
+    } else {
+        addExtraLoadResource(data.config.view, data.cache);
+    }
+    if (data.data && isValidComponent(data.component)) {
+        let oldSkeletonData = data.component.skeletonData;
         try {
-            let replaceData = isValid(data) ? data : null;
-            if (replaceData) component.skeletonData = replaceData;
-            if (config.complete) config.complete(replaceData);
+            let replaceData = isValid(data.data) ? data.data : null;
+            if (replaceData) data.component.skeletonData = replaceData;
+            if (data.config.complete) data.config.complete(replaceData!);
         } catch (err) {
             let temp = isValid(oldSkeletonData) ? oldSkeletonData : null;
-            component.skeletonData = temp as sp.SkeletonData;
-            if (config.complete) config.complete(null);
+            data.component.skeletonData = temp!;
+            if (data.config.complete) data.config.complete(null!);
             //把数据放到全局的垃圾回收中 //好像有点不行，
-            Log.e(`${url} : ${err ? err : "replace skeletonData error"}`);
+            Log.e(`${data.cache.key} : ${err ? err : "replace skeletonData error"}`);
         }
     } else {
         //完成回调
-        if (config.complete && isValidComponent(component)) config.complete(data);
+        if (data.config.complete && isValidComponent(data.component)) data.config.complete(data.data);
     }
 }
 
@@ -365,26 +413,36 @@ export function setSkeletonSkeletonData(
  * @description 通过预置体创建Node
  * @param config 配置信息
  */
-export function createNodeWithPrefab(config: { bundle: BUNDLE_TYPE, url: string, view: any, complete: (node: Node | null) => void }) {
+export function createNodeWithPrefab(config: {
+    bundle?: BUNDLE_TYPE,
+    url: string,
+    view: any,
+    complete: (node: Node) => void,
+    dir?: string,
+}) {
 
-    let url = config.url;
-    let bundle = getBundle(config);
-    let cache = App.cache.get(bundle, url);
-    App.cache.getCacheByAsync(url, Prefab, bundle).then((data) => {
-        if (!cache) {
-            let info = new Resource.Info;
-            info.url = config.url;
-            info.type = Prefab;
-            info.data = data;
-            info.bundle = getBundle(config);
-            addExtraLoadResource(config.view, info);
+    let onComplete = ([cache, data]: [Resource.Cache, Prefab]) => {
+        if (cache) {
+            addExtraLoadResource(config.view, cache);
         }
         if (data && isValidComponent(config.view) && config.complete) {
             let node = instantiate(data);
             config.complete(node);
         } else if (isValidComponent(config.view) && config.complete) {
-            config.complete(null);
+            config.complete(null!);
         }
+    }
+    let url = config.url;
+    let bundle = getBundle(config);
+    if (config.dir) {
+        App.cache.getCache(config.dir, Prefab, bundle, true).then(([cache, data]) => {
+            data = getAsset(config.dir!,config.url,bundle,Prefab);
+            onComplete([cache, data]);
+        })
+        return;
+    }
+    App.cache.getCacheByAsync(url, Prefab, bundle).then(([cache, data]) => {
+        onComplete([cache, data]);
     });
 }
 
@@ -394,26 +452,28 @@ export function _loadDirRes(config: {
     type: typeof Asset,
     view: any,
     onProgress?: (finish: number, total: number, item: AssetManager.RequestItem) => void,
-    onComplete: (data: Resource.CacheData) => void
+    onComplete: (data: Resource.Cache) => void,
+    dir?: string,
 }) {
     let bundle = getBundle(config);
-    let cache = App.cache.get(bundle, config.url);
-    //这里要做一个防止重复加载操作，以免对加载完成后的引用计数多加次数
-    App.asset.loadDir(bundle, config.url, config.type, config.onProgress as any, (data) => {
 
-        if (!cache) {
-            //如果已经有了，可能是从logic中加载过来的，不在进行引用计数操作
-            let info = new Resource.Info;
-            info.url = config.url;
-            info.type = config.type;
-            info.data = data.data as any;
-            info.bundle = bundle;
-            addExtraLoadResource(config.view, info)
+    let onComplete = (cache: Resource.Cache) => {
+        if (cache) {
+            addExtraLoadResource(config.view, cache);
         }
-
         if (config.onComplete) {
-            config.onComplete(data);
+            config.onComplete(cache);
         }
+    }
+    if (config.dir) {
+        App.cache.getCache(config.dir, config.type, bundle, true).then(([cache, data]) => {
+            onComplete(cache);
+        })
+        return;
+    }
+    //这里要做一个防止重复加载操作，以免对加载完成后的引用计数多加次数
+    App.asset.loadDir(bundle, config.url, config.type, config.onProgress!, (cache) => {
+        onComplete(cache);
     });
 }
 
@@ -424,65 +484,88 @@ export function _loadRes(config: {
     onProgress?: (finish: number, total: number, item: AssetManager.RequestItem) => void,
     onComplete: (data: any) => void,
     view: any,
+    dir?: string,
 }) {
     let bundle = getBundle(config);
-    let cache = App.cache.get(bundle, config.url);
-    App.asset.load(
-        bundle,
-        config.url,
-        config.type,
-        config.onProgress as any,
-        (data) => {
-            if (!cache) {
-                let info = new Resource.Info;
-                info.url = config.url;
-                info.type = config.type;
-                info.data = data.data as any;
-                info.bundle = bundle;
-                addExtraLoadResource(config.view, info);
-            }
-            if (config.onComplete) {
-                config.onComplete(data);
-            }
+    let onComplete = ([cache, data]: [Resource.Cache, Asset]) => {
+        if (cache) {
+            addExtraLoadResource(config.view, cache);
         }
-    )
+        if (config.onComplete) {
+            config.onComplete(data);
+        }
+    }
+    if (config.dir) {
+        App.cache.getCache(config.dir, config.type, bundle, true).then(([cache, data]) => {
+            data = getAsset(config.dir!, config.url, bundle, config.type);
+            onComplete([cache, data]);
+        })
+        return;
+    }
+    App.cache.getCacheByAsync(config.url, config.type, bundle).then(([cache, data]) => {
+        onComplete([cache, data])
+    })
 }
 
-export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay, config: { assetUrl: string, atlasUrl: string, view: UIView, complete: (asset: dragonBones.DragonBonesAsset | null, atlas: dragonBones.DragonBonesAtlasAsset | null) => void, bundle?: BUNDLE_TYPE }) {
+export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay,
+    config: {
+        assetUrl: string,
+        atlasUrl: string,
+        view: UIView,
+        complete: (asset: dragonBones.DragonBonesAsset, atlas: dragonBones.DragonBonesAtlasAsset) => void,
+        bundle?: BUNDLE_TYPE,
+        dir?: string,
+    }) {
     let bundle = getBundle(config);
-    App.cache.getCacheByAsync(config.assetUrl, dragonBones.DragonBonesAsset, bundle).then((asset) => {
-        if (asset) {
-            let info = new Resource.Info;
-            info.url = config.assetUrl;
-            info.type = dragonBones.DragonBonesAsset;
-            info.data = asset;
-            info.bundle = getBundle(config);
-            addExtraLoadResource(config.view, info);
-            App.cache.getCacheByAsync(config.atlasUrl, dragonBones.DragonBonesAtlasAsset, bundle).then((atlas) => {
-                if (atlas) {
-                    if (sys.isBrowser) {
-                        let info = new Resource.Info;
-                        info.url = config.atlasUrl;
-                        info.type = dragonBones.DragonBonesAtlasAsset;
-                        info.data = atlas;
-                        info.bundle = getBundle(config);
-                        addExtraLoadResource(config.view, info);
-                    }
 
-                    comp.dragonAsset = asset;
-                    comp.dragonAtlasAsset = atlas;
-                    if (config.complete) {
-                        config.complete(asset, atlas);
-                    }
-                } else {
-                    if (config.complete) {
-                        config.complete(asset, null);
-                    }
+    let onAssetComplete = ([assetCache, data]: [Resource.Cache, dragonBones.DragonBonesAsset]) => {
+        if (assetCache) {
+            addExtraLoadResource(config.view, assetCache);
+        }
+    }
+
+    let onAtlasComplete = ([atlasCache, atlas, asset]: [Resource.Cache, dragonBones.DragonBonesAtlasAsset, dragonBones.DragonBonesAsset]) => {
+        if (atlas) {
+            addExtraLoadResource(config.view, atlasCache);
+            comp.dragonAsset = asset;
+            comp.dragonAtlasAsset = atlas;
+            if (config.complete) {
+                config.complete(asset, atlas);
+            }
+        } else {
+            if (config.complete) {
+                config.complete(asset, null!);
+            }
+        }
+    }
+
+    if (config.dir) {
+        App.cache.getCache(config.dir, dragonBones.DragonBonesAsset, bundle, true).then(([assetCache, asset]) => {
+            if (asset) {
+                asset = getAsset(config.dir!, config.assetUrl, bundle, dragonBones.DragonBonesAsset);
+                onAssetComplete([assetCache, asset]);
+                App.cache.getCache(config.dir!, dragonBones.DragonBonesAtlasAsset, bundle, true).then(([atlasCache, atlas]) => {
+                    atlas = getAsset(config.dir!, config.atlasUrl, bundle, dragonBones.DragonBonesAtlasAsset);
+                    onAtlasComplete([atlasCache, atlas, asset])
+                })
+            } else {
+                Log.w(`未加载资源${config.dir}`);
+                if (config.complete) {
+                    config.complete(null!, null!);
                 }
+            }
+        })
+        return;
+    }
+    App.cache.getCacheByAsync(config.assetUrl, dragonBones.DragonBonesAsset, bundle).then(([assetCache, asset]) => {
+        if (asset) {
+            onAssetComplete([assetCache, asset]);
+            App.cache.getCacheByAsync(config.atlasUrl, dragonBones.DragonBonesAtlasAsset, bundle).then(([atlasCache, atlas]) => {
+                onAtlasComplete([atlasCache, atlas, asset])
             });
         } else {
             if (config.complete) {
-                config.complete(null, null);
+                config.complete(null!, null!);
             }
         }
     });

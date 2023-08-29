@@ -1,11 +1,11 @@
 import {
     addExtraLoadResource, setSpriteSpriteFrame, setButtonSpriteFrame,
     setParticleSystemFile, setLabelFont, setSkeletonSkeletonData,
-    createNodeWithPrefab,getBundle,_loadDirRes,_loadRes, loadDragonDisplay
+    createNodeWithPrefab, getBundle, _loadDirRes, _loadRes, loadDragonDisplay, getAsset
 } from "./CocosUtils";
 import { Resource } from "../core/asset/Resource";
 import { Macro } from "../defines/Macros";
-import { Sprite , Node, isValid , SpriteFrame, sp, Button, Label, Font, ParticleSystem2D , ParticleAsset, EditBox, AssetManager, dragonBones } from "cc";
+import { Sprite , Node, isValid , SpriteFrame, sp, Button, Label, Font, ParticleSystem2D , ParticleAsset, EditBox, AssetManager, dragonBones, SpriteAtlas } from "cc";
 import { EDITOR } from "cc/env";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
@@ -56,18 +56,36 @@ prototype.loadRemoteImage = function (config: any) {
     }
     me.loadUrl = config.url;
     let defaultBundle = getBundle({ bundle: config.defaultBundle, view: config.view })
-    App.asset.remote.loadImage(config.url, config.isNeedCache).then((data) => {
-        if ( me.loadUrl == data?.nativeUrl ){
+    App.asset.remote.loadImage(config.url, config.isNeedCache).then(([cache, data]) => {
+        if (me.loadUrl == data?.nativeUrl) {
             //防止时间调用加载不同url时，以当前记录的url为最终
             if (data) {
-                setSpriteSpriteFrame(config.view, config.url, me, data, config.complete, Macro.BUNDLE_REMOTE, Resource.Type.Remote, isRetain);
+                setSpriteSpriteFrame({
+                    view: config.view,
+                    url: config.url,
+                    sprite: me,
+                    spriteFrame: data,
+                    complete: config.complete,
+                    bundle: Macro.BUNDLE_REMOTE,
+                    resourceType: Resource.Type.Remote,
+                    retain: isRetain,
+                    cache: cache,
+                });
             } else {
                 if (config.defaultSpriteFrame) {
                     if (typeof config.defaultSpriteFrame == "string") {
                         config.defaultSpriteFrame = config.defaultSpriteFrame + "/spriteFrame";
                         //动态加载了一张图片，把资源通知管理器
-                        App.cache.getCacheByAsync(config.defaultSpriteFrame, SpriteFrame, defaultBundle).then((spriteFrame) => {
-                            setSpriteSpriteFrame(config.view, config.defaultSpriteFrame, me, spriteFrame, config.complete, defaultBundle);
+                        App.cache.getCacheByAsync(config.defaultSpriteFrame, SpriteFrame, defaultBundle).then(([cache, spriteFrame]) => {
+                            setSpriteSpriteFrame({
+                                view: config.view,
+                                url: config.defaultSpriteFrame,
+                                sprite: me,
+                                spriteFrame: spriteFrame,
+                                complete: config.complete,
+                                bundle: defaultBundle,
+                                cache: cache,
+                            });
                         });
                     }
                 }
@@ -96,18 +114,65 @@ prototype.loadImage = function (config: any) {
     let url = config.url;
     let complete = config.complete;
     let bundle = getBundle(config);
+
+    let onComplete = ([cache,data,url,isAtlas]:[Resource.Cache,SpriteFrame,string,boolean])=>{
+        setSpriteSpriteFrame({
+            view: view,
+            url: url,
+            sprite: me,
+            spriteFrame: data,
+            complete: complete,
+            bundle: bundle,
+            cache: cache,
+            isAtlas : isAtlas,
+        });
+    }
+
     if (typeof url == "string") {
-        url = url + "/spriteFrame";
-        App.cache.getCacheByAsync(url, SpriteFrame, bundle).then((spriteFrame) => {
-            setSpriteSpriteFrame(view, url, me, spriteFrame, complete, bundle);
+        url = `${url}/spriteFrame`
+        if (config.dir) {
+            App.cache.getCache(config.dir, SpriteFrame, bundle, true).then(([cache, data]) => {
+                onComplete([cache,getAsset(config.dir,url as string,bundle,SpriteFrame),config.dir,false]);
+            })
+            return;
+        }
+        App.cache.getCacheByAsync(url, SpriteFrame, bundle).then(([cache, spriteFrame]) => {
+            onComplete([cache,spriteFrame,url as string,false]);
         });
     } else {
+        let urls = url.urls;
+        let key = url.key;
+        if (config.dir) {
+            App.cache.getCache(config.dir, SpriteAtlas, bundle, true).then(([cache, data]) => {
+                if (data) {
+                    let __bundle = App.bundleManager.getBundle(bundle)!;
+                    let isSuccess = false;
+                    for (let i = 0; i < urls.length; i++) {
+                        let atlas: SpriteAtlas = __bundle.get(`${config.dir}/${urls[i]}`, SpriteAtlas)!;
+                        if (atlas && atlas.getSpriteFrame(key)) {
+                            addExtraLoadResource(view, cache);
+                            onComplete([cache,atlas.getSpriteFrame(key)!,config.dir,true]);
+                            isSuccess = true;
+                            break;
+                        }
+                    }
+                    if (!isSuccess) {
+                        Log.w(`加载的资源中未找到:${bundle}/${config.dir}/${url}`);
+                        onComplete([null!,null!,config.dir,true]);
+                    }
+                } else {
+                    Log.w(`未加载资源${config.dir}`);
+                    onComplete([null!,null!,config.dir,true]);
+                }
+            })
+            return;
+        }
         //在纹理图集中查找
         App.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle).then((data) => {
             if (data && data.isTryReload) {
                 //来到这里面程序已经崩溃了，无意义在处理了
             } else {
-                setSpriteSpriteFrame(view, data.url, me, data.spriteFrame as SpriteFrame, complete, bundle, Resource.Type.Local, false, true);
+                onComplete([data.cache,data.spriteFrame,data.url,true]);
             }
         });
     }
@@ -139,8 +204,14 @@ prototype.loadRemoteSkeleton = function (config: any) {
     if (config.isNeedCache == undefined || config.isNeedCache == null) {
         config.isNeedCache = true;
     }
-    App.asset.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then((data) => {
-        setSkeletonSkeletonData(me, config, data as sp.SkeletonData, Resource.Type.Remote);
+    App.asset.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then(([cache, data]) => {
+        setSkeletonSkeletonData({
+            component: me,
+            config: config,
+            data: data,
+            resourceType: Resource.Type.Remote,
+            cache: cache,
+        });
     });
 }
 
@@ -159,8 +230,23 @@ prototype.loadSkeleton = function (config: any) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
-    App.cache.getCacheByAsync(url, sp.SkeletonData, bundle).then((data) => {
-        setSkeletonSkeletonData(me, config, data);
+    let onComplete = ([cache,data]:[Resource.Cache,sp.SkeletonData])=>{
+        setSkeletonSkeletonData({
+            component: me,
+            config: config,
+            data: data,
+            cache: cache,
+        });
+    }
+    if (config.dir) {
+        App.cache.getCache(config.dir, sp.SkeletonData, bundle, true).then(([cache, dirAsset]) => {
+            config.url = config.dir;
+            onComplete([cache,getAsset(config.dir,url,bundle,sp.SkeletonData)]);
+        })
+        return;
+    }
+    App.cache.getCacheByAsync(url, sp.SkeletonData, bundle).then(([cache, data]) => {
+        onComplete([cache,data]);
     });
 }
 
@@ -193,13 +279,20 @@ dragonBones.ArmatureDisplay.prototype.loadDisplay = function(config) {
  */
  prototype = ParticleSystem2D.prototype;
  prototype.loadFile = function (config: any) {
-     let me = this;
-     let url = config.url;
-     let bundle = getBundle(config);
-     App.cache.getCacheByAsync(url, ParticleAsset, bundle).then((data) => {
-         setParticleSystemFile(me, config, data);
-     });
- }
+    let me = this;
+    let url = config.url;
+    let bundle = getBundle(config);
+    if (config.dir) {
+        App.cache.getCache(config.dir, ParticleAsset, bundle, true).then(([cache, dirAsset]) => {
+            config.url = config.dir;
+            setParticleSystemFile(me, config, getAsset(config.dir,url,bundle,ParticleAsset), cache);
+        })
+        return;
+    }
+    App.cache.getCacheByAsync(url, ParticleAsset, bundle).then(([cache, data]) => {
+        setParticleSystemFile(me, config, data, cache);
+    });
+}
 
 prototype = Label.prototype;
 /**@description 强制label在当前帧进行绘制 */
@@ -223,13 +316,19 @@ prototype.forceDoLayout = function () {
  * content.getComponent(cc.Label).loadFont({font:roomPath + dfFont,view:this});
  */
  prototype.loadFont = function (config: any) {
-     let font = config.font;
-     let me = this;
-     let bundle = getBundle(config);
-     App.cache.getCacheByAsync(font, Font, bundle).then((data) => {
-         setLabelFont(me, config, data);
-     });
- }
+    let font = config.font;
+    let me = this;
+    let bundle = getBundle(config);
+    if (config.dir) {
+        App.cache.getCache(config.dir, Font, bundle, true).then(([cache, dirAsset]) => {
+            setLabelFont(me, config, getAsset(config.dir,config.font,bundle,Font), cache);
+        })
+        return;
+    }
+    App.cache.getCacheByAsync(font, Font, bundle).then(([cache, data]) => {
+        setLabelFont(me, config, data, cache);
+    });
+}
 
 /**@description 通过预置体路径创建节点 
  * @param config 配置信息
@@ -243,7 +342,7 @@ prototype.forceDoLayout = function () {
  *     }
  * }});
  */
-window.createPrefab = function (config:any) {
+window.createPrefab = function (config: any) {
     createNodeWithPrefab(config);
 }
 
@@ -257,7 +356,7 @@ window.createPrefab = function (config:any) {
  * @param config.bundle 可不填，默认为view指向的bundle
  * @param config.type 加载的资源类型
  * */
-window.loadDirRes = function (config:any) {
+window.loadDirRes = function (config: any) {
     _loadDirRes(config)
 }
 
@@ -271,7 +370,7 @@ window.loadDirRes = function (config:any) {
  * @param config.onComplete 加载完成回调 data为ResourceCacheData
  * @param config.view 资源持有者,继承自UIView
  */
-window.loadRes = function (config:any) {
+window.loadRes = function (config: any) {
     _loadRes(config);
 }
 

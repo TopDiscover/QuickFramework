@@ -18,6 +18,7 @@ declare let Log: Logger;
 
 declare type BUNDLE_TYPE = string | import("cc").AssetManager.Bundle;
 declare type SocketBuffer = string | Uint8Array;
+declare type AssetDataType = import("cc").Asset | import("cc").Asset[]
 /**
  * @description 发事件 参考framework/extentions/extentions dispatch 方法
  * @param name 
@@ -199,10 +200,16 @@ declare interface ServiceClass<T extends Service> extends ModuleClass<T> {
  **/
 declare function createPrefab(
 	config: {
+		/**@description url */
 		url: string,
+		/**@description 资源持有者 UIView 子类 */
 		view: UIView,
+		/**@description 完成回调 */
 		complete: (node: import("cc").Node) => void,
-		bundle?: BUNDLE_TYPE
+		/**@description 资源所在bundle */
+		bundle?: BUNDLE_TYPE,
+		/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
+		dir?: string
 	}): void;
 
 /**
@@ -216,12 +223,20 @@ declare function createPrefab(
 * @param config.type 加载的资源类型
 * */
 declare function loadDirRes(config: {
+	/**@description 资源所在bundle */
 	bundle?: BUNDLE_TYPE,
+	/**@description url */
 	url: string,
+	/**@description 资源类型 */
 	type: typeof import("cc").Asset,
+	/**@description  资源持有者 UIView 子类 */
 	view: UIView,
+	/**@description 加载进度回调 */
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
-	onComplete: (data: import("../assets/scripts/framework/core/asset/Resource").Resource.CacheData) => void
+	/**@description 加载完成回调 */
+	onComplete: (data: import("../assets/scripts/framework/core/asset/Resource").Resource.Cache) => void
+	/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
+	dir?: string,
 }): void;
 
 /**
@@ -234,13 +249,21 @@ declare function loadDirRes(config: {
 * @param config.onComplete 加载完成回调 data为ResourceCacheData
 * @param config.view 资源持有者,继承自UIView
 */
-declare function loadRes(config: {
+declare function loadRes<T extends import("cc").Asset>(config: {
+	/**@description 资源所在bundle */
 	bundle?: BUNDLE_TYPE,
+	/**@description url */
 	url: string,
+	/**@description 资源类型 */
 	type: typeof import("cc").Asset,
+	/**@description 加载进度回调 */
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
-	onComplete: (data: import("../assets/scripts/framework/core/asset/Resource").Resource.CacheData) => void,
-	view: UIView
+	/**@description 加载完成回调 */
+	onComplete: (data: T) => void,
+	/**@description  资源持有者 UIView 子类 */
+	view: UIView,
+	/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
+	dir?: string,
 }): void;
 
 
