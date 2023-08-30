@@ -290,7 +290,7 @@ export class CacheManager implements ISingleton {
         let isSuccess = true;
         if (data.refCount <= 0) {
             if (App.isLazyRelease) {
-                DEBUG && Log.d(`${this.module} bundle : ${cache.bundle} 释放资源成功 : ${cache.url} , 将加载到释放队列中`);
+                DEBUG && Log.d(`${this.module} bundle : ${cache.bundle} 释放资源成功 : ${cache.url} 将加入释放队列中`);
             } else {
                 bundle.release(cache.url, cache.type);
                 DEBUG && Log.d(`${this.module} bundle : ${cache.bundle} 释放资源成功 : ${cache.url}`);
@@ -298,7 +298,7 @@ export class CacheManager implements ISingleton {
         } else {
             if (DEBUG) {
                 if (App.isLazyRelease) {
-                    Log.w(`${this.module} bundle : ${cache.bundle} 释放资源失败 : ${cache.url} , 引用计数 : ${data.refCount} , 不能加载到释放队列中`);
+                    Log.w(`${this.module} bundle : ${cache.bundle} 释放资源失败 : ${cache.url} , 引用计数 : ${data.refCount} , 无法加入释放队列中`);
                 } else {
                     Log.w(`${this.module} bundle : ${cache.bundle} 释放资源失败 : ${cache.url} , 引用计数 : ${data.refCount}`);
                 }
