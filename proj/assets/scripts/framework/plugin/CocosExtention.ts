@@ -51,10 +51,10 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
     if (config.retain) {
         isRetain = true;
     }
-    me.loadUrl = config.url;
+    (<any>me).loadUrl = config.url;
     let defaultBundle = getBundle({ bundle: config.defaultBundle, view: config.view })
     App.asset.remote.loadImage(config.url, config.isNeedCache).then(([cache, data]) => {
-        if (me.loadUrl == data?.nativeUrl) {
+        if ((<any>me).loadUrl == data?.nativeUrl) {
             //防止时间调用加载不同url时，以当前记录的url为最终
             if (data) {
                 setSpriteSpriteFrame({
@@ -62,7 +62,7 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
                     url: config.url,
                     sprite: me,
                     spriteFrame: data,
-                    complete: config.complete,
+                    complete: config.complete!,
                     bundle: Macro.BUNDLE_REMOTE,
                     resourceType: Resource.Type.Remote,
                     retain: isRetain,
@@ -75,10 +75,10 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
                         App.cache.getCacheByAsync(config.defaultSpriteFrame, cc.SpriteFrame, defaultBundle).then(([cache, spriteFrame]) => {
                             setSpriteSpriteFrame({
                                 view: config.view,
-                                url: config.defaultSpriteFrame,
+                                url: config.defaultSpriteFrame!,
                                 sprite: me,
                                 spriteFrame: spriteFrame,
-                                complete: config.complete,
+                                complete: config.complete!,
                                 bundle: defaultBundle,
                                 cache: cache,
                             });
@@ -108,7 +108,7 @@ cc.Sprite.prototype.loadImage = function (config) {
     let me = this;
     let view = config.view;
     let url = config.url;
-    let complete = config.complete;
+    let complete = config.complete!;
     let bundle = getBundle(config);
 
     let onComplete = ([cache,data,url,isAtlas]:[Resource.Cache,cc.SpriteFrame,string,boolean])=>{
@@ -146,18 +146,18 @@ cc.Sprite.prototype.loadImage = function (config) {
                         let atlas: cc.SpriteAtlas = __bundle.get(`${config.dir}/${urls[i]}`, cc.SpriteAtlas);
                         if (atlas && atlas.getSpriteFrame(key)) {
                             addExtraLoadResource(view, cache);
-                            onComplete([cache,atlas.getSpriteFrame(key),config.dir,true]);
+                            onComplete([cache,atlas.getSpriteFrame(key)!,config.dir!,true]);
                             isSuccess = true;
                             break;
                         }
                     }
                     if (!isSuccess) {
                         Log.w(`加载的资源中未找到:${bundle}/${config.dir}/${url}`);
-                        onComplete([null,null,config.dir,true]);
+                        onComplete([null!,null!,config.dir!,true]);
                     }
                 } else {
                     Log.w(`未加载资源${config.dir}`);
-                    onComplete([null,null,config.dir,true]);
+                    onComplete([null!,null!,config.dir!,true]);
                 }
             })
             return;
@@ -220,7 +220,7 @@ sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
  *	}
  * }});
  */
-sp.Skeleton.prototype.loadSkeleton = function (config) {
+ sp.Skeleton.prototype.loadSkeleton = function (config) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
@@ -234,8 +234,8 @@ sp.Skeleton.prototype.loadSkeleton = function (config) {
     }
     if (config.dir) {
         App.cache.getCache(config.dir, sp.SkeletonData, bundle, true).then(([cache, dirAsset]) => {
-            config.url = config.dir;
-            onComplete([cache,getAsset(config.dir,url,bundle,sp.SkeletonData)]);
+            config.url = config.dir!;
+            onComplete([cache,getAsset(config.dir!,url,bundle,sp.SkeletonData)]);
         })
         return;
     }
@@ -258,8 +258,8 @@ cc.Button.prototype.loadButton = function (config) {
 /**
  * @description 加载龙骨动画
  */
-dragonBones.ArmatureDisplay.prototype.loadDisplay = function (config) {
-    loadDragonDisplay(this, config);
+dragonBones.ArmatureDisplay.prototype.loadDisplay = function(config) {
+    loadDragonDisplay(this,config);
 }
 
 /**
@@ -286,14 +286,18 @@ cc.ParticleSystem.prototype.loadFile = function (config) {
     });
 }
 
+/**@description 强制label在当前帧进行绘制 */
 cc.Label.prototype.forceDoLayout = function () {
     //2.2.0
-    if (this._forceUpdateRenderData) {
-        this._forceUpdateRenderData();
+    let self : any = this;
+    if (self._forceUpdateRenderData) {
+        self._forceUpdateRenderData();
     }
     //2.2.0以下版本
-    else if (this._updateRenderData) {
-        this._updateRenderData(true);
+    else if (self._updateRenderData) {
+        self._updateRenderData(true);
+    }else if(self.updateRenderData){
+        self.updateRenderData(true);
     }
 }
 
