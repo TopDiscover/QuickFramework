@@ -334,7 +334,7 @@ cc.Label.prototype.loadFont = function (config) {
  *     }
  * }});
  */
-window.createPrefab = function (config: any) {
+window.createPrefab = function (config) {
     createNodeWithPrefab(config);
 }
 
@@ -348,7 +348,7 @@ window.createPrefab = function (config: any) {
  * @param config.bundle 可不填，默认为view指向的bundle
  * @param config.type 加载的资源类型
  * */
-window.loadDirRes = function (config: any) {
+window.loadDirRes = function (config) {
     _loadDirRes(config)
 }
 
@@ -362,7 +362,7 @@ window.loadDirRes = function (config: any) {
  * @param config.onComplete 加载完成回调 data为ResourceCacheData
  * @param config.view 资源持有者,继承自UIView
  */
-window.loadRes = function (config: any) {
+window.loadRes = function (config) {
     _loadRes(config);
 }
 
