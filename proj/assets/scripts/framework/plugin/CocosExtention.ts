@@ -44,8 +44,7 @@ if (typeof Reflect == "object") {
  */
 
 //config : {url: string, view : any , complete?: (data: cc.SpriteFrame) => void, defaultSpriteFrame?: string , isNeedCache ?: boolean }
-let prototype:any = Sprite.prototype;
-prototype.loadRemoteImage = function (config: any) {
+Sprite.prototype.loadRemoteImage = function (config) {
     let me = this;
     if (config.isNeedCache == undefined || config.isNeedCache == null) {
         config.isNeedCache = true;
@@ -54,10 +53,10 @@ prototype.loadRemoteImage = function (config: any) {
     if (config.retain) {
         isRetain = true;
     }
-    me.loadUrl = config.url;
+    (<any>me).loadUrl = config.url;
     let defaultBundle = getBundle({ bundle: config.defaultBundle, view: config.view })
     App.asset.remote.loadImage(config.url, config.isNeedCache).then(([cache, data]) => {
-        if (me.loadUrl == data?.nativeUrl) {
+        if ((<any>me).loadUrl == data?.nativeUrl) {
             //防止时间调用加载不同url时，以当前记录的url为最终
             if (data) {
                 setSpriteSpriteFrame({
@@ -65,7 +64,7 @@ prototype.loadRemoteImage = function (config: any) {
                     url: config.url,
                     sprite: me,
                     spriteFrame: data,
-                    complete: config.complete,
+                    complete: config.complete!,
                     bundle: Macro.BUNDLE_REMOTE,
                     resourceType: Resource.Type.Remote,
                     retain: isRetain,
@@ -79,10 +78,10 @@ prototype.loadRemoteImage = function (config: any) {
                         App.cache.getCacheByAsync(config.defaultSpriteFrame, SpriteFrame, defaultBundle).then(([cache, spriteFrame]) => {
                             setSpriteSpriteFrame({
                                 view: config.view,
-                                url: config.defaultSpriteFrame,
+                                url: config.defaultSpriteFrame!,
                                 sprite: me,
                                 spriteFrame: spriteFrame,
-                                complete: config.complete,
+                                complete: config.complete!,
                                 bundle: defaultBundle,
                                 cache: cache,
                             });
@@ -107,12 +106,12 @@ prototype.loadRemoteImage = function (config: any) {
  * sprite.getComponent(cc.Sprite).loadImage({url:"hall/a",view:this});
  */
 //loadImage( config : { url : string | {urls:string[],key:string} , view : any , complete?:(data : SpriteFrame)=>void});
-prototype.loadImage = function (config: any) {
+Sprite.prototype.loadImage = function (config) {
 
     let me = this;
     let view = config.view;
     let url = config.url;
-    let complete = config.complete;
+    let complete = config.complete!;
     let bundle = getBundle(config);
 
     let onComplete = ([cache,data,url,isAtlas]:[Resource.Cache,SpriteFrame,string,boolean])=>{
@@ -132,7 +131,7 @@ prototype.loadImage = function (config: any) {
         url = `${url}/spriteFrame`
         if (config.dir) {
             App.cache.getCache(config.dir, SpriteFrame, bundle, true).then(([cache, data]) => {
-                onComplete([cache,getAsset(config.dir,url as string,bundle,SpriteFrame),config.dir,false]);
+                onComplete([cache,getAsset(config.dir!,url as string,bundle,SpriteFrame),config.dir!,false]);
             })
             return;
         }
@@ -151,18 +150,18 @@ prototype.loadImage = function (config: any) {
                         let atlas: SpriteAtlas = __bundle.get(`${config.dir}/${urls[i]}`, SpriteAtlas)!;
                         if (atlas && atlas.getSpriteFrame(key)) {
                             addExtraLoadResource(view, cache);
-                            onComplete([cache,atlas.getSpriteFrame(key)!,config.dir,true]);
+                            onComplete([cache,atlas.getSpriteFrame(key)!,config.dir!,true]);
                             isSuccess = true;
                             break;
                         }
                     }
                     if (!isSuccess) {
                         Log.w(`加载的资源中未找到:${bundle}/${config.dir}/${url}`);
-                        onComplete([null!,null!,config.dir,true]);
+                        onComplete([null!,null!,config.dir!,true]);
                     }
                 } else {
                     Log.w(`未加载资源${config.dir}`);
-                    onComplete([null!,null!,config.dir,true]);
+                    onComplete([null!,null!,config.dir!,true]);
                 }
             })
             return;
@@ -198,8 +197,7 @@ prototype.loadImage = function (config: any) {
  * }});
  */
 
-prototype = sp.Skeleton.prototype;
-prototype.loadRemoteSkeleton = function (config: any) {
+sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
     let me = this;
     if (config.isNeedCache == undefined || config.isNeedCache == null) {
         config.isNeedCache = true;
@@ -226,7 +224,7 @@ prototype.loadRemoteSkeleton = function (config: any) {
  *	}
  * }});
  */
-prototype.loadSkeleton = function (config: any) {
+ sp.Skeleton.prototype.loadSkeleton = function (config) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
@@ -240,8 +238,8 @@ prototype.loadSkeleton = function (config: any) {
     }
     if (config.dir) {
         App.cache.getCache(config.dir, sp.SkeletonData, bundle, true).then(([cache, dirAsset]) => {
-            config.url = config.dir;
-            onComplete([cache,getAsset(config.dir,url,bundle,sp.SkeletonData)]);
+            config.url = config.dir!;
+            onComplete([cache,getAsset(config.dir!,url,bundle,sp.SkeletonData)]);
         })
         return;
     }
@@ -257,8 +255,7 @@ prototype.loadSkeleton = function (config: any) {
  * button.getComponent(cc.Button).loadButton({normalSprite : "hall/a",view:this});
  * button.getComponent(cc.Button).loadButton({normalSprite : "hall/b",pressedSprite : "hall/c",view:this});
  */
-prototype = Button.prototype;
-prototype.loadButton = function (config: any) {
+Button.prototype.loadButton = function (config) {
     setButtonSpriteFrame(this, config);
 }
 
@@ -277,15 +274,14 @@ dragonBones.ArmatureDisplay.prototype.loadDisplay = function(config) {
  * par.loadFile({url:GAME_RES( "res/action/DDZ_win_lizi" ),view:null});
  * this.node.addChild(node);
  */
- prototype = ParticleSystem2D.prototype;
- prototype.loadFile = function (config: any) {
+ ParticleSystem2D.prototype.loadFile = function (config) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
     if (config.dir) {
         App.cache.getCache(config.dir, ParticleAsset, bundle, true).then(([cache, dirAsset]) => {
-            config.url = config.dir;
-            setParticleSystemFile(me, config, getAsset(config.dir,url,bundle,ParticleAsset), cache);
+            config.url = config.dir!;
+            setParticleSystemFile(me, config, getAsset(config.dir!,url,bundle,ParticleAsset), cache);
         })
         return;
     }
@@ -294,18 +290,18 @@ dragonBones.ArmatureDisplay.prototype.loadDisplay = function(config) {
     });
 }
 
-prototype = Label.prototype;
 /**@description 强制label在当前帧进行绘制 */
-prototype.forceDoLayout = function () {
+Label.prototype.forceDoLayout = function () {
     //2.2.0
-    if (this._forceUpdateRenderData) {
-        this._forceUpdateRenderData();
+    let self : any = this;
+    if (self._forceUpdateRenderData) {
+        self._forceUpdateRenderData();
     }
     //2.2.0以下版本
-    else if (this._updateRenderData) {
-        this._updateRenderData(true);
-    }else if(this.updateRenderData){
-        this.updateRenderData(true);
+    else if (self._updateRenderData) {
+        self._updateRenderData(true);
+    }else if(self.updateRenderData){
+        self.updateRenderData(true);
     }
 }
 
@@ -315,13 +311,13 @@ prototype.forceDoLayout = function () {
  * let content = cc.find("content",this.node); 
  * content.getComponent(cc.Label).loadFont({font:roomPath + dfFont,view:this});
  */
- prototype.loadFont = function (config: any) {
+Label.prototype.loadFont = function (config) {
     let font = config.font;
     let me = this;
     let bundle = getBundle(config);
     if (config.dir) {
         App.cache.getCache(config.dir, Font, bundle, true).then(([cache, dirAsset]) => {
-            setLabelFont(me, config, getAsset(config.dir,config.font,bundle,Font), cache);
+            setLabelFont(me, config, getAsset(config.dir!,config.font,bundle,Font), cache);
         })
         return;
     }
@@ -342,7 +338,7 @@ prototype.forceDoLayout = function () {
  *     }
  * }});
  */
-window.createPrefab = function (config: any) {
+window.createPrefab = function (config) {
     createNodeWithPrefab(config);
 }
 
@@ -356,7 +352,7 @@ window.createPrefab = function (config: any) {
  * @param config.bundle 可不填，默认为view指向的bundle
  * @param config.type 加载的资源类型
  * */
-window.loadDirRes = function (config: any) {
+window.loadDirRes = function (config) {
     _loadDirRes(config)
 }
 
@@ -370,7 +366,7 @@ window.loadDirRes = function (config: any) {
  * @param config.onComplete 加载完成回调 data为ResourceCacheData
  * @param config.view 资源持有者,继承自UIView
  */
-window.loadRes = function (config: any) {
+window.loadRes = function (config) {
     _loadRes(config);
 }
 
