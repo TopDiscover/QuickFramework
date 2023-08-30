@@ -145,6 +145,7 @@ class RemoteLoader {
             let [cache] = App.releaseManger.getRemote(key, type);
             if (cache) {
                 (<Asset>cache.data).addRef();
+                App.cache.remoteCaches.set(cache);
                 //把再加载过程里，双加载同一资源的回调都回调回去
                 cache.doFinish([cache, cache.data as any]);
                 cache.doGet();
