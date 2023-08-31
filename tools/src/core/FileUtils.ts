@@ -22,9 +22,16 @@ export default class FileUtils extends Handler {
      * @param path 
      * @param type 
      */
-    symlinkSync(target: PathLike, path: PathLike, type?: symlink.Type | null): void {
+    async symlinkSync(target: PathLike, path: PathLike, type?: symlink.Type | null): Promise<void> {
         if (existsSync(path)) {
-            unlinkSync(path);
+            let stat = statSync(path);
+            if (stat.isDirectory()) {
+                // console.log(`删除目录:${path}`);
+                await this.delDir(path)
+            } else {
+                // console.log(`删除文件:${path}`);
+                unlinkSync(path);
+            }
         }
         if (!existsSync(target)) {
             this.logger.error(`不存在 : ${target}`);
@@ -43,7 +50,7 @@ export default class FileUtils extends Handler {
      * @param isCurrentDirFiles 是否只读取当前目录的文件
      * @returns 
      */
-    private _getFiles(path: string, root: string, result: FileResult[], isInclude?: (info: FileResult) => boolean,isCurrentDirFiles = false) {
+    private _getFiles(path: string, root: string, result: FileResult[], isInclude?: (info: FileResult) => boolean, isCurrentDirFiles = false) {
         if (!existsSync(path)) {
             return result;
         }
@@ -65,9 +72,9 @@ export default class FileUtils extends Handler {
                     result.push(info);
                 }
             } else {
-                if ( !isCurrentDirFiles ){
+                if (!isCurrentDirFiles) {
                     stat.isDirectory() && this._getFiles(fullPath, root, result, isInclude);
-                }   
+                }
             }
         }
     }
@@ -78,12 +85,12 @@ export default class FileUtils extends Handler {
      * @param isInclude 是否包含该文件
      * @returns 
      */
-    getFiles(path: string, isInclude?: (info: FileResult) => boolean, root?: string,isCurrentDirFiles = false) {
+    getFiles(path: string, isInclude?: (info: FileResult) => boolean, root?: string, isCurrentDirFiles = false) {
         let out: FileResult[] = [];
         if (!root) {
             root = path;
         }
-        this._getFiles(path, root, out, isInclude,isCurrentDirFiles);
+        this._getFiles(path, root, out, isInclude, isCurrentDirFiles);
         return out;
     }
 
@@ -91,7 +98,7 @@ export default class FileUtils extends Handler {
      * @description 获取当前目前下所有文件
      * @param path 
      */
-    getCurFiles(path:string){
+    getCurFiles(path: string) {
         let result: FileResult[] = [];
         if (!existsSync(path)) {
             return result;
@@ -193,7 +200,7 @@ export default class FileUtils extends Handler {
      * @param path 打包路径
      * @param outPath 输出zip目录全路径
      */
-    archive(path: string | string[], outPath: string, root: string,append?:FileResult[]) {
+    archive(path: string | string[], outPath: string, root: string, append?: FileResult[]) {
         return new Promise<boolean>((resolve) => {
             let files: FileResult[] = [];
             if (typeof path == "string") {
@@ -204,12 +211,12 @@ export default class FileUtils extends Handler {
                     files = files.concat(temp);
                 }
             }
-            if ( append ){
+            if (append) {
                 files = files.concat(append);
             }
             this.formatPaths(files);
             let arch = archiver("zip", {
-                zlib: { level: 9}
+                zlib: { level: 9 }
             });
             let output = createWriteStream(outPath);
             //绑定流
@@ -260,8 +267,8 @@ export default class FileUtils extends Handler {
      * @param path 
      * @param assets 
      */
-    md5Dir(path: string, assets: Asset, root: string,isCurrentDirFiles = false) {
-        let files = FileUtils.instance.getFiles(path, undefined, root,isCurrentDirFiles)
+    md5Dir(path: string, assets: Asset, root: string, isCurrentDirFiles = false) {
+        let files = FileUtils.instance.getFiles(path, undefined, root, isCurrentDirFiles)
         files.forEach(v => {
             let md5 = this.md5(readFileSync(v.path));
             let relative = this.formatPath(v.relative);
@@ -289,28 +296,28 @@ export default class FileUtils extends Handler {
         }
     }
 
-    private createCopyDatas(source: string, dest: string,datas : CopyData){
+    private createCopyDatas(source: string, dest: string, datas: CopyData) {
         let stat = statSync(source);
-        if ( !stat.isDirectory() ){
+        if (!stat.isDirectory()) {
             return;
         }
         this.createDir(dest);
         let from = "";
         let to = "";
-        let create = (source:string,dest:string)=>{
+        let create = (source: string, dest: string) => {
             let readdir = readdirSync(source);
-            readdir.forEach(v=>{
-                from = join(source,v);
-                to = join(dest,v);
-                if( statSync(from).isDirectory() ){
+            readdir.forEach(v => {
+                from = join(source, v);
+                to = join(dest, v);
+                if (statSync(from).isDirectory()) {
                     this.createDir(to);
-                    create(from,to);
-                }else{
-                    datas.push({from : from, to : to});
+                    create(from, to);
+                } else {
+                    datas.push({ from: from, to: to });
                 }
             })
         }
-        create(source,dest);
+        create(source, dest);
     }
 
     /**
@@ -323,12 +330,12 @@ export default class FileUtils extends Handler {
     copyDir(source: string, dest: string) {
         return new Promise<boolean>(async resolve => {
             this.logger.log(`准备复制 : ${source}->${dest}`);
-            if ( !existsSync(source) ){
+            if (!existsSync(source)) {
                 resolve(false);
                 return;
             }
             await this.delDir(dest);
-            if ( Environment.isCommand && cp ){
+            if (Environment.isCommand && cp) {
                 cp(source, dest, {
                     recursive: true
                 }, (err) => {
@@ -340,17 +347,17 @@ export default class FileUtils extends Handler {
                     }
                     this.logger.log(`复制完成 : ${source}->${dest}`);
                 });
-            }else{
+            } else {
                 //creator node版本只有16.0.1,需要使用老式处理方式
-                let datas : CopyData = [];
-                this.createCopyDatas(source,dest,datas);
-                for ( let i = 0 ;i < datas.length ; i++){
+                let datas: CopyData = [];
+                this.createCopyDatas(source, dest, datas);
+                for (let i = 0; i < datas.length; i++) {
                     let info = datas[i];
-                    await this.copyFile(info.from,info.to);
+                    await this.copyFile(info.from, info.to);
                 }
                 resolve(true);
             }
-            
+
         })
     }
 
@@ -359,7 +366,7 @@ export default class FileUtils extends Handler {
      * @param path 
      * @param isRemove 是否删除源目录本身，默认不删除
      */
-    async delDir(path: string) {
+    async delDir(path: PathLike) {
         if (existsSync(path)) {
             await rm(path, { recursive: true });
         }

@@ -124,24 +124,24 @@ export class Helper extends Handler {
     }
 
     /**@description 链接 Bundles 示例 */
-    symlinkSyncBundles() {
+    async symlinkSyncBundles() {
         let data: SyncData[] = [
             { from: `${this.bundleName}`, to: `proj/assets/`, type: SyncType.CUR_DIR_AND_META }
         ]
-        this.symlinkSync(data, this.bundleName);
+        await this.symlinkSync(data, this.bundleName);
     }
 
     /**@description 链接 私有 项目 */
-    symlinkSyncPrivate() {
+    async symlinkSyncPrivate() {
         //链接私有bundles代码
         let data: SyncData[] = [
             { from: `${this.privateProj}/${this.bundleName}`, to: `proj/assets/${this.bundleName}`, type: SyncType.CUR_DIR_AND_META },
         ]
-        this.symlinkSync(data, "私有");
+        await this.symlinkSync(data, "私有");
     }
 
     /**@description 链接 resources */
-    symlinkSyncResources() {
+    async symlinkSyncResources() {
         let data: SyncData[] = [
             { from: `${this.resources}/${this.resources}`, to: `proj/assets/${this.resources}`, type: SyncType.SINGLE },
             { from: `${this.resources}/${this.resources}${META}`, to: `proj/assets/${this.resources}${META}`, type: SyncType.SINGLE },
@@ -151,55 +151,58 @@ export class Helper extends Handler {
             { from: `${this.resources}/MainController.ts`, to: `proj/assets/MainController.ts`, type: SyncType.CUR_FILE_AND_META },
             { from: `${this.resources}/@types`, to: `proj/@types`, type: SyncType.CUR_ALL_FILES },
         ]
-        this.symlinkSync(data, this.resources);
+        await this.symlinkSync(data, this.resources);
     }
 
     /**@description 链接 */
-    symlinkSync(data: SyncData[], tag: string , fromRoot : string = null!, toRoot : string = null! ) {
+    async symlinkSync(data: SyncData[], tag: string, fromRoot: string = null!, toRoot: string = null!) {
         this.log(`链接${tag}`, false);
-        if( !fromRoot ){
+        if (!fromRoot) {
             fromRoot = this.projPath;
         }
-        if (!toRoot ){
-            toRoot  = this.projPath;
+        if (!toRoot) {
+            toRoot = this.projPath;
         }
         let fromPath = "";
         let toPath = "";
-        data.forEach(v => {
+        for (let i = 0; i < data.length; i++) {
+            let v = data[i];
             if (v.type == SyncType.CUR_ALL_FILES) {
                 fromPath = join(fromRoot, v.from)
                 let files = FileUtils.instance.getCurFiles(fromPath);
-                files.forEach(info => {
+                for (let j = 0; j < files.length; j++) {
+                    let info = files[j];
                     fromPath = info.path;
-                    FileUtils.instance.symlinkSync(fromPath, join(toRoot, `${v.to}/${info.name}`));
-                })
+                    await FileUtils.instance.symlinkSync(fromPath, join(toRoot, `${v.to}/${info.name}`));
+                }
             } else if (v.type == SyncType.CUR_DIR_AND_META) {
                 fromPath = join(fromRoot, v.from);
                 let result = FileUtils.instance.getDirs(fromPath);
-                result.forEach(info => {
+                for (let j = 0; j < result.length; j++) {
+                    let info = result[j];
                     if (!info.name.startsWith(".")) {
                         fromPath = info.path;
                         toPath = join(toRoot, `${v.to}/${info.name}`);
-                        FileUtils.instance.symlinkSync(fromPath, toPath);
-                        FileUtils.instance.symlinkSync(`${fromPath}${META}`, `${toPath}${META}`)
+                        await FileUtils.instance.symlinkSync(fromPath, toPath);
+                        await FileUtils.instance.symlinkSync(`${fromPath}${META}`, `${toPath}${META}`)
                     }
-                })
+                }
             } else if (v.type == SyncType.SINGLE) {
                 fromPath = join(fromRoot, v.from)
-                FileUtils.instance.symlinkSync(fromPath, join(toRoot, `${v.to}`));
-            } else if (v.type == SyncType.CUR_FILE_AND_META ){
+                await FileUtils.instance.symlinkSync(fromPath, join(toRoot, `${v.to}`));
+            } else if (v.type == SyncType.CUR_FILE_AND_META) {
                 fromPath = join(fromRoot, v.from)
-                FileUtils.instance.symlinkSync(fromPath, join(toRoot, `${v.to}`));
-                FileUtils.instance.symlinkSync(`${fromPath}${META}`, join(toRoot, `${v.to}${META}`));
+                await FileUtils.instance.symlinkSync(fromPath, join(toRoot, `${v.to}`));
+                await FileUtils.instance.symlinkSync(`${fromPath}${META}`, join(toRoot, `${v.to}${META}`));
             }
-        })
+        }
         this.log(`链接${tag}`, true);
     }
 
     /**
      * @description 链接扩展插件代码
      */
-    symlinkSyncExtensions() {
+    async symlinkSyncExtensions() {
         this.log(`链接扩展插件代码`, false);
 
         for (let i = 0; i < this.extensions.length; i++) {
@@ -209,7 +212,7 @@ export class Helper extends Handler {
             //core 部分代码
             if (Environment.isLinkCore(element)) {
                 this.logger.log(`链接core`);
-                FileUtils.instance.symlinkSync(formPath, toPath);
+                await FileUtils.instance.symlinkSync(formPath, toPath);
             }
 
             //node_modules 依赖
@@ -217,7 +220,7 @@ export class Helper extends Handler {
                 this.logger.log(`链接node_modules`);
                 formPath = this.node_modules;
                 toPath = join(this.extensionsPath, `${element}/node_modules`);
-                FileUtils.instance.symlinkSync(formPath, toPath);
+                await FileUtils.instance.symlinkSync(formPath, toPath);
             }
 
 
@@ -226,14 +229,14 @@ export class Helper extends Handler {
                 this.logger.log(`链接Impl`);
                 formPath = join(__dirname, element);
                 toPath = join(this.extensionsPath, `${element}/src/impl`);
-                FileUtils.instance.symlinkSync(formPath, toPath);
+                await FileUtils.instance.symlinkSync(formPath, toPath);
             }
 
             //链接声明部分
             this.logger.log(`链接声明部分`);
             formPath = join(__dirname, `../@types`);
             toPath = join(this.extensionsPath, `${element}/@types`);
-            FileUtils.instance.symlinkSync(formPath, toPath);
+            await FileUtils.instance.symlinkSync(formPath, toPath);
         }
 
         this.log(`链接扩展插件代码`, true);
@@ -285,7 +288,7 @@ export class Helper extends Handler {
         this.log(`打包热更新`, true);
     }
 
-    async updateQuick(){
+    async updateQuick() {
         this.log(`更新框架`, false);
         this.chdir(this.projPath)
         this.exec("git pull")
