@@ -76,7 +76,7 @@ async function main() {
                 if (jsonPath) {
                     let syncDataStr = readFileSync(jsonPath, "utf-8");
                     let syncData : CustomSyncData = JSON.parse(syncDataStr);
-                    Helper.instance.symlinkSync(syncData.data,syncData.tag);
+                    Helper.instance.symlinkSync(syncData.data,syncData.tag,syncData.fromRoot,syncData.toRoot);
                     FileUtils.instance.delFile(jsonPath);
                 } else {
                     console.error(`自定义同步参数错误`)
