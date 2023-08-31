@@ -146,40 +146,49 @@ export class Helper extends Handler {
             { from: `${this.resources}/${this.resources}`, to: `proj/assets/${this.resources}`, type: SyncType.SINGLE },
             { from: `${this.resources}/${this.resources}${META}`, to: `proj/assets/${this.resources}${META}`, type: SyncType.SINGLE },
             { from: `${this.resources}/scripts`, to: `proj/assets/scripts`, type: SyncType.CUR_DIR_AND_META },
-            { from: `${this.resources}/Application.ts`, to: `proj/assets/Application.ts`, type: SyncType.SINGLE },
-            { from: `${this.resources}/Application.ts${META}`, to: `proj/assets/Application.ts${META}`, type: SyncType.SINGLE },
+            { from: `${this.resources}/Application.ts`, to: `proj/assets/Application.ts`, type: SyncType.CUR_FILE_AND_META },
             { from: `${this.resources}/@types`, to: `proj/@types`, type: SyncType.CUR_ALL_FILES },
         ]
         this.symlinkSync(data, this.resources);
     }
 
     /**@description 链接 */
-    symlinkSync(data: SyncData[], tag: string) {
+    symlinkSync(data: SyncData[], tag: string , fromRoot : string = null!, toRoot : string = null! ) {
         this.log(`链接${tag}`, false);
+        if( !fromRoot ){
+            fromRoot = this.projPath;
+        }
+        if (!toRoot ){
+            toRoot  = this.projPath;
+        }
         let fromPath = "";
         let toPath = "";
         data.forEach(v => {
             if (v.type == SyncType.CUR_ALL_FILES) {
-                fromPath = join(this.projPath, v.from)
+                fromPath = join(fromRoot, v.from)
                 let files = FileUtils.instance.getCurFiles(fromPath);
                 files.forEach(info => {
                     fromPath = info.path;
-                    FileUtils.instance.symlinkSync(fromPath, join(this.projPath, `${v.to}/${info.name}`));
+                    FileUtils.instance.symlinkSync(fromPath, join(toRoot, `${v.to}/${info.name}`));
                 })
             } else if (v.type == SyncType.CUR_DIR_AND_META) {
-                fromPath = join(this.projPath, v.from);
+                fromPath = join(fromRoot, v.from);
                 let result = FileUtils.instance.getDirs(fromPath);
                 result.forEach(info => {
                     if (!info.name.startsWith(".")) {
                         fromPath = info.path;
-                        toPath = join(this.projPath, `${v.to}/${info.name}`);
+                        toPath = join(toRoot, `${v.to}/${info.name}`);
                         FileUtils.instance.symlinkSync(fromPath, toPath);
                         FileUtils.instance.symlinkSync(`${fromPath}${META}`, `${toPath}${META}`)
                     }
                 })
             } else if (v.type == SyncType.SINGLE) {
-                fromPath = join(this.projPath, v.from)
-                FileUtils.instance.symlinkSync(fromPath, join(this.projPath, `${v.to}`));
+                fromPath = join(fromRoot, v.from)
+                FileUtils.instance.symlinkSync(fromPath, join(toRoot, `${v.to}`));
+            } else if (v.type == SyncType.CUR_FILE_AND_META ){
+                fromPath = join(fromRoot, v.from)
+                FileUtils.instance.symlinkSync(fromPath, join(toRoot, `${v.to}`));
+                FileUtils.instance.symlinkSync(`${fromPath}${META}`, join(toRoot, `${v.to}${META}`));
             }
         })
         this.log(`链接${tag}`, true);

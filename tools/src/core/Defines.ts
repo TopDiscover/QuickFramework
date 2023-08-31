@@ -219,6 +219,8 @@ export type CopyData = { from : string , to : string}[];
 export enum SyncType{
     /**@description 当前目录及.meta文件 */
     CUR_DIR_AND_META,
+    /**@description 当前文件及.meta文件 */
+    CUR_FILE_AND_META,
     /**@description 当前目录下所有文件 */
     CUR_ALL_FILES,
     /**@description 单个文件或目录 */
@@ -237,4 +239,6 @@ export type SyncData = {
 export interface CustomSyncData{
     tag : string,
     data : SyncData[],
+    fromRoot : string,
+    toRoot : string,
 }
