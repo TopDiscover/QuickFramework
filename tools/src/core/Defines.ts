@@ -28,29 +28,35 @@ export interface Logger {
 
 export enum CmdType {
     /**@description 拉取 Bunldes 代码 */
-    GitBundles = "-gitBundles",
+    GitBundles = "bundles",
+    /**@description 拉取 Resources 代码 */
+    GitResources = "resources",
+    /**@description 拉取 私有 代码 */
+    GitPrivate = "private",
     /**@description 链接Bundles代码 */
-    Sync = "-sync",
+    SyncBundles = "syncBundles",
+    /**@description 链接Resources代码 */
+    SyncResources = "syncResources",
+    /**@description 链接私有代码 */
+    SyncPrivate = "syncPrivate",
     /**@description 链接扩展插件代码 */
-    Extensions = "-extensions",
+    Extensions = "extensions",
     /**@description 引擎修改 */
-    FixEngine = "-fixEngine",
+    FixEngine = "fixEngine",
     /**@description Gulp 压缩 */
-    Gulp = "-gulp",
+    Gulp = "gulp",
     /**@description 链接 gulpfile.js 到dist */
-    LinkGulp = "-linkGulp",
+    LinkGulp = "linkGulp",
     /**@description 获取工程目录所有资源信息资源 */
-    Assets = "-assets",
+    Assets = "assets",
     /**@description 压缩图片资源 */
-    Pngquant = "-pngquant",
+    Pngquant = "pngquant",
     /**@description 热更新 */
-    Hotupdate = "-hotupdate",
-    /**@description 上帝模式，功能全开 */
-    God = "-god",
+    Hotupdate = "hotupdate",
     /**@description protobufjs */
-    ProtobufJS = "-protobufjs",
+    ProtobufJS = "protobufjs",
     /**@description 自定义同步 */
-    CustomSync = "-customSync",
+    CustomSync = "customSync",
 }
 
 /**@description 命令行执行结果 */
