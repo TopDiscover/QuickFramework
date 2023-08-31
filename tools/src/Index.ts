@@ -1,6 +1,8 @@
-import { CmdType } from "./core/Defines";
+import { readFileSync } from "fs";
+import { CmdType, CustomSyncData } from "./core/Defines";
 import { Environment } from "./core/Environment";
 import { Helper } from "./Helper"
+import FileUtils from "./core/FileUtils";
 
 async function main() {
 
@@ -69,6 +71,17 @@ async function main() {
                 await doProcess(true);
             } else if (type == CmdType.ProtobufJS) {
                 await Helper.instance.installProtobufJS();
+            } else if (type == CmdType.CustomSync) {
+                let jsonPath = argv.shift();
+                if (jsonPath) {
+                    let syncDataStr = readFileSync(jsonPath, "utf-8");
+                    let syncData : CustomSyncData = JSON.parse(syncDataStr);
+                    Helper.instance.symlinkSync(syncData.data,syncData.tag);
+                    FileUtils.instance.delFile(jsonPath);
+                } else {
+                    console.error(`自定义同步参数错误`)
+                    break;
+                }
             }
             type = argv.shift();
         }

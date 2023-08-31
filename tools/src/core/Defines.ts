@@ -49,6 +49,8 @@ export enum CmdType {
     God = "-god",
     /**@description protobufjs */
     ProtobufJS = "-protobufjs",
+    /**@description 自定义同步 */
+    CustomSync = "-customSync",
 }
 
 /**@description 命令行执行结果 */
@@ -231,3 +233,8 @@ export type SyncData = {
     /**@description 同步类型 */
     type : SyncType 
 };
+
+export interface CustomSyncData{
+    tag : string,
+    data : SyncData[],
+}
