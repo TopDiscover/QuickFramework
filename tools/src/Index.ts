@@ -65,6 +65,8 @@ async function main() {
                 console.error(`自定义同步参数错误`)
                 break;
             }
+        } else if (type == CmdType.Update) {
+            await Helper.instance.updateQuick();
         }
         type = argv.shift();
     }

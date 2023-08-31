@@ -8,8 +8,8 @@
     "syncBundles": "node -r ts-node/register src/Index.ts syncBundles",
     "syncResources": "node -r ts-node/register src/Index.ts syncResources",
     "extensions": "node -r ts-node/register src/Index.ts extensions",
-    "main": "node -r ts-node/register src/Index.ts bundles resources syncBundles syncResources extensions",
-    "god": "node -r ts-node/register src/Index.ts bundles resources private syncBundles syncResources syncPrivate extensions",
+    "main": "node -r ts-node/register src/Index.ts update bundles resources syncBundles syncResources extensions",
+    "god": "node -r ts-node/register src/Index.ts update bundles resources private syncBundles syncResources syncPrivate extensions",
     "fixEngine": "node -r ts-node/register src/Index.ts fixEngine",
     "gulp": "node dist/Index.js gulp",
     "linkGulp": "node -r ts-node/register src/Index.ts linkGulp",
@@ -18,7 +18,8 @@
     "hotupdate": "node -r ts-node/register src/Index.ts hotupdate",
     "protobufjs": "node -r ts-node/register src/Index.ts protobufjs",
     "private": "node -r ts-node/register src/Index.ts private",
-    "syncPrivate": "node -r ts-node/register src/Index.ts syncPrivate"
+    "syncPrivate": "node -r ts-node/register src/Index.ts syncPrivate",
+    "update": "node -r ts-node/register src/Index.ts update"
   },
   "devDependencies": {
     "@types/archiver": "^5.3.1",

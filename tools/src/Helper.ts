@@ -285,4 +285,11 @@ export class Helper extends Handler {
         this.log(`打包热更新`, true);
     }
 
+    async updateQuick(){
+        this.log(`更新框架`, false);
+        this.chdir(this.projPath)
+        this.exec("git pull")
+        this.log(`更新框架`, true);
+    }
+
 }

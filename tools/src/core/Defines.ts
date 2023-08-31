@@ -57,6 +57,8 @@ export enum CmdType {
     ProtobufJS = "protobufjs",
     /**@description 自定义同步 */
     CustomSync = "customSync",
+    /**@description 更新当前项目 */
+    Update = "update",
 }
 
 /**@description 命令行执行结果 */
