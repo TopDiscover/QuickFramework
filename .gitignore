@@ -41,3 +41,5 @@ proj/@types/taxi.d.ts
 proj/assets/MainController.ts
 proj/assets/MainController.ts.meta
 proj/@types/project.d.ts
+proj/assets/main.scene
+proj/assets/main.scene.meta
