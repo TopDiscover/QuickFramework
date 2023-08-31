@@ -147,6 +147,8 @@ export class Helper extends Handler {
             { from: `${this.resources}/${this.resources}${META}`, to: `proj/assets/${this.resources}${META}`, type: SyncType.SINGLE },
             { from: `${this.resources}/scripts`, to: `proj/assets/scripts`, type: SyncType.CUR_DIR_AND_META },
             { from: `${this.resources}/Application.ts`, to: `proj/assets/Application.ts`, type: SyncType.CUR_FILE_AND_META },
+            { from: `${this.resources}/main.scene`, to: `proj/assets/main.scene`, type: SyncType.CUR_FILE_AND_META },
+            { from: `${this.resources}/MainController.ts`, to: `proj/assets/MainController.ts`, type: SyncType.CUR_FILE_AND_META },
             { from: `${this.resources}/@types`, to: `proj/@types`, type: SyncType.CUR_ALL_FILES },
         ]
         this.symlinkSync(data, this.resources);

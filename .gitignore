@@ -38,3 +38,7 @@ proj/@types/Proto.js
 proj/@types/protobuf.d.ts
 proj/@types/TankBattleLogic.d.ts
 proj/@types/taxi.d.ts
+proj/assets/main.scene
+proj/assets/main.scene.meta
+proj/assets/MainController.ts
+proj/assets/MainController.ts.meta
