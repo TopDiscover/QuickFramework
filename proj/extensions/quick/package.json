@@ -1,0 +1,25 @@
+{
+    "package_version": 2,
+    "version": "1.0.0",
+    "name": "quick",
+    "description": "框架",
+    "main": "./dist/main.js",
+    "devDependencies": {
+        "@types/node": "^16.0.1",
+        "typescript": "^4.3.4"
+    },
+    "author": "Zheng Fa Sheng",
+    "editor": ">=3.7.2",
+    "scripts": {
+        "build": "tsc -b",
+        "watch": "tsc -w"
+    },
+    "contributions": {
+        "asset-db": {
+            "mount": {
+                "path": "../../quick",
+                "readonly": true
+            }
+        }
+    }
+}
