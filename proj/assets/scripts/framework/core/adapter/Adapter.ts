@@ -1,5 +1,5 @@
 
-import { _decorator, Component, UITransform, size, Size, screen, view, sys, math, native, js, CCObject, Vec2, v2, v4 } from 'cc';
+import { _decorator, Component, UITransform, size, Size, screen, view, v4 } from 'cc';
 import { EDITOR, JSB } from 'cc/env';
 const { ccclass, property } = _decorator;
 /**

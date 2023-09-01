@@ -3,6 +3,43 @@ import { js, Node } from "cc";
 import { DEBUG } from "cc/env";
 import { LanguageDelegate } from "../language/LanguageDelegate";
 import GameView from "../ui/GameView";
+import { Update } from "../update/Update";
+
+/**@description 入口数据 */
+export class EntryData {
+    constructor(data:BundleData){
+        this.data = data;
+        this.update = new Update.Config(this.getLanguage(data.bundle),data.bundle);
+    }
+
+    /**@description bundle 名 */
+    get bundle(){
+        return this.data.bundle;
+    }
+
+    /**@description 返回语言包 key */
+    get language(){
+        return this.update.name;
+    }
+
+    get name(){
+        return this.data.name;
+    }
+
+    /**
+     * @description 通过bundle名获取语言包key
+     * @param bundle 
+     * @returns 
+     */
+    private getLanguage(bundle: string) {
+        return `bundles.${bundle}`;
+    }
+
+	/**@description bundle 数据 */
+	data : BundleData = null!;
+	/**@description 更新配置,由stage */
+	update : Update.Config = null!;
+}
 
 export abstract class Entry {
 

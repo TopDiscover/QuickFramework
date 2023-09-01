@@ -332,8 +332,6 @@ declare type ByteArray = import("../assets/scripts/framework/plugin/ByteArray").
 
 declare type TableView = import("../assets/scripts/framework/core/ui/TableView").default;
 
-declare type Bundles = import("../assets/scripts/common/data/Bundles").Bundles;
-
 declare let App: import("../assets/Application").Application;
 
 /**@description 注入类型 */
@@ -341,6 +339,21 @@ type InjectType = "logic" | "data" | "singleton" | "service" | "sender" | "handl
 interface InjectParam<T> {
 	type: ({ new(): T } | string);
 	name: InjectType;
+}
+
+/**@description bundle 数据 */
+interface BundleData{
+	/**@description bundle 展示名，该字段会合并到语言包内 */
+	name: { 
+		/**@description 中文 */
+		CN: string, 
+		/**@description 英文 */
+		EN: string 
+	};
+	/**@description bundle 名 */
+    bundle: string;
+	/**@description 类型，根据这个从小到大排序，相当于枚举值，定义后，不能改变数值，否则会影响到语言包的获取 */
+    type: number;
 }
 
 declare type LanguageZH = typeof import("../assets/scripts/common/language/LanguageZH").LanguageZH;

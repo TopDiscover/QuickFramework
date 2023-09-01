@@ -1,7 +1,7 @@
-import { Update } from "../framework/core/update/Update";
-import { GameData } from "../framework/data/GameData"
-import { Macro } from "../framework/defines/Macros"
-import { Bundles } from "../common/data/Bundles";
+import { Update } from "../core/update/Update";
+import { GameData } from "./GameData"
+import { Macro } from "../defines/Macros"
+import { EntryData } from "../core/entry/Entry";
 
 /**
  * @description Stage数据
@@ -9,6 +9,16 @@ import { Bundles } from "../common/data/Bundles";
 
 export class StageData extends GameData {
     static module = "【Stage数据】";
+
+    private readonly defaultData = [
+        { type: 0, name: { CN: "主包", EN: "Main" }, bundle: Macro.BUNDLE_RESOURCES },
+        { type: 1, name: { CN: "大厅", EN: "Hall" }, bundle: Macro.BUNDLE_HALL },
+    ];
+
+    protected _bundles : { [key: string | number]: number | string } = {}
+    get bundles() {
+        return this._bundles;
+    }
 
     /**@description 进入场景堆栈 */
     private _sceneStack: string[] = [];
@@ -27,16 +37,27 @@ export class StageData extends GameData {
         }
     }
     /**@description 所有入口配置信息 */
-    private _entrys: Map<string, Update.Config> = new Map();
-
-    init() {
+    private _entrys: EntryData[] = [];
+    get entrys() {
+        return this._entrys;
+    }
+    init(datas?: BundleData[]) {
         super.init();
-        Bundles.init();
-        //初始化游戏入口配置
-        this._entrys.clear();
-        Bundles.datas.forEach(v=>{
-            let data = new Update.Config(Bundles.getLanguage(v.bundle),v.bundle);
-            this._entrys.set(v.bundle,data);
+        if (!datas) {
+            datas = this.defaultData;
+        }
+
+        //先对数据进入排序
+        datas.sort((a, b) => {
+            return a.type - b.type;
+        });
+
+        this._entrys = [];
+        this._bundles = {};
+        datas.forEach(v => {
+            this._bundles[v.bundle] = v.type;
+            this._bundles[v.type] = v.bundle;
+            this._entrys.push(new EntryData(v))
         })
     }
 
@@ -44,10 +65,10 @@ export class StageData extends GameData {
      * @description 是否在登录场景
      * @param bundle  不传入则判断当前场景是否在登录，传为判断传入bundle是不是登录场景
      * */
-    isLoginStage( bundle ?: string) {
-        if ( bundle ){
+    isLoginStage(bundle?: string) {
+        if (bundle) {
             return bundle == Macro.BUNDLE_RESOURCES;
-        }else{
+        } else {
             return this.where == Macro.BUNDLE_RESOURCES;
         }
     }
@@ -56,10 +77,10 @@ export class StageData extends GameData {
      *  @description 是否在大厅场景
      * @param bundle 不传入则判断当前场景是否在大厅场景，传为判断传入bundle是不是大厅场景
      */
-    isHallStage( bundle ?: string ){
-        if ( bundle ){
+    isHallStage(bundle?: string) {
+        if (bundle) {
             return bundle == Macro.BUNDLE_HALL;
-        }else{
+        } else {
             return this.where == Macro.BUNDLE_HALL;
         }
     }
@@ -68,12 +89,26 @@ export class StageData extends GameData {
      * @description 获取Bunlde入口配置
      * */
     getEntry(bundle: string) {
-        return this._entrys.get(bundle);
+        let result: Update.Config | null = null;
+        for (let i = 0; i < this._entrys.length; i++) {
+            if (this._entrys[i].bundle == bundle) {
+                result = this._entrys[i].update;
+                break;
+            }
+        }
+        return result;
     }
 
-    /**@description 获取当前所有游戏 */
+    /**@description 获取当前所有游戏(临时对象，不要频繁调用) */
     get games() {
-        return Bundles.games;
+        let games: EntryData[] = [];
+        for (let i = 0; i < this._entrys.length; i++) {
+            const el = this._entrys[i];
+            if (!(el.bundle == Macro.BUNDLE_HALL || el.bundle == Macro.BUNDLE_RESOURCES)) {
+                games.push(el);
+            }
+        }
+        return games;
     }
 
     /**

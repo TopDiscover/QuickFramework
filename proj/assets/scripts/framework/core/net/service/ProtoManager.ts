@@ -1,6 +1,5 @@
 import { sys, TextAsset } from "cc";
 import { DEBUG } from "cc/env";
-import { Resource } from "../../asset/Resource";
 import { Net } from "../Net";
 export class ProtoManager implements ISingleton{
     

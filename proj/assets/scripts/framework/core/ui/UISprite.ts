@@ -188,7 +188,7 @@ export default class UISprite extends Sprite {
     async forceDoLayout(): Promise<void> {
         if (this.isUseMultilingual) {
             let bundle = this.bundle;
-            let realBundle = Bundles[bundle]
+            let realBundle = Bundles[bundle] as string;
             let loaded = App.bundleManager.getBundle(realBundle);
             if (!loaded) {
                 // Log.d(`${realBundle}未加载`);

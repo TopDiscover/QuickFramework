@@ -24,12 +24,28 @@ import { HandlerManager } from "./core/net/service/HandlerManager";
 import { Utils } from "./utils/Utils";
 import { CanvasHelper } from "./utils/CanvasHelper";
 import { Platform } from "./platform/Platform";
+import { StageData } from "./data/StageData";
+import { IAlert } from "./interface/IAlert";
+import { ILoading } from "./interface/ILoading";
+import { IUILoading } from "./interface/IUILoading";
+import { ITips } from "./interface/ITips";
+import GlobalAudio from "./componects/GlobalAudio";
+import { Node } from "cc";
 
 /**@description 框架层使用的各管理器单例的管理 */
-export class Framewok {
+export class Framewok implements GameEventInterface{
+
+    get Bundles() {
+        return this.stageData.bundles;
+    }
+
+    /**@description 获取Stage数据 */
+    get stageData() {
+        return this.dataCenter.get(StageData)!;
+    }
 
     /**@description 是否采用全屏适配方案 */
-    get isFullScreenAdaption(){
+    get isFullScreenAdaption() {
         return true;
     }
 
@@ -39,12 +55,12 @@ export class Framewok {
     }
 
     /**@description 是否开启自动释放长时间未使用资源 */
-    get isAutoReleaseUnuseResources(){
+    get isAutoReleaseUnuseResources() {
         return true;
     }
 
     /**@description 当isLazyRelease 为true时有效，当资源长时间未使用时自动释放 */
-    get autoReleaseUnuseResourcesTimeout(){
+    get autoReleaseUnuseResourcesTimeout() {
         return 5 * 60;
     }
 
@@ -183,21 +199,6 @@ export class Framewok {
         return Singleton.get(HttpClient)!;
     }
 
-    /**@description 小提示 */
-    get tips(): any {
-        return null;
-    }
-
-    /**@description 界面加载时的全屏Loading,显示加载进度 */
-    get uiLoading(): any {
-        return null;
-    }
-
-    /**@description websocket wss 证书url地址 */
-    get wssCacertUrl() {
-        return "";
-    }
-
     get layout() {
         return Singleton.get(LayoutManager)!;
     }
@@ -215,6 +216,51 @@ export class Framewok {
     /**@description 当前游戏GameView, GameView进入onLoad赋值 */
     gameView: GameView | null = null;
 
+    protected _wssCacertUrl = "";
+    /**@description websocket wss 证书url地址 */
+    set wssCacertUrl(value) {
+        this._wssCacertUrl = value;
+    }
+    get wssCacertUrl() {
+        return this._wssCacertUrl;
+    }
+
+    /**@description 小提示 */
+    get tips() {
+        return Singleton.get(ITips);
+    }
+
+    /**@description 界面加载时的全屏Loading,显示加载进度 */
+    get uiLoading() {
+        return Singleton.get(IUILoading)!;
+    }
+
+    /**@description 弹出提示框,带一到两个按钮 */
+    get alert() {
+        return Singleton.get(IAlert)!;
+    }
+
+    /**@description 公共loading */
+    get loading() {
+        return Singleton.get(ILoading)!;
+    }
+
+    /**@description 更新专用 loading */
+    get updateLoading() {
+        return Singleton.get(ILoading)!;
+    }
+
+
+    /**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
+    private _globalAudio: GlobalAudio = null!;
+    get globalAudio() {
+        if (this._globalAudio) {
+            return this._globalAudio;
+        }
+        this._globalAudio = this.uiManager.addComponent(GlobalAudio);
+        return this._globalAudio;
+    }
+    
     /**
      * @description 获取语言包 
      * 
@@ -237,4 +283,51 @@ export class Framewok {
     onLowMemory() {
         this.releaseManger.onLowMemory();
     }
+
+    onLoad(node: Node) {
+        //预先加载下loading预置体
+        App.uiManager.onLoad(node);
+        //Service onLoad
+        App.serviceManager.onLoad();
+        //入口管理器
+        App.entryManager.onLoad(node);
+        //释放管理器
+        App.releaseManger.onLoad(node);
+    }
+
+    update(node: Node) {
+        //Service 网络调试
+        App.serviceManager.update();
+
+        //远程资源下载任务调度
+        App.asset.remote.update();
+    }
+
+    onDestroy(node: Node) {
+        App.serviceManager.onDestroy();
+        //入口管理器
+        App.entryManager.onDestroy(node);
+        //释放管理器
+        App.releaseManger.onDestroy(node);
+        //ui管理器
+        App.uiManager.onDestroy(node);
+    }
+
+    /**@description 进入后台的时间 */
+    protected _enterBackgroundTime = 0;
+
+    onEnterBackground(): void {
+        this._enterBackgroundTime = Date.timeNow();
+        Log.d(`[MainController]`, `onEnterBackground ${this._enterBackgroundTime}`);
+        App.globalAudio.onEnterBackground();
+        App.serviceManager.onEnterBackground();
+    }
+    onEnterForgeground(): void {
+        let now = Date.timeNow();
+        let inBackgroundTime = now - this._enterBackgroundTime;
+        Log.d(`[MainController]`, `onEnterForgeground ${now} background total time : ${inBackgroundTime}`);
+        App.globalAudio.onEnterForgeground(inBackgroundTime);
+        App.serviceManager.onEnterForgeground(inBackgroundTime);
+    }
+
 }

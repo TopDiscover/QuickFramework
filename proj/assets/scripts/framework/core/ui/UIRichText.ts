@@ -125,7 +125,7 @@ export default class UIRichText extends RichText {
     forceDoLayout(): void {
         if (this.isUseMultilingual) {
             let bundle = this.bundle;
-            let realBundle = Bundles[bundle]
+            let realBundle = Bundles[bundle] as string;
             let str = App.getLanguage(this.language as any,this.params, realBundle)
             this.string = str;
         }

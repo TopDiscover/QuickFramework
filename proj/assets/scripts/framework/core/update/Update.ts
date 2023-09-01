@@ -111,7 +111,7 @@ export namespace Update {
     export class Config {
         /**@description Bundle名 如:hall*/
         bundle: string = "";
-        /**@description Bundle名 如:大厅  */
+        /**@description bundle 语言包key  */
         name: string = "";
         /**
          * 

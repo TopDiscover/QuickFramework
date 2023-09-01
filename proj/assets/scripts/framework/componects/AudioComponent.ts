@@ -2,7 +2,6 @@ import UIView from "../core/ui/UIView";
 import EventComponent from "./EventComponent";
 import { AudioClip, AudioSource, _decorator } from "cc";
 import { DEBUG } from "cc/env";
-import { Resource } from "../core/asset/Resource";
 import { Macro } from "../defines/Macros";
 import { Singleton } from "../utils/Singleton";
 /**
