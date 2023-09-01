@@ -10,15 +10,18 @@ import { EntryData } from "../core/entry/Entry";
 export class StageData extends GameData {
     static module = "【Stage数据】";
 
-    private readonly defaultData = [
-        { type: 0, name: { CN: "主包", EN: "Main" }, bundle: Macro.BUNDLE_RESOURCES },
-        { type: 1, name: { CN: "大厅", EN: "Hall" }, bundle: Macro.BUNDLE_HALL },
+    private readonly defaultData: BundleData[] = [
+        { sort: 0, type: 0, name: { CN: "主包", EN: "Main" }, bundle: Macro.BUNDLE_RESOURCES },
+        { sort: 1, type: 1, name: { CN: "大厅", EN: "Hall" }, bundle: Macro.BUNDLE_HALL },
     ];
 
-    protected _bundles : { [key: string | number]: number | string } = {}
+    protected _bundles: { [key: string | number]: number | string } = {}
     get bundles() {
         return this._bundles;
     }
+
+    /**@description 是否显示调试按钮 */
+    isShowDebugButton = true;
 
     /**@description 进入场景堆栈 */
     private _sceneStack: string[] = [];
@@ -49,7 +52,7 @@ export class StageData extends GameData {
 
         //先对数据进入排序
         datas.sort((a, b) => {
-            return a.type - b.type;
+            return a.sort - b.sort;
         });
 
         this._entrys = [];

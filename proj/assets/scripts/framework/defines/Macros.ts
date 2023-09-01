@@ -25,4 +25,8 @@ export namespace Macro{
     export const MAIN_PACK_BUNDLE_NAME = "main";
     /**@description 大厅bunlde名 */
     export const BUNDLE_HALL = "hall";
+    /**@description 调器显示保存本地的key */
+    export const SHOW_DEBUG_INFO_KEY = "SHOW_DEBUG_INFO_KEY";
+    /**@description 网络重连弹出框tag */
+    export const RECONNECT_ALERT_TAG = "RECONNECT_ALERT_TAG";
 }

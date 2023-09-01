@@ -4,6 +4,8 @@ import { Codec, IMessage, Message } from "../message/Message";
 import { Net } from "../Net";
 import { ServerConnector } from "../socket/ServerConnector";
 import { Process } from "./Process";
+import { StageData } from "../../../data/StageData";
+import { ReconnectHandler } from "./ReconnectHandler";
 
 
 /** @description 处理函数声明 handleType 为你之前注册的handleType类型的数据 返回值number 为处理函数需要的时间 */
@@ -15,28 +17,39 @@ export abstract class Service extends ServerConnector implements IService {
     /**@description 该字段由ServiceManager指定 */
     module = Macro.UNKNOWN;
 
-    /**@description 进入后台的最大允许时间，超过了最大值，则进入网络重连 */
-    abstract maxEnterBackgroundTime : number;
+    constructor() {
+        super();
+        this.reconnectHandler = new ReconnectHandler(this);
+    }
+
+    private _data: StageData = null!;
+    protected get data() {
+        if (this._data) {
+            return this._data;
+        }
+        this._data = App.stageData;
+        return this._data;
+    }
+
+    /**@description 进入后台的最大允许时间，超过了最大值，则进入网络重连,默认60秒 */
+    maxEnterBackgroundTime: number = 60;
+
+    /**@description 重连超时时间 */
+    reconnectTimeout = 30;
+
+    protected _backgroundTimeOutId: any = -1;
+
     /**@description 连接服务器 */
     abstract connect(): void;
 
     /**
      * @description 发送心跳
      */
-    protected abstract sendHeartbeat():void ;
+    protected abstract sendHeartbeat(): void;
     /**
      * @description 是否为心跳消息
      */
     protected abstract isHeartBeat(data: IMessage): boolean;
-
-    /**@description 进入后台网络处理 */
-    abstract onEnterBackground() : void;
-
-    /**
-     * @description 进入前台网络处理
-     * @param inBackgroundTime 进入后面总时间
-     **/
-    abstract onEnterForgeground(inBackgroundTime: number) : void;
 
     /**@description 网络重连 */
     reconnectHandler: ReconnectHandler | null = null;
@@ -55,7 +68,7 @@ export abstract class Service extends ServerConnector implements IService {
     private _Heartbeat: Net.HeartbeatClass<Message> = null!;
     /**@description 心跳的消息定义类型 */
     public get heartbeat(): Net.HeartbeatClass<Message> { return this._Heartbeat }
-    public set heartbeat(value: Net.HeartbeatClass<Message>) { 
+    public set heartbeat(value: Net.HeartbeatClass<Message>) {
         this._Heartbeat = value;
         this.serviceType = value.type;
         this._Process.serviceType = value.type;
@@ -64,20 +77,20 @@ export abstract class Service extends ServerConnector implements IService {
     /**@description 值越大，优先级越高 */
     public priority: number = 0;
 
-    serviceType : Net.ServiceType = Net.ServiceType.Unknown;
+    serviceType: Net.ServiceType = Net.ServiceType.Unknown;
 
     protected onOpen(ev: Event) {
         super.onOpen(ev);
-        App.serviceManager.onOpen(ev,this);
+        App.serviceManager.onOpen(ev, this);
     }
 
     protected onClose(ev: Event) {
         super.onClose(ev);
-        App.serviceManager.onClose(ev,this);
+        App.serviceManager.onClose(ev, this);
     }
     protected onError(ev: Event) {
         super.onError(ev);
-        App.serviceManager.onError(ev,this);
+        App.serviceManager.onError(ev, this);
     }
 
     protected onMessage(data: MessageEvent) {
@@ -88,7 +101,7 @@ export abstract class Service extends ServerConnector implements IService {
             Log.e(`decode header error`);
             return;
         }
-        
+
         if (this.isHeartBeat(header)) {
             //心跳消息，路过处理，应该不会有人注册心跳吧
             this.onRecvHeartBeat();
@@ -99,16 +112,25 @@ export abstract class Service extends ServerConnector implements IService {
     }
 
     /**@description 收到心跳 */
-    protected onRecvHeartBeat(){
+    protected onRecvHeartBeat() {
 
     }
 
     /**
-  * @description 添加服务器数据监听
-  * @param handleType 处理类型，指你用哪一个类来进行解析数据
-  * @param handleFunc 处理回调
-  * @param isQueue 是否进入消息队列
-  */
+     * @description 心跳超时
+     */
+    protected onHeartbeatTimeOut() {
+        Log.w(`${this.module} 心跳超时，您已经断开网络`);
+        this.close();
+        App.serviceManager.reconnect(this);
+    }
+
+    /**
+     * @description 添加服务器数据监听
+     * @param handleType 处理类型，指你用哪一个类来进行解析数据
+     * @param handleFunc 处理回调
+     * @param isQueue 是否进入消息队列
+     */
     public addListener(cmd: string, handleType: any, handleFunc: Function, isQueue: boolean, target: any) {
         this._Process.addListener(cmd, handleType, handleFunc as any, isQueue, target)
     }
@@ -166,9 +188,40 @@ export abstract class Service extends ServerConnector implements IService {
 
     }
 
-    destory(){
-        if ( this.reconnectHandler ){
+    destory() {
+        if (this.reconnectHandler) {
             this.reconnectHandler.onDestroy();
+        }
+    }
+
+    onEnterBackground() {
+        if (this.data.isLoginStage()) {
+            return;
+        }
+        let me = this;
+        me._backgroundTimeOutId = setTimeout(() => {
+            //进入后台超时，主动关闭网络
+            Log.d(`进入后台时间过长，主动关闭网络，等玩家切回前台重新连接网络`);
+            me.close();
+            App.alert.close(Macro.RECONNECT_ALERT_TAG);
+        }, me.maxEnterBackgroundTime * 1000);
+    }
+
+    onEnterForgeground(inBackgroundTime: number) {
+        if (this._backgroundTimeOutId != -1) {
+            Log.d(`清除进入后台的超时关闭网络定时器`);
+            clearTimeout(this._backgroundTimeOutId);
+            Log.d(`在后台时间${inBackgroundTime} , 最大时间为: ${this.maxEnterBackgroundTime}`)
+            //登录界面，不做处理
+            if (this.data.isLoginStage()) {
+                return;
+            }
+            if (inBackgroundTime > this.maxEnterBackgroundTime) {
+                Log.d(`从回台切换，显示重新连接网络`);
+                this.close();
+                App.alert.close(Macro.RECONNECT_ALERT_TAG);
+                App.serviceManager.reconnect(this);
+            }
         }
     }
 }

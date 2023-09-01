@@ -178,7 +178,7 @@ declare interface GameViewClass<T extends UIView> {
 
 declare type Sender = import("../assets/scripts/framework/core/net/service/Sender").Sender;
 declare type Handler = import("../assets/scripts/framework/core/net/service/Handler").Handler;
-declare type ReconnectHandler = import("../assets/scripts/common/net/ReconnectHandler").ReconnectHandler;
+declare type ReconnectHandler = import("../assets/scripts/framework/core/net/service/ReconnectHandler").ReconnectHandler;
 
 declare type Service = import("../assets/scripts/framework/core/net/service/Service").Service;
 declare interface ServiceClass<T extends Service> extends ModuleClass<T> {
@@ -352,8 +352,10 @@ interface BundleData{
 	};
 	/**@description bundle 名 */
     bundle: string;
-	/**@description 类型，根据这个从小到大排序，相当于枚举值，定义后，不能改变数值，否则会影响到语言包的获取 */
+	/**@description 类型，相当于枚举值，定义后，不能改变数值，否则会影响到语言包的获取 */
     type: number;
+	/**@description 排序 */
+	sort : number;
 }
 
 declare type LanguageZH = typeof import("../assets/scripts/common/language/LanguageZH").LanguageZH;
