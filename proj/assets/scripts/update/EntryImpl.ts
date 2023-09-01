@@ -6,7 +6,7 @@ import { BundleUpdate } from "./BundleUpdate";
 import { HallUpdate } from "./HallUpdate";
 import { MainUpdate } from "./MainUpdate";
 
-export class CmmEntry extends EntryDelegate {
+export class EntryImpl extends EntryDelegate {
 
     /**@description 进入bundle完成 */
     onEnterGameView(entry: Entry, gameView: GameView) {

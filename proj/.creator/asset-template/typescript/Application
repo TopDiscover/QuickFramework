@@ -1,0 +1,113 @@
+import { LogLevel } from "./scripts/framework/defines/Enums";
+import { Framewok } from "./scripts/framework/Framework";
+import { Singleton } from "./scripts/framework/utils/Singleton";
+import { StageData } from "./scripts/framework/data/StageData";
+import { ILoading } from "./scripts/framework/interface/ILoading";
+import { ITips } from "./scripts/framework/interface/ITips";
+import { IAlert } from "./scripts/framework/interface/IAlert";
+import { IUILoading } from "./scripts/framework/interface/IUILoading";
+
+export class <%UnderscoreCaseClassName%> extends Framewok {
+
+    get stageData() {
+        //return this.dataCenter.get(StageData, true, Config.BUNDLES)!;
+        //示例返回自己的 StageData 初始化
+        return this.dataCenter.get(StageData)!;
+    }
+
+    get uiReconnect() {
+        //参考示例返回自己的
+        // return Singleton.get(UIReconnect)!;
+        return Singleton.get(ILoading)!;
+    }
+
+    get tips() {
+        //参考示例返回自己的
+        // return Singleton.get(Tips)!;
+        return Singleton.get(ITips)!;
+    }
+
+    get uiLoading() {
+        //参考示例返回自己的
+        // return Singleton.get(UILoading)!;
+        return Singleton.get(IUILoading)!;
+    }
+
+    get alert() {
+        //参考示例返回自己的
+        // return Singleton.get(Alert)!;
+        return Singleton.get(IAlert)!;
+    }
+
+    get loading() {
+        //参考示例返回自己的
+        // return Singleton.get(Loading)!;
+        return Singleton.get(ILoading)!;
+    }
+
+    get updateLoading() {
+        //参考示例返回自己的
+        // return Singleton.get(UpdateLoading)!;
+        return Singleton.get(ILoading)!;
+    }
+
+    init() {
+        super.init();
+        // this.stageData.isShowDebugButton = Config.isShowDebugButton;
+        // this.updateManager.hotUpdateUrl = Config.HOT_UPDATE_URL;
+        // this.updateManager.isAutoVersion = Config.USE_AUTO_VERSION;
+        // this.updateManager.isSkipCheckUpdate = Config.isSkipCheckUpdate;
+        //语言包初始化
+        //cc.log("language init");
+        // this.language.addDelegate(new CommonLanguage);
+    }
+}
+
+let app = new Application();
+app.logger.level = LogLevel.ALL;
+(<any>window)["App"] = app;
+app.init();
+
+/**
+ * COMMENTS_GENERATE_IGNORE
+ * Use "COMMENTS_GENERATE_IGNORE" tag if you do not want later created scripts to contain these comments.
+ * 
+ * Predefined Variables
+ * You can use predefined variables below to setup your scripting preference. For example, whether to use camel case style.
+ * 
+ * <%UnderscoreCaseClassName%>, class name in underscore format, like 'new_component'
+ * <%CamelCaseClassName%>, class name in camel format, like 'NewComponent'
+ * <%Author%>, Who create this file
+ * <%DateTime%>, when create this file
+ * <%FileBasename%>, creating file name with extension
+ * <%FileBasenameNoExtension%>, creating file name without extension
+ * <%URL%>, url of this file in COCOS ASSET URL format
+ * <%ManualUrl%>, url of office help document, like 'https://docs.cocos.com/creator/manual/en/'
+ *
+ * 
+ * Example:
+ * 
+  @ccclass('<%UnderscoreCaseClassName%>')
+  export class <%UnderscoreCaseClassName%> extends Component {
+  
+    // class member could be defined like this.
+    dummy = '';
+
+    // Use 'property' decorator if your want the member to be serializable.
+    @property
+    serializableDummy = 0;
+
+    start () {
+        // Your initialization goes here.
+    }
+
+    update (deltaTime: number) {
+        // Your update function goes here.
+    }
+
+  }
+ *
+ * Learn more about scripting: <%ManualUrl%>scripting/
+ * Learn more about CCClass: <%ManualUrl%>scripting/decorator.html
+ * Learn more about life-cycle callbacks: <%ManualUrl%>scripting/life-cycle-callbacks.html
+ */

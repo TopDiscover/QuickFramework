@@ -31,6 +31,7 @@ import { IUILoading } from "./interface/IUILoading";
 import { ITips } from "./interface/ITips";
 import GlobalAudio from "./componects/GlobalAudio";
 import { Node } from "cc";
+import { EntryImpl } from "../update/EntryImpl";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok implements GameEventInterface{
@@ -280,6 +281,8 @@ export class Framewok implements GameEventInterface{
     }
 
     init() {
+        //初始化自定主entry代理
+        this.entryManager.delegate = new EntryImpl();
         //引擎扩展初始化
         CocosExtentionInit();
     }
