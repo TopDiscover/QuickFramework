@@ -1,11 +1,11 @@
-import { Framewok } from "../quick/scripts/framework/Framework";
-import { StageData } from "../quick/scripts/framework/data/StageData";
-import { LogLevel } from "../quick/scripts/framework/defines/Enums";
-import { IAlert } from "../quick/scripts/framework/interface/IAlert";
-import { ILoading } from "../quick/scripts/framework/interface/ILoading";
-import { ITips } from "../quick/scripts/framework/interface/ITips";
-import { IUILoading } from "../quick/scripts/framework/interface/IUILoading";
-import { Singleton } from "../quick/scripts/framework/utils/Singleton";
+import { Framewok } from "db://quick/scripts/framework/Framework";
+import { StageData } from "db://quick/scripts/framework/data/StageData";
+import { LogLevel } from "db://quick/scripts/framework/defines/Enums";
+import { IAlert } from "db://quick/scripts/framework/interface/IAlert";
+import { ILoading } from "db://quick/scripts/framework/interface/ILoading";
+import { ITips } from "db://quick/scripts/framework/interface/ITips";
+import { IUILoading } from "db://quick/scripts/framework/interface/IUILoading";
+import { Singleton } from "db://quick/scripts/framework/utils/Singleton";
 
 export class <%UnderscoreCaseClassName%> extends Framewok {
 
