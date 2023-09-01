@@ -227,7 +227,7 @@ export class Framewok implements GameEventInterface{
 
     /**@description 小提示 */
     get tips() {
-        return Singleton.get(ITips);
+        return Singleton.get(ITips)!;
     }
 
     /**@description 界面加载时的全屏Loading,显示加载进度 */
@@ -250,6 +250,10 @@ export class Framewok implements GameEventInterface{
         return Singleton.get(ILoading)!;
     }
 
+    /**@description 重连专用提示UI部分 */
+    get uiReconnect( ){
+        return Singleton.get(ILoading)!;
+    }
 
     /**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
     private _globalAudio: GlobalAudio = null!;
