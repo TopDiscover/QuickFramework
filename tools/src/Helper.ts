@@ -152,6 +152,7 @@ export class Helper extends Handler {
             { from: `${this.resources}/MainController.ts`, to: `proj/assets/MainController.ts`, type: SyncType.CUR_FILE_AND_META },
             { from: `${this.resources}/@types`, to: `proj/@types`, type: SyncType.CUR_ALL_FILES },
             { from: `${this.resources}/@types/proto`, to: `proj/@types/proto`, type: SyncType.SINGLE },
+            { from: `${this.resources}/project.json`, to: `proj/project.json`, type: SyncType.SINGLE },
         ]
         await this.symlinkSync(data, this.resources);
     }
