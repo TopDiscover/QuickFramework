@@ -144,7 +144,7 @@ export default class HollowOut extends cc.Component {
         if ( CC_EDITOR && !(this.sprite.spriteFrame && this.sprite.spriteFrame.name.startsWith("singleColor_unpackable"))) {
             let view = App.retainMemory;
             this.sprite.loadImage({
-                url: "images/singleColor_unpackable",
+                url: "quick/images/singleColor_unpackable",
                 view: view,
                 complete: data => {
                     this.onLoadSpriteComplete(data);
