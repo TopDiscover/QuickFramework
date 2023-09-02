@@ -170,7 +170,7 @@ export default class HollowOut extends cc.Component {
             //加载材质
             loadRes<cc.Material>({
                 bundle: Macro.BUNDLE_RESOURCES,
-                url: "material/quick-2d-hollowout-sprite",
+                url: "quick/material/quick-2d-hollowout-sprite",
                 view: view,
                 type: cc.Material,
                 onComplete: (data) => {
