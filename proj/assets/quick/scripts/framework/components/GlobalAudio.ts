@@ -1,5 +1,5 @@
-import AudioComponent from "../../framework/componects/AudioComponent";
-import { Macro } from "../../framework/defines/Macros";
+import AudioComponent from "./AudioComponent";
+import { Macro } from "../defines/Macros";
 
 /**
  * @description 全局音频播放组棒

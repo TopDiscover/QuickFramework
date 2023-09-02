@@ -1,4 +1,4 @@
-import { Snapshot } from "../componects/Snapshot";
+import { Snapshot } from "../components/Snapshot";
 
 /**
  * @description 平台相关代码处理

@@ -1,5 +1,5 @@
 import { DebugView } from "./debug/DebugView";
-import EventComponent from "./componects/EventComponent";
+import EventComponent from "./components/EventComponent";
 import { Macro } from "./defines/Macros";
 /**
  * @description 主控制器 

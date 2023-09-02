@@ -1,5 +1,5 @@
 
-import EventComponent from '../../framework/componects/EventComponent';
+import EventComponent from '../components/EventComponent';
 import { inject } from '../../framework/defines/Decorators';
 import { LogLevel } from '../../framework/defines/Enums';
 import { Singleton } from '../../framework/utils/Singleton';

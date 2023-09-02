@@ -1,4 +1,4 @@
-import EventComponent from "../../componects/EventComponent";
+import EventComponent from "../../components/EventComponent";
 
 const { ccclass, property, menu } = cc._decorator;
 
