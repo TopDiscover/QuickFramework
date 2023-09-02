@@ -1,5 +1,5 @@
-import EventComponent from "../../componects/EventComponent";
-import AudioComponent from "../../componects/AudioComponent";
+import EventComponent from "../../components/EventComponent";
+import AudioComponent from "../../components/AudioComponent";
 import { _decorator, Node, game, Game, EventKeyboard, macro, input, Input } from "cc";
 import { Macro } from "../../defines/Macros";
 

@@ -1,6 +1,6 @@
 
 import { _decorator, Node, find, Toggle, view, Input, profiler, screen } from 'cc';
-import EventComponent from '../componects/EventComponent';
+import EventComponent from '../components/EventComponent';
 import { inject } from '../defines/Decorators';
 import { LogLevel } from '../defines/Enums';
 import { Singleton } from '../utils/Singleton';

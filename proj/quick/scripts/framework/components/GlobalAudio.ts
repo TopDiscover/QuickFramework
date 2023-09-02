@@ -1,6 +1,6 @@
 import { AudioClip, AudioSource, _decorator } from "cc";
-import AudioComponent, { AudioInfo } from "../../framework/componects/AudioComponent";
-import { Macro } from "../../framework/defines/Macros";
+import AudioComponent, { AudioInfo } from "./AudioComponent";
+import { Macro } from "../defines/Macros";
 
 /**
  * @description 全局音频播放组棒

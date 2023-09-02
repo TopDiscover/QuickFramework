@@ -1,5 +1,5 @@
 import { _decorator } from "cc";
-import EventComponent from "../../componects/EventComponent";
+import EventComponent from "../../components/EventComponent";
 
 const { ccclass, property, menu } = _decorator;
 

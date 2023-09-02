@@ -29,7 +29,7 @@ import { IAlert } from "./interface/IAlert";
 import { ILoading } from "./interface/ILoading";
 import { IUILoading } from "./interface/IUILoading";
 import { ITips } from "./interface/ITips";
-import GlobalAudio from "./componects/GlobalAudio";
+import GlobalAudio from "./components/GlobalAudio";
 import { Node } from "cc";
 import { EntryImpl } from "../update/EntryImpl";
 
