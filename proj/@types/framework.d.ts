@@ -119,7 +119,7 @@ declare interface GameEventInterface {
 	onEnterForgeground(inBackgroundTime: number): void;
 }
 
-declare type UIView = import("../assets/scripts/framework/core/ui/UIView").default;
+declare type UIView = import("../assets/quick/scripts/framework/core/ui/UIView").default;
 declare interface UIClass<T extends UIView> {
 	new(): T;
 	/**
@@ -167,19 +167,19 @@ declare interface EntryClass<T> {
 	bundle: string;
 }
 
-declare type Entry = import("../assets/scripts/framework/core/entry/Entry").Entry;
-declare type Logic = import("../assets/scripts/framework/core/logic/Logic").Logic;
-declare type GameView = import("../assets/scripts/framework/core/ui/GameView").default;
+declare type Entry = import("../assets/quick/scripts/framework/core/entry/Entry").Entry;
+declare type Logic = import("../assets/quick/scripts/framework/core/logic/Logic").Logic;
+declare type GameView = import("../assets/quick/scripts/framework/core/ui/GameView").default;
 declare interface GameViewClass<T extends UIView> {
 	new(): T;
 	logicType: ModuleClass<Logic>;
 }
 
-declare type Sender = import("../assets/scripts/framework/core/net/service/Sender").Sender;
-declare type Handler = import("../assets/scripts/framework/core/net/service/Handler").Handler;
-declare type ReconnectHandler = import("../assets/scripts/common/net/ReconnectHandler").ReconnectHandler;
+declare type Sender = import("../assets/quick/scripts/framework/core/net/service/Sender").Sender;
+declare type Handler = import("../assets/quick/scripts/framework/core/net/service/Handler").Handler;
+declare type ReconnectHandler = import("../assets/quick/scripts/framework/core/net/service/ReconnectHandler").ReconnectHandler;
 
-declare type Service = import("../assets/scripts/framework/core/net/service/Service").Service;
+declare type Service = import("../assets/quick/scripts/framework/core/net/service/Service").Service;
 declare interface ServiceClass<T extends Service> extends ModuleClass<T> {
 }
 
@@ -233,7 +233,7 @@ declare function loadDirRes(config: {
 	/**@description 加载进度回调 */
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
 	/**@description 加载完成回调 */
-	onComplete: (data: import("../assets/scripts/framework/core/asset/Resource").Resource.Cache) => void
+	onComplete: (data: import("../assets/quick/scripts/framework/core/asset/Resource").Resource.Cache) => void
 	/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
 	dir?: string,
 }): void;
@@ -266,8 +266,8 @@ declare function loadRes<T extends cc.Asset>(config: {
 }): void;
 
 
-declare type EntryDelegate = import("../assets/scripts/framework/core/entry/EntryDelegate").EntryDelegate;
-declare type Message = import("../assets/scripts/framework/core/net/message/Message").Message;
+declare type EntryDelegate = import("../assets/quick/scripts/framework/core/entry/EntryDelegate").EntryDelegate;
+declare type Message = import("../assets/quick/scripts/framework/core/net/message/Message").Message;
 
 interface IService {
 	addListener?(cmd: string, handleType: any, handleFunc: Function, isQueue: boolean, target: any): any;
@@ -327,11 +327,9 @@ declare interface DefaultOpenOption extends OpenOption {
 	preload: boolean;
 }
 
-declare type ByteArray = import("../assets/scripts/framework/plugin/ByteArray").ByteArray;
+declare type ByteArray = import("../assets/quick/scripts/framework/plugin/ByteArray").ByteArray;
 
-declare type TableView = import("../assets/scripts/framework/core/ui/TableView").default;
-
-declare type Bundles = import("../assets/scripts/common/data/Bundles").Bundles;
+declare type TableView = import("../assets/quick/scripts/framework/core/ui/TableView").default;
 
 declare let App: import("../assets/Application").Application;
 
@@ -340,6 +338,23 @@ type InjectType = "logic" | "data" | "singleton" | "service" | "sender" | "handl
 interface InjectParam<T> {
 	type: ({ new(): T } | string);
 	name: InjectType;
+}
+
+/**@description bundle 数据 */
+interface BundleData{
+	/**@description bundle 展示名，该字段会合并到语言包内 */
+	name: { 
+		/**@description 中文 */
+		CN: string, 
+		/**@description 英文 */
+		EN: string 
+	};
+	/**@description bundle 名 */
+    bundle: string;
+	/**@description 类型，相当于枚举值，定义后，不能改变数值，否则会影响到语言包的获取 */
+    type: number;
+	/**@description 排序 */
+	sort : number;
 }
 
 declare type LanguageZH = typeof import("../assets/scripts/common/language/LanguageZH").LanguageZH;

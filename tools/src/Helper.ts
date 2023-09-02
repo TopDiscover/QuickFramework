@@ -137,7 +137,7 @@ export class Helper extends Handler {
         let data: SyncData[] = [
             { from: `${this.privateProj}/${this.bundleName}`, to: `proj/assets/${this.bundleName}`, type: SyncType.CUR_DIR_AND_META },
             { from: `${this.privateProj}/@types`, to: `proj/@types`, type: SyncType.CUR_ALL_FILES },
-            { from: `${this.privateProj}/framework`, to: `proj/assets/scripts/framework`, type: SyncType.CUR_DIR_AND_META },
+            { from: `${this.privateProj}/framework`, to: `proj/quick/scripts/framework`, type: SyncType.CUR_DIR_AND_META },
         ]
         await this.symlinkSync(data, "私有");
     }
@@ -149,7 +149,6 @@ export class Helper extends Handler {
             { from: `${this.resources}/${this.resources}${META}`, to: `proj/assets/${this.resources}${META}`, type: SyncType.SINGLE },
             { from: `${this.resources}/scripts`, to: `proj/assets/scripts`, type: SyncType.CUR_DIR_AND_META },
             { from: `${this.resources}/Application.ts`, to: `proj/assets/Application.ts`, type: SyncType.CUR_FILE_AND_META },
-            { from: `${this.resources}/MainController.ts`, to: `proj/assets/MainController.ts`, type: SyncType.CUR_FILE_AND_META },
             { from: `${this.resources}/@types`, to: `proj/@types`, type: SyncType.CUR_ALL_FILES },
             { from: `${this.resources}/@types/proto`, to: `proj/@types/proto`, type: SyncType.SINGLE },
             { from: `${this.resources}/project.json`, to: `proj/project.json`, type: SyncType.SINGLE },
