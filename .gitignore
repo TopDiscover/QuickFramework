@@ -42,3 +42,5 @@ proj/assets/scripts/plugin.meta
 proj/assets/MainController.ts
 proj/assets/MainController.ts.meta
 proj/project.json
+proj/assets/quick/scripts/framework/slot
+proj/assets/quick/scripts/framework/slot.meta
