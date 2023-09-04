@@ -21,8 +21,6 @@ proj/packages/test-server/src/core
 proj/packages/test-server/src/impl
 proj/@types/EscapeStation.d.ts
 proj/@types/slot.d.ts
-proj/assets/scripts/framework/slot
-proj/assets/scripts/framework/slot.meta
 proj/assets/bundles.meta
 proj/@types/cryptojs.d.ts
 proj/@types/hall.d.ts
@@ -39,8 +37,6 @@ proj/assets/scripts/login
 proj/assets/scripts/login.meta
 proj/assets/scripts/plugin
 proj/assets/scripts/plugin.meta
-proj/assets/MainController.ts
-proj/assets/MainController.ts.meta
 proj/project.json
-proj/assets/quick/scripts/framework/slot
-proj/assets/quick/scripts/framework/slot.meta
+proj/assets/quick/slot
+proj/assets/quick/slot.meta
