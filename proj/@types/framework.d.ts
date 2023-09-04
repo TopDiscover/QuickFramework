@@ -357,8 +357,3 @@ interface BundleData{
 	/**@description 排序 */
 	sort : number;
 }
-
-declare type CmmLang = typeof import("../assets/scripts/common/language/CommonLanguageZH").LanguageZH;
-declare type Lang = typeof import("../quick/data/Lang").Lang;
-declare type TaxiLan = typeof import("../assets/bundles/taxi/script/data/TaxiLanguage").TaxiLan;
-declare type LanguageData = CmmLang & Lang & TaxiLan;
