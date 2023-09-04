@@ -2,7 +2,7 @@ import archiver from "archiver";
 import { createHash } from "crypto";
 import { cp, createReadStream, createWriteStream, existsSync, mkdirSync, PathLike, readdirSync, readFileSync, statSync, symlink, symlinkSync, unlinkSync } from "fs";
 import { copyFile, rm } from "fs/promises";
-import { basename, join, relative } from "path";
+import { basename, join, parse, relative } from "path";
 import { Asset, CopyData, DirResult, FileResult } from "./Defines";
 import { Environment } from "./Environment";
 import { Handler } from "./Handler";
@@ -37,6 +37,15 @@ export default class FileUtils extends Handler {
             this.logger.error(`不存在 : ${target}`);
             return;
         }
+
+        let stat = statSync(target);
+        if ( stat.isDirectory() ){
+            let root = parse(path as string);
+            if( !existsSync(root.dir) ) {
+                this.createDir(root.dir);
+            }
+        }
+
         symlinkSync(target, path, type);
         this.logger.log(`创建链接 ${target} -> ${path}`)
     }
@@ -289,7 +298,7 @@ export default class FileUtils extends Handler {
      * @description 创建目录
      * @param dir 
      */
-    createDir(dir: string) {
+    createDir(dir: PathLike) {
         if (!existsSync(dir)) {
             // console.log(`创建目录 : ${dir}`);
             mkdirSync(dir);
