@@ -22,6 +22,10 @@ export abstract class LanguageDelegate{
         this.datas.set(data.language,data);
     }
 
+    get( lang : string  ){
+        return this.datas.get(lang);
+    }
+
     /**
      * @description 数据合并,由管理器Language调用
      * @param language 语言
@@ -33,6 +37,25 @@ export abstract class LanguageDelegate{
             source[this.bundle] = realData.data;
         }
         return source;
+    }
+
+    /**
+     * @description 合并数据,返回以 data1 为主的数据
+     * @param data1
+     * @param data2 
+     */
+    mergeData( data1 : Language.Data , data2 : Language.Data ){
+        let result = data1;
+        if ( data2 && data1 ){
+            let _data2 = data2.data as any;
+            let _data1 = data1.data as any;
+            Object.keys(_data2).forEach(v=>{
+                if ( !_data1[v] ){
+                    _data1[v] = _data2[v];
+                }
+            })
+        }
+        return result;
     }
 }
 
