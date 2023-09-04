@@ -40,3 +40,4 @@ proj/assets/scripts/plugin.meta
 proj/project.json
 proj/assets/quick/slot
 proj/assets/quick/slot.meta
+proj/@types/project.d.ts
