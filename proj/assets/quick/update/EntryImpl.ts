@@ -1,7 +1,7 @@
-import { EntryDelegate } from "../framework/core/entry/EntryDelegate";
-import { UpdateItem } from "../framework/core/update/UpdateItem";
-import { Macro } from "../framework/defines/Macros";
-import { Singleton } from "../framework/utils/Singleton";
+import { EntryDelegate } from "../core/entry/EntryDelegate";
+import { UpdateItem } from "../core/update/UpdateItem";
+import { Macro } from "../defines/Macros";
+import { Singleton } from "../utils/Singleton";
 import { BundleUpdate } from "./BundleUpdate";
 import { HallUpdate } from "./HallUpdate";
 import { MainUpdate } from "./MainUpdate";

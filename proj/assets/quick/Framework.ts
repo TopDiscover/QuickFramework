@@ -30,7 +30,7 @@ import { ILoading } from "./interface/ILoading";
 import { IUILoading } from "./interface/IUILoading";
 import { ITips } from "./interface/ITips";
 import GlobalAudio from "./components/GlobalAudio";
-import { EntryImpl } from "../update/EntryImpl";
+import { EntryImpl } from "./update/EntryImpl";
 
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok implements GameEventInterface{

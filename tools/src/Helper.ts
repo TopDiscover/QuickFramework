@@ -137,7 +137,7 @@ export class Helper extends Handler {
         let data: SyncData[] = [
             { from: `${this.privateProj}/${this.bundleName}`, to: `proj/assets/${this.bundleName}`, type: SyncType.CUR_DIR_AND_META },
             { from: `${this.privateProj}/@types`, to: `proj/@types`, type: SyncType.CUR_ALL_FILES },
-            { from: `${this.privateProj}/framework`, to: `proj/assets/quick/scripts/framework`, type: SyncType.CUR_DIR_AND_META },
+            { from: `${this.privateProj}/framework`, to: `proj/assets/quick`, type: SyncType.CUR_DIR_AND_META },
         ]
         await this.symlinkSync(data, "私有");
     }

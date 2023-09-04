@@ -1,5 +1,5 @@
-import { Update } from "../framework/core/update/Update";
-import { UpdateHandlerDelegate, UpdateItem } from "../framework/core/update/UpdateItem";
+import { Update } from "../core/update/Update";
+import { UpdateHandlerDelegate, UpdateItem } from "../core/update/UpdateItem";
 
 /**@description 主包更新代理 */
 export class MainUpdate implements UpdateHandlerDelegate, ISingleton {

@@ -119,7 +119,7 @@ declare interface GameEventInterface {
 	onEnterForgeground(inBackgroundTime: number): void;
 }
 
-declare type UIView = import("../assets/quick/scripts/framework/core/ui/UIView").default;
+declare type UIView = import("../assets/quick/core/ui/UIView").default;
 declare interface UIClass<T extends UIView> {
 	new(): T;
 	/**
@@ -167,19 +167,19 @@ declare interface EntryClass<T> {
 	bundle: string;
 }
 
-declare type Entry = import("../assets/quick/scripts/framework/core/entry/Entry").Entry;
-declare type Logic = import("../assets/quick/scripts/framework/core/logic/Logic").Logic;
-declare type GameView = import("../assets/quick/scripts/framework/core/ui/GameView").default;
+declare type Entry = import("../assets/quick/core/entry/Entry").Entry;
+declare type Logic = import("../assets/quick/core/logic/Logic").Logic;
+declare type GameView = import("../assets/quick/core/ui/GameView").default;
 declare interface GameViewClass<T extends UIView> {
 	new(): T;
 	logicType: ModuleClass<Logic>;
 }
 
-declare type Sender = import("../assets/quick/scripts/framework/core/net/service/Sender").Sender;
-declare type Handler = import("../assets/quick/scripts/framework/core/net/service/Handler").Handler;
-declare type ReconnectHandler = import("../assets/quick/scripts/framework/core/net/service/ReconnectHandler").ReconnectHandler;
+declare type Sender = import("../assets/quick/core/net/service/Sender").Sender;
+declare type Handler = import("../assets/quick/core/net/service/Handler").Handler;
+declare type ReconnectHandler = import("../assets/quick/core/net/service/ReconnectHandler").ReconnectHandler;
 
-declare type Service = import("../assets/quick/scripts/framework/core/net/service/Service").Service;
+declare type Service = import("../assets/quick/core/net/service/Service").Service;
 declare interface ServiceClass<T extends Service> extends ModuleClass<T> {
 }
 
@@ -233,7 +233,7 @@ declare function loadDirRes(config: {
 	/**@description 加载进度回调 */
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
 	/**@description 加载完成回调 */
-	onComplete: (data: import("../assets/quick/scripts/framework/core/asset/Resource").Resource.Cache) => void
+	onComplete: (data: import("../assets/quick/core/asset/Resource").Resource.Cache) => void
 	/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
 	dir?: string,
 }): void;
@@ -266,8 +266,8 @@ declare function loadRes<T extends cc.Asset>(config: {
 }): void;
 
 
-declare type EntryDelegate = import("../assets/quick/scripts/framework/core/entry/EntryDelegate").EntryDelegate;
-declare type Message = import("../assets/quick/scripts/framework/core/net/message/Message").Message;
+declare type EntryDelegate = import("../assets/quick/core/entry/EntryDelegate").EntryDelegate;
+declare type Message = import("../assets/quick/core/net/message/Message").Message;
 
 interface IService {
 	addListener?(cmd: string, handleType: any, handleFunc: Function, isQueue: boolean, target: any): any;
@@ -327,9 +327,9 @@ declare interface DefaultOpenOption extends OpenOption {
 	preload: boolean;
 }
 
-declare type ByteArray = import("../assets/quick/scripts/framework/plugin/ByteArray").ByteArray;
+declare type ByteArray = import("../assets/quick/plugin/ByteArray").ByteArray;
 
-declare type TableView = import("../assets/quick/scripts/framework/core/ui/TableView").default;
+declare type TableView = import("../assets/quick/core/ui/TableView").default;
 
 declare let App: import("../assets/Application").Application;
 
