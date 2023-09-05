@@ -1,6 +1,6 @@
 import EventComponent from "../../components/EventComponent";
 import AudioComponent from "../../components/AudioComponent";
-import { _decorator, Node, game, Game, EventKeyboard, macro, input, Input } from "cc";
+import { _decorator, Node, game, Game, EventKeyboard, macro, input, Input, KeyCode } from "cc";
 import { Macro } from "../../defines/Macros";
 
 /**
@@ -121,7 +121,7 @@ export default class UIView extends EventComponent {
     }
 
     protected onKeyUp(ev: EventKeyboard) {
-        if (ev.keyCode == macro.KEY.escape) {
+        if (ev.keyCode == KeyCode.ESCAPE) {
             this.onKeyBackUp(ev);
         } else {
             ev.propagationStopped = true;
@@ -129,7 +129,7 @@ export default class UIView extends EventComponent {
     }
 
     protected onKeyDown(ev: EventKeyboard) {
-        if (ev.keyCode == macro.KEY.escape) {
+        if (ev.keyCode == KeyCode.ESCAPE) {
             this.onKeyBackDown(ev);
         } else {
             ev.propagationStopped = true;

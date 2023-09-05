@@ -41,7 +41,13 @@ class LazyInfo {
                 cache.data.addRef();//为释放管理器添加引用计数
             }
         }
-        cache.stamp = Date.timeNow();
+        if ( cache.inputStamp ){
+            cache.stamp = cache.inputStamp;
+            cache.inputStamp = null!;
+        }else{
+            cache.stamp = Date.timeNow();
+        }
+        
         this._caches.set(cache.key, cache);
     }
 
@@ -299,6 +305,19 @@ export class ReleaseManager implements ISingleton {
 
     onLowMemory() {
         Log.d(`${LOG_TAG}------------收到内存警告，释放无用资源------------`);
+
+        //先释放UI资源
+        this._uiDatas.forEach((v,k)=>{
+            if( isValid(v.view) && isValid(v.node) ){
+                v.node.destroy();
+            }
+            v.loadData.clear();
+            if( v.isPrefab ){
+                App.asset.releaseAsset(v.cache);
+            }
+            this._uiDatas.delete(k);
+        })
+
         this._lazyInfos.forEach((info, key, source) => {
             info.onLowMemory();
         });
@@ -325,6 +344,27 @@ export class ReleaseManager implements ISingleton {
     onAutoReleaseUnuseResources() {
         Log.d(`${LOG_TAG}------------释放长时间未使用资源开始------------`);
         let curBundle = App.stageData.where;
+
+        //释放UI 资源
+        let now = Date.timeNow();
+        this._uiDatas.forEach((v,k)=>{
+            let pass = now - v.cache.stamp!;
+            if (pass >= App.autoReleaseUnuseResourcesTimeout) {
+                Log.d(`${this.module} 释放UI资源 : ${v.name} 开始`)
+                v.updateStamp();
+                if( isValid(v.view) && isValid(v.node) ){
+                    v.node.destroy();
+                }
+                v.loadData.clear();
+                if( v.isPrefab ){
+                    Log.d(`${this.module} 释放UI预置体 : ${v.cache.fullUrl}`)
+                    App.asset.releaseAsset(v.cache);
+                }
+                Log.d(`${this.module} 释放UI资源 : ${v.name} 结束`)
+                this._uiDatas.delete(k);
+            }
+        });
+
         //排除当前bundle的资源，当前bundle正在运行，没有必要释放当前bundle资源
         this._lazyInfos.forEach((info, bundle, source) => {
             if (bundle == curBundle) {
@@ -342,9 +382,25 @@ export class ReleaseManager implements ISingleton {
     /**@description 尝试释放指定bundel的资源 */
     tryRemoveBundle(bundle: BUNDLE_TYPE) {
         Log.d(`${LOG_TAG}--------------尝试释放${bundle}加载资源------------`);
+
+        //先释放UI资源
+        this._uiDatas.forEach((v,k)=>{
+            if ( v.bundle == bundle ){
+                if( isValid(v.view) && isValid(v.node) ){
+                    v.node.destroy();
+                }
+                v.loadData.clear();
+                if( v.isPrefab ){
+                    App.asset.releaseAsset(v.cache);
+                }
+                this._uiDatas.delete(k);
+            }
+        })
+
         this._lazyInfos.forEach((info, key, source) => {
             info.tryRemove(bundle);
         });
+
         let name = this.getBundleName(bundle);
         let temp = assetManager.getBundle(name);
         if (temp) {
@@ -414,25 +470,32 @@ export class ReleaseManager implements ISingleton {
     /**@description 释放 UI 资源数据 */
     releaseUI( data : ViewAsset.Data ){
         data.status = ViewStatus.WAITTING_CLOSE;
-        let result = false;
-        if( isValid(data.view) && isValid(data.node) ){
-            result = true;
-            data.node.removeFromParent();
-            data.view.onClose();
-            if ( !App.isLazyRelease ){
+        if ( App.isLazyRelease && data.isCache ){
+            let result = false;
+            if( isValid(data.view) && isValid(data.node) ){
+                result = true;
+                data.node.removeFromParent();
+                data.view.onClose();
+                data.cache.stamp = Date.timeNow();
+            }else{
+                DEBUG && Log.d(`${this.module} 界面数据已经无效,尝试释放加载的资源`)
+                data.loadData.clear();
+                data.isPrefab && App.asset.releaseAsset(data.cache);
+            }
+            if ( result ){
+                DEBUG && Log.d(`${this.module}加入待释放的UI资源${data.name}`);
+                this._uiDatas.set(data.name,data);
+            }
+        }else{
+            if( isValid(data.view) && isValid(data.node) ){
+                data.node.removeFromParent();
+                data.view.onClose();
                 data.node.destroy();
             }
-        }
-        if ( !App.isLazyRelease ){
             data.loadData.clear();
             if( data.isPrefab ){
                 App.asset.releaseAsset(data.cache);
             }
-        }
-       
-        if ( result ){
-            DEBUG && Log.d(`${this.module}加入待释放的UI资源${data.name}`);
-            this._uiDatas.set(data.name,data);
         }
     }
 
@@ -462,6 +525,11 @@ export class ReleaseManager implements ISingleton {
         }
         Log.d(`--------------${this.module}调试信息如下--------------`)
         if (App.isLazyRelease) {
+
+            this._uiDatas.forEach((v,k)=>{
+                Log.d(`待释放UI ${k}`)
+            })
+
             if (data.bundles.length > 0) {
                 Log.d(`待释放Bundle : ${data.bundles.toString()}`);
             }

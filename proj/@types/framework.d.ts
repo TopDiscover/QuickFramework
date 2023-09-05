@@ -317,6 +317,8 @@ declare interface OpenOption {
 	preload?: boolean;
 	/**@description 用户自定义参数 */
 	args?: any | any[];
+	/**@description 默认为 true 是否缓存界面，开启懒释放功能生效，会把整个界面及加载过的资源都缓存起来，收到内存警告时，才会通过释放管理器释放资源及节点 */
+	isCache?: boolean;
 }
 
 declare interface DefaultOpenOption extends OpenOption {

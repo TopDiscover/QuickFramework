@@ -1,5 +1,5 @@
 import { EntryDelegate } from "./EntryDelegate";
-import { Node } from "cc";
+import { Node, game } from "cc";
 import { DEBUG } from "cc/env";
 import { Macro } from "../../defines/Macros";
 import { UpdateItem } from "../update/UpdateItem";
@@ -122,6 +122,13 @@ export class EntryManager implements ISingleton{
         }
     }
 
+    onDestroyGameView(bundle: BUNDLE_TYPE, gameView: GameView) {
+        let entry = this.getEntry(bundle);
+        if (entry) {
+            entry.onDestroyGameView(gameView);
+        }
+    }
+
     /**@description 管理器调用show时,在GameView的onLoad之后  */
     onShowGameView(bundle : BUNDLE_TYPE , gameView : GameView){
         let entry = this.getEntry(bundle);
@@ -131,18 +138,18 @@ export class EntryManager implements ISingleton{
         }
     }
 
+    onCloseGameView(bundle : BUNDLE_TYPE , gameView : GameView){
+        let entry = this.getEntry(bundle);
+        if ( entry ){
+            entry.onCloseGameView(gameView);
+        }
+    }
+
     /**@description bundle管事器卸载bundle前通知 */
     onUnloadBundle(bundle: BUNDLE_TYPE) {
         let entry = this.getEntry(bundle);
         if (entry) {
             entry.onUnloadBundle();
-        }
-    }
-
-    onDestroyGameView(bundle: BUNDLE_TYPE, gameView: GameView) {
-        let entry = this.getEntry(bundle);
-        if (entry) {
-            entry.onDestroyGameView(gameView);
         }
     }
 

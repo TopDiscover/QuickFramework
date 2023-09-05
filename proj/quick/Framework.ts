@@ -36,6 +36,11 @@ import { EntryImpl } from "./update/EntryImpl";
 /**@description 框架层使用的各管理器单例的管理 */
 export class Framewok implements GameEventInterface{
 
+    /**@description 全局的默认值 是否允许缓存UI 资源,即 UIView 界面元素，需要开启 isLazyRelease 才有效  */
+    get isCacheUI(){
+        return false;
+    }
+
     get Bundles() {
         return this.stageData.bundles;
     }
@@ -62,7 +67,8 @@ export class Framewok implements GameEventInterface{
 
     /**@description 当isLazyRelease 为true时有效，当资源长时间未使用时自动释放 */
     get autoReleaseUnuseResourcesTimeout() {
-        return 5 * 60;
+        // return 5 * 60;
+        return 10;
     }
 
     /**@description 资源释放管理 */

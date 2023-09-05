@@ -94,6 +94,8 @@ export namespace Resource {
         resourceType: Type = Type.Local;
         /**@description 加入释放资源的時間戳 */
         stamp: number | null = null;
+        /**@description 外部输入时间戳 */
+        inputStamp : number = null!;
 
         /**@description 是否已经加载完成 */
         isLoaded: boolean = false;

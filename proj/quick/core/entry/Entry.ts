@@ -42,7 +42,7 @@ export class EntryData {
 }
 
 export abstract class Entry {
-
+    /**@description 外部模块可直接指定bund进行去bundle内调用 */
     static bundle = "";
     gameViewType : typeof GameView = null!;
     /**@description 是否是主包入口，只能有一个主包入口 */
@@ -100,33 +100,6 @@ export abstract class Entry {
         });
     }
 
-    /**@description 这个位置说明自己GameView 进入onLoad完成 */
-    onEnterGameView(gameViw: GameView): void {
-        this._gameView = gameViw;
-        let viewType = App.uiManager.getViewType(gameViw);
-        if (viewType) {
-            if (viewType.logicType) {
-                viewType.logicType.module = gameViw.bundle as string;
-                let logic = App.logicManager.get(viewType.logicType, true);
-                if (logic) {
-                    gameViw.setLogic(logic);
-                }
-            } else {
-                if (DEBUG) {
-                    Log.w(`${js.getClassName(viewType)}未指定logictype`);
-                }
-            }
-        }
-    }
-
-    onShowGameView(gameView: GameView) {
-
-    }
-
-    onDestroyGameView(gameView: GameView) {
-        this._gameView = null as any;
-    }
-
     /**@description 卸载bundle,即在自己bundle删除之前最后的一条消息 */
     onUnloadBundle(): void {
         DEBUG && Log.d(`${this.bundle} : onUnloadBundle`)
@@ -171,4 +144,47 @@ export abstract class Entry {
     public call(eventName: string, args: any[]): void {
 
     }
+
+
+
+    /**@description 这个位置说明自己GameView 进入onLoad完成 */
+    onEnterGameView(gameViw: GameView): void {
+        this._gameView = gameViw;
+        let viewType = App.uiManager.getViewType(gameViw);
+        if (viewType) {
+            if (viewType.logicType) {
+                viewType.logicType.module = gameViw.bundle as string;
+                let logic = App.logicManager.get(viewType.logicType, true);
+                if (logic) {
+                    gameViw.setLogic(logic);
+                }
+            } else {
+                if (DEBUG) {
+                    Log.w(`${js.getClassName(viewType)}未指定logictype`);
+                }
+            }
+        }
+    }
+
+    /**
+     * @description GameView 销毁 
+     * @param gameView 
+     */
+    onDestroyGameView(gameView: GameView) {
+        this._gameView = null as any;
+    }
+
+    /**
+     * @description GameView  显示
+     * @param gameView 
+     */
+    onShowGameView(gameView: GameView) {
+        this._gameView = gameView;
+    }
+
+    /**@description GameView 关闭 */
+    onCloseGameView(gameView: GameView) {
+        this._gameView = null!;
+    }
+
 }

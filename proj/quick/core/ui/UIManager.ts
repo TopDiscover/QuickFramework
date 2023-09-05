@@ -70,6 +70,7 @@ export class UIManager implements ISingleton {
             preload: false,
             type: options.type,
             args: options.args,
+            isCache : App.isCacheUI
         };
         if (options.bundle != undefined) {
             out.bundle = options.bundle;
@@ -79,6 +80,9 @@ export class UIManager implements ISingleton {
         }
         if (options.preload != undefined) {
             out.preload = options.preload;
+        }
+        if ( options.isCache != undefined ){
+            out.isCache = options.isCache;
         }
         return out;
     }
@@ -181,6 +185,7 @@ export class UIManager implements ISingleton {
                 viewData.isPrefab = result.isPrefab;
                 viewData.viewType = openOption.type;
                 viewData.bundle = openOption.bundle;
+                viewData.isCache = openOption.isCache!;
                 this._viewDatas.set(className, viewData);
                 if (!result.isPrefab) {
                     //说明存在于主场景中

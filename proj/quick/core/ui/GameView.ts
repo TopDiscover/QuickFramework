@@ -29,16 +29,11 @@ export default class GameView extends UIView {
     onLoad(){
         super.onLoad();
         //进入场景完成，即onLoad最后一行  必须发进入完成事件
-        // this.onEnterGameView()
-    }
-
-    show(args ?: any[] | any){
-        super.show(args);
-        App.entryManager.onShowGameView(this.bundle,this);
+        this.onEnterGameView()
     }
 
     onShow(): void {
-        this.onEnterGameView();
+        App.entryManager.onShowGameView(this.bundle,this);
     }
 
     protected onEnterGameView(){
@@ -63,15 +58,15 @@ export default class GameView extends UIView {
     }
 
     onDestroy(){
-        // if ( this.audioHelper ){
-        //     //停止背景音乐
-        //     //this.audioHelper.stopMusic();
-        //     this.audioHelper.stopAllEffects();
-        // }
-        // if ( this.logic ){
-        //     App.logicManager.destory(this.logic.bundle);
-        // }
-        // App.entryManager.onDestroyGameView(this.bundle,this);
+        if ( this.audioHelper ){
+            //停止背景音乐
+            //this.audioHelper.stopMusic();
+            this.audioHelper.stopAllEffects();
+        }
+        if ( this.logic ){
+            App.logicManager.destory(this.logic.bundle);
+        }
+        App.entryManager.onDestroyGameView(this.bundle,this);
         super.onDestroy();
     }
 
@@ -80,9 +75,6 @@ export default class GameView extends UIView {
             //停止背景音乐
             //this.audioHelper.stopMusic();
             this.audioHelper.stopAllEffects();
-        }
-        if ( this.logic ){
-            App.logicManager.destory(this.logic.bundle);
         }
         App.entryManager.onDestroyGameView(this.bundle,this);
         super.onClose();

@@ -4,7 +4,7 @@
  */
 
 import { DEBUG } from "cc/env";
-import { Node } from "cc";
+import { Node, tiledLayerAssembler } from "cc";
 import { Resource } from "./Resource";
 import { ViewStatus } from "../../defines/Enums";
 import { Macro } from "../../defines/Macros";
@@ -84,6 +84,19 @@ export namespace ViewAsset {
                 }
             }
         }
+
+        updateStamp(stamp: number) {
+            if ( this.local ){
+                this.local.forEach((v)=>{
+                    v.stamp = stamp;
+                })
+            }
+            if ( this.remote ){
+                this.remote.forEach(v=>{
+                    v.stamp = stamp;
+                })
+            }
+        }
     }
 
     export class Data {
@@ -110,6 +123,7 @@ export namespace ViewAsset {
         /**@description 界面动态加载的数据 */
         loadData: Dynamic = new Dynamic();
         node: Node = null!;
+        isCache:boolean = false;
 
         get name(){
             return this.loadData.name!;
@@ -141,6 +155,13 @@ export namespace ViewAsset {
         doCallback(view: UIView | null, className: string, msg: string) {
             this.doFinish(view, className, msg);
             this.doGet(view, className, msg);
+        }
+
+        updateStamp(){
+            if ( this.cache ){
+                let stamp = this.cache.stamp;
+                this.loadData.updateStamp(stamp!);
+            }
         }
     }
 }
