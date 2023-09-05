@@ -8,8 +8,11 @@
 import { Asset, assetManager, Node, isValid, tween, Tween, Prefab, AssetManager, SpriteFrame, Texture2D, sp, JsonAsset, TextAsset } from "cc";
 import { Macro } from "../../defines/Macros";
 import { Resource } from "./Resource";
+import { ViewAsset } from "./ViewAsset";
+import { ViewStatus } from "../../defines/Enums";
+import { DEBUG } from "cc/env";
 
-const LOG_TAG = "[ReleaseManager] : ";
+const LOG_TAG = "【释放管理器】 : ";
 
 class LazyInfo {
 
@@ -193,7 +196,7 @@ class LazyInfo {
 }
 
 export class ReleaseManager implements ISingleton {
-    static module: string = "【资源管理器】";
+    static module: string = LOG_TAG;
     isResident?: boolean = true;
     module: string = null!;
     /**@description 待释放资源 */
@@ -202,6 +205,8 @@ export class ReleaseManager implements ISingleton {
     private _bundles: Map<string, boolean> = new Map();
     /**@description 远程资源 */
     private _remote: LazyInfo = new LazyInfo(Macro.BUNDLE_REMOTE);
+    /**@description 界面资源 */
+    private _uiDatas = new Map<string,ViewAsset.Data>;
 
     private _actionTag = 999;
 
@@ -384,6 +389,50 @@ export class ReleaseManager implements ISingleton {
             if (cache.data instanceof Asset) {
                 assetManager.releaseAsset(cache.data as Asset);
             }
+        }
+    }
+
+    /**@description 获取 UI 资源数据 */
+    getUI( name : string ){
+        let out = this._uiDatas.get(name);
+        if ( out ){
+            if ( isValid(out.view) && isValid(out.node) ){
+                DEBUG && Log.d(`${this.module}获取待释放UI资源 : ${name}`)
+            }else{
+                DEBUG && Log.d(`${this.module}获取待释放UI资源 : ${name} 时，节点已经销毁`);
+                out.loadData.clear();
+                if ( out.isPrefab ){
+                    App.asset.releaseAsset(out.cache);
+                }
+                out = undefined;
+            }
+            this._uiDatas.delete(name);
+        }
+        return out;
+    }
+
+    /**@description 释放 UI 资源数据 */
+    releaseUI( data : ViewAsset.Data ){
+        data.status = ViewStatus.WAITTING_CLOSE;
+        let result = false;
+        if( isValid(data.view) && isValid(data.node) ){
+            result = true;
+            data.node.removeFromParent();
+            data.view.onClose();
+            if ( !App.isLazyRelease ){
+                data.node.destroy();
+            }
+        }
+        if ( !App.isLazyRelease ){
+            data.loadData.clear();
+            if( data.isPrefab ){
+                App.asset.releaseAsset(data.cache);
+            }
+        }
+       
+        if ( result ){
+            DEBUG && Log.d(`${this.module}加入待释放的UI资源${data.name}`);
+            this._uiDatas.set(data.name,data);
         }
     }
 

@@ -107,11 +107,13 @@ export namespace ViewAsset {
         viewType: UIClass<UIView> = null!;
         /**@description bundle */
         bundle: BUNDLE_TYPE = null!;
-
         /**@description 界面动态加载的数据 */
         loadData: Dynamic = new Dynamic();
-
         node: Node = null!;
+
+        get name(){
+            return this.loadData.name!;
+        }
 
         private doGet(view: UIView | null, className: string, msg: string) {
             for (let i = 0; i < this.getViewCb.length; i++) {

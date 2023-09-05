@@ -128,7 +128,22 @@ export class UIManager implements ISingleton {
                 reslove(<any>null);
                 return;
             }
-            let viewData = this.getViewData(openOption.type);
+            //先从缓存中获取资源
+            let viewData = App.releaseManger.getUI(className)!;
+            if( viewData ){
+                this._viewDatas.set(className, viewData);
+                viewData.status = ViewStatus.WAITTING_NONE;
+                if (!openOption.preload) {
+                    viewData.node.zIndex = openOption.zIndex;
+                    if (!viewData.node.parent) {
+                        this.addView(viewData.node, openOption.zIndex);
+                    }
+                    viewData.view.show(openOption.args);
+                }
+                reslove(<T>viewData.view);
+                return;
+            }
+            viewData = this.getViewData(openOption.type);
             if (viewData) {
                 viewData.isPreload = openOption.preload;
                 //已经加载
@@ -193,7 +208,7 @@ export class UIManager implements ISingleton {
                     }).catch((reason) => {
                         viewData.isLoaded = true;
                         Log.e(reason);
-                        this.close(openOption.type);
+                        this._close(viewData);
                         viewData.doCallback(null, className, "打开界面异常");
                         reslove(<any>null);
                         let uiName = "";
@@ -212,7 +227,7 @@ export class UIManager implements ISingleton {
 
     private _addComponent(uiNode: Node, viewData: ViewAsset.Data, openOption: DefaultOpenOption): UIView | null {
         if (uiNode) {
-            let className = this.getClassName(viewData.viewType);
+            let className = viewData.name;
             //挂载脚本
             let view = uiNode.getComponent(viewData.viewType);
             if (!view) {
@@ -252,7 +267,7 @@ export class UIManager implements ISingleton {
 
     private createNode(viewData: ViewAsset.Data, reslove: any, openOptions: DefaultOpenOption) {
         viewData.isLoaded = true;
-        let className = this.getClassName(viewData.viewType);
+        let className = viewData.name;
         if (viewData.status == ViewStatus.WAITTING_CLOSE) {
             //加载过程中有人关闭了界面
             reslove(null);
@@ -412,19 +427,15 @@ export class UIManager implements ISingleton {
         //当前所有界面都已经加载完成
         let viewData = this.getViewData(data);
         if (viewData) {
-            viewData.status = ViewStatus.WAITTING_CLOSE;
-            let className = this.getClassName(data);
-            if (viewData.view && isValid(viewData.node)) {
-                viewData.node.removeFromParent();
-                viewData.node.destroy();
-            }
-            viewData.loadData.clear();
-            if (viewData.isPrefab) {
-                App.asset.releaseAsset(viewData.cache);
-            }
-            this._viewDatas.delete(className);
-            Log.d(`${this.module} close view : ${className}`);
+            this._close(viewData);
         }
+    }
+
+    private _close( data : ViewAsset.Data ){
+        let className = data.name;
+        App.releaseManger.releaseUI(data);
+        this._viewDatas.delete(className);
+        Log.d(`${this.module} close view : ${className}`);
     }
 
     /**@description 关闭除传入参数以外的所有其它界面,不传入，关闭所有界面 */
