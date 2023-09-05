@@ -55,6 +55,7 @@ class RemoteLoader {
                 } else {
                     if (DEBUG) Log.w(`${this._logTag}加载图片错误${url}`);
                     resolve([null!, null!]);
+                    App.cache.remoteCaches.remove(url,SpriteFrame,true);
                 }
             })
         });
@@ -109,19 +110,19 @@ class RemoteLoader {
                                         } else {
                                             resolve([null!, null!]);
                                             cache.doFinish([null!, null!]);
-                                            App.cache.remoteCaches.remove(spineAtlas, TextAsset);
+                                            App.cache.remoteCaches.remove(cache.url, sp.SkeletonData,true);
                                         }
                                     });
                                 } else {
                                     resolve([null!, null!]);
                                     cache.doFinish([null!, null!]);
-                                    App.cache.remoteCaches.remove(spineJson, JsonAsset);
+                                    App.cache.remoteCaches.remove(cache.url, sp.SkeletonData,true);
                                 }
                             });
                         } else {
                             resolve([null!, null!]);
                             cache.doFinish([null, null]);
-                            App.cache.remoteCaches.remove(spinePng, Texture2D);
+                            App.cache.remoteCaches.remove(cache.url, sp.SkeletonData,true);
                         }
                     })
                 }

@@ -5,156 +5,17 @@ import { Macro } from "../../defines/Macros";
 import AdapterView from "../adapter/AdapterView";
 import { Resource } from "../asset/Resource";
 import UIView from "./UIView";
-
-/**@description 动态加载垃圾数据名 */
-const DYNAMIC_LOAD_GARBAGE = "DYNAMIC_LOAD_GARBAGE";
-/**@description 动画加载全局数据名 */
-const DYNAMIC_LOAD_RETAIN_MEMORY = "DYNAMIC_LOAD_RETAIN_MEMORY";
-export class ViewDynamicLoadData {
-    private local = new Map<string, Resource.Cache>();
-    private remote = new Map<string, Resource.Cache>();
-    public name: string | null;
-
-    constructor(name: string | null = null) {
-        this.name = name;
-    }
-
-    /**@description 添加动态加载的本地资源 */
-    public addLocal(cache : Resource.Cache, className: string | null = null) {
-        if (this.name == DYNAMIC_LOAD_GARBAGE) {
-            Log.e(`找不到资源持有者: ${cache.key}`);
-        }
-        if (DEBUG) App.uiManager.checkView(cache.key, className);
-        if (!this.local.has(cache.key)) {
-            App.asset.retainAsset(cache);
-            this.local.set(cache.key, cache);
-        }
-    }
-
-    /**@description 添加动态加载的远程资源 */
-    public addRemote(cache : Resource.Cache, className: string | null = null) {
-        if (!this.remote.has(cache.key)) {
-            if (this.name == DYNAMIC_LOAD_GARBAGE) {
-                Log.e(`找不到资源持有者 : ${cache.key}`);
-            }
-            if (DEBUG) App.uiManager.checkView(cache.key, className);
-            App.cache.remoteCaches.retainAsset(cache);
-            this.remote.set(cache.key, cache);
-        }
-    }
-
-    /**@description 清除远程加载资源 */
-    public clear() {
-        if (this.name == DYNAMIC_LOAD_GARBAGE) {
-            //先输出
-            let isShow = this.local.size > 0 || this.remote.size > 0;
-            if (isShow) {
-                Log.e(`当前未能释放资源如下:`);
-            }
-            if (this.local && this.local.size > 0) {
-                Log.e("-----------local-----------");
-                if (this.local) {
-                    this.local.forEach((value, key) => {
-                        Log.e(key);
-                    });
-                }
-            }
-            if (this.remote && this.remote.size > 0) {
-                Log.e("-----------remote-----------");
-                if (this.remote) {
-                    this.remote.forEach((value, key) => {
-                        Log.e(key);
-                    });
-                }
-            }
-
-        } else {
-            //先清除当前资源的引用关系
-            if (this.local) {
-                this.local.forEach((value, key) => {
-                    App.asset.releaseAsset(value);
-                });
-                this.local.clear();
-            }
-            if (this.remote) {
-                this.remote.forEach((value, key) => {
-                    App.cache.remoteCaches.releaseAsset(value);
-                });
-                this.remote.clear();
-            }
-        }
-
-    }
-}
-
-/**@description 界面数据，这里需要处理一个问题，当一个界面打开，收到另一个人的关闭，此时如果界面未加载完成
- * 可能导致另一个人关闭无效，等界面加载完成后，又显示出来
- */
-class ViewData {
-    /**@description 界面是否已经加载 */
-    isLoaded: boolean = false;
-    /**@description 界面当前等待操作状态 */
-    status: ViewStatus = ViewStatus.WAITTING_NONE;
-    /**@description 实际显示界面 */
-    view: UIView = null!;
-    /**@description 等待加载完成回调 */
-    finishCb: ((view: any) => void)[] = [];
-    /**@description 等待获取界面回调 */
-    getViewCb: ((view: any) => void)[] = [];
-    /**是否预加载,不显示出来，但会加到当前场景上 */
-    isPreload: boolean = false;
-    /**@description 是否通过预置创建 */
-    isPrefab: boolean = true;
-    /**@description 资源缓存信息 */
-    cache: Resource.Cache = null!;
-    /**@description 界面的类型 */
-    viewType: UIClass<UIView> = null!;
-    /**@description bundle */
-    bundle: BUNDLE_TYPE = null!;
-
-    /**@description 界面动态加载的数据 */
-    loadData: ViewDynamicLoadData = new ViewDynamicLoadData();
-
-    node: Node = null!;
-
-    private doGet(view: UIView | null, className: string, msg: string) {
-        for (let i = 0; i < this.getViewCb.length; i++) {
-            let cb = this.getViewCb[i];
-            if (cb) {
-                cb(view);
-                if (DEBUG) Log.w(`ViewData do get view : ${className} msg : ${msg}`);
-            }
-        }
-
-        this.getViewCb = [];
-    }
-
-    private doFinish(view: UIView | null, className: string, msg: string) {
-        for (let i = 0; i < this.finishCb.length; i++) {
-            let cb = this.finishCb[i];
-            if (cb) {
-                cb(view);
-                if (DEBUG) Log.w(`ViewData do finish view : ${className} msg : ${msg}`);
-            }
-        }
-        this.finishCb = [];
-    }
-
-    doCallback(view: UIView | null, className: string, msg: string) {
-        this.doFinish(view, className, msg);
-        this.doGet(view, className, msg);
-    }
-}
+import { ViewAsset } from "../asset/ViewAsset";
 
 export class UIManager implements ISingleton {
     isResident?: boolean = true;
     static module: string = "【UI管理器】";
     module: string = null!;
     /**@description 视图 */
-    private _viewDatas: Map<string, ViewData> = new Map<string, ViewData>();
-    private getViewData(className: string): ViewData;
-    private getViewData<T extends UIView>(uiClass: UIClass<T>): ViewData;
-    private getViewData(data: any): ViewData | undefined {
+    private _viewDatas: Map<string, ViewAsset.Data> = new Map<string, ViewAsset.Data>();
+    private getViewData(className: string): ViewAsset.Data;
+    private getViewData<T extends UIView>(uiClass: UIClass<T>): ViewAsset.Data;
+    private getViewData(data: any): ViewAsset.Data | undefined {
         let className = this.getClassName(data);
         if (!className) return undefined;
         let viewData = this._viewDatas.has(className) ? this._viewDatas.get(className) : undefined;
@@ -196,9 +57,9 @@ export class UIManager implements ISingleton {
     }
 
     /**@description 无主资源 */
-    public garbage = new ViewDynamicLoadData(DYNAMIC_LOAD_GARBAGE);
+    public garbage = new ViewAsset.Dynamic(Macro.DYNAMIC_LOAD_GARBAGE);
     /**@description 驻留内存资源 */
-    public retainMemory = new ViewDynamicLoadData(DYNAMIC_LOAD_RETAIN_MEMORY);
+    public retainMemory = new ViewAsset.Dynamic(Macro.DYNAMIC_LOAD_RETAIN_MEMORY);
 
     private defaultOpenOption(options: OpenOption) {
         let out: DefaultOpenOption = {
@@ -297,7 +158,7 @@ export class UIManager implements ISingleton {
                 }
             }
             else {
-                viewData = new ViewData();
+                viewData = new ViewAsset.Data();
                 viewData.loadData.name = className;
                 let prefabUrl = openOption.type.getPrefabUrl();
                 let result = this.parsePrefabUrl(prefabUrl);
@@ -349,7 +210,7 @@ export class UIManager implements ISingleton {
         });
     }
 
-    private _addComponent(uiNode: Node, viewData: ViewData, openOption: DefaultOpenOption): UIView | null {
+    private _addComponent(uiNode: Node, viewData: ViewAsset.Data, openOption: DefaultOpenOption): UIView | null {
         if (uiNode) {
             let className = this.getClassName(viewData.viewType);
             //挂载脚本
@@ -389,7 +250,7 @@ export class UIManager implements ISingleton {
         }
     }
 
-    private createNode(viewData: ViewData, reslove: any, openOptions: DefaultOpenOption) {
+    private createNode(viewData: ViewAsset.Data, reslove: any, openOptions: DefaultOpenOption) {
         viewData.isLoaded = true;
         let className = this.getClassName(viewData.viewType);
         if (viewData.status == ViewStatus.WAITTING_CLOSE) {
@@ -572,7 +433,7 @@ export class UIManager implements ISingleton {
         if (views == undefined || views == null || views.length == 0) {
             //关闭所有界面
             if (DEBUG) Log.e(`请检查参数，至少需要保留一个界面，不然就黑屏了，大兄弟`);
-            this._viewDatas.forEach((viewData: ViewData, key: string) => {
+            this._viewDatas.forEach((viewData, key) => {
                 self.close(key);
             });
             return;
@@ -584,7 +445,7 @@ export class UIManager implements ISingleton {
             viewClassNames.add(this.getClassName(views[i] as any));
         }
 
-        this._viewDatas.forEach((viewData: ViewData, key: string) => {
+        this._viewDatas.forEach((viewData, key) => {
             if (viewClassNames.has(key)) {
                 //如果包含，不做处理，是排除项
                 return;

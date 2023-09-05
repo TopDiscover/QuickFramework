@@ -126,19 +126,19 @@ export namespace Resource {
 
         debug() {
 
-            let info = (data: Asset | Asset[] | null) => {
+            let type = js.getClassName(this.type);
+            let info = (data: Asset | Asset[] | null) : { url: string, isValid: boolean, refCount: number }[] =>{
                 if (!data) {
-                    return [];
+                    return [{ url : this.fullUrl , isValid : false , refCount : -1}];
                 }
                 if (Array.isArray(data)) {
-                    let datas: { url: string, isValid: boolean, refCount: number, type: string }[] = [];
+                    let datas: { url: string, isValid: boolean, refCount: number }[] = [];
                     data.forEach(v => {
                         let temp = isValid(v);
                         datas.push({
                             url: `${this.fullUrl}/${temp ? v.name : "unknown"}`,
                             isValid: temp,
-                            refCount: temp ? v.refCount : -1,
-                            type: js.getClassName(v),
+                            refCount: temp ? v.refCount : -1
                         })
                     })
                     return datas;
@@ -147,8 +147,7 @@ export namespace Resource {
                     return [{
                         url: this.fullUrl,
                         isValid: temp,
-                        refCount: temp ? data.refCount : -1,
-                        type: js.getClassName(data),
+                        refCount: temp ? data.refCount : -1
                     }];
                 }
             };
@@ -157,6 +156,7 @@ export namespace Resource {
                 isLoaded: this.isLoaded,
                 info: info(this.data),
                 status: this.status,
+                type : type,
             }
             return data;
         }

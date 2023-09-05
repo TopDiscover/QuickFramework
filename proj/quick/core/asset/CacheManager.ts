@@ -186,10 +186,14 @@ class RemoteCaches {
         let cache = this.get(key);
         if (cache) {
             let data: Asset = cache.data as any;
-            data.decRef(false);
-            if (data.refCount <= 0) {
+            if ( isValid(data) ){
+                data.decRef(false);
+                if (data.refCount <= 0) {
+                    this._caches.delete(key);
+                    App.releaseManger.releaseRemote(cache, force);
+                }
+            }else{
                 this._caches.delete(key);
-                App.releaseManger.releaseRemote(cache, force);
             }
         }
     }
