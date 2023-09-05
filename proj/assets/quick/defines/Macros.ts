@@ -29,4 +29,8 @@ export namespace Macro{
     export const SHOW_DEBUG_INFO_KEY = "SHOW_DEBUG_INFO_KEY";
     /**@description 网络重连弹出框tag */
     export const RECONNECT_ALERT_TAG = "RECONNECT_ALERT_TAG";
+    /**@description 动态加载垃圾数据名 */
+    export const DYNAMIC_LOAD_GARBAGE = "DYNAMIC_LOAD_GARBAGE";
+    /**@description 动画加载全局数据名 */
+    export const DYNAMIC_LOAD_RETAIN_MEMORY = "DYNAMIC_LOAD_RETAIN_MEMORY";
 }
