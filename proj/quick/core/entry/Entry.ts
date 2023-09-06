@@ -42,7 +42,7 @@ export class EntryData {
 }
 
 export abstract class Entry {
-    /**@description 外部模块可直接指定bund进行去bundle内调用 */
+    /**@description 子类可直接指定bundle 该值会设置到成员变量 bundle 上 */
     static bundle = "";
     gameViewType : typeof GameView = null!;
     /**@description 是否是主包入口，只能有一个主包入口 */

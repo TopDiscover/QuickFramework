@@ -76,7 +76,7 @@ export default class GameView extends UIView {
             //this.audioHelper.stopMusic();
             this.audioHelper.stopAllEffects();
         }
-        App.entryManager.onDestroyGameView(this.bundle,this);
+        App.entryManager.onCloseGameView(this.bundle,this);
         super.onClose();
     }
 
