@@ -4,7 +4,7 @@
  */
 
 import { DEBUG } from "cc/env";
-import { Node, tiledLayerAssembler } from "cc";
+import { Node, isValid, tiledLayerAssembler } from "cc";
 import { Resource } from "./Resource";
 import { ViewStatus } from "../../defines/Enums";
 import { Macro } from "../../defines/Macros";
@@ -45,7 +45,7 @@ export namespace ViewAsset {
         }
 
         /**@description 清除远程加载资源 */
-        public clear() {
+        public clear(isCache = false) {
             if (this.name == Macro.DYNAMIC_LOAD_GARBAGE) {
                 //先输出
                 let isShow = this.local.size > 0 || this.remote.size > 0;
@@ -74,27 +74,39 @@ export namespace ViewAsset {
                     this.local.forEach((value, key) => {
                         App.asset.releaseAsset(value);
                     });
-                    this.local.clear();
+                    if (!isCache) {
+                        this.local.clear();
+                    }
                 }
                 if (this.remote) {
                     this.remote.forEach((value, key) => {
                         App.cache.remoteCaches.releaseAsset(value);
                     });
-                    this.remote.clear();
+                    if (!isCache) {
+                        this.remote.clear();
+                    }
                 }
             }
         }
 
-        updateStamp(stamp: number) {
-            if ( this.local ){
-                this.local.forEach((v)=>{
-                    v.stamp = stamp;
-                })
+        resume(input: Resource.Cache) {
+            let cache = App.releaseManger.get(input.bundle, input.key);
+            if (cache) {
+                App.cache.set(cache);
+                App.asset.retainAsset(cache);
             }
-            if ( this.remote ){
-                this.remote.forEach(v=>{
-                    v.stamp = stamp;
-                })
+        }
+
+        resumeRelease() {
+            if (this.local) {
+                this.local.forEach((value, key) => {
+                    this.resume(value);
+                });
+            }
+            if (this.remote) {
+                this.remote.forEach((value, key) => {
+                    this.resume(value);
+                });
             }
         }
     }
@@ -123,9 +135,9 @@ export namespace ViewAsset {
         /**@description 界面动态加载的数据 */
         loadData: Dynamic = new Dynamic();
         node: Node = null!;
-        isCache:boolean = false;
+        isCache: boolean = false;
 
-        get name(){
+        get name() {
             return this.loadData.name!;
         }
 
@@ -157,10 +169,50 @@ export namespace ViewAsset {
             this.doGet(view, className, msg);
         }
 
-        updateStamp(){
-            if ( this.cache ){
-                let stamp = this.cache.stamp;
-                this.loadData.updateStamp(stamp!);
+        resumeRelease() {
+            let isCache = App.isLazyRelease && this.isCache;
+            let ret = this;
+            if (isCache) {
+                //如果节点已经不存在，则直接销毁资源
+                if (isValid(this.view) && isValid(this.node)) {
+                    //先从释放管理器中取回预置
+                    if (this.isPrefab) {
+                        this.loadData.resume(this.cache);
+                    }
+                    //从待释放资源中取回已经加载过的资源
+                    this.loadData.resumeRelease();
+                } else {
+                    //在释放管理器资源，由管理继续管理，等待超时释放就可以了
+                    ret = undefined!;
+                }
+            }
+            return ret;
+        }
+
+        toRelease() {
+            this.status == ViewStatus.WAITTING_CLOSE;
+            let isCache = App.isLazyRelease && this.isCache;
+            let isSuccess = false;
+            if (isValid(this.view) && isValid(this.node)) {
+                this.node.removeFromParent();
+                this.view.onClose();
+                if (isCache) {
+                    isSuccess = true
+                } else {
+                    this.node.destroy();
+                }
+            }
+            if (this.isPrefab && this.cache) {
+                App.asset.releaseAsset(this.cache);
+            }
+            this.loadData.clear(isCache);
+            return isSuccess;
+        }
+
+        destroy(){
+            if ( isValid(this.view) && isValid(this.node) ){
+                this.node.destroy();
+                DEBUG && Log.d(`${App.releaseManger.module}销毁UI : ${this.name}`);
             }
         }
     }
