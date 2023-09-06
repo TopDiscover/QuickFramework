@@ -6,6 +6,10 @@ export class EntryDelegate {
 
     /**@description 进入bundle完成 */
     onEnterGameView(entry: Entry | null, gameView: GameView) {
+
+    }
+
+    onShowGameView(entry: Entry | null, gameView: GameView) {
         //删除除自己之外的其它bundle
         let excludeBundles = this.getPersistBundle();
         if (entry) {
@@ -21,10 +25,6 @@ export class EntryDelegate {
         App.bundleManager.removeLoadedBundle(excludeBundles);
     }
 
-    onShowGameView(entry: Entry | null, gameView: GameView) {
-
-    }
-
     /**@description 主包检测更新 */
     onCheckUpdate() {
         Log.d(`主包检测更新`);
@@ -37,7 +37,7 @@ export class EntryDelegate {
         return [Macro.BUNDLE_RESOURCES];
     }
 
-    onEnterMain(mainEntry: Entry | null , userData ?: any) {
+    onEnterMain(mainEntry: Entry | null, userData?: any) {
         if (mainEntry) {
             if (App.gameView) {
                 App.gameView.close();

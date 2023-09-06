@@ -2,9 +2,9 @@
  * @description 界面资源
  */
 
+import { Resource } from "./Resource";
 import { ViewStatus } from "../../defines/Enums";
 import { Macro } from "../../defines/Macros";
-import { Resource } from "./Resource";
 
 export namespace ViewAsset {
     /**@description 动态加载资源 */
@@ -42,7 +42,7 @@ export namespace ViewAsset {
         }
 
         /**@description 清除远程加载资源 */
-        public clear() {
+        public clear(isCache = false) {
             if (this.name == Macro.DYNAMIC_LOAD_GARBAGE) {
                 //先输出
                 let isShow = this.local.size > 0 || this.remote.size > 0;
@@ -65,21 +65,45 @@ export namespace ViewAsset {
                         });
                     }
                 }
-
             } else {
                 //先清除当前资源的引用关系
                 if (this.local) {
                     this.local.forEach((value, key) => {
                         App.asset.releaseAsset(value);
                     });
-                    this.local.clear();
+                    if (!isCache) {
+                        this.local.clear();
+                    }
                 }
                 if (this.remote) {
                     this.remote.forEach((value, key) => {
                         App.cache.remoteCaches.releaseAsset(value);
                     });
-                    this.remote.clear();
+                    if (!isCache) {
+                        this.remote.clear();
+                    }
                 }
+            }
+        }
+
+        resume(input: Resource.Cache) {
+            let cache = App.releaseManger.get(input.bundle, input.key);
+            if (cache) {
+                App.cache.set(cache);
+                App.asset.retainAsset(cache);
+            }
+        }
+
+        resumeRelease() {
+            if (this.local) {
+                this.local.forEach((value, key) => {
+                    this.resume(value);
+                });
+            }
+            if (this.remote) {
+                this.remote.forEach((value, key) => {
+                    this.resume(value);
+                });
             }
         }
     }
@@ -105,11 +129,14 @@ export namespace ViewAsset {
         viewType: UIClass<UIView> = null!;
         /**@description bundle */
         bundle: BUNDLE_TYPE = null!;
-
         /**@description 界面动态加载的数据 */
         loadData: Dynamic = new Dynamic();
+        node: cc.Node = null!;
+        isCache: boolean = false;
 
-        node: cc.Node = null;
+        get name() {
+            return this.loadData.name!;
+        }
 
         private doGet(view: UIView | null, className: string, msg: string) {
             for (let i = 0; i < this.getViewCb.length; i++) {
@@ -137,6 +164,53 @@ export namespace ViewAsset {
         doCallback(view: UIView | null, className: string, msg: string) {
             this.doFinish(view, className, msg);
             this.doGet(view, className, msg);
+        }
+
+        resumeRelease() {
+            let isCache = App.isLazyRelease && this.isCache;
+            let ret = this;
+            if (isCache) {
+                //如果节点已经不存在，则直接销毁资源
+                if (cc.isValid(this.view) && cc.isValid(this.node)) {
+                    //先从释放管理器中取回预置
+                    if (this.isPrefab) {
+                        this.loadData.resume(this.cache);
+                    }
+                    //从待释放资源中取回已经加载过的资源
+                    this.loadData.resumeRelease();
+                } else {
+                    //在释放管理器资源，由管理继续管理，等待超时释放就可以了
+                    ret = undefined!;
+                }
+            }
+            return ret;
+        }
+
+        toRelease() {
+            this.status == ViewStatus.WAITTING_CLOSE;
+            let isCache = App.isLazyRelease && this.isCache;
+            let isSuccess = false;
+            if (cc.isValid(this.view) && cc.isValid(this.node)) {
+                this.node.removeFromParent(false);
+                this.view.onClose();
+                if (isCache) {
+                    isSuccess = true
+                } else {
+                    this.node.destroy();
+                }
+            }
+            if (this.isPrefab && this.cache) {
+                App.asset.releaseAsset(this.cache);
+            }
+            this.loadData.clear(isCache);
+            return isSuccess;
+        }
+
+        destroy(){
+            if ( cc.isValid(this.view) && cc.isValid(this.node) ){
+                this.node.destroy();
+                CC_DEBUG && Log.d(`${App.releaseManger.module}销毁UI : ${this.name}`);
+            }
         }
     }
 }

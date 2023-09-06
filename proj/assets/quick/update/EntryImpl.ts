@@ -10,14 +10,13 @@ export class EntryImpl extends EntryDelegate {
 
     /**@description 进入bundle完成 */
     onEnterGameView(entry: Entry, gameView: GameView) {
-        let data = App.stageData;
-        data.where = entry.bundle;
-        super.onEnterGameView(entry, gameView);
-        App.loading.hide();
+       
     }
 
-    onShowGameView(entry: Entry | null, gameView: GameView) {
-        App.stageData.where = gameView.bundle as string;
+    onShowGameView(entry: Entry, gameView: GameView) {
+        App.stageData.where = entry.bundle;
+        super.onShowGameView(entry,gameView);
+        App.loading.hide();
     }
 
     getEntryConfig(bundle: string): UpdateItem | null {

@@ -71,6 +71,7 @@ export default class UIView extends EventComponent {
         //再如果界面已经存在于界面管理器中，此时传入新的参数，只从show里面过来,这里重新对_args重新赋值
         this._args = args;
         if (this.node) this.node.active = true;
+        this.onShow();
         if ( this.showAction ){
             this.showAction(()=>{});
         }
@@ -182,6 +183,26 @@ export default class UIView extends EventComponent {
 
     }
     protected onEnterBackground() {
+
+    }
+
+    /**
+     * @description 在界面关闭时收到，onDestroy 之前调用 
+     * 如果启用了懒释放功能，
+     * 直接界面被【释放管理器】真正销毁才会收到 onDestroy 
+     * 但只要界面关闭，必定会收到 onClose
+     * */
+    onClose(){
+
+    }
+
+    /**
+     * @description 在界面打开时收到，onLoad 之后 
+     * 如果启用了懒释放功能
+     * 如果界面存在缓存，没有被【释放管理器】释放，不会收到 onLoad
+     * 但只要界面打开，必定会收到 onShow
+     * */
+    onShow(){
 
     }
 }

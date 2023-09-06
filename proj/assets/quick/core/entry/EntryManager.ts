@@ -16,7 +16,7 @@ export class EntryManager implements ISingleton{
     private node: cc.Node | null = null;
 
     /**@description 注册入口 */
-    register(entryClass: EntryClass<Entry>,type : typeof GameView) {
+    register(entryClass: EntryClass<Entry>,type:typeof GameView) {
         let entry = this.getEntry(entryClass.bundle);
         if (entry) {
             if ( CC_DEBUG ){
@@ -120,6 +120,13 @@ export class EntryManager implements ISingleton{
         }
     }
 
+    onDestroyGameView(bundle: BUNDLE_TYPE, gameView: GameView) {
+        let entry = this.getEntry(bundle);
+        if (entry) {
+            entry.onDestroyGameView(gameView);
+        }
+    }
+
     /**@description 管理器调用show时,在GameView的onLoad之后  */
     onShowGameView(bundle : BUNDLE_TYPE , gameView : GameView){
         let entry = this.getEntry(bundle);
@@ -129,18 +136,18 @@ export class EntryManager implements ISingleton{
         }
     }
 
+    onCloseGameView(bundle : BUNDLE_TYPE , gameView : GameView){
+        let entry = this.getEntry(bundle);
+        if ( entry ){
+            entry.onCloseGameView(gameView);
+        }
+    }
+
     /**@description bundle管事器卸载bundle前通知 */
     onUnloadBundle(bundle: BUNDLE_TYPE) {
         let entry = this.getEntry(bundle);
         if (entry) {
             entry.onUnloadBundle();
-        }
-    }
-
-    onDestroyGameView(bundle: BUNDLE_TYPE, gameView: GameView) {
-        let entry = this.getEntry(bundle);
-        if (entry) {
-            entry.onDestroyGameView(gameView);
         }
     }
 
