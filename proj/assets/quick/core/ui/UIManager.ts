@@ -91,8 +91,8 @@ export class UIManager implements ISingleton {
      * @param bundle 
      * @returns 
      */
-    public preload<T extends UIView>(uiClass: UIClass<T>, bundle: BUNDLE_TYPE) {
-        return this.open({ type: uiClass, preload: true, bundle: bundle });
+    public preload<T extends UIView>(uiClass: UIClass<T>, bundle: BUNDLE_TYPE , isCache ?: boolean) {
+        return this.open({ type: uiClass, preload: true, bundle: bundle , isCache : isCache});
     }
 
     private parsePrefabUrl(url: string): { isPrefab: boolean, url: string } {
@@ -183,7 +183,7 @@ export class UIManager implements ISingleton {
                 viewData.isPrefab = result.isPrefab;
                 viewData.viewType = openOption.type;
                 viewData.bundle = openOption.bundle;
-                viewData.isCache = openOption.isCache!;
+                viewData.isCache = openOption.isCache;
                 this._viewDatas.set(className, viewData);
                 if (!result.isPrefab) {
                     //说明存在于主场景中
