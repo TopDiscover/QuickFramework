@@ -11,12 +11,7 @@ export class BundleUpdate implements UpdateHandlerDelegate, ISingleton {
     }
     onUpdateFailed(item: UpdateItem): void {
         App.tips.show(App.getLanguage("updateFaild",[item.name]));
-        //更新大厅图片状态到可更新,让用户再二次点击
-        App.uiManager.getView("HallView").then((view: HallView) => {
-            if (view) {
-                view.toUpdateStatus(item);
-            }
-        });
+        dispatch(Macro.ON_UPDATE_FAILED,item);
     }
     onPreVersionFailed(item: UpdateItem): void {
         this.onUpdateFailed(item);
@@ -37,11 +32,7 @@ export class BundleUpdate implements UpdateHandlerDelegate, ISingleton {
 
     }
     onDownloading(item: UpdateItem, info: Update.DownLoadInfo): void {
-        App.uiManager.getView("HallView").then((view: HallView) => {
-            if (view) {
-                view.onDownloadProgess(info);
-            }
-        });
+        dispatch(Macro.ON_UPDATE_DOWNLOADING,item,info);
     }
     onAreadyUpToData(item: UpdateItem): void {
         App.tips.show(App.getLanguage("alreadyRemoteVersion",[item.name]));
