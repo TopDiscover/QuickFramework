@@ -14,7 +14,6 @@ export class EntryImpl extends EntryDelegate {
     }
 
     onShowGameView(entry: Entry, gameView: GameView) {
-        App.stageData.where = entry.bundle;
         super.onShowGameView(entry,gameView);
         App.loading.hide();
     }

@@ -220,8 +220,6 @@ export class Framewok implements GameEventInterface{
     get platform() {
         return Singleton.get(Platform)!;
     }
-    /**@description 当前游戏GameView, GameView进入onLoad赋值 */
-    gameView: GameView | null = null;
 
     protected _wssCacertUrl = "";
     /**@description websocket wss 证书url地址 */

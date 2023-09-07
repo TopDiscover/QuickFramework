@@ -177,6 +177,8 @@ export namespace Resource {
         bundle?: BUNDLE_TYPE,
         /**@description 如果是加载的目录，请用dir字段,必须指定类型，否则无法正确的释放资源 */
         dir?: string,
+        /**@description 是否缓存preloadView */
+        isCache?:boolean,
     }
 
     export function getKey(url: string, type: typeof Asset | Asset) {
