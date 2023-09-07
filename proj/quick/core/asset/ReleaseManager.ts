@@ -315,6 +315,18 @@ export class ReleaseManager implements ISingleton {
     }
 
     /**
+     * @description 高度状态下，打印出当前资源的引用情况
+     */
+    private debugUselessBundleAssets( bundle : string ){
+        if ( DEBUG ){
+            let bundleCache = this._lazyInfos.get(bundle)
+            if ( bundleCache ){
+                bundleCache.tryRemove(bundle);
+            }
+        }
+    }
+
+    /**
      * @description 释放无用的bundle 
      * @param isTimout true , 只释放超时的bundle ，并返回释放的 bundle名
      */
@@ -333,6 +345,7 @@ export class ReleaseManager implements ISingleton {
                     let pass = now - value;
                     if (pass >= App.autoReleaseUnuseResourcesTimeout) {
                         Log.d(`释放长时间无用bundle : ${bundle}`);
+                        this.debugUselessBundleAssets(bundle);
                         temp.releaseAll();
                         assetManager.removeBundle(temp);
                         result.push(bundle);
@@ -341,6 +354,7 @@ export class ReleaseManager implements ISingleton {
                     }
                 } else {
                     Log.d(`释放无用bundle : ${bundle}`);
+                    this.debugUselessBundleAssets(bundle);
                     temp.releaseAll();
                     assetManager.removeBundle(temp);
                     this._bundles.delete(bundle);
