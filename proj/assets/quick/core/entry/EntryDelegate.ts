@@ -12,7 +12,7 @@ export class EntryDelegate {
     /**@description 关闭当前运行bundle的GameView */
     protected closeCurEntryGameView(){
         let curEntry = App.entryManager.getEntry(App.stageData.where);
-        if ( curEntry && isValid(curEntry.gameView) ){
+        if ( curEntry && cc.isValid(curEntry.gameView) ){
             curEntry.gameView.close();
         }
     }
