@@ -5,23 +5,27 @@ import { UpdateItem } from "../update/UpdateItem";
 export class EntryDelegate {
 
     /**@description 进入bundle完成 */
-    onEnterGameView(entry: Entry | null, gameView: GameView) {
+    onEnterGameView(entry: Entry, gameView: GameView) {
 
     }
 
-    onShowGameView(entry: Entry | null, gameView: GameView) {
+    /**@description 关闭当前运行bundle的GameView */
+    protected closeCurEntryGameView(){
+        let curEntry = App.entryManager.getEntry(App.stageData.where);
+        if ( curEntry && isValid(curEntry.gameView) ){
+            curEntry.gameView.close();
+        }
+    }
+
+    onShowGameView(entry: Entry, gameView: GameView) {
         //删除除自己之外的其它bundle
         let excludeBundles = this.getPersistBundle();
         if (entry) {
             excludeBundles.push(entry.bundle);
         }
-
         //进入下一场景，关闭掉当前的场景
-        if (App.gameView) {
-            App.gameView.close();
-        }
-        App.gameView = gameView;
-
+        this.closeCurEntryGameView();
+        App.stageData.where = entry.bundle;
         App.bundleManager.removeLoadedBundle(excludeBundles);
     }
 
@@ -39,9 +43,7 @@ export class EntryDelegate {
 
     onEnterMain(mainEntry: Entry | null, userData?: any) {
         if (mainEntry) {
-            if (App.gameView) {
-                App.gameView.close();
-            }
+            this.closeCurEntryGameView();
             mainEntry.onEnter(userData);
         }
     }
