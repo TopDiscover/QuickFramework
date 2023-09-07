@@ -98,7 +98,7 @@ export default class ResourceLoader {
         this._resources.forEach((value, key, source) => {
             if (value.preloadView) {
                 App.uiManager.preload(value.preloadView, value.bundle as BUNDLE_TYPE ,value.isCache).then((view) => {
-                    let cache = new Resource.Cache(value.url, value.type, value.bundle);
+                    let cache = new Resource.Cache(value.url!, value.type!, value.bundle!);
                     cache.isLoaded = true;
                     cache.data = <any>view;
                     if (value.preloadView) cache.url = value.preloadView.getPrefabUrl();
