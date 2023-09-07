@@ -105,8 +105,6 @@ export abstract class Entry {
         DEBUG && Log.d(`${this.bundle} : onUnloadBundle`)
         //自己bundle初始卸载前要关闭当前bundle的所有界面
         App.uiManager.closeBundleView(this.bundle);
-        //移除入口语言包数据
-        App.language.removeDelegate(this.language);
         //移除本模块网络事件
         this.removeNetHandler();
         //卸载资源
@@ -171,6 +169,8 @@ export abstract class Entry {
      * @param gameView 
      */
     onDestroyGameView(gameView: GameView) {
+        //界面真正销毁时，才移除语言包(防止在释放队列中时，更新界面获取语言包数据出错)
+        App.language.removeDelegate(this.language);
         this._gameView = null as any;
     }
 
