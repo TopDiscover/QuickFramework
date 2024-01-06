@@ -27,6 +27,7 @@
 
 #include <cerrno>
 #include <cstdio>
+#include <regex>
 
 #include "AsyncTaskPool.h"
 #include "base/DeferredReleasePool.h"
@@ -403,9 +404,32 @@ void AssetsManagerEx::removeTempDirectory() {
 	removeBundleDirectory(_tempStoragePath);
 }
 
-bool AssetsManagerEx::isNeedDownLoadZip(float download, float total) {
-	//The proportion of total downloads
-	auto percent = download / total;
+bool AssetsManagerEx::isNeedDownLoadZip(std::unordered_map<std::string, Manifest::AssetDiff>& diffMap) {
+
+    // the size of the zip file
+    auto zipSize = _remoteManifest->getZipSize();
+    // Calculate the size that needs to be downloaded
+
+    // 1,delete the information of the zip package
+    for (auto it = diffMap.begin(); it != diffMap.end(); ++it) {
+        std::regex reg(this->_bundle + "_" + "[[:alnum:]]*.zip");
+        auto isFonudZip = std::regex_match(it->first, reg);
+        if (isFonudZip) {
+            diffMap.erase(it);
+            break;;
+        }
+    }
+
+    // 2,Calculate the total download size required
+    auto toDownloadTotalSize = 0;
+    for (auto &it : diffMap) {
+        if (it.second.type == Manifest::DiffType::ADDED || it.second.type == Manifest::DiffType::MODIFIED) {
+            toDownloadTotalSize += it.second.asset.size;
+        }
+    }
+
+	//Calculate the ratio of required download size to total package size
+	auto percent = toDownloadTotalSize / zipSize;
 	if (percent >= 1.0000f) {
 		return true;
 	}
@@ -861,7 +885,7 @@ void AssetsManagerEx::prepareUpdate() {
                 updateSucceed();
                 return;
             } // Generate download units for all assets that need to be updated or added
-            if (this->isNeedDownLoadZip(diffMap.size(), _remoteManifest->getAssets().size())) {
+            if (this->isNeedDownLoadZip(diffMap)) {
                 toDownloadZip();
             }
             else {

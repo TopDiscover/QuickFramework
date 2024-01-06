@@ -2599,7 +2599,7 @@ static bool js_cc_extension_AssetsManager_setDownloadAgainZip(se::State& s)
     const auto& args = s.args();
     size_t argc = args.size();
     cc::extension::AssetsManagerEx *arg1 = (cc::extension::AssetsManagerEx *) NULL;
-    int arg2;
+    float arg2;
 
     if (argc != 1) {
         SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
