@@ -9,6 +9,8 @@ import { EntryData } from "../core/entry/Entry";
 
 export class StageData extends GameData {
     static module = "【Stage数据】";
+    /**@description 这个数据需要常驻，防止在第一次进时，被释放了不能准确的取出当前场景的位置 */
+    isResident = true; 
 
     private readonly defaultData: BundleData[] = [
         { sort: 0, type: 0, name: { CN: "主包", EN: "Main" }, bundle: Macro.BUNDLE_RESOURCES },

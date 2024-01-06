@@ -46,7 +46,7 @@ export class Framewok implements GameEventInterface{
 
     /**@description 获取Stage数据 */
     get stageData() {
-        return this.dataCenter.get(StageData)!;
+        return Singleton.get(StageData)!;
     }
 
     /**@description 是否采用全屏适配方案 */
