@@ -7,6 +7,7 @@ import UIView from "../ui/UIView";
 export class LogicManager extends SingletonT<Logic> implements ISingleton {
     static module: string = "【逻辑管理器】";
     module: string = null!;
+    isResident: boolean = true;
 
     /**
      * @description 返回Logic
