@@ -9,7 +9,7 @@ export type CellType = number | string;
 /**
  * @description TableView 的列表项
  */
-@ccclass
+@ccclass("TableViewCell")
 @menu("QuickUI组件/TableViewCell")
 export class TableViewCell extends EventComponent {
     static INVALID_INDEX = INVALID_INDEX;

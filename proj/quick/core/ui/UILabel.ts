@@ -7,7 +7,7 @@ const { ccclass, property, menu } = _decorator;
 
 const Bundles = Enum(App.Bundles);
 
-@ccclass
+@ccclass("UILabel")
 @menu("Quick渲染组件/UILabel")
 export default class UILabel extends Label {
 

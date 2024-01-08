@@ -25,7 +25,7 @@ enum Flags {
  * 1. 根据安全区域范围，修改widget组件属性
  * 自动添加刘海宽度，以避免显示到安全区域之外
  */
-@ccclass
+@ccclass("AdapterSafeArea")
 @executeInEditMode
 @menu("Quick适配组件/AdapterSafeArea")
 export default class AdapterSafeArea extends Adapter {

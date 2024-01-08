@@ -8,7 +8,7 @@ import { Macro } from "../defines/Macros";
 
 const { ccclass, property, menu } = _decorator;
 
-@ccclass
+@ccclass("GlobalAudio")
 @menu("Quick公共组件/GlobalAudio")
 export default class GlobalAudio extends AudioComponent {
 

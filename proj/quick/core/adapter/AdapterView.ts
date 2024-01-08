@@ -17,7 +17,7 @@ const { ccclass, property, executeInEditMode, menu } = _decorator;
  *
  * 1. 将节点的宽高设置为安全区域的宽高
  */
-@ccclass
+@ccclass("AdapterView")
 @executeInEditMode(true)
 @menu("Quick适配组件/AdapterView")
 export default class AdapterView extends Adapter {

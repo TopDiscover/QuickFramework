@@ -55,7 +55,7 @@ export enum SpriteAlignType {
  * @author caizhitao
  * @created 2020-12-27 21:22:43
  */
-@ccclass
+@ccclass("AdapterSprite")
 @executeInEditMode(true)
 @menu("Quick适配组件/AdapterSprite")
 export default class AdapterSprite extends Adapter {

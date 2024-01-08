@@ -208,7 +208,7 @@ class AudioData implements ISingleton{
     }
 }
 
-@ccclass
+@ccclass('AudioComponent')
 export default class AudioComponent extends EventComponent {
 
     onDestroy() {

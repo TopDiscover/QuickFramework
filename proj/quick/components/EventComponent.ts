@@ -7,7 +7,7 @@ import { IEventProcessor, EventAgrs, EventProcessor, EventCallback } from "../co
 
 const { ccclass, property } = _decorator;
 
-@ccclass
+@ccclass("EventComponent")
 export default class EventComponent extends Component implements IEventProcessor {
 
     private _eventProcessor = new EventProcessor;

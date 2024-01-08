@@ -8,7 +8,7 @@ import { Macro } from "./defines/Macros";
 
 const { ccclass, property, menu } = _decorator;
 
-@ccclass
+@ccclass("MainController")
 @menu("Quick公共组件/MainController")
 export default class MainController extends EventComponent {
 

@@ -10,7 +10,7 @@ import UIView from "./UIView";
 
 const {ccclass, property,menu} = _decorator;
 
-@ccclass
+@ccclass("GameView")
 @menu("Quick公共组件/GameView")
 export default class GameView extends UIView {
 

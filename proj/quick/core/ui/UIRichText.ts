@@ -6,7 +6,7 @@ import { CCString, Enum, RichText, _decorator } from "cc";
 const { ccclass, property, menu } = _decorator;
 const Bundles = Enum(App.Bundles);
 
-@ccclass
+@ccclass("UIRichText")
 @menu("Quick渲染组件/UIRichText")
 export default class UIRichText extends RichText {
 

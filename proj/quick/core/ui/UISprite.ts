@@ -12,7 +12,7 @@ const { ccclass, property, menu } = _decorator;
 
 const Bundles = Enum(App.Bundles);
 
-@ccclass
+@ccclass("UISprite")
 @menu("Quick渲染组件/UISprite")
 export default class UISprite extends Sprite {
     /**@description 多谗言包 */
