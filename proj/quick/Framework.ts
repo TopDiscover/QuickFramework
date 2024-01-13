@@ -274,6 +274,10 @@ export class Framewok implements GameEventInterface{
         this._globalAudio = this.uiManager.addComponent(GlobalAudio);
         return this._globalAudio;
     }
+
+    get isShowStatus(){
+        return true;
+    }
     
     /**
      * @description 获取语言包 

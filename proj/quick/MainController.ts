@@ -26,11 +26,11 @@ export default class MainController extends EventComponent {
         let debug = find("debug", this.node);
         this.debugView = find("debugView",this.node);
         if (debug&&this.debugView) {
-            let isVisibleDebugInfo = App.storage.getItem(Macro.SHOW_DEBUG_INFO_KEY,true);
+            let isVisibleDebugInfo = App.storage.getItem(Macro.SHOW_DEBUG_INFO_KEY,App.isShowStatus);
             if ( isVisibleDebugInfo ) {
-                profiler.showStats();
+                profiler && profiler.showStats();
             }else{
-                profiler.hideStats();
+                profiler && profiler.hideStats();
             }
             if ( App.stageData.isShowDebugButton ){
                 debug.active = true;
