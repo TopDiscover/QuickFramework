@@ -190,7 +190,7 @@ export namespace ViewAsset {
         }
 
         toRelease() {
-            this.status == ViewStatus.WAITTING_CLOSE;
+            this.status = ViewStatus.WAITTING_CLOSE;
             let isCache = App.isLazyRelease && this.isCache;
             let isSuccess = false;
             if (isValid(this.view) && isValid(this.node)) {

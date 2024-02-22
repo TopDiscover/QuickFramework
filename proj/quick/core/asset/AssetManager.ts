@@ -398,7 +398,7 @@ export class _AssetManager implements ISingleton {
             let cache = App.cache.get(input.bundle, input.url, input.type)!
             if (cache) {
                 if (!cache.retain) {
-                    cache.retain = cache.retain;
+                    cache.retain = input.retain;
                 }
                 if (Array.isArray(cache.data)) {
                     //如果，对引用的目录加1
