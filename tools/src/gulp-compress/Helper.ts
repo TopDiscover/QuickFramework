@@ -4,7 +4,6 @@ import { Extensions, GulpConfig } from "../core/Defines";
 import GulpClient from "gulp";
 import { Environment } from "../core/Environment";
 import GulpUglify from "gulp-uglify"
-import { ObfuscatorOptions } from 'javascript-obfuscator';
 import gulpJavaScriptObfuscator from "gulp-javascript-obfuscator"
 const htmlmin = require("gulp-htmlmin")
 import GulpCleanCss from "gulp-clean-css"
@@ -99,7 +98,7 @@ export default class Helper extends Config<GulpConfig> {
     }
 
     private get JSObfuscatorOptions() {
-        const options: ObfuscatorOptions = {
+        const options /*: ObfuscatorOptions */ = {
             /**
              * @description 压缩代码输出在一行
              * 默认：true
