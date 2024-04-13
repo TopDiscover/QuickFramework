@@ -36,7 +36,7 @@ class Helper extends Handler_1.Handler {
             socket.on("error", (err) => {
                 this.logger.error("连接错误", err);
             });
-        }).listen(3000);
+        }).listen(3030);
         this.logger.log("本地测试服务器启动");
     }
 }
