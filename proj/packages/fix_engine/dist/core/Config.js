@@ -3,13 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = require("fs");
 const Handler_1 = require("./Handler");
 class Config extends Handler_1.Handler {
-    constructor() {
-        super();
-        /**@description 配置数据 */
-        this._data = null;
-        /**@description 默认配置 */
-        this.defaultData = null;
-    }
     get data() {
         return this._data;
     }
@@ -19,6 +12,13 @@ class Config extends Handler_1.Handler {
     /**@description 配置文件路径 */
     get path() {
         return "";
+    }
+    constructor() {
+        super();
+        /**@description 配置数据 */
+        this._data = null;
+        /**@description 默认配置 */
+        this.defaultData = null;
     }
     /**
      * @description 读取数据
