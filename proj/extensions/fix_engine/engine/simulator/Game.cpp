@@ -56,6 +56,7 @@ Game::~Game() {
 int Game::init() {
     
     cc::pipeline::GlobalDSManager::setDescriptorSetLayout();
+    ____start____
     cc::ISystemWindowInfo info;
     info.width= SimulatorApp::getInstance()->getWidth();
     info.height = SimulatorApp::getInstance()->getHeight();
@@ -74,6 +75,7 @@ int Game::init() {
     
     cc::ISystemWindowManager* windowMgr = CC_GET_PLATFORM_INTERFACE(cc::ISystemWindowManager);
     windowMgr->createWindow(info);
+    ____end____
 
     SimulatorApp::getInstance()->run();
     auto parser = ConfigParser::getInstance();

@@ -367,5 +367,5 @@ class FileUtils extends Handler_1.Handler {
         }
     }
 }
-exports.default = FileUtils;
 FileUtils._instance = null;
+exports.default = FileUtils;

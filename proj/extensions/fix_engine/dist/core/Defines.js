@@ -38,7 +38,7 @@ var CmdType;
     CmdType["CustomSync"] = "customSync";
     /**@description 更新当前项目 */
     CmdType["Update"] = "update";
-})(CmdType = exports.CmdType || (exports.CmdType = {}));
+})(CmdType || (exports.CmdType = CmdType = {}));
 var Extensions;
 (function (Extensions) {
     /**@description 资源引用检查，目录只对2.x有效,可能兼容上有问题，后续不再维护 */
@@ -55,7 +55,7 @@ var Extensions;
     Extensions["TestServer"] = "test-server";
     /**@description 确定删除bundle */
     Extensions["ConfirmDelSubgames"] = "confirm_del_subgames";
-})(Extensions = exports.Extensions || (exports.Extensions = {}));
+})(Extensions || (exports.Extensions = Extensions = {}));
 var SyncType;
 (function (SyncType) {
     /**@description 当前目录及.meta文件 */
@@ -66,4 +66,4 @@ var SyncType;
     SyncType[SyncType["CUR_ALL_FILES"] = 2] = "CUR_ALL_FILES";
     /**@description 单个文件或目录 */
     SyncType[SyncType["SINGLE"] = 3] = "SINGLE";
-})(SyncType = exports.SyncType || (exports.SyncType = {}));
+})(SyncType || (exports.SyncType = SyncType = {}));

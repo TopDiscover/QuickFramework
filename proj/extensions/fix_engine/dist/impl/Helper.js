@@ -195,6 +195,39 @@ class Helper extends Handler_1.Handler {
                     if ((0, fs_1.existsSync)(destPath)) {
                         if ((0, fs_1.existsSync)(sourcePath)) {
                             let sourceData = (0, fs_1.readFileSync)(sourcePath, "utf-8");
+                            if (data.from == "simulator/Game.cpp") {
+                                if (this.creatorVerion >= "3.8.0") {
+                                    sourceData = sourceData.replace(/____start____/g, `
+    SimulatorApp::getInstance()->init();
+    std::call_once(_windowCreateFlag, [&]() {
+`);
+                                    sourceData = sourceData.replace(/____end____/g, `
+    });
+`);
+                                }
+                                else {
+                                    sourceData = sourceData.replace(/____start____/g, "");
+                                    sourceData = sourceData.replace(/____end____/g, "");
+                                }
+                            }
+                            else if (data.from == "engine-native/BaseGame.cpp") {
+                                if (this.creatorVerion >= "3.8.2") {
+                                    sourceData = sourceData.replace(/____ADPFMgr_include____/g, `
+#if CC_PLATFORM == CC_PLATFORM_ANDROID
+    #include "platform/android/adpf_manager.h"
+#endif
+`);
+                                    sourceData = sourceData.replace(/____ADPFMgr_init____/g, `
+#if (CC_PLATFORM == CC_PLATFORM_ANDROID) && CC_SUPPORT_ADPF
+    ADPFManager::getInstance().Initialize();
+#endif
+`);
+                                }
+                                else {
+                                    sourceData = sourceData.replace(/____ADPFMgr_include____/g, "");
+                                    sourceData = sourceData.replace(/____ADPFMgr_init____/g, "");
+                                }
+                            }
                             (0, fs_1.writeFileSync)(destPath, sourceData, { encoding: "utf-8" });
                             this.logger.log(`${this.module}${data.desc}`);
                         }

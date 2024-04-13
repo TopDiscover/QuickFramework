@@ -173,7 +173,7 @@ export default class Helper extends Handler {
                             return arguments[1] + self.HotUpdateDTS.manifest + arguments[3];
                         }
                         destData = destData.replace(/(export\s*class\s*Manifest\s*\{)([\s\n\S]*)(isVersionLoaded\s*\(\s*\):\s*\w+;)/g, replaceManifest);
-                        
+
                         let replaceAssetsManager = function () {
                             return arguments[1] + self.HotUpdateDTS.assetsManager + arguments[3];
                         }
@@ -198,7 +198,7 @@ export default class Helper extends Handler {
 
             } else {
 
-                let copyTo = ()=>{
+                let copyTo = () => {
                     let sourcePath = join(this.curExtensionPath, `engine/${data.from}`);
                     sourcePath = normalize(sourcePath);
                     let destPath = join(this.creatorPath, data.to);
@@ -206,6 +206,36 @@ export default class Helper extends Handler {
                     if (existsSync(destPath)) {
                         if (existsSync(sourcePath)) {
                             let sourceData = readFileSync(sourcePath, "utf-8");
+                            if (data.from == "simulator/Game.cpp") {
+                                if (this.creatorVerion >= "3.8.0") {
+                                    sourceData = sourceData.replace(/____start____/g, `
+    SimulatorApp::getInstance()->init();
+    std::call_once(_windowCreateFlag, [&]() {
+`);
+                                    sourceData = sourceData.replace(/____end____/g, `
+    });
+`);
+                                } else {
+                                    sourceData = sourceData.replace(/____start____/g, "");
+                                    sourceData = sourceData.replace(/____end____/g, "");
+                                }
+                            } else if (data.from == "engine-native/BaseGame.cpp") {
+                                if (this.creatorVerion >= "3.8.2") {
+                                    sourceData = sourceData.replace(/____ADPFMgr_include____/g, `
+#if CC_PLATFORM == CC_PLATFORM_ANDROID
+    #include "platform/android/adpf_manager.h"
+#endif
+`);
+                                    sourceData = sourceData.replace(/____ADPFMgr_init____/g, `
+#if (CC_PLATFORM == CC_PLATFORM_ANDROID) && CC_SUPPORT_ADPF
+    ADPFManager::getInstance().Initialize();
+#endif
+`)
+                                } else {
+                                    sourceData = sourceData.replace(/____ADPFMgr_include____/g, "");
+                                    sourceData = sourceData.replace(/____ADPFMgr_init____/g, "");
+                                }
+                            }
                             writeFileSync(destPath, sourceData, { encoding: "utf-8" });
                             this.logger.log(`${this.module}${data.desc}`);
                         } else {
@@ -217,13 +247,13 @@ export default class Helper extends Handler {
                 }
 
                 //查看本地是否有文件
-                if ( data.versions ){
+                if (data.versions) {
                     let versions = data.versions.split("|");
                     this.logger.log(`${this.module} 支持版本 : ${versions.toString()}`);
-                    if ( versions.indexOf(this.creatorVerion) >=0 ){
+                    if (versions.indexOf(this.creatorVerion) >= 0) {
                         copyTo();
                     }
-                }else{
+                } else {
                     copyTo();
                 }
             }
