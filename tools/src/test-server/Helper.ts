@@ -33,7 +33,7 @@ export default class Helper extends Handler {
             socket.on("error",(err:any)=>{
                 this.logger.error("连接错误",err);
             })
-        }).listen(3000);
+        }).listen(3030);
         this.logger.log("本地测试服务器启动")
     }
 }

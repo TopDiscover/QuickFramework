@@ -18,5 +18,5 @@ class BuilderHelper extends Config_1.default {
         return (0, path_1.join)(this.configPath, `builder_cache.json`);
     }
 }
-exports.default = BuilderHelper;
 BuilderHelper._instance = null;
+exports.default = BuilderHelper;
