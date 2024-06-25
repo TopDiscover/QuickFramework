@@ -539,7 +539,7 @@ export class UIManager implements ISingleton {
     public isShow<T extends UIView>(uiClass: UIClass<T>): boolean;
     public isShow(data: any) {
         let viewData = this.getViewData(data);
-        if (!viewData) {
+        if (!viewData || viewData.isPreload) {
             return false;
         }
         if (viewData.isLoaded && viewData.status == ViewStatus.WAITTING_NONE) {
