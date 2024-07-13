@@ -15,6 +15,8 @@ class Helper extends Handler_1.Handler {
     
             /**@description 热更新地址 */
             setPackageUrl(url:string):void;
+            /**@description 删除指定bundle的本地下载缓存 */
+            removeBundle(bundle:string):void;
             /**@description 设置主包包含哪些bunlde,如果 main,resources */
             setMainBundles(bundles:string[]):void;
             /**

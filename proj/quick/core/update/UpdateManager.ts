@@ -68,17 +68,36 @@ export class UpdateManager implements ISingleton {
     getAssetsManager(item: UpdateItem) {
         //初始化资源管理器
         let name = item.convertBundle(item.bundle);
+        return this._getAssetsManager(name);
+    }
+
+    private _getAssetsManager( bundle : string ){
         if (JSB) {
-            if (!this.assetsManagers[name]) {
-                this.assetsManagers[name] = new Update.AssetsManager(name, this.storagePath);
+            if (!this.assetsManagers[bundle]) {
+                this.assetsManagers[bundle] = new Update.AssetsManager(bundle, this.storagePath);
                 //设置下载并发量
-                this.assetsManagers[name].manager.setPackageUrl(this.hotUpdateUrl);
-                this.assetsManagers[name].manager.setMainBundles(this.mainBundles);
+                this.assetsManagers[bundle].manager.setPackageUrl(this.hotUpdateUrl);
+                this.assetsManagers[bundle].manager.setMainBundles(this.mainBundles);
                 //设置重新下载的标准
-                this.assetsManagers[name].manager.setDownloadAgainZip(0.8);
+                this.assetsManagers[bundle].manager.setDownloadAgainZip(0.8);
             }
         }
-        return this.assetsManagers[name];
+        return this.assetsManagers[bundle];
+    }
+
+    /**
+     * @description 删除下载的bundle缓存
+     * @param bundle bundle名
+     */
+    removeBunbleCache(bundle : string ){
+         if ( JSB ){
+            let assetManaer = this._getAssetsManager(bundle);
+            if ( assetManaer ){
+                assetManaer.removeCache();
+            }
+         }else{
+            Log.d(`${this.module} Web端无此功能`)
+         }
     }
 
     /**@description 下载update项，以最新的为当前操作的对象 */

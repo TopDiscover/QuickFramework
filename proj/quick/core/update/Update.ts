@@ -162,6 +162,18 @@ export namespace Update {
             this.manager.reset();
         }
 
+        /**
+         * @description 删除本地缓存
+         */
+        removeCache(){
+            //删除下载缓存
+            this.manager.removeBundle(this.storagePath);
+            //删除下载临时缓存
+            this.manager.removeBundle(this.storagePath.substring(0,this.storagePath.length-1) + "_temp/");
+            //派发事件
+            dispatch(Macro.ON_DELETE_BUNDLE_CACHE,this.name);
+        }
+
         private create() {
             Log.d(`创建 ${this.name} AssetsManager`);
             this.manager = new native.AssetsManager(this.type, this.storagePath);

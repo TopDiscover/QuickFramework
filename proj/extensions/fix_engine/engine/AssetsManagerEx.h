@@ -225,6 +225,10 @@ public:
 	 * @brief 设置 【将要下载资源总数】超过【总下载资源总数】的percent(取值0-1)，则删除掉本地缓存资源，重新下载bunlde的zip包
 	 */
 	void setDownloadAgainZip(float percent);
+    /**
+     * @brief 删除指定bundle下载缓存
+     */
+    void removeBundleDirectory(const std::string& path);
 	void reset();
 
 protected:
@@ -312,7 +316,6 @@ protected:
 	/************************************************************************/
 	void removeCachedDirectory();
 	void removeTempDirectory();
-	void removeBundleDirectory(const std::string& path);
 	void moveTempToCached(const std::string& root, const std::string& path, std::unordered_map<std::string, Manifest::AssetDiff>& diff_map, bool isComplete = true);
 
 	bool isNeedDownLoadZip(std::unordered_map<std::string, Manifest::AssetDiff>& diffMap );

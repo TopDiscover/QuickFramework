@@ -2566,6 +2566,33 @@ static bool js_cc_extension_AssetsManager_reset(se::State& s)
 }
 SE_BIND_FUNC(js_cc_extension_AssetsManager_reset)
 
+static bool js_cc_extension_AssetsManager_removeBundle(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::extension::AssetsManagerEx *arg1 = (cc::extension::AssetsManagerEx *) NULL;
+    std::string *arg2 = 0;
+    std::string temp2;
+
+    if (argc != 1) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::extension::AssetsManagerEx>(s);
+    if (nullptr == arg1) return true;
+
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+
+    (arg1)->removeBundleDirectory((std::string const &)*arg2);
+
+
+    return true;
+}
+SE_BIND_FUNC(js_cc_extension_AssetsManager_removeBundle)
+
 static bool js_cc_extension_AssetsManager_setMainBundles(se::State& s)
 {
     CC_UNUSED bool ok = true;
@@ -2644,6 +2671,7 @@ bool js_register_cc_extension_AssetsManagerEx(se::Object* obj) {
     cls->defineFunction("setEventCallback", _SE(js_cc_extension_AssetsManager_setEventCallback));
     cls->defineFunction("setPackageUrl", _SE(js_cc_extension_AssetsManager_setPackageUrl));
     cls->defineFunction("reset", _SE(js_cc_extension_AssetsManager_reset));
+    cls->defineFunction("removeBundle", _SE(js_cc_extension_AssetsManager_removeBundle));
     cls->defineFunction("setMainBundles", _SE(js_cc_extension_AssetsManager_setMainBundles));
     cls->defineFunction("setDownloadAgainZip", _SE(js_cc_extension_AssetsManager_setDownloadAgainZip));
     
