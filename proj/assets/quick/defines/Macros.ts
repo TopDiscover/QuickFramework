@@ -35,4 +35,6 @@ export namespace Macro{
     export const ON_UPDATE_FAILED = "ON_UPDATE_FAILED";
     /**@description 更新进度 */
     export const ON_UPDATE_DOWNLOADING = "ON_UPDATE_DOWNLOADING";
+    /**@description 删除Bundle */
+    export const ON_DELETE_BUNDLE_CACHE = "ON_DELETE_BUNDLE_CACHE";
 }

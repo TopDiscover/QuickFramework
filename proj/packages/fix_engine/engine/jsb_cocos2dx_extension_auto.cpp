@@ -869,6 +869,28 @@ static bool js_extension_AssetsManagerEx_reset(se::State& s)
 }
 SE_BIND_FUNC(js_extension_AssetsManagerEx_reset)
 
+static bool js_extension_AssetsManagerEx_removeBundle(se::State& s)
+{
+	CC_UNUSED bool ok = true;
+	cocos2d::extension::AssetsManagerEx* cobj = (cocos2d::extension::AssetsManagerEx*)s.nativeThisObject();
+	SE_PRECONDITION2(cobj, false, "js_extension_AssetsManagerEx_removeBundle : Invalid Native Object");
+	const auto& args = s.args();
+	size_t argc = args.size();
+	do {
+		if (argc == 1) {
+			std::string arg0;
+			ok &= seval_to_std_string(args[0], &arg0);
+			if (!ok) { ok = true; break; }
+			cobj->removeBundleDirectory(arg0);
+			SE_PRECONDITION2(ok, false, "js_extension_AssetsManagerEx_removeBundle : Error processing arguments");
+			return true;
+		}
+	} while (false);
+	SE_REPORT_ERROR("wrong number of arguments: %d", (int)argc);
+	return false;
+}
+SE_BIND_FUNC(js_extension_AssetsManagerEx_removeBundle)
+
 static bool js_extension_AssetsManagerEx_setMainBundles(se::State& s)
 {
 	cocos2d::extension::AssetsManagerEx* cobj = (cocos2d::extension::AssetsManagerEx*)s.nativeThisObject();
@@ -1331,6 +1353,7 @@ bool js_register_extension_AssetsManagerEx(se::Object* obj)
     cls->defineFunction("getStoragePath", _SE(js_extension_AssetsManagerEx_getStoragePath));
 	cls->defineFunction("update", _SE(js_extension_AssetsManagerEx_update));
 	cls->defineFunction("reset", _SE(js_extension_AssetsManagerEx_reset));
+	cls->defineFunction("removeBundle", _SE(js_extension_AssetsManagerEx_removeBundle));
 	cls->defineFunction("setMainBundles", _SE(js_extension_AssetsManagerEx_setMainBundles));
 	cls->defineFunction("setDownloadAgainZip", _SE(js_extension_AssetsManagerEx_setDownloadAgainZip));
 	cls->defineFunction("setEventCallback", _SE(js_extension_AssetsManagerEx_setEventCallback));

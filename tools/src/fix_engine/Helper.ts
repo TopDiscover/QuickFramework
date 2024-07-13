@@ -39,6 +39,8 @@ export default class Helper extends Handler {
         setDownloadAgainZip(percent:number):void;
         /**@description 重置检测状态 */
         reset():void;
+        /**@description 删除指定bundle的本地下载缓存 */
+        removeBundle(bundle:string):void;
     
         `,
         manifest: `

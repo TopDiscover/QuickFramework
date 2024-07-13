@@ -32018,6 +32018,8 @@ declare namespace jsb{
         setDownloadAgainZip(percent:number):void;
         /**@description 重置检测状态 */
         reset():void;
+        /**@description 删除指定bundle的本地下载缓存 */
+        removeBundle(bundle:string):void;
     
         constructor (manifestUrl: string, storagePath: string, versionCompareHandle?: (versionA: string, versionB: string) => number);
         static create (manifestUrl: string, storagePath: string): AssetsManager;
