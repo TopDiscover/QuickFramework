@@ -228,11 +228,20 @@ export default class Helper extends Handler {
     #include "platform/android/adpf_manager.h"
 #endif
 `);
-                                    sourceData = sourceData.replace(/____ADPFMgr_init____/g, `
+                                    if ( this.creatorVerion == "3.8.2" ){
+                                        sourceData = sourceData.replace(/____ADPFMgr_init____/g, `
 #if (CC_PLATFORM == CC_PLATFORM_ANDROID) && CC_SUPPORT_ADPF
     ADPFManager::getInstance().Initialize();
 #endif
 `)
+                                    }else{
+                                        sourceData = sourceData.replace(/____ADPFMgr_init____/g, `
+#if (CC_PLATFORM == CC_PLATFORM_ANDROID) && CC_SUPPORT_ADPF
+    ADPFManager::getInstance().initialize();
+#endif
+`)
+                                    }
+
                                 } else {
                                     sourceData = sourceData.replace(/____ADPFMgr_include____/g, "");
                                     sourceData = sourceData.replace(/____ADPFMgr_init____/g, "");
