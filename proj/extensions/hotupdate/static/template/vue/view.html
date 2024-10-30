@@ -1,10 +1,5 @@
 <ui-section header="主包Manifest配置" expand>
     <ui-prop>
-        <ui-label class="contentColor">注意，主包版本目前只包含了 assets/main &
-            assets/resources,如果对src目录下有需要升级的，请在extensions/hotupdate/panels/index.js的getMainBundleIncludes函数中添加进入版本
-        </ui-label>
-    </ui-prop>
-    <ui-prop>
         <ui-label slot="label" class="titleColor">自动生成版本号</ui-label>
         <ui-checkbox slot="content" v-bind:disabled="isProcessing" v-bind:value="isAutoVersion"
             @confirm="onChangeAutoVersion($event.target.value)" tooltip="当构建完成后，自动生成版本号">当构建完成后，自动生成版本号

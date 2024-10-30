@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.configs = exports.unload = exports.load = void 0;
+exports.configs = void 0;
+exports.load = load;
+exports.unload = unload;
 function load() {
 }
-exports.load = load;
 function unload() {
 }
-exports.unload = unload;
 exports.configs = {
     '*': {
         hooks: 'Hooks',
