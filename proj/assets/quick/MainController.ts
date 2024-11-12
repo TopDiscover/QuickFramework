@@ -19,7 +19,7 @@ export default class MainController extends EventComponent {
     private startPos : cc.Vec3 = null!;
 
     start() {
-        super.start();
+        super.start && super.start();
         App.onStart(this.node);
     }
 
