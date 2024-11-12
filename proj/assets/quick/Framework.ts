@@ -273,10 +273,33 @@ export class Framewok implements GameEventInterface{
     }
     
     /**
-     * @description 获取语言包 
-     * 
-     */
-    getLanguage<K extends string & keyof LanguageData["data"]>(key: K, params: (string | number)[] = [], bundle: BUNDLE_TYPE | null = null): LanguageData["data"][K] {
+     * @description 获取语言 
+     * @param key 语言key
+     * @param params 语言参数
+     * @returns 语言值
+     * @example
+     * ```ts
+     * export let LANG = {
+     *     language: "BR",
+     *     data: {
+     *         test: "测试语言包",
+     *         mul : {
+     *             test : "测试多语言",
+     *             gggg : ["测试多语言嵌套"]
+     *         }
+     *     }
+     * }
+     * export default class TestData extends GameData<typeof LANG["data"]> {
+     *     static module = "TestData";
+     *     init(): void {
+     *         this.getLanguage("test")
+     *         this.getLanguage("mul.test")
+     *         this.getLanguage("mul.gggg" as any)// 如何需要取出对象，key需要转换成any
+     *     }
+     * }
+     * ```
+     * */
+    getLanguage<K extends DotNestedKeys<LanguageData>>(key: K, params: (string | number)[] = [], bundle: BUNDLE_TYPE | null = null): any {
         if (!bundle) {
             bundle = Macro.BUNDLE_RESOURCES;
         }
