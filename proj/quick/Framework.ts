@@ -305,6 +305,10 @@ export class Framewok implements GameEventInterface{
         this.releaseManger.onLowMemory();
     }
 
+    onStart(node : Node){
+        
+    }
+
     onLoad(node: Node) {
 
         //初始化层级管理器
