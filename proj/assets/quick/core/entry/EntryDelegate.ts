@@ -10,9 +10,9 @@ export class EntryDelegate {
     }
 
     /**@description 关闭当前运行bundle的GameView */
-    protected closeCurEntryGameView(){
+    protected closeCurEntryGameView() {
         let curEntry = App.entryManager.getEntry(App.stageData.where);
-        if ( curEntry && cc.isValid(curEntry.gameView) ){
+        if (curEntry && cc.isValid(curEntry.gameView)) {
             curEntry.gameView.close();
         }
     }
@@ -23,6 +23,12 @@ export class EntryDelegate {
         if (entry) {
             excludeBundles.push(entry.bundle);
         }
+
+        // 如果进入场景与当前显示场景相同，不进行切换，否则会造成黑屏，无显示场景了
+        if (App.stageData.where === entry.bundle) {
+            return;
+        }
+
         //进入下一场景，关闭掉当前的场景
         this.closeCurEntryGameView();
         App.stageData.where = entry.bundle;
