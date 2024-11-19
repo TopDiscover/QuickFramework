@@ -2,7 +2,6 @@ import { Update } from "./Update";
 import { native, sys, } from "cc";
 import { JSB, PREVIEW } from "cc/env";
 import { Macro } from "../../defines/Macros";
-import { HttpPackage } from "../net/http/HttpClient";
 import { UpdateItem } from "./UpdateItem";
 
 const VERSION_FILENAME = "versions.json";
@@ -71,7 +70,7 @@ export class UpdateManager implements ISingleton {
         return this._getAssetsManager(name);
     }
 
-    private _getAssetsManager( bundle : string ){
+    private _getAssetsManager(bundle: string) {
         if (JSB) {
             if (!this.assetsManagers[bundle]) {
                 this.assetsManagers[bundle] = new Update.AssetsManager(bundle, this.storagePath);
@@ -89,15 +88,15 @@ export class UpdateManager implements ISingleton {
      * @description 删除下载的bundle缓存
      * @param bundle bundle名
      */
-    removeBunbleCache(bundle : string ){
-         if ( JSB ){
+    removeBunbleCache(bundle: string) {
+        if (JSB) {
             let assetManaer = this._getAssetsManager(bundle);
-            if ( assetManaer ){
+            if (assetManaer) {
                 assetManaer.removeCache();
             }
-         }else{
+        } else {
             Log.d(`${this.module} Web端无此功能`)
-         }
+        }
     }
 
     /**@description 下载update项，以最新的为当前操作的对象 */
@@ -366,7 +365,7 @@ export class UpdateManager implements ISingleton {
             Log.d(`${this.module} 请求远程版本信息`);
             let data = await this.readRemoteVersions();
             if (data) {
-                this.remoteVersions = JSON.parse(data);
+                this.remoteVersions = data;
                 let bundle = item.convertBundle(item.bundle);
                 if (bundle == Update.MAIN_PACK && this.getStatus(bundle) == Update.Status.UP_TO_DATE) {
                     Log.d(`${this.module} 主包已经是最新，写入远程的版本信息`);
@@ -402,16 +401,19 @@ export class UpdateManager implements ISingleton {
 
     /**@description 读取远程版本文件 */
     private readRemoteVersions() {
-        return new Promise<string | null>((resolove) => {
-            let httpPackage = new HttpPackage;
-            httpPackage.data.url = `${this.hotUpdateUrl}/${Update.MANIFEST_ROOT}${VERSION_FILENAME}`;
-            httpPackage.data.isAutoAttachCurrentTime = true;
-            httpPackage.send((data) => {
-                resolove(data);
-            }, (err) => {
-                Log.dump(err);
-                resolove(null);
-            });
+        return new Promise<any>((resolove) => {
+            App.http.fetch(`${this.hotUpdateUrl}/${Update.MANIFEST_ROOT}${VERSION_FILENAME}`,
+                {
+                    timestamp: true,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    resolove(data);
+                })
+                .catch((err: Error) => {
+                    Log.e(`${this.module} 读取远程版本信息失败:${err.message}`);
+                    resolove(null);
+                })
         })
     }
 

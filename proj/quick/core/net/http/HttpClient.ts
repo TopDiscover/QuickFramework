@@ -1,117 +1,49 @@
-import { Http } from "./Http";
+import { DEBUG, JSB } from "cc/env";
 
-/**
- * @description http网络请求
- */
+export interface FetchResponse {
+    /**@description 请求是否成功 */
+    ok: boolean,
+    /**@description 请求状态码 */
+    status: number,
+    /**@description 请求状态文本 */
+    statusText: string,
+    /**@description 请求url */
+    url: string,
+    /**@description 解析json */
+    json: () => Promise<any>,
+    /**@description 解析文本 */
+    text: () => Promise<string>,
+    /**@description 解析arrayBuffer */
+    arrayBuffer: () => Promise<ArrayBuffer>,
+    /**@description 解析blob */
+    blob: () => Promise<Blob>,
+    /**@description 解析formData */
+    formData: () => Promise<FormData>,
+}
 
-import { sys } from "cc";
-import { DEBUG, JSB, PREVIEW } from "cc/env";
-
-class HttpPackageData {
-    data: any = null;
-    url: string = null!;
-    /**@description 超时设置 默认为10s*/
-    timeout: number = 10000;
-    /**@description 请求类型 默认为GET请求*/
-    type: Http.Type = Http.Type.GET;
+export interface FetchOptions {
+    /**@description 请求方法 默认为GET */
+    method?: "POST" | "GET",
+    /**@description 请求头 */
+    headers?:  [string, string][] | Record<string, string>,
+    /**@description 超时时间 默认为10s*/
+    timeout?: number,
+    /**@description 请求体 */
+    body?: Document | XMLHttpRequestBodyInit | null,
+    /**@description 请求参数 */
+    params?: Object,
+    /**@description 是否自动附加当前时间戳 */
+    timestamp?: boolean,
     /**@description 是否同步 */
-    async : boolean = true;
-    requestHeader: { name: string, value: string }[] | { name: string, value: string } | null = null;
-    /**@description 发送接口时，默认为false 仅浏览器端生效
-     * 自动附加当前时间的参数字段
-     * 但如果服务器做了接口参数效验，可能会导致接口无法通过服务器验证，返回错误数据
-     * @example 
-     * 请求地址为http:www.baidu.com 当isAutoAttachCurrentTime 为 true为
-     * 实际的请求接口为http:www.baidu.com?cur_loc_t=当前时间
-     * 请求地址为http:www.baidu.com?uid=123 当isAutoAttachCurrentTime 为 true为
-     * 实际的请求接口为http:www.baidu.com?uid=123&cur_loc_t=当前时间
-     *  */
-    isAutoAttachCurrentTime = false;
-    private _responseType: XMLHttpRequestResponseType = "";
-    public set responseType(type: XMLHttpRequestResponseType) {
-        this._responseType = type;
-    }
-    public get responseType() {
-        if (JSB) {
-            if (this._responseType == "") {
-                this._responseType = "text";
-            }
-        }
-        return this._responseType;
-    }
+    async?:boolean;
+    /**@description 响应类型 */
+    responseType?: XMLHttpRequestResponseType;
 }
 
-/**
- * @description http 请求包
- */
-export class HttpPackage {
-
-    /**@description 跨域代理 */
-    public static crossProxy: any = {};
-    /**@description 当前主机地址 */
-    public static location = { host: "", pathname: "", protocol: "" };
-
-    private _data: HttpPackageData = new HttpPackageData();
-    public set data(data: HttpPackageData) {
-        this._data = data;
-    }
-    public get data(): HttpPackageData {
-        return this._data;
-    }
-
-    private _params: Object = null!;
-    /**
-     * @description 传入的请求参数会拼在data.url 
-     * @example params = { a : 10 , b : 20 }
-     * 最终的url 为data.url?&a=10&b=20
-     */
-    public set params(value: Object) {
-        this._params = value;
-    }
-    public get params() {
-        return this._params;
-    }
-    /**
-     * @description 发送请求包
-     * @param cb 
-     * @param errorcb 
-     */
-    public send(cb?: (data: any) => void, errorcb?: (errorData: Http.Error) => void) {
-        App.http.request(this, cb, errorcb);
-    }
-}
-
-export class HttpClient implements ISingleton{
+export class HttpClient implements ISingleton {
     static module: string = "【Http管理器】";
     module: string = null!;
-    protected crossProxy(url: string): string {
-        //浏览器，非调试模式下
-        if (sys.isBrowser && !PREVIEW && HttpPackage.crossProxy) {
-            let config = HttpPackage.crossProxy;
-            let location = HttpPackage.location;
-            let keys = Object.keys(config);
-
-            for (let i = 0; i < keys.length; i++) {
-                let key = keys[i];
-                let value = config[key];
-
-                if (url.indexOf(key) > -1) {
-                    if (value.protocol && value.api) {
-                        if (location.protocol != value.protocol) {
-                            //所有跨域的都从当前服务器的代理转发，把https也得转化成http:
-                            url = url.replace(value.protocol, location.protocol);
-                        }
-                        return url.replace(key, `${location.host}/${value.api}`);
-                    }
-                }
-            }
-            return url;
-        } else {
-            return url;
-        }
-    }
-
-    protected convertParams(url: string, params: Object): string {
+    protected convertParams(url: string, params?: Object): string {
         if (params == null || params == undefined) {
             return url;
         }
@@ -131,103 +63,94 @@ export class HttpClient implements ISingleton{
         return result;
     }
 
-    protected convertData( data : any ){
-        return data;
-    }
+    fetch(url: string , options: FetchOptions = {}) {
+        return new Promise<FetchResponse>((resolve, reject) => {
+            let xhr = new XMLHttpRequest();
 
-    request(httpPackage: HttpPackage, cb?: (data: any) => void, errorcb?: (errorData: Http.Error) => void) {
-
-        let url = httpPackage.data.url;
-        if (!url) {
-            if ( DEBUG ){
-                Log.e(`reuqest url error`);
+            // 设置请求方法和 URL
+            const method = options.method || 'GET';
+            url = this.convertParams(url, options.params);
+            if (options.timestamp) {
+                if (url.indexOf("?") >= 0) {
+                    url = `${url}&cur_loc_t=${Date.now()}`;
+                } else {
+                    url = `${url}?cur_loc_t=${Date.now()}`;
+                }
             }
-            if (errorcb) errorcb({ type: Http.ErrorType.UrlError, reason: "错误的Url地址" });
-            return;
-        }
 
-        let xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-                if ((xhr.status >= 200 && xhr.status < 300)) {
-                    if (xhr.responseType == "arraybuffer" || xhr.responseType == "blob") {
-                        if (cb) cb(xhr.response);
+            if ( options.async == undefined ) {
+                options.async = true;
+            }
+
+            if ( options.responseType == undefined ) {
+                options.responseType = "";
+                if ( JSB ) {
+                    options.responseType = "text";
+                }
+            }
+
+            xhr.responseType = options.responseType;
+
+            // 处理响应
+            xhr.onreadystatechange = function(){
+                if (xhr.readyState === 4) {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        // 解析响应数据
+                        const response: FetchResponse = {
+                            ok: true,
+                            status: xhr.status,
+                            statusText: xhr.statusText,
+                            url: xhr.responseURL,
+                            json: () => Promise.resolve(JSON.parse(xhr.responseText)),
+                            text: () => Promise.resolve(xhr.responseText),
+                            arrayBuffer: () => Promise.resolve(xhr.response),
+                            blob: () => Promise.resolve(xhr.response),
+                            formData: () => Promise.resolve(xhr.response),
+                        };
+                        resolve(response);
                     } else {
-                        if ( DEBUG) Log.d(`htpp res(${xhr.responseText})`);
-                        if (cb) cb(xhr.responseText);
+                        reject(new Error(`HTTP error status: ${xhr.status}`));
                     }
                 } else {
-                    let reason = `请求错误,错误状态:${xhr.status}`;
-                    Log.e(`request error status : ${xhr.status} url : ${url} `);
-                    if (errorcb) errorcb({ type: Http.ErrorType.RequestError, reason: reason });
+                    // Log.d(`readyState ${xhr.readyState}`);
                 }
-            }
-            else {
-                //cc.log(`readyState ${xhr.readyState}`);
-            }
-        };
+            };
 
-        xhr.responseType = httpPackage.data.responseType;
+            // 处理错误
+            xhr.onerror = () => {
+                reject(new Error('Network error'));
+            };
 
-        xhr.timeout = httpPackage.data.timeout;
-        xhr.ontimeout = () => {
-            xhr.abort();//网络超时，断开连接
-            if ( DEBUG) Log.w(`request timeout : ${url}`);
-            if (errorcb) errorcb({ type: Http.ErrorType.TimeOut, reason: "连接超时" });
-        };
+            // 处理超时
+            xhr.ontimeout = () => {
+                reject(new Error('Request timed out'));
+            };
 
-        xhr.onerror = () => {
-            Log.e(`request error : ${url} `);
-            if (errorcb) errorcb({ type: Http.ErrorType.RequestError, reason: "请求错误" });
-        };
+            // 设置超时（可选）
+            xhr.timeout = options.timeout || 10000;
+            if (DEBUG) Log.d(`[send] url : ${url} request type : ${method} , async : ${options.async}`);
+            xhr.open(method, url,options.async);
 
-        if ( DEBUG ) Log.d(`[send http request] url : ${url} request type : ${httpPackage.data.type} , responseType : ${xhr.responseType}`);
-
-        url = this.crossProxy(url);
-        url = this.convertParams(url,httpPackage.params);
-
-        if ( httpPackage.data.isAutoAttachCurrentTime ){
-            if ( url.indexOf("?") >=0 ){
-                url = `${url}&cur_loc_t=${Date.timeNow()}`;
-            }else{
-                url = `${url}?cur_loc_t=${Date.timeNow()}`;
-            }
-        }
-
-        if (sys.isBrowser && !PREVIEW) {
-            if ( DEBUG) Log.d(`[send http request] corss prox url : ${url} request type : ${httpPackage.data.type} , responseType : ${xhr.responseType}`);
-        }
-
-        if (httpPackage.data.type === Http.Type.POST) {
-            xhr.open(Http.Type.POST, url,httpPackage.data.async);
-            if (httpPackage.data.requestHeader) {
-                if( httpPackage.data.requestHeader instanceof Array ){
-                    httpPackage.data.requestHeader.forEach((header)=>{
-                        xhr.setRequestHeader(header.name, header.value);
+            // 设置请求头
+            if (options.headers) {
+                if (Array.isArray(options.headers)) {
+                    options.headers.forEach((header) => {
+                        xhr.setRequestHeader(header[0], header[1]);
                     });
-                }else{
-                    let header : { name: string, value: string } = httpPackage.data.requestHeader;
-                    xhr.setRequestHeader(header.name,header.value);
-                }
-            }
-            else {
-                xhr.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
-            }
-            xhr.send( this.convertData(httpPackage.data.data) );
-        }
-        else {
-            xhr.open(Http.Type.GET, url, httpPackage.data.async);
-            if( httpPackage.data.requestHeader ){
-                if( httpPackage.data.requestHeader instanceof Array ){
-                    httpPackage.data.requestHeader.forEach((header)=>{
-                        xhr.setRequestHeader(header.name, header.value);
+                } else {
+                    const headers = options.headers as Record<string, string>;
+                    Object.keys(headers).forEach(key => {
+                        xhr.setRequestHeader(key, headers[key]);
                     });
-                }else{
-                    let header : { name: string, value: string } = httpPackage.data.requestHeader;
-                    xhr.setRequestHeader(header.name,header.value);
                 }
             }
-            xhr.send();
-        }
+
+            // 发送请求
+            if (method === 'POST' && options.body) {
+                xhr.send(options.body);
+            } else {
+                xhr.send();
+            }
+        });
     }
 }
