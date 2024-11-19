@@ -71,8 +71,6 @@ declare interface StringConstructor {
 	format(...args: any[]): string;
 }
 
-declare function md5(data: any): any;
-
 /**@description 提示弹出框配置 */
 declare interface AlertConfig {
 	/**@description 用来标识弹出框，后面可指定tag进行关闭所有相同tag的弹出框 */
