@@ -1,6 +1,5 @@
 import { Update } from "./Update";
 import { Macro } from "../../defines/Macros";
-import { HttpPackage } from "../net/http/HttpClient";
 import { UpdateItem } from "./UpdateItem";
 
 const VERSION_FILENAME = "versions.json";
@@ -57,10 +56,10 @@ export class UpdateManager implements ISingleton {
     }
 
     /**@description 主包包含资源目录,固定的，请勿修改 */
-    readonly mainBundles: string[] = ["src", "jsb-adapter", "assets/resources", "assets/main","assets/internal", "main.js"];
+    readonly mainBundles: string[] = ["src", "jsb-adapter", "assets/resources", "assets/main", "assets/internal", "main.js"];
 
     /**@description 是否使用了自动版本 */
-    isAutoVersion : boolean = true;
+    isAutoVersion: boolean = true;
 
     /**@description 获取资源管理器，默认为hall 大厅的资源管理器 */
     getAssetsManager(item: UpdateItem) {
@@ -69,7 +68,7 @@ export class UpdateManager implements ISingleton {
         return this._getAssetsManager(name);
     }
 
-    private _getAssetsManager( bundle : string ){
+    private _getAssetsManager(bundle: string) {
         if (CC_JSB) {
             if (!this.assetsManagers[bundle]) {
                 this.assetsManagers[bundle] = new Update.AssetsManager(bundle, this.storagePath);
@@ -87,15 +86,15 @@ export class UpdateManager implements ISingleton {
      * @description 删除下载的bundle缓存
      * @param bundle bundle名
      */
-    removeBunbleCache(bundle : string ){
-         if ( CC_JSB ){
+    removeBunbleCache(bundle: string) {
+        if (CC_JSB) {
             let assetManaer = this._getAssetsManager(bundle);
-            if ( assetManaer ){
+            if (assetManaer) {
                 assetManaer.removeCache();
             }
-         }else{
+        } else {
             Log.d(`${this.module} Web端无此功能`)
-         }
+        }
     }
 
     /**@description 下载update项，以最新的为当前操作的对象 */
@@ -283,7 +282,7 @@ export class UpdateManager implements ISingleton {
             return this.defaultVersion;
         } else {
             bundle = this.convertBundle(bundle as string);
-            if ( this.isAutoVersion ){
+            if (this.isAutoVersion) {
                 ///如果使用了自动版本，所有的版本号都是一致的,都使用主包版本号
                 bundle = Macro.MAIN_PACK_BUNDLE_NAME;
             }
@@ -364,7 +363,7 @@ export class UpdateManager implements ISingleton {
             Log.d(`${this.module} 请求远程版本信息`);
             let data = await this.readRemoteVersions();
             if (data) {
-                this.remoteVersions = JSON.parse(data);
+                this.remoteVersions = data;
                 let bundle = item.convertBundle(item.bundle);
                 if (bundle == Update.MAIN_PACK && this.getStatus(bundle) == Update.Status.UP_TO_DATE) {
                     Log.d(`${this.module} 主包已经是最新，写入远程的版本信息`);
@@ -400,16 +399,19 @@ export class UpdateManager implements ISingleton {
 
     /**@description 读取远程版本文件 */
     private readRemoteVersions() {
-        return new Promise<string | null>((resolove) => {
-            let httpPackage = new HttpPackage;
-            httpPackage.data.url = `${this.hotUpdateUrl}/${Update.MANIFEST_ROOT}${VERSION_FILENAME}`;
-            httpPackage.data.isAutoAttachCurrentTime = true;
-            httpPackage.send((data) => {
-                resolove(data);
-            }, (err) => {
-                Log.dump(err);
-                resolove(null);
-            });
+        return new Promise<any>((resolove) => {
+            App.http.fetch(`${this.hotUpdateUrl}/${Update.MANIFEST_ROOT}${VERSION_FILENAME}`,
+                {
+                    timestamp: true,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    resolove(data);
+                })
+                .catch((err:Error) => {
+                    Log.e(`${this.module} 读取远程版本信息失败:${err.message}`);
+                    resolove(null);
+                })
         })
     }
 
