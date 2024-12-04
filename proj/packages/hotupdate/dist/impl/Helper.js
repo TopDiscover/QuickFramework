@@ -443,10 +443,10 @@ class Helper extends Config_1.default {
             for (let i = 0; i < mainIncludes.length; i++) {
                 let v = mainIncludes[i];
                 if (v == this.mainJS) {
-                    FileUtils_1.default.instance.md5Dir(buildDir, manifest.assets, buildDir, true);
+                    await FileUtils_1.default.instance.md5Dir(buildDir, manifest.assets, buildDir, true);
                 }
                 else {
-                    FileUtils_1.default.instance.md5Dir((0, path_1.join)(buildDir, mainIncludes[i]), manifest.assets, buildDir);
+                    await FileUtils_1.default.instance.md5Dir((0, path_1.join)(buildDir, mainIncludes[i]), manifest.assets, buildDir);
                 }
             }
             let versionDatas = {};
@@ -454,7 +454,7 @@ class Helper extends Config_1.default {
             let projectManifestPath = (0, path_1.join)(manifestDir, "main_project.json");
             let versionManifestPath = (0, path_1.join)(manifestDir, "main_version.json");
             let content = JSON.stringify(manifest);
-            let md5 = FileUtils_1.default.instance.md5(content);
+            let md5 = await FileUtils_1.default.instance.md5(content);
             manifest.md5 = md5;
             manifest.version = version;
             let projectData = JSON.parse(JSON.stringify(manifest));
@@ -472,11 +472,11 @@ class Helper extends Config_1.default {
                     assets: {},
                     bundle: key
                 };
-                FileUtils_1.default.instance.md5Dir((0, path_1.join)(buildDir, `assets/${key}`), manifest.assets, buildDir);
+                await FileUtils_1.default.instance.md5Dir((0, path_1.join)(buildDir, `assets/${key}`), manifest.assets, buildDir);
                 projectManifestPath = (0, path_1.join)(manifestDir, `${key}_project.json`);
                 versionManifestPath = (0, path_1.join)(manifestDir, `${key}_version.json`);
                 let content = JSON.stringify(manifest);
-                let md5 = FileUtils_1.default.instance.md5(content);
+                let md5 = await FileUtils_1.default.instance.md5(content);
                 manifest.md5 = md5;
                 manifest.version = data.bundles[key].version;
                 projectData = JSON.parse(JSON.stringify(manifest));
