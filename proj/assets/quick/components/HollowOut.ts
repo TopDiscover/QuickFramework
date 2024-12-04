@@ -173,14 +173,13 @@ export default class HollowOut extends cc.Component {
                 url: "quick/material/quick-2d-hollowout-sprite",
                 view: view,
                 type: cc.Material,
-                onComplete: (data) => {
-                    if (data) {
-                        let material = data;
-                        this.sprite.setMaterial(0, material);
-                        this.onLoadMaterialComplete(material)
-                    }
-                },
-            })
+            }).then((data) => {
+                if (data) {
+                    let material = data;
+                    this.sprite.setMaterial(0, material);
+                    this.onLoadMaterialComplete(material)
+                }
+            });
         } else {
             this.onLoadMaterialComplete(material);
         }

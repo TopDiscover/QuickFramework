@@ -125,43 +125,10 @@ cc.Sprite.prototype.loadImage = function (config) {
     }
 
     if (typeof url == "string") {
-        if (config.dir) {
-            App.cache.getCache(config.dir, cc.SpriteFrame, bundle, true).then(([cache, data]) => {
-                onComplete([cache,getAsset(config.dir,url as string,bundle,cc.SpriteFrame),config.dir,false]);
-            })
-            return;
-        }
         App.cache.getCacheByAsync(url, cc.SpriteFrame, bundle).then(([cache, spriteFrame]) => {
             onComplete([cache,spriteFrame,url as string,false]);
         });
     } else {
-        let urls = url.urls;
-        let key = url.key;
-        if (config.dir) {
-            App.cache.getCache(config.dir, cc.SpriteAtlas, bundle, true).then(([cache, data]) => {
-                if (data) {
-                    let __bundle = App.bundleManager.getBundle(bundle);
-                    let isSuccess = false;
-                    for (let i = 0; i < urls.length; i++) {
-                        let atlas: cc.SpriteAtlas = __bundle.get(`${config.dir}/${urls[i]}`, cc.SpriteAtlas);
-                        if (atlas && atlas.getSpriteFrame(key)) {
-                            addExtraLoadResource(view, cache);
-                            onComplete([cache,atlas.getSpriteFrame(key)!,config.dir!,true]);
-                            isSuccess = true;
-                            break;
-                        }
-                    }
-                    if (!isSuccess) {
-                        Log.w(`加载的资源中未找到:${bundle}/${config.dir}/${url}`);
-                        onComplete([null!,null!,config.dir!,true]);
-                    }
-                } else {
-                    Log.w(`未加载资源${config.dir}`);
-                    onComplete([null!,null!,config.dir!,true]);
-                }
-            })
-            return;
-        }
         //在纹理图集中查找
         App.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle).then((data) => {
             if (data && data.isTryReload) {
@@ -232,13 +199,6 @@ sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
             cache: cache,
         });
     }
-    if (config.dir) {
-        App.cache.getCache(config.dir, sp.SkeletonData, bundle, true).then(([cache, dirAsset]) => {
-            config.url = config.dir!;
-            onComplete([cache,getAsset(config.dir!,url,bundle,sp.SkeletonData)]);
-        })
-        return;
-    }
     App.cache.getCacheByAsync(url, sp.SkeletonData, bundle).then(([cache, data]) => {
         onComplete([cache,data]);
     });
@@ -274,13 +234,6 @@ cc.ParticleSystem.prototype.loadFile = function (config) {
     let me = this;
     let url = config.url;
     let bundle = getBundle(config);
-    if (config.dir) {
-        App.cache.getCache(config.dir, cc.ParticleAsset, bundle, true).then(([cache, dirAsset]) => {
-            config.url = config.dir;
-            setParticleSystemFile(me, config, getAsset(config.dir,url,bundle,cc.ParticleAsset), cache);
-        })
-        return;
-    }
     App.cache.getCacheByAsync(url, cc.ParticleAsset, bundle).then(([cache, data]) => {
         setParticleSystemFile(me, config, data, cache);
     });
@@ -311,12 +264,6 @@ cc.Label.prototype.loadFont = function (config) {
     let font = config.font;
     let me = this;
     let bundle = getBundle(config);
-    if (config.dir) {
-        App.cache.getCache(config.dir, cc.Font, bundle, true).then(([cache, dirAsset]) => {
-            setLabelFont(me, config, getAsset(config.dir,config.font,bundle,cc.Font), cache);
-        })
-        return;
-    }
     App.cache.getCacheByAsync(font, cc.Font, bundle).then(([cache, data]) => {
         setLabelFont(me, config, data, cache);
     });
@@ -335,7 +282,7 @@ cc.Label.prototype.loadFont = function (config) {
  * }});
  */
 window.createPrefab = function (config) {
-    createNodeWithPrefab(config);
+    return createNodeWithPrefab(config);
 }
 
 /**
@@ -349,7 +296,7 @@ window.createPrefab = function (config) {
  * @param config.type 加载的资源类型
  * */
 window.loadDirRes = function (config) {
-    _loadDirRes(config)
+    return _loadDirRes(config);
 }
 
 /**
@@ -363,7 +310,7 @@ window.loadDirRes = function (config) {
  * @param config.view 资源持有者,继承自UIView
  */
 window.loadRes = function (config) {
-    _loadRes(config);
+    return _loadRes(config);
 }
 
 /**

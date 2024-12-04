@@ -25,10 +25,19 @@ export namespace Resource {
     }
     export class Cache {
 
-        constructor(url: string, type: typeof cc.Asset, bundle: BUNDLE_TYPE) {
+        /**@description 是否是目录资源 */
+        isDir: boolean = false;
+
+        constructor(
+            url: string,
+            type: typeof cc.Asset,
+            bundle: BUNDLE_TYPE,
+            isDir: boolean = false
+        ) {
             this.url = url;
             this.type = type;
             this.bundle = bundle;
+            this.isDir = isDir;
         }
 
         /**@description 缓存的key值 */
@@ -73,8 +82,14 @@ export namespace Resource {
             return this._retain;
         }
 
-        /**@description 目录资源有效 */
-        refCount = 0;
+        private _refCount = 0;
+        /**@description 资源引用计数 */
+        get refCount() {
+            if (this.isDir) {
+                return this._refCount;
+            }
+            return cc.isValid(this.data) ? (this.data as cc.Asset).refCount : 0;
+        }
 
         /**@description 加载完成数据 
          * cc.Prefab 
@@ -87,7 +102,36 @@ export namespace Resource {
          * cc.Texture2D
          * cc.JsonAsset
          * */
-        data: cc.Asset | cc.Asset[] = null;
+        private _data: cc.Asset | cc.Asset[] = null;
+        get data() {
+            return this._data;
+        }
+        set data(v) {
+            this._data = v;
+            if (this.isDir) {
+                if (v && Array.isArray(v)) {
+                    const bundle = App.bundleManager.getBundle(this.bundle);
+                    if (bundle) {
+                        v.forEach(asset => {
+                            const info = bundle.getAssetInfo((asset as any)._uuid);
+                            if (info) {
+                                const cache = new Cache(`${info.path}`, this.type, this.bundle);
+                                cache.isLoaded = true;
+                                cache.data = asset;
+                                App.cache.set(cache);
+                                this.deps.push(cache.key);
+                            } else {
+                                Log.e(`${this.url}.${asset.name} uuid:不存在`);
+                            }
+                        })
+                    }
+                }
+            }
+        }
+
+        /**@description 依赖资源 */
+        deps: string[] = [];
+
         /**@description 默认为本地资源 */
         resourceType: Type = Type.Local;
         /**@description 加入释放资源的時間戳 */
@@ -122,12 +166,42 @@ export namespace Resource {
             return this.isLoaded && this.data && !cc.isValid(this.data);
         }
 
+        addRef() {
+            if (this.data) {
+                if (this.isDir) {
+                    this._refCount++;
+                    return true;
+                } else {
+                    if (cc.isValid(this.data)) {
+                        (this.data as cc.Asset).addRef();
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        decRef(autoRelease?: boolean) {
+            if (this.data) {
+                if (this.isDir) {
+                    this._refCount--;
+                    return true;
+                } else {
+                    if (cc.isValid(this.data)) {
+                        (this.data as cc.Asset).decRef(autoRelease);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         debug() {
 
             let type = cc.js.getClassName(this.type);
-            let info = (data: cc.Asset | cc.Asset[] | null) : { url: string, isValid: boolean, refCount: number }[] => {
+            let info = (data: cc.Asset | cc.Asset[] | null): { url: string, isValid: boolean, refCount: number }[] => {
                 if (!data) {
-                    return [{ url : this.fullUrl , isValid : false , refCount : -1 }];
+                    return [{ url: this.fullUrl, isValid: false, refCount: -1 }];
                 }
                 if (Array.isArray(data)) {
                     let datas: { url: string, isValid: boolean, refCount: number }[] = [];
@@ -154,7 +228,7 @@ export namespace Resource {
                 isLoaded: this.isLoaded,
                 info: info(this.data),
                 status: this.status,
-                type : type,
+                type: type,
             }
             return data;
         }
@@ -176,7 +250,7 @@ export namespace Resource {
         /**@description 如果是加载的目录，请用dir字段,必须指定类型，否则无法正确的释放资源 */
         dir?: string,
         /**@description 是否缓存preloadView */
-        isCache?:boolean,
+        isCache?: boolean,
     }
 
     export function getKey(url: string, type: typeof cc.Asset | cc.Asset) {

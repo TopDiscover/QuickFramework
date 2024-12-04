@@ -201,12 +201,10 @@ declare function createPrefab(
 		/**@description 资源持有者 UIView 子类 */
 		view: UIView,
 		/**@description 完成回调 */
-		complete: (node: cc.Node) => void,
+		complete?: (node: cc.Node) => void,
 		/**@description 资源所在bundle */
 		bundle?: BUNDLE_TYPE,
-		/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
-		dir?: string
-	}): void;
+	}): Promise<cc.Node>;
 
 /**
 * @description 扩展一个在界面中加载指定目录的接口 请使用全局的导入
@@ -230,10 +228,8 @@ declare function loadDirRes(config: {
 	/**@description 加载进度回调 */
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
 	/**@description 加载完成回调 */
-	onComplete: (data: import("../assets/quick/core/asset/Resource").Resource.Cache) => void
-	/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
-	dir?: string,
-}): void;
+	onComplete?: (data: import("../assets/quick/core/asset/Resource").Resource.Cache) => void
+}): Promise<import("../assets/quick/core/asset/Resource").Resource.Cache>;
 
 /**
 * @description 扩展一个在界面加载指定资源接口 请使用全局的导入
@@ -255,12 +251,10 @@ declare function loadRes<T extends cc.Asset>(config: {
 	/**@description 加载进度回调 */
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
 	/**@description 加载完成回调 */
-	onComplete: (data: T) => void,
+	onComplete?: (data: T) => void,
 	/**@description  资源持有者 UIView 子类 */
 	view: UIView,
-	/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
-	dir?: string,
-}): void;
+}): Promise<T>;
 
 
 declare type EntryDelegate = import("../assets/quick/core/entry/EntryDelegate").EntryDelegate;

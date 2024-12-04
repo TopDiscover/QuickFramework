@@ -53,7 +53,7 @@ class RemoteLoader {
                 } else {
                     if (CC_DEBUG) Log.w(`${this._logTag}加载图片错误${url}`);
                     resolve([null, null]);
-                    App.cache.remoteCaches.remove(url,cc.SpriteFrame,true);
+                    App.cache.remoteCaches.remove(url, cc.SpriteFrame, true);
                 }
             })
         });
@@ -108,19 +108,19 @@ class RemoteLoader {
                                         } else {
                                             resolve([null, null]);
                                             cache.doFinish([null, null]);
-                                            App.cache.remoteCaches.remove(cache.url, sp.SkeletonData,true);
+                                            App.cache.remoteCaches.remove(cache.url, sp.SkeletonData, true);
                                         }
                                     });
                                 } else {
                                     resolve([null, null]);
                                     cache.doFinish([null, null]);
-                                    App.cache.remoteCaches.remove(cache.url, sp.SkeletonData,true);
+                                    App.cache.remoteCaches.remove(cache.url, sp.SkeletonData, true);
                                 }
                             });
                         } else {
                             resolve([null, null]);
                             cache.doFinish([null, null]);
-                            App.cache.remoteCaches.remove(cache.url, sp.SkeletonData,true);
+                            App.cache.remoteCaches.remove(cache.url, sp.SkeletonData, true);
                         }
                     })
                 }
@@ -143,7 +143,7 @@ class RemoteLoader {
             //先从待释放中取
             let [cache] = App.releaseManger.getRemote(key, type);
             if (cache) {
-                (<cc.Asset>cache.data).addRef();
+                cache.addRef();
                 App.cache.remoteCaches.set(cache);
                 //把再加载过程里，双加载同一资源的回调都回调回去
                 cache.doFinish([cache, cache.data as any]);
@@ -284,15 +284,18 @@ export class AssetManager implements ISingleton {
         //添加引用关系
         let tempCache = cache;
         let key = cache.key;
+
+        let type = cache.isDir ? "目录" : "资源";
+
         if (err) {
-            Log.e(`${this.module}加载资源失败:${cache.bundle}/${key} 原因:${err.message ? err.message : "未知"}`);
+            Log.e(`${this.module}加载${type}失败:${cache.bundle}/${key} 原因:${err.message ? err.message : "未知"}`);
             cache.data = null;
             tempCache.data = null;
             App.cache.remove(cache);
             complete(cache);
         }
         else {
-            if (CC_DEBUG) Log.d(`${this.module}加载资源成功:${cache.bundle}/${key}`);
+            if (CC_DEBUG) Log.d(`${this.module}加载${type}成功:${cache.bundle}/${key}`);
             cache.data = data;
             tempCache.data = data;
             complete(cache);
@@ -303,7 +306,7 @@ export class AssetManager implements ISingleton {
         cache.doGet();
 
         if (cache.status == Resource.CacheStatus.WAITTING_FOR_RELEASE) {
-            if (CC_DEBUG) Log.w(this.module, `资源:${cache.bundle}/${key}加载完成，但缓存状态为等待销毁，销毁资源`);
+            if (CC_DEBUG) Log.w(this.module, `${type}:${cache.bundle}/${key}加载完成，但缓存状态为等待销毁，销毁资源`);
             if (cache.data) {
                 cache.status = Resource.CacheStatus.NONE;
                 this.releaseAsset(cache);
@@ -326,11 +329,19 @@ export class AssetManager implements ISingleton {
         if (cache) {
             console.time(`加载资源 : ${bundle}/${key}`);
             App.cache.set(cache);
+            if ( cache.isDir ){
+                cache.deps.forEach(v => {
+                    const temp = App.releaseManger.get(bundle,v);
+                    if ( temp ){
+                        App.cache.set(cache);
+                    }
+                });
+            }
             this._onLoadComplete(cache, onComplete, null, cache.data);
             return;
         }
 
-        cache = App.cache.get(bundle, key, type);
+        cache = App.cache.get(bundle, url, type);
         if (cache) {
             //存在缓存信息
             if (cache.isLoaded) {
@@ -350,7 +361,7 @@ export class AssetManager implements ISingleton {
             cache.status = Resource.CacheStatus.NONE;
         } else {
             //无缓存信息
-            cache = new Resource.Cache(key, type, bundle);
+            cache = new Resource.Cache(url, type, bundle,true);
             App.cache.set(cache);
             console.time(`加载资源 : ${bundle}/${cache.key}`);
 
@@ -398,16 +409,7 @@ export class AssetManager implements ISingleton {
                 if (!cache.retain) {
                     cache.retain = cache.retain;
                 }
-                if (Array.isArray(cache.data)) {
-                    //如果，对引用的目录加1
-                    cache.refCount++;
-                    //里面是数组 
-                    for (let i = 0; i < cache.data.length; i++) {
-                        cache.data[i] && cache.data[i].addRef();
-                    }
-                } else {
-                    cache.data && cache.data.addRef();
-                }
+                cache.addRef();
             } else {
                 if (CC_DEBUG) Log.e(`${input.url} retainAsset cache.data is null`);
             }

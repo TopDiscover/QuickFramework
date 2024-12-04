@@ -169,8 +169,7 @@ class RemoteCaches {
         let key = Resource.getKey(url, type);
         let cache = this.get(key);
         if (cache) {
-            let data: cc.Asset = cache.data as any;
-            data.addRef();
+            cache.addRef();
         }
     }
 
@@ -178,14 +177,13 @@ class RemoteCaches {
         let key = Resource.getKey(url, type);
         let cache = this.get(key);
         if (cache) {
-            let data: cc.Asset = cache.data as any;
-            if ( cc.isValid(data) ){
-                data.decRef(false);
-                if (data.refCount <= 0) {
+            const success = cache.decRef(false);
+            if (success) {
+                if (cache.refCount <= 0) {
                     this._caches.delete(key);
                     App.releaseManger.releaseRemote(cache, force);
                 }
-            }else{
+            } else {
                 this._caches.delete(key);
             }
         }
@@ -280,63 +278,55 @@ export class CacheManager implements ISingleton {
         return false;
     }
 
-    /**@description 释放资源，引用计数减1  */
-    protected decRef(cache: Resource.Cache, assets: cc.Asset, bundle: cc.AssetManager.Bundle) {
-        const data = assets
-        data.decRef(false);
+    public removeWithInfo(cache: Resource.Cache, bundle: cc.AssetManager.Bundle, lazyInfo?: { add: (cache: Resource.Cache) => void }) {
         let isSuccess = true;
-        if (data.refCount <= 0) {
-            if (App.isLazyRelease) {
-                CC_DEBUG && Log.d(`${this.module} bundle : ${cache.bundle} 释放资源成功 : ${cache.url} 将加入释放队列中`);
-            } else {
-                bundle.release(cache.url, cache.type);
-                CC_DEBUG && Log.d(`${this.module} bundle : ${cache.bundle} 释放资源成功 : ${cache.url}`);
-            }
-        } else {
-            if (CC_DEBUG) {
+        if (cache) {
+            cache.decRef(false);
+            let type = cache.isDir ? "目录" : "资源";
+            if (cache.refCount <= 0) {
                 if (App.isLazyRelease) {
-                    Log.w(`${this.module} bundle : ${cache.bundle} 释放资源失败 : ${cache.url} , 引用计数 : ${data.refCount} , 无法加入释放队列中`);
-                } else {
-                    Log.w(`${this.module} bundle : ${cache.bundle} 释放资源失败 : ${cache.url} , 引用计数 : ${data.refCount}`);
-                }
-            }
-            isSuccess = false;
-        }
-        return isSuccess;
-    }
-
-    public removeWithInfo(cache: Resource.Cache, bundle: cc.AssetManager.Bundle) {
-        let isSuccess = true;
-        if (cache && cache.data) {
-
-            if (Array.isArray(cache.data)) {
-                cache.refCount--;
-                for (let i = 0; i < cache.data.length; i++) {
-                    this.decRef(cache, cache.data[i], bundle);
-                }
-                isSuccess = cache.refCount <= 0;
-                if (isSuccess) {
-                    if (App.isLazyRelease) {
-                        CC_DEBUG && Log.d(`${this.module} 成功释放资源目录,将释放目录加入到释放队列中 bundle : ${cache.bundle} : ${cache.bundle}.${cache.url}`);
-                    } else {
-                        this.remove(cache);
-                        CC_DEBUG && Log.d(`${this.module} 成功释放资源目录 bundle : ${cache.bundle} : ${cache.bundle}.${cache.url}`);
+                    CC_DEBUG && Log.d(`${this.module} 成功释放${type},将释放资源加入到释放队列中 bundle : ${cache.bundle} url : ${cache.url}`);
+                    if ( lazyInfo && lazyInfo.add && cache.isDir ){
+                        const deps = cache.deps;
+                        deps.forEach(v => {
+                            const temp = this.get(cache.bundle,v,cache.type);
+                            if ( temp ){
+                                lazyInfo.add(temp);
+                                this.remove(temp);
+                            }
+                        });
                     }
                 } else {
-                    if (App.isLazyRelease) {
-                        CC_DEBUG && Log.d(`${this.module} 释放资源目录失败，无法加入到释放队列中 bundle : ${cache.bundle} : ${cache.bundle}.${cache.url}`);
+                    if (cache.isDir) {
+                        // 只删除缓存
+                        const deps = cache.deps;
+                        deps.forEach(v => {
+                            const temp = this.get(cache.bundle,v,cache.type)
+                            if ( temp ){
+                                if ( temp.refCount <= 0 ){
+                                    CC_DEBUG && Log.d(`${this.module} [${type}]成功释放资源 bundle : ${cache.bundle} url : ${temp.url}`)
+                                    bundle.release(temp.url,cache.type)
+                                    this.remove(temp);
+                                }
+                                else{
+                                    CC_DEBUG && Log.w(`${this.module} [${type}]资源${temp.url} 正使用中引用计数为:${temp.refCount}`)
+                                }
+                            }
+                        });
                     } else {
-                        CC_DEBUG && Log.d(`${this.module} 释放资源目录失败 bundle : ${cache.bundle} : ${cache.bundle}.${cache.url}`);
+                        bundle.release(cache.url, cache.type);
                     }
+                    this.remove(cache);
+                    CC_DEBUG && Log.d(`${this.module} 成功释放${type} bundle : ${cache.bundle} url : ${cache.url}`);
                 }
-
             } else {
-                if (this.decRef(cache, cache.data, bundle)) {
-                    if (!App.isLazyRelease) {
-                        this.remove(cache);
+                isSuccess = false;
+                if (CC_DEBUG) {
+                    if (App.isLazyRelease) {
+                        Log.w(`${this.module} 释放${type}失败，无法加入释放队列中 bundle : ${cache.bundle} url : ${cache.url} 引用计数 : ${cache.refCount}`);
+                    } else {
+                        Log.w(`${this.module} 释放${type}失败 bundle : ${cache.bundle} url : ${cache.url} 引用计数 : ${cache.refCount}`);
                     }
-                } else {
-                    isSuccess = false;
                 }
             }
         }

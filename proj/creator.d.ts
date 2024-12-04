@@ -124,8 +124,6 @@ declare module cc {
 			complete?: (data: SpriteFrame) => void,
 			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
 			bundle?: BUNDLE_TYPE,
-			/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
-			dir?: string
 		});
 	}
 
@@ -161,8 +159,6 @@ declare module cc {
 			complete?: (type: string, spriteFrame: SpriteFrame) => void,
 			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
 			bundle?: BUNDLE_TYPE
-			/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
-			dir?: string
 		});
 	}
 
@@ -182,8 +178,6 @@ declare module cc {
 			complete?: (font: Font) => void, 
 			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
 			bundle?: BUNDLE_TYPE,
-			/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
-			dir?: string
 		});
 
 		/**@description 强制label在当前帧进行绘制 */
@@ -217,8 +211,6 @@ declare module cc {
 			complete?: (file: ParticleAsset) => void, 
 			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
 			bundle?: BUNDLE_TYPE,
-			/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
-			dir?: string
 		});
 
 	}
@@ -275,8 +267,6 @@ declare namespace sp {
 			complete: (data: sp.SkeletonData) => void, 
 			/**@description 资源所在bundle */
 			bundle?: BUNDLE_TYPE,
-			/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
-			dir?: string
 		});
 	}
 }
@@ -312,8 +302,6 @@ declare namespace dragonBones{
 			complete : (asset : DragonBonesAsset , atlas : DragonBonesAtlasAsset)=>void,
 			/**@description 资源所在bundle */
 			bundle?:BUNDLE_TYPE,
-			/**@description 目录资源url，传入此参数时，必须要提前加载此目录 */
-			dir?: string
 		}):void;
 	}
 }
