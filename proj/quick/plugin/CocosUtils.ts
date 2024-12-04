@@ -209,7 +209,7 @@ function _setButtonWithType(
     bundle?: BUNDLE_TYPE,
     dir?: string
 ) {
-    let onComplete = ([cache,data,url,isAtlas]:[Resource.Cache,SpriteFrame,string,boolean])=>{
+    let onComplete = ([cache, data, url, isAtlas]: [Resource.Cache, SpriteFrame, string, boolean]) => {
         _setButtonSpriteFrame({
             button: button,
             memberName: memberName,
@@ -219,7 +219,7 @@ function _setButtonWithType(
             complete: complete!,
             bundle: bundle!,
             cache: cache,
-            isAtlas : isAtlas
+            isAtlas: isAtlas
         });
     }
     if (url) {
@@ -227,12 +227,12 @@ function _setButtonWithType(
             url = `${url}/spriteFrame`;
             if (dir) {
                 App.cache.getCache(dir, SpriteFrame, bundle!, true).then(([cache, dirAsset]) => {
-                    onComplete([cache,getAsset(dir,url as string,bundle!,SpriteFrame),dir,false]);
+                    onComplete([cache, getAsset(dir, url as string, bundle!, SpriteFrame), dir, false]);
                 })
                 return;
             }
             App.cache.getCacheByAsync(url, SpriteFrame, bundle!).then(([cache, spriteFrame]) => {
-                onComplete([cache,spriteFrame,url as string,false]);
+                onComplete([cache, spriteFrame, url as string, false]);
             });
         } else {
             let urls = url.urls;
@@ -245,18 +245,18 @@ function _setButtonWithType(
                         for (let i = 0; i < urls.length; i++) {
                             let atlas: SpriteAtlas = __bundle.get(`${dir}/${urls[i]}`, SpriteAtlas)!;
                             if (atlas && atlas.getSpriteFrame(key)) {
-                                onComplete([cache,atlas.getSpriteFrame(key)!,dir,true]);
+                                onComplete([cache, atlas.getSpriteFrame(key)!, dir, true]);
                                 isSuccess = true;
                                 break;
                             }
                         }
                         if (!isSuccess) {
                             Log.w(`加载的资源中未找到:${bundle}/${dir}/${url}`);
-                            onComplete([null!,null!,dir,true]);
+                            onComplete([null!, null!, dir, true]);
                         }
                     } else {
                         Log.w(`未加载资源${dir}`);
-                        onComplete([null!,null!,dir,true]);
+                        onComplete([null!, null!, dir, true]);
                     }
                 })
                 return;
@@ -266,7 +266,7 @@ function _setButtonWithType(
                 if (data && data.isTryReload) {
                     //来到这里面，程序已经崩溃，无意义在处理
                 } else {
-                    onComplete([data.cache,data.spriteFrame,data.url,true]);
+                    onComplete([data.cache, data.spriteFrame, data.url, true]);
                 }
             });
         }
@@ -418,33 +418,31 @@ export function createNodeWithPrefab(config: {
     bundle?: BUNDLE_TYPE,
     url: string,
     view: any,
-    complete: (node: Node) => void,
-    dir?: string,
-}) {
+    complete?: (node: Node) => void,
+}): Promise<Node> {
 
-    let onComplete = ([cache, data]: [Resource.Cache, Prefab]) => {
-        if (cache) {
-            addExtraLoadResource(config.view, cache);
+    return new Promise((resolve, reject) => {
+        let onComplete = ([cache, data]: [Resource.Cache, Prefab]) => {
+            if (cache) {
+                addExtraLoadResource(config.view, cache);
+            }
+            if (data && isValidComponent(config.view)) {
+                let node = instantiate(data);
+                if (config.complete) config.complete(node);
+                resolve(node);
+            } else if (isValidComponent(config.view)) {
+                if (config.complete) config.complete(null!);
+                resolve(null!);
+            } else {
+                resolve(null!);
+            }
         }
-        if (data && isValidComponent(config.view) && config.complete) {
-            let node = instantiate(data);
-            config.complete(node);
-        } else if (isValidComponent(config.view) && config.complete) {
-            config.complete(null!);
-        }
-    }
-    let url = config.url;
-    let bundle = getBundle(config);
-    if (config.dir) {
-        App.cache.getCache(config.dir, Prefab, bundle, true).then(([cache, data]) => {
-            data = getAsset(config.dir!,config.url,bundle,Prefab);
+        let url = config.url;
+        let bundle = getBundle(config);
+        App.cache.getCacheByAsync(url, Prefab, bundle).then(([cache, data]) => {
             onComplete([cache, data]);
-        })
-        return;
-    }
-    App.cache.getCacheByAsync(url, Prefab, bundle).then(([cache, data]) => {
-        onComplete([cache, data]);
-    });
+        });
+    })
 }
 
 export function _loadDirRes(config: {
@@ -453,59 +451,53 @@ export function _loadDirRes(config: {
     type: typeof Asset,
     view: any,
     onProgress?: (finish: number, total: number, item: AssetManager.RequestItem) => void,
-    onComplete: (data: Resource.Cache) => void,
-    dir?: string,
-}) {
-    let bundle = getBundle(config);
+    onComplete?: (data: Resource.Cache) => void,
+}): Promise<Resource.Cache> {
 
-    let onComplete = (cache: Resource.Cache) => {
-        if (cache) {
-            addExtraLoadResource(config.view, cache);
+    return new Promise((resolve, reject) => {
+
+        let bundle = getBundle(config);
+
+        let onComplete = (cache: Resource.Cache) => {
+            if (cache) {
+                addExtraLoadResource(config.view, cache);
+            }
+            if (config.onComplete) {
+                config.onComplete(cache);
+            }
+            resolve(cache);
         }
-        if (config.onComplete) {
-            config.onComplete(cache);
-        }
-    }
-    if (config.dir) {
-        App.cache.getCache(config.dir, config.type, bundle, true).then(([cache, data]) => {
+        //这里要做一个防止重复加载操作，以免对加载完成后的引用计数多加次数
+        App.asset.loadDir(bundle, config.url, config.type, config.onProgress!, (cache) => {
             onComplete(cache);
-        })
-        return;
-    }
-    //这里要做一个防止重复加载操作，以免对加载完成后的引用计数多加次数
-    App.asset.loadDir(bundle, config.url, config.type, config.onProgress!, (cache) => {
-        onComplete(cache);
-    });
+        });
+    })
 }
 
-export function _loadRes(config: {
+export function _loadRes<T extends Asset>(config: {
     bundle?: BUNDLE_TYPE,
     url: string,
     type: typeof Asset,
     onProgress?: (finish: number, total: number, item: AssetManager.RequestItem) => void,
-    onComplete: (data: any) => void,
+    onComplete?: (data: any) => void,
     view: any,
-    dir?: string,
-}) {
-    let bundle = getBundle(config);
-    let onComplete = ([cache, data]: [Resource.Cache, Asset]) => {
-        if (cache) {
-            addExtraLoadResource(config.view, cache);
+}): Promise<T> {
+
+    return new Promise((resolve, reject) => {
+        let bundle = getBundle(config);
+        let onComplete = ([cache, data]: [Resource.Cache, Asset]) => {
+            if (cache) {
+                addExtraLoadResource(config.view, cache);
+            }
+            if (config.onComplete) {
+                config.onComplete(data);
+            }
+            resolve(data as T);
         }
-        if (config.onComplete) {
-            config.onComplete(data);
-        }
-    }
-    if (config.dir) {
-        App.cache.getCache(config.dir, config.type, bundle, true).then(([cache, data]) => {
-            data = getAsset(config.dir!, config.url, bundle, config.type);
-            onComplete([cache, data]);
+        App.cache.getCacheByAsync(config.url, config.type, bundle).then(([cache, data]) => {
+            onComplete([cache, data])
         })
-        return;
-    }
-    App.cache.getCacheByAsync(config.url, config.type, bundle).then(([cache, data]) => {
-        onComplete([cache, data])
-    })
+    });
 }
 
 export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay,

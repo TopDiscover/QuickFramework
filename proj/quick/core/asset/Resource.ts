@@ -27,10 +27,19 @@ export namespace Resource {
     }
     export class Cache {
 
-        constructor(url: string, type: typeof Asset, bundle: BUNDLE_TYPE) {
+        /**@description 是否是目录资源 */
+        isDir: boolean = false;
+
+        constructor(
+            url: string,
+            type: typeof Asset,
+            bundle: BUNDLE_TYPE,
+            isDir: boolean = false
+        ) {
             this.url = url;
             this.type = type;
             this.bundle = bundle;
+            this.isDir = isDir;
         }
 
         /**@description 缓存的key值 */
@@ -75,8 +84,14 @@ export namespace Resource {
             return this._retain;
         }
 
-        /**@description 目录资源有效 */
-        refCount = 0;
+        private _refCount = 0;
+        /**@description 资源引用计数 */
+        get refCount() {
+            if (this.isDir) {
+                return this._refCount;
+            }
+            return isValid(this.data) ? (this.data as Asset).refCount : 0;
+        }
 
         /**@description 加载完成数据 
          * cc.Prefab 
@@ -89,7 +104,36 @@ export namespace Resource {
          * cc.Texture2D
          * cc.JsonAsset
          * */
-        data: Asset | Asset[] = null!;
+        private _data: Asset | Asset[] = null!;
+        get data() {
+            return this._data;
+        }
+        set data(v) {
+            this._data = v;
+            if (this.isDir) {
+                if (v && Array.isArray(v)) {
+                    const bundle = App.bundleManager.getBundle(this.bundle);
+                    if (bundle) {
+                        v.forEach(asset => {
+                            const info = bundle.getAssetInfo(asset.uuid);
+                            if (info) {
+                                const cache = new Cache(`${(info as any).path}`, this.type, this.bundle);
+                                cache.isLoaded = true;
+                                cache.data = asset;
+                                App.cache.set(cache);
+                                this.deps.push(cache.key);
+                            } else {
+                                Log.e(`${this.url}.${asset.name} uuid:不存在`);
+                            }
+                        })
+                    }
+                }
+            }
+        }
+
+        /**@description 依赖资源 */
+        deps: string[] = [];
+
         /**@description 默认为本地资源 */
         resourceType: Type = Type.Local;
         /**@description 加入释放资源的時間戳 */
@@ -122,6 +166,36 @@ export namespace Resource {
 
         public get isInvalid() {
             return this.isLoaded && this.data && !isValid(this.data);
+        }
+
+        addRef() {
+            if (this.data) {
+                if (this.isDir) {
+                    this._refCount++;
+                    return true;
+                } else {
+                    if (isValid(this.data)) {
+                        (this.data as Asset).addRef();
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        decRef(autoRelease?: boolean) {
+            if (this.data) {
+                if (this.isDir) {
+                    this._refCount--;
+                    return true;
+                } else {
+                    if (isValid(this.data)) {
+                        (this.data as Asset).decRef(autoRelease);
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         debug() {

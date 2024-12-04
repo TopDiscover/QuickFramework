@@ -25,22 +25,16 @@ class LazyInfo {
     /**@description 放入懒释放资源 */
     add(cache: Resource.Cache) {
 
-        //管理器引用加1
-        if (Array.isArray(cache.data)) {
-            cache.refCount++;
-            Log.d(`${LOG_TAG}向${this.name}加入待释放目录:${cache.key}`);
-            for (let i = 0; i < cache.data.length; i++) {
-                if (cache.data[i]) {
-                    cache.data[i].addRef();//为释放管理器添加引用计数
-                }
-            }
-        } else {
-            if (cache.data) {
-                Log.d(`${LOG_TAG}向${this.name}加入待释放资源:${cache.key}`);
-                cache.data.addRef();//为释放管理器添加引用计数
+        const success = cache.addRef();
+        if ( DEBUG ){
+            let log = success ? "成功" : "失败";
+            if (cache.isDir) {
+                Log.d(`${LOG_TAG}${log} 向${this.name}加入待释放目录:${cache.key}`);
+            } else {
+                Log.d(`${LOG_TAG}${log} 向${this.name}加入待释放资源:${cache.key}`);
             }
         }
-
+        
         cache.stamp = Date.timeNow();
 
         this._caches.set(cache.key, cache);
@@ -54,19 +48,14 @@ class LazyInfo {
     get(key: string) {
         let cache = this._caches.get(key);
         if (cache) {
-            if (Array.isArray(cache.data)) {
-                for (let i = 0; i < cache.data.length; i++) {
-                    if (cache.data[i]) {
-                        cache.data[i].decRef(false);
-                    }
-                }
+            const success = cache.decRef(false);
+            if (cache.isDir) {
                 Log.d(`${LOG_TAG}向${this.name}获取待释放目录:${cache.key}`);
                 this._caches.delete(key);
                 return cache;
             } else {
-                if (isValid(cache.data)) {
+                if (success) {
                     //获取后删除当前管理器的引用
-                    cache.data.decRef(false);
                     Log.d(`${LOG_TAG}向${this.name}获取待释放资源:${cache.key}`);
                     this._caches.delete(key);
                     return cache;
@@ -143,30 +132,17 @@ class LazyInfo {
     }
 
     protected release(cache: Resource.Cache, bundle: AssetManager.Bundle) {
-        if (Array.isArray(cache.data)) {
+        const success = cache.decRef(false);
+        if (cache.isDir) {
             Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载目录${cache.fullUrl}`);
-            for (let i = 0; i < cache.data.length; i++) {
-                if (cache.data[i]) {
-                    cache.data[i].decRef(false);
-                    let path = `${cache.fullUrl}/${cache.data[i].name}`;
-                    if (cache.data[i].refCount <= 0) {
-                        bundle?.release(path, cache.type);
-                        Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载资源${path}`);
-                    } else {
-                        Log.w(`${LOG_TAG}bundle : ${this.name} 资源${path}正使用中引用计数为:${cache.data[i].refCount}`)
-                    }
-                }
-            }
         } else {
-            if (isValid(cache.data)) {
+            if (success) {
                 //获取后删除当前管理器的引用
-                cache.data.decRef(false);
-
-                if (cache.data.refCount <= 0) {
+                if (cache.refCount <= 0) {
                     bundle?.release(cache.url, cache.type);
                     Log.d(`${LOG_TAG}bundle : ${this.name} 释放加载资源${cache.url}`);
                 } else {
-                    Log.w(`${LOG_TAG}bundle : ${this.name} 资源${cache.url}正使用中引用计数为:${cache.data.refCount}`)
+                    Log.w(`${LOG_TAG}bundle : ${this.name} 资源${cache.url}正使用中引用计数为:${cache.refCount}`)
                 }
             }
         }
@@ -249,14 +225,14 @@ export class ReleaseManager implements ISingleton {
                     this._lazyInfos.set(name, lazyInfo);
                 }
 
-                if (App.cache.removeWithInfo(cache, bundle)) {
+                if (App.cache.removeWithInfo(cache, bundle,lazyInfo)) {
                     if (lazyInfo) {
                         lazyInfo.add(cache);
                     }
                     App.cache.remove(cache);
                 }
             } else {
-                App.cache.removeWithInfo(cache, bundle);
+                App.cache.removeWithInfo(cache, bundle,null!);
             }
         } else {
             Log.e(`${LOG_TAG}${cache.bundle} no found`);
