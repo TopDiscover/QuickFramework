@@ -333,7 +333,7 @@ export class AssetManager implements ISingleton {
                 cache.deps.forEach(v => {
                     const temp = App.releaseManger.get(bundle,v);
                     if ( temp ){
-                        App.cache.set(cache);
+                        App.cache.set(temp);
                     }
                 });
             }
