@@ -107,7 +107,7 @@ module.exports = Editor.Panel.define({
                     },
                     onInputAppVersionOver(version) {
                         this.appVersion = version;
-                        Helper_1.helper.data.appVersion = version;
+                        Helper_1.helper.data.appVersion = this.appVersion;
                         Helper_1.helper.save();
                     },
                     onInputUrlOver(inputUrl) {

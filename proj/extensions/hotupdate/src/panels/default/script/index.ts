@@ -80,10 +80,10 @@ module.exports = Editor.Panel.define({
                         helper.save();
                     },
                     onRefreshMainVersion() {
-                        this.remoteVersion = helper.getVersion();
+                        (this as any).remoteVersion = helper.getVersion();
                     },
                     onRefreshVersion(dir: string) {
-                        this.remoteBundles[dir].md5 = helper.getVersion(dir);
+                        (this as any).remoteBundles[dir].md5 = helper.getVersion(dir);
                     },
                     onDeployToRemote() {
                         helper.deployToRemote();
@@ -108,17 +108,17 @@ module.exports = Editor.Panel.define({
                     },
                     onBuildDirConfirm(url: string) {
                         helper.data!.buildDir = url;
-                        this.buildOutDir = helper.getManifestDir(helper.data!.buildDir);
+                        (this as any).buildOutDir = helper.getManifestDir(helper.data!.buildDir);
                         helper.save();
                     },
                     onInputVersionOver(version: string) {
-                        this.version = version;
-                        helper.data!.version = this.version;
+                        (this as any).version = version;
+                        helper.data!.version = (this as any).version;
                         helper.save();
                     },
                     onInputAppVersionOver(version:string){
-                        this.appVersion = version;
-                        helper.data!.appVersion = version;
+                        (this as any).appVersion = version;
+                        helper.data!.appVersion = (this as any).appVersion;
                         helper.save();
                     },
                     onInputUrlOver(inputUrl: string) {
@@ -128,9 +128,9 @@ module.exports = Editor.Panel.define({
                             return;
                         }
                         helper.data!.serverIP = url;
-                        this.serverIP = url;
+                        (this as any).serverIP = url;
                         if (helper.addHotAddress(url)) {
-                            this.hotupdateUrls = helper.data!.historyIps;
+                            (this as any).hotupdateUrls = helper.data!.historyIps;
                         }
                         helper.save();
                         helper.updateToConfigTS();
@@ -154,14 +154,14 @@ module.exports = Editor.Panel.define({
                         this.onInputUrlOver(url);
                     },
                     onChangeAutoVersion(value : boolean){
-                        this.isAutoVersion = value;
+                        (this as any).isAutoVersion = value;
                         helper.data!.isAutoVersion = value;
                         helper.save();
                         helper.updateToConfigTS();
                     },
                 },
                 created: function () {
-                    view = this;
+                    view = this as any;
                 },
                 mounted: function () {
 

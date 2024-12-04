@@ -496,9 +496,9 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
             for (let i = 0; i < mainIncludes.length; i++) {
                 let v = mainIncludes[i];
                 if (v == this.mainJS) {
-                    FileUtils.instance.md5Dir(buildDir, manifest.assets!, buildDir, true);
+                    await FileUtils.instance.md5Dir(buildDir, manifest.assets!, buildDir, true);
                 } else {
-                    FileUtils.instance.md5Dir(join(buildDir, mainIncludes[i]), manifest.assets!, buildDir);
+                    await FileUtils.instance.md5Dir(join(buildDir, mainIncludes[i]), manifest.assets!, buildDir);
                 }
             }
 
@@ -508,7 +508,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
             let projectManifestPath = join(manifestDir, "main_project.json");
             let versionManifestPath = join(manifestDir, "main_version.json");
             let content = JSON.stringify(manifest);
-            let md5 = FileUtils.instance.md5(content);
+            let md5 = await FileUtils.instance.md5(content);
             manifest.md5 = md5;
             manifest.version = version;
 
@@ -538,12 +538,12 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
                     assets: {},
                     bundle: key
                 };
-                FileUtils.instance.md5Dir(join(buildDir, `assets/${key}`), manifest.assets!, buildDir);
+                await FileUtils.instance.md5Dir(join(buildDir, `assets/${key}`), manifest.assets!, buildDir);
                 projectManifestPath = join(manifestDir, `${key}_project.json`);
                 versionManifestPath = join(manifestDir, `${key}_version.json`);
 
                 let content = JSON.stringify(manifest);
-                let md5 = FileUtils.instance.md5(content);
+                let md5 = await FileUtils.instance.md5(content);
                 manifest.md5 = md5;
                 manifest.version = data.bundles[key].version
 
