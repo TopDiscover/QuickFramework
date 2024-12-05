@@ -414,7 +414,9 @@ export function createNodeWithPrefab(config: {
                 resolve(node);
             } else if (isValidComponent(config.view)) {
                 if (config.complete) config.complete(null);
-                resolve(null);
+                resolve(null!);
+            } else {
+                resolve(null!);
             }
         }
         let url = config.url;
