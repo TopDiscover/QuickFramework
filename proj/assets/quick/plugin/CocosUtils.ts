@@ -206,69 +206,43 @@ function _setButtonWithType(
     url: string | { urls: string[], key: string },
     complete?: (type: string, spriteFrame: cc.SpriteFrame) => void,
     bundle?: BUNDLE_TYPE,
-    dir?: string
 ) {
-    let onComplete = ([cache, data, url, isAtlas]: [Resource.Cache, cc.SpriteFrame, string, boolean]) => {
-        _setButtonSpriteFrame({
-            button: button,
-            memberName: memberName,
-            view: view,
-            url: url,
-            spriteFrame: data,
-            complete: complete,
-            bundle: bundle,
-            cache: cache,
-            isAtlas: isAtlas
-        });
-    }
-    if (url) {
-        if (typeof url == "string") {
-            if (dir) {
-                App.cache.getCache(dir, cc.SpriteFrame, bundle, true).then(([cache, dirAsset]) => {
-                    onComplete([cache, getAsset(dir, url, bundle, cc.SpriteFrame), dir, false]);
-                })
-                return;
-            }
-            App.cache.getCacheByAsync(url, cc.SpriteFrame, bundle).then(([cache, spriteFrame]) => {
-                onComplete([cache, spriteFrame, url, false]);
-            });
-        } else {
-            let urls = url.urls;
-            let key = url.key;
-            if (dir) {
-                App.cache.getCache(dir, cc.SpriteAtlas, bundle, true).then(([cache, data]) => {
-                    if (data) {
-                        let __bundle = App.bundleManager.getBundle(bundle);
-                        let isSuccess = false;
-                        for (let i = 0; i < urls.length; i++) {
-                            let atlas: cc.SpriteAtlas = __bundle.get(`${dir}/${urls[i]}`, cc.SpriteAtlas);
-                            if (atlas && atlas.getSpriteFrame(key)) {
-                                onComplete([cache, atlas.getSpriteFrame(key), dir, true]);
-                                isSuccess = true;
-                                break;
-                            }
-                        }
-                        if (!isSuccess) {
-                            Log.w(`加载的资源中未找到:${bundle}/${dir}/${url}`);
-                            onComplete([null, null, dir, true]);
-                        }
-                    } else {
-                        Log.w(`未加载资源${dir}`);
-                        onComplete([null, null, dir, true]);
-                    }
-                })
-                return;
-            }
-            //在纹理图集中查找
-            App.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle).then((data) => {
-                if (data && data.isTryReload) {
-                    //来到这里面，程序已经崩溃，无意义在处理
-                } else {
-                    onComplete([data.cache, data.spriteFrame, data.url, true]);
-                }
+    return new Promise<cc.SpriteFrame>((resolve, reject) => {
+        let onComplete = ([cache, data, url, isAtlas]: [Resource.Cache, cc.SpriteFrame, string, boolean]) => {
+            _setButtonSpriteFrame({
+                button: button,
+                memberName: memberName,
+                view: view,
+                url: url,
+                spriteFrame: data,
+                complete: (type, data) => {
+                    complete && complete(type, data);
+                    resolve(data);
+                },
+                bundle: bundle,
+                cache: cache,
+                isAtlas: isAtlas
             });
         }
-    }
+        if (url) {
+            if (typeof url == "string") {
+                App.cache.getCacheByAsync(url, cc.SpriteFrame, bundle).then(([cache, spriteFrame]) => {
+                    onComplete([cache, spriteFrame, url, false]);
+                });
+            } else {
+                //在纹理图集中查找
+                App.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle).then((data) => {
+                    if (data && data.isTryReload) {
+                        //来到这里面，程序已经崩溃，无意义在处理
+                    } else {
+                        onComplete([data.cache, data.spriteFrame, data.url, true]);
+                    }
+                });
+            }
+        } else {
+            resolve(undefined);
+        }
+    });
 }
 
 /**
@@ -284,13 +258,23 @@ export function setButtonSpriteFrame(button: cc.Button, config: {
     disabledSprite?: string | { urls: string[], key: string },
     complete?: (type: string, spriteFrame: cc.SpriteFrame) => void,
     bundle?: BUNDLE_TYPE,
-    dir?: string
 }) {
-    let bundle = getBundle(config);
-    _setButtonWithType(button, ButtonSpriteType.Norml, config.view, config.normalSprite, config.complete, bundle, config.dir);
-    _setButtonWithType(button, ButtonSpriteType.Pressed, config.view, config.pressedSprite, config.complete, bundle, config.dir);
-    _setButtonWithType(button, ButtonSpriteType.Hover, config.view, config.hoverSprite, config.complete, bundle, config.dir);
-    _setButtonWithType(button, ButtonSpriteType.Disable, config.view, config.disabledSprite, config.complete, bundle, config.dir);
+    return new Promise(async (resolve, reject) => {
+
+        let result: {
+            normalSprite?: cc.SpriteFrame,
+            pressedSprite?: cc.SpriteFrame,
+            hoverSprite?: cc.SpriteFrame,
+            disabledSprite?: cc.SpriteFrame
+        } = {};
+
+        let bundle = getBundle(config);
+        result.normalSprite = await _setButtonWithType(button, ButtonSpriteType.Norml, config.view, config.normalSprite, config.complete, bundle);
+        result.pressedSprite = await _setButtonWithType(button, ButtonSpriteType.Pressed, config.view, config.pressedSprite, config.complete, bundle);
+        result.hoverSprite = await _setButtonWithType(button, ButtonSpriteType.Hover, config.view, config.hoverSprite, config.complete, bundle);
+        result.disabledSprite = await _setButtonWithType(button, ButtonSpriteType.Disable, config.view, config.disabledSprite, config.complete, bundle);
+        resolve(result);
+    });
 }
 
 /**
@@ -371,8 +355,8 @@ export function setLabelFont(
  */
 export function setSkeletonSkeletonData(data: {
     component: sp.Skeleton,
-    config: { url: string, view: any, complete: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE } |
-    { view: any, path: string, name: string, complete: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE, isNeedCache?: boolean, retain?: boolean },
+    config: { url: string, view: any, complete?: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE } |
+    { view: any, path: string, name: string, complete?: (data: sp.SkeletonData) => void, bundle?: BUNDLE_TYPE, isNeedCache?: boolean, retain?: boolean },
     data: sp.SkeletonData,
     resourceType?: Resource.Type,
     cache: Resource.Cache,
@@ -499,61 +483,52 @@ export function loadDragonDisplay(comp: dragonBones.ArmatureDisplay,
         assetUrl: string,
         atlasUrl: string,
         view: UIView,
-        complete: (asset: dragonBones.DragonBonesAsset, atlas: dragonBones.DragonBonesAtlasAsset) => void,
+        complete?: (asset: dragonBones.DragonBonesAsset, atlas: dragonBones.DragonBonesAtlasAsset) => void,
         bundle?: BUNDLE_TYPE,
-        dir?: string,
     }) {
-    let bundle = getBundle(config);
+    return new Promise<{ asset: dragonBones.DragonBonesAsset, atlas: dragonBones.DragonBonesAtlasAsset }>((resolve, reject) => {
 
-    let onAssetComplete = ([assetCache, data]: [Resource.Cache, dragonBones.DragonBonesAsset]) => {
-        if (assetCache) {
-            addExtraLoadResource(config.view, assetCache);
-        }
-    }
+        let result: { asset: dragonBones.DragonBonesAsset, atlas: dragonBones.DragonBonesAtlasAsset } = { asset: null, atlas: null };
 
-    let onAtlasComplete = ([atlasCache, atlas, asset]: [Resource.Cache, dragonBones.DragonBonesAtlasAsset, dragonBones.DragonBonesAsset]) => {
-        if (atlas) {
-            addExtraLoadResource(config.view, atlasCache);
-            comp.dragonAsset = asset;
-            comp.dragonAtlasAsset = atlas;
-            if (config.complete) {
-                config.complete(asset, atlas);
-            }
-        } else {
-            if (config.complete) {
-                config.complete(asset, null);
+        let bundle = getBundle(config);
+
+        let onAssetComplete = ([assetCache, data]: [Resource.Cache, dragonBones.DragonBonesAsset]) => {
+            if (assetCache) {
+                addExtraLoadResource(config.view, assetCache);
             }
         }
-    }
 
-    if (config.dir) {
-        App.cache.getCache(config.dir, dragonBones.DragonBonesAsset, bundle, true).then(([assetCache, asset]) => {
-            if (asset) {
-                asset = getAsset(config.dir, config.assetUrl, bundle, dragonBones.DragonBonesAsset);
-                onAssetComplete([assetCache, asset]);
-                App.cache.getCache(config.dir, dragonBones.DragonBonesAtlasAsset, bundle, true).then(([atlasCache, atlas]) => {
-                    atlas = getAsset(config.dir, config.atlasUrl, bundle, dragonBones.DragonBonesAtlasAsset);
-                    onAtlasComplete([atlasCache, atlas, asset])
-                })
+        let onAtlasComplete = ([atlasCache, atlas, asset]: [Resource.Cache, dragonBones.DragonBonesAtlasAsset, dragonBones.DragonBonesAsset]) => {
+            if (atlas) {
+                addExtraLoadResource(config.view, atlasCache);
+                comp.dragonAsset = asset;
+                comp.dragonAtlasAsset = atlas;
+                if (config.complete) {
+                    config.complete(asset, atlas);
+                }
+                result.asset = asset;
+                result.atlas = atlas;
+                resolve(result);
             } else {
-                Log.w(`未加载资源${config.dir}`);
+                if (config.complete) {
+                    config.complete(asset, null);
+                }
+                result.asset = asset;
+                resolve(result);
+            }
+        }
+        App.cache.getCacheByAsync(config.assetUrl, dragonBones.DragonBonesAsset, bundle).then(([assetCache, asset]) => {
+            if (asset) {
+                onAssetComplete([assetCache, asset]);
+                App.cache.getCacheByAsync(config.atlasUrl, dragonBones.DragonBonesAtlasAsset, bundle).then(([atlasCache, atlas]) => {
+                    onAtlasComplete([atlasCache, atlas, asset])
+                });
+            } else {
                 if (config.complete) {
                     config.complete(null, null);
                 }
+                resolve(result);
             }
-        })
-        return;
-    }
-    App.cache.getCacheByAsync(config.assetUrl, dragonBones.DragonBonesAsset, bundle).then(([assetCache, asset]) => {
-        if (asset) {
-            onAssetComplete([assetCache, asset]);
-            App.cache.getCacheByAsync(config.atlasUrl, dragonBones.DragonBonesAtlasAsset, bundle).then(([atlasCache, atlas]) => {
-                onAtlasComplete([atlasCache, atlas, asset])
-            });
-        } else {
-            if (config.complete) {
-                config.complete(null, null);
-            }
-        }
+        });
     });
 }

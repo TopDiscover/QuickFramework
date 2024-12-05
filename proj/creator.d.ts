@@ -105,7 +105,7 @@ declare module cc {
 			isNeedCache?: boolean,
 			/**@description 远程加载的资源是否驻留在内存中,默认都不驻留内存*/
 			retain?: boolean
-		});
+		}):Promise<SpriteFrame>;
 
 		/**
 		 * @description 加载本地图片
@@ -124,7 +124,7 @@ declare module cc {
 			complete?: (data: SpriteFrame) => void,
 			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
 			bundle?: BUNDLE_TYPE,
-		});
+		}):Promise<SpriteFrame>;
 	}
 
 	export interface Button {
@@ -159,7 +159,12 @@ declare module cc {
 			complete?: (type: string, spriteFrame: SpriteFrame) => void,
 			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
 			bundle?: BUNDLE_TYPE
-		});
+		}):Promise<{
+			normalSprite ?: SpriteFrame,
+			pressedSprite ?: SpriteFrame,
+			hoverSprite ?: SpriteFrame,
+			disabledSprite?: SpriteFrame
+		}>;
 	}
 
 	export interface Label {
@@ -178,7 +183,7 @@ declare module cc {
 			complete?: (font: Font) => void, 
 			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
 			bundle?: BUNDLE_TYPE,
-		});
+		}):Promise<Font>;
 
 		/**@description 强制label在当前帧进行绘制 */
 		forceDoLayout();
@@ -211,7 +216,7 @@ declare module cc {
 			complete?: (file: ParticleAsset) => void, 
 			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
 			bundle?: BUNDLE_TYPE,
-		});
+		}):Promise<ParticleAsset>;
 
 	}
 }
@@ -240,12 +245,12 @@ declare namespace sp {
 			/**@description name 远程Spine文件名，不再后缀 */
 			name: string,
 			/**@description 完成回调 */
-			complete: (data: sp.SkeletonData) => void,
+			complete?: (data: SkeletonData) => void,
 			/**@description 是否需要缓存到本地,如果不需要，每次都会从网络拉取资源,默认都会缓存到本地 */
 			isNeedCache?: boolean,
 			/**@description 远程加载的资源是否驻留在内存中,默认都不驻留内存 */
 			retain?: boolean
-		});
+		}):Promise<SkeletonData>;
 
 		/**
 		 * @description 加载动画
@@ -264,10 +269,10 @@ declare namespace sp {
 			/**@description 资源持有者 UIView 子类 */
 			view: UIView, 
 			/**@description 完成回调 */
-			complete: (data: sp.SkeletonData) => void, 
+			complete?: (data: SkeletonData) => void, 
 			/**@description 资源所在bundle */
 			bundle?: BUNDLE_TYPE,
-		});
+		}):Promise<SkeletonData>;
 	}
 }
 
@@ -299,10 +304,13 @@ declare namespace dragonBones{
 			/**@description 资源持有者 UIView 子类 */
 			view : UIView , 
 			/**@description 完成回调 */
-			complete : (asset : DragonBonesAsset , atlas : DragonBonesAtlasAsset)=>void,
+			complete?: (asset : DragonBonesAsset , atlas : DragonBonesAtlasAsset)=>void,
 			/**@description 资源所在bundle */
 			bundle?:BUNDLE_TYPE,
-		}):void;
+		}):Promise<{
+			asset : DragonBonesAsset,
+			atlas : DragonBonesAtlasAsset,
+		}>;
 	}
 }
 
