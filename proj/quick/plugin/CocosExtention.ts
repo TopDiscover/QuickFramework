@@ -5,7 +5,7 @@ import {
 } from "./CocosUtils";
 import { Resource } from "../core/asset/Resource";
 import { Macro } from "../defines/Macros";
-import { Sprite , Node, isValid , SpriteFrame, sp, Button, Label, Font, ParticleSystem2D , ParticleAsset, EditBox, AssetManager, dragonBones, SpriteAtlas } from "cc";
+import { Sprite, Node, isValid, SpriteFrame, sp, Button, Label, Font, ParticleSystem2D, ParticleAsset, EditBox, AssetManager, dragonBones, SpriteAtlas } from "cc";
 import { EDITOR } from "cc/env";
 
 /**@description 对cc.Node 扩展一个临时存储的用户自定义数据 */
@@ -45,52 +45,64 @@ if (typeof Reflect == "object") {
 
 //config : {url: string, view : any , complete?: (data: cc.SpriteFrame) => void, defaultSpriteFrame?: string , isNeedCache ?: boolean }
 Sprite.prototype.loadRemoteImage = function (config) {
-    let me = this;
-    if (config.isNeedCache == undefined || config.isNeedCache == null) {
-        config.isNeedCache = true;
-    }
-    let isRetain = false;
-    if (config.retain) {
-        isRetain = true;
-    }
-    (<any>me).loadUrl = config.url;
-    let defaultBundle = getBundle({ bundle: config.defaultBundle, view: config.view })
-    App.asset.remote.loadImage(config.url, config.isNeedCache).then(([cache, data]) => {
-        if ((<any>me).loadUrl == data?.nativeUrl) {
-            //防止时间调用加载不同url时，以当前记录的url为最终
-            if (data) {
-                setSpriteSpriteFrame({
-                    view: config.view,
-                    url: config.url,
-                    sprite: me,
-                    spriteFrame: data,
-                    complete: config.complete!,
-                    bundle: Macro.BUNDLE_REMOTE,
-                    resourceType: Resource.Type.Remote,
-                    retain: isRetain,
-                    cache: cache,
-                });
-            } else {
-                if (config.defaultSpriteFrame) {
-                    if (typeof config.defaultSpriteFrame == "string") {
-                        config.defaultSpriteFrame = config.defaultSpriteFrame + "/spriteFrame";
-                        //动态加载了一张图片，把资源通知管理器
-                        App.cache.getCacheByAsync(config.defaultSpriteFrame, SpriteFrame, defaultBundle).then(([cache, spriteFrame]) => {
-                            setSpriteSpriteFrame({
-                                view: config.view,
-                                url: config.defaultSpriteFrame!,
-                                sprite: me,
-                                spriteFrame: spriteFrame,
-                                complete: config.complete!,
-                                bundle: defaultBundle,
-                                cache: cache,
+    return new Promise((resolve, reject) => {
+        let me = this;
+        if (config.isNeedCache == undefined || config.isNeedCache == null) {
+            config.isNeedCache = true;
+        }
+        let isRetain = false;
+        if (config.retain) {
+            isRetain = true;
+        }
+        (<any>me).loadUrl = config.url;
+        let defaultBundle = getBundle({ bundle: config.defaultBundle, view: config.view })
+        App.asset.remote.loadImage(config.url, config.isNeedCache).then(([cache, data]) => {
+            if ((<any>me).loadUrl == data?.nativeUrl) {
+                //防止时间调用加载不同url时，以当前记录的url为最终
+                if (data) {
+                    setSpriteSpriteFrame({
+                        view: config.view,
+                        url: config.url,
+                        sprite: me,
+                        spriteFrame: data,
+                        complete: () => {
+                            config.complete && config.complete(data);
+                            resolve(data);
+                        },
+                        bundle: Macro.BUNDLE_REMOTE,
+                        resourceType: Resource.Type.Remote,
+                        retain: isRetain,
+                        cache: cache,
+                    });
+                } else {
+                    if (config.defaultSpriteFrame) {
+                        if (typeof config.defaultSpriteFrame == "string") {
+                            config.defaultSpriteFrame = config.defaultSpriteFrame + "/spriteFrame";
+                            //动态加载了一张图片，把资源通知管理器
+                            App.cache.getCacheByAsync(config.defaultSpriteFrame, SpriteFrame, defaultBundle).then(([cache, spriteFrame]) => {
+                                setSpriteSpriteFrame({
+                                    view: config.view,
+                                    url: config.defaultSpriteFrame!,
+                                    sprite: me,
+                                    spriteFrame: spriteFrame,
+                                    complete: () => {
+                                        config.complete && config.complete(spriteFrame);
+                                        resolve(spriteFrame);
+                                    },
+                                    bundle: defaultBundle,
+                                    cache: cache,
+                                });
                             });
-                        });
+                        }
+                    } else {
+                        if (isValid(me)) {
+                            config.complete && config.complete(data);
+                            resolve(data);
+                        }
                     }
                 }
-                if (config.complete && isValid(me)) config.complete(data);
             }
-        }
+        });
     });
 };
 
@@ -107,41 +119,45 @@ Sprite.prototype.loadRemoteImage = function (config) {
  */
 //loadImage( config : { url : string | {urls:string[],key:string} , view : any , complete?:(data : SpriteFrame)=>void});
 Sprite.prototype.loadImage = function (config) {
+    return new Promise((resolve, reject) => {
+        let me = this;
+        let view = config.view;
+        let url = config.url;
+        let complete = config.complete!;
+        let bundle = getBundle(config);
 
-    let me = this;
-    let view = config.view;
-    let url = config.url;
-    let complete = config.complete!;
-    let bundle = getBundle(config);
+        let onComplete = ([cache, data, url, isAtlas]: [Resource.Cache, SpriteFrame, string, boolean]) => {
+            setSpriteSpriteFrame({
+                view: view,
+                url: url,
+                sprite: me,
+                spriteFrame: data,
+                complete: () => {
+                    complete && complete(data);
+                    resolve(data);
+                },
+                bundle: bundle,
+                cache: cache,
+                isAtlas: isAtlas,
+            });
+        }
 
-    let onComplete = ([cache,data,url,isAtlas]:[Resource.Cache,SpriteFrame,string,boolean])=>{
-        setSpriteSpriteFrame({
-            view: view,
-            url: url,
-            sprite: me,
-            spriteFrame: data,
-            complete: complete,
-            bundle: bundle,
-            cache: cache,
-            isAtlas : isAtlas,
-        });
-    }
-
-    if (typeof url == "string") {
-        url = `${url}/spriteFrame`
-        App.cache.getCacheByAsync(url, SpriteFrame, bundle).then(([cache, spriteFrame]) => {
-            onComplete([cache,spriteFrame,url as string,false]);
-        });
-    } else {
-        //在纹理图集中查找
-        App.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle).then((data) => {
-            if (data && data.isTryReload) {
-                //来到这里面程序已经崩溃了，无意义在处理了
-            } else {
-                onComplete([data.cache,data.spriteFrame,data.url,true]);
-            }
-        });
-    }
+        if (typeof url == "string") {
+            url = `${url}/spriteFrame`
+            App.cache.getCacheByAsync(url, SpriteFrame, bundle).then(([cache, spriteFrame]) => {
+                onComplete([cache, spriteFrame, url as string, false]);
+            });
+        } else {
+            //在纹理图集中查找
+            App.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle).then((data) => {
+                if (data && data.isTryReload) {
+                    //来到这里面程序已经崩溃了，无意义在处理了
+                } else {
+                    onComplete([data.cache, data.spriteFrame, data.url, true]);
+                }
+            });
+        }
+    });
 }
 
 /**
@@ -165,17 +181,25 @@ Sprite.prototype.loadImage = function (config) {
  */
 
 sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
-    let me = this;
-    if (config.isNeedCache == undefined || config.isNeedCache == null) {
-        config.isNeedCache = true;
-    }
-    App.asset.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then(([cache, data]) => {
-        setSkeletonSkeletonData({
-            component: me,
-            config: config,
-            data: data,
-            resourceType: Resource.Type.Remote,
-            cache: cache,
+    return new Promise((resolve, reject) => {
+        let me = this;
+        if (config.isNeedCache == undefined || config.isNeedCache == null) {
+            config.isNeedCache = true;
+        }
+
+        let _onComplete = config.complete;
+        config.complete = (data) => {
+            _onComplete && _onComplete(data);
+            resolve(data);
+        }
+        App.asset.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then(([cache, data]) => {
+            setSkeletonSkeletonData({
+                component: me,
+                config: config,
+                data: data,
+                resourceType: Resource.Type.Remote,
+                cache: cache,
+            });
         });
     });
 }
@@ -191,20 +215,27 @@ sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
  *	}
  * }});
  */
- sp.Skeleton.prototype.loadSkeleton = function (config) {
-    let me = this;
-    let url = config.url;
-    let bundle = getBundle(config);
-    let onComplete = ([cache,data]:[Resource.Cache,sp.SkeletonData])=>{
-        setSkeletonSkeletonData({
-            component: me,
-            config: config,
-            data: data,
-            cache: cache,
+sp.Skeleton.prototype.loadSkeleton = function (config) {
+    return new Promise((resolve, reject) => {
+        let me = this;
+        let url = config.url;
+        let bundle = getBundle(config);
+        let _onComplete = config.complete;
+        config.complete = (data) => {
+            _onComplete && _onComplete(data);
+            resolve(data);
+        }
+        let onComplete = ([cache, data]: [Resource.Cache, sp.SkeletonData]) => {
+            setSkeletonSkeletonData({
+                component: me,
+                config: config,
+                data: data,
+                cache: cache,
+            });
+        }
+        App.cache.getCacheByAsync(url, sp.SkeletonData, bundle).then(([cache, data]) => {
+            onComplete([cache, data]);
         });
-    }
-    App.cache.getCacheByAsync(url, sp.SkeletonData, bundle).then(([cache, data]) => {
-        onComplete([cache,data]);
     });
 }
 
@@ -216,14 +247,14 @@ sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
  * button.getComponent(cc.Button).loadButton({normalSprite : "hall/b",pressedSprite : "hall/c",view:this});
  */
 Button.prototype.loadButton = function (config) {
-    setButtonSpriteFrame(this, config);
+    return setButtonSpriteFrame(this, config);
 }
 
 /**
  * @description 加载龙骨动画
  */
-dragonBones.ArmatureDisplay.prototype.loadDisplay = function(config) {
-    loadDragonDisplay(this,config);
+dragonBones.ArmatureDisplay.prototype.loadDisplay = function (config) {
+    return loadDragonDisplay(this, config);
 }
 
 /**
@@ -234,26 +265,33 @@ dragonBones.ArmatureDisplay.prototype.loadDisplay = function(config) {
  * par.loadFile({url:GAME_RES( "res/action/DDZ_win_lizi" ),view:null});
  * this.node.addChild(node);
  */
- ParticleSystem2D.prototype.loadFile = function (config) {
-    let me = this;
-    let url = config.url;
-    let bundle = getBundle(config);
-    App.cache.getCacheByAsync(url, ParticleAsset, bundle).then(([cache, data]) => {
-        setParticleSystemFile(me, config, data, cache);
+ParticleSystem2D.prototype.loadFile = function (config) {
+    return new Promise((resolve, reject) => {
+        let me = this;
+        let url = config.url;
+        let bundle = getBundle(config);
+        let onComplete = config.complete;
+        config.complete = (data) => {
+            onComplete && onComplete(data);
+            resolve(data);
+        }
+        App.cache.getCacheByAsync(url, ParticleAsset, bundle).then(([cache, data]) => {
+            setParticleSystemFile(me, config, data, cache);
+        });
     });
 }
 
 /**@description 强制label在当前帧进行绘制 */
 Label.prototype.forceDoLayout = function () {
     //2.2.0
-    let self : any = this;
+    let self: any = this;
     if (self._forceUpdateRenderData) {
         self._forceUpdateRenderData();
     }
     //2.2.0以下版本
     else if (self._updateRenderData) {
         self._updateRenderData(true);
-    }else if(self.updateRenderData){
+    } else if (self.updateRenderData) {
         self.updateRenderData(true);
     }
 }
@@ -265,11 +303,18 @@ Label.prototype.forceDoLayout = function () {
  * content.getComponent(cc.Label).loadFont({font:roomPath + dfFont,view:this});
  */
 Label.prototype.loadFont = function (config) {
-    let font = config.font;
-    let me = this;
-    let bundle = getBundle(config);
-    App.cache.getCacheByAsync(font, Font, bundle).then(([cache, data]) => {
-        setLabelFont(me, config, data, cache);
+    return new Promise((resolve, reject) => {
+        let font = config.font;
+        let me = this;
+        let bundle = getBundle(config);
+        let onComplete = config.complete;
+        config.complete = (data) => {
+            onComplete && onComplete(data);
+            resolve(data);
+        }
+        App.cache.getCacheByAsync(font, Font, bundle).then(([cache, data]) => {
+            setLabelFont(me, config, data, cache);
+        });
     });
 }
 
@@ -300,7 +345,7 @@ window.createPrefab = function (config) {
  * @param config.type 加载的资源类型
  * */
 window.loadDirRes = function (config) {
-    return _loadDirRes(config)
+    return _loadDirRes(config);
 }
 
 /**
