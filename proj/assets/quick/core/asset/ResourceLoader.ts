@@ -88,7 +88,7 @@ export default class ResourceLoader {
             return;
         }
 
-        if (this._resources.length > 0 && this.isLoadComplete()) {
+        if (this._resources.length > 0 && this.isLoadComplete) {
             if (CC_DEBUG) Log.w(`资源已经加载完成，使用已经加载完成的资源`);
             this.onLoadComplete && this.onLoadComplete(Resource.LoaderError.SUCCESS);
             this.onLoadResourceComplete();
@@ -185,7 +185,7 @@ export default class ResourceLoader {
      */
     protected checkLoadResourceComplete() {
         //抛出事件给业务逻辑处理
-        if (this.isLoadComplete()) {
+        if (this.isLoadComplete) {
             //加载完成
             this._isLoading = false;
 
@@ -199,7 +199,7 @@ export default class ResourceLoader {
 
     }
 
-    public isLoadComplete(): boolean {
+    public get isLoadComplete(): boolean {
         return this._loadedCount >= this._resources.length;
     }
 
