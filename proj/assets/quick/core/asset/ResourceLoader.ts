@@ -15,6 +15,9 @@ export default class ResourceLoader {
 
     /**@description 当前是否正在加载资源 */
     private _isLoading: boolean = false;
+    public get isLoading() {
+        return this._isLoading;
+    }
 
     /**@description 标识 */
     private _tag: string = null!;
