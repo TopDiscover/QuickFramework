@@ -46,7 +46,7 @@ class RemoteLoader {
             //改变缓存类型
             let key = Resource.getKey(url, Texture2D);
             let cache = App.cache.remoteCaches.get(key);
-            if (data && cache) {
+            if (cache && data.asset) {
                 if (DEBUG) Log.d(`${this._logTag}加载图片完成${key}`);
                 cache.data = data.asset;
                 (<Asset>cache.data).name = url;
@@ -182,6 +182,7 @@ class RemoteLoader {
                         if (DEBUG) Log.d(`${this._logTag}加载远程资源完成:${url}`);
                     }
                     else {
+                        cache.data = null!;
                         if (DEBUG) Log.w(`${this._logTag}加载本地资源异常:${url}`);
                     }
                     //把再加载过程里，双加载同一资源的回调都回调回去
