@@ -8,7 +8,7 @@ export abstract class LanguageDelegate{
     }
     /**@description 语言包所在bundle */
     abstract bundle : string;
-    private datas : Map<string,Language.Data> = new Map();
+    private datas : Map<string,Language.Data | Language.BundleData> = new Map();
     /**
      * @description 数据初始化
      * @example 
@@ -18,7 +18,7 @@ export abstract class LanguageDelegate{
      * }
      */
     abstract init():void;
-    add( data : Language.Data ){
+    add( data : Language.Data | Language.BundleData ){
         this.datas.set(data.language,data);
     }
 

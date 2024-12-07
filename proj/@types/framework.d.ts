@@ -314,6 +314,12 @@ declare namespace Language {
 		data: T;
 	}
 
+	export interface BundleData<T extends Object = Object> {
+		language: string;
+		[key:string] : Object;
+		data: T;
+	}
+
 	export interface LanguageComponent {
 		forceDoLayout(): void;
 	}
