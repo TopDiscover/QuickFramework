@@ -273,7 +273,7 @@ declare namespace Language {
 
 	interface FrameworkData {
 		/**@description 程序写入 */
-		bundles: { [key: string]: string };
+		bundles: Record<string, any>;
 		/**@description 保存图片失败 */
 		capture_save_failed: string;
 		/**@description 截图成功*/
@@ -308,7 +308,7 @@ declare namespace Language {
 		loading: string;
 	}
 
-	export interface Data<T extends FrameworkData = {}> {
+	export interface Data<T extends FrameworkData = FrameworkData> {
 		language: string;
 		[key:string] : Object;
 		data: T;
