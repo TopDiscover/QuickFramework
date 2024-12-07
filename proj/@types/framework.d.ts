@@ -270,51 +270,48 @@ interface IService {
 
 /**@description 语言包相关 */
 declare namespace Language {
-	export interface Data {
-		language: string;
-		[key:string] : Object;
-		data: any;
+
+	interface FrameworkData {
+		/**@description 程序写入 */
+		bundles: { [key: string]: string };
+		/**@description 保存图片失败 */
+		capture_save_failed: string;
+		/**@description 截图成功*/
+		capture_success: string;
+		/**@description 截图失败 */
+		capture_failed: string;
+		/**@description 成功保存到设备相册 */
+		capture_save_photo_album: string;
+		/**@description 成功保存在设备目录并加载成功: {0} */
+		capture_save_local_success1: string;
+		/**@description 成功保存在设备目录: {0}*/
+		capture_save_local_success2: string;
+		/**@description {0}网络已断开，是否重新连接？ */
+		warningReconnect: string;
+		/**@description {0}网络:正在尝试第{1}次连接... */
+		tryReconnect: string;
+		/**@description 更新{0}失败*/
+		updateFaild: string;
+		/**@description 检测更新中...*/
+		checkingUpdate: string;
+		/**@description 版本过低，请更新 */
+		mainPackVersionIsTooLow: string;
+		/**@description {0}已升级到最新 */
+		alreadyRemoteVersion: string;
+		/**@description {0}加载失败!!! */
+		loadFailed: string;
+		/**@description {0}更新完成，需要重启游戏 */
+		restartApp: string;
+		/**@description 下载文件失败，请重试!!! */
+		downloadFailed: string;
+		/**@description 正在加载... */
+		loading: string;
 	}
 
-	/**@description Quick 框架内使用的语言包 */
-	export interface ResourceData extends Data {
-		data: {
-			[key: string]: any;
-			/**@description 程序写入 */
-			bundles: { [key: string]: string };
-			/**@description 保存图片失败 */
-			capture_save_failed: string;
-			/**@description 截图成功*/
-			capture_success: string;
-			/**@description 截图失败 */
-			capture_failed: string;
-			/**@description 成功保存到设备相册 */
-			capture_save_photo_album: string;
-			/**@description 成功保存在设备目录并加载成功: {0} */
-			capture_save_local_success1: string;
-			/**@description 成功保存在设备目录: {0}*/
-			capture_save_local_success2: string;
-			/**@description {0}网络已断开，是否重新连接？ */
-			warningReconnect: string;
-			/**@description {0}网络:正在尝试第{1}次连接... */
-			tryReconnect: string;
-			/**@description 更新{0}失败*/
-			updateFaild: string;
-			/**@description 检测更新中...*/
-			checkingUpdate: string;
-			/**@description 版本过低，请更新 */
-			mainPackVersionIsTooLow: string;
-			/**@description {0}已升级到最新 */
-			alreadyRemoteVersion: string;
-			/**@description {0}加载失败!!! */
-			loadFailed: string;
-			/**@description {0}更新完成，需要重启游戏 */
-			restartApp: string;
-			/**@description 下载文件失败，请重试!!! */
-			downloadFailed: string;
-			/**@description 正在加载... */
-			loading: string;
-		}
+	export interface Data<T extends FrameworkData = {}> {
+		language: string;
+		[key:string] : Object;
+		data: T;
 	}
 
 	export interface LanguageComponent {
