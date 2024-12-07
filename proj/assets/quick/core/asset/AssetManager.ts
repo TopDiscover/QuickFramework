@@ -88,11 +88,11 @@ class RemoteLoader {
                 cache.resourceType = Resource.Type.Remote;
                 App.cache.remoteCaches.set(cache);
                 me._loadRemoteRes<cc.Texture2D>(spinePng, cc.Texture2D, isNeedCache,{},(texture2DCache) => {
-                    if (texture2DCache.cache) {
+                    if (texture2DCache.asset) {
                         me._loadRemoteRes<cc.JsonAsset>(spineJson, cc.JsonAsset, isNeedCache,{},(jsonCache) => {
-                            if (jsonCache.cache) {
+                            if (jsonCache.asset) {
                                 me._loadRemoteRes<cc.TextAsset>(spineAtlas, cc.TextAsset, isNeedCache,{},(atlasCache) => {
-                                    if (atlasCache.cache) {
+                                    if (atlasCache.asset) {
                                         App.cache.remoteCaches.makeSkeletonData(
                                             cache,
                                             texture2DCache.asset as cc.Texture2D,

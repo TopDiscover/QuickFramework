@@ -256,10 +256,10 @@ export function setButtonSpriteFrame(button: cc.Button, config: {
     bundle?: BUNDLE_TYPE,
 }) {
     let bundle = getBundle(config);
-    _setButtonWithType(button, ButtonSpriteType.Norml, config.view, config.normalSprite, config.complete, bundle);
-    _setButtonWithType(button, ButtonSpriteType.Pressed, config.view, config.pressedSprite, config.complete, bundle);
-    _setButtonWithType(button, ButtonSpriteType.Hover, config.view, config.hoverSprite, config.complete, bundle);
-    _setButtonWithType(button, ButtonSpriteType.Disable, config.view, config.disabledSprite, config.complete, bundle);
+    _setButtonWithType(button, ButtonSpriteType.Norml, config.view, config.normalSprite!, config.complete, bundle);
+    _setButtonWithType(button, ButtonSpriteType.Pressed, config.view, config.pressedSprite!, config.complete, bundle);
+    _setButtonWithType(button, ButtonSpriteType.Hover, config.view, config.hoverSprite!, config.complete, bundle);
+    _setButtonWithType(button, ButtonSpriteType.Disable, config.view, config.disabledSprite!, config.complete, bundle);
 }
 
 /**

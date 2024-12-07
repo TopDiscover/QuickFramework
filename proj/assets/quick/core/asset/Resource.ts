@@ -72,10 +72,6 @@ export namespace Resource {
         /**@description 是否常驻内存，远程加载资源有效 */
         protected _retain: boolean = false;
         set retain(v) {
-            if (this._retain) {
-                Log.w(`${this.fullUrl}已经是常驻资源，无需要重复设置`);
-                return;
-            }
             this._retain = v;
         }
         get retain() {
@@ -185,8 +181,10 @@ export namespace Resource {
                 } else {
                     const asset = this.data as cc.Asset;
                     if (cc.isValid(asset)) {
-                        if (asset.refCount <= 0) {
-                            Log.w(`${this.fullUrl} 资源引用计数为0，尝试释放资源`);
+                        if ( CC_DEBUG ){
+                            if (asset.refCount <= 0) {
+                                Log.w(`${this.fullUrl} 资源引用计数为0，尝试释放资源`);
+                            }
                         }
                         asset.decRef(autoRelease);
                         return true;
