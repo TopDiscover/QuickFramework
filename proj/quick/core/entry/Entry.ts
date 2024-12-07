@@ -85,7 +85,7 @@ export abstract class Entry {
     }
 
     /**@description 管理器通知自己进入GameView */
-    onEnter(userData?: any): void {
+    onEnter( userData?:EntryUserData): void {
         //语言包初始化
         App.language.addDelegate(this.language);
         //初始化游戏数据
@@ -96,8 +96,23 @@ export abstract class Entry {
         this.pauseMessageQueue();
         //加载资源
         this.loadResources(() => {
-            this.openGameView(userData);
+            if ( userData && userData.isPreload ){
+                //预加载资源，不打开界面
+                this.onPreload();
+            }else{
+                this.onStartGameView(userData);
+            }
         });
+    }
+
+    /**@description 预加载资源 */
+    protected onPreload(){
+
+    }
+
+    /**@description 打开游戏主场景视图 */
+    protected onStartGameView(userData?:EntryUserData){
+        this.openGameView(userData);
     }
 
     /**@description 卸载bundle,即在自己bundle删除之前最后的一条消息 */

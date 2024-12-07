@@ -38,7 +38,7 @@ export class Logic extends EventProcessor {
      * @param bundle Bundle名
      * @param userData 用户自定义数据
      */
-    enterBundle( bundle : BUNDLE_TYPE , userData ?: any){
+    enterBundle( bundle : BUNDLE_TYPE , userData ?: EntryUserData){
         App.entryManager.enterBundle(bundle , userData);
     }
 
