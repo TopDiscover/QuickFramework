@@ -33,11 +33,11 @@ export default class GlobalAudio extends AudioComponent {
             this.audioData.curMusicUrl = url;
             this.audioData.curBundle = bundle;
             if (this.audioData.isMusicOn) {
-                App.cache.getCacheByAsync(url, cc.AudioClip,bundle).then(([cache,data]) => {
-                    if (data) {
-                        App.asset.addPersistAsset(cache);
+                App.cache.getCacheByAsync(url, cc.AudioClip,bundle,(data) => {
+                    if (data.asset) {
+                        App.asset.addPersistAsset(data.cache);
                         me.stopMusic();
-                        cc.audioEngine.playMusic(data, loop);
+                        cc.audioEngine.playMusic(data.asset as cc.AudioClip, loop);
                         this.isPlaying = true;
                         resolve({ url: url, isSuccess: true });
                     } else {
@@ -58,10 +58,10 @@ export default class GlobalAudio extends AudioComponent {
                 return;
             }
             if (this.audioData.isEffectOn) {
-                App.cache.getCacheByAsync(url, cc.AudioClip,bundle).then(([cache,data]) => {
-                    if (data) {
-                        App.asset.addPersistAsset(cache);
-                        this.audioData.curEffectId = cc.audioEngine.playEffect(data, loop);
+                App.cache.getCacheByAsync(url, cc.AudioClip,bundle,(data) => {
+                    if (data.asset) {
+                        App.asset.addPersistAsset(data.cache);
+                        this.audioData.curEffectId = cc.audioEngine.playEffect(data.asset as cc.AudioClip, loop);
                         resolve(this.audioData.curEffectId);
                     } else {
                         resolve(this.audioData.curEffectId);

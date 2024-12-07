@@ -142,20 +142,15 @@ export namespace Resource {
 
         status: CacheStatus = CacheStatus.NONE;
 
-        /**@description 在加载过程中有地方获取,加载完成后再回调 */
-        getCb: ((data: any) => void)[] = [];
-
         /**@description 完成回调，在资源正在加载过程中，又有其它地方调用加载同一个资源，此时需要等待资源加载完成，统一回调 */
-        finishCb: ((data: any) => void)[] = [];
+        finishCb: CompleteFun<cc.Asset>[] = [];
 
-        public doGet() {
-            for (let i = 0; i < this.getCb.length; i++) {
-                if (this.getCb[i]) this.getCb[i]([this, this.data]);
+        public doFinish(data?: CacheResult<cc.Asset>) {
+
+            if (data == undefined || data == null) {
+                data = { cache: this, asset: this.data };
             }
-            this.getCb = [];
-        }
 
-        public doFinish(data: any) {
             for (let i = 0; i < this.finishCb.length; i++) {
                 if (this.finishCb[i]) this.finishCb[i](data);
             }
@@ -172,8 +167,9 @@ export namespace Resource {
                     this._refCount++;
                     return true;
                 } else {
-                    if (cc.isValid(this.data)) {
-                        (this.data as cc.Asset).addRef();
+                    const asset = this.data as cc.Asset;
+                    if (cc.isValid(asset)) {
+                        asset.addRef();
                         return true;
                     }
                 }
@@ -187,8 +183,12 @@ export namespace Resource {
                     this._refCount--;
                     return true;
                 } else {
-                    if (cc.isValid(this.data)) {
-                        (this.data as cc.Asset).decRef(autoRelease);
+                    const asset = this.data as cc.Asset;
+                    if (cc.isValid(asset)) {
+                        if (asset.refCount <= 0) {
+                            Log.w(`${this.fullUrl} 资源引用计数为0，尝试释放资源`);
+                        }
+                        asset.decRef(autoRelease);
                         return true;
                     }
                 }
@@ -259,4 +259,11 @@ export namespace Resource {
         }
         return `${url}(${cc.js.getClassName(type)})`;
     }
+
+    export interface CacheResult<T extends cc.Asset> {
+        cache: Resource.Cache;
+        asset: T | T[];
+    }
+    export type CompleteFun<T extends cc.Asset> = (data: CacheResult<T>) => void;
+
 }

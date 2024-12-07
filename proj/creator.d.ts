@@ -105,7 +105,7 @@ declare module cc {
 			isNeedCache?: boolean,
 			/**@description 远程加载的资源是否驻留在内存中,默认都不驻留内存*/
 			retain?: boolean
-		}):Promise<SpriteFrame>;
+		}):void;
 
 		/**
 		 * @description 加载本地图片
@@ -124,7 +124,7 @@ declare module cc {
 			complete?: (data: SpriteFrame) => void,
 			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
 			bundle?: BUNDLE_TYPE,
-		}):Promise<SpriteFrame>;
+		}):void;
 	}
 
 	export interface Button {
@@ -159,12 +159,7 @@ declare module cc {
 			complete?: (type: string, spriteFrame: SpriteFrame) => void,
 			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
 			bundle?: BUNDLE_TYPE
-		}):Promise<{
-			normalSprite ?: SpriteFrame,
-			pressedSprite ?: SpriteFrame,
-			hoverSprite ?: SpriteFrame,
-			disabledSprite?: SpriteFrame
-		}>;
+		}):void;
 	}
 
 	export interface Label {
@@ -183,7 +178,7 @@ declare module cc {
 			complete?: (font: Font) => void, 
 			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
 			bundle?: BUNDLE_TYPE,
-		}):Promise<Font>;
+		}):void;
 
 		/**@description 强制label在当前帧进行绘制 */
 		forceDoLayout();
@@ -216,7 +211,7 @@ declare module cc {
 			complete?: (file: ParticleAsset) => void, 
 			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
 			bundle?: BUNDLE_TYPE,
-		}):Promise<ParticleAsset>;
+		}):void;
 
 	}
 }
@@ -250,7 +245,7 @@ declare namespace sp {
 			isNeedCache?: boolean,
 			/**@description 远程加载的资源是否驻留在内存中,默认都不驻留内存 */
 			retain?: boolean
-		}):Promise<SkeletonData>;
+		}):void;
 
 		/**
 		 * @description 加载动画
@@ -272,7 +267,7 @@ declare namespace sp {
 			complete?: (data: SkeletonData) => void, 
 			/**@description 资源所在bundle */
 			bundle?: BUNDLE_TYPE,
-		}):Promise<SkeletonData>;
+		}):void;
 	}
 }
 
@@ -307,10 +302,7 @@ declare namespace dragonBones{
 			complete?: (asset : DragonBonesAsset , atlas : DragonBonesAtlasAsset)=>void,
 			/**@description 资源所在bundle */
 			bundle?:BUNDLE_TYPE,
-		}):Promise<{
-			asset : DragonBonesAsset,
-			atlas : DragonBonesAtlasAsset,
-		}>;
+		}):void;
 	}
 }
 

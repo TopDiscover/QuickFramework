@@ -5,129 +5,125 @@ class RemoteLoader {
 
     private _logTag = `[RemoteLoader] `;
 
-    public loadImage(url: string, isNeedCache: boolean) {
+    public loadImage(url: string, isNeedCache: boolean, onComplete: Resource.CompleteFun<cc.SpriteFrame>) {
         let me = this;
-        return new Promise<[Resource.Cache, cc.SpriteFrame]>((resolve) => {
-            if (url == null || url == undefined || url.length <= 0) {
-                resolve([null, null]);
+        if (url == null || url == undefined || url.length <= 0) {
+            onComplete({ cache: null, asset: null });
+            return;
+        }
+        let key = Resource.getKey(url, cc.SpriteFrame);
+        if (isNeedCache) {
+            //从释放缓存中取
+            let [spCache, texture2DCache] = App.releaseManger.getRemote(url, cc.SpriteFrame);
+            if (spCache) {
+                App.cache.remoteCaches.set(texture2DCache);
+                App.cache.remoteCaches.set(spCache);
+                onComplete({ cache: spCache, asset: <cc.SpriteFrame>(spCache.data) });
+                return
+            }
+            //如果存在缓存 ，直接取出
+            spCache = App.cache.remoteCaches.getSpriteFrame(url);
+            if (spCache) {
+                if (CC_DEBUG) Log.d(this._logTag, `从缓存精灵帧中获取:${key}`);
+                onComplete({ cache: spCache, asset: <cc.SpriteFrame>(spCache.data) });
                 return;
             }
-            let key = Resource.getKey(url, cc.SpriteFrame);
-            if (isNeedCache) {
-                //从释放缓存中取
-                let [spCache, texture2DCache] = App.releaseManger.getRemote(url, cc.SpriteFrame);
-                if (spCache) {
-                    App.cache.remoteCaches.set(texture2DCache);
-                    App.cache.remoteCaches.set(spCache);
-                    resolve([spCache, <cc.SpriteFrame>(spCache.data)]);
-                    return
-                }
-                //如果存在缓存 ，直接取出
-                spCache = App.cache.remoteCaches.getSpriteFrame(url);
-                if (spCache) {
-                    if (CC_DEBUG) Log.d(this._logTag, `从缓存精灵帧中获取:${key}`);
-                    resolve([spCache, <cc.SpriteFrame>(spCache.data)]);
-                    return;
-                }
+        } else {
+            //不需要缓存，先删除之前的,再重新加载
+            if (CC_DEBUG) Log.d(this._logTag, `不需要缓存信息，删除缓存，重新加载${key}`);
+            //把待释放中的缓存取出来，并删除掉
+            let [spCache, texture2DCache] = App.releaseManger.getRemote(url, cc.SpriteFrame);
+            if (spCache) {
+                App.cache.remoteCaches.set(spCache);
+                App.cache.remoteCaches.set(texture2DCache);
+            }
+            App.cache.remoteCaches.remove(url, cc.SpriteFrame, true);
+        }
+
+        me._loadRemoteRes<cc.Texture2D>(url, cc.Texture2D, isNeedCache, {}, (data: Resource.CacheResult<cc.Texture2D>) => {
+            //改变缓存类型
+            let key = Resource.getKey(url, cc.Texture2D);
+            let cache = App.cache.remoteCaches.get(key);
+            if (data && cache) {
+                if (CC_DEBUG) Log.d(`${this._logTag}加载图片完成${key}`);
+                cache.data = data.asset;
+                (<cc.Asset>cache.data).name = url;
+                onComplete(App.cache.remoteCaches.makeSpriteFrame(url, cache.data));
             } else {
-                //不需要缓存，先删除之前的,再重新加载
-                if (CC_DEBUG) Log.d(this._logTag, `不需要缓存信息，删除缓存，重新加载${key}`);
-                //把待释放中的缓存取出来，并删除掉
-                let [spCache, texture2DCache] = App.releaseManger.getRemote(url, cc.SpriteFrame);
-                if (spCache) {
-                    App.cache.remoteCaches.set(spCache);
-                    App.cache.remoteCaches.set(texture2DCache);
-                }
+                if (CC_DEBUG) Log.w(`${this._logTag}加载图片错误${url}`);
+                onComplete({ cache: null, asset: null });
                 App.cache.remoteCaches.remove(url, cc.SpriteFrame, true);
             }
-
-            me._loadRemoteRes<cc.Texture2D>(url, cc.Texture2D, isNeedCache).then(([cache, data]) => {
-                //改变缓存类型
-                let key = Resource.getKey(url, cc.Texture2D);
-                cache = App.cache.remoteCaches.get(key);
-                if (data && cache) {
-                    if (CC_DEBUG) Log.d(`${this._logTag}加载图片完成${key}`);
-                    cache.data = data;
-                    (<cc.Asset>cache.data).name = url;
-                    resolve(App.cache.remoteCaches.makeSpriteFrame(url, cache.data));
-                } else {
-                    if (CC_DEBUG) Log.w(`${this._logTag}加载图片错误${url}`);
-                    resolve([null, null]);
-                    App.cache.remoteCaches.remove(url, cc.SpriteFrame, true);
-                }
-            })
-        });
+        })
     }
 
-    public loadSkeleton(url: string, name: string, isNeedCache: boolean) {
+    public loadSkeleton(url: string, name: string, isNeedCache: boolean, onComplete: Resource.CompleteFun<sp.SkeletonData>) {
         let me = this;
-        return new Promise<[Resource.Cache, sp.SkeletonData]>((resolve) => {
-            if (url && name) {
-                url = `${url}/${name}`;
-                let spineAtlas = `${url}.atlas`;
-                let spinePng = `${url}.png`;
-                let spineJson = `${url}.json`;
-                let [cache, pngCache, jsonCache, atlasCache] = App.releaseManger.getRemote(url, sp.SkeletonData);
-                if (cache) {
-                    //从释放队列中获取,如果有值，直接使用
-                    App.cache.remoteCaches.set(cache);
-                    App.cache.remoteCaches.set(pngCache);
-                    App.cache.remoteCaches.set(jsonCache);
-                    App.cache.remoteCaches.set(atlasCache);
-                    resolve([cache, <sp.SkeletonData>cache.data as any]);
-                    return;
-                }
+        if (url && name) {
+            url = `${url}/${name}`;
+            let spineAtlas = `${url}.atlas`;
+            let spinePng = `${url}.png`;
+            let spineJson = `${url}.json`;
+            let [cache, pngCache, jsonCache, atlasCache] = App.releaseManger.getRemote(url, sp.SkeletonData);
+            if (cache) {
+                //从释放队列中获取,如果有值，直接使用
+                App.cache.remoteCaches.set(cache);
+                App.cache.remoteCaches.set(pngCache);
+                App.cache.remoteCaches.set(jsonCache);
+                App.cache.remoteCaches.set(atlasCache);
+                onComplete({ cache: cache, asset: <sp.SkeletonData>cache.data as any });
+                return;
+            }
 
-                let key = Resource.getKey(url, sp.SkeletonData);
-                cache = App.cache.remoteCaches.get(key);
-                if (cache) {
-                    if (cache.isLoaded) {
-                        resolve([cache, <sp.SkeletonData>(cache.data)]);
-                    } else {
-                        cache.finishCb.push(resolve);
-                    }
+            let key = Resource.getKey(url, sp.SkeletonData);
+            cache = App.cache.remoteCaches.get(key);
+            if (cache) {
+                if (cache.isLoaded) {
+                    onComplete({ cache: cache, asset: <sp.SkeletonData>cache.data as any });
                 } else {
-                    cache = new Resource.Cache(url, sp.SkeletonData, Macro.BUNDLE_REMOTE);
-                    cache.resourceType = Resource.Type.Remote;
-                    App.cache.remoteCaches.set(cache);
-                    me._loadRemoteRes<cc.Texture2D>(spinePng, cc.Texture2D, isNeedCache).then(([cacheTexture2D, texture2D]) => {
-                        if (texture2D) {
-                            me._loadRemoteRes<cc.JsonAsset>(spineJson, cc.JsonAsset, isNeedCache).then(([jsonCache, json]) => {
-                                if (json) {
-                                    me._loadRemoteRes<cc.TextAsset>(spineAtlas, cc.TextAsset, isNeedCache).then(([atlasCache, atlas]) => {
-                                        if (atlas) {
-                                            App.cache.remoteCaches.makeSkeletonData(
-                                                cache,
-                                                texture2D,
-                                                json,
-                                                atlas,
-                                                name
-                                            )
-                                            resolve([cache, <sp.SkeletonData>(cache.data)]);
-                                            cache.doFinish([cache, <sp.SkeletonData>(cache.data)]);
-                                        } else {
-                                            resolve([null, null]);
-                                            cache.doFinish([null, null]);
-                                            App.cache.remoteCaches.remove(cache.url, sp.SkeletonData, true);
-                                        }
-                                    });
-                                } else {
-                                    resolve([null, null]);
-                                    cache.doFinish([null, null]);
-                                    App.cache.remoteCaches.remove(cache.url, sp.SkeletonData, true);
-                                }
-                            });
-                        } else {
-                            resolve([null, null]);
-                            cache.doFinish([null, null]);
-                            App.cache.remoteCaches.remove(cache.url, sp.SkeletonData, true);
-                        }
-                    })
+                    cache.finishCb.push(onComplete);
                 }
             } else {
-                resolve([null, null]);
+                cache = new Resource.Cache(url, sp.SkeletonData, Macro.BUNDLE_REMOTE);
+                cache.resourceType = Resource.Type.Remote;
+                App.cache.remoteCaches.set(cache);
+                me._loadRemoteRes<cc.Texture2D>(spinePng, cc.Texture2D, isNeedCache,{},(texture2DCache) => {
+                    if (texture2DCache.cache) {
+                        me._loadRemoteRes<cc.JsonAsset>(spineJson, cc.JsonAsset, isNeedCache,{},(jsonCache) => {
+                            if (jsonCache.cache) {
+                                me._loadRemoteRes<cc.TextAsset>(spineAtlas, cc.TextAsset, isNeedCache,{},(atlasCache) => {
+                                    if (atlasCache.cache) {
+                                        App.cache.remoteCaches.makeSkeletonData(
+                                            cache,
+                                            texture2DCache.asset as cc.Texture2D,
+                                            jsonCache.asset as cc.JsonAsset,
+                                            atlasCache.asset as cc.TextAsset,
+                                            name
+                                        )
+                                        onComplete({ cache: cache, asset: <sp.SkeletonData>cache.data as any });
+                                        cache.doFinish();
+                                    } else {
+                                        onComplete({ cache: null, asset: null });
+                                        cache.doFinish({cache:null,asset:null});
+                                        App.cache.remoteCaches.remove(cache.url, sp.SkeletonData, true);
+                                    }
+                                });
+                            } else {
+                                onComplete({ cache: null, asset: null });
+                                cache.doFinish({cache:null,asset:null});
+                                App.cache.remoteCaches.remove(cache.url, sp.SkeletonData, true);
+                            }
+                        });
+                    } else {
+                        onComplete({ cache: null, asset: null });
+                        cache.doFinish({cache:null,asset:null});
+                        App.cache.remoteCaches.remove(cache.url, sp.SkeletonData, true);
+                    }
+                })
             }
-        });
+        } else {
+            onComplete({ cache: null, asset: null });
+        }
     }
 
     private extname(url: string) {
@@ -136,61 +132,62 @@ class RemoteLoader {
         return value ? value[1] : ".png";
     }
 
-    private _loadRemoteRes<T extends cc.Asset>(url: string, type: typeof cc.Asset, isNeedCache: boolean, options: Record<string, any> = {}) {
-        return new Promise<[Resource.Cache, T]>((resolve) => {
-            let key = Resource.getKey(url, type);
+    private _loadRemoteRes<T extends cc.Asset>(
+        url: string,
+        type: typeof cc.Asset,
+        isNeedCache: boolean,
+        options: Record<string, any> = {},
+        onComplete: Resource.CompleteFun<T>
+    ) {
+        let key = Resource.getKey(url, type);
+        //先从待释放中取
+        let [cache] = App.releaseManger.getRemote(key, type);
+        if (cache) {
+            cache.addRef();
+            App.cache.remoteCaches.set(cache);
+            //把再加载过程里，双加载同一资源的回调都回调回去
+            cache.doFinish();
+            onComplete && onComplete({ cache: cache, asset: cache.data as T });
+            return;
+        }
 
-            //先从待释放中取
-            let [cache] = App.releaseManger.getRemote(key, type);
-            if (cache) {
-                cache.addRef();
-                App.cache.remoteCaches.set(cache);
-                //把再加载过程里，双加载同一资源的回调都回调回去
-                cache.doFinish([cache, cache.data as any]);
-                cache.doGet();
-                resolve([cache, cache.data as any]);
-                return;
-            }
-
-            //从缓存中取
-            cache = App.cache.remoteCaches.get(key);
-            if (cache) {
-                //有缓存,查看是否已经加载
-                if (cache.isLoaded) {
-                    //如果已经加载完成
-                    resolve([cache, cache.data as any]);
-                } else {
-                    //正在加载中
-                    cache.finishCb.push(resolve);
-                }
+        //从缓存中取
+        cache = App.cache.remoteCaches.get(key);
+        if (cache) {
+            //有缓存,查看是否已经加载
+            if (cache.isLoaded) {
+                //如果已经加载完成
+                onComplete && onComplete({ cache: cache, asset: cache.data as T });
             } else {
-                //没有缓存存在,生成加载缓存
-                cache = new Resource.Cache(url, type, Macro.BUNDLE_REMOTE);
-                cache.resourceType = Resource.Type.Remote;
-                App.cache.remoteCaches.set(cache);
-                options["cacheAsset"] = true;
-                options["reloadAsset"] = !isNeedCache;
-                if (type == cc.Texture2D) {
-                    options.ext = this.extname(url);
-                }
-                cc.assetManager.loadRemote(url, options, (error, data) => {
-                    if (cache) {
-                        cache.isLoaded = true;
-                        if (data) {
-                            cache.data = data;
-                            if (CC_DEBUG) Log.d(`${this._logTag}加载远程资源完成:${url}`);
-                        }
-                        else {
-                            if (CC_DEBUG) Log.w(`${this._logTag}加载本地资源异常:${url}`);
-                        }
-                        //把再加载过程里，双加载同一资源的回调都回调回去
-                        cache.doFinish([cache, cache.data as any]);
-                        cache.doGet();
-                        resolve([cache, cache.data as any])
-                    }
-                })
+                //正在加载中
+                cache.finishCb.push(onComplete);
             }
-        });
+        } else {
+            //没有缓存存在,生成加载缓存
+            cache = new Resource.Cache(url, type, Macro.BUNDLE_REMOTE);
+            cache.resourceType = Resource.Type.Remote;
+            App.cache.remoteCaches.set(cache);
+            options["cacheAsset"] = true;
+            options["reloadAsset"] = !isNeedCache;
+            if (type == cc.Texture2D) {
+                options.ext = this.extname(url);
+            }
+            cc.assetManager.loadRemote(url, options, (error, data) => {
+                if (cache) {
+                    cache.isLoaded = true;
+                    if (data) {
+                        cache.data = data;
+                        if (CC_DEBUG) Log.d(`${this._logTag}加载远程资源完成:${url}`);
+                    }
+                    else {
+                        if (CC_DEBUG) Log.w(`${this._logTag}加载本地资源异常:${url}`);
+                    }
+                    //把再加载过程里，双加载同一资源的回调都回调回去
+                    cache.doFinish();
+                    onComplete && onComplete({ cache: cache, asset: cache.data as T });
+                }
+            })
+        }
     }
 
     /**@description 由主游戏控制器驱动，在下载远程资源时，设置一个上限下载任务数据，以免同一时间任务数量过大 */
@@ -243,7 +240,10 @@ export class AssetManager implements ISingleton {
                 if (CC_DEBUG && cache.status == Resource.CacheStatus.WAITTING_FOR_RELEASE) {
                     Log.w(this.module, `资源:${bundle}/${key}等待释放，但资源处理加载过程中，此时有人又重新加载，不进行释放处理`);
                 }
-                cache.finishCb.push(onComplete);
+                let completeFun = (data: Resource.CacheResult<cc.Asset>) => {
+                    onComplete(data.cache);
+                }
+                cache.finishCb.push(completeFun);
             }
             //重新复位资源状态
             cache.status = Resource.CacheStatus.NONE;
@@ -302,8 +302,7 @@ export class AssetManager implements ISingleton {
         }
 
         //加载过程，有不同地方调用过来加载同一个资源的地方，都回调回去
-        cache.doFinish(cache);
-        cache.doGet();
+        cache.doFinish();
 
         if (cache.status == Resource.CacheStatus.WAITTING_FOR_RELEASE) {
             if (CC_DEBUG) Log.w(this.module, `${type}:${cache.bundle}/${key}加载完成，但缓存状态为等待销毁，销毁资源`);
@@ -329,10 +328,10 @@ export class AssetManager implements ISingleton {
         if (cache) {
             console.time(`加载资源 : ${bundle}/${key}`);
             App.cache.set(cache);
-            if ( cache.isDir ){
+            if (cache.isDir) {
                 cache.deps.forEach(v => {
-                    const temp = App.releaseManger.get(bundle,v);
-                    if ( temp ){
+                    const temp = App.releaseManger.get(bundle, v);
+                    if (temp) {
                         App.cache.set(temp);
                     }
                 });
@@ -355,13 +354,16 @@ export class AssetManager implements ISingleton {
                 if (CC_DEBUG && cache.status == Resource.CacheStatus.WAITTING_FOR_RELEASE) {
                     Log.w(this.module, `资源:${key}等待释放，但资源处理加载过程中，此时有人又重新加载，不进行释放处理`);
                 }
-                cache.finishCb.push(onComplete);
+                let completeFun = (data: Resource.CacheResult<cc.Asset>) => {
+                    onComplete(data.cache);
+                }
+                cache.finishCb.push(completeFun);
             }
             //重新复位资源状态
             cache.status = Resource.CacheStatus.NONE;
         } else {
             //无缓存信息
-            cache = new Resource.Cache(url, type, bundle,true);
+            cache = new Resource.Cache(url, type, bundle, true);
             App.cache.set(cache);
             console.time(`加载资源 : ${bundle}/${cache.key}`);
 

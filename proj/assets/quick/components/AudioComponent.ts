@@ -185,18 +185,18 @@ export default class AudioComponent extends EventComponent {
             this.curBundle = bundle;
             this.curLoop = loop;
             if (this.audioData.isMusicOn) {
-                App.cache.getCacheByAsync(url, cc.AudioClip, bundle).then(([cache,data]) => {
-                    if (data) {
+                App.cache.getCacheByAsync(url, cc.AudioClip, bundle,(data) => {
+                    if (data.asset) {
                         if (this.owner) {
-                            App.uiManager.addLocal(cache, this.owner.className);
+                            App.uiManager.addLocal(data.cache, this.owner.className);
                         } else {
-                            App.uiManager.garbage.addLocal(cache);
+                            App.uiManager.garbage.addLocal(data.cache);
                         }
                         if ( !(this.isPlaying && this.curMusicUrl == this.prevMusiUrl) || (this.isPlaying && loop == false) ) {
                             //停掉当前播放音乐
                             this.stopMusic();
                             //播放新的背景音乐
-                            cc.audioEngine.playMusic(data, loop);
+                            cc.audioEngine.playMusic(data.asset as cc.AudioClip, loop);
                         }
 
                         this.isPlaying = true;
@@ -220,14 +220,14 @@ export default class AudioComponent extends EventComponent {
                 }
             }
             if (this.audioData.isEffectOn) {
-                App.cache.getCacheByAsync(url, cc.AudioClip, bundle).then(([cache,data]) => {
-                    if (data) {
+                App.cache.getCacheByAsync(url, cc.AudioClip, bundle,(data) => {
+                    if (data.asset) {
                         if (this.owner) {
-                            App.uiManager.addLocal(cache, this.owner.className);
+                            App.uiManager.addLocal(data.cache, this.owner.className);
                         } else {
-                            App.uiManager.garbage.addLocal(cache);
+                            App.uiManager.garbage.addLocal(data.cache);
                         }
-                        this.audioData.curEffectId = cc.audioEngine.playEffect(data, loop);
+                        this.audioData.curEffectId = cc.audioEngine.playEffect(data.asset as cc.AudioClip, loop);
                         resolve(this.audioData.curEffectId);
                     } else {
                         resolve(this.audioData.curEffectId);

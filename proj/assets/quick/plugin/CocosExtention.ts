@@ -43,63 +43,52 @@ if (typeof Reflect == "object") {
 
 //config : {url: string, view : any , complete?: (data: cc.SpriteFrame) => void, defaultSpriteFrame?: string , isNeedCache ?: boolean }
 cc.Sprite.prototype.loadRemoteImage = function (config) {
-    return new Promise((resolve, reject) => {
-        let me = this;
-        if (config.isNeedCache == undefined || config.isNeedCache == null) {
-            config.isNeedCache = true;
-        }
-        let isRetain = false;
-        if (config.retain) {
-            isRetain = true;
-        }
-        (<any>me).loadUrl = config.url;
-        let defaultBundle = getBundle({ bundle: config.defaultBundle, view: config.view })
-        App.asset.remote.loadImage(config.url, config.isNeedCache).then(([cache, data]) => {
-            if ((<any>me).loadUrl == data?.nativeUrl) {
-                //防止时间调用加载不同url时，以当前记录的url为最终
-                if (data) {
-                    setSpriteSpriteFrame({
-                        view: config.view,
-                        url: config.url,
-                        sprite: me,
-                        spriteFrame: data,
-                        complete: () => {
-                            config.complete && config.complete(data);
-                            resolve(data);
-                        },
-                        bundle: Macro.BUNDLE_REMOTE,
-                        resourceType: Resource.Type.Remote,
-                        retain: isRetain,
-                        cache: cache,
+    let me = this;
+    if (config.isNeedCache == undefined || config.isNeedCache == null) {
+        config.isNeedCache = true;
+    }
+    let isRetain = false;
+    if (config.retain) {
+        isRetain = true;
+    }
+    (<any>me).loadUrl = config.url;
+    let defaultBundle = getBundle({ bundle: config.defaultBundle, view: config.view })
+    App.asset.remote.loadImage(config.url, config.isNeedCache, (data: Resource.CacheResult<cc.SpriteFrame>) => {
+        if (data.asset) {
+            const asset = data.asset as cc.SpriteFrame;
+            setSpriteSpriteFrame({
+                view: config.view,
+                url: config.url,
+                sprite: me,
+                spriteFrame: asset as cc.SpriteFrame,
+                complete: config.complete,
+                bundle: Macro.BUNDLE_REMOTE,
+                resourceType: Resource.Type.Remote,
+                retain: isRetain,
+                cache: data.cache,
+            });
+        } else {
+            if (config.defaultSpriteFrame) {
+                if (typeof config.defaultSpriteFrame == "string") {
+                    //动态加载了一张图片，把资源通知管理器
+                    App.cache.getCacheByAsync(config.defaultSpriteFrame, cc.SpriteFrame, defaultBundle, (data: Resource.CacheResult<cc.SpriteFrame>) => {
+                        setSpriteSpriteFrame({
+                            view: config.view,
+                            url: config.defaultSpriteFrame!,
+                            sprite: me,
+                            spriteFrame: data.asset as cc.SpriteFrame,
+                            complete: config.complete,
+                            bundle: defaultBundle,
+                            cache: data.cache,
+                        });
                     });
-                } else {
-                    if (config.defaultSpriteFrame) {
-                        if (typeof config.defaultSpriteFrame == "string") {
-                            //动态加载了一张图片，把资源通知管理器
-                            App.cache.getCacheByAsync(config.defaultSpriteFrame, cc.SpriteFrame, defaultBundle).then(([cache, spriteFrame]) => {
-                                setSpriteSpriteFrame({
-                                    view: config.view,
-                                    url: config.defaultSpriteFrame!,
-                                    sprite: me,
-                                    spriteFrame: spriteFrame,
-                                    complete: () => {
-                                        config.complete && config.complete(spriteFrame);
-                                        resolve(spriteFrame);
-                                    },
-                                    bundle: defaultBundle,
-                                    cache: cache,
-                                });
-                            });
-                        }
-                    } else {
-                        if (cc.isValid(me)) {
-                            config.complete && config.complete(data);
-                            resolve(data);
-                        }
-                    }
+                }
+            } else {
+                if (cc.isValid(me)) {
+                    config.complete && config.complete(null);
                 }
             }
-        });
+        }
     });
 }
 
@@ -116,44 +105,38 @@ cc.Sprite.prototype.loadRemoteImage = function (config) {
  */
 //loadImage( config : { url : string | {urls:string[],key:string} , view : any , complete?:(data : SpriteFrame)=>void});
 cc.Sprite.prototype.loadImage = function (config) {
-    return new Promise((resolve, reject) => {
-        let me = this;
-        let view = config.view;
-        let url = config.url;
-        let complete = config.complete!;
-        let bundle = getBundle(config);
+    let me = this;
+    let view = config.view;
+    let url = config.url;
+    let bundle = getBundle(config);
 
-        let onComplete = ([cache, data, url, isAtlas]: [Resource.Cache, cc.SpriteFrame, string, boolean]) => {
-            setSpriteSpriteFrame({
-                view: view,
-                url: url,
-                sprite: me,
-                spriteFrame: data,
-                complete: () => {
-                    complete && complete(data);
-                    resolve(data);
-                },
-                bundle: bundle,
-                cache: cache,
-                isAtlas: isAtlas,
-            });
-        }
+    let onComplete = ([cache, data, url, isAtlas]: [Resource.Cache, cc.SpriteFrame, string, boolean]) => {
+        setSpriteSpriteFrame({
+            view: view,
+            url: url,
+            sprite: me,
+            spriteFrame: data,
+            complete: config.complete,
+            bundle: bundle,
+            cache: cache,
+            isAtlas: isAtlas,
+        });
+    }
 
-        if (typeof url == "string") {
-            App.cache.getCacheByAsync(url, cc.SpriteFrame, bundle).then(([cache, spriteFrame]) => {
-                onComplete([cache, spriteFrame, url as string, false]);
-            });
-        } else {
-            //在纹理图集中查找
-            App.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle).then((data) => {
-                if (data && data.isTryReload) {
-                    //来到这里面程序已经崩溃了，无意义在处理了
-                } else {
-                    onComplete([data.cache, data.spriteFrame, data.url, true]);
-                }
-            });
-        }
-    });
+    if (typeof url == "string") {
+        App.cache.getCacheByAsync(url, cc.SpriteFrame, bundle, (data: Resource.CacheResult<cc.SpriteFrame>) => {
+            onComplete([data.cache, data.asset as cc.SpriteFrame, url as string, false]);
+        });
+    } else {
+        //在纹理图集中查找
+        App.cache.getSpriteFrameByAsync(url.urls, url.key, view, addExtraLoadResource, bundle, (data) => {
+            if (data && data.isTryReload) {
+                //来到这里面程序已经崩溃了，无意义在处理了
+            } else {
+                onComplete([data.cache, data.spriteFrame, data.url, true]);
+            }
+        });
+    }
 }
 
 /**
@@ -177,25 +160,17 @@ cc.Sprite.prototype.loadImage = function (config) {
  */
 
 sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
-    return new Promise((resolve, reject) => {
-        let me = this;
-        if (config.isNeedCache == undefined || config.isNeedCache == null) {
-            config.isNeedCache = true;
-        }
-
-        let _onComplete = config.complete;
-        config.complete = (data) => {
-            _onComplete && _onComplete(data);
-            resolve(data);
-        }
-        App.asset.remote.loadSkeleton(config.path, config.name, config.isNeedCache).then(([cache, data]) => {
-            setSkeletonSkeletonData({
-                component: me,
-                config: config,
-                data: data,
-                resourceType: Resource.Type.Remote,
-                cache: cache,
-            });
+    let me = this;
+    if (config.isNeedCache == undefined || config.isNeedCache == null) {
+        config.isNeedCache = true;
+    }
+    App.asset.remote.loadSkeleton(config.path, config.name, config.isNeedCache, (data: Resource.CacheResult<sp.SkeletonData>) => {
+        setSkeletonSkeletonData({
+            component: me,
+            config: config,
+            data: data.asset as sp.SkeletonData,
+            resourceType: Resource.Type.Remote,
+            cache: data.cache,
         });
     });
 }
@@ -212,26 +187,19 @@ sp.Skeleton.prototype.loadRemoteSkeleton = function (config) {
  * }});
  */
 sp.Skeleton.prototype.loadSkeleton = function (config) {
-    return new Promise((resolve, reject) => {
-        let me = this;
-        let url = config.url;
-        let bundle = getBundle(config);
-        let _onComplete = config.complete;
-        config.complete = (data) => {
-            _onComplete && _onComplete(data);
-            resolve(data);
-        }
-        let onComplete = ([cache, data]: [Resource.Cache, sp.SkeletonData]) => {
-            setSkeletonSkeletonData({
-                component: me,
-                config: config,
-                data: data,
-                cache: cache,
-            });
-        }
-        App.cache.getCacheByAsync(url, sp.SkeletonData, bundle).then(([cache, data]) => {
-            onComplete([cache, data]);
+    let me = this;
+    let url = config.url;
+    let bundle = getBundle(config);
+    let onComplete = ([cache, data]: [Resource.Cache, sp.SkeletonData]) => {
+        setSkeletonSkeletonData({
+            component: me,
+            config: config,
+            data: data,
+            cache: cache,
         });
+    }
+    App.cache.getCacheByAsync(url, sp.SkeletonData, bundle, (data: Resource.CacheResult<sp.SkeletonData>) => {
+        onComplete([data.cache, data.asset as sp.SkeletonData]);
     });
 }
 
@@ -243,14 +211,14 @@ sp.Skeleton.prototype.loadSkeleton = function (config) {
  * button.getComponent(cc.Button).loadButton({normalSprite : "hall/b",pressedSprite : "hall/c",view:this});
  */
 cc.Button.prototype.loadButton = function (config) {
-    return setButtonSpriteFrame(this, config);
+    setButtonSpriteFrame(this, config);
 }
 
 /**
  * @description 加载龙骨动画
  */
 dragonBones.ArmatureDisplay.prototype.loadDisplay = function (config) {
-    return loadDragonDisplay(this, config);
+    loadDragonDisplay(this, config);
 }
 
 /**
@@ -262,18 +230,11 @@ dragonBones.ArmatureDisplay.prototype.loadDisplay = function (config) {
  * this.node.addChild(node);
  */
 cc.ParticleSystem.prototype.loadFile = function (config) {
-    return new Promise((resolve, reject) => {
-        let me = this;
-        let url = config.url;
-        let bundle = getBundle(config);
-        let onComplete = config.complete;
-        config.complete = (data) => {
-            onComplete && onComplete(data);
-            resolve(data);
-        }
-        App.cache.getCacheByAsync(url, cc.ParticleAsset, bundle).then(([cache, data]) => {
-            setParticleSystemFile(me, config, data, cache);
-        });
+    let me = this;
+    let url = config.url;
+    let bundle = getBundle(config);
+    App.cache.getCacheByAsync(url, cc.ParticleAsset, bundle, (data) => {
+        setParticleSystemFile(me, config, data.asset as cc.ParticleAsset, data.cache);
     });
 }
 
@@ -299,18 +260,11 @@ cc.Label.prototype.forceDoLayout = function () {
  * content.getComponent(cc.Label).loadFont({font:roomPath + dfFont,view:this});
  */
 cc.Label.prototype.loadFont = function (config) {
-    return new Promise((resolve, reject) => {
-        let font = config.font;
-        let me = this;
-        let bundle = getBundle(config);
-        let onComplete = config.complete;
-        config.complete = (data) => {
-            onComplete && onComplete(data);
-            resolve(data);
-        }
-        App.cache.getCacheByAsync(font, cc.Font, bundle).then(([cache, data]) => {
-            setLabelFont(me, config, data, cache);
-        });
+    let font = config.font;
+    let me = this;
+    let bundle = getBundle(config);
+    App.cache.getCacheByAsync(font, cc.Font, bundle, (data) => {
+        setLabelFont(me, config, data.asset as cc.Font, data.cache);
     });
 }
 
@@ -327,7 +281,7 @@ cc.Label.prototype.loadFont = function (config) {
  * }});
  */
 window.createPrefab = function (config) {
-    return createNodeWithPrefab(config);
+    createNodeWithPrefab(config);
 }
 
 /**
@@ -341,7 +295,7 @@ window.createPrefab = function (config) {
  * @param config.type 加载的资源类型
  * */
 window.loadDirRes = function (config) {
-    return _loadDirRes(config);
+    _loadDirRes(config);
 }
 
 /**
@@ -355,7 +309,7 @@ window.loadDirRes = function (config) {
  * @param config.view 资源持有者,继承自UIView
  */
 window.loadRes = function (config) {
-    return _loadRes(config);
+    _loadRes(config);
 }
 
 /**
