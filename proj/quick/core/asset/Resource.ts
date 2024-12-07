@@ -1,4 +1,5 @@
 import { Asset, isValid, js } from "cc";
+import { DEBUG } from "cc/env";
 
 /**@description 资源相关 */
 export namespace Resource {
@@ -74,10 +75,6 @@ export namespace Resource {
         /**@description 是否常驻内存，远程加载资源有效 */
         protected _retain: boolean = false;
         set retain(v) {
-            if (this._retain) {
-                Log.w(`${this.fullUrl}已经是常驻资源，无需要重复设置`);
-                return;
-            }
             this._retain = v;
         }
         get retain() {
@@ -144,20 +141,15 @@ export namespace Resource {
 
         status: CacheStatus = CacheStatus.NONE;
 
-        /**@description 在加载过程中有地方获取,加载完成后再回调 */
-        getCb: ((data: any) => void)[] = [];
-
         /**@description 完成回调，在资源正在加载过程中，又有其它地方调用加载同一个资源，此时需要等待资源加载完成，统一回调 */
-        finishCb: ((data: any) => void)[] = [];
+        finishCb: CompleteFun<Asset>[] = [];
 
-        public doGet() {
-            for (let i = 0; i < this.getCb.length; i++) {
-                if (this.getCb[i]) this.getCb[i]([this, this.data]);
+        public doFinish(data?: CacheResult<Asset>) {
+
+            if (data == undefined || data == null) {
+                data = { cache: this, asset: this.data };
             }
-            this.getCb = [];
-        }
 
-        public doFinish(data: any) {
             for (let i = 0; i < this.finishCb.length; i++) {
                 if (this.finishCb[i]) this.finishCb[i](data);
             }
@@ -174,8 +166,9 @@ export namespace Resource {
                     this._refCount++;
                     return true;
                 } else {
-                    if (isValid(this.data)) {
-                        (this.data as Asset).addRef();
+                    const asset = this.data as Asset;
+                    if (isValid(asset)) {
+                        asset.addRef();
                         return true;
                     }
                 }
@@ -189,8 +182,14 @@ export namespace Resource {
                     this._refCount--;
                     return true;
                 } else {
-                    if (isValid(this.data)) {
-                        (this.data as Asset).decRef(autoRelease);
+                    const asset = this.data as Asset;
+                    if (isValid(asset)) {
+                        if ( DEBUG ){
+                            if (asset.refCount <= 0) {
+                                Log.w(`${this.fullUrl} 资源引用计数为0，尝试释放资源`);
+                            }
+                        }
+                        asset.decRef(autoRelease);
                         return true;
                     }
                 }
@@ -230,7 +229,7 @@ export namespace Resource {
                 isLoaded: this.isLoaded,
                 info: info(this.data),
                 status: this.status,
-                type : type,
+                type: type,
             }
             return data;
         }
@@ -261,4 +260,11 @@ export namespace Resource {
         }
         return `${url}(${js.getClassName(type)})`;
     }
+
+    export interface CacheResult<T extends Asset> {
+        cache: Resource.Cache;
+        asset: T | T[];
+    }
+    export type CompleteFun<T extends Asset> = (data: CacheResult<T>) => void;
+
 }

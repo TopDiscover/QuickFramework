@@ -207,7 +207,7 @@ declare function createPrefab(
 		complete?: (node: import("cc").Node) => void,
 		/**@description 资源所在bundle */
 		bundle?: BUNDLE_TYPE
-	}): Promise<import("cc").Node>;
+	}): void;
 
 /**
 * @description 扩展一个在界面中加载指定目录的接口 请使用全局的导入
@@ -232,7 +232,7 @@ declare function loadDirRes(config: {
 	onProgress?: (finish: number, total: number, item: import("cc").AssetManager.RequestItem) => void,
 	/**@description 加载完成回调 */
 	onComplete?: (data: import("../quick/core/asset/Resource").Resource.Cache) => void
-}): Promise<import("../quick/core/asset/Resource").Resource.Cache>;
+}): void;
 
 /**
 * @description 扩展一个在界面加载指定资源接口 请使用全局的导入
@@ -257,7 +257,7 @@ declare function loadRes<T extends import("cc").Asset>(config: {
 	onComplete?: (data: T) => void,
 	/**@description  资源持有者 UIView 子类 */
 	view: UIView,
-}): Promise<T>;
+}): void;
 
 
 declare type EntryDelegate = import("../quick/core/entry/EntryDelegate").EntryDelegate;

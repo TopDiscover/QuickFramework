@@ -3,6 +3,7 @@ import { DEBUG } from "cc/env";
 import { Asset, isValid, js, SpriteAtlas, SpriteFrame, sp, Texture2D, ImageAsset, AssetManager, JsonAsset, TextAsset } from "cc";
 import { Resource } from "./Resource";
 import { Macro } from "../../defines/Macros";
+
 class BundleCache {
 
     private _caches = new Map<string, Resource.Cache>();
@@ -44,7 +45,7 @@ class BundleCache {
         let content: any[] = [];
         let invalidContent: any[] = [];
         caches.forEach((data, key, source) => {
-            if (data.isLoaded && data.data) {
+            if (data.isLoaded && isValid(data.data)) {
                 content.push(data.debug());
             } else {
                 invalidContent.push(data.debug());
@@ -91,12 +92,12 @@ class RemoteCaches {
         }
         return null;
     }
-    public makeSpriteFrame(url: string, data: any): [Resource.Cache, SpriteFrame] {
+    public makeSpriteFrame(url: string, data: any): Resource.CacheResult<SpriteFrame> {
         if (data && data instanceof ImageAsset) {
             //同一图片加载两次也会回调到这里，这里如果当前精灵缓存中有，不在重新创建
             let cache = this.getSpriteFrame(url);
             if (cache) {
-                return [cache, <SpriteFrame>(cache.data)];
+                return {cache, asset: <SpriteFrame>(cache.data)};
             }
             cache = new Resource.Cache(url, SpriteFrame, Macro.BUNDLE_REMOTE);
             let sp = new SpriteFrame();
@@ -109,9 +110,9 @@ class RemoteCaches {
             cache.url = url;
             cache.data = sp;
             this.set(cache);
-            return [cache, <SpriteFrame>(cache.data)];
+            return {cache, asset: <SpriteFrame>(cache.data)};
         }
-        return [null!, null!];
+        return {cache: null!, asset: null!};
     }
 
     makeSkeletonData(
@@ -347,63 +348,43 @@ export class CacheManager implements ISingleton {
         }
     }
 
-    private _getGetCacheByAsyncArgs(): { url: string, type: typeof Asset, bundle: BUNDLE_TYPE, ignoreType: boolean } | null {
-        if (arguments.length < 3) {
-            if (DEBUG) Log.e(`${this.module}参数传入有误，必须两个参数`);
-            return null;
-        }
-        if (typeof arguments[0] != "string") {
-            if (DEBUG) Log.e(`${this.module}传入第一个参数有误,必须是string`);
-            return null;
-        }
-
-        let ignoreType = arguments.length > 3 ? arguments[3] : false;
-        if (!ignoreType && !js.isChildClassOf(arguments[1], Asset)) {
-            if (DEBUG) Log.e(`${this.module}传入的第二个参数有误,必须是cc.Asset的子类`);
-            return null;
-        }
-        return { url: arguments[0], type: arguments[1], bundle: arguments[2], ignoreType: ignoreType };
-    }
-
     /**
      * @description 如果资源正在加载中，会等待资源加载完成后返回，否则直接返回null
      * @param url 
      * @param type 资源类型
      * @param bundle
+     * @param onComplete 完成回调,如果调用时资源会在加载完成后回调 getCache的最终值
      */
-    public getCache<T extends Asset>(url: string, type: { prototype: T }, bundle: BUNDLE_TYPE): Promise<[Resource.Cache, T]>;
-    public getCache<T extends Asset>(url: string, type: { prototype: T }, bundle: BUNDLE_TYPE, ignoreType: boolean): Promise<[Resource.Cache, T]>;
-    public getCache() {
-        let args = arguments;
-        let me = this;
-        return new Promise<[Resource.Cache, any]>((resolve) => {
-            let _args = me._getGetCacheByAsyncArgs.apply(me, args as any);
-            if (!_args) {
-                resolve([null!, null!]);
-                return;
-            }
-            let cache = me.get(_args.bundle, _args.url, _args.type);
-            if (cache) {
-                if (cache.isLoaded) {
-                    //已经加载完成
-                    if (_args.type && !_args.ignoreType) {
-                        if (cache.data instanceof _args.type) {
-                            resolve([cache, cache.data]);
-                        } else {
-                            if (DEBUG) Log.e(`${this.module}传入类型:${js.getClassName(_args.type)}与资源实际类型: ${js.getClassName(cache.data as any)}不同 url : ${cache.url}`);
-                            resolve([null!, null!]);
-                        }
-                    } else {
-                        resolve([cache, cache.data]);
-                    }
+    public getCache<T extends Asset>(
+        url: string,
+        type: { prototype: T },
+        bundle: BUNDLE_TYPE,
+        onComplete: Resource.CompleteFun<T>
+    ): Resource.CacheResult<T> {
+        const _type = type as any as typeof Asset;
+        let cache = this.get(bundle, url, _type);
+        const _onComplete = (data: Resource.CacheResult<T>) => {
+            DEBUG && Log.d(`${this.module} getCache 资源${url} 加载完成`);
+            onComplete(data);
+        }
+        if (cache) {
+            if (cache.isLoaded) {
+                //已经加载完成
+                if (cache.data instanceof _type) {
+                    return { cache: cache, asset: cache.data as T};
                 } else {
-                    //加载中
-                    cache.getCb.push(resolve);
+                    if (DEBUG) Log.e(`${this.module}传入类型:${js.getClassName(_type)}与资源实际类型: ${js.getClassName(cache.data as any)}不同 url : ${cache.url}`);
+                    return { cache: cache, asset: null!};
                 }
             } else {
-                resolve([null!, null!]);
+                //加载中
+                cache.finishCb.push(_onComplete as Resource.CompleteFun<Asset>);
+                DEBUG && Log.d(`${this.module} getCache 资源${url} 正在加载中`);
+                return { cache: cache, asset: null!};
             }
-        });
+        } else {
+            return { cache: null!, asset: null!};
+        }
     }
 
     /**
@@ -412,67 +393,76 @@ export class CacheManager implements ISingleton {
      * @param type 
      * @param bundle 
      */
-    public getCacheByAsync<T extends Asset>(url: string, type: { prototype: T }, bundle: BUNDLE_TYPE): Promise<[Resource.Cache, T]>;
-    public getCacheByAsync() {
-        let me = this;
-        let args = this._getGetCacheByAsyncArgs.apply(this, <any>arguments);
-        return new Promise<[Resource.Cache, any]>((resolve) => {
-            if (!args) {
-                resolve([null!, null!]);
-                return;
+    public getCacheByAsync<T extends Asset>(
+        url: string,
+        type: { prototype: T },
+        bundle: BUNDLE_TYPE,
+        onComplete?: Resource.CompleteFun<T>
+    ) {
+        const _type = type as any as typeof Asset;
+
+        const _onComplete = (data: Resource.CacheResult<T>) => {
+            onComplete && onComplete(data);
+        }
+
+        const result = this.getCache(url, type, bundle, _onComplete)
+        if (result.cache) {
+            if ( result.cache.isLoaded ){
+                _onComplete(result as Resource.CacheResult<T>);
             }
-            me.getCache(args.url, args.type, args.bundle).then(([cache, data]) => {
-                if (data && data instanceof args!.type) {
-                    resolve([cache, data]);
+        }else{
+            // 没有加载资源
+            App.asset.load(bundle, url, _type, <any>null, (cache) => {
+                if (cache && cache.data && cache.data instanceof _type) {
+                    if (onComplete) {
+                        onComplete({cache:cache,asset:cache.data as T});
+                    }
                 } else {
-                    //加载资源
-                    App.asset.load(args!.bundle, args!.url, args!.type, <any>null, (cache) => {
-                        if (cache && cache.data && cache.data instanceof args!.type) {
-                            resolve([cache, cache.data]);
-                        } else {
-                            Log.e(`${this.module}加载失败 : ${args!.url}`);
-                            resolve([null!, null!]);
-                        }
-                    });
+                    Log.e(`${this.module}加载失败 : ${url}`);
+                    if (onComplete) {
+                        onComplete({cache:null!,asset:null!});
+                    }
                 }
             });
-        });
+        }
     }
 
-    public getSpriteFrameByAsync(urls: string[], key: string, view: UIView, addExtraLoadResource: (view: UIView, info: Resource.Cache) => void, bundle: BUNDLE_TYPE) {
-        let me = this;
-        return new Promise<{ url: string, spriteFrame: SpriteFrame, isTryReload?: boolean, cache: Resource.Cache }>((resolve) => {
-            let nIndex = 0;
-            let getFun = (url: string) => {
-                me.getCacheByAsync(url, SpriteAtlas, bundle).then(([cache, atlas]) => {
-                    addExtraLoadResource(view, cache);
-                    if (atlas) {
-                        let spriteFrame = atlas.getSpriteFrame(key);
-                        if (spriteFrame) {
-                            if (isValid(spriteFrame)) {
-                                resolve({ url: url, spriteFrame: spriteFrame, cache: cache });
-                            } else {
-                                //来到这里面，其实程序已经崩溃了，已经没什么意思，也不知道写这个有啥用，尽量安慰,哈哈哈
-                                Log.e(`精灵帧被释放，释放当前无法的图集资源 url ：${url} key : ${key}`);
-                                App.asset.releaseAsset(cache);
-                                resolve({ url: url, spriteFrame: null!, isTryReload: true, cache: cache });
-                            }
-                        } else {
-                            nIndex++;
-                            if (nIndex >= urls.length) {
-                                resolve({ url: url, spriteFrame: null!, cache: null! });
-                            } else {
-                                getFun(urls[nIndex]);
-                            }
-                        }
-                    } else {
-                        resolve({ url: url, spriteFrame: null!, cache: null! });
-                    }
-                })
-            };
+    public getSpriteFrameByAsync(
+        urls: string[],
+        key: string,
+        view: UIView,
+        addExtraLoadResource: (view: UIView, info: Resource.Cache) => void,
+        bundle: BUNDLE_TYPE,
+        onComplete: (info: { url: string, spriteFrame: SpriteFrame, isTryReload?: boolean, cache: Resource.Cache }) => void
+    ) {
+        let nIndex = 0;
+        let onCompleteFun = (data: Resource.CacheResult<SpriteAtlas>) => {
+            addExtraLoadResource(view, data.cache);
+            let spriteFrame = (data.asset as SpriteAtlas).getSpriteFrame(key);
+            if (spriteFrame) {
+                if (isValid(spriteFrame)) {
+                    onComplete({ url: urls[nIndex], spriteFrame: spriteFrame, cache: data.cache });
+                } else {
+                    //来到这里面，其实程序已经崩溃了，已经没什么意思，也不知道写这个有啥用，尽量安慰,哈哈哈
+                    Log.e(`精灵帧被释放，释放当前无法的图集资源 url ：${urls[nIndex]} key : ${key}`);
+                    App.asset.releaseAsset(data.cache);
+                    onComplete({ url: urls[nIndex], spriteFrame: null!, isTryReload: true, cache: data.cache });
+                }
+            } else {
+                nIndex++;
+                if (nIndex >= urls.length) {
+                    onComplete({ url: urls[nIndex], spriteFrame: null!, cache: data.cache });
+                } else {
+                    getFun(urls[nIndex]);
+                }
+            }
+        }
 
-            getFun(urls[nIndex]);
-        });
+        let getFun = (url: string) => {
+            this.getCacheByAsync(url, SpriteAtlas, bundle, onCompleteFun)
+        };
+
+        getFun(urls[nIndex]);
     }
 
     debug() {

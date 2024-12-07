@@ -271,18 +271,18 @@ export default class AudioComponent extends EventComponent {
                 this.audioData.musicInfos.set(key, audioInfo);
             }
             this.audioData.curMusic = audioInfo;
-            App.cache.getCacheByAsync(url, AudioClip, bundle).then(([cache,data]) => {
-                if (data) {
+            App.cache.getCacheByAsync(url, AudioClip, bundle,(data) => {
+                if (data.asset) {
                     if (this.owner) {
-                        App.uiManager.addLocal(cache, this.owner.className);
+                        App.uiManager.addLocal(data.cache, this.owner.className);
                     } else {
-                        App.uiManager.garbage.addLocal(cache);
+                        App.uiManager.garbage.addLocal(data.cache);
                     }
                     //停掉当前播放音乐
                     this.stopMusic();
                     //播放新的背景音乐
                     if (audioInfo && audioInfo.source) {
-                        audioInfo.source.clip = data;
+                        audioInfo.source.clip = data.asset as AudioClip;
                         audioInfo.source.loop = loop;
                         audioInfo.volume = this.musicVolume;
                         //如果当前音乐是开的，才播放
@@ -317,15 +317,15 @@ export default class AudioComponent extends EventComponent {
                 audioInfo.source.playOnAwake = true;
                 this.audioData.effectInfos.set(key, audioInfo);
             }
-            App.cache.getCacheByAsync(url, AudioClip, bundle).then(([cache,data]) => {
-                if (data) {
+            App.cache.getCacheByAsync(url, AudioClip, bundle,(data) => {
+                if (data.asset) {
                     if (this.owner) {
-                        App.uiManager.addLocal(cache, this.owner.className);
+                        App.uiManager.addLocal(data.cache, this.owner.className);
                     } else {
-                        App.uiManager.garbage.addLocal(cache);
+                        App.uiManager.garbage.addLocal(data.cache);
                     }
                     if (audioInfo && audioInfo.source) {
-                        audioInfo.source.clip = data;
+                        audioInfo.source.clip = data.asset as AudioClip;
                         audioInfo.source.loop = loop;
                         audioInfo.source.volume = this.effectVolume;
                         this.play(audioInfo,false,resolve);
