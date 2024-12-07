@@ -402,7 +402,7 @@ interface BundleData{
 	sort : number;
 }
 
-/**@description 入口数据 */
+/**@description 入口用户数据 */
 interface EntryUserData{
 	[key:string] : any;
 	/**@description 是否是预加载资源,并不会进入bundle */
