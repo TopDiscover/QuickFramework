@@ -75,7 +75,7 @@ export class EntryManager implements ISingleton{
      * @param bundle bundle
      * @param userData 用户自定义数据
      **/
-    enterBundle(bundle: BUNDLE_TYPE , userData ?: any) {
+    enterBundle(bundle: BUNDLE_TYPE , userData ?: EntryUserData) {
         let config = this.delegate.getEntryConfig(bundle);
         if (config) {
             if (bundle == Macro.BUNDLE_RESOURCES) {

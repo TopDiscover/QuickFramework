@@ -33,6 +33,10 @@ export class ProtoManager implements ISingleton{
             }
             this._loadDir[`${bundle}/${path}`] = false;
             App.asset.loadDir(bundle, path, cc.TextAsset, (finish, total, item) => { }, (cacheData) => {
+                if ( this._loadDir[`${bundle}/${path}`] ){
+                    //如果已经加载过，则不进行加载
+                    return;
+                }
                 if (cacheData && cacheData.data && Array.isArray(cacheData.data)) {
 
                     //解析proto文件

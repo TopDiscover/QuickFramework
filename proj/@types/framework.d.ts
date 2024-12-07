@@ -401,3 +401,10 @@ interface BundleData{
 	/**@description 排序 */
 	sort : number;
 }
+
+/**@description 入口数据 */
+interface EntryUserData{
+	[key:string] : any;
+	/**@description 是否是预加载资源,并不会进入bundle */
+	isPreload : boolean;
+}
