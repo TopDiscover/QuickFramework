@@ -294,15 +294,7 @@ class FileUtils extends Handler_1.Handler {
         });
     }
     md5(content) {
-        if (typeof content === 'string') {
-            return Promise.resolve((0, crypto_1.createHash)("md5").update(content).digest("hex"));
-        }
-        else if (Buffer.isBuffer(content)) {
-            return Promise.resolve((0, crypto_1.createHash)("md5").update(content).digest("hex"));
-        }
-        else {
-            return this.md5File(content);
-        }
+        return (0, crypto_1.createHash)("md5").update(content).digest("hex");
     }
     /**
      * @description 对目录下所有文件做md5，使用并发限制
@@ -317,7 +309,7 @@ class FileUtils extends Handler_1.Handler {
                 // 并发处理当前批次的文件
                 const results = await Promise.all(batch.map(async (v) => {
                     try {
-                        const md5 = await this.md5(v.path);
+                        const md5 = await this.md5File(v.path);
                         return {
                             relative: this.formatPath(v.relative),
                             size: v.size,

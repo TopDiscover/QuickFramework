@@ -508,7 +508,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
             let projectManifestPath = join(manifestDir, "main_project.json");
             let versionManifestPath = join(manifestDir, "main_version.json");
             let content = JSON.stringify(manifest);
-            let md5 = await FileUtils.instance.md5(content);
+            let md5 = FileUtils.instance.md5(content);
             manifest.md5 = md5;
             manifest.version = version;
 
@@ -543,7 +543,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
                 versionManifestPath = join(manifestDir, `${key}_version.json`);
 
                 let content = JSON.stringify(manifest);
-                let md5 = await FileUtils.instance.md5(content);
+                let md5 = FileUtils.instance.md5(content);
                 manifest.md5 = md5;
                 manifest.version = data.bundles[key].version
 

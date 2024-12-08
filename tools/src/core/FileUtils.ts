@@ -310,14 +310,8 @@ export default class FileUtils extends Handler {
         });
     }
 
-    md5(content: string | Buffer | PathLike): Promise<string> {
-        if (typeof content === 'string') {
-            return Promise.resolve(createHash("md5").update(content).digest("hex"));
-        } else if (Buffer.isBuffer(content)) {
-            return Promise.resolve(createHash("md5").update(content).digest("hex"));
-        } else {
-            return this.md5File(content);
-        }
+    md5(content: string | Buffer) {
+        return createHash("md5").update(content).digest("hex");
     }
 
     /**
@@ -336,7 +330,7 @@ export default class FileUtils extends Handler {
                 const results = await Promise.all(
                     batch.map(async (v) => {
                         try {
-                            const md5 = await this.md5(v.path);
+                            const md5 = await this.md5File(v.path);
                             return {
                                 relative: this.formatPath(v.relative),
                                 size: v.size,
