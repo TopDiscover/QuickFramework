@@ -16,18 +16,18 @@ class RemoteLoader {
         let key = Resource.getKey(url, SpriteFrame);
         if (isNeedCache) {
             //从释放缓存中取
-            let [spCache, texture2DCache] = App.releaseManger.getRemote(url, SpriteFrame);
-            if (spCache) {
+            let [tempCache, texture2DCache] = App.releaseManger.getRemote(url, SpriteFrame);
+            if (tempCache) {
                 App.cache.remoteCaches.set(texture2DCache);
-                App.cache.remoteCaches.set(spCache);
-                onComplete({ cache: spCache, asset: <SpriteFrame>(spCache.data) });
+                App.cache.remoteCaches.set(tempCache);
+                onComplete({ cache: tempCache, asset: <SpriteFrame>(tempCache.data) });
                 return
             }
             //如果存在缓存 ，直接取出
-            let spCache1 = App.cache.remoteCaches.getSpriteFrame(url);
-            if (spCache1) {
+            let spCache = App.cache.remoteCaches.getSpriteFrame(url);
+            if (spCache) {
                 if (DEBUG) Log.d(this._logTag, `从缓存精灵帧中获取:${key}`);
-                onComplete({ cache: spCache1, asset: <SpriteFrame>(spCache1.data) });
+                onComplete({ cache: spCache, asset: <SpriteFrame>(spCache.data) });
                 return;
             }
         } else {
