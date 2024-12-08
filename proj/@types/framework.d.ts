@@ -294,8 +294,6 @@ declare namespace Language {
 		updateFaild: string;
 		/**@description 检测更新中...*/
 		checkingUpdate: string;
-		/**@description 版本过低，请更新 */
-		mainPackVersionIsTooLow: string;
 		/**@description {0}已升级到最新 */
 		alreadyRemoteVersion: string;
 		/**@description {0}加载失败!!! */

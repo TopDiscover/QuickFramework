@@ -80,6 +80,8 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
 
     readonly mainJS = "main.js";
 
+    readonly navagation = "navagation.json";
+
     private _mainBundleIncludes: string[] = null!;
     /**
      * @description 主包包含目录
@@ -87,7 +89,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
     /**@description 返回需要添加到主包版本的文件目录 */
     private get mainBundleIncludes() {
         if (!this._mainBundleIncludes) {
-            this._mainBundleIncludes = ["src", "jsb-adapter", "assets/resources", "assets/main", this.mainJS , "assets/internal"];
+            this._mainBundleIncludes = ["src", "jsb-adapter", "assets/resources", "assets/main", this.mainJS, "assets/internal"];
         }
         return this._mainBundleIncludes;
     }
@@ -154,13 +156,27 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
         });
     }
 
+    /**@description 获取导航文件版本 */
+    protected get navagationVersion() {
+        if (this.data && this.data.remoteDir.length > 0) {
+            let navagationPath = join(this.data.remoteDir, this.navagation);
+            if (existsSync(navagationPath)) {
+                let data = readFileSync(navagationPath, { encoding: "utf-8" });
+                let config = JSON.parse(data);
+                return config.version;
+            }
+        }
+        return null;
+    }
+
     /**
      * @description 刷新测试环境子包信息
      * @param {*} key 
      */
     protected getBundleVersion(key: string) {
-        if (this.data && this.data.remoteDir.length > 0) {
-            let versionManifestPath = join(this.data.remoteDir, `manifest/${key}_version.json`);
+        let version = this.navagationVersion;
+        if (this.data && this.data.remoteDir.length > 0 && version) {
+            let versionManifestPath = join(this.data.remoteDir, `${version}/manifest/${key}_version.json`);
             if (existsSync(versionManifestPath)) {
                 let data = readFileSync(versionManifestPath, { encoding: "utf-8" });
                 let config = JSON.parse(data);
@@ -496,7 +512,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
             for (let i = 0; i < mainIncludes.length; i++) {
                 let v = mainIncludes[i];
                 if (v == this.mainJS) {
-                    await FileUtils.instance.md5Dir(buildDir, manifest.assets!, buildDir, true);
+                    await FileUtils.instance.md5Dir(buildDir, manifest.assets!, buildDir, this.mainJS);
                 } else {
                     await FileUtils.instance.md5Dir(join(buildDir, mainIncludes[i]), manifest.assets!, buildDir);
                 }
@@ -626,10 +642,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
             this.logger.log(`${this.module}请先选择本地服务器目录`);
             return;
         }
-        // if (!existsSync(data.remoteDir)) {
-        //     this.logger.log(`${this.module}本地测试服务器目录不存在 : ${data.remoteDir}`);
-        //     return;
-        // }
+        FileUtils.instance.createDir(data.remoteDir);
         if (!existsSync(data.buildDir)) {
             this.logger.log(`${this.module}构建目录不存在 : ${data.buildDir} , 请先构建`);
             return;
@@ -668,16 +681,19 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
             }
         }
 
-        this.logger.log(`${this.module}开始拷贝文件到 : ${data.remoteDir}`);
+        // 创建更新版本目录
+        const updateVersionDir = join(data.remoteDir, `${data.version}`);
+
+        this.logger.log(`${this.module}开始拷贝文件到 : ${updateVersionDir}`);
         this._cur = 0;
         this.total = 1 + copyDirs.length;
-        this.logger.log(`${this.module}删除旧目录 : ${data.remoteDir}`);
-        await FileUtils.instance.delDir(data.remoteDir);
-        FileUtils.instance.createDir(data.remoteDir);
+        this.logger.log(`${this.module}删除旧目录 : ${updateVersionDir}`);
+        await FileUtils.instance.delDir(updateVersionDir);
+        FileUtils.instance.createDir(updateVersionDir);
         this.cur = 0;
         for (let i = 0; i < copyDirs.length; i++) {
             let source = join(data.buildDir, copyDirs[i]);
-            let dest = join(data.remoteDir, copyDirs[i]);
+            let dest = join(updateVersionDir, copyDirs[i]);
             if (copyDirs[i] == this.mainJS) {
                 await FileUtils.instance.copyFile(source, dest);
             } else {
@@ -690,12 +706,25 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
 
 
         let source = this.zipPath
-        let dest = join(data.remoteDir, "zips");
+        let dest = join(updateVersionDir, "zips");
         // this.logger.log(`${this.module}准备复制${source} => ${dest}`);
         await FileUtils.instance.copyDir(source, dest);
         // this.logger.log(`${this.module}复制完成${source} => ${dest}`);
         this.cur = this.cur + 1;
+
+        // 生成热更新导航文件
+        let manifestPath = join(data.remoteDir, this.navagation);
+        let manifest = {
+            version: data.version,
+        }
+        this.logger.log(`${this.module}生成热更新导航文件 : ${manifestPath}`);
+        writeFileSync(manifestPath, JSON.stringify(manifest));
+
+
         this.logger.log(`${this.module}全部完成`);
+
+
+
         this.onSetProcess(false);
     }
 

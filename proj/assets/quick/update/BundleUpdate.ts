@@ -19,15 +19,6 @@ export class BundleUpdate implements UpdateHandlerDelegate, ISingleton {
     onShowUpdating(item: UpdateItem): void {
         App.tips.show(App.getLanguage("checkingUpdate"));
     }
-    onNeedUpdateMain(item: UpdateItem): void {
-        let content = App.getLanguage("mainPackVersionIsTooLow") as string;
-        App.alert.show({
-            text: content,
-            confirmCb: (isOK) => {
-                App.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
-            }
-        });
-    }
     onOther(item: UpdateItem): void {
 
     }

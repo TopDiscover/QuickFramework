@@ -154,6 +154,9 @@ class HelperImpl extends Helper_1.default {
         this.onSetProcess(true);
         this.data.buildDir = options.dest;
         if (this.isSupportUpdate(options.platform)) {
+            if (options.md5Cache) {
+                throw new Error(`${this.module}不能使用md5缓存`);
+            }
             this.logger.warn(`${this.module}如果热更新勾选了【自动生成】或【自动部署】请不要关闭此界面`);
             Editor.Panel.open("hotupdate");
         }

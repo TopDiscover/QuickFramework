@@ -317,8 +317,14 @@ export default class FileUtils extends Handler {
     /**
      * @description 对目录下所有文件做md5，使用并发限制
      */
-    async md5Dir(path: string, assets: Asset, root: string, isCurrentDirFiles = false) {
-        const files = FileUtils.instance.getFiles(path, undefined, root, isCurrentDirFiles);
+    async md5Dir(path: string, assets: Asset, root: string, MainJS?: string) {
+        let isCurrentDirFiles = MainJS != undefined;
+        const files = FileUtils.instance.getFiles(path, (info)=>{
+            if ( MainJS ){
+                return info.name == MainJS
+            }
+            return true;
+        }, root, isCurrentDirFiles);
         const concurrentLimit = 50; // 同时处理的最大文件数
         
         // 将文件列表分成多个批次

@@ -32,9 +32,7 @@ export class MainUpdate implements UpdateHandlerDelegate, ISingleton {
     onShowUpdating(item: UpdateItem): void {
         App.updateLoading.show(App.getLanguage("loading"));
     }
-    onNeedUpdateMain(item: UpdateItem): void {
-
-    }
+    
     onOther(item: UpdateItem): void {
 
     }

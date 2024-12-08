@@ -29,6 +29,7 @@ class Helper extends Config_1.default {
             isAutoVersion: true,
         };
         this.mainJS = "main.js";
+        this.navagation = "navagation.json";
         this._mainBundleIncludes = null;
         this._cur = 0;
         /**@description 文件总数 */
@@ -127,13 +128,26 @@ class Helper extends Config_1.default {
             this._remoteBundles[key].md5 = this.getBundleVersion(key);
         });
     }
+    /**@description 获取导航文件版本 */
+    get navagationVersion() {
+        if (this.data && this.data.remoteDir.length > 0) {
+            let navagationPath = (0, path_1.join)(this.data.remoteDir, this.navagation);
+            if ((0, fs_1.existsSync)(navagationPath)) {
+                let data = (0, fs_1.readFileSync)(navagationPath, { encoding: "utf-8" });
+                let config = JSON.parse(data);
+                return config.version;
+            }
+        }
+        return null;
+    }
     /**
      * @description 刷新测试环境子包信息
      * @param {*} key
      */
     getBundleVersion(key) {
-        if (this.data && this.data.remoteDir.length > 0) {
-            let versionManifestPath = (0, path_1.join)(this.data.remoteDir, `manifest/${key}_version.json`);
+        let version = this.navagationVersion;
+        if (this.data && this.data.remoteDir.length > 0 && version) {
+            let versionManifestPath = (0, path_1.join)(this.data.remoteDir, `${version}/manifest/${key}_version.json`);
             if ((0, fs_1.existsSync)(versionManifestPath)) {
                 let data = (0, fs_1.readFileSync)(versionManifestPath, { encoding: "utf-8" });
                 let config = JSON.parse(data);
@@ -443,7 +457,7 @@ class Helper extends Config_1.default {
             for (let i = 0; i < mainIncludes.length; i++) {
                 let v = mainIncludes[i];
                 if (v == this.mainJS) {
-                    await FileUtils_1.default.instance.md5Dir(buildDir, manifest.assets, buildDir, true);
+                    await FileUtils_1.default.instance.md5Dir(buildDir, manifest.assets, buildDir, this.mainJS);
                 }
                 else {
                     await FileUtils_1.default.instance.md5Dir((0, path_1.join)(buildDir, mainIncludes[i]), manifest.assets, buildDir);
@@ -542,10 +556,7 @@ class Helper extends Config_1.default {
             this.logger.log(`${this.module}请先选择本地服务器目录`);
             return;
         }
-        // if (!existsSync(data.remoteDir)) {
-        //     this.logger.log(`${this.module}本地测试服务器目录不存在 : ${data.remoteDir}`);
-        //     return;
-        // }
+        FileUtils_1.default.instance.createDir(data.remoteDir);
         if (!(0, fs_1.existsSync)(data.buildDir)) {
             this.logger.log(`${this.module}构建目录不存在 : ${data.buildDir} , 请先构建`);
             return;
@@ -582,16 +593,18 @@ class Helper extends Config_1.default {
                 return;
             }
         }
-        this.logger.log(`${this.module}开始拷贝文件到 : ${data.remoteDir}`);
+        // 创建更新版本目录
+        const updateVersionDir = (0, path_1.join)(data.remoteDir, `${data.version}`);
+        this.logger.log(`${this.module}开始拷贝文件到 : ${updateVersionDir}`);
         this._cur = 0;
         this.total = 1 + copyDirs.length;
-        this.logger.log(`${this.module}删除旧目录 : ${data.remoteDir}`);
-        await FileUtils_1.default.instance.delDir(data.remoteDir);
-        FileUtils_1.default.instance.createDir(data.remoteDir);
+        this.logger.log(`${this.module}删除旧目录 : ${updateVersionDir}`);
+        await FileUtils_1.default.instance.delDir(updateVersionDir);
+        FileUtils_1.default.instance.createDir(updateVersionDir);
         this.cur = 0;
         for (let i = 0; i < copyDirs.length; i++) {
             let source = (0, path_1.join)(data.buildDir, copyDirs[i]);
-            let dest = (0, path_1.join)(data.remoteDir, copyDirs[i]);
+            let dest = (0, path_1.join)(updateVersionDir, copyDirs[i]);
             if (copyDirs[i] == this.mainJS) {
                 await FileUtils_1.default.instance.copyFile(source, dest);
             }
@@ -603,11 +616,18 @@ class Helper extends Config_1.default {
             this.cur = this.cur + 1;
         }
         let source = this.zipPath;
-        let dest = (0, path_1.join)(data.remoteDir, "zips");
+        let dest = (0, path_1.join)(updateVersionDir, "zips");
         // this.logger.log(`${this.module}准备复制${source} => ${dest}`);
         await FileUtils_1.default.instance.copyDir(source, dest);
         // this.logger.log(`${this.module}复制完成${source} => ${dest}`);
         this.cur = this.cur + 1;
+        // 生成热更新导航文件
+        let manifestPath = (0, path_1.join)(data.remoteDir, this.navagation);
+        let manifest = {
+            version: data.version,
+        };
+        this.logger.log(`${this.module}生成热更新导航文件 : ${manifestPath}`);
+        (0, fs_1.writeFileSync)(manifestPath, JSON.stringify(manifest));
         this.logger.log(`${this.module}全部完成`);
         this.onSetProcess(false);
     }

@@ -34,21 +34,6 @@ export class HallUpdate implements UpdateHandlerDelegate, ISingleton {
     onShowUpdating(item: UpdateItem): void {
         App.updateLoading.show(App.getLanguage("loading"));
     }
-    onNeedUpdateMain(item: UpdateItem): void {
-        App.updateLoading.hide();
-        let content = App.getLanguage("mainPackVersionIsTooLow") as string;
-        App.alert.show({
-            text: content,
-            confirmCb: (isOK) => {
-                if (App.stageData.isLoginStage()) {
-                    //如果是在登录界面，直接检测更新
-                    App.entryManager.onCheckUpdate();
-                } else {
-                    App.entryManager.enterBundle(Macro.BUNDLE_RESOURCES);
-                }
-            }
-        });
-    }
     onOther(item: UpdateItem): void {
 
     }
