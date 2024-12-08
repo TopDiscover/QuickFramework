@@ -14,15 +14,15 @@ class RemoteLoader {
         let key = Resource.getKey(url, cc.SpriteFrame);
         if (isNeedCache) {
             //从释放缓存中取
-            let [spCache, texture2DCache] = App.releaseManger.getRemote(url, cc.SpriteFrame);
-            if (spCache) {
+            let [tempCache, texture2DCache] = App.releaseManger.getRemote(url, cc.SpriteFrame);
+            if (tempCache) {
                 App.cache.remoteCaches.set(texture2DCache);
-                App.cache.remoteCaches.set(spCache);
-                onComplete({ cache: spCache, asset: <cc.SpriteFrame>(spCache.data) });
+                App.cache.remoteCaches.set(tempCache);
+                onComplete({ cache: tempCache, asset: <cc.SpriteFrame>(tempCache.data) });
                 return
             }
             //如果存在缓存 ，直接取出
-            spCache = App.cache.remoteCaches.getSpriteFrame(url);
+            let spCache = App.cache.remoteCaches.getSpriteFrame(url);
             if (spCache) {
                 if (CC_DEBUG) Log.d(this._logTag, `从缓存精灵帧中获取:${key}`);
                 onComplete({ cache: spCache, asset: <cc.SpriteFrame>(spCache.data) });
@@ -141,18 +141,18 @@ class RemoteLoader {
     ) {
         let key = Resource.getKey(url, type);
         //先从待释放中取
-        let [cache] = App.releaseManger.getRemote(key, type);
-        if (cache) {
-            cache.addRef();
-            App.cache.remoteCaches.set(cache);
+        let [tempCache] = App.releaseManger.getRemote(key, type);
+        if (tempCache) {
+            tempCache.addRef();
+            App.cache.remoteCaches.set(tempCache);
             //把再加载过程里，双加载同一资源的回调都回调回去
-            cache.doFinish();
-            onComplete && onComplete({ cache: cache, asset: cache.data as T });
+            tempCache.doFinish();
+            onComplete && onComplete({ cache: tempCache, asset: tempCache.data as T });
             return;
         }
 
         //从缓存中取
-        cache = App.cache.remoteCaches.get(key);
+        let cache = App.cache.remoteCaches.get(key);
         if (cache) {
             //有缓存,查看是否已经加载
             if (cache.isLoaded) {
