@@ -297,8 +297,6 @@ declare namespace Language {
 		updateFaild: string;
 		/**@description 检测更新中...*/
 		checkingUpdate: string;
-		/**@description 版本过低，请更新 */
-		mainPackVersionIsTooLow: string;
 		/**@description {0}已升级到最新 */
 		alreadyRemoteVersion: string;
 		/**@description {0}加载失败!!! */
@@ -410,6 +408,10 @@ interface EntryUserData{
 	[key:string] : any;
 	/**@description 是否是预加载资源,并不会进入bundle */
 	isPreload : boolean;
+}
+
+interface NavigationData{
+	version : string;
 }
 
 /**@description 层级 配置 */

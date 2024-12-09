@@ -57,9 +57,6 @@ export namespace Update {
         ERROR_DECOMPRESS,
 
         //以下是js中扩展的字段，上面是引擎中已经有的字段
-
-        /**@description 主包版本不匹配，需要升级主包 */
-        MAIN_PACK_NEED_UPDATE,
         /**@description 预处理版本文件不存在 */
         PRE_VERSIONS_NOT_FOUND,
         /**@description 未初始化 */

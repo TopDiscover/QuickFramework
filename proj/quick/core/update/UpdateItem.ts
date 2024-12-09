@@ -12,8 +12,6 @@ export interface UpdateHandlerDelegate {
     onPreVersionFailed(item: UpdateItem): void;
     /**@description 正在更新或检测更新中 */
     onShowUpdating(item: UpdateItem): void;
-    /**@description 需要更新主包 */
-    onNeedUpdateMain(item: UpdateItem): void;
     /**@description 其它状态 */
     onOther(item: UpdateItem): void;
     /**@description 下载进度 */
@@ -44,7 +42,7 @@ export interface UpdateHandlerDelegate {
 export class UpdateItem {
     /**@description 更新项名字,如果大厅 */
     private _name = "";
-    get name() {
+    get name(){
         return App.getLanguage(this._name as any);
     };
     /**@description 更新项bundle名 */
@@ -153,7 +151,7 @@ export class UpdateItem {
     }
 
     private get hotUpdateUrl() {
-        return App.updateManager.hotUpdateUrl;
+        return App.updateManager.realHotUpdateUrl;
     }
 
     /**@description 当前是否正在检测更新或更新过程中 */
@@ -256,18 +254,9 @@ export class UpdateItem {
                 break;
             case Update.Code.ALREADY_UP_TO_DATE:
                 Log.d(`${this.bundle} Already up to date with the latest remote version.`);
-                if (this.isMain) {
-                    App.updateManager.savePreVersions();
-                } else if (this.bundle == Macro.BUNDLE_HALL) {
-                    //如果大厅已经没有更新，但此时主包有更新，需要检测升级主包
-                    code = App.updateManager.checkMainMd5(this, code);
-                }
                 break;
             case Update.Code.NEW_VERSION_FOUND:
                 Log.d(`${this.bundle} New version found, please try to update.`);
-                if (!this.isMain) {
-                    code = App.updateManager.checkAllowUpdate(this, code);
-                }
                 break;
             default:
                 return;
@@ -280,10 +269,9 @@ export class UpdateItem {
             this.handler.onAreadyUpToData(this);
         } else if (code == Update.Code.ERROR_DOWNLOAD_MANIFEST ||
             code == Update.Code.ERROR_NO_LOCAL_MANIFEST ||
-            code == Update.Code.ERROR_PARSE_MANIFEST) {
+            code == Update.Code.ERROR_PARSE_MANIFEST ||
+            code == Update.Code.PRE_VERSIONS_NOT_FOUND) {
             this.handler.onUpdateFailed(this);
-        } else if (code == Update.Code.MAIN_PACK_NEED_UPDATE || code == Update.Code.PRE_VERSIONS_NOT_FOUND) {
-            this.handler.onNeedUpdateMain(this);
         } else {
             this.handler.onOther(this);
         }
@@ -331,16 +319,10 @@ export class UpdateItem {
             case Update.Code.ALREADY_UP_TO_DATE:
                 Log.d(`${this.bundle} Already up to date with the latest remote version`);
                 failed = true;
-                if (this.isMain) {
-                    App.updateManager.savePreVersions();
-                }
                 break;
             case Update.Code.UPDATE_FINISHED:
                 Log.d(`${this.bundle} Update finished. ${event.getMessage()}`);
                 isUpdateFinished = true;
-                if (this.isMain) {
-                    App.updateManager.savePreVersions();
-                }
                 break;
             case Update.Code.UPDATE_FAILED:
                 Log.d(`${this.bundle} Update failed. ${event.getMessage()}`);
@@ -444,8 +426,6 @@ export class UpdateItem {
             }
         }
         Log.d(`${this.bundle}update cb  failed : ${failed}  , isRestartApp : ${isRestartApp} isUpdateFinished : ${isUpdateFinished} , updating : ${this.isUpdating}`);
-
-        
     }
 }
 

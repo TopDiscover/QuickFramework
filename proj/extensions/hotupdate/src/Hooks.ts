@@ -11,7 +11,13 @@ export function unload() {
 
 export async function onBeforeBuild(options: IBuildTaskOption, result: IBuildResult) {
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeBuild`);
-    Editor.Message.send(PACKAGE_NAME,"onBeforeBuild",options.platform);
+    const platform = options.platform;
+    if ( platform == "android" || platform == "ios" || platform == "mac" || platform == "windows" ){
+        if ( options.md5Cache ){
+            throw new Error("md5Cache 不能为 true,否则热更新无法正常运行");
+        }
+    }
+    Editor.Message.send(PACKAGE_NAME,"onBeforeBuild",platform);
 }
 export async function onBeforeInit(options: IBuildTaskOption, result: IBuildResult) {
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeInit`);
