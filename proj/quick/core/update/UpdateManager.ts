@@ -299,8 +299,8 @@ export class UpdateManager implements ISingleton {
             }
             item.state = Update.State.PREDOWNLOAD_VERSION;
             item.handler.onShowUpdating(item);
-            
-            const onError = ()=>{
+
+            const onError = () => {
                 this.remoteVersions = {};
                 item.state = Update.State.FAIL_TO_UPDATE;
                 item.code = Update.Code.PRE_VERSIONS_NOT_FOUND;
@@ -368,8 +368,21 @@ export class UpdateManager implements ISingleton {
         })
     }
 
-    private get navigationVersion(){
-        if(this.navigationData){
+    private get navigationVersion() {
+        if (this.navigationData) {
+            if (this.navigationData.whiteList) {
+                DEBUG && Log.d(`${this.module} 白名单更新`);
+                if (this.navigationData.whiteList.length > 0 && this.navigationData.whiteList.indexOf(App.platform.uuid) > -1) {
+                    DEBUG && Log.d(`${this.module} 白名单更新,更新版本:${this.navigationData.version}`);
+                    return this.navigationData.version;
+                } else {
+                    // 更新运营版本
+                    DEBUG && Log.d(`${this.module} 白名单为空,更新运营版本:${this.navigationData.onlineVersion}`);
+                    return this.navigationData.onlineVersion;
+                }
+            }
+            DEBUG && Log.d(`${this.module} 全量更新`);
+            // 全量更新
             return this.navigationData.version;
         }
         return null;
