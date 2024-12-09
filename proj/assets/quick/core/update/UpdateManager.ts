@@ -401,7 +401,7 @@ export class UpdateManager implements ISingleton {
     }
 
     debug() {
-        Log.d(`-----------热火更新管理器中相关信息------------`);
+        Log.d(`-----------热更新管理器中相关信息------------`);
         Log.dump({ name: "远程版本信息", data: this.remoteVersions });
     }
 }
