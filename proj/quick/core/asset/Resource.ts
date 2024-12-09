@@ -112,7 +112,7 @@ export namespace Resource {
                     const bundle = App.bundleManager.getBundle(this.bundle);
                     if (bundle) {
                         v.forEach(asset => {
-                            const info = bundle.getAssetInfo(asset.uuid);
+                            const info = bundle.getAssetInfo(asset.uuid || asset._uuid);
                             if (info) {
                                 const cache = new Cache(`${(info as any).path}`, this.type, this.bundle);
                                 cache.isLoaded = true;
@@ -120,7 +120,7 @@ export namespace Resource {
                                 App.cache.set(cache);
                                 this.deps.push(cache.key);
                             } else {
-                                Log.e(`${this.url}.${asset.name} uuid:不存在`);
+                                Log.e(`${this.url}.${asset.name} uuid:${asset.uuid || asset._uuid}不存在`);
                             }
                         })
                     }
