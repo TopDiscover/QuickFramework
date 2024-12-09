@@ -41,6 +41,7 @@ export class MainUpdate implements UpdateHandlerDelegate, ISingleton {
     }
     onAreadyUpToData(item: UpdateItem): void {
         App.updateLoading.hide();
+        App.entryManager.onMainUpdateComplete(item);
     }
     onStarCheckUpdate(item: UpdateItem): void {
         App.updateLoading.show(App.getLanguage("loading"));

@@ -49,7 +49,7 @@ export class UpdateItem {
     /**@description 处理者,统一指定，具体实现由内部的代理来处理 */
     handler: UpdateHandlerDelegate = null!;
     /**@description 更新用户自定义数据,多次点击，以最新数据为主 */
-    userData: any = null;
+    userData: EntryUserData = null!;
 
     /**@description 是否已经加载完成过 */
     isLoaded: boolean = false;

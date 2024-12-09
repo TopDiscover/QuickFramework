@@ -57,4 +57,10 @@ export class EntryDelegate {
     getEntryConfig(bundle: BUNDLE_TYPE): UpdateItem | null {
         return null;
     }
+
+    onMainUpdateComplete(mainEntry: Entry | null, item: UpdateItem) {
+        if (mainEntry) {
+            mainEntry.onMainUpdateComplete(item);
+        }
+    }
 }
