@@ -153,6 +153,12 @@ export class EntryManager implements ISingleton{
         }
     }
 
+    /**@description 主包更新完成 */
+    onMainUpdateComplete(item: UpdateItem) {
+        let entry = this.getEntry(Macro.BUNDLE_RESOURCES);
+        this.delegate.onMainUpdateComplete(entry,item);
+    }
+
     /**@description 获取bundle入口 */
     getEntry(bundle: BUNDLE_TYPE) {
         let name = App.bundleManager.getBundleName(bundle);

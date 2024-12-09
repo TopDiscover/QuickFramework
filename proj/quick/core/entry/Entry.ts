@@ -4,6 +4,7 @@ import { DEBUG } from "cc/env";
 import { LanguageDelegate } from "../language/LanguageDelegate";
 import GameView from "../ui/GameView";
 import { Update } from "../update/Update";
+import { UpdateItem } from "../update/UpdateItem";
 
 /**@description 入口数据 */
 export class EntryData {
@@ -186,6 +187,11 @@ export abstract class Entry {
     /**@description GameView 关闭 */
     onCloseGameView(gameView: GameView) {
         this._gameView = null!;
+    }
+
+    /**@description 主包更新完成 */
+    onMainUpdateComplete(item: UpdateItem) {
+
     }
 
 }
