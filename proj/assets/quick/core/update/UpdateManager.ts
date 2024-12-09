@@ -370,7 +370,7 @@ export class UpdateManager implements ISingleton {
         if (this.navigationData) {
             if (this.navigationData.whiteList) {
                 CC_DEBUG && Log.d(`${this.module} 白名单更新`);
-                if (this.navigationData.whiteList.length > 0 && this.navigationData.whiteList.includes(App.platform.uuid)) {
+                if (this.navigationData.whiteList.length > 0 && this.navigationData.whiteList.indexOf(App.platform.uuid) > -1) {
                     CC_DEBUG && Log.d(`${this.module} 白名单更新,更新版本:${this.navigationData.version}`);
                     return this.navigationData.version;
                 } else {
