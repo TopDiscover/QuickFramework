@@ -129,7 +129,7 @@ class Helper extends Config_1.default {
         });
     }
     /**@description 获取导航文件版本 */
-    get navagationVersion() {
+    get navigationVersion() {
         if (this.data && this.data.remoteDir.length > 0) {
             let navagationPath = (0, path_1.join)(this.data.remoteDir, this.navigation);
             if ((0, fs_1.existsSync)(navagationPath)) {
@@ -145,7 +145,7 @@ class Helper extends Config_1.default {
      * @param {*} key
      */
     getBundleVersion(key) {
-        let version = this.navagationVersion;
+        let version = this.navigationVersion;
         if (this.data && this.data.remoteDir.length > 0 && version) {
             let versionManifestPath = (0, path_1.join)(this.data.remoteDir, `${version}/manifest/${key}_version.json`);
             if ((0, fs_1.existsSync)(versionManifestPath)) {

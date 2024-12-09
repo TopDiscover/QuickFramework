@@ -157,7 +157,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
     }
 
     /**@description 获取导航文件版本 */
-    protected get navagationVersion() {
+    protected get navigationVersion() {
         if (this.data && this.data.remoteDir.length > 0) {
             let navagationPath = join(this.data.remoteDir, this.navigation);
             if (existsSync(navagationPath)) {
@@ -174,7 +174,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
      * @param {*} key 
      */
     protected getBundleVersion(key: string) {
-        let version = this.navagationVersion;
+        let version = this.navigationVersion;
         if (this.data && this.data.remoteDir.length > 0 && version) {
             let versionManifestPath = join(this.data.remoteDir, `${version}/manifest/${key}_version.json`);
             if (existsSync(versionManifestPath)) {
