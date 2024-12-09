@@ -81,7 +81,7 @@ export class UpdateManager implements ISingleton {
     }
 
     get realHotUpdateUrl() {
-        return `${this.hotUpdateUrl}/${this._navagationVersion}`;
+        return `${this.hotUpdateUrl}/${this.navigationVersion}`;
     }
 
     /**
@@ -307,7 +307,7 @@ export class UpdateManager implements ISingleton {
                 resolove(false);
             }
 
-            let version = await this.readNavagationVersion();
+            let version = await this.readNavigationVersion();
             if (version) {
                 CC_DEBUG && Log.d(`${this.module} 请求远程版本信息`);
                 let data = await this.readRemoteVersions();
@@ -366,26 +366,32 @@ export class UpdateManager implements ISingleton {
         })
     }
 
-    private _navagationVersion: string | null = null;
+    private get navigationVersion(){
+        if(this.navigationData){
+            return this.navigationData.version;
+        }
+        return null;
+    }
+    navigationData: NavigationData | null = null;
 
     /**@description 获取导航文件版本 */
-    private readNavagationVersion() {
+    private readNavigationVersion() {
         CC_DEBUG && Log.d(`${this.module} 获取导航文件版本`);
         return new Promise<string | null>((resolove) => {
-            if (this._navagationVersion) {
-                resolove(this._navagationVersion);
+            if (this.navigationData) {
+                resolove(this.navigationData.version);
                 return;
             }
-            CC_DEBUG && Log.d(`${this.hotUpdateUrl}/navagation.json`);
-            App.http.fetch(`${this.hotUpdateUrl}/navagation.json`,
+            CC_DEBUG && Log.d(`${this.hotUpdateUrl}/navigation.json`);
+            App.http.fetch(`${this.hotUpdateUrl}/navigation.json`,
                 {
                     timestamp: true,
                 })
                 .then(response => response.json())
                 .then(data => {
-                    this._navagationVersion = data.version;
-                    Log.d(`${this.module} 获取导航文件版本成功,热更新版本:${this._navagationVersion}`);
-                    resolove(this._navagationVersion);
+                    this.navigationData = data;
+                    Log.d(`${this.module} 获取导航文件版本成功,热更新版本:${this.navigationData.version}`);
+                    resolove(this.navigationData.version);
                 })
                 .catch((err: Error) => {
                     CC_DEBUG && Log.e(`${this.module} 获取导航文件版本失败:${err.message}`);

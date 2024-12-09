@@ -80,7 +80,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
 
     readonly mainJS = "main.js";
 
-    readonly navagation = "navagation.json";
+    readonly navigation = "navigation.json";
 
     private _mainBundleIncludes: string[] = null!;
     /**
@@ -159,7 +159,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
     /**@description 获取导航文件版本 */
     protected get navagationVersion() {
         if (this.data && this.data.remoteDir.length > 0) {
-            let navagationPath = join(this.data.remoteDir, this.navagation);
+            let navagationPath = join(this.data.remoteDir, this.navigation);
             if (existsSync(navagationPath)) {
                 let data = readFileSync(navagationPath, { encoding: "utf-8" });
                 let config = JSON.parse(data);
@@ -713,7 +713,7 @@ export default class Helper extends Config<HotupdateConfig> implements UIDelegat
         this.cur = this.cur + 1;
 
         // 生成热更新导航文件
-        let manifestPath = join(data.remoteDir, this.navagation);
+        let manifestPath = join(data.remoteDir, this.navigation);
         let manifest = {
             version: data.version,
         }

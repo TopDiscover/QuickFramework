@@ -406,3 +406,7 @@ interface EntryUserData{
 	/**@description 是否是预加载资源,并不会进入bundle */
 	isPreload : boolean;
 }
+
+interface NavigationData{
+	version : string;
+}

@@ -29,7 +29,7 @@ class Helper extends Config_1.default {
             isAutoVersion: true,
         };
         this.mainJS = "main.js";
-        this.navagation = "navagation.json";
+        this.navigation = "navigation.json";
         this._mainBundleIncludes = null;
         this._cur = 0;
         /**@description 文件总数 */
@@ -131,7 +131,7 @@ class Helper extends Config_1.default {
     /**@description 获取导航文件版本 */
     get navagationVersion() {
         if (this.data && this.data.remoteDir.length > 0) {
-            let navagationPath = (0, path_1.join)(this.data.remoteDir, this.navagation);
+            let navagationPath = (0, path_1.join)(this.data.remoteDir, this.navigation);
             if ((0, fs_1.existsSync)(navagationPath)) {
                 let data = (0, fs_1.readFileSync)(navagationPath, { encoding: "utf-8" });
                 let config = JSON.parse(data);
@@ -622,7 +622,7 @@ class Helper extends Config_1.default {
         // this.logger.log(`${this.module}复制完成${source} => ${dest}`);
         this.cur = this.cur + 1;
         // 生成热更新导航文件
-        let manifestPath = (0, path_1.join)(data.remoteDir, this.navagation);
+        let manifestPath = (0, path_1.join)(data.remoteDir, this.navigation);
         let manifest = {
             version: data.version,
         };
