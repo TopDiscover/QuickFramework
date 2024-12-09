@@ -69,4 +69,10 @@ export class Platform implements ISingleton {
         }
         return this._screenshotsPath;
     }
+
+    get uuid() : string{
+        Log.e("未实现获取uuid");
+        // 生成uuid
+        return "1234567890";
+    }
 }

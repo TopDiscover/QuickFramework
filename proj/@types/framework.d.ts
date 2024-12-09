@@ -407,6 +407,16 @@ interface EntryUserData{
 	isPreload : boolean;
 }
 
+/**@description 热更新导航数据 */
 interface NavigationData{
+	/**@description 当前热更新版本号 */
 	version : string;
+	/**@description 
+	 * undefined 时，所有人都更新 version 对应热更新, 
+	 * 不为 undefined 时，只有白名单内的用户更新 version 对应热更新
+	 * 否则更新 onlineVersion 对应热更新
+	 * */
+	whiteList ?: string[];
+	/**@description 线上运营热更新版本号 */
+	onlineVersion ?: string;
 }

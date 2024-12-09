@@ -297,8 +297,8 @@ export class UpdateManager implements ISingleton {
             }
             item.state = Update.State.PREDOWNLOAD_VERSION;
             item.handler.onShowUpdating(item);
-            
-            const onError = ()=>{
+
+            const onError = () => {
                 this.remoteVersions = {};
                 item.state = Update.State.FAIL_TO_UPDATE;
                 item.code = Update.Code.PRE_VERSIONS_NOT_FOUND;
@@ -346,7 +346,7 @@ export class UpdateManager implements ISingleton {
     /**@description 读取远程版本文件 */
     private readRemoteVersions() {
         return new Promise<VERSIONS | null>((resolove) => {
-            if ( this.remoteVersions ) {
+            if (this.remoteVersions) {
                 resolove(this.remoteVersions);
                 return;
             }
@@ -366,8 +366,21 @@ export class UpdateManager implements ISingleton {
         })
     }
 
-    private get navigationVersion(){
-        if(this.navigationData){
+    private get navigationVersion() {
+        if (this.navigationData) {
+            if (this.navigationData.whiteList) {
+                CC_DEBUG && Log.d(`${this.module} 白名单更新`);
+                if (this.navigationData.whiteList.length > 0 && this.navigationData.whiteList.includes(App.platform.uuid)) {
+                    CC_DEBUG && Log.d(`${this.module} 白名单更新,更新版本:${this.navigationData.version}`);
+                    return this.navigationData.version;
+                } else {
+                    // 更新运营版本
+                    CC_DEBUG && Log.d(`${this.module} 白名单为空,更新运营版本:${this.navigationData.onlineVersion}`);
+                    return this.navigationData.onlineVersion;
+                }
+            }
+            CC_DEBUG && Log.d(`${this.module} 全量更新`);
+            // 全量更新
             return this.navigationData.version;
         }
         return null;
