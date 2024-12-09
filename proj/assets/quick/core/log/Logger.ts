@@ -105,7 +105,7 @@ export class LoggerImpl implements ISingleton {
                     data.toJSON() : data;
 
                 const ret = this._dump(processedData, name || "unknown", deep, 0);
-                this.logger.d(ret);
+                this.logger.d(`${name || "unknown"}=`, ret);
             } catch (e) {
                 this.logger.e("Dump error:", e);
             }
@@ -121,7 +121,7 @@ export class LoggerImpl implements ISingleton {
         return `${this.convertName(name)}${v};`
     }
 
-    private toNumber(name: string, v: number) {
+    private toNumber(name: string, v: number | bigint) {
         return `${this.convertName(name)}${v}`;
     }
 
@@ -196,11 +196,13 @@ export class LoggerImpl implements ISingleton {
         name = typeof name === 'undefined' ? '' : name;
         let out = '';
         let v_name = '';
+
         switch (typeof data) {
             case "boolean":
                 out += this.toBoolean(v_name, data);
                 break;
             case "number":
+            case "bigint":
                 out += this.toNumber(v_name, data);
                 break;
             case "string":
