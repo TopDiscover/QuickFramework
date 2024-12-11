@@ -199,6 +199,12 @@ export default class AudioComponent extends EventComponent {
                 return;
             }
         }
+        if (this.isGlobal && bundle != Macro.BUNDLE_RESOURCES) {
+            CC_DEBUG && Log.e(`全局音频组件不能指定资源包`);
+            this.audioData.curEffectId = -1;
+            onComplete && onComplete(-1);
+            return;
+        }
         this.curPlayMusicUrl = url;
         this.curMusicUrl = url;
         this.curBundle = this.fixBundle(bundle);
@@ -235,6 +241,12 @@ export default class AudioComponent extends EventComponent {
                 onComplete && onComplete(-1);
                 return;
             }
+        }
+        if (this.isGlobal && bundle != Macro.BUNDLE_RESOURCES) {
+            CC_DEBUG && Log.e(`全局音频组件不能指定资源包`);
+            this.audioData.curEffectId = -1;
+            onComplete && onComplete(-1);
+            return;
         }
         if (this.audioData.isEffectOn) {
             bundle = this.fixBundle(bundle);

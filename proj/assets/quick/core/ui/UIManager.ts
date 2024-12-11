@@ -117,7 +117,6 @@ export class UIManager implements ISingleton {
 
     public _open<T extends UIView>(openOption: DefaultOpenOption) {
         return new Promise<T>((reslove, reject) => {
-            openOption = this.defaultOpenOption(openOption);
             if (!openOption.type) {
                 if (CC_DEBUG) Log.d(`${this.module}open ui class error`);
                 reslove(<any>null);

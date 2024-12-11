@@ -279,14 +279,9 @@ export class Framewok implements GameEventInterface {
     get audio(): AudioComponent {
         const where = this.stageData.where;
         if (where) {
-            const root = this.uiManager.viewRoot;
-            if (root) {
-                for (const child of root.children) {
-                    const view = child.getComponent("UIView") as UIView;
-                    if (view && view.bundle == where) {
-                        return view.audioHelper;
-                    }
-                }
+            const root = this.entryManager.getEntry(where);
+            if (root && cc.isValid(root.gameView)) {
+               return root.gameView.audioHelper;
             }
         }
         return null!;
