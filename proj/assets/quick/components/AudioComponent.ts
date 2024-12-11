@@ -1,6 +1,8 @@
 import EventComponent from "./EventComponent";
 import UIView from "../core/ui/UIView";
 import { Singleton } from "../utils/Singleton";
+import { Macro } from "../defines/Macros";
+import { Resource } from "../core/asset/Resource";
 
 /**
  * @description 声音组件
@@ -64,6 +66,7 @@ class AudioData implements ISingleton {
 const PLAY_MUSIC = "AudioComponent_PLAY_MUSIC";
 
 @ccclass
+@menu("Quick公共组件/AudioComponent")
 export default class AudioComponent extends EventComponent {
 
 
@@ -74,7 +77,7 @@ export default class AudioComponent extends EventComponent {
 
     private onPlayMusic(data) {
         if (this.curPlayMusicUrl == this.curMusicUrl && !this.isPlaying && this.curMusicUrl && this.curBundle) {
-            this.playMusic(this.curMusicUrl, this.curBundle, this.curLoop);
+            this.playMusic(this.curMusicUrl, this.curLoop, this.curBundle);
         }
     }
 
@@ -142,6 +145,10 @@ export default class AudioComponent extends EventComponent {
     protected set isPlaying(value) { this.audioData.isPlaying = value };
     /**@description 指向当前组件的播放音乐 */
     protected curPlayMusicUrl: string = null;
+    protected curPlayMusicId: number = -1;
+
+    /**@description 是否是全局音频组件 */
+    public isGlobal: boolean = false;
 
     /**@description 存储 */
     public save() {
@@ -171,73 +178,92 @@ export default class AudioComponent extends EventComponent {
         this.isPlaying = false;
     }
 
-    public playMusic(url: string, bundle: BUNDLE_TYPE, loop: boolean = true) {
-        return new Promise<{ url: string, isSuccess: boolean }>((resolve) => {
-            if (CC_DEBUG) {
-                if (!this.owner) {
-                    Log.e(`必须要指定资源的管理都才能播放`);
-                    resolve({ url: url, isSuccess: false });
-                    return;
-                }
+    protected fixBundle(bundle?: BUNDLE_TYPE) {
+        if (bundle == undefined || bundle == null) {
+            if (this.owner) {
+                bundle = this.owner.bundle;
             }
-            this.curPlayMusicUrl = url;
-            this.curMusicUrl = url;
-            this.curBundle = bundle;
-            this.curLoop = loop;
-            if (this.audioData.isMusicOn) {
-                App.cache.getCacheByAsync(url, cc.AudioClip, bundle,(data) => {
-                    if (data.asset) {
-                        if (this.owner) {
-                            App.uiManager.addLocal(data.cache, this.owner.className);
-                        } else {
-                            App.uiManager.garbage.addLocal(data.cache);
-                        }
-                        if ( !(this.isPlaying && this.curMusicUrl == this.prevMusiUrl) || (this.isPlaying && loop == false) ) {
-                            //停掉当前播放音乐
-                            this.stopMusic();
-                            //播放新的背景音乐
-                            cc.audioEngine.playMusic(data.asset as cc.AudioClip, loop);
-                        }
-
-                        this.isPlaying = true;
-                        resolve({ url: url, isSuccess: true });
-                    } else {
-                        resolve({ url: url, isSuccess: false });
-                    }
-                });
+            else {
+                bundle = Macro.BUNDLE_RESOURCES;
             }
-        });
-
+        }
+        return bundle;
     }
 
-    public playEffect(url: string, bundle: BUNDLE_TYPE, loop: boolean = false) {
-        return new Promise<number>((resolve) => {
-            if (CC_DEBUG) {
-                if (!this.owner) {
-                    Log.e(`必须要指定资源的管理都才能播放`);
-                    resolve(-1);
-                    return;
-                }
+    public playMusic(url: string, loop: boolean = true, bundle?: BUNDLE_TYPE, onComplete?: (audioID: number) => void) {
+        if (CC_DEBUG) {
+            if (!this.owner && !this.isGlobal) {
+                CC_DEBUG && Log.e(`必须要指定资源的管理都才能播放`);
+                this.curPlayMusicId = -1;
+                onComplete && onComplete(this.curPlayMusicId);
+                return;
             }
-            if (this.audioData.isEffectOn) {
-                App.cache.getCacheByAsync(url, cc.AudioClip, bundle,(data) => {
-                    if (data.asset) {
-                        if (this.owner) {
-                            App.uiManager.addLocal(data.cache, this.owner.className);
-                        } else {
-                            App.uiManager.garbage.addLocal(data.cache);
-                        }
-                        this.audioData.curEffectId = cc.audioEngine.playEffect(data.asset as cc.AudioClip, loop);
-                        resolve(this.audioData.curEffectId);
-                    } else {
-                        resolve(this.audioData.curEffectId);
+        }
+        this.curPlayMusicUrl = url;
+        this.curMusicUrl = url;
+        this.curBundle = this.fixBundle(bundle);
+        this.curLoop = loop;
+        if (this.audioData.isMusicOn) {
+            App.cache.getCacheByAsync(url, cc.AudioClip, this.curBundle, (data) => {
+                if (data.asset) {
+                    this.addLocal(data.cache);
+                    if (!(this.isPlaying && this.curMusicUrl == this.prevMusiUrl) || (this.isPlaying && loop == false)) {
+                        //停掉当前播放音乐
+                        this.stopMusic();
+                        //播放新的背景音乐
+                        this.curPlayMusicId = cc.audioEngine.playMusic(data.asset as cc.AudioClip, loop);
                     }
-                });
-            } else {
+
+                    this.isPlaying = true;
+                    onComplete && onComplete(this.curPlayMusicId);
+                } else {
+                    this.curPlayMusicId = -1;
+                    onComplete && onComplete(-1);
+                }
+            });
+        } else {
+            this.curPlayMusicId = -1;
+            onComplete && onComplete(-1);
+        }
+    }
+
+    public playEffect(url: string, loop: boolean = false, bundle?: BUNDLE_TYPE, onComplete?: (audioID: number) => void) {
+        if (CC_DEBUG) {
+            if (!this.owner && !this.isGlobal) {
+                CC_DEBUG && Log.e(`必须要指定资源的管理都才能播放`);
                 this.audioData.curEffectId = -1;
-                resolve(-1);
+                onComplete && onComplete(-1);
+                return;
             }
-        });
+        }
+        if (this.audioData.isEffectOn) {
+            bundle = this.fixBundle(bundle);
+            App.cache.getCacheByAsync(url, cc.AudioClip, bundle, (data) => {
+                if (data.asset) {
+                    this.addLocal(data.cache);
+                    this.audioData.curEffectId = cc.audioEngine.playEffect(data.asset as cc.AudioClip, loop);
+                    onComplete && onComplete(this.audioData.curEffectId);
+                } else {
+                    this.audioData.curEffectId = -1;
+                    onComplete && onComplete(-1);
+                }
+            });
+        } else {
+            this.audioData.curEffectId = -1;
+            onComplete && onComplete(-1);
+        }
+    }
+
+    private addLocal(cache: Resource.Cache) {
+        if (this.isGlobal) {
+            App.asset.addPersistAsset(cache);
+        } else {
+            if (this.owner) {
+                App.uiManager.addLocal(cache, this.owner.className);
+            } else {
+                App.uiManager.garbage.addLocal(cache);
+            }
+        }
     }
 
     public onEnterBackground() {
@@ -248,6 +274,13 @@ export default class AudioComponent extends EventComponent {
     public onEnterForgeground(inBackgroundTime: number) {
         cc.audioEngine.resumeMusic();
         cc.audioEngine.resumeAllEffects();
+    }
+
+    public onLoad() {
+        if (this.isGlobal) {
+            this.effectVolume = this.audioData.effectVolume;
+            this.musicVolume = this.audioData.musicVolume;
+        }
     }
 
 }

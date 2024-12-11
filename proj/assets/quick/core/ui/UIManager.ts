@@ -68,7 +68,7 @@ export class UIManager implements ISingleton {
             preload: false,
             type: options.type,
             args: options.args,
-            isCache : App.isCacheUI
+            isCache: App.isCacheUI
         };
         if (options.bundle != undefined) {
             out.bundle = options.bundle;
@@ -79,7 +79,7 @@ export class UIManager implements ISingleton {
         if (options.preload != undefined) {
             out.preload = options.preload;
         }
-        if ( options.isCache != undefined ){
+        if (options.isCache != undefined) {
             out.isCache = options.isCache;
         }
         return out;
@@ -91,8 +91,8 @@ export class UIManager implements ISingleton {
      * @param bundle 
      * @returns 
      */
-    public preload<T extends UIView>(uiClass: UIClass<T>, bundle: BUNDLE_TYPE , isCache ?: boolean) {
-        return this.open({ type: uiClass, preload: true, bundle: bundle , isCache : isCache});
+    public preload<T extends UIView>(uiClass: UIClass<T>, bundle: BUNDLE_TYPE, isCache?: boolean) {
+        return this.open({ type: uiClass, preload: true, bundle: bundle, isCache: isCache });
     }
 
     private parsePrefabUrl(url: string): { isPrefab: boolean, url: string } {
@@ -115,8 +115,9 @@ export class UIManager implements ISingleton {
         return this._open(_OpenOption);
     }
 
-    private _open<T extends UIView>(openOption: DefaultOpenOption) {
+    public _open<T extends UIView>(openOption: DefaultOpenOption) {
         return new Promise<T>((reslove, reject) => {
+            openOption = this.defaultOpenOption(openOption);
             if (!openOption.type) {
                 if (CC_DEBUG) Log.d(`${this.module}open ui class error`);
                 reslove(<any>null);
@@ -132,7 +133,7 @@ export class UIManager implements ISingleton {
             }
             //先从缓存中获取资源
             let viewData = App.releaseManger.getUI(className)!;
-            if( viewData ){
+            if (viewData) {
                 this._viewDatas.set(className, viewData);
                 viewData.status = ViewStatus.WAITTING_NONE;
                 if (!openOption.preload) {
@@ -202,15 +203,14 @@ export class UIManager implements ISingleton {
                         App.uiLoading.updateProgress(progress);
                     };
                 }
-                this.loadPrefab(openOption.bundle, prefabUrl, progressCallback)
-                    .then((cache) => {
+                this.loadPrefab(openOption.bundle, prefabUrl, progressCallback, (cache) => {
+                    if (cache) {
                         viewData.cache = cache;
                         App.asset.retainAsset(cache);
                         this.createNode(viewData, reslove, openOption);
                         App.uiLoading.hide();
-                    }).catch((reason) => {
+                    } else {
                         viewData.isLoaded = true;
-                        Log.e(reason);
                         this._close(viewData);
                         viewData.doCallback(null, className, "打开界面异常");
                         reslove(<any>null);
@@ -223,7 +223,8 @@ export class UIManager implements ISingleton {
                         }
                         App.tips.show(`加载界面${uiName}失败，请重试`);
                         App.uiLoading.hide();
-                    });
+                    }
+                });
             }
         });
     }
@@ -306,23 +307,26 @@ export class UIManager implements ISingleton {
         }
     }
 
-    private loadPrefab(bundle: BUNDLE_TYPE, url: string, progressCallback: (completedCount: number, totalCount: number, item: any) => void) {
-        return new Promise<Resource.Cache>((resolove, reject) => {
-            App.asset.load(bundle, url, cc.Prefab, progressCallback, (cache) => {
-                if (cache && cache.data && cache.data instanceof cc.Prefab) {
-                    resolove(cache);
-                }
-                else {
-                    reject(`加载prefab : ${url} 失败`)
-                }
-            });
+    private loadPrefab(
+        bundle: BUNDLE_TYPE,
+        url: string,
+        progressCallback: (completedCount: number, totalCount: number, item: any) => void,
+        onComplete: (cache: Resource.Cache) => void
+    ) {
+        App.asset.load(bundle, url, cc.Prefab, progressCallback, (cache) => {
+            if (cache && cache.data && cache.data instanceof cc.Prefab) {
+                onComplete(cache);
+            }
+            else {
+                onComplete(null);
+            }
         });
     }
 
     private _canvas: cc.Node = null!;
 
     private _viewRoot: cc.Node = null!;
-    private get viewRoot() {
+    get viewRoot() {
         if (!this._viewRoot && !cc.isValid(this._viewRoot)) {
             this._viewRoot = cc.find("viewRoot", this.canvas);
         }
@@ -425,7 +429,7 @@ export class UIManager implements ISingleton {
         }
     }
 
-    private _close( data : ViewAsset.Data ){
+    private _close(data: ViewAsset.Data) {
         let className = data.name;
         App.releaseManger.releaseUI(data);
         this._viewDatas.delete(className);
@@ -487,38 +491,70 @@ export class UIManager implements ISingleton {
         }
     }
 
-    public getView(className: string): Promise<any>;
-    public getView<T extends UIView>(uiClass: UIClass<T>): Promise<T>;
-    public getView(data: any): any {
-        return new Promise<any>((resolove, reject) => {
-            if (data == undefined || data == null) {
-                resolove(null);
-                return;
-            }
-            let viewData = this.getViewData(data);
-            if (viewData) {
-                if (viewData.isPreload) {
-                    //如果只是预加载，返回空，让使用者用open的方式打开
-                    resolove(null);
-                } else {
-                    if (viewData.isLoaded) {
-                        resolove(viewData.view);
-                    }
-                    else {
-                        //加载中
-                        viewData.getViewCb.push(resolove);
-                    }
+    /**
+     * @description 获取指定视图,如果还没有加载完成，获取只是预加载，则返回空
+     * @param className 
+     * @param onComplete 
+     */
+    public getView(className: string, onComplete?: (view: UIView) => void): UIView;
+    /**
+     * @description 获取指定视图,如果还没有加载完成，获取只是预加载，则返回空
+     * @param uiClass 
+     * @param onComplete 
+     */
+    public getView<T extends UIView>(uiClass: UIClass<T>, onComplete?: (view: T) => void): T;
+    public getView(data: any, onComplete?: (view: any) => void): any {
+        if (data == undefined || data == null || data == "") {
+            onComplete && onComplete(null);
+            return null!;
+        }
+        let viewData = this.getViewData(data);
+        if (viewData) {
+            if (viewData.isPreload) {
+                //如果只是预加载，返回空，让使用者用open的方式打开
+                onComplete && onComplete(null);
+                return null!;
+            } else {
+                if (viewData.isLoaded) {
+                    onComplete && onComplete(viewData.view);
+                    return viewData.view;
+                }
+                else {
+                    //加载中
+                    viewData.getViewCb.push(onComplete);
+                    return null!;
                 }
             }
-            else {
-                resolove(null);
-            }
+        }
+        else {
+            onComplete && onComplete(null);
+            return null!;
+        }
+    }
+
+    /**
+     * @description 获取指定视图,如果还没有加载完成，获取只是预加载，则返回空
+     * @param className 
+     * @param onComplete 
+     */
+    public getViewAsync(className: string, onComplete?: (view: UIView) => void): Promise<UIView>;
+    /**
+     * @description 获取指定视图,如果还没有加载完成，获取只是预加载，则返回空
+     * @param uiClass 
+     * @param onComplete 
+     */
+    public getViewAsync<T extends UIView>(uiClass: UIClass<T>, onComplete?: (view: T) => void): Promise<T>;
+    public getViewAsync(data: any, onComplete?: (view: any) => void): Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            this.getView(data, (view) => {
+                resolve(view);
+            });
         });
     }
 
     public checkView(url: string, className: string | null) {
         if (CC_DEBUG && className) {
-            this.getView(className).then((view) => {
+            this.getViewAsync(className).then((view) => {
                 if (!view) {
                     let viewData = this.getViewData(className);
                     if (viewData) {

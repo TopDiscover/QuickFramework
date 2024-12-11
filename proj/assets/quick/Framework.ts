@@ -29,14 +29,14 @@ import { IAlert } from "./interface/IAlert";
 import { ILoading } from "./interface/ILoading";
 import { IUILoading } from "./interface/IUILoading";
 import { ITips } from "./interface/ITips";
-import GlobalAudio from "./components/GlobalAudio";
 import { EntryImpl } from "./update/EntryImpl";
+import AudioComponent from "./components/AudioComponent";
 
 /**@description 框架层使用的各管理器单例的管理 */
-export class Framewok implements GameEventInterface{
+export class Framewok implements GameEventInterface {
 
     /**@description 全局的默认值 是否允许缓存UI 资源,即 UIView 界面元素，需要开启 isLazyRelease 才有效  */
-    get isCacheUI(){
+    get isCacheUI() {
         return true;
     }
 
@@ -55,8 +55,8 @@ export class Framewok implements GameEventInterface{
     }
 
     /**@description 资源是否懒释放，true时，只有收到平台的内存警告才会释放资源，还有在更新时才分释放,否则不会释放资源 */
-    get isLazyRelease(){
-        if ( !this.isAutoReleaseUnuseResources ){
+    get isLazyRelease() {
+        if (!this.isAutoReleaseUnuseResources) {
             Log.w(`需要使用都自己导出cc.game.EVENT_LOW_MEMORY事件`);
         }
         return true;
@@ -258,20 +258,40 @@ export class Framewok implements GameEventInterface{
     }
 
     /**@description 重连专用提示UI部分 */
-    get uiReconnect( ){
+    get uiReconnect() {
         return Singleton.get(ILoading)!;
     }
 
+    private _gAudio: AudioComponent = null!;
     /**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
-    private _globalAudio: GlobalAudio = null!;
-    get globalAudio() {
-        if (this._globalAudio) {
-            return this._globalAudio;
+    get gAudio() {
+        if (this._gAudio) {
+            return this._gAudio;
         }
-        this._globalAudio = this.uiManager.addComponent(GlobalAudio);
-        return this._globalAudio;
+        this._gAudio = this.uiManager.addComponent(AudioComponent);
+        this._gAudio.isGlobal = true;
+        return this._gAudio;
     }
-    
+
+    /**
+     * @description 当前Bundle的音频组件
+     */
+    get audio(): AudioComponent {
+        const where = this.stageData.where;
+        if (where) {
+            const root = this.uiManager.viewRoot;
+            if (root) {
+                for (const child of root.children) {
+                    const view = child.getComponent("UIView") as UIView;
+                    if (view && view.bundle == where) {
+                        return view.audioHelper;
+                    }
+                }
+            }
+        }
+        return null!;
+    }
+
     /**
      * @description 获取语言 
      * @param key 语言key
@@ -320,7 +340,7 @@ export class Framewok implements GameEventInterface{
         this.releaseManger.onLowMemory();
     }
 
-    onStart(node : cc.Node) {
+    onStart(node: cc.Node) {
     }
 
     onLoad(node: cc.Node) {
@@ -358,14 +378,14 @@ export class Framewok implements GameEventInterface{
     onEnterBackground(): void {
         this._enterBackgroundTime = Date.timeNow();
         Log.d(`[MainController]`, `onEnterBackground ${this._enterBackgroundTime}`);
-        App.globalAudio.onEnterBackground();
+        App.gAudio.onEnterBackground();
         App.serviceManager.onEnterBackground();
     }
     onEnterForgeground(): void {
         let now = Date.timeNow();
         let inBackgroundTime = now - this._enterBackgroundTime;
         Log.d(`[MainController]`, `onEnterForgeground ${now} background total time : ${inBackgroundTime}`);
-        App.globalAudio.onEnterForgeground(inBackgroundTime);
+        App.gAudio.onEnterForgeground(inBackgroundTime);
         App.serviceManager.onEnterForgeground(inBackgroundTime);
     }
 
