@@ -7,6 +7,7 @@
 
 import { CCString, Enum, Sprite, SpriteFrame, _decorator } from "cc";
 import { Macro } from "../../defines/Macros";
+import { EDITOR } from "cc/env";
 
 const { ccclass, property, menu } = _decorator;
 
@@ -192,17 +193,20 @@ export default class UISprite extends Sprite {
             let loaded = App.bundleManager.getBundle(realBundle);
             if (!loaded) {
                 // Log.d(`${realBundle}未加载`);
+                if ( EDITOR ){
+                    this.spriteFrame = null!;
+                }
                 return;
             }
 
             let url = App.getLanguage(this.language as any, this.params, realBundle)
             if (!url) {
+                if ( EDITOR ){
+                    this.spriteFrame = null!;
+                }
                 return;
             }
             let view = await App.uiManager.getViewAsync(this.user);
-            if (!view) {
-                return;
-            }
             if (this.isRemote) {
                 // Log.d("加载远程图片")
                 this.loadRemoteImage({
