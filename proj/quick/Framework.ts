@@ -29,9 +29,9 @@ import { IAlert } from "./interface/IAlert";
 import { ILoading } from "./interface/ILoading";
 import { IUILoading } from "./interface/IUILoading";
 import { ITips } from "./interface/ITips";
-import GlobalAudio from "./components/GlobalAudio";
-import { Node } from "cc";
+import { isValid, Node } from "cc";
 import { EntryImpl } from "./update/EntryImpl";
+import AudioComponent from "./components/AudioComponent";
 import LayerManager from "./core/ui/LayerManager";
 
 /**@description 框架层使用的各管理器单例的管理 */
@@ -266,13 +266,28 @@ export class Framewok implements GameEventInterface{
     }
 
     /**@description 全局网络播放声音组件，如播放按钮音效，弹出框音效等 */
-    private _globalAudio: GlobalAudio = null!;
-    get globalAudio() {
-        if (this._globalAudio) {
-            return this._globalAudio;
+    private _gAudio: AudioComponent = null!;
+    get gAudio() {
+        if (this._gAudio) {
+            return this._gAudio;
         }
-        this._globalAudio = this.uiManager.addComponent(GlobalAudio);
-        return this._globalAudio;
+        this._gAudio = this.uiManager.addComponent(AudioComponent);
+        this._gAudio.isGlobal = true;
+        return this._gAudio;
+    }
+
+    /**
+     * @description 当前Bundle的音频组件
+     */
+    get audio(): AudioComponent {
+        const where = this.stageData.where;
+        if (where) {
+            const root = this.entryManager.getEntry(where);
+            if (root && isValid(root.gameView)) {
+                return root.gameView.audioHelper;
+            }
+        }
+        return null!;
     }
 
     get isShowStatus(){
@@ -319,7 +334,6 @@ export class Framewok implements GameEventInterface{
     init() {
         //初始化自定主entry代理
         this.entryManager.delegate = new EntryImpl();
-
         //引擎扩展初始化
         CocosExtentionInit();
     }
@@ -371,14 +385,14 @@ export class Framewok implements GameEventInterface{
     onEnterBackground(): void {
         this._enterBackgroundTime = Date.timeNow();
         Log.d(`[MainController]`, `onEnterBackground ${this._enterBackgroundTime}`);
-        App.globalAudio.onEnterBackground();
+        App.gAudio.onEnterBackground();
         App.serviceManager.onEnterBackground();
     }
     onEnterForgeground(): void {
         let now = Date.timeNow();
         let inBackgroundTime = now - this._enterBackgroundTime;
         Log.d(`[MainController]`, `onEnterForgeground ${now} background total time : ${inBackgroundTime}`);
-        App.globalAudio.onEnterForgeground(inBackgroundTime);
+        App.gAudio.onEnterForgeground(inBackgroundTime);
         App.serviceManager.onEnterForgeground(inBackgroundTime);
     }
 

@@ -4,6 +4,7 @@ import { AudioClip, AudioSource, _decorator } from "cc";
 import { DEBUG } from "cc/env";
 import { Macro } from "../defines/Macros";
 import { Singleton } from "../utils/Singleton";
+import { Resource } from "../core/asset/Resource";
 /**
  * @description 声音组件
  */
@@ -26,8 +27,8 @@ export class AudioInfo {
     pause(): void {
         this.isPause = false;
         if (this.source) {
-            if( this.source.playing ){
-                Log.d(this.url,"isPlaying to pause");
+            if (this.source.playing) {
+                Log.d(this.url, "isPlaying to pause");
                 this.isPause = true;
                 this.source.pause();
             }
@@ -42,8 +43,8 @@ export class AudioInfo {
     }
 
     resume() {
-        if (this.source && this.isPause ) {
-            Log.d(this.url,"resume play")
+        if (this.source && this.isPause) {
+            Log.d(this.url, "resume play")
             this.source.play();
         }
         this.isPause = false;
@@ -63,7 +64,7 @@ export class AudioInfo {
 }
 
 /**@description 框架内部使用，外部请不要调用 */
-class AudioData implements ISingleton{
+class AudioData implements ISingleton {
     static module: string = "【音效数据】";
     module: string = null!;
     public musicVolume = 1;
@@ -184,15 +185,15 @@ class AudioData implements ISingleton{
         }
     }
 
-    
+
     public resumeAll() {
         this.musicInfos.forEach((info, key, source) => {
-            if( this.isMusicOn ){
+            if (this.isMusicOn) {
                 info.resume();
             }
         });
         this.effectInfos.forEach((info, key, source) => {
-            if( this.isEffectOn ){
+            if (this.isEffectOn) {
                 info.resume();
             }
         });
@@ -216,7 +217,7 @@ export default class AudioComponent extends EventComponent {
         super.onDestroy();
     }
 
-    protected get audioData(){
+    protected get audioData() {
         return Singleton.get(AudioData)!;
     }
 
@@ -239,6 +240,9 @@ export default class AudioComponent extends EventComponent {
     /**@description 设置背景音乐开关 */
     public set isMusicOn(isOn: boolean) { this.audioData.setMusicStatus(isOn); }
 
+    /**@description 是否是全局音频组件 */
+    public isGlobal: boolean = false;
+
     public save(): void { this.audioData.save(); }
 
     /**@description 停止 */
@@ -248,113 +252,141 @@ export default class AudioComponent extends EventComponent {
 
     public stopMusic() { this.audioData.stopMusic(); }
 
-    public playMusic(url: string, bundle: BUNDLE_TYPE, loop: boolean = true) {
-        return new Promise<boolean>((resolve) => {
-            if (DEBUG) {
-                if (!this.owner) {
-                    Log.e(`必须要指定资源的管理都才能播放`);
-                    resolve(false);
-                    return;
-                }
+    /**
+     * @description 播放背景音乐
+     * @param url 音乐地址
+     * @param loop 是否循环
+     * @param bundle 资源包 如果未指定，则使用owner的bundle，如果owner为null，则使用Macro.BUNDLE_RESOURCES
+     * @param onComplete 播放完成回调
+     * @returns 
+     */
+    public playMusic(url: string, loop: boolean = true, bundle?: BUNDLE_TYPE, onComplete?: (info: AudioInfo) => void) {
+        if (DEBUG) {
+            if (!this.owner && !this.isGlobal) {
+                DEBUG && Log.e(`必须要指定资源的管理都才能播放`);
+                onComplete && onComplete(null!);
+                return;
             }
+        }
+        bundle = this.fixBundle(bundle);
+        if (this.isGlobal && bundle != Macro.BUNDLE_RESOURCES) {
+            DEBUG && Log.e(`全局音频组件不能指定资源包`);
+            onComplete && onComplete(null!);
+            return;
+        }
 
-            let key = this.audioData.makeKey(url, bundle);
-            let audioInfo = this.audioData.musicInfos.get(key);
-            if (!audioInfo) {
-                audioInfo = new AudioInfo;
-                audioInfo.url = url;
-                audioInfo.bundle = bundle;
-                audioInfo.source = this.node.addComponent(AudioSource);
-                audioInfo.owner = this.owner;
-                audioInfo.source.name = key;
-                audioInfo.source.playOnAwake = true;
-                this.audioData.musicInfos.set(key, audioInfo);
-            }
-            this.audioData.curMusic = audioInfo;
-            App.cache.getCacheByAsync(url, AudioClip, bundle,(data) => {
-                if (data.asset) {
-                    if (this.owner) {
-                        App.uiManager.addLocal(data.cache, this.owner.className);
-                    } else {
-                        App.uiManager.garbage.addLocal(data.cache);
-                    }
-                    //停掉当前播放音乐
-                    this.stopMusic();
-                    //播放新的背景音乐
-                    if (audioInfo && audioInfo.source) {
-                        audioInfo.source.clip = data.asset as AudioClip;
-                        audioInfo.source.loop = loop;
-                        audioInfo.volume = this.musicVolume;
-                        //如果当前音乐是开的，才播放
-                        this.play(audioInfo,true,resolve);
-                    }
-                } else {
-                    resolve(false);
+        let key = this.audioData.makeKey(url, bundle);
+        let audioInfo = this.audioData.musicInfos.get(key);
+        if (!audioInfo) {
+            audioInfo = new AudioInfo;
+            audioInfo.url = url;
+            audioInfo.bundle = bundle;
+            audioInfo.source = this.node.addComponent(AudioSource);
+            audioInfo.owner = this.owner;
+            audioInfo.source.name = key;
+            audioInfo.source.playOnAwake = true;
+            this.audioData.musicInfos.set(key, audioInfo);
+        }
+        this.audioData.curMusic = audioInfo;
+        App.cache.getCacheByAsync(url, AudioClip, bundle, (data) => {
+            if (data.asset) {
+                this.addLocal(data.cache);
+                //停掉当前播放音乐
+                this.stopMusic();
+                //播放新的背景音乐
+                if (audioInfo && audioInfo.source) {
+                    audioInfo.source.clip = data.asset as AudioClip;
+                    audioInfo.source.loop = loop;
+                    audioInfo.volume = this.musicVolume;
+                    //如果当前音乐是开的，才播放
+                    this.play(audioInfo, true, (isSuccess) => {
+                        if (isSuccess) {
+                            onComplete && onComplete(audioInfo);
+                        } else {
+                            onComplete && onComplete(null!);
+                        }
+                    });
                 }
-            });
+            } else {
+                onComplete && onComplete(null!);
+            }
         });
     }
 
-    public playEffect(url: string, bundle: BUNDLE_TYPE, loop: boolean = false) {
-        return new Promise<boolean>((resolve) => {
-            if (DEBUG) {
-                if (!this.owner) {
-                    Log.e(`必须要指定资源的管理都才能播放`);
-                    resolve(false);
-                    return;
-                }
+    /**
+     * @description 播放音效
+     * @param url 音效地址
+     * @param loop 是否循环
+     * @param bundle 资源包 如果未指定，则使用owner的bundle，如果owner为null，则使用Macro.BUNDLE_RESOURCES
+     * @param onComplete 播放完成回调
+     * @returns 
+     */
+    public playEffect(url: string, loop: boolean = false, bundle?: BUNDLE_TYPE, onComplete?: (info: AudioInfo) => void) {
+        if (DEBUG) {
+            if (!this.owner && !this.isGlobal) {
+                DEBUG && Log.e(`必须要指定资源的管理都才能播放`);
+                onComplete && onComplete(null!);
+                return;
             }
-            //检查是否已经加载过
-            let key = this.audioData.makeKey(url, bundle);
-            let audioInfo = this.audioData.effectInfos.get(key);
-            if (!audioInfo) {
-                audioInfo = new AudioInfo();
-                audioInfo.url = url;
-                audioInfo.bundle = bundle;
-                audioInfo.source = this.node.addComponent(AudioSource);
-                audioInfo.owner = this.owner;
-                audioInfo.source.name = key;
-                audioInfo.source.playOnAwake = true;
-                this.audioData.effectInfos.set(key, audioInfo);
-            }
-            App.cache.getCacheByAsync(url, AudioClip, bundle,(data) => {
-                if (data.asset) {
-                    if (this.owner) {
-                        App.uiManager.addLocal(data.cache, this.owner.className);
-                    } else {
-                        App.uiManager.garbage.addLocal(data.cache);
-                    }
-                    if (audioInfo && audioInfo.source) {
-                        audioInfo.source.clip = data.asset as AudioClip;
-                        audioInfo.source.loop = loop;
-                        audioInfo.source.volume = this.effectVolume;
-                        this.play(audioInfo,false,resolve);
-                    }
-                } else {
-                    resolve(false);
+        }
+        bundle = this.fixBundle(bundle);
+        if (this.isGlobal && bundle != Macro.BUNDLE_RESOURCES) {
+            DEBUG && Log.e(`全局音频组件不能指定资源包`);
+            onComplete && onComplete(null!);
+            return;
+        }
+        //检查是否已经加载过
+        let key = this.audioData.makeKey(url, bundle);
+        let audioInfo = this.audioData.effectInfos.get(key);
+        if (!audioInfo) {
+            audioInfo = new AudioInfo();
+            audioInfo.url = url;
+            audioInfo.bundle = bundle;
+            audioInfo.source = this.node.addComponent(AudioSource);
+            audioInfo.owner = this.owner;
+            audioInfo.source.name = key;
+            audioInfo.source.playOnAwake = true;
+            this.audioData.effectInfos.set(key, audioInfo);
+        }
+        App.cache.getCacheByAsync(url, AudioClip, bundle, (data) => {
+            if (data.asset) {
+                this.addLocal(data.cache);
+                if (audioInfo && audioInfo.source) {
+                    audioInfo.source.clip = data.asset as AudioClip;
+                    audioInfo.source.loop = loop;
+                    audioInfo.source.volume = this.effectVolume;
+                    this.play(audioInfo, false, (isSuccess) => {
+                        if (isSuccess) {
+                            onComplete && onComplete(audioInfo);
+                        } else {
+                            onComplete && onComplete(null!);
+                        }
+                    });
                 }
-            });
+            } else {
+                onComplete && onComplete(null!);
+            }
         });
     }
 
-    protected play( info : AudioInfo , isMusic : boolean , resolve : (isSuccess : boolean)=>void){
-        if( info && info.source ){
-            if( isMusic ){
-                if( this.isMusicOn ){
+    protected play(info: AudioInfo, isMusic: boolean, resolve: (isSuccess: boolean) => void) {
+        if (info && info.source) {
+            if (isMusic) {
+                if (this.isMusicOn) {
                     info.source.play();
                     resolve(true)
-                }else{
+                } else {
                     resolve(false);
                 }
-            }else{
-                if( this.isEffectOn ){
+            } else {
+                if (this.isEffectOn) {
                     info.source.play();
                     resolve(true);
-                }else{
+                } else {
                     resolve(false);
                 }
             }
-        }else{
+        } else {
             resolve(false);
         }
     }
@@ -365,5 +397,29 @@ export default class AudioComponent extends EventComponent {
 
     public onEnterForgeground(inBackgroundTime: number) {
         this.audioData.resumeAll();
+    }
+
+    private addLocal(cache: Resource.Cache) {
+        if (this.isGlobal) {
+            App.asset.addPersistAsset(cache);
+        } else {
+            if (this.owner) {
+                App.uiManager.addLocal(cache, this.owner.className);
+            } else {
+                App.uiManager.garbage.addLocal(cache);
+            }
+        }
+    }
+
+    protected fixBundle(bundle?: BUNDLE_TYPE) {
+        if (bundle == undefined || bundle == null) {
+            if (this.owner) {
+                bundle = this.owner.bundle;
+            }
+            else {
+                bundle = Macro.BUNDLE_RESOURCES;
+            }
+        }
+        return bundle;
     }
 }

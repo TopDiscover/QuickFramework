@@ -199,7 +199,10 @@ export default class UISprite extends Sprite {
             if (!url) {
                 return;
             }
-            let view = await App.uiManager.getView(this.user);
+            let view = await App.uiManager.getViewAsync(this.user);
+            if (!view) {
+                return;
+            }
             if (this.isRemote) {
                 // Log.d("加载远程图片")
                 this.loadRemoteImage({

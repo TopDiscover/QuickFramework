@@ -174,6 +174,7 @@ declare interface EntryClass<T> {
 declare type Entry = import("../quick/core/entry/Entry").Entry;
 declare type Logic = import("../quick/core/logic/Logic").Logic;
 declare type GameView = import("../quick/core/ui/GameView").default;
+declare type AudioComponent = import("../quick/components/AudioComponent").default;
 
 declare type Sender = import("../quick/core/net/service/Sender").Sender;
 declare type Handler = import("../quick/core/net/service/Handler").Handler;
