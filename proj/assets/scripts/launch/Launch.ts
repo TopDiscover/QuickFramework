@@ -54,8 +54,8 @@ export default class Launch extends EventComponent {
     }
 
     private initDebug() {
+        let debug = cc.find("debug", this.node);
         if (CC_DEBUG) {
-            let debug = cc.find("debug", this.node);
             if (debug) {
                 let isVisibleDebugInfo = App.storage.getItem(Macro.SHOW_DEBUG_INFO_KEY, true);
                 cc.debug.setDisplayStats(isVisibleDebugInfo);
@@ -88,6 +88,8 @@ export default class Launch extends EventComponent {
                     debug.destroy();
                 }
             }
+        }else{
+            if ( debug && cc.isValid(debug) ) debug.destroy();
         }
     }
 }
