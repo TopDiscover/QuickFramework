@@ -34,7 +34,18 @@ export class UpdateManager implements ISingleton {
     }
 
     /**@description 是否路过热更新 */
-    public isSkipCheckUpdate = false;
+    private _isSkipUpdate = false;
+    /**@description 是否路过热更新 */
+    public get isSkipUpdate() {
+        if ( this.isBrowser ) {
+            //预览及浏览器下，不需要有更新的操作
+            return true;
+        }
+        return this._isSkipUpdate;
+    }
+    public set isSkipUpdate(value) {
+        this._isSkipUpdate = value;
+    }
 
     /**@description 资源管理器 */
     private assetsManagers: { [key: string]: Update.AssetsManager } = {};
@@ -101,7 +112,7 @@ export class UpdateManager implements ISingleton {
 
     /**@description 下载update项，以最新的为当前操作的对象 */
     dowonLoad(item: UpdateItem) {
-        if (item.isSkipUpdate) {
+        if (this.isSkipUpdate) {
             item.handler.onLoadBundle(item);
         } else {
             this.current = this.getItem(item);
@@ -165,7 +176,7 @@ export class UpdateManager implements ISingleton {
      * @returns 
      */
     getStatus(bundle: string) {
-        if (this.isBrowser || this.isSkipCheckUpdate) {
+        if (this.isSkipUpdate) {
             //浏览器无更新
             return Update.Status.UP_TO_DATE;
         }
