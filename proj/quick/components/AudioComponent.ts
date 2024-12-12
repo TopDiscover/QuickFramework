@@ -67,6 +67,7 @@ export class AudioInfo {
 class AudioData implements ISingleton {
     static module: string = "【音效数据】";
     module: string = null!;
+    isResident = true;
     public musicVolume = 1;
     public effectVolume = 1;
     public isEffectOn = true;
