@@ -5,6 +5,7 @@
 import EventComponent from "../../quick/components/EventComponent";
 import { DebugView } from "../debug/DebugView";
 import { Macro } from "../../quick/defines/Macros";
+import { ViewZOrder } from "../common/config/Config";
 
 const { ccclass, property, menu } = cc._decorator;
 
@@ -75,7 +76,8 @@ export default class Launch extends EventComponent {
                                 onClose : () => {
                                     if (debug) debug.active = true;
                                 }
-                            }
+                            },
+                            zIndex : ViewZOrder.Debug
                         })
                     });
                     this.onN(debug, cc.Node.EventType.TOUCH_MOVE, (ev: cc.Event.EventTouch) => {
