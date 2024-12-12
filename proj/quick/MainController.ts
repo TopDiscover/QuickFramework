@@ -17,11 +17,6 @@ export default class MainController extends EventComponent {
 
     private debugView : Node | null = null!;
 
-    protected start(): void {
-        super.start && super.start();
-        App.onStart(this.node);
-    }
-
     onLoad() {
         super.onLoad();
         App.onLoad(this.node);
