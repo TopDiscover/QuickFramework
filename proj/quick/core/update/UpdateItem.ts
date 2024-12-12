@@ -97,17 +97,6 @@ export class UpdateItem {
         return App.updateManager.isBrowser;
     }
 
-    /**@description 是否跳过热更新 */
-    get isSkipUpdate() {
-        if (this.isBrowser) {
-            //预览及浏览器下，不需要有更新的操作
-            return true;
-        } else {
-            return App.updateManager.isSkipCheckUpdate;
-        }
-    }
-
-
     /**
      * @description 重置
      */
