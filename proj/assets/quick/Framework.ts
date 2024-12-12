@@ -335,9 +335,6 @@ export class Framewok implements GameEventInterface {
         this.releaseManger.onLowMemory();
     }
 
-    onStart(node: cc.Node) {
-    }
-
     onLoad(node: cc.Node) {
         //预先加载下loading预置体
         App.uiManager.onLoad(node);
