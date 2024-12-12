@@ -27,6 +27,8 @@
 
 # 完整工程拉取
 
+**注意：请不要下载zip,直接使用 git clone 下载项目**
+
 进入tools 目录先执行 npm install 安装依赖
 
 然后在tools目录下执行 npm run main 
