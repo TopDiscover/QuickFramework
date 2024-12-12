@@ -199,6 +199,7 @@ export default class AudioComponent extends EventComponent {
                 return;
             }
         }
+        bundle = this.fixBundle(bundle);
         if (this.isGlobal && bundle != Macro.BUNDLE_RESOURCES) {
             CC_DEBUG && Log.e(`全局音频组件不能指定资源包`);
             this.audioData.curEffectId = -1;
@@ -207,7 +208,7 @@ export default class AudioComponent extends EventComponent {
         }
         this.curPlayMusicUrl = url;
         this.curMusicUrl = url;
-        this.curBundle = this.fixBundle(bundle);
+        this.curBundle = bundle;
         this.curLoop = loop;
         if (this.audioData.isMusicOn) {
             App.cache.getCacheByAsync(url, cc.AudioClip, this.curBundle, (data) => {
@@ -242,6 +243,7 @@ export default class AudioComponent extends EventComponent {
                 return;
             }
         }
+        bundle = this.fixBundle(bundle);
         if (this.isGlobal && bundle != Macro.BUNDLE_RESOURCES) {
             CC_DEBUG && Log.e(`全局音频组件不能指定资源包`);
             this.audioData.curEffectId = -1;
@@ -249,7 +251,6 @@ export default class AudioComponent extends EventComponent {
             return;
         }
         if (this.audioData.isEffectOn) {
-            bundle = this.fixBundle(bundle);
             App.cache.getCacheByAsync(url, cc.AudioClip, bundle, (data) => {
                 if (data.asset) {
                     this.addLocal(data.cache);
