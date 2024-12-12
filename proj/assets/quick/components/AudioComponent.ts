@@ -13,6 +13,7 @@ const { ccclass, property, menu } = cc._decorator;
 class AudioData implements ISingleton {
     static module = "【音效数据】";
     module: string;
+    isResident = true;
     public musicVolume = 1;
     public effectVolume = 1;
     public isEffectOn = true;
