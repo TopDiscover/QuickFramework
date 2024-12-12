@@ -1,15 +1,18 @@
 
 import { _decorator, Node, find, Toggle, view, Input, profiler, screen } from 'cc';
-import EventComponent from '../components/EventComponent';
-import { inject } from '../defines/Decorators';
-import { LogLevel } from '../defines/Enums';
-import { Singleton } from '../utils/Singleton';
-import { Macro } from '../defines/Macros';
+import EventComponent from 'db://quick/components/EventComponent';
+import UIView from 'db://quick/core/ui/UIView';
+import { inject } from 'db://quick/defines/Decorators';
+import { LogLevel } from 'db://quick/defines/Enums';
+import { Macro } from 'db://quick/defines/Macros';
+import { Singleton } from 'db://quick/utils/Singleton';
 const { ccclass, property } = _decorator;
 
 @ccclass('DebugView')
-export class DebugView extends EventComponent {
-
+export class DebugView extends UIView {
+    static getPrefabUrl(): string {
+        return "common/prefabs/DebugView";
+    }
     @inject("logView", Node)
     private logView: Node = null!;
     @inject("content", Node)
@@ -60,7 +63,6 @@ export class DebugView extends EventComponent {
         this.bindEvent("singleton", this.onSingleton);
         this.doOther();
     }
-    debug: Node = null!;
 
     private doOther() {
         if (this.logView) {
@@ -68,8 +70,8 @@ export class DebugView extends EventComponent {
             this.initLogView();
         }
         this.onN(this.background, Input.EventType.TOUCH_END, () => {
-            this.node.active = false;
-            if (this.debug) this.debug.active = true;
+            if ( this.args.onClose ) this.args.onClose();
+            this.close();
         });
     }
 
