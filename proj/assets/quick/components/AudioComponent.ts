@@ -290,6 +290,7 @@ export default class AudioComponent extends EventComponent {
     }
 
     public onLoad() {
+        super.onLoad();
         if (this.isGlobal) {
             this.effectVolume = this.audioData.effectVolume;
             this.musicVolume = this.audioData.musicVolume;
