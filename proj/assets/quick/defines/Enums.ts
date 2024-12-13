@@ -5,6 +5,7 @@
 
 /**@description 日志等级 */
 export enum LogLevel {
+    OFF = 0X00000001,
     DEBUG = 0X00000001,
     DUMP = 0X00000010,
     WARN = 0X00000100,

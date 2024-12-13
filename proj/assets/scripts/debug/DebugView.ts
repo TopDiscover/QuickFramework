@@ -147,11 +147,6 @@ export class DebugView extends UIView {
         });
     }
 
-    private bindEvent(path: string, cb: () => void) {
-        let node = cc.find(path, this.content);
-        this.onN(node, cc.Node.EventType.TOUCH_END, cb, this);
-    }
-
     private initLogView() {
         this.onN(this.logViewBackground, cc.Node.EventType.TOUCH_END, () => {
             this.logView.active = false;
@@ -172,6 +167,7 @@ export class DebugView extends UIView {
                         } else {
                             App.logger.detach(this.getLogLevel(i));
                         }
+                        this.testLog();
                     });
                 }
             }
@@ -186,6 +182,16 @@ export class DebugView extends UIView {
             case 3: return LogLevel.DUMP;
             default: return LogLevel.DEBUG;
         }
+    }
+
+    private testLog(){
+        Log.d("测试 debug");
+        Log.w("测试 warn");
+        Log.e("测试 error");
+        Log.dump({
+            name : "测试dump",
+            value : 666,
+        },"dump")
     }
 
     private onLogicManager() {

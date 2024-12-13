@@ -26,9 +26,6 @@ export class LoggerImpl implements ISingleton {
      * @param level 
      */
     public attach(level: LogLevel) {
-        if (this.isValid(level)) {
-            return;
-        }
         this.level = this.level | level;
         this.update();
     }
@@ -55,7 +52,7 @@ export class LoggerImpl implements ISingleton {
     private update() {
         if (this.isValid(LogLevel.DUMP)) {
             if (cc.sys.isBrowser) {
-                this.logger.dump = console.debug;
+                this.logger.dump = console.info;
             } else {
                 this.logger.dump = this.dump.bind(this);
             }
