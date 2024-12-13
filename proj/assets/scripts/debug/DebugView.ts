@@ -1,6 +1,5 @@
 
-import { _decorator, Node, find, Toggle, view, Input, profiler, screen } from 'cc';
-import EventComponent from 'db://quick/components/EventComponent';
+import { _decorator, Node, find, Toggle, view, Input, profiler, screen, instantiate, Label } from 'cc';
 import UIView from 'db://quick/core/ui/UIView';
 import { inject } from 'db://quick/defines/Decorators';
 import { LogLevel } from 'db://quick/defines/Enums';
@@ -8,59 +7,131 @@ import { Macro } from 'db://quick/defines/Macros';
 import { Singleton } from 'db://quick/utils/Singleton';
 const { ccclass, property } = _decorator;
 
+interface Data {
+    text: string;
+    onEvent: () => void;
+}
 @ccclass('DebugView')
 export class DebugView extends UIView {
+
     static getPrefabUrl(): string {
         return "common/prefabs/DebugView";
     }
+
     @inject("logView", Node)
     private logView: Node = null!;
     @inject("content", Node)
     private content: Node = null!;
+    @inject("item", Node,"content")
+    private itemPrefab: Node = null!;
     @inject("background", Node)
     private background: Node = null!;
     @inject("background", Node, "logView")
     private logViewBackground: Node = null!;
+
+    get config() {
+        let config: Data[] = [
+            {
+                text: "显示视图",
+                onEvent: this.onShowUI,
+            },
+            {
+                text: "显示节点",
+                onEvent: this.onShowNode,
+            },
+            {
+                text: "资源缓存",
+                onEvent: this.onShowRes,
+            },
+            {
+                text: "显示组件",
+                onEvent: this.onShowComp,
+            },
+            {
+                text: "调试信息",
+                onEvent: this.onShowDebugInfo,
+            },
+            {
+                text: "日志",
+                onEvent: this.onLog,
+            },
+            {
+                text: "逻辑管理器",
+                onEvent: this.onLogicManager,
+            },
+            {
+                text: "数据中心",
+                onEvent: this.onDataCenter,
+            },
+            {
+                text: "Bundle入口",
+                onEvent: this.onEntry,
+            },
+            {
+                text: "Proto信息",
+                onEvent: this.onProto,
+            },
+            {
+                text: "Bundle管理器",
+                onEvent: this.onBundleMgr,
+            },
+            {
+                text: "节点缓存池",
+                onEvent: this.onPool,
+            },
+            {
+                text: "Handlers",
+                onEvent: this.onHandler,
+            },
+            {
+                text: "Sandlers",
+                onEvent: this.onSender,
+            },
+            {
+                text: "网络管理器",
+                onEvent: this.onServiceManager,
+            },
+            {
+                text: "热更新",
+                onEvent: this.onHotUpdate,
+            },
+            {
+                text: "内存警告模拟",
+                onEvent: this.onLowMemory,
+            },
+            {
+                text: "释放管理器",
+                onEvent: this.onReleaseManager,
+            },
+            {
+                text: "适配器",
+                onEvent: this.onAdaptor,
+            },
+            {
+                text: "当前单例",
+                onEvent: this.onSingleton,
+            }
+        ]
+
+        return config;
+    }
+
+    private initData(){
+        const config = this.config;
+        this.content.removeAllChildren();
+        config.forEach(v=>{
+            const node = instantiate(this.itemPrefab);
+            node.name = v.text;
+            find("Label",node)!.getComponent(Label)!.string = v.text;
+            this.onN(node,Node.EventType.TOUCH_END,v.onEvent);
+            this.content.addChild(node);
+        })
+    }
+
     onLoad() {
         super.onLoad();
-        //显示界面信息
-        this.bindEvent("showUI", this.onShowUI);
-        //显示节点信息
-        this.bindEvent("showNode", this.onShowNode);
-        //显示资源缓存信息
-        this.bindEvent("showRes", this.onShowRes);
-        //显示当前组件信息
-        this.bindEvent("showComponent", this.onShowComp);
-        //显示调试信息
-        this.bindEvent("showDebugInfo", this.onShowDebugInfo);
-        this.bindEvent("log", this.onLog);
-        //逻辑管理器信息输出
-        this.bindEvent("logic", this.onLogicManager);
-        //数据中心
-        this.bindEvent("dataCenter", this.onDataCenter);
-        //bundle入口管理器
-        this.bindEvent("entry", this.onEntry);
-        //proto 信息输出 
-        this.bindEvent("proto", this.onProto);
-        //bundle管理器
-        this.bindEvent("bundleMgr", this.onBundleMgr);
-        //节点缓存池
-        this.bindEvent("pool", this.onPool);
-        //Senders
-        this.bindEvent("sender", this.onSender);
-        this.bindEvent("handler", this.onHandler);
-        //网络管理器
-        this.bindEvent("serviceManager", this.onServiceManager);
-        //热火更新管理
-        this.bindEvent("hotupdate", this.onHotUpdate);
-        //内存警告
-        this.bindEvent("lowMemory", this.onLowMemory);
-        //释放管理器
-        this.bindEvent("releaseManager", this.onReleaseManager);
-        //适配器
-        this.bindEvent("adaptor", this.onAdaptor);
-        //当前所有单例
-        this.bindEvent("singleton", this.onSingleton);
+        this.itemPrefab.removeFromParent();
+        this.initData();
         this.doOther();
     }
 
@@ -73,11 +144,6 @@ export class DebugView extends UIView {
             if ( this.args.onClose ) this.args.onClose();
             this.close();
         });
-    }
-
-    private bindEvent(path: string, cb: () => void) {
-        let node = find(path, this.content);
-        this.onN(node!, Input.EventType.TOUCH_END, cb);
     }
 
     private initLogView() {
