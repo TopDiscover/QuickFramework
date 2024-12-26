@@ -142,7 +142,7 @@
 			complete?: (file: ParticleAsset) => void, 
 			/**@description 资源所在bundle 默认为打开UIView时指向的Bundle*/
 			bundle?: BUNDLE_TYPE
-		})void;
+		}):void;
 
 	}
 
@@ -175,7 +175,7 @@
                 isNeedCache?: boolean,
                 /**@description 远程加载的资源是否驻留在内存中,默认都不驻留内存 */
                 retain?: boolean
-            })void;
+            }):void;
 
             /**
              * @description 加载动画
@@ -197,7 +197,7 @@
                 complete?: (data: sp.SkeletonData) => void, 
                 /**@description 资源所在bundle */
                 bundle?: BUNDLE_TYPE
-            })void;
+            }):void;
 	    }
     }
 
