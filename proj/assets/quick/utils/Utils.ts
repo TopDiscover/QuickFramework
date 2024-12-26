@@ -238,7 +238,6 @@ export class Utils implements ISingleton {
     }
 
     md5(data: string){
-        const crypto = require("crypto");
-		return crypto.createHash('md5').update(data).digest('hex');
+		return CryptoJS.MD5(data).toString();
     }
 }

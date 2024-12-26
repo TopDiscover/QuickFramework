@@ -22,32 +22,8 @@ export default class Helper extends Handler {
 
     /**@description 添加热更新接口导出声明 */
     protected HotUpdateDTS = {
-        assetsManager: `
-    
-        /**@description 热更新地址 */
-        setPackageUrl(url:string):void;
-        /**@description 设置主包包含哪些bunlde,如果 main,resources */
-        setMainBundles(bundles:string[]):void;
-        /**
-         * @description 设置 下载总数占比(即【将要下载资源文件总数】/【总下载资源文件总数】) 
-         * 如 ：当为1时，删除本地缓存直接下载整个zip包进行解压
-         *      当为0时，不会下载zip ,都以散列文件方式更新
-         *      当 percent > 0 && percent < 1，假设为0.5,【下载总数占比】50%会删除掉本地缓存，重新下载zip包进行解压
-         * 注意：在将要下载的总数 == 总下载总数 这个值无效，会直接下载zip包
-         * @param percent 取值范围0~1
-         */
-        setDownloadAgainZip(percent:number):void;
-        /**@description 重置检测状态 */
-        reset():void;
-        /**@description 删除指定bundle的本地下载缓存 */
-        removeBundle(bundle:string):void;
-    
-        `,
         manifest: `
-    
         constructor (content: string, manifestRoot: string,packageUrl:string);
-        getMd5():string;
-        
         `
     }
 
@@ -141,39 +117,8 @@ export default class Helper extends Handler {
                 writeFileSync(destPath, sourceData, { encoding: "utf-8" });
                 this.logger.log(`${this.module}${sourcePath} -> ${destPath}`);
                 this.logger.log(`${this.module}${data.desc}`);
-            } else if (data.from == "ccdts") {
-                //更新声明文件
-                let destPath = join(this.creatorPath, data.to);
-                destPath = normalize(destPath);
-                let sourcePath = join(this.curExtensionPath, `engine/${data.from}`);
-                sourcePath = normalize(sourcePath);
-                let sourceData = readFileSync(sourcePath, "utf-8");
-                if (existsSync(destPath)) {
-                    let destData = readFileSync(destPath, "utf-8");
-                    let replace = function () {
-                        return arguments[1] + sourceData + arguments[3];
-                    }
-                    if (this.creatorVerion >= "3.0.0") {
-                        //3.x 版本Creator 处理
-                        destData = destData.replace(/(declare\s*module\s*"cc"\s*\{)([\s\n\S]*)(export\s*function\s* murmurhash2_32_gc)/g, replace);
-                    } else {
-                        //2.x 版本Creator 处理
-                        destData = destData.replace(/(\*\/)([\s\S\n]*)(declare\s*namespace\s*cc\s*\{)/g, replace);
-                        //(decRef\s*\()([autoRelease\?:boolean]*)(\)\s*:\s*cc.Asset)
-                        let replaceDecRef = function () {
-                            return arguments[1] + "autoRelease?:boolean" + arguments[3];
-                        }
-                        destData = destData.replace(/(decRef\s*\()([autoRelease\?:boolean]*)(\)\s*:\s*cc.Asset)/g, replaceDecRef);
-                    }
-                    writeFileSync(destPath, destData, { encoding: "utf-8" });
-                    this.logger.log(`${this.module}${data.desc}`);
-                } else {
-                    this.logger.error(`${this.module}找不到引擎目录下文件:${destPath}`);
-                }
-
             } else if (data.from == "jsbdts") {
                 //更新热更新声明文件
-                //(export\s*class\s*Manifest)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string\))
                 let destPath = join(this.creatorPath, data.to);
                 destPath = normalize(destPath);
                 if (existsSync(destPath)) {
@@ -183,10 +128,6 @@ export default class Helper extends Handler {
                         return arguments[1] + self.HotUpdateDTS.manifest + arguments[3];
                     }
                     destData = destData.replace(/(export\s*class\s*Manifest\s*\{)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string\))/g, replaceManifest);
-                    let replaceAssetsManager = function () {
-                        return arguments[1] + self.HotUpdateDTS.assetsManager + arguments[3];
-                    }
-                    destData = destData.replace(/(export\s*class\s*AssetsManager\s*\{)([\s\n\S]*)(constructor\s*\(manifestUrl:\s*string)/g, replaceAssetsManager);
                     writeFileSync(destPath, destData, { encoding: "utf-8" });
                     this.logger.log(`${this.module}${data.desc}`);
                 } else {

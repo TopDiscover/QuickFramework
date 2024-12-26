@@ -204,7 +204,7 @@ class FileUtils extends Handler_1.Handler {
      * @param path 打包路径
      * @param outPath 输出zip目录全路径
      */
-    archive(path, outPath, root, append) {
+    async archive(path, outPath, root, append) {
         return new Promise((resolve) => {
             let files = [];
             if (typeof path == "string") {
@@ -220,32 +220,46 @@ class FileUtils extends Handler_1.Handler {
                 files = files.concat(append);
             }
             this.formatPaths(files);
-            let arch = (0, archiver_1.default)("zip", {
+            const arch = (0, archiver_1.default)("zip", {
                 zlib: { level: 9 }
             });
-            let output = (0, fs_1.createWriteStream)(outPath);
-            //绑定流
+            const output = (0, fs_1.createWriteStream)(outPath);
             arch.pipe(output);
-            //向zip中添加文件
-            let v = null;
-            for (let i = 0; i < files.length; i++) {
-                v = files[i];
-                arch.append((0, fs_1.createReadStream)(v.path), { name: v.relative });
-            }
+            // 使用队列处理文件添加
+            const addFileToArchive = async (fileInfos) => {
+                const batchSize = 50; // 每批处理的文件数
+                for (let i = 0; i < fileInfos.length; i += batchSize) {
+                    const batch = fileInfos.slice(i, Math.min(i + batchSize, fileInfos.length));
+                    await Promise.all(batch.map(v => {
+                        return new Promise((resolveFile) => {
+                            const stream = (0, fs_1.createReadStream)(v.path);
+                            arch.append(stream, { name: v.relative });
+                            stream.on('end', () => {
+                                stream.destroy();
+                                resolveFile();
+                            });
+                        });
+                    }));
+                }
+            };
+            arch.on("warning", (err) => {
+                if (err.code !== "ENOENT") {
+                    this.logger.warn(`${this.module}打包警告`, err);
+                }
+            });
             arch.once("close", () => {
+                this.logger.log(`${this.module}打包关闭${(0, path_1.basename)(outPath)}`);
             });
             arch.once("end", () => {
                 this.logger.log(`${this.module}打包完成${(0, path_1.basename)(outPath)}`);
                 resolve(true);
             });
             arch.once("error", (err) => {
-                this.logger.log(`${this.module}打包错误${(0, path_1.basename)(outPath)}`);
-                this.logger.error(err);
+                this.logger.error(`${this.module}打包错误${(0, path_1.basename)(outPath)}`, err);
                 resolve(false);
             });
-            //打包
             this.logger.log(`${this.module}开始打包${(0, path_1.basename)(outPath)}`);
-            arch.finalize();
+            addFileToArchive(files).then(() => arch.finalize());
         });
     }
     /**
@@ -262,24 +276,71 @@ class FileUtils extends Handler_1.Handler {
         }
     }
     /**
-     * @description 对目录下所有文件做md5
-     * @param path
-     * @param assets
+     * @description 对文件内容进行md5计算，支持大文件
      */
-    md5Dir(path, assets, root, isCurrentDirFiles = false) {
-        let files = FileUtils.instance.getFiles(path, undefined, root, isCurrentDirFiles);
-        files.forEach(v => {
-            let md5 = this.md5((0, fs_1.readFileSync)(v.path));
-            let relative = this.formatPath(v.relative);
-            assets[relative] = {
-                size: v.size,
-                md5: md5
-            };
+    async md5File(filePath) {
+        return new Promise((resolve, reject) => {
+            const hash = (0, crypto_1.createHash)('md5');
+            const stream = (0, fs_1.createReadStream)(filePath);
+            stream.on('data', chunk => hash.update(chunk));
+            stream.on('end', () => {
+                stream.destroy();
+                resolve(hash.digest('hex'));
+            });
+            stream.on('error', error => {
+                stream.destroy();
+                reject(error);
+            });
         });
     }
     md5(content) {
-        let md5 = (0, crypto_1.createHash)("md5").update(content).digest("hex");
-        return md5;
+        return (0, crypto_1.createHash)("md5").update(content).digest("hex");
+    }
+    /**
+     * @description 对目录下所有文件做md5，使用并发限制
+     */
+    async md5Dir(path, assets, root, MainJS) {
+        let isCurrentDirFiles = MainJS != undefined;
+        const files = FileUtils.instance.getFiles(path, (info) => {
+            if (MainJS) {
+                return info.name == MainJS;
+            }
+            return true;
+        }, root, isCurrentDirFiles);
+        const concurrentLimit = 50; // 同时处理的最大文件数
+        // 将文件列表分成多个批次
+        for (let i = 0; i < files.length; i += concurrentLimit) {
+            const batch = files.slice(i, i + concurrentLimit);
+            try {
+                // 并发处理当前批次的文件
+                const results = await Promise.all(batch.map(async (v) => {
+                    try {
+                        const md5 = await this.md5File(v.path);
+                        return {
+                            relative: this.formatPath(v.relative),
+                            size: v.size,
+                            md5
+                        };
+                    }
+                    catch (error) {
+                        this.logger.error(`计算文件MD5失败: ${v.path}`, error);
+                        return null;
+                    }
+                }));
+                // 更新assets对象
+                results.forEach(result => {
+                    if (result) {
+                        assets[result.relative] = {
+                            size: result.size,
+                            md5: result.md5
+                        };
+                    }
+                });
+            }
+            catch (error) {
+                this.logger.error('批次处理失败:', error);
+            }
+        }
     }
     /**
      * @description 创建目录

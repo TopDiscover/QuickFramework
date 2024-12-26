@@ -59,11 +59,6 @@
         "from" : "jsb-link/build.gradle",
         "desc" : "执更新修改,删除jsb-link build.gradle对版本控制文件的复制脚本"
     },
-    "ccdts":{
-        "to" : "utils/api/creator.d.ts",
-        "from" : "ccdts",
-        "desc" : "执行更新添加对自定义引擎扩展接口声明"
-    },
     "jsbdts":{
         "to" : "utils/api/creator.d.ts",
         "from" : "jsbdts",
