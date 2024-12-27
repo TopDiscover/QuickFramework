@@ -51,7 +51,7 @@ function unload() {
     Editor.Builder.removeListener('build-finished', onBuildFinished);
 }
 exports.messages = {
-    fix_engine: () => {
-        helper.run();
+    open_panel: () => {
+        Editor.Panel.open("fix_engine");
     }
 };

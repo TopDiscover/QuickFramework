@@ -50,7 +50,7 @@ export function unload() {
 }
 
 export const messages = {
-    fix_engine: () => {
-        helper.run();
+    open_panel: () => {
+        Editor.Panel.open("fix_engine")
     }
 }

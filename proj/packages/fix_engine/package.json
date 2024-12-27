@@ -6,7 +6,18 @@
   "main": "dist/main.js",
   "main-menu": {
     "项目工具/引擎修正": {
-      "message": "fix_engine:fix_engine"
+      "message": "fix_engine:open_panel"
+    }
+  },
+  "panel": {
+    "title": "引擎修正",
+    "type": "dockable",
+    "main": "dist/panels/default/script/index.js",
+    "size": {
+      "min-width": 700,
+      "min-height": 700,
+      "width": 700,
+      "height": 700
     }
   },
   "scripts": {
