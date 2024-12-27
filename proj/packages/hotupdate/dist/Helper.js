@@ -89,8 +89,15 @@ class HelperImpl extends Helper_1.default {
     async onDelBundles() {
         if (this.isDoing)
             return;
-        //弹出提示确定是否需要删除当前的子游戏
-        Editor.Panel.open('confirm_del_subgames');
+        const config = {
+            title: '警告',
+            detail: '执行此操作将会删除不包含在包内的所有bundles,是否继续？',
+            buttons: ['取消', '确定'],
+        };
+        const code = await Editor.Dialog.messageBox(config);
+        if (code == 1) {
+            this.removeNotInApkBundle();
+        }
     }
     updateToConfigTS() {
         let configTSPath = (0, path_1.join)(Editor.Project.path, "assets/scripts/common/config/Config.ts");

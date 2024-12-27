@@ -686,7 +686,7 @@ interface AssetInfo {
 declare module Editor.App {
 
     export const version: string;
-    export const path : string;
+    export const path: string;
 
 }
 
@@ -1122,10 +1122,30 @@ declare module Editor.Utils {
 
 }
 
-declare module Editor.Dialog{
-    export function openFile(options : {
+declare module Editor.Dialog {
+    export function openFile(options: {
         title: string,
         defaultPath: string,
         properties: string[]
     })
+
+    export interface MessageDialogOptions {
+        title?: string;
+        detail?: string;
+        default?: number;
+        cancel?: number;
+        checkboxLabel?: string;
+        checkboxChecked?: boolean;
+        buttons?: string[];
+    }
+
+    /**
+     * 信息弹窗
+     * Information popup window
+     *
+     * @param message 显示的消息 Displayed message
+     * @param options 信息弹窗可选参数 Information popup optional parameter
+     * @param window 依附于哪个窗口（插件主进程才可使用） Which window it is attached to (only available to the plugin's main process)
+     */
+    export function messageBox(options?: MessageDialogOptions, window?: BrowserWindow): Promise<MessageBoxReturnValue>;
 }

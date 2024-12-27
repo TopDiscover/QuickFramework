@@ -31,7 +31,6 @@ class _Environment {
         /**@description 项目插件 */
         this.extensions = [
             Defines_1.Extensions.CheckResources,
-            Defines_1.Extensions.ConfirmDelSubgames,
             Defines_1.Extensions.FixEngine,
             Defines_1.Extensions.Hotupdate,
             Defines_1.Extensions.PngCompress,
@@ -48,9 +47,6 @@ class _Environment {
      * @param extensionsName
      */
     isLinkCore(extensionsName) {
-        if (extensionsName == Defines_1.Extensions.ConfirmDelSubgames) {
-            return false;
-        }
         return true;
     }
     /**
@@ -58,7 +54,7 @@ class _Environment {
      * @param extensionsName
      */
     isLinkImpl(extensionsName) {
-        if (extensionsName == Defines_1.Extensions.CheckResources || extensionsName == Defines_1.Extensions.ConfirmDelSubgames) {
+        if (extensionsName == Defines_1.Extensions.CheckResources) {
             return false;
         }
         return true;
@@ -68,9 +64,6 @@ class _Environment {
      * @param extensionsName
      */
     isLinkNodeModules(extensionsName) {
-        if (extensionsName == Defines_1.Extensions.ConfirmDelSubgames) {
-            return false;
-        }
         return true;
     }
     /**
