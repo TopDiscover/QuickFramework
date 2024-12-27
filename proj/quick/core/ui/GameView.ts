@@ -21,8 +21,8 @@ export default class GameView extends UIView {
     }
 
     onShow(): void {
-        super.onShow();
         App.entryManager.onShowGameView(this.bundle,this);
+        super.onShow();
     }
 
     protected onEnterGameView(){
