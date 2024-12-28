@@ -418,8 +418,8 @@ export default class Helper extends Config<FixEngineConfig> {
     }
 
     async run() {
-        await this.restoreEngine();
+        // await this.restoreEngine();
         await this.backupEngine();
-        await this.syncCustomToEngine();
+        // await this.syncCustomToEngine();
     }
 }
