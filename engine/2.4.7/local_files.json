@@ -12,5 +12,5 @@
     "cocos2d-x/templates/js-template-link/frameworks/runtime-src/Classes/AppDelegate.cpp": "b1be86723f9e24ce00392cf463cef8f4",
     "cocos2d-x/templates/js-template-link/frameworks/runtime-src/proj.android-studio/app/build.gradle": "6da89adbcc4e12d097cd71e9e1550e38",
     "cocos2d-x/templates/js-template-link/frameworks/runtime-src/proj.win32/HelloJavascript.vcxproj": "56eea78f559217d8e5081c7fe96ae82e",
-    "utils/api/creator.d.ts": "e12c0c45934ac00112af605001be8e72"
+    "utils/api/creator.d.ts": "1836fbfb42f701dd54ed6e14438de59b"
 }
