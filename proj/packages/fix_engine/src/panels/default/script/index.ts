@@ -58,7 +58,7 @@ module.exports = Editor.Panel.extend({
             },
             methods: {
                 removeIncludeItem(index: number) {
-                    if ( view.isEnable == false ) {
+                    if (view.isEnable == false) {
                         Editor.log("操作中断");
                         return;
                     };
@@ -67,7 +67,7 @@ module.exports = Editor.Panel.extend({
                     Editor.Ipc.sendToMain("fix_engine:saveConfig", view.config);
                 },
                 addIncludeItem() {
-                    if ( view.isEnable == false ){
+                    if (view.isEnable == false) {
                         Editor.log("操作中断");
                         return;
                     }
@@ -76,7 +76,7 @@ module.exports = Editor.Panel.extend({
                     Editor.Ipc.sendToMain("fix_engine:saveConfig", view.config);
                 },
                 reset() {
-                    if ( view.isEnable == false ){
+                    if (view.isEnable == false) {
                         Editor.log("操作中断");
                         return;
                     }
@@ -106,14 +106,32 @@ module.exports = Editor.Panel.extend({
                         (this as any).setEnable(true);
                     });
                 },
-                onSyncCustomToEngine() {
-                    (this as any).setEnable(false);
-                    Editor.Ipc.sendToMain("fix_engine:onSyncCustomToEngine", (err: any, isSuccess: boolean) => {
-                        Editor.log(`同步项目修改到引擎${isSuccess ? "成功" : "失败"}`);
-                        (this as any).setEnable(true);
+                async onSyncCustomToEngine() {
+                    // 检查是否有备份
+                    Editor.Ipc.sendToMain("fix_engine:checkBackupEngine", async (err: any, isBackup: boolean) => {
+                        Editor.log(`备份状态 : ${isBackup ? "已备份" : "未备份"}`);
+                        if (isBackup) {
+                            (this as any).setEnable(false);
+                            Editor.Ipc.sendToMain("fix_engine:onSyncCustomToEngine", (err: any, isSuccess: boolean) => {
+                                Editor.log(`同步项目修改到引擎${isSuccess ? "成功" : "失败"}`);
+                                (this as any).setEnable(true);
+                            });
+                        } else {
+                            const config = {
+                                title: '警告',
+                                detail: '未检测到引擎的备份，请先备份引擎，是否继续?',
+                                buttons: ['取消', '备份'],
+                            };
+                            const code = await Editor.Dialog.messageBox(config);
+                            if (code == 1) {
+                                (this as any).onEngineBackup(false);
+                            }
+                        }
                     });
+
+
                 },
-                setEnable( isEnable : boolean ) {
+                setEnable(isEnable: boolean) {
                     panel.$addIncludeBtn.disabled = !isEnable;
                     panel.$addIncludeItem.disabled = !isEnable;
                     panel.$resetBtn.disabled = !isEnable;

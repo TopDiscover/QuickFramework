@@ -28,12 +28,6 @@ class Helper extends Config_1.default {
             ],
             exclude: [],
         };
-        /**@description 添加热更新接口导出声明 */
-        this.HotUpdateDTS = {
-            manifest: `
-        constructor (content: string, manifestRoot: string,packageUrl:string);
-        `
-        };
         this._curExtensionPath = null;
     }
     get path() {
@@ -44,16 +38,16 @@ class Helper extends Config_1.default {
         return Environment_1.Environment.creatorVerion;
     }
     /**@description 本地引擎路径 */
-    get localEnginePath() {
+    get customEngineRoot() {
         return (0, path_1.join)(this.projPath, `engine/${this.creatorVerion}`);
     }
     /**@description 备份指定版本引擎路径 */
     get backupEnigineLocalPath() {
-        return (0, path_1.join)(this.projPath, `engine/${this.creatorVerion}/backupEngine`);
+        return (0, path_1.join)(this.customEngineRoot, `backupEngine`);
     }
     /**@description 修改指定版本引擎路径 */
     get customEnginePath() {
-        return (0, path_1.join)(this.projPath, `engine/${this.creatorVerion}/customEngine`);
+        return (0, path_1.join)(this.customEngineRoot, `customEngine`);
     }
     /**
      * @description cocos creator 安装路径
@@ -142,12 +136,12 @@ class Helper extends Config_1.default {
         return files;
     }
     saveMd5(files, isRaw = true) {
-        FileUtils_1.default.instance.createDir(this.localEnginePath);
-        const path = (0, path_1.join)(this.localEnginePath, `${isRaw ? "raw_" : "local_"}files.json`);
+        FileUtils_1.default.instance.createDir(this.customEngineRoot);
+        const path = (0, path_1.join)(this.customEngineRoot, `${isRaw ? "raw_" : "local_"}files.json`);
         (0, fs_1.writeFileSync)(path, JSON.stringify(files, undefined, 4));
     }
     readMd5(isRaw = true) {
-        const path = (0, path_1.join)(this.localEnginePath, `${isRaw ? "raw_" : "local_"}files.json`);
+        const path = (0, path_1.join)(this.customEngineRoot, `${isRaw ? "raw_" : "local_"}files.json`);
         if ((0, fs_1.existsSync)(path)) {
             return JSON.parse((0, fs_1.readFileSync)(path, "utf-8"));
         }
@@ -373,6 +367,17 @@ class Helper extends Config_1.default {
         }
         // 保存最后自定义引擎的md5
         this.saveMd5(files, false);
+    }
+    checkBackupEngine() {
+        try {
+            if (!(0, fs_1.existsSync)(this.backupEnigineLocalPath)) {
+                return false;
+            }
+            return true;
+        }
+        catch (error) {
+            return false;
+        }
     }
     async run() {
         await this.restoreEngine();

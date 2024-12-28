@@ -170,4 +170,14 @@ exports.messages = {
             ev.reply(null, false);
         }
     },
+    checkBackupEngine: (ev) => {
+        try {
+            const isBackup = helper.checkBackupEngine();
+            ev.reply(null, isBackup);
+        }
+        catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
+        }
+    }
 };

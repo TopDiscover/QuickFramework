@@ -37,18 +37,18 @@ export default class Helper extends Config<FixEngineConfig> {
     }
 
     /**@description 本地引擎路径 */
-    protected get localEnginePath() {
+    protected get customEngineRoot() {
         return join(this.projPath, `engine/${this.creatorVerion}`);
     }
 
     /**@description 备份指定版本引擎路径 */
     protected get backupEnigineLocalPath() {
-        return join(this.projPath, `engine/${this.creatorVerion}/backupEngine`);
+        return join(this.customEngineRoot,`backupEngine`);
     }
 
     /**@description 修改指定版本引擎路径 */
     protected get customEnginePath() {
-        return join(this.projPath, `engine/${this.creatorVerion}/customEngine`);
+        return join(this.customEngineRoot, `customEngine`);
     }
 
     /**
@@ -56,13 +56,6 @@ export default class Helper extends Config<FixEngineConfig> {
      */
     protected get creatorPath() {
         return Environment.creatorPath;
-    }
-
-    /**@description 添加热更新接口导出声明 */
-    protected HotUpdateDTS = {
-        manifest: `
-        constructor (content: string, manifestRoot: string,packageUrl:string);
-        `
     }
 
     private _curExtensionPath: string = null!;
@@ -158,13 +151,13 @@ export default class Helper extends Config<FixEngineConfig> {
 
 
     protected saveMd5(files: { [key: string]: string }, isRaw = true) {
-        FileUtils.instance.createDir(this.localEnginePath);
-        const path = join(this.localEnginePath, `${isRaw ? "raw_" : "local_"}files.json`);
+        FileUtils.instance.createDir(this.customEngineRoot);
+        const path = join(this.customEngineRoot, `${isRaw ? "raw_" : "local_"}files.json`);
         writeFileSync(path, JSON.stringify(files, undefined, 4));
     }
 
     protected readMd5(isRaw = true): { [key: string]: string } | null {
-        const path = join(this.localEnginePath, `${isRaw ? "raw_" : "local_"}files.json`);
+        const path = join(this.customEngineRoot, `${isRaw ? "raw_" : "local_"}files.json`);
         if (existsSync(path)) {
             return JSON.parse(readFileSync(path, "utf-8"));
         }
@@ -415,6 +408,17 @@ export default class Helper extends Config<FixEngineConfig> {
         }
         // 保存最后自定义引擎的md5
         this.saveMd5(files, false);
+    }
+
+    checkBackupEngine(){
+        try {
+            if (!existsSync(this.backupEnigineLocalPath)) {
+                return false;
+            }
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
 
     async run() {

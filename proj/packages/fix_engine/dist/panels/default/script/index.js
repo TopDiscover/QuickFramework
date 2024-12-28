@@ -79,11 +79,28 @@ module.exports = Editor.Panel.extend({
                         this.setEnable(true);
                     });
                 },
-                onSyncCustomToEngine() {
-                    this.setEnable(false);
-                    Editor.Ipc.sendToMain("fix_engine:onSyncCustomToEngine", (err, isSuccess) => {
-                        Editor.log(`同步项目修改到引擎${isSuccess ? "成功" : "失败"}`);
-                        this.setEnable(true);
+                async onSyncCustomToEngine() {
+                    // 检查是否有备份
+                    Editor.Ipc.sendToMain("fix_engine:checkBackupEngine", async (err, isBackup) => {
+                        Editor.log(`备份状态 : ${isBackup ? "已备份" : "未备份"}`);
+                        if (isBackup) {
+                            this.setEnable(false);
+                            Editor.Ipc.sendToMain("fix_engine:onSyncCustomToEngine", (err, isSuccess) => {
+                                Editor.log(`同步项目修改到引擎${isSuccess ? "成功" : "失败"}`);
+                                this.setEnable(true);
+                            });
+                        }
+                        else {
+                            const config = {
+                                title: '警告',
+                                detail: '未检测到引擎的备份，请先备份引擎，是否继续?',
+                                buttons: ['取消', '备份'],
+                            };
+                            const code = await Editor.Dialog.messageBox(config);
+                            if (code == 1) {
+                                this.onEngineBackup(false);
+                            }
+                        }
                     });
                 },
                 setEnable(isEnable) {

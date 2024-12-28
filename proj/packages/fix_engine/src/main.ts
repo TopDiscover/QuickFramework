@@ -52,7 +52,6 @@ export class HelperImpl extends Helper {
         } catch (error) {
             this.logger.error(error);
         }
-
     }
 }
 const helper = new HelperImpl();
@@ -162,4 +161,13 @@ export const messages = {
             ev.reply(null, false);
         }
     },
+    checkBackupEngine: (ev: any) => {
+        try {
+            const isBackup = helper.checkBackupEngine();
+            ev.reply(null, isBackup);
+        } catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
+        }
+    }
 }
