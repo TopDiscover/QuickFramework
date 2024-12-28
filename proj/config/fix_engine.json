@@ -7,8 +7,9 @@
         "**/HelloJavascript.vcxproj",
         "**/jsb_cocos2dx_extension_auto.*",
         "**/app/build.gradle",
-        "**/api/creator.d.ts",
-        "**/Classes/AppDelegate.*"
+        "utils/api/**",
+        "**/js-template-default/frameworks/runtime-src/Classes/AppDelegate.cpp",
+        "**/js-template-link/frameworks/runtime-src/Classes/AppDelegate.cpp"
     ],
     "exclude": []
 }

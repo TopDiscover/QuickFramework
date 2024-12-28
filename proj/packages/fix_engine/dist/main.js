@@ -8,6 +8,7 @@ exports.load = load;
 exports.unload = unload;
 const path_1 = require("path");
 const Helper_1 = __importDefault(require("./impl/Helper"));
+const PACKAGE_NAME = "fix_engine";
 class HelperImpl extends Helper_1.default {
     constructor() {
         super(...arguments);
@@ -15,7 +16,7 @@ class HelperImpl extends Helper_1.default {
         this._path = null;
     }
     get creatorVerion() {
-        return Editor.versions.CocosCreator;
+        return Editor.App.version;
     }
     get creatorPath() {
         if (this._path) {
@@ -33,10 +34,11 @@ class HelperImpl extends Helper_1.default {
 exports.HelperImpl = HelperImpl;
 const helper = new HelperImpl();
 helper.logger = Editor;
+exports.default = helper;
 function onBuildStart(options, callback) {
-    if (helper.isUpdate) {
-        Editor.error(`请先执行【项目工具】->【引擎修正】同步对引擎的修改，再构建!!!`);
-    }
+    // if (helper.isUpdate) {
+    //     Editor.error(`请先执行【项目工具】->【引擎修正】同步对引擎的修改，再构建!!!`);
+    // }
     callback();
 }
 function onBuildFinished(options, callback) {
@@ -53,5 +55,90 @@ function unload() {
 exports.messages = {
     open_panel: () => {
         Editor.Panel.open("fix_engine");
-    }
+    },
+    creatorVersion: (ev) => {
+        try {
+            ev.reply(null, helper.creatorVerion);
+        }
+        catch (error) {
+            helper.logger.error(error);
+        }
+    },
+    creatorPath: (ev) => {
+        try {
+            ev.reply(null, helper.creatorPath);
+        }
+        catch (error) {
+            helper.logger.error(error);
+        }
+    },
+    getConfig: (ev) => {
+        try {
+            helper.read(true);
+            ev.reply(null, helper.data);
+        }
+        catch (error) {
+            helper.logger.error(error);
+        }
+    },
+    saveConfig: (ev, data) => {
+        try {
+            helper.data = data;
+            helper.save();
+            // ev.reply(null);
+        }
+        catch (error) {
+            helper.logger.error(error);
+        }
+    },
+    restoreDefault: (ev) => {
+        try {
+            helper.data = helper.defaultData;
+            helper.save();
+            ev.reply(null, helper.data);
+        }
+        catch (error) {
+            helper.logger.error(error);
+        }
+    },
+    onEngineBackup: (ev) => {
+        try {
+            helper.backupEngine();
+            ev.reply(null, true);
+        }
+        catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
+        }
+    },
+    onEngineRestore: (ev) => {
+        try {
+            helper.restoreEngine();
+            ev.reply(null, true);
+        }
+        catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
+        }
+    },
+    onSyncEngineToCustom: (ev) => {
+        try {
+            helper.syncEngineToCustom();
+            ev.reply(null, true);
+        }
+        catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
+        }
+    },
+    onSyncCustomToEngine: (ev) => {
+        try {
+            helper.syncCustomToEngine();
+            ev.reply(null, true);
+        }
+        catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
+        }
+    },
 };

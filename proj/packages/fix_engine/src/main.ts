@@ -1,16 +1,17 @@
 import { parse } from "path"
 
 import Helper from "./impl/Helper";
-
+import { FixEngineConfig } from "./core/Defines";
+const PACKAGE_NAME = "fix_engine";
 export class HelperImpl extends Helper {
 
-    protected get creatorVerion() {
-        return Editor.App.version;
+    get creatorVerion() {
+        return Editor.App.version
     }
 
     /**@description creator 安所路径 */
     private _path: string | null = null;
-    protected get creatorPath() {
+    get creatorPath() {
         if (this._path) {
             return this._path;
         }
@@ -25,6 +26,7 @@ export class HelperImpl extends Helper {
 }
 const helper = new HelperImpl();
 helper.logger = Editor;
+export default helper;
 
 
 function onBuildStart(options: BuildOptions, callback: Function) {
@@ -52,5 +54,81 @@ export function unload() {
 export const messages = {
     open_panel: () => {
         Editor.Panel.open("fix_engine")
-    }
+    },
+    creatorVersion: (ev: any) => {
+        try {
+            ev.reply(null, helper.creatorVerion);
+        } catch (error) {
+            helper.logger.error(error);
+        }
+    },
+    creatorPath: (ev: any) => {
+        try {
+            ev.reply(null, helper.creatorPath);
+        } catch (error) {
+            helper.logger.error(error);
+        }
+    },
+    getConfig: (ev: any) => {
+        try {
+            helper.read(true);
+            ev.reply(null, helper.data);
+        } catch (error) {
+            helper.logger.error(error);
+        }
+    },
+    saveConfig: (ev: any, data: FixEngineConfig) => {
+        try {
+            helper.data = data;
+            helper.save();
+            // ev.reply(null);
+        } catch (error) {
+            helper.logger.error(error);
+        }
+    },
+    restoreDefault: (ev: any) => {
+        try {
+            helper.data = helper.defaultData;
+            helper.save();
+            ev.reply(null, helper.data);
+        } catch (error) {
+            helper.logger.error(error);
+        }
+    },
+    onEngineBackup: (ev: any) => {
+        try {
+            helper.backupEngine();
+            ev.reply(null, true);
+        } catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
+        }
+    },
+    onEngineRestore: (ev: any) => {
+        try {
+            helper.restoreEngine();
+            ev.reply(null, true);
+        } catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
+        }
+    },
+    onSyncEngineToCustom: (ev: any) => {
+        try {
+            helper.syncEngineToCustom();
+            ev.reply(null, true);
+        } catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
+        }
+    },
+    onSyncCustomToEngine: (ev: any) => {
+        try {
+            helper.syncCustomToEngine();
+            ev.reply(null, true);
+        } catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
+        }
+    },
 }

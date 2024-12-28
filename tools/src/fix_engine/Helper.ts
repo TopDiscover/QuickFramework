@@ -17,7 +17,6 @@ export default class Helper extends Config<FixEngineConfig> {
             "**/assets-manager/Manifest.*",
             "**/jsb_cocos2dx_extension_auto.*",
             "**/HelloJavascript.vcxproj",
-            "**/jsb_cocos2dx_extension_auto.*",
             "**/app/build.gradle",
             "utils/api/**",
             "**/js-template-default/frameworks/runtime-src/Classes/AppDelegate.cpp",
@@ -33,7 +32,7 @@ export default class Helper extends Config<FixEngineConfig> {
     }
 
     /**@description cocos creator 版本号 */
-    protected get creatorVerion() {
+    get creatorVerion() {
         return Environment.creatorVerion;
     }
 
@@ -189,7 +188,7 @@ export default class Helper extends Config<FixEngineConfig> {
     /**
      * @description 备份引擎
      */
-    protected async backupEngine() {
+    async backupEngine() {
         try {
             this.onBackupEngineBegin();
             const files = await this.getAllFiles(this.creatorPath);
@@ -239,7 +238,7 @@ export default class Helper extends Config<FixEngineConfig> {
     /**
      * @description 还原引擎
      */
-    protected async restoreEngine() {
+    async restoreEngine() {
         try {
             this.onRestoreEngineBegin();
             if (!existsSync(this.backupEnigineLocalPath)) {
@@ -307,7 +306,7 @@ export default class Helper extends Config<FixEngineConfig> {
     /**
      * @description 同步引擎修改到本地
      */
-    protected async syncEngineToCustom() {
+    async syncEngineToCustom() {
         try {
             this.onSyncEngineBegin();
             // 获取engine md5
@@ -391,7 +390,7 @@ export default class Helper extends Config<FixEngineConfig> {
     /**
      * @description 同步自定义引擎到引擎
      */
-    protected async syncCustomToEngine() {
+    async syncCustomToEngine() {
         // 获取自定义引擎md5 
         // 用户可能直接在自定义引擎下修改，直接重新读文件
         const files = await this.getAllFiles(this.customEnginePath);

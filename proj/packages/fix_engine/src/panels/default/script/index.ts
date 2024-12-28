@@ -1,154 +1,139 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import Helper from "../../../impl/Helper";
+import { FixEngineConfig } from '../../../core/Defines';
 
-interface MyView {
+
+interface Data {
+    creatorVerion: string;
+    creatorPath: string;
+    config: FixEngineConfig;
+    isEnable: boolean;
+}
+
+interface MyView extends Data {
     sourceAssetsDir: string;
     buildAssetsDir: string;
-    progress : number;
+    progress: number;
 }
-let view : MyView = null!;
+let view: MyView = null!;
 
-interface MYPanel{
-    shadowRoot : any;
-    $startCompressBtn : HTMLButtonElement;
-    $saveBtn : HTMLButtonElement;
+interface MYPanel {
+    shadowRoot: any;
+    $addIncludeItem: HTMLInputElement;
+    $engineBackup: HTMLButtonElement;
+    $engineRestore: HTMLButtonElement;
+    $syncEngineToCustom: HTMLButtonElement;
+    $syncCustomToEngine: HTMLButtonElement;
+    $addIncludeBtn: HTMLButtonElement;
+    $resetBtn: HTMLButtonElement;
 }
 
-let panel : MYPanel = null!;
+let panel: MYPanel = null!;
 
 module.exports = Editor.Panel.extend({
     template: readFileSync(join(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
     style: readFileSync(join(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
     $: {
-        startCompressBtn : "#startCompressBtn",
-        saveBtn : "#saveBtn"
+        addIncludeItem: "#addIncludeItem",
+        engineBackup: "#engineBackup",
+        engineRestore: "#engineRestore",
+        syncEngineToCustom: "#syncEngineToCustom",
+        syncCustomToEngine: "#syncCustomToEngine",
+        addIncludeBtn: "#addIncludeBtn",
+        resetBtn: "#resetBtn",
     },
     messages: {
-        //更新进度
-        updateProgess(sender:any,progress:number) {
-            if (view) {
-                view.progress = progress;
-                // if (progress >= 100) {
-                //     panel.$saveBtn.disabled = false;
-                //     panel.$startCompressBtn.disabled = false;
-                //     helper.data!.isProcessing = false;
-                //     helper.save();
-                // }
-            }
-        },
-        //压缩开始
-        onStartCompress() {
-            if (view) {
-                panel.$saveBtn.disabled = true;
-                panel.$startCompressBtn.disabled = true;
-                view.progress = 0;
-            }
-        },
-        //构建目录
-        onSetBuildDir(sender:any,dir: string) {
-            if (view) {
-                view.buildAssetsDir = dir;
-            }
-        }
+
     },
     ready() {
         panel = this as any;
-        let sourcePath = join(Editor.Project.path, "assets");
         const vm = new window.Vue({
             data() {
                 return {
-                    // enabled: helper.data!.enabled,
-                    // enabledNoFound : helper.data!.enabledNoFound,
-
-                    // minQuality: helper.data!.minQuality,
-                    // maxQuality: helper.data!.maxQuality,
-                    // speed: helper.data!.speed,
-
-                    // excludeFolders: helper.data!.excludeFolders,
-                    // excludeFiles: helper.data!.excludeFiles,
-
-                    // progress: 0,//压缩进度
-                    // buildAssetsDir: "",//构建资源目录
-                    // sourceAssetsDir: sourcePath,
+                    creatorVerion: "",
+                    creatorPath: "",
+                    config: { include: [], exclude: [] } as FixEngineConfig,
+                    isEnable: true
                 };
             },
             methods: {
-                onChangeEnabled(enabled: boolean) {
-                    // console.log("enabled",enabled);
-                    // helper.data!.enabled = enabled;
-                    // helper.save();
+                removeIncludeItem(index: number) {
+                    if ( view.isEnable == false ) {
+                        Editor.log("操作中断");
+                        return;
+                    };
+                    Editor.log("removeIncludeItem", index, view.config.include[index]);
+                    view.config.include.splice(index, 1);
+                    Editor.Ipc.sendToMain("fix_engine:saveConfig", view.config);
                 },
-                onChangeEnabledNoFound(enabled:boolean){
-                    // helper.data!.enabledNoFound = enabled;
-                    // helper.save();
-                },
-                onChangeMinQuality(value: number) {
-                    // console.log("minQuality",value);
-                    // helper.data!.minQuality = value;
-                },
-                onChangeMaxQuality(value: number) {
-                    // console.log("maxQuality",value)
-                    // helper.data!.maxQuality = value;
-                },
-                onChangeSpeed(value: number) {
-                    // console.log("speed",value);
-                    // helper.data!.speed = value;
-                },
-                onInputExcludeFoldersOver(value: string) {
-                    // console.log("excludeFolders",value);
-                    // helper.data!.excludeFolders = value;
-                },
-                onInputExcludeFilesOver(value: string) {
-                    // console.log(`excludeFiles`,value);
-                    // helper.data!.excludeFiles = value;
-                },
-                /**@description 保存配置 */
-                onSaveConfig() {
-                    // if ( helper.data!.isProcessing ){
-                    //     helper.logger.warn(`${helper.module}处理过程中，请不要操作`);
-                    //     return;
-                    // }
-                    // helper.save();
-                },
-                onStartCompress() {
-                    // if ( helper.data!.isProcessing ){
-                    //     helper.logger.warn(`${helper.module}处理过程中，请不要操作`);
-                    //     return;
-                    // }
-                    // let view = this as any as MyView;
-                    // helper.data!.isProcessing = true;
-                    // helper.startCompress(view.sourceAssetsDir);
-                },
-                onOpenBulidOutDir() {
-                    let view = this as any as MyView;
-                    let buildDir = view.buildAssetsDir;
-                    if (!!!buildDir) {
-                        buildDir = Editor.Project.path;
+                addIncludeItem() {
+                    if ( view.isEnable == false ){
+                        Editor.log("操作中断");
+                        return;
                     }
-                    Editor.Dialog.openFile({
-                        title: "打开构建目录",
-                        defaultPath: buildDir,
-                        properties: ["openDirectory"]
+                    Editor.log("addIncludeItem", panel.$addIncludeItem.value);
+                    view.config.include.push(panel.$addIncludeItem.value);
+                    Editor.Ipc.sendToMain("fix_engine:saveConfig", view.config);
+                },
+                reset() {
+                    if ( view.isEnable == false ){
+                        Editor.log("操作中断");
+                        return;
+                    }
+                    Editor.Ipc.sendToMain("fix_engine:restoreDefault", (err: any, data: FixEngineConfig) => {
+                        Editor.log("reset", data);
+                        view.config = data;
                     });
                 },
-                onOpenSourceAssetsDir(){
-                    let view = this as any as MyView;
-                    let sourceDir = view.sourceAssetsDir;
-                    if (!!!sourceDir) {
-                        sourceDir = Editor.Project.path;
-                    }
-                    Editor.Dialog.openFile({
-                        title: "打开构建目录",
-                        defaultPath: sourceDir,
-                        properties: ["openDirectory"]
+                onEngineBackup() {
+                    (this as any).setEnable(false);
+                    Editor.Ipc.sendToMain("fix_engine:onEngineBackup", (err: any, isSuccess: boolean) => {
+                        Editor.log(`备份引擎${isSuccess ? "成功" : "失败"}`);
+                        (this as any).setEnable(true);
                     });
+                },
+                onEngineRestore() {
+                    (this as any).setEnable(false);
+                    Editor.Ipc.sendToMain("fix_engine:onEngineRestore", (err: any, isSuccess: boolean) => {
+                        Editor.log(`恢复引擎${isSuccess ? "成功" : "失败"}`);
+                        (this as any).setEnable(true);
+                    });
+                },
+                onSyncEngineToCustom() {
+                    (this as any).setEnable(false);
+                    Editor.Ipc.sendToMain("fix_engine:onSyncEngineToCustom", (err: any, isSuccess: boolean) => {
+                        Editor.log(`同步引擎修改到项目${isSuccess ? "成功" : "失败"}`);
+                        (this as any).setEnable(true);
+                    });
+                },
+                onSyncCustomToEngine() {
+                    (this as any).setEnable(false);
+                    Editor.Ipc.sendToMain("fix_engine:onSyncCustomToEngine", (err: any, isSuccess: boolean) => {
+                        Editor.log(`同步项目修改到引擎${isSuccess ? "成功" : "失败"}`);
+                        (this as any).setEnable(true);
+                    });
+                },
+                setEnable( isEnable : boolean ) {
+                    panel.$addIncludeBtn.disabled = !isEnable;
+                    panel.$addIncludeItem.disabled = !isEnable;
+                    panel.$resetBtn.disabled = !isEnable;
+                    panel.$engineBackup.disabled = !isEnable;
+                    panel.$engineRestore.disabled = !isEnable;
+                    panel.$syncEngineToCustom.disabled = !isEnable;
+                    panel.$syncCustomToEngine.disabled = !isEnable;
                 }
             },
             created: function () {
                 view = this as any;
-                // panel.$saveBtn.disabled = helper.data!.isProcessing;
-                // panel.$startCompressBtn.disabled = helper.data!.isProcessing;
+                Editor.Ipc.sendToMain("fix_engine:creatorVersion", (err: any, version: string) => {
+                    view.creatorVerion = version;
+                });
+                Editor.Ipc.sendToMain("fix_engine:creatorPath", (err: any, path: string) => {
+                    view.creatorPath = path;
+                });
+                Editor.Ipc.sendToMain("fix_engine:getConfig", (err: any, data: FixEngineConfig) => {
+                    view.config = data;
+                });
             },
             mounted: function () {
 

@@ -8,131 +8,105 @@ module.exports = Editor.Panel.extend({
     template: (0, fs_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/template/default/index.html'), 'utf-8'),
     style: (0, fs_1.readFileSync)((0, path_1.join)(__dirname, '../../../../static/style/default/index.css'), 'utf-8'),
     $: {
-        startCompressBtn: "#startCompressBtn",
-        saveBtn: "#saveBtn"
+        addIncludeItem: "#addIncludeItem",
+        engineBackup: "#engineBackup",
+        engineRestore: "#engineRestore",
+        syncEngineToCustom: "#syncEngineToCustom",
+        syncCustomToEngine: "#syncCustomToEngine",
+        addIncludeBtn: "#addIncludeBtn",
+        resetBtn: "#resetBtn",
     },
-    messages: {
-        //更新进度
-        updateProgess(sender, progress) {
-            if (view) {
-                view.progress = progress;
-                // if (progress >= 100) {
-                //     panel.$saveBtn.disabled = false;
-                //     panel.$startCompressBtn.disabled = false;
-                //     helper.data!.isProcessing = false;
-                //     helper.save();
-                // }
-            }
-        },
-        //压缩开始
-        onStartCompress() {
-            if (view) {
-                panel.$saveBtn.disabled = true;
-                panel.$startCompressBtn.disabled = true;
-                view.progress = 0;
-            }
-        },
-        //构建目录
-        onSetBuildDir(sender, dir) {
-            if (view) {
-                view.buildAssetsDir = dir;
-            }
-        }
-    },
+    messages: {},
     ready() {
         panel = this;
-        let sourcePath = (0, path_1.join)(Editor.Project.path, "assets");
         const vm = new window.Vue({
             data() {
                 return {
-                // enabled: helper.data!.enabled,
-                // enabledNoFound : helper.data!.enabledNoFound,
-                // minQuality: helper.data!.minQuality,
-                // maxQuality: helper.data!.maxQuality,
-                // speed: helper.data!.speed,
-                // excludeFolders: helper.data!.excludeFolders,
-                // excludeFiles: helper.data!.excludeFiles,
-                // progress: 0,//压缩进度
-                // buildAssetsDir: "",//构建资源目录
-                // sourceAssetsDir: sourcePath,
+                    creatorVerion: "",
+                    creatorPath: "",
+                    config: { include: [], exclude: [] },
+                    isEnable: true
                 };
             },
             methods: {
-                onChangeEnabled(enabled) {
-                    // console.log("enabled",enabled);
-                    // helper.data!.enabled = enabled;
-                    // helper.save();
-                },
-                onChangeEnabledNoFound(enabled) {
-                    // helper.data!.enabledNoFound = enabled;
-                    // helper.save();
-                },
-                onChangeMinQuality(value) {
-                    // console.log("minQuality",value);
-                    // helper.data!.minQuality = value;
-                },
-                onChangeMaxQuality(value) {
-                    // console.log("maxQuality",value)
-                    // helper.data!.maxQuality = value;
-                },
-                onChangeSpeed(value) {
-                    // console.log("speed",value);
-                    // helper.data!.speed = value;
-                },
-                onInputExcludeFoldersOver(value) {
-                    // console.log("excludeFolders",value);
-                    // helper.data!.excludeFolders = value;
-                },
-                onInputExcludeFilesOver(value) {
-                    // console.log(`excludeFiles`,value);
-                    // helper.data!.excludeFiles = value;
-                },
-                /**@description 保存配置 */
-                onSaveConfig() {
-                    // if ( helper.data!.isProcessing ){
-                    //     helper.logger.warn(`${helper.module}处理过程中，请不要操作`);
-                    //     return;
-                    // }
-                    // helper.save();
-                },
-                onStartCompress() {
-                    // if ( helper.data!.isProcessing ){
-                    //     helper.logger.warn(`${helper.module}处理过程中，请不要操作`);
-                    //     return;
-                    // }
-                    // let view = this as any as MyView;
-                    // helper.data!.isProcessing = true;
-                    // helper.startCompress(view.sourceAssetsDir);
-                },
-                onOpenBulidOutDir() {
-                    let view = this;
-                    let buildDir = view.buildAssetsDir;
-                    if (!!!buildDir) {
-                        buildDir = Editor.Project.path;
+                removeIncludeItem(index) {
+                    if (view.isEnable == false) {
+                        Editor.log("操作中断");
+                        return;
                     }
-                    Editor.Dialog.openFile({
-                        title: "打开构建目录",
-                        defaultPath: buildDir,
-                        properties: ["openDirectory"]
+                    ;
+                    Editor.log("removeIncludeItem", index, view.config.include[index]);
+                    view.config.include.splice(index, 1);
+                    Editor.Ipc.sendToMain("fix_engine:saveConfig", view.config);
+                },
+                addIncludeItem() {
+                    if (view.isEnable == false) {
+                        Editor.log("操作中断");
+                        return;
+                    }
+                    Editor.log("addIncludeItem", panel.$addIncludeItem.value);
+                    view.config.include.push(panel.$addIncludeItem.value);
+                    Editor.Ipc.sendToMain("fix_engine:saveConfig", view.config);
+                },
+                reset() {
+                    if (view.isEnable == false) {
+                        Editor.log("操作中断");
+                        return;
+                    }
+                    Editor.Ipc.sendToMain("fix_engine:restoreDefault", (err, data) => {
+                        Editor.log("reset", data);
+                        view.config = data;
                     });
                 },
-                onOpenSourceAssetsDir() {
-                    let view = this;
-                    let sourceDir = view.sourceAssetsDir;
-                    if (!!!sourceDir) {
-                        sourceDir = Editor.Project.path;
-                    }
-                    Editor.Dialog.openFile({
-                        title: "打开构建目录",
-                        defaultPath: sourceDir,
-                        properties: ["openDirectory"]
+                onEngineBackup() {
+                    this.setEnable(false);
+                    Editor.Ipc.sendToMain("fix_engine:onEngineBackup", (err, isSuccess) => {
+                        Editor.log(`备份引擎${isSuccess ? "成功" : "失败"}`);
+                        this.setEnable(true);
                     });
+                },
+                onEngineRestore() {
+                    this.setEnable(false);
+                    Editor.Ipc.sendToMain("fix_engine:onEngineRestore", (err, isSuccess) => {
+                        Editor.log(`恢复引擎${isSuccess ? "成功" : "失败"}`);
+                        this.setEnable(true);
+                    });
+                },
+                onSyncEngineToCustom() {
+                    this.setEnable(false);
+                    Editor.Ipc.sendToMain("fix_engine:onSyncEngineToCustom", (err, isSuccess) => {
+                        Editor.log(`同步引擎修改到项目${isSuccess ? "成功" : "失败"}`);
+                        this.setEnable(true);
+                    });
+                },
+                onSyncCustomToEngine() {
+                    this.setEnable(false);
+                    Editor.Ipc.sendToMain("fix_engine:onSyncCustomToEngine", (err, isSuccess) => {
+                        Editor.log(`同步项目修改到引擎${isSuccess ? "成功" : "失败"}`);
+                        this.setEnable(true);
+                    });
+                },
+                setEnable(isEnable) {
+                    panel.$addIncludeBtn.disabled = !isEnable;
+                    panel.$addIncludeItem.disabled = !isEnable;
+                    panel.$resetBtn.disabled = !isEnable;
+                    panel.$engineBackup.disabled = !isEnable;
+                    panel.$engineRestore.disabled = !isEnable;
+                    panel.$syncEngineToCustom.disabled = !isEnable;
+                    panel.$syncCustomToEngine.disabled = !isEnable;
                 }
             },
             created: function () {
                 view = this;
-                // panel.$saveBtn.disabled = helper.data!.isProcessing;
-                // panel.$startCompressBtn.disabled = helper.data!.isProcessing;
+                Editor.Ipc.sendToMain("fix_engine:creatorVersion", (err, version) => {
+                    view.creatorVerion = version;
+                });
+                Editor.Ipc.sendToMain("fix_engine:creatorPath", (err, path) => {
+                    view.creatorPath = path;
+                });
+                Editor.Ipc.sendToMain("fix_engine:getConfig", (err, data) => {
+                    view.config = data;
+                });
             },
             mounted: function () {
             },
