@@ -12,18 +12,14 @@ export default class Helper extends Config<FixEngineConfig> {
 
     readonly defaultData: FixEngineConfig = {
         include: [
-            "**/libcocos2d.vcxproj.filters",
-            "**/assets-manager/AssetsManagerEx.*",
-            "**/assets-manager/Manifest.*",
-            "**/jsb_cocos2dx_extension_auto.*",
-            "**/HelloJavascript.vcxproj",
-            "**/app/build.gradle",
-            "utils/api/**",
-            "**/js-template-default/frameworks/runtime-src/Classes/AppDelegate.cpp",
-            "**/js-template-link/frameworks/runtime-src/Classes/AppDelegate.cpp",
+            "resources/3d/engine/native/extensions/assets-manager/AssetsManagerEx.*",
+            "resources/3d/engine/native/extensions/assets-manager/Manifest.*",
+            "resources/3d/engine/native/cocos/bindings/auto/jsb_extension_auto.cpp",
+            "resources/3d/engine/bin/.declarations/cc.d.ts",
+            "resources/3d/engine/native/cocos/application/BaseGame.cpp",
+            "resources/3d/engine/native/tools/simulator/frameworks/runtime-src/Classes/Game.cpp",
         ],
         exclude: [
-
         ],
     }
 
@@ -43,7 +39,7 @@ export default class Helper extends Config<FixEngineConfig> {
 
     /**@description 备份指定版本引擎路径 */
     protected get backupEnigineLocalPath() {
-        return join(this.customEngineRoot,`backupEngine`);
+        return join(this.customEngineRoot, `backupEngine`);
     }
 
     /**@description 修改指定版本引擎路径 */
@@ -144,8 +140,8 @@ export default class Helper extends Config<FixEngineConfig> {
 
     protected async getAllFiles(dir: string) {
         this.read();
-        const files = await this.md5engine(dir);
-        // writeFileSync(join(__dirname, "files.json"), JSON.stringify(files, undefined, 4));
+        let files = await this.md5engine(dir);
+        // console.log(files);
         return files;
     }
 
@@ -190,7 +186,7 @@ export default class Helper extends Config<FixEngineConfig> {
                 const sourcePath = join(this.creatorPath, key);
                 const destPath = join(this.backupEnigineLocalPath, key);
                 this.logger.log(`${this.module}备份引擎文件 \nfrom: ${sourcePath} \nto: ${destPath}`);
-                await FileUtils.instance.copyFile(sourcePath, destPath,true);
+                await FileUtils.instance.copyFile(sourcePath, destPath, true);
             }
 
             // for (const key in files) {
@@ -260,7 +256,7 @@ export default class Helper extends Config<FixEngineConfig> {
                     throw new Error(`${this.module}备份引擎文件${sourcePath}已经被修改，无法还原`);
                 }
                 this.logger.log(`${this.module}还原引擎文件 \nfrom: ${sourcePath} \nto: ${destPath}`);
-                await FileUtils.instance.copyFile(sourcePath, destPath,true);
+                await FileUtils.instance.copyFile(sourcePath, destPath, true);
             }
 
             // 需要把新增文件删除掉
@@ -342,7 +338,7 @@ export default class Helper extends Config<FixEngineConfig> {
                 const dest = join(this.customEnginePath, key);
                 // 先判断文件是否是原引擎未改动的文件
                 this.logger.log(`${this.module}保存引擎修改文件 \nfrom: ${src} \nto: ${dest}`);
-                await FileUtils.instance.copyFile(src, dest,true);
+                await FileUtils.instance.copyFile(src, dest, true);
             }
 
             // 保存新增文件到本地
@@ -352,7 +348,7 @@ export default class Helper extends Config<FixEngineConfig> {
                 const dest = join(this.customEnginePath, key);
                 // 先判断文件是否是原引擎未改动的文件
                 this.logger.log(`${this.module}保存引擎新增文件 \nfrom: ${src} \nto: ${dest}`);
-                await FileUtils.instance.copyFile(src, dest,true);
+                await FileUtils.instance.copyFile(src, dest, true);
             }
 
             // 删除文件到本地
@@ -393,7 +389,7 @@ export default class Helper extends Config<FixEngineConfig> {
             const src = join(this.customEnginePath, key);
             const dest = join(this.creatorPath, key);
             this.logger.log(`${this.module}同步自定义引擎文件 \nfrom: ${src} \nto: ${dest}`);
-            await FileUtils.instance.copyFile(src, dest,true);
+            await FileUtils.instance.copyFile(src, dest, true);
         }
 
         const customMd5 = this.readMd5(false);
@@ -410,7 +406,7 @@ export default class Helper extends Config<FixEngineConfig> {
         this.saveMd5(files, false);
     }
 
-    checkBackupEngine(){
+    checkBackupEngine() {
         try {
             if (!existsSync(this.backupEnigineLocalPath)) {
                 return false;
