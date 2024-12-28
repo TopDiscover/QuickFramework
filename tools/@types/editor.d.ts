@@ -973,7 +973,7 @@ declare interface BuildOptions {
     title: string;
     useDebugKeystore: boolean;
     vsVersion: string;
-    webOrientation: boolean;
+    webOrientation: string;
     win32: object;
     xxteaKey: string;
     zipCompressJs: string;

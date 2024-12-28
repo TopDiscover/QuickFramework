@@ -5,7 +5,7 @@ import Helper from "./impl/Helper";
 export class HelperImpl extends Helper {
 
     protected get creatorVerion() {
-        return Editor.versions.CocosCreator;
+        return Editor.App.version;
     }
 
     /**@description creator 安所路径 */
@@ -28,9 +28,9 @@ helper.logger = Editor;
 
 
 function onBuildStart(options: BuildOptions, callback: Function) {
-    if (helper.isUpdate) {
-        Editor.error(`请先执行【项目工具】->【引擎修正】同步对引擎的修改，再构建!!!`);
-    }
+    // if (helper.isUpdate) {
+    //     Editor.error(`请先执行【项目工具】->【引擎修正】同步对引擎的修改，再构建!!!`);
+    // }
     callback();
 }
 
