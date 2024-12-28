@@ -254,7 +254,7 @@ export class Helper extends Handler {
     /**@description 引擎修改 */
     async fixEngine() {
         this.log(`引擎修正`, false);
-        this._fixEngine.run();
+        await this._fixEngine.run();
         this.log(`引擎修正`, true);
     }
 

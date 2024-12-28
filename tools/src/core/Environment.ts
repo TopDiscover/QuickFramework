@@ -12,7 +12,7 @@ class _Environment {
     }
 
     /**@description cocos creator 安装目录 */
-    readonly creatorPath: string = "D:/Creator/Creator/2.4.7/resources";
+    readonly creatorPath: string = "D:/Cocos/Creator/2.4.7/resources";
 
     /**@description cocos creator 版本 */
     readonly creatorVerion: string = "2.4.7";
