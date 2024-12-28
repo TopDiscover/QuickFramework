@@ -14,6 +14,7 @@ class HelperImpl extends Helper_1.default {
         super(...arguments);
         /**@description creator 安所路径 */
         this._path = null;
+        this.userVersion = "2.4.7";
     }
     get creatorVerion() {
         return Editor.App.version;
@@ -29,6 +30,34 @@ class HelperImpl extends Helper_1.default {
         let parser = (0, path_1.parse)(this._path);
         this._path = parser.dir;
         return this._path;
+    }
+    get customEnginePath() {
+        return (0, path_1.join)(this.projPath, `engine/${this.userVersion}/customEngine`);
+    }
+    async syncCustomToEngine() {
+        try {
+            this.userVersion = this.creatorVerion;
+            if (this.isSupport(this.creatorVerion)) {
+                // 先获取 自定义的md5
+                const customMd5 = this.readMd5(false);
+                if (!customMd5) {
+                    Editor.error(`自定义引擎不存在，请先同步自定义引擎到引擎`);
+                    return;
+                }
+                if (Object.keys(customMd5).length == 0) {
+                    Editor.warn(`自定义引擎为空，使用通用版本2.4.7`);
+                    this.userVersion = "2.4.7";
+                }
+                await super.syncCustomToEngine();
+                // 保存引擎的md5到自定义
+            }
+            else {
+                Editor.error(`不支持的引擎版本:${this.creatorVerion}`);
+            }
+        }
+        catch (error) {
+            this.logger.error(error);
+        }
     }
 }
 exports.HelperImpl = HelperImpl;
@@ -101,9 +130,9 @@ exports.messages = {
             helper.logger.error(error);
         }
     },
-    onEngineBackup: (ev) => {
+    onEngineBackup: async (ev) => {
         try {
-            helper.backupEngine();
+            await helper.backupEngine();
             ev.reply(null, true);
         }
         catch (error) {
@@ -111,9 +140,9 @@ exports.messages = {
             ev.reply(null, false);
         }
     },
-    onEngineRestore: (ev) => {
+    onEngineRestore: async (ev) => {
         try {
-            helper.restoreEngine();
+            await helper.restoreEngine();
             ev.reply(null, true);
         }
         catch (error) {
@@ -121,9 +150,9 @@ exports.messages = {
             ev.reply(null, false);
         }
     },
-    onSyncEngineToCustom: (ev) => {
+    onSyncEngineToCustom: async (ev) => {
         try {
-            helper.syncEngineToCustom();
+            await helper.syncEngineToCustom();
             ev.reply(null, true);
         }
         catch (error) {
@@ -131,9 +160,9 @@ exports.messages = {
             ev.reply(null, false);
         }
     },
-    onSyncCustomToEngine: (ev) => {
+    onSyncCustomToEngine: async (ev) => {
         try {
-            helper.syncCustomToEngine();
+            await helper.syncCustomToEngine();
             ev.reply(null, true);
         }
         catch (error) {
