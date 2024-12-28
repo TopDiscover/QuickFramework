@@ -92,6 +92,13 @@ export const messages = {
             helper.logger.error(error);
         }
     },
+    supportVersion: (ev: any) => {
+        try {
+            ev.reply(null, helper.supportVersions.join(" | "));
+        } catch (error) {
+            helper.logger.error(error);
+        }
+    },
     creatorPath: (ev: any) => {
         try {
             ev.reply(null, helper.creatorPath);

@@ -8,6 +8,7 @@ interface Data {
     creatorPath: string;
     config: FixEngineConfig;
     isEnable: boolean;
+    supportVersions: string;
 }
 
 interface MyView extends Data {
@@ -53,7 +54,8 @@ module.exports = Editor.Panel.extend({
                     creatorVerion: "",
                     creatorPath: "",
                     config: { include: [], exclude: [] } as FixEngineConfig,
-                    isEnable: true
+                    isEnable: true,
+                    supportVersions: "",
                 };
             },
             methods: {
@@ -151,6 +153,9 @@ module.exports = Editor.Panel.extend({
                 });
                 Editor.Ipc.sendToMain("fix_engine:getConfig", (err: any, data: FixEngineConfig) => {
                     view.config = data;
+                });
+                Editor.Ipc.sendToMain("fix_engine:supportVersion", (err: any, versions: string) => {
+                    view.supportVersions = versions;
                 });
             },
             mounted: function () {

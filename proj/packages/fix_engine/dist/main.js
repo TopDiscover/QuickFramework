@@ -93,6 +93,14 @@ exports.messages = {
             helper.logger.error(error);
         }
     },
+    supportVersion: (ev) => {
+        try {
+            ev.reply(null, helper.supportVersions.join(" | "));
+        }
+        catch (error) {
+            helper.logger.error(error);
+        }
+    },
     creatorPath: (ev) => {
         try {
             ev.reply(null, helper.creatorPath);

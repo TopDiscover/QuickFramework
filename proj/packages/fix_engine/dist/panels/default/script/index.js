@@ -25,7 +25,8 @@ module.exports = Editor.Panel.extend({
                     creatorVerion: "",
                     creatorPath: "",
                     config: { include: [], exclude: [] },
-                    isEnable: true
+                    isEnable: true,
+                    supportVersions: "",
                 };
             },
             methods: {
@@ -123,6 +124,9 @@ module.exports = Editor.Panel.extend({
                 });
                 Editor.Ipc.sendToMain("fix_engine:getConfig", (err, data) => {
                     view.config = data;
+                });
+                Editor.Ipc.sendToMain("fix_engine:supportVersion", (err, versions) => {
+                    view.supportVersions = versions;
                 });
             },
             mounted: function () {
