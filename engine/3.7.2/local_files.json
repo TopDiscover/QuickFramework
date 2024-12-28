@@ -1,10 +1,10 @@
 {
-    "resources/3d/engine/bin/.declarations/cc.d.ts": "795ff897af39a1cad1f923e8e0be9466",
-    "resources/3d/engine/native/cocos/application/BaseGame.cpp": "4b4c94ecb14bca05cd50f38da27c4a55",
-    "resources/3d/engine/native/cocos/bindings/auto/jsb_extension_auto.cpp": "f58b598a20882f5f77fe18ef80074c62",
-    "resources/3d/engine/native/extensions/assets-manager/AssetsManagerEx.cpp": "83a32abb1d3fb2f7d54881f25a003275",
-    "resources/3d/engine/native/extensions/assets-manager/AssetsManagerEx.h": "898a5d2ac81f296bae612112f20a9b3a",
-    "resources/3d/engine/native/extensions/assets-manager/Manifest.cpp": "9f9cfc116b72eda7e5557ee9e170feb7",
-    "resources/3d/engine/native/extensions/assets-manager/Manifest.h": "d115aa40a75ad39a590e34aaa5eeae0a",
-    "resources/3d/engine/native/tools/simulator/frameworks/runtime-src/Classes/Game.cpp": "47654802e047f96319d29d96c828b719"
+    "resources/3d/engine/bin/.declarations/cc.d.ts": "51de717e72ec924531c6ef38e02f354d",
+    "resources/3d/engine/native/cocos/application/BaseGame.cpp": "7e97898a73bceebda2c91fc1f18be741",
+    "resources/3d/engine/native/cocos/bindings/auto/jsb_extension_auto.cpp": "577d5116549788457439ef038ecf8d10",
+    "resources/3d/engine/native/extensions/assets-manager/AssetsManagerEx.cpp": "817077f0a00f92564dbc039f092ead91",
+    "resources/3d/engine/native/extensions/assets-manager/AssetsManagerEx.h": "c2e4e6f481af698df3323f4c7c05db1c",
+    "resources/3d/engine/native/extensions/assets-manager/Manifest.cpp": "77b08a1d09699273fd5b6212bf5790dd",
+    "resources/3d/engine/native/extensions/assets-manager/Manifest.h": "bafe0cb6c79fa16dca032b0dea9be0a8",
+    "resources/3d/engine/native/tools/simulator/frameworks/runtime-src/Classes/Game.cpp": "2e22c956804f18562b975eeef2875bdf"
 }
