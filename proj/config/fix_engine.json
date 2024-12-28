@@ -1,0 +1,14 @@
+{
+    "include": [
+        "**/libcocos2d.vcxproj.filters",
+        "**/assets-manager/AssetsManagerEx.*",
+        "**/assets-manager/Manifest.*",
+        "**/jsb_cocos2dx_extension_auto.*",
+        "**/HelloJavascript.vcxproj",
+        "**/jsb_cocos2dx_extension_auto.*",
+        "**/app/build.gradle",
+        "**/api/creator.d.ts",
+        "**/Classes/AppDelegate.*"
+    ],
+    "exclude": []
+}
