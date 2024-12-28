@@ -66,7 +66,7 @@
             <div v-if="config.include.length === 0" class="tips">暂未配置包含文件</div>
             <div
                 class="operator">
-                <ui-input v-bind:disabled="!isEnable"
+                <ui-input v-bind:disabled="!isEnable" v-on:blur="onInputIncludeItemOver($event.target.value)"
                     class="operatorText"></ui-input>
                 <ui-button v-bind:disabled="!isEnable"
                     @click="addIncludeItem()">添加</ui-button>

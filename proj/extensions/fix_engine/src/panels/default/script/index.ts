@@ -9,6 +9,7 @@ interface Data {
     creatorPath: string;
     config: FixEngineConfig;
     isEnable: boolean;
+    addText: string;
 }
 
 interface MyView extends Data {
@@ -25,7 +26,7 @@ module.exports = Editor.Panel.define({
         app: "#app"
     },
     methods: {
-        
+
     },
     ready() {
         if (this.$.app) {
@@ -44,6 +45,10 @@ module.exports = Editor.Panel.define({
                     };
                 },
                 methods: {
+                    onInputIncludeItemOver(value: string) {
+                        // console.log("onInputIncludeItemOver", value);
+                        view.addText = value;
+                    },
                     removeIncludeItem(index: number) {
                         console.log("removeIncludeItem", index, view.config.include[index]);
                         view.config.include.splice(index, 1);
@@ -51,30 +56,28 @@ module.exports = Editor.Panel.define({
                         helper.save();
                     },
                     addIncludeItem() {
-                        if (view.isEnable == false) {
-                            // Editor.log("操作中断");
+                        console.log("addIncludeItem", view.addText);
+                        if (view.config.include.includes(view.addText)) {
+                            console.log("addIncludeItem重复", view.addText);
                             return;
                         }
-                        // Editor.log("addIncludeItem", panel.$addIncludeItem.value);
-                        // view.config.include.push(panel.$addIncludeItem.value);
-                        // Editor.Ipc.sendToMain("fix_engine:saveConfig", view.config);
+                        view.config.include.push(view.addText);
+                        helper.data = view.config;
+                        helper.save();
                     },
                     reset() {
-                        if (view.isEnable == false) {
-                            // Editor.log("操作中断");
-                            return;
-                        }
-                        // Editor.Ipc.sendToMain("fix_engine:restoreDefault", (err: any, data: FixEngineConfig) => {
-                        //     Editor.log("reset", data);
-                        //     view.config = data;
-                        // });
+                        helper.data = helper.defaultData;
+                        helper.save();
+                        view.config = helper.data;
                     },
-                    onEngineBackup() {
-                        // (this as any).setEnable(false);
-                        // Editor.Ipc.sendToMain("fix_engine:onEngineBackup", (err: any, isSuccess: boolean) => {
-                        //     Editor.log(`备份引擎${isSuccess ? "成功" : "失败"}`);
-                        //     (this as any).setEnable(true);
-                        // });
+                    async onEngineBackup() {
+                        view.isEnable = false;
+                        try {
+                            await helper.backupEngine();
+                        } catch (error) {
+                            console.error(error);
+                        }
+                        view.isEnable = true;
                     },
                     onEngineRestore() {
                         // (this as any).setEnable(false);
@@ -112,8 +115,8 @@ module.exports = Editor.Panel.define({
                         //         }
                         //     }
                         // });
-    
-    
+
+
                     },
                     setEnable(isEnable: boolean) {
                         // panel.$addIncludeBtn.disabled = !isEnable;
@@ -127,7 +130,7 @@ module.exports = Editor.Panel.define({
                 },
                 created() {
                     view = this as any;
-                    Editor.Message.send("fix_engine","creatorVersion");
+                    Editor.Message.send("fix_engine", "creatorVersion");
                     // Editor.Message.send("fix_engine:creatorPath", (err: any, path: string) => {
                     //     view.creatorPath = path;
                     // });

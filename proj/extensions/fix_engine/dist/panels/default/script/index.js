@@ -33,41 +33,40 @@ module.exports = Editor.Panel.define({
                     };
                 },
                 methods: {
+                    onInputIncludeItemOver(value) {
+                        // console.log("onInputIncludeItemOver", value);
+                        view.addText = value;
+                    },
                     removeIncludeItem(index) {
-                        if (view.isEnable == false) {
-                            // Editor.log("操作中断");
-                            return;
-                        }
-                        ;
-                        // Editor.log("removeIncludeItem", index, view.config.include[index]);
+                        console.log("removeIncludeItem", index, view.config.include[index]);
                         view.config.include.splice(index, 1);
-                        // Editor.Ipc.sendToMain("fix_engine:saveConfig", view.config);
+                        main_1.default.data = view.config;
+                        main_1.default.save();
                     },
                     addIncludeItem() {
-                        if (view.isEnable == false) {
-                            // Editor.log("操作中断");
+                        console.log("addIncludeItem", view.addText);
+                        if (view.config.include.includes(view.addText)) {
+                            console.log("addIncludeItem重复", view.addText);
                             return;
                         }
-                        // Editor.log("addIncludeItem", panel.$addIncludeItem.value);
-                        // view.config.include.push(panel.$addIncludeItem.value);
-                        // Editor.Ipc.sendToMain("fix_engine:saveConfig", view.config);
+                        view.config.include.push(view.addText);
+                        main_1.default.data = view.config;
+                        main_1.default.save();
                     },
                     reset() {
-                        if (view.isEnable == false) {
-                            // Editor.log("操作中断");
-                            return;
-                        }
-                        // Editor.Ipc.sendToMain("fix_engine:restoreDefault", (err: any, data: FixEngineConfig) => {
-                        //     Editor.log("reset", data);
-                        //     view.config = data;
-                        // });
+                        main_1.default.data = main_1.default.defaultData;
+                        main_1.default.save();
+                        view.config = main_1.default.data;
                     },
-                    onEngineBackup() {
-                        // (this as any).setEnable(false);
-                        // Editor.Ipc.sendToMain("fix_engine:onEngineBackup", (err: any, isSuccess: boolean) => {
-                        //     Editor.log(`备份引擎${isSuccess ? "成功" : "失败"}`);
-                        //     (this as any).setEnable(true);
-                        // });
+                    async onEngineBackup() {
+                        view.isEnable = false;
+                        try {
+                            await main_1.default.backupEngine();
+                        }
+                        catch (error) {
+                            console.error(error);
+                        }
+                        view.isEnable = true;
                     },
                     onEngineRestore() {
                         // (this as any).setEnable(false);
