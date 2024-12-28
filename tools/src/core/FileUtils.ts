@@ -2,7 +2,7 @@ import archiver from "archiver";
 import { createHash } from "crypto";
 import { cp, createReadStream, createWriteStream, existsSync, mkdirSync, PathLike, readdirSync, readFileSync, statSync, symlink, symlinkSync, unlinkSync } from "fs";
 import { copyFile, rm } from "fs/promises";
-import { basename, join, parse, relative } from "path";
+import { basename, dirname, join, parse, relative } from "path";
 import { Asset, CopyData, DirResult, FileResult } from "./Defines";
 import { Environment } from "./Environment";
 import { Handler } from "./Handler";
@@ -165,6 +165,7 @@ export default class FileUtils extends Handler {
             if (isForceCopy) {
                 this.delFile(dest);
             }
+            this.createDir(dirname(dest));
             await copyFile(src, dest)
         } catch (error) {
             this.logger.error(error);
@@ -293,7 +294,7 @@ export default class FileUtils extends Handler {
     /**
      * @description 对文件内容进行md5计算，支持大文件
      */
-    private async md5File(filePath: PathLike): Promise<string> {
+    async md5File(filePath: PathLike): Promise<string> {
         return new Promise((resolve, reject) => {
             const hash = createHash('md5');
             const stream = createReadStream(filePath);
@@ -369,10 +370,17 @@ export default class FileUtils extends Handler {
      * @description 创建目录
      * @param dir 
      */
-    createDir(dir: PathLike) {
+    createDir(dir: string) {
+        // 判断如果是文件，先取出目录，再创建
         if (!existsSync(dir)) {
             // console.log(`创建目录 : ${dir}`);
-            mkdirSync(dir);
+            let dirs = dir.replace(/\\/g, "/").split("/")
+            for (let i = 0; i < dirs.length; i++) {
+                let dir = dirs.slice(0, i + 1).join("/");
+                if (!existsSync(dir)) {
+                    mkdirSync(dir);
+                }
+            }
         }
     }
 

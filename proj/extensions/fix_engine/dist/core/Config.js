@@ -47,7 +47,7 @@ class Config extends Handler_1.Handler {
      */
     save() {
         if (this.path && this.data) {
-            let data = JSON.stringify(this.data);
+            let data = JSON.stringify(this.data, undefined, 4);
             (0, fs_1.writeFileSync)(this.path, data, "utf-8");
             this.logger.log(`${this.module}保存【${this.path}】配置数据 : ${data}`);
         }

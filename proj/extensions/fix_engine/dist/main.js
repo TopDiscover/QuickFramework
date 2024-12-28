@@ -6,10 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.unload = exports.load = exports.methods = exports._Helper = void 0;
 const path_1 = require("path");
 const Helper_1 = __importDefault(require("./impl/Helper"));
+const PACKAGE_NAME = "fix_engine";
 class _Helper extends Helper_1.default {
     constructor() {
         super(...arguments);
         this._path = null;
+        this.userVersion = "3.7.2";
     }
     get creatorVerion() {
         return Editor.App.version;
@@ -25,20 +27,99 @@ class _Helper extends Helper_1.default {
         this._path = parser.dir;
         return this._path;
     }
+    get customEnginePath() {
+        return (0, path_1.join)(this.projPath, `engine/${this.userVersion}/customEngine`);
+    }
+    async syncCustomToEngine() {
+        try {
+            this.userVersion = this.creatorVerion;
+            if (this.isSupport(this.creatorVerion)) {
+                // 先获取 自定义的md5
+                const customMd5 = this.readMd5(false);
+                if (!customMd5) {
+                    this.logger.error(`自定义引擎不存在，请先同步自定义引擎到引擎`);
+                    return;
+                }
+                if (Object.keys(customMd5).length == 0) {
+                    this.logger.warn(`自定义引擎为空，使用通用版本2.4.7`);
+                    this.userVersion = "2.4.7";
+                }
+                await super.syncCustomToEngine();
+                // 保存引擎的md5到自定义
+            }
+            else {
+                this.logger.error(`不支持的引擎版本:${this.creatorVerion}`);
+            }
+        }
+        catch (error) {
+            this.logger.error(error);
+        }
+    }
 }
 exports._Helper = _Helper;
-const Impl = new _Helper();
+const helper = new _Helper();
+exports.default = helper;
 /**
 * @en
 * @zh 为扩展的主进程的注册方法
 */
 exports.methods = {
-    fixEngine() {
-        Impl.run();
+    open_panel() {
+        Editor.Panel.open(PACKAGE_NAME);
     },
     onBeforeBuild() {
-        if (Impl.isUpdate) {
-            console.error(`请先执行【项目工具】->【引擎修正】同步对引擎的修改，再构建!!!`);
+        // if (Impl.isUpdate) {
+        //     console.error(`请先执行【项目工具】->【引擎修正】同步对引擎的修改，再构建!!!`);
+        // }
+    },
+    onEngineBackup: async (ev) => {
+        try {
+            await helper.backupEngine();
+            ev.reply(null, true);
+        }
+        catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
+        }
+    },
+    onEngineRestore: async (ev) => {
+        try {
+            await helper.restoreEngine();
+            ev.reply(null, true);
+        }
+        catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
+        }
+    },
+    onSyncEngineToCustom: async (ev) => {
+        try {
+            await helper.syncEngineToCustom();
+            ev.reply(null, true);
+        }
+        catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
+        }
+    },
+    onSyncCustomToEngine: async (ev) => {
+        try {
+            await helper.syncCustomToEngine();
+            ev.reply(null, true);
+        }
+        catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
+        }
+    },
+    checkBackupEngine: (ev) => {
+        try {
+            const isBackup = helper.checkBackupEngine();
+            ev.reply(null, isBackup);
+        }
+        catch (error) {
+            helper.logger.error(error);
+            ev.reply(null, false);
         }
     }
 };
@@ -47,7 +128,7 @@ exports.methods = {
 * @zh 扩展加载完成后触发的钩子
 */
 const load = function () {
-    console.log("加载fix_engine");
+    console.log(`加载${PACKAGE_NAME}`);
 };
 exports.load = load;
 /**
@@ -55,6 +136,6 @@ exports.load = load;
 * @zh 扩展卸载完成后触发的钩子
 */
 const unload = function () {
-    console.log("卸载fix_engine");
+    console.log(`卸载${PACKAGE_NAME}`);
 };
 exports.unload = unload;

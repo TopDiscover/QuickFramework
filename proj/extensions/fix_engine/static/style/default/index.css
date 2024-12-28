@@ -1,0 +1,54 @@
+.view {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: 2px;
+}
+
+.tips {
+    background-color: #1b1a1a;
+    padding: 10px;
+    border-radius: 10px;
+    margin : 5px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    border-color: #353434;
+    border-radius: 10px;
+    border-width: 2px;
+    border-style: solid;
+    margin-top: 10px;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 10px;
+}
+
+.operator {
+    display: flex;
+    align-items: center;
+    margin: 5px;
+}
+
+.operatorText {
+    flex-grow: 1;
+    margin-right: 10px;
+    background-color: #1b1a1a;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.button {
+    height: 32px;
+    align-items: center;
+    display: flex;
+}

@@ -170,4 +170,12 @@ export class Handler {
         return false;
     }
 
+    /**
+     * @description 数组去重
+     */
+    uniqueArray(arr: any[]) {
+        return arr.filter(function (item, pos) {
+            return arr.indexOf(item) == pos;
+        })
+    }
 }

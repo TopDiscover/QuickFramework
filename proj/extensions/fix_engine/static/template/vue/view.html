@@ -1,0 +1,78 @@
+<div>
+    <div class="title">引擎修复工具</div>
+    <div class="container">
+        <div class="tips">
+            引擎版本: <span
+                style="color : rgb(19, 255, 19); white-space : nowrap">{{creatorVersion}}</span>
+            <br>
+            引擎路径: <span
+                style="color : rgb(19, 255, 19); white-space : nowrap">{{creatorPath}}</span>
+            <br>
+        </div>
+    </div>
+
+    <div class="title">操作</div>
+    <div class="container">
+        <div
+            class="operator">
+            <div
+                class="operatorText">备份引擎到项目中，方便引擎的还原</div>
+            <ui-button v-bind:disabled="!isEnable" class="button"
+                @confirm="onEngineBackup">引擎备份
+            </ui-button>
+
+        </div>
+
+        <div
+            class="operator">
+            <div
+                class="operatorText">被修改过的引擎文件进行还原</div>
+            <ui-button v-bind:disabled="!isEnable"
+                @confirm="onEngineRestore">引擎还原</ui-button>
+        </div>
+
+        <div
+            class="operator">
+            <div
+                class="operatorText">同步引擎修改到项目</div>
+            <ui-button v-bind:disabled="!isEnable"
+                @confirm="onSyncEngineToCustom">同步引擎修改到项目</ui-button>
+        </div>
+
+        <div
+            class="operator">
+            <div
+                class="operatorText">同步项目修改到引擎</div>
+            <ui-button v-bind:disabled="!isEnable"
+                @confirm="onSyncCustomToEngine">同步项目修改到引擎</ui-button>
+        </div>
+    </div>
+
+    <div class="title">包含引擎文件和目录</div>
+    <div class="container">
+        <div class="tips">
+            配置 <span
+                style="color : rgb(19, 255, 19); white-space : nowrap">glob模式</span>
+            以包含文件和文件夹,来匹配引擎中的文件的变化
+        </div>
+        <div class="layout vertical">
+            <div v-for="(item,index) in config.include"
+                class="operator">
+                <ui-input v-bind:value="config.include[index]" readonly
+                    class="operatorText"></ui-input>
+                <ui-button v-bind:disabled="!isEnable"
+                    @click="removeIncludeItem(index)">删除</ui-button>
+            </div>
+            <div v-if="config.include.length === 0" class="tips">暂未配置包含文件</div>
+            <div
+                class="operator">
+                <ui-input v-bind:disabled="!isEnable"
+                    class="operatorText"></ui-input>
+                <ui-button v-bind:disabled="!isEnable"
+                    @click="addIncludeItem()">添加</ui-button>
+                <ui-button v-bind:disabled="!isEnable"
+                    @click="reset()">恢复默认</ui-button>
+            </div>
+        </div>
+    </div>
+</div>

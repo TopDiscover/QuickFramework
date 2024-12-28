@@ -6,6 +6,19 @@
     "main": "./dist/main.js",
     "author": "Zheng Fasheng",
     "editor": ">=3.3.1",
+    "panels": {
+        "default": {
+            "title": "引擎修正",
+            "type": "dockable",
+            "main": "dist/panels/default/script",
+            "size": {
+                "min-width": 700,
+                "min-height": 700,
+                "width": 600,
+                "height": 600
+            }
+        }
+    },
     "scripts": {
         "build": "tsc -b",
         "watch": "tsc -w"
@@ -15,13 +28,13 @@
             {
                 "path": "项目工具",
                 "label": "引擎修正",
-                "message": "fixEngine"
+                "message": "open-panel"
             }
         ],
         "messages": {
-            "fixEngine": {
+            "open-panel": {
                 "methods": [
-                    "fixEngine"
+                    "open_panel"
                 ]
             },
             "onBeforeBuild": {

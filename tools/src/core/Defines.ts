@@ -5,19 +5,12 @@
 /**
  * @description 引擎修正插件数据定义
  */
-export interface FixEngineData {
-    /**@description 相对于 Editor.App.path 的相对路径 */
-    to: string;
-    /**@description 相对于 fix_engine/engine 的相对路径 */
-    from: string;
-    /**@description 修正说明 */
-    desc: string;
-    /**@description 支持版本，如果无，则支持所有版本，如果有值，则只在 versions 内的版本才生效 */
-    versions?:string;
+export interface FixEngineConfig {
+    /**@description 包含的文件 */
+    include: string[];
+    /**@description 排除的文件 */
+    exclude: string[];
 }
-
-/**@description 引擎修正插件config.json的结构定义 */
-export type FixEngineConfig = { [key: string]: FixEngineData };
 
 
 export interface Logger {
@@ -94,8 +87,6 @@ export enum Extensions {
     PngCompress = "png-compress",
     /**@description 测试服务器 */
     TestServer = "test-server",
-    /**@description 确定删除bundle */
-    ConfirmDelSubgames = "confirm_del_subgames"
 }
 
 export interface GulpConfig {
