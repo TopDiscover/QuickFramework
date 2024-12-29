@@ -91,6 +91,12 @@ export namespace Update {
         UP_TO_DATE,
         /**@description 更新失败 */
         FAIL_TO_UPDATE,
+        /**
+         * @description 准备下载更新(3.8.5之后才有) , 
+         * 原3.8.5 放在READY_TO_UPDATE之前，为了统一逻辑处理，
+         * 添加到末尾，为了兼容3.8.5之前的版本
+         * */
+        PREDOWNLOAD_UPDATE,
     }
 
     /**
