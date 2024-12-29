@@ -9,6 +9,7 @@ interface Data {
     config: FixEngineConfig;
     isEnable: boolean;
     supportVersions: string;
+    tipState :string;
 }
 
 interface MyView extends Data {
@@ -56,6 +57,7 @@ module.exports = Editor.Panel.extend({
                     config: { include: [], exclude: [] } as FixEngineConfig,
                     isEnable: true,
                     supportVersions: "",
+                    tipState: "",
                 };
             },
             methods: {
@@ -89,23 +91,29 @@ module.exports = Editor.Panel.extend({
                 },
                 onEngineBackup() {
                     (this as any).setEnable(false);
+                    view.tipState = "(引擎备份中，请稍等...)";
                     Editor.Ipc.sendToMain("fix_engine:onEngineBackup", (err: any, isSuccess: boolean) => {
                         Editor.log(`备份引擎${isSuccess ? "成功" : "失败"}`);
                         (this as any).setEnable(true);
+                        view.tipState = "";
                     });
                 },
                 onEngineRestore() {
                     (this as any).setEnable(false);
+                    view.tipState = "(引擎恢复中，请稍等...)";
                     Editor.Ipc.sendToMain("fix_engine:onEngineRestore", (err: any, isSuccess: boolean) => {
                         Editor.log(`恢复引擎${isSuccess ? "成功" : "失败"}`);
                         (this as any).setEnable(true);
+                        view.tipState = "";
                     });
                 },
                 onSyncEngineToCustom() {
                     (this as any).setEnable(false);
+                    view.tipState = "(正在同步引擎修改，请稍等...)";
                     Editor.Ipc.sendToMain("fix_engine:onSyncEngineToCustom", (err: any, isSuccess: boolean) => {
-                        Editor.log(`同步引擎修改到项目${isSuccess ? "成功" : "失败"}`);
+                        Editor.log(`同步引擎修改到自定义引擎${isSuccess ? "成功" : "失败"}`);
                         (this as any).setEnable(true);
+                        view.tipState = "";
                     });
                 },
                 async onSyncCustomToEngine() {
@@ -114,9 +122,11 @@ module.exports = Editor.Panel.extend({
                         Editor.log(`备份状态 : ${isBackup ? "已备份" : "未备份"}`);
                         if (isBackup) {
                             (this as any).setEnable(false);
+                            view.tipState = "(正在同步自定义引擎修改，请稍等...)";
                             Editor.Ipc.sendToMain("fix_engine:onSyncCustomToEngine", (err: any, isSuccess: boolean) => {
-                                Editor.log(`同步项目修改到引擎${isSuccess ? "成功" : "失败"}`);
+                                Editor.log(`同步定义引擎修改到引擎${isSuccess ? "成功" : "失败"}`);
                                 (this as any).setEnable(true);
+                                view.tipState = "";
                             });
                         } else {
                             const config = {
@@ -134,6 +144,7 @@ module.exports = Editor.Panel.extend({
 
                 },
                 setEnable(isEnable: boolean) {
+                    view.isEnable = isEnable;
                     panel.$addIncludeBtn.disabled = !isEnable;
                     panel.$addIncludeItem.disabled = !isEnable;
                     panel.$resetBtn.disabled = !isEnable;

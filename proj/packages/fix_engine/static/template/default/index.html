@@ -12,7 +12,7 @@
         <br>
     </ui-hint>
 
-    <h2>操作</h2>
+    <h2>操作<span v-if="!isEnable"></span>{{tipState}}</h2>
     <ui-box-container class="layout vertical">
         <div style="display: flex; align-items: center; margin-bottom: 5px;">
             <ui-hint
@@ -32,16 +32,16 @@
 
         <div style="display: flex; align-items: center; margin-bottom: 5px;">
             <ui-hint
-                style="flex-grow: 1; margin-right: 10px;">同步引擎修改到项目</ui-hint>
+                style="flex-grow: 1; margin-right: 10px;">同步引擎修改到自定义引擎</ui-hint>
             <ui-button id="syncEngineToCustom"
-                @confirm="onSyncEngineToCustom">同步引擎修改到项目</ui-button>
+                @confirm="onSyncEngineToCustom">同步引擎</ui-button>
         </div>
 
         <div style="display: flex; align-items: center; margin-bottom: 5px;">
             <ui-hint
-                style="flex-grow: 1; margin-right: 10px;">同步项目修改到引擎</ui-hint>
+                style="flex-grow: 1; margin-right: 10px;">同步自定义引擎修改到引擎</ui-hint>
             <ui-button id="syncCustomToEngine"
-                @confirm="onSyncCustomToEngine">同步项目修改到引擎</ui-button>
+                @confirm="onSyncCustomToEngine">同步自定义引擎</ui-button>
         </div>
     </ui-box-container>
 
