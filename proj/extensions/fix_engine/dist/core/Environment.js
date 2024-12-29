@@ -8,7 +8,7 @@ const Defines_1 = require("./Defines");
 class _Environment {
     constructor() {
         /**@description cocos creator 安装目录 */
-        this.creatorPath = "D:/Creator/Creator/3.7.2/resources";
+        this.creatorPath = "D:/Cocos/Creator/3.7.2/resources";
         /**@description cocos creator 版本 */
         this.creatorVerion = "3.7.2";
         /**@description 支持版本 */

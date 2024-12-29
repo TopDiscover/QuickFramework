@@ -16,15 +16,12 @@ class Helper extends Config_1.default {
         this.module = "【引擎修正】";
         this.defaultData = {
             include: [
-                "**/libcocos2d.vcxproj.filters",
-                "**/assets-manager/AssetsManagerEx.*",
-                "**/assets-manager/Manifest.*",
-                "**/jsb_cocos2dx_extension_auto.*",
-                "**/HelloJavascript.vcxproj",
-                "**/app/build.gradle",
-                "utils/api/**",
-                "**/js-template-default/frameworks/runtime-src/Classes/AppDelegate.cpp",
-                "**/js-template-link/frameworks/runtime-src/Classes/AppDelegate.cpp",
+                "resources/3d/engine/native/extensions/assets-manager/AssetsManagerEx.*",
+                "resources/3d/engine/native/extensions/assets-manager/Manifest.*",
+                "resources/3d/engine/native/cocos/bindings/auto/jsb_extension_auto.cpp",
+                "resources/3d/engine/bin/.declarations/cc.d.ts",
+                "resources/3d/engine/native/cocos/application/BaseGame.cpp",
+                "resources/3d/engine/native/tools/simulator/frameworks/runtime-src/Classes/Game.cpp",
             ],
             exclude: [],
         };
@@ -131,8 +128,8 @@ class Helper extends Config_1.default {
     }
     async getAllFiles(dir) {
         this.read();
-        const files = await this.md5engine(dir);
-        // writeFileSync(join(__dirname, "files.json"), JSON.stringify(files, undefined, 4));
+        let files = await this.md5engine(dir);
+        // console.log(files);
         return files;
     }
     saveMd5(files, isRaw = true) {

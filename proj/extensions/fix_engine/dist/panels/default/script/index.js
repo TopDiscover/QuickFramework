@@ -29,7 +29,8 @@ module.exports = Editor.Panel.define({
                         creatorVersion: main_1.default.creatorVerion,
                         creatorPath: main_1.default.creatorPath,
                         config: main_1.default.data,
-                        isEnable: true
+                        isEnable: true,
+                        supportVersion: main_1.default.supportVersions.join(" | "),
                     };
                 },
                 methods: {
@@ -68,62 +69,53 @@ module.exports = Editor.Panel.define({
                         }
                         view.isEnable = true;
                     },
-                    onEngineRestore() {
-                        // (this as any).setEnable(false);
-                        // Editor.Ipc.sendToMain("fix_engine:onEngineRestore", (err: any, isSuccess: boolean) => {
-                        //     Editor.log(`恢复引擎${isSuccess ? "成功" : "失败"}`);
-                        //     (this as any).setEnable(true);
-                        // });
+                    async onEngineRestore() {
+                        view.isEnable = false;
+                        try {
+                            await main_1.default.restoreEngine();
+                        }
+                        catch (error) {
+                            console.error(error);
+                        }
+                        view.isEnable = true;
                     },
-                    onSyncEngineToCustom() {
-                        // (this as any).setEnable(false);
-                        // Editor.Ipc.sendToMain("fix_engine:onSyncEngineToCustom", (err: any, isSuccess: boolean) => {
-                        //     Editor.log(`同步引擎修改到项目${isSuccess ? "成功" : "失败"}`);
-                        //     (this as any).setEnable(true);
-                        // });
+                    async onSyncEngineToCustom() {
+                        view.isEnable = false;
+                        try {
+                            await main_1.default.syncEngineToCustom();
+                        }
+                        catch (error) {
+                            console.error(error);
+                        }
+                        view.isEnable = true;
                     },
                     async onSyncCustomToEngine() {
                         // 检查是否有备份
-                        // Editor.Ipc.sendToMain("fix_engine:checkBackupEngine", async (err: any, isBackup: boolean) => {
-                        //     Editor.log(`备份状态 : ${isBackup ? "已备份" : "未备份"}`);
-                        //     if (isBackup) {
-                        //         (this as any).setEnable(false);
-                        //         Editor.Ipc.sendToMain("fix_engine:onSyncCustomToEngine", (err: any, isSuccess: boolean) => {
-                        //             Editor.log(`同步项目修改到引擎${isSuccess ? "成功" : "失败"}`);
-                        //             (this as any).setEnable(true);
-                        //         });
-                        //     } else {
-                        //         const config = {
-                        //             title: '警告',
-                        //             detail: '未检测到引擎的备份，请先备份引擎，是否继续?',
-                        //             buttons: ['取消', '备份'],
-                        //         };
-                        //         const code = await Editor.Dialog.messageBox(config);
-                        //         if (code == 1) {
-                        //             (this as any).onEngineBackup(false);
-                        //         }
-                        //     }
-                        // });
+                        if (main_1.default.checkBackupEngine()) {
+                            view.isEnable = false;
+                            try {
+                                await main_1.default.syncCustomToEngine();
+                            }
+                            catch (error) {
+                                console.error(error);
+                            }
+                            view.isEnable = true;
+                        }
+                        else {
+                            const config = {
+                                title: '警告',
+                                detail: '',
+                                buttons: ['取消', '备份'],
+                            };
+                            const code = await Editor.Dialog.warn('未检测到引擎的备份，请先备份引擎，是否继续?', config);
+                            if (code.response == 1) {
+                                await this.onEngineBackup();
+                            }
+                        }
                     },
-                    setEnable(isEnable) {
-                        // panel.$addIncludeBtn.disabled = !isEnable;
-                        // panel.$addIncludeItem.disabled = !isEnable;
-                        // panel.$resetBtn.disabled = !isEnable;
-                        // panel.$engineBackup.disabled = !isEnable;
-                        // panel.$engineRestore.disabled = !isEnable;
-                        // panel.$syncEngineToCustom.disabled = !isEnable;
-                        // panel.$syncCustomToEngine.disabled = !isEnable;
-                    }
                 },
                 created() {
                     view = this;
-                    Editor.Message.send("fix_engine", "creatorVersion");
-                    // Editor.Message.send("fix_engine:creatorPath", (err: any, path: string) => {
-                    //     view.creatorPath = path;
-                    // });
-                    // Editor.Message.send("fix_engine:getConfig", (err: any, data: FixEngineConfig) => {
-                    //     view.config = data;
-                    // });
                 }
             });
             app.mount(this.$.app);
