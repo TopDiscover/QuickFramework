@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <fstream>
+#include <time.h>
 
 #define KEY_VERSION          "version"
 #define KEY_PACKAGE_URL      "packageUrl"
@@ -51,6 +52,11 @@
 #define KEY_SIZE            "size"
 #define KEY_COMPRESSED_FILE "compressedFile"
 #define KEY_DOWNLOAD_STATE  "downloadState"
+
+#define KEY_BUNDLE			"bundle"
+#define VERSION_FILENAME    "_version.json"
+#define MANIFEST_FILENAME   "_project.json"
+#define MANIFEST_ROOT	    "manifest/"
 
 NS_CC_EXT_BEGIN
 
@@ -78,7 +84,14 @@ static int cmpVersion(const std::string &v1, const std::string &v2) {
 Manifest::Manifest(const std::string &manifestUrl /* = ""*/)
 : _versionLoaded(false),
   _loaded(false),
-  _updating(false) {
+  _updating(false),
+  _manifestRoot(""),
+  _version(""),
+  _engineVer(""),
+  _packageUrl(""),
+  _bundle(""),
+  _md5(""),
+  _zipSize(0) {
     // Init variables
     _fileUtils = FileUtils::getInstance();
     if (!manifestUrl.empty()) {
@@ -89,12 +102,37 @@ Manifest::Manifest(const std::string &manifestUrl /* = ""*/)
 Manifest::Manifest(const std::string &content, const std::string &manifestRoot)
 : _versionLoaded(false),
   _loaded(false),
-  _updating(false) {
+  _updating(false),
+  _manifestRoot(""),
+  _version(""),
+  _engineVer(""),
+  _packageUrl(""),
+  _bundle(""),
+  _md5(""),
+  _zipSize(0) {
     // Init variables
     _fileUtils = FileUtils::getInstance();
     if (!content.empty()) {
         parseJSONString(content, manifestRoot);
     }
+}
+
+Manifest::Manifest(const std::string &content, const std::string &manifestRoot, const std::string& packageUrl)
+: _versionLoaded(false),
+  _loaded(false),
+  _updating(false),
+  _manifestRoot(""),
+  _version(""),
+  _engineVer(""),
+  _packageUrl(""),
+  _bundle(""),
+  _md5(""),
+  _zipSize(0) {
+    // Init variables
+    _fileUtils = FileUtils::getInstance();
+	setPackageUrl(packageUrl);
+    if (content.size() > 0)
+        parseJSONString(content, manifestRoot);
 }
 
 void Manifest::loadJson(const std::string &url) {
@@ -143,9 +181,9 @@ void Manifest::parseFile(const std::string &manifestUrl) {
 
     if (!_json.HasParseError() && _json.IsObject()) {
         // Register the local manifest root
-        size_t found = manifestUrl.find_last_of("/\\");
+        size_t found = manifestUrl.find(MANIFEST_ROOT);
         if (found != std::string::npos) {
-            _manifestRoot = manifestUrl.substr(0, found + 1);
+            _manifestRoot = manifestUrl.substr(0, found);
         }
         loadManifest(_json);
     }
@@ -231,6 +269,15 @@ bool Manifest::versionGreater(const Manifest *b, const std::function<int(const s
     return greater;
 }
 
+bool Manifest::equal(const Manifest*b) const {
+	auto localMd5 = getMd5();
+	auto bMd5 = b->getMd5();
+	if ( localMd5 == bMd5 ){
+		return true;
+	}
+	return false;
+}
+
 std::unordered_map<std::string, Manifest::AssetDiff> Manifest::genDiff(const Manifest *b) const {
     std::unordered_map<std::string, AssetDiff> diffMap;
     const std::unordered_map<std::string, Asset> &bAssets = b->getAssets();
@@ -282,16 +329,26 @@ std::unordered_map<std::string, Manifest::AssetDiff> Manifest::genDiff(const Man
     return diffMap;
 }
 
-void Manifest::genResumeAssetsList(DownloadUnits *units) const {
+void Manifest::genResumeAssetsList(DownloadUnits *units, bool& unzip) const {
+    unzip = false;
     for (const auto &it : _assets) {
         Asset asset = it.second;
 
         if (asset.downloadState != DownloadState::SUCCESSED && asset.downloadState != DownloadState::UNMARKED) {
             DownloadUnit unit;
             unit.customId = it.first;
-            unit.srcUrl = _packageUrl + asset.path;
+            if (asset.compressed) {
+                unit.srcUrl = getPackageUrl() + "zips/" + asset.path;
+            }
+            else {
+                unit.srcUrl = getPackageUrl() + asset.path + "?md5=" + asset.md5;
+            }
             unit.storagePath = _manifestRoot + asset.path;
             unit.size = asset.size;
+            unit.compressed = asset.compressed;
+            if (asset.downloadState == DownloadState::UNZIP && _fileUtils->isFileExist(unit.storagePath)) {
+                unzip = true;
+            }
             units->emplace(unit.customId, unit);
         }
     }
@@ -340,16 +397,31 @@ const std::string &Manifest::getPackageUrl() const {
     return _packageUrl;
 }
 
-const std::string &Manifest::getManifestFileUrl() const {
-    return _remoteManifestUrl;
+const void Manifest::setPackageUrl(const std::string& packageUrl) {
+    _packageUrl = packageUrl;
+    // Append automatically "/"
+    if (_packageUrl.size() > 0 && _packageUrl[_packageUrl.size() - 1] != '/')
+    {
+        _packageUrl.append("/");
+    }
 }
 
-const std::string &Manifest::getVersionFileUrl() const {
-    return _remoteVersionUrl;
+const std::string Manifest::getManifestFileUrl() const {
+    // Add a timestamp to ensure the fetch is up-to-date
+    return getPackageUrl() + MANIFEST_ROOT + _bundle + MANIFEST_FILENAME + "?time=" + std::to_string(time(nullptr));
+}
+
+const std::string Manifest::getVersionFileUrl() const {
+    // Add a timestamp to ensure the fetch is up-to-date
+    return getPackageUrl() + MANIFEST_ROOT + _bundle + VERSION_FILENAME + "?time=" + std::to_string(time(nullptr));
 }
 
 const std::string &Manifest::getVersion() const {
     return _version;
+}
+
+const std::string &Manifest::getMd5() const {
+    return _md5;
 }
 
 const std::vector<std::string> &Manifest::getGroups() const {
@@ -392,13 +464,41 @@ void Manifest::setAssetDownloadState(const std::string &key, const Manifest::Dow
     }
 }
 
+void Manifest::updateToZipAsset(const DownloadUnit& unit) {
+    Asset asset;
+    asset.compressed = unit.compressed;
+    asset.md5 = _md5;
+    asset.path = _bundle + "_" + _md5 + ".zip";
+    asset.size = unit.size;
+    // Update json object
+    if (_json.IsObject()) {
+        if (_json.HasMember(KEY_ASSETS)) {
+            rapidjson::Value &assets = _json[KEY_ASSETS];
+            if (assets.IsObject()) {
+                auto key = unit.customId.data();
+                if (!assets.HasMember(key)) {
+                    rapidjson::Value value(rapidjson::Type::kObjectType);
+                    value.SetObject();
+                    rapidjson::Value name(rapidjson::Type::kStringType);
+                    name.SetString(key, unit.customId.size(), _json.GetAllocator());
+                    assets.AddMember(name, value, _json.GetAllocator());
+
+                    rapidjson::Value &entry = assets[unit.customId.c_str()];
+                    entry.AddMember<bool>(KEY_COMPRESSED, static_cast<int>(asset.compressed), _json.GetAllocator());
+
+                    entry.AddMember<int>(KEY_SIZE, static_cast<int>(asset.size), _json.GetAllocator());
+                }
+            }
+        }
+    }
+    _assets.emplace(unit.customId, asset);
+}
+
 void Manifest::clear() {
     if (_versionLoaded || _loaded) {
         _groups.clear();
         _groupVer.clear();
 
-        _remoteManifestUrl = "";
-        _remoteVersionUrl = "";
         _version = "";
         _engineVer = "";
 
@@ -433,7 +533,7 @@ Manifest::Asset Manifest::parseAsset(const std::string &path, const rapidjson::V
     }
 
     if (json.HasMember(KEY_SIZE) && json[KEY_SIZE].IsInt()) {
-        asset.size = static_cast<float>(json[KEY_SIZE].GetInt());
+        asset.size = static_cast<int>(json[KEY_SIZE].GetInt());
     } else {
         asset.size = 0;
     }
@@ -448,15 +548,6 @@ Manifest::Asset Manifest::parseAsset(const std::string &path, const rapidjson::V
 }
 
 void Manifest::loadVersion(const rapidjson::Document &json) {
-    // Retrieve remote manifest url
-    if (json.HasMember(KEY_MANIFEST_URL) && json[KEY_MANIFEST_URL].IsString()) {
-        _remoteManifestUrl = json[KEY_MANIFEST_URL].GetString();
-    }
-
-    // Retrieve remote version url
-    if (json.HasMember(KEY_VERSION_URL) && json[KEY_VERSION_URL].IsString()) {
-        _remoteVersionUrl = json[KEY_VERSION_URL].GetString();
-    }
 
     // Retrieve local version
     if (json.HasMember(KEY_VERSION) && json[KEY_VERSION].IsString()) {
@@ -489,20 +580,38 @@ void Manifest::loadVersion(const rapidjson::Document &json) {
         _updating = json[KEY_UPDATING].GetBool();
     }
 
+    // Retrieve package url
+    if (json.HasMember(KEY_PACKAGE_URL) && json[KEY_PACKAGE_URL].IsString())
+    {
+        setPackageUrl(json[KEY_PACKAGE_URL].GetString());
+    }
+
+    //md5
+    if (json.HasMember(KEY_MD5) && json[KEY_MD5].IsString()) {
+        _md5 = json[KEY_MD5].GetString();
+    }
+    else {
+        _md5 = "";
+    }
+
+    //bundle
+    if (json.HasMember(KEY_BUNDLE) && json[KEY_BUNDLE].IsString()) {
+        _bundle = json[KEY_BUNDLE].GetString();
+    }
+    else {
+        _bundle = "";
+    }
+
+    //zip文件大小
+    if (json.HasMember(KEY_SIZE) && json[KEY_SIZE].IsInt()) {
+        _zipSize = json[KEY_SIZE].GetInt();
+    }
+
     _versionLoaded = true;
 }
 
 void Manifest::loadManifest(const rapidjson::Document &json) {
     loadVersion(json);
-
-    // Retrieve package url
-    if (json.HasMember(KEY_PACKAGE_URL) && json[KEY_PACKAGE_URL].IsString()) {
-        _packageUrl = json[KEY_PACKAGE_URL].GetString();
-        // Append automatically "/"
-        if (!_packageUrl.empty() && _packageUrl[_packageUrl.size() - 1] != '/') {
-            _packageUrl.append("/");
-        }
-    }
 
     // Retrieve all assets
     if (json.HasMember(KEY_ASSETS)) {
@@ -541,6 +650,20 @@ void Manifest::saveToFile(const std::string &filepath) {
     if (!output.bad()) {
         output << buffer.GetString() << std::endl;
     }
+}
+
+void Manifest::saveVersionToFile(const std::string& filepath) {
+	rapidjson::StringBuffer buffer;
+	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+	if (_json.HasMember(KEY_ASSETS)) {
+		_json.EraseMember(KEY_ASSETS);
+	}
+	_json.Accept(writer);
+
+	std::ofstream output(FileUtils::getInstance()->getSuitableFOpen(filepath), std::ofstream::out);
+
+	if (!output.bad())
+		output << buffer.GetString() << std::endl;
 }
 
 NS_CC_EXT_END

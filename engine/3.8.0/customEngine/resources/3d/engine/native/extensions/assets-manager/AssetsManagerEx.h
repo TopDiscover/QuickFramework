@@ -212,6 +212,25 @@ public:
         _eventCallback = callback;
     };
 
+    /**
+	 * @brief 设置热更新地址,由于热更新地址会动态的发生变化，热更新的地址以下发的地址为准,设置热更新地址后，会自动的替换所有热更新的源地址
+	 */
+	void setPackageUrl(const std::string& url);
+	const std::string& getPackageUrl() const;
+	/**
+	 * @brief 设置主包包含的bunldes ,用& 隔开，示例 main&resources
+	 */
+	void setMainBundles(const std::vector<std::string>& bundles);
+	/**
+	 * @brief 设置 【将要下载资源总数】超过【总下载资源总数】的percent(取值0-1)，则删除掉本地缓存资源，重新下载bunlde的zip包
+	 */
+	void setDownloadAgainZip(float percent);
+    /**
+     * @brief 删除指定bundle下载缓存
+     */
+    void removeBundleDirectory(const std::string& path);
+	void reset();
+
 protected:
     void init(const std::string &manifestUrl, const std::string &storagePath);
 
@@ -291,6 +310,17 @@ protected:
      * @lua NA
      */
     virtual void onSuccess(const std::string &srcUrl, const std::string &storagePath, const std::string &customId);
+
+    /************************************************************************/
+	/* 删除缓存中下载文件                                                   */
+	/************************************************************************/
+	void removeCachedDirectory();
+	void removeTempDirectory();
+	void moveTempToCached(const std::string& root, const std::string& path, std::unordered_map<std::string, Manifest::AssetDiff>& diff_map, bool isComplete = true);
+
+	bool isNeedDownLoadZip(std::unordered_map<std::string, Manifest::AssetDiff>& diffMap );
+
+	void toDownloadZip();
 
 private:
     void batchDownload();
@@ -407,6 +437,17 @@ private:
 
     //! Marker for whether the assets manager is inited
     bool _inited = false;
+
+    /*是否启用资源下载类型*/
+	bool _isUsingBundle;
+	/*资源类型 "main"为大厅 其它为子游戏包名*/
+	std::string _bundle;
+	/* 热更新地址*/
+	std::string _packageUrl;
+	/* 主包包含哪些bundle,如 main&resources */
+	std::vector<std::string> _mainBundles;
+	float _downloadAagin;
+    bool _unzip;
 };
 
 NS_CC_EXT_END

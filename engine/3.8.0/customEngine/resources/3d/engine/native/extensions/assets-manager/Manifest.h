@@ -45,6 +45,7 @@ struct DownloadUnit {
     std::string storagePath;
     std::string customId;
     float size;
+    bool compressed;
 };
 
 struct ManifestAsset {
@@ -72,7 +73,8 @@ public:
         UNSTARTED,
         DOWNLOADING,
         SUCCESSED,
-        UNMARKED
+        UNMARKED,
+        UNZIP
     };
 
     //! Asset object
@@ -95,18 +97,23 @@ public:
     /** @brief Gets remote package url.
      */
     const std::string &getPackageUrl() const;
+    /***********************************************************************/
+    /* @brief 设置远程热更新地址                                             */
+    /***********************************************************************/
+    const void setPackageUrl(const std::string& packageUrl);
 
     /** @brief Gets remote manifest file url.
      */
-    const std::string &getManifestFileUrl() const;
+    const std::string getManifestFileUrl() const;
 
     /** @brief Gets remote version file url.
      */
-    const std::string &getVersionFileUrl() const;
+    const std::string getVersionFileUrl() const;
 
     /** @brief Gets manifest version.
      */
     const std::string &getVersion() const;
+    const std::string &getMd5() const;
 
     /** @brief Get the search paths list related to the Manifest.
      */
@@ -128,6 +135,7 @@ public:
      * @param manifestRoot The root path of the manifest file (It should be local path, so that we can find assets path relative to the root path)
      */
     Manifest(const std::string &content, const std::string &manifestRoot);
+    Manifest(const std::string &content, const std::string &manifestRoot, const std::string &packageUrl);
 
     /** @brief Parse the manifest file information into this manifest
      * @param manifestUrl Url of the local manifest
@@ -181,6 +189,8 @@ protected:
      */
     bool versionGreaterOrEquals(const Manifest *b, const std::function<int(const std::string &versionA, const std::string &versionB)> &handle) const;
 
+    bool equal(const Manifest*b) const;
+
     /** @brief Check whether the version of this manifest is greater or equals than another.
      * @param b         The other manifest
      * @param [handle]  Customized comparasion handle function
@@ -196,7 +206,7 @@ protected:
     /** @brief Generate resuming download assets list
      * @param units   The download units reference to be modified by the generation result
      */
-    void genResumeAssetsList(DownloadUnits *units) const;
+    void genResumeAssetsList(DownloadUnits *units , bool& unzip) const;
 
     /** @brief Prepend all search paths to the FileUtils.
      */
@@ -207,6 +217,8 @@ protected:
     void loadManifest(const rapidjson::Document &json);
 
     void saveToFile(const std::string &filepath);
+
+    void saveVersionToFile(const std::string& filepath);
 
     static Asset parseAsset(const std::string &path, const rapidjson::Value &json);
 
@@ -241,6 +253,10 @@ protected:
         _manifestRoot = root;
     };
 
+    double getZipSize() { return _zipSize; }
+    /* 更新当前资源为zip下载*/
+    void updateToZipAsset(const DownloadUnit& unit);
+
 private:
     //! Indicate whether the version informations have been fully loaded
     bool _versionLoaded;
@@ -259,12 +275,6 @@ private:
 
     //! The remote package url
     std::string _packageUrl;
-
-    //! The remote path of manifest file
-    std::string _remoteManifestUrl;
-
-    //! The remote path of version file [Optional]
-    std::string _remoteVersionUrl;
 
     //! The version of local manifest
     std::string _version;
@@ -285,6 +295,15 @@ private:
     std::vector<std::string> _searchPaths;
 
     rapidjson::Document _json;
+
+    //设置bundle
+    std::string _bundle;
+
+    //md5
+    std::string _md5;
+
+    //zip文件大小
+    double _zipSize;
 };
 
 NS_CC_EXT_END

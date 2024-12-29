@@ -27,7 +27,7 @@
 #include "ApplicationManager.h"
 #include "platform/interfaces/modules/ISystemWindowManager.h"
 #include "renderer/pipeline/GlobalDescriptorSetManager.h"
-
+#include "platform/FileUtils.h"
 extern "C" void cc_load_all_plugins(); // NOLINT
 
 namespace cc {
@@ -73,6 +73,19 @@ int BaseGame::init() {
     int ret = cc::CocosApplication::init();
     if (ret != 0) {
         return ret;
+    }
+
+    // 首先必须要设置缓存下载载的搜索路径，不然，会首先加载到原的代码，而不是最新缓存的代码
+    auto cache = cc::FileUtils::getInstance()->getWritablePath() + "caches/";
+    auto searchPath = cc::FileUtils::getInstance()->getSearchPaths();
+    auto it = std::find_if(searchPath.begin(), searchPath.end(), [=](const std::string& value) {
+        if (value == cache) {
+            return true;
+        }
+        return false;
+    });
+    if (it == searchPath.end()) {
+        cc::FileUtils::getInstance()->addSearchPath(cache, true);
     }
 
     setXXTeaKey(_xxteaKey);
