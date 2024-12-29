@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { Handler } from "./Handler";
+import { Environment } from "./Environment";
 
 export default class Config<T> extends Handler {
 
@@ -24,7 +25,9 @@ export default class Config<T> extends Handler {
         super();
     }
 
-
+    isSupportUpdate(platform: string) {
+       return Environment.isSupportUpdate(platform);
+    }
 
     /**
      * @description 读取数据

@@ -48,12 +48,6 @@ class HelperImpl extends Helper_1.default {
         this.isDoing = false;
         this.logger = Editor;
     }
-    isSupportUpdate(platform) {
-        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac" || platform == "win32") {
-            return true;
-        }
-        return false;
-    }
     onUpdateCreateProgress(percent) {
         if (this.isDeploy) {
             Editor.Ipc.sendToPanel(PACKAGE_NAME, "hotupdate:updateDeployProgress", percent);

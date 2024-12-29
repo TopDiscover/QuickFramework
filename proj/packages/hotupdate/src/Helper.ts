@@ -13,13 +13,6 @@ class HelperImpl extends Helper{
     
     isDoing = false;
 
-    isSupportUpdate(platform: string) {
-        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac" || platform == "win32") {
-            return true;
-        }
-        return false;
-    }
-
     onUpdateCreateProgress(percent: number): void {
         if ( this.isDeploy ){
             Editor.Ipc.sendToPanel(PACKAGE_NAME, "hotupdate:updateDeployProgress", percent);

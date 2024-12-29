@@ -170,6 +170,10 @@ export class Handler {
         return false;
     }
 
+    isSupportUpdate(platform: string) {
+        return Environment.isSupportUpdate(platform);
+    }
+
     /**
      * @description 数组去重
      */

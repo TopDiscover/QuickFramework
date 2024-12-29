@@ -67,9 +67,9 @@ const helper = new HelperImpl();
 helper.logger = Editor;
 exports.default = helper;
 function onBuildStart(options, callback) {
-    // if (helper.isUpdate) {
-    //     Editor.error(`请先执行【项目工具】->【引擎修正】同步对引擎的修改，再构建!!!`);
-    // }
+    if (helper.isSupportUpdate(options.platform)) {
+        Editor.error(`请先执行【项目工具】->【引擎修正】->【同步自定义引擎】同步对引擎的修改，再构建，保证热更新部分能正常运行`);
+    }
     callback();
 }
 function onBuildFinished(options, callback) {

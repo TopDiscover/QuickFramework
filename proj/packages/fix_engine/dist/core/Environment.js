@@ -83,6 +83,12 @@ class _Environment {
     get resources() {
         return "resources";
     }
+    isSupportUpdate(platform) {
+        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac" || platform == "win32") {
+            return true;
+        }
+        return false;
+    }
 }
 _Environment._instance = null;
 exports.Environment = _Environment.instance;

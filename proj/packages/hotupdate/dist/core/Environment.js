@@ -8,11 +8,11 @@ const Defines_1 = require("./Defines");
 class _Environment {
     constructor() {
         /**@description cocos creator 安装目录 */
-        this.creatorPath = "D:/Creator/Creator/2.4.7/resources";
+        this.creatorPath = "D:/Cocos/Creator/2.4.7/resources";
         /**@description cocos creator 版本 */
         this.creatorVerion = "2.4.7";
         /**@description 支持版本 */
-        this.supportVersions = ["2.4.0", "2.4.1", "2.4.2", "2.4.3", "2.4.4", "2.4.5", "2.4.6", "2.4.7", "2.4.8", "2.4.9", "2.4.10", "2.4.11", "2.4.12", "2.4.13"];
+        this.supportVersions = ["2.4.7", "2.4.8", "2.4.9", "2.4.10", "2.4.11", "2.4.12", "2.4.13"];
         /**@description 扩展插件目录名 */
         this.extensionsName = "packages";
         this.build = {
@@ -82,6 +82,12 @@ class _Environment {
     /**@description 项目基础包 resources 目录名 */
     get resources() {
         return "resources";
+    }
+    isSupportUpdate(platform) {
+        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac" || platform == "win32") {
+            return true;
+        }
+        return false;
     }
 }
 _Environment._instance = null;

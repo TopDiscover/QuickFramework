@@ -100,6 +100,13 @@ class _Environment {
 
     /**@description 是否进行代码混淆 */
     readonly isGulpCompex = false;
+
+    isSupportUpdate(platform: string) {
+        if (platform == "android" || platform == "windows" || platform == "ios" || platform == "mac" || platform == "win32") {
+            return true;
+        }
+        return false;
+    }
 }
 
 export const Environment = _Environment.instance;
