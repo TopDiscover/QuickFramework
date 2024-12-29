@@ -43,3 +43,4 @@ proj/@types/project.d.ts
 proj/assets/main.scene
 proj/assets/main.scene.meta
 proj/package.json
+engine/3.8.4/customEngine/resources/3d/engine/native
