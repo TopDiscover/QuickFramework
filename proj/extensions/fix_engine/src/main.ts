@@ -40,8 +40,10 @@ export class _Helper extends Helper {
                     return;
                 }
                 if (Object.keys(customMd5).length == 0) {
-                    this.logger.warn(`自定义引擎为空，使用通用版本2.4.7`);
-                    this.userVersion = "2.4.7";
+                    if ( this.creatorVerion == "3.7.3" ) {
+                        this.logger.warn(`自定义引擎为空，使用通用版本3.7.2`);
+                        this.userVersion = "3.7.2";
+                    }
                 }
                 await super.syncCustomToEngine();
                 // 保存引擎的md5到自定义
