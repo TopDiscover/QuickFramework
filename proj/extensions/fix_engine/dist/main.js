@@ -8,11 +8,6 @@ const path_1 = require("path");
 const Helper_1 = __importDefault(require("./impl/Helper"));
 const PACKAGE_NAME = "fix_engine";
 class _Helper extends Helper_1.default {
-    constructor() {
-        super(...arguments);
-        this._path = null;
-        this.userVersion = "3.7.2";
-    }
     get creatorVerion() {
         return Editor.App.version;
     }
@@ -27,12 +22,17 @@ class _Helper extends Helper_1.default {
         this._path = parser.dir;
         return this._path;
     }
+    constructor() {
+        super();
+        this._path = null;
+        this.userVersion = "3.7.2";
+        this.userVersion = this.creatorVerion;
+    }
     get customEnginePath() {
         return (0, path_1.join)(this.projPath, `engine/${this.userVersion}/customEngine`);
     }
     async syncCustomToEngine() {
         try {
-            this.userVersion = this.creatorVerion;
             if (this.isSupport(this.creatorVerion)) {
                 // 先获取 自定义的md5
                 const customMd5 = this.readMd5(false);
@@ -47,6 +47,7 @@ class _Helper extends Helper_1.default {
                     }
                 }
                 await super.syncCustomToEngine();
+                this.userVersion = this.creatorVerion;
                 // 保存引擎的md5到自定义
             }
             else {
@@ -55,6 +56,7 @@ class _Helper extends Helper_1.default {
         }
         catch (error) {
             this.logger.error(error);
+            this.userVersion = this.creatorVerion;
         }
     }
 }

@@ -23,6 +23,11 @@ export class _Helper extends Helper {
         return this._path;
     }
 
+    constructor() {
+        super();
+        this.userVersion = this.creatorVerion;
+    }
+
     private userVersion: string = "3.7.2";
 
     protected get customEnginePath() {
@@ -31,7 +36,6 @@ export class _Helper extends Helper {
 
     async syncCustomToEngine() {
         try {
-            this.userVersion = this.creatorVerion;
             if (this.isSupport(this.creatorVerion)) {
                 // 先获取 自定义的md5
                 const customMd5 = this.readMd5(false);
@@ -46,12 +50,14 @@ export class _Helper extends Helper {
                     }
                 }
                 await super.syncCustomToEngine();
+                this.userVersion = this.creatorVerion;
                 // 保存引擎的md5到自定义
             } else {
                 this.logger.error(`不支持的引擎版本:${this.creatorVerion}`);
             }
         } catch (error) {
             this.logger.error(error);
+            this.userVersion = this.creatorVerion;
         }
     }
 }

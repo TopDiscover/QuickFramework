@@ -58,12 +58,12 @@ public:
         DOWNLOADING_MANIFEST,
         MANIFEST_LOADED,
         NEED_UPDATE,
-        PREPARE_UPDATING,
         READY_TO_UPDATE,
         UPDATING,
         UNZIPPING,
         UP_TO_DATE,
-        FAIL_TO_UPDATE
+        FAIL_TO_UPDATE,
+        PREPARE_UPDATING,
     };
 
     static const std::string VERSION_ID;
