@@ -22,16 +22,9 @@ export default class FileUtils extends Handler {
      * @param path 
      * @param type 
      */
-    async symlinkSync(target: PathLike, path: PathLike, type?: symlink.Type | null): Promise<void> {
+    symlinkSync(target: PathLike, path: PathLike, type?: symlink.Type | null) {
         if (existsSync(path)) {
-            let stat = statSync(path);
-            if (stat.isDirectory()) {
-                // console.log(`删除目录:${path}`);
-                await this.delDir(path)
-            } else {
-                // console.log(`删除文件:${path}`);
-                unlinkSync(path);
-            }
+            unlinkSync(path);
         }
         if (!existsSync(target)) {
             this.logger.error(`不存在 : ${target}`);

@@ -24,17 +24,9 @@ class FileUtils extends Handler_1.Handler {
      * @param path
      * @param type
      */
-    async symlinkSync(target, path, type) {
+    symlinkSync(target, path, type) {
         if ((0, fs_1.existsSync)(path)) {
-            let stat = (0, fs_1.statSync)(path);
-            if (stat.isDirectory()) {
-                // console.log(`删除目录:${path}`);
-                await this.delDir(path);
-            }
-            else {
-                // console.log(`删除文件:${path}`);
-                (0, fs_1.unlinkSync)(path);
-            }
+            (0, fs_1.unlinkSync)(path);
         }
         if (!(0, fs_1.existsSync)(target)) {
             this.logger.error(`不存在 : ${target}`);

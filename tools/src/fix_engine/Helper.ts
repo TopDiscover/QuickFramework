@@ -380,6 +380,16 @@ export default class Helper extends Config<FixEngineConfig> {
      * @description 同步自定义引擎到引擎
      */
     async syncCustomToEngine() {
+
+        if ( this.creatorVerion == "3.8.4" ) {
+            // 从3.8.3 版本创建连接
+            // 只有 cc.d.ts 不一样，其它都一样，直接创建一个连接
+
+            let sourceEngine = join(this.projPath, "engine/3.8.3/customEngine/resources/3d/engine/native");
+            let destEngine = join(this.projPath, `engine/${this.creatorVerion}/customEngine/resources/3d/engine/native`);
+            FileUtils.instance.symlinkSync(sourceEngine, destEngine);
+        }
+
         // 获取自定义引擎md5 
         // 用户可能直接在自定义引擎下修改，直接重新读文件
         const files = await this.getAllFiles(this.customEnginePath);
