@@ -31,6 +31,7 @@ module.exports = Editor.Panel.define({
                         config: main_1.default.data,
                         isEnable: true,
                         supportVersion: main_1.default.supportVersions.join(" | "),
+                        tipState: "",
                     };
                 },
                 methods: {
@@ -61,45 +62,69 @@ module.exports = Editor.Panel.define({
                     },
                     async onEngineBackup() {
                         view.isEnable = false;
+                        view.tipState = "(引擎备份中，请稍等...)";
                         try {
-                            await main_1.default.backupEngine();
+                            setTimeout(async () => {
+                                await main_1.default.backupEngine();
+                                view.isEnable = true;
+                                view.tipState = "";
+                            }, 100);
                         }
                         catch (error) {
                             console.error(error);
+                            view.isEnable = true;
+                            view.tipState = "";
                         }
-                        view.isEnable = true;
                     },
                     async onEngineRestore() {
                         view.isEnable = false;
+                        view.tipState = "(引擎还原中，请稍等...)";
                         try {
-                            await main_1.default.restoreEngine();
+                            setTimeout(async () => {
+                                await main_1.default.restoreEngine();
+                                view.isEnable = true;
+                                view.tipState = "";
+                            }, 100);
                         }
                         catch (error) {
                             console.error(error);
+                            view.isEnable = true;
+                            view.tipState = "";
                         }
-                        view.isEnable = true;
                     },
                     async onSyncEngineToCustom() {
                         view.isEnable = false;
+                        view.tipState = "(正在同步引擎修改，请稍等...)";
                         try {
-                            await main_1.default.syncEngineToCustom();
+                            setTimeout(async () => {
+                                await main_1.default.syncEngineToCustom();
+                                view.isEnable = true;
+                                view.tipState = "";
+                            }, 100);
                         }
                         catch (error) {
                             console.error(error);
+                            view.isEnable = true;
+                            view.tipState = "";
                         }
-                        view.isEnable = true;
                     },
                     async onSyncCustomToEngine() {
                         // 检查是否有备份
                         if (main_1.default.checkBackupEngine()) {
                             view.isEnable = false;
+                            view.tipState = "(正在同步自定义引擎修改，请稍等...)";
                             try {
-                                await main_1.default.syncCustomToEngine();
+                                setTimeout(async () => {
+                                    await main_1.default.syncCustomToEngine();
+                                    view.isEnable = true;
+                                    view.tipState = "";
+                                }, 100);
                             }
                             catch (error) {
                                 console.error(error);
+                                view.isEnable = true;
+                                view.tipState = "";
                             }
-                            view.isEnable = true;
                         }
                         else {
                             const config = {

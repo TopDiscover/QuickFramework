@@ -11,6 +11,7 @@ interface Data {
     isEnable: boolean;
     addText: string;
     supportVersion: string;
+    tipState: string;
 }
 
 interface MyView extends Data {
@@ -44,6 +45,7 @@ module.exports = Editor.Panel.define({
                         config: helper.data,
                         isEnable: true,
                         supportVersion: helper.supportVersions.join(" | "),
+                        tipState: "",
                     };
                 },
                 methods: {
@@ -74,41 +76,65 @@ module.exports = Editor.Panel.define({
                     },
                     async onEngineBackup() {
                         view.isEnable = false;
+                        view.tipState = "(引擎备份中，请稍等...)";
                         try {
-                            await helper.backupEngine();
+                            setTimeout(async () => {
+                                await helper.backupEngine();
+                                view.isEnable = true;
+                                view.tipState = "";
+                            }, 100);
                         } catch (error) {
                             console.error(error);
+                            view.isEnable = true;
+                            view.tipState = "";
                         }
-                        view.isEnable = true;
                     },
                     async onEngineRestore() {
                         view.isEnable = false;
+                        view.tipState = "(引擎还原中，请稍等...)";
                         try {
-                            await helper.restoreEngine();
+                            setTimeout(async () => {
+                                await helper.restoreEngine();
+                                view.isEnable = true;
+                                view.tipState = "";
+                            }, 100);
                         } catch (error) {
                             console.error(error);
+                            view.isEnable = true;
+                            view.tipState = "";
                         }
-                        view.isEnable = true;
                     },
                     async onSyncEngineToCustom() {
                         view.isEnable = false;
+                        view.tipState = "(正在同步引擎修改，请稍等...)";
                         try {
-                            await helper.syncEngineToCustom();
+                            setTimeout(async () => {
+                                await helper.syncEngineToCustom();
+                                view.isEnable = true;
+                                view.tipState = "";
+                            }, 100);
                         } catch (error) {
                             console.error(error);
+                            view.isEnable = true;
+                            view.tipState = "";
                         }
-                        view.isEnable = true;
                     },
                     async onSyncCustomToEngine() {
                         // 检查是否有备份
                         if (helper.checkBackupEngine()){
                             view.isEnable = false;
+                            view.tipState = "(正在同步自定义引擎修改，请稍等...)";
                             try {
-                                await helper.syncCustomToEngine();
+                                setTimeout(async () => {
+                                    await helper.syncCustomToEngine();
+                                    view.isEnable = true;
+                                    view.tipState = "";
+                                }, 100);
                             } catch (error) {
                                 console.error(error);
+                                view.isEnable = true;
+                                view.tipState = "";
                             }
-                            view.isEnable = true;
                         }else{
                             const config = {
                                 title: '警告',

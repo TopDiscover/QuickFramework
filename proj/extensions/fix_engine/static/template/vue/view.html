@@ -14,7 +14,7 @@
         </div>
     </div>
 
-    <div class="title">操作</div>
+    <div class="title">操作<ui-label v-if="!isEnable" v-bind:value="tipState"></ui-label></div>
     <div class="container">
         <div
             class="operator">
@@ -37,17 +37,17 @@
         <div
             class="operator">
             <div
-                class="operatorText">同步引擎修改到项目</div>
+                class="operatorText">同步引擎修改到自定义引擎</div>
             <ui-button v-bind:disabled="!isEnable"
-                @confirm="onSyncEngineToCustom">同步引擎修改到项目</ui-button>
+                @confirm="onSyncEngineToCustom">同步引擎</ui-button>
         </div>
 
         <div
             class="operator">
             <div
-                class="operatorText">同步项目修改到引擎</div>
+                class="operatorText">同步自定义引擎修改到引擎</div>
             <ui-button v-bind:disabled="!isEnable"
-                @confirm="onSyncCustomToEngine">同步项目修改到引擎</ui-button>
+                @confirm="onSyncCustomToEngine">同步自定义引擎</ui-button>
         </div>
     </div>
 
