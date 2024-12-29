@@ -1,0 +1,9 @@
+{
+    "resources/3d/engine/bin/.declarations/cc.d.ts": "c42f423f246c9308c379aa022dbb6738",
+    "resources/3d/engine/native/cocos/application/BaseGame.cpp": "f19c16967493355f68ee1cd86f804d00",
+    "resources/3d/engine/native/extensions/assets-manager/AssetsManagerEx.cpp": "83a32abb1d3fb2f7d54881f25a003275",
+    "resources/3d/engine/native/extensions/assets-manager/AssetsManagerEx.h": "898a5d2ac81f296bae612112f20a9b3a",
+    "resources/3d/engine/native/extensions/assets-manager/Manifest.cpp": "9f9cfc116b72eda7e5557ee9e170feb7",
+    "resources/3d/engine/native/extensions/assets-manager/Manifest.h": "d115aa40a75ad39a590e34aaa5eeae0a",
+    "resources/3d/engine/native/tools/simulator/frameworks/runtime-src/Classes/Game.cpp": "e891391cb5c39b970b168a01c7140cfe"
+}
