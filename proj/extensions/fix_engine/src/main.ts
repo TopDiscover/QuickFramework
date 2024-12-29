@@ -2,6 +2,7 @@ import { join, parse } from "path";
 import Helper from "./impl/Helper";
 import { FixEngineConfig } from "./core/Defines";
 import { IBuildTaskOption } from "../@types/packages/builder/@types";
+import FileUtils from "./core/FileUtils";
 
 const PACKAGE_NAME = "fix_engine"
 
@@ -49,6 +50,14 @@ export class _Helper extends Helper {
                         this.logger.warn(`自定义引擎为空，使用通用版本3.7.2`);
                         this.userVersion = "3.7.2";
                     }
+                }
+                if ( this.creatorVerion == "3.8.4" ) {
+                    // 从3.8.3 版本创建连接
+                    // 只有 cc.d.ts 不一样，其它都一样，直接创建一个连接
+        
+                    let sourceEngine = join(this.projPath, "engine/3.8.3/customEngine/resources/3d/engine/native");
+                    let destEngine = join(this.projPath, `engine/${this.creatorVerion}/customEngine/resources/3d/engine/native`);
+                    FileUtils.instance.symlinkSync(sourceEngine, destEngine);
                 }
                 await super.syncCustomToEngine();
                 this.userVersion = this.creatorVerion;

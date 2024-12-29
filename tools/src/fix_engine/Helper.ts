@@ -20,6 +20,7 @@ export default class Helper extends Config<FixEngineConfig> {
             "resources/3d/engine/native/tools/simulator/frameworks/runtime-src/Classes/Game.cpp",
         ],
         exclude: [
+
         ],
     }
 
@@ -140,8 +141,8 @@ export default class Helper extends Config<FixEngineConfig> {
 
     protected async getAllFiles(dir: string) {
         this.read();
-        let files = await this.md5engine(dir);
-        // console.log(files);
+        const files = await this.md5engine(dir);
+        // writeFileSync(join(__dirname, "files.json"), JSON.stringify(files, undefined, 4));
         return files;
     }
 
@@ -250,11 +251,6 @@ export default class Helper extends Config<FixEngineConfig> {
                 files[key] = files[key].replace(/\\/g, "/");
                 const sourcePath = join(this.backupEnigineLocalPath, key);
                 const destPath = join(this.creatorPath, key);
-                const sourceMd5 = await FileUtils.instance.md5File(sourcePath);
-                // 检测原始文件是否被修改
-                if (rawMd5[key] !== sourceMd5) {
-                    throw new Error(`${this.module}备份引擎文件${sourcePath}已经被修改，无法还原`);
-                }
                 this.logger.log(`${this.module}还原引擎文件 \nfrom: ${sourcePath} \nto: ${destPath}`);
                 await FileUtils.instance.copyFile(sourcePath, destPath, true);
             }
@@ -292,6 +288,55 @@ export default class Helper extends Config<FixEngineConfig> {
         this.logger.log(`${this.module}同步引擎修改到本地完成`);
     }
 
+
+    protected async sync( 
+        fromMd5: { [key: string]: string }, 
+        toMd5: { [key: string]: string } , 
+        fromRoot: string, 
+        toRoot: string,
+        tag: string) {
+        let addFiles: { [key: string]: string } = {};
+        let delFiles: { [key: string]: string } = {};
+        let changeFiles: { [key: string]: string } = {};
+        for (const key in fromMd5) {
+            if (!toMd5[key]) {
+                addFiles[key] = fromMd5[key];
+            } else if (toMd5[key] !== fromMd5[key]) {
+                changeFiles[key] = fromMd5[key];
+            }
+        }
+        for (const key in toMd5) {
+            if (!fromMd5[key]) {
+                delFiles[key] = toMd5[key];
+            }
+        }
+        this.logger.log(`${this.module}${tag}新增文件数量 : ${Object.keys(addFiles).length} 个\n${JSON.stringify(addFiles, undefined, 4)}`);
+        this.logger.log(`${this.module}${tag}删除文件数量 : ${Object.keys(delFiles).length} 个\n${JSON.stringify(delFiles, undefined, 4)}`);
+        this.logger.log(`${this.module}${tag}变更文件数量 : ${Object.keys(changeFiles).length} 个\n${JSON.stringify(changeFiles, undefined, 4)}`);
+
+        for (const key in addFiles) {
+            const src = join(fromRoot, key);
+            const dest = join(toRoot, key);
+            this.logger.log(`${this.module}${tag}新增文件 \nfrom: ${src} \nto: ${dest}`);
+            await FileUtils.instance.copyFile(src, dest, true);
+        }
+
+        for (const key in delFiles) {
+            const filePath = join(toRoot, key);
+            let isDel = FileUtils.instance.delFile(filePath);
+            if (isDel) {
+                this.logger.log(`${this.module}${tag}删除文件 : ${filePath}`);
+            }
+        }
+
+        for (const key in changeFiles) {
+            const src = join(fromRoot, key);
+            const dest = join(toRoot, key);
+            this.logger.log(`${this.module}${tag}变更文件 \nfrom: ${src} \nto: ${dest}`);
+            await FileUtils.instance.copyFile(src, dest, true);
+        }
+    }
+
     /**
      * @description 同步引擎修改到本地
      */
@@ -299,76 +344,20 @@ export default class Helper extends Config<FixEngineConfig> {
         try {
             this.onSyncEngineBegin();
             // 获取engine md5
-            const rawMd5 = this.readMd5();
-            if (!rawMd5) {
+            const rawEngineMd5 = this.readMd5();
+            if (!rawEngineMd5) {
                 throw new Error(`${this.module}备份引擎原始MD5文件不存在!请先备份引擎`);
             }
-
-            // 获取引擎所有文件
-            const files = await this.getAllFiles(this.creatorPath);
-            if (Object.keys(files).length == 0) {
+            // 获取当前引擎md5
+            const curRawEngineMd5 = await this.getAllFiles(this.creatorPath);
+            if (Object.keys(curRawEngineMd5).length == 0) {
                 throw new Error(`${this.module}引擎为空，没有可以同步的文件`);
             }
-
-            // 新增的文件
-            let addFiles: { [key: string]: string } = {};
-            // 删除的文件
-            let delFiles: { [key: string]: string } = {};
-            // 变更的文件
-            let changeFiles: { [key: string]: string } = {};
-            for (const key in files) {
-                if (!rawMd5[key]) {
-                    addFiles[key] = files[key];
-                } else if (rawMd5[key] !== files[key]) {
-                    changeFiles[key] = files[key];
-                }
-            }
-
-            // 删除的文件
-            for (const key in rawMd5) {
-                if (!files[key]) {
-                    delFiles[key] = rawMd5[key];
-                }
-            }
-
-            // 保存修改文件到本地
-            for (const key in changeFiles) {
-                // 先复制修改的文件到本地备份目录
-                const src = join(this.creatorPath, key);
-                const dest = join(this.customEnginePath, key);
-                // 先判断文件是否是原引擎未改动的文件
-                this.logger.log(`${this.module}保存引擎修改文件 \nfrom: ${src} \nto: ${dest}`);
-                await FileUtils.instance.copyFile(src, dest, true);
-            }
-
-            // 保存新增文件到本地
-            for (const key in addFiles) {
-                // 先复制新增的文件到本地备份目录
-                const src = join(this.creatorPath, key);
-                const dest = join(this.customEnginePath, key);
-                // 先判断文件是否是原引擎未改动的文件
-                this.logger.log(`${this.module}保存引擎新增文件 \nfrom: ${src} \nto: ${dest}`);
-                await FileUtils.instance.copyFile(src, dest, true);
-            }
-
-            // 删除文件到本地
-            for (const key in delFiles) {
-                // 先复制删除的文件到本地备份目录
-                const dest = join(this.customEnginePath, key);
-                // 先判断文件是否是原引擎未改动的文件
-                this.logger.log(`${this.module}删除文件: ${dest}`);
-                await FileUtils.instance.delFile(dest);
-            }
-
-            // 保存最后自定义引擎的md5
-            const localMd5 = await this.getAllFiles(this.customEnginePath);
-            this.saveMd5(localMd5, false);
-
-            // this.logger.log(`${this.module}原引擎文件量 : ${Object.keys(rawMd5).length} 个\n${JSON.stringify(rawMd5,undefined,4)}`);
-            this.logger.log(`${this.module}新增文件数量 : ${Object.keys(addFiles).length} 个\n${JSON.stringify(addFiles, undefined, 4)}`);
-            this.logger.log(`${this.module}删除文件数量 : ${Object.keys(delFiles).length} 个\n${JSON.stringify(delFiles, undefined, 4)}`);
-            this.logger.log(`${this.module}变更文件数量 : ${Object.keys(changeFiles).length} 个\n${JSON.stringify(changeFiles, undefined, 4)}`);
-
+            // 获取自定义引擎md5
+            const curCustomEngineMd5 = await this.getAllFiles(this.customEnginePath);
+            await this.sync(curRawEngineMd5, curCustomEngineMd5, this.creatorPath, this.customEnginePath, '【引擎->自定义引擎】');
+            // 更新自定义引擎的md5
+            this.saveMd5(curRawEngineMd5, false);
             this.onSyncEngineEnd();
         } catch (error) {
             this.logger.error(error);
@@ -380,40 +369,17 @@ export default class Helper extends Config<FixEngineConfig> {
      * @description 同步自定义引擎到引擎
      */
     async syncCustomToEngine() {
-
-        if ( this.creatorVerion == "3.8.4" ) {
-            // 从3.8.3 版本创建连接
-            // 只有 cc.d.ts 不一样，其它都一样，直接创建一个连接
-
-            let sourceEngine = join(this.projPath, "engine/3.8.3/customEngine/resources/3d/engine/native");
-            let destEngine = join(this.projPath, `engine/${this.creatorVerion}/customEngine/resources/3d/engine/native`);
-            FileUtils.instance.symlinkSync(sourceEngine, destEngine);
+        // 获取自定义引擎最新md5 
+        const curCustomEngineMd5 = await this.getAllFiles(this.customEnginePath);
+        const rawEngineMd5 = this.readMd5(true);
+        if (!rawEngineMd5) {
+            throw new Error(`${this.module}备份引擎原始MD5文件不存在!请先备份引擎`);
         }
-
-        // 获取自定义引擎md5 
-        // 用户可能直接在自定义引擎下修改，直接重新读文件
-        const files = await this.getAllFiles(this.customEnginePath);
-
-        // 复制文件到引擎目录 // 里面包含了新增，修改
-        for (const key in files) {
-            const src = join(this.customEnginePath, key);
-            const dest = join(this.creatorPath, key);
-            this.logger.log(`${this.module}同步自定义引擎文件 \nfrom: ${src} \nto: ${dest}`);
-            await FileUtils.instance.copyFile(src, dest, true);
-        }
-
-        const customMd5 = this.readMd5(false);
-        for (const key in customMd5) {
-            if (!files[key]) {
-                const filePath = join(this.creatorPath, key);
-                let isDel = FileUtils.instance.delFile(filePath);
-                if (isDel) {
-                    this.logger.log(`${this.module}删除自定义引擎文件 : ${filePath}`);
-                }
-            }
-        }
-        // 保存最后自定义引擎的md5
-        this.saveMd5(files, false);
+        // 重新获取当前引擎md5
+        let curRawEngineMd5 = await this.getAllFiles(this.creatorPath);
+        await this.sync(curCustomEngineMd5, curRawEngineMd5, this.customEnginePath, this.creatorPath, '【自定义引擎->引擎】');
+        // 更新自定义引擎的md5
+        this.saveMd5(curCustomEngineMd5, false);
     }
 
     checkBackupEngine() {
@@ -431,5 +397,6 @@ export default class Helper extends Config<FixEngineConfig> {
         await this.restoreEngine();
         await this.backupEngine();
         await this.syncCustomToEngine();
+        // await this.syncEngineToCustom();
     }
 }

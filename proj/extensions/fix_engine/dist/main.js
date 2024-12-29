@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.unload = exports.load = exports.methods = exports._Helper = void 0;
 const path_1 = require("path");
 const Helper_1 = __importDefault(require("./impl/Helper"));
+const FileUtils_1 = __importDefault(require("./core/FileUtils"));
 const PACKAGE_NAME = "fix_engine";
 class _Helper extends Helper_1.default {
     get creatorVerion() {
@@ -45,6 +46,13 @@ class _Helper extends Helper_1.default {
                         this.logger.warn(`自定义引擎为空，使用通用版本3.7.2`);
                         this.userVersion = "3.7.2";
                     }
+                }
+                if (this.creatorVerion == "3.8.4") {
+                    // 从3.8.3 版本创建连接
+                    // 只有 cc.d.ts 不一样，其它都一样，直接创建一个连接
+                    let sourceEngine = (0, path_1.join)(this.projPath, "engine/3.8.3/customEngine/resources/3d/engine/native");
+                    let destEngine = (0, path_1.join)(this.projPath, `engine/${this.creatorVerion}/customEngine/resources/3d/engine/native`);
+                    FileUtils_1.default.instance.symlinkSync(sourceEngine, destEngine);
                 }
                 await super.syncCustomToEngine();
                 this.userVersion = this.creatorVerion;
