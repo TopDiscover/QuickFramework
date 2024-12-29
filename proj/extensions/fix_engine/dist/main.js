@@ -74,56 +74,6 @@ exports.methods = {
         //     console.error(`请先执行【项目工具】->【引擎修正】同步对引擎的修改，再构建!!!`);
         // }
     },
-    onEngineBackup: async (ev) => {
-        try {
-            await helper.backupEngine();
-            ev.reply(null, true);
-        }
-        catch (error) {
-            helper.logger.error(error);
-            ev.reply(null, false);
-        }
-    },
-    onEngineRestore: async (ev) => {
-        try {
-            await helper.restoreEngine();
-            ev.reply(null, true);
-        }
-        catch (error) {
-            helper.logger.error(error);
-            ev.reply(null, false);
-        }
-    },
-    onSyncEngineToCustom: async (ev) => {
-        try {
-            await helper.syncEngineToCustom();
-            ev.reply(null, true);
-        }
-        catch (error) {
-            helper.logger.error(error);
-            ev.reply(null, false);
-        }
-    },
-    onSyncCustomToEngine: async (ev) => {
-        try {
-            await helper.syncCustomToEngine();
-            ev.reply(null, true);
-        }
-        catch (error) {
-            helper.logger.error(error);
-            ev.reply(null, false);
-        }
-    },
-    checkBackupEngine: (ev) => {
-        try {
-            const isBackup = helper.checkBackupEngine();
-            ev.reply(null, isBackup);
-        }
-        catch (error) {
-            helper.logger.error(error);
-            ev.reply(null, false);
-        }
-    }
 };
 /**
 * @en Hooks triggered after extension loading is complete
