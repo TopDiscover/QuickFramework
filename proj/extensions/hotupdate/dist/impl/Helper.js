@@ -631,34 +631,5 @@ class Helper extends Config_1.default {
         this.logger.log(`${this.module}全部完成`);
         this.onSetProcess(false);
     }
-    /**@description 插入热更新代码*/
-    async insertHotupdate(dest) {
-        if (Environment_1.Environment.isVersion3X) {
-            let codePath = (0, path_1.join)(this.curExtensionPath, "code/hotupdate.js");
-            let code = (0, fs_1.readFileSync)(codePath, "utf8");
-            // console.log(code);
-            let sourcePath = (0, path_1.join)(dest, `assets/${this.mainJS}`);
-            sourcePath = (0, path_1.normalize)(sourcePath);
-            let sourceCode = (0, fs_1.readFileSync)(sourcePath, "utf8");
-            let templateReplace = function templateReplace() {
-                return arguments[1] + code + arguments[3];
-            };
-            //添加子游戏测试环境版本号
-            sourceCode = sourceCode.replace(/(\);)([\s\w\S]*)(const[ ]*importMapJson)/g, templateReplace);
-            this.logger.log(`${this.module}向${sourcePath}中插入热更新代码`);
-            (0, fs_1.writeFileSync)(sourcePath, sourceCode, { "encoding": "utf8" });
-        }
-        else {
-            let mainJSPath = (0, path_1.join)(dest, this.mainJS);
-            let content = (0, fs_1.readFileSync)(mainJSPath, "utf-8");
-            content = content.replace(/if\s*\(\s*window.jsb\)\s*\{/g, `if (window.jsb) {
-        var hotUpdateSearchPaths = localStorage.getItem('HotUpdateSearchPaths');
-        if (hotUpdateSearchPaths) {
-            jsb.fileUtils.setSearchPaths(JSON.parse(hotUpdateSearchPaths));
-        }`);
-            (0, fs_1.writeFileSync)(mainJSPath, content, "utf-8");
-            this.logger.log(`${this.module}热更新代码：${mainJSPath}`);
-        }
-    }
 }
 exports.default = Helper;

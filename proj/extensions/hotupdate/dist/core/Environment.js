@@ -8,11 +8,11 @@ const Defines_1 = require("./Defines");
 class _Environment {
     constructor() {
         /**@description cocos creator 安装目录 */
-        this.creatorPath = "D:/Creator/Creator/3.7.2/resources";
+        this.creatorPath = "D:/Cocos/Creator/3.7.2/resources";
         /**@description cocos creator 版本 */
         this.creatorVerion = "3.7.2";
         /**@description 支持版本 */
-        this.supportVersions = ["3.7.2", "3.7.3", "3.7.4", "3.8.0", "3.8.1", "3.8.2", "3.8.3", "3.8.4"];
+        this.supportVersions = ["3.7.2", "3.7.3", "3.7.4", "3.8.0", "3.8.1", "3.8.2", "3.8.3", "3.8.4", "3.8.5"];
         /**@description 扩展插件目录名 */
         this.extensionsName = "extensions";
         this.build = {
@@ -48,9 +48,6 @@ class _Environment {
      * @param extensionsName
      */
     isLinkCore(extensionsName) {
-        if (extensionsName == Defines_1.Extensions.ConfirmDelSubgames) {
-            return false;
-        }
         return true;
     }
     /**
@@ -58,7 +55,7 @@ class _Environment {
      * @param extensionsName
      */
     isLinkImpl(extensionsName) {
-        if (extensionsName == Defines_1.Extensions.CheckResources || extensionsName == Defines_1.Extensions.ConfirmDelSubgames) {
+        if (extensionsName == Defines_1.Extensions.CheckResources) {
             return false;
         }
         return true;
@@ -68,9 +65,6 @@ class _Environment {
      * @param extensionsName
      */
     isLinkNodeModules(extensionsName) {
-        if (extensionsName == Defines_1.Extensions.ConfirmDelSubgames) {
-            return false;
-        }
         return true;
     }
     /**
@@ -89,6 +83,12 @@ class _Environment {
     /**@description 项目基础包 resources 目录名 */
     get resources() {
         return "resources";
+    }
+    isSupportUpdate(platform) {
+        if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+            return true;
+        }
+        return false;
     }
 }
 _Environment._instance = null;

@@ -149,6 +149,9 @@ class Handler {
         }
         return false;
     }
+    isSupportUpdate(platform) {
+        return Environment_1.Environment.isSupportUpdate(platform);
+    }
     /**
      * @description 数组去重
      */

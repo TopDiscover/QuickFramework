@@ -11,20 +11,20 @@ exports.methods = {
         Editor.Panel.open("hotupdate");
     },
     onAfterBuild(dest, platform) {
-        if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+        if (Helper_1.helper.isSupportUpdate(platform)) {
             Helper_1.helper.onAfterBuild(dest);
         }
     },
     onBeforeBuild(platform) {
         console.log(`[热更新]开始构建，构建平台:${platform}`);
-        if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+        if (Helper_1.helper.isSupportUpdate(platform)) {
             Helper_1.helper.onBeforeBuild();
         }
     },
     /**@description png图片压缩完成 */
     onPngCompressComplete(dest, platform) {
         console.log(`[热更新]png图片压缩完成,构建平台:${platform}`);
-        if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+        if (Helper_1.helper.isSupportUpdate(platform)) {
             Helper_1.helper.onPngCompressComplete();
         }
     }

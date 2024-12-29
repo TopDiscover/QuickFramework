@@ -24,17 +24,9 @@ class FileUtils extends Handler_1.Handler {
      * @param path
      * @param type
      */
-    async symlinkSync(target, path, type) {
+    symlinkSync(target, path, type) {
         if ((0, fs_1.existsSync)(path)) {
-            let stat = (0, fs_1.statSync)(path);
-            if (stat.isDirectory()) {
-                // console.log(`删除目录:${path}`);
-                await this.delDir(path);
-            }
-            else {
-                // console.log(`删除文件:${path}`);
-                (0, fs_1.unlinkSync)(path);
-            }
+            (0, fs_1.unlinkSync)(path);
         }
         if (!(0, fs_1.existsSync)(target)) {
             this.logger.error(`不存在 : ${target}`);
@@ -161,6 +153,7 @@ class FileUtils extends Handler_1.Handler {
             if (isForceCopy) {
                 this.delFile(dest);
             }
+            this.createDir((0, path_1.dirname)(dest));
             await (0, promises_1.copyFile)(src, dest);
         }
         catch (error) {
@@ -347,9 +340,16 @@ class FileUtils extends Handler_1.Handler {
      * @param dir
      */
     createDir(dir) {
+        // 判断如果是文件，先取出目录，再创建
         if (!(0, fs_1.existsSync)(dir)) {
             // console.log(`创建目录 : ${dir}`);
-            (0, fs_1.mkdirSync)(dir);
+            let dirs = dir.replace(/\\/g, "/").split("/");
+            for (let i = 0; i < dirs.length; i++) {
+                let dir = dirs.slice(0, i + 1).join("/");
+                if (!(0, fs_1.existsSync)(dir)) {
+                    (0, fs_1.mkdirSync)(dir);
+                }
+            }
         }
     }
     createCopyDatas(source, dest, datas) {

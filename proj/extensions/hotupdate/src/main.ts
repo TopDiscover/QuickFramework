@@ -10,20 +10,20 @@ export const methods: { [key: string]: (...any: any) => any } = {
         Editor.Panel.open("hotupdate");
     },
     onAfterBuild(dest: string, platform: Platform) {
-        if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+        if (helper.isSupportUpdate(platform)) {
             helper.onAfterBuild(dest);
         }
     },
     onBeforeBuild(platform:Platform){
         console.log(`[热更新]开始构建，构建平台:${platform}`);
-        if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+        if (helper.isSupportUpdate(platform)) {
             helper.onBeforeBuild();
         }
     },
     /**@description png图片压缩完成 */
     onPngCompressComplete(dest: string, platform: Platform){
         console.log(`[热更新]png图片压缩完成,构建平台:${platform}`);
-        if (platform == "android" || platform == "ios" || platform == "mac" || platform == "windows") {
+        if (helper.isSupportUpdate(platform)) {
             helper.onPngCompressComplete();
         }
     }

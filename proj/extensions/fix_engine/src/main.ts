@@ -1,6 +1,7 @@
 import { join, parse } from "path";
 import Helper from "./impl/Helper";
 import { FixEngineConfig } from "./core/Defines";
+import { IBuildTaskOption } from "../@types/packages/builder/@types";
 
 const PACKAGE_NAME = "fix_engine"
 
@@ -72,10 +73,10 @@ export const methods = {
     open_panel() {
         Editor.Panel.open(PACKAGE_NAME);
     },
-    onBeforeBuild() {
-        // if (Impl.isUpdate) {
-        //     console.error(`请先执行【项目工具】->【引擎修正】同步对引擎的修改，再构建!!!`);
-        // }
+    onBeforeBuild( options : IBuildTaskOption) {
+        if (helper.isSupportUpdate(options.platform)) {
+            console.error(`请先执行【项目工具】->【引擎修正】->【同步自定义引擎】同步对引擎的修改，再构建，保证热更新部分能正常运行`);
+        }
     },
 };
 

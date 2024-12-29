@@ -19,7 +19,7 @@ function unload() {
 }
 async function onBeforeBuild(options, result) {
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeBuild`);
-    Editor.Message.send(PACKAGE_NAME, "onBeforeBuild");
+    Editor.Message.send(PACKAGE_NAME, "onBeforeBuild", options);
 }
 async function onBeforeInit(options, result) {
     console.log(`[${PACKAGE_NAME}] =====>> onBeforeInit`);

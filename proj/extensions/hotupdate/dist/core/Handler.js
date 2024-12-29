@@ -149,5 +149,16 @@ class Handler {
         }
         return false;
     }
+    isSupportUpdate(platform) {
+        return Environment_1.Environment.isSupportUpdate(platform);
+    }
+    /**
+     * @description 数组去重
+     */
+    uniqueArray(arr) {
+        return arr.filter(function (item, pos) {
+            return arr.indexOf(item) == pos;
+        });
+    }
 }
 exports.Handler = Handler;

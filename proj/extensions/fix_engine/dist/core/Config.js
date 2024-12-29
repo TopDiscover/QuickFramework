@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = require("fs");
 const Handler_1 = require("./Handler");
+const Environment_1 = require("./Environment");
 class Config extends Handler_1.Handler {
     get data() {
         return this._data;
@@ -19,6 +20,9 @@ class Config extends Handler_1.Handler {
         this._data = null;
         /**@description 默认配置 */
         this.defaultData = null;
+    }
+    isSupportUpdate(platform) {
+        return Environment_1.Environment.isSupportUpdate(platform);
     }
     /**
      * @description 读取数据
