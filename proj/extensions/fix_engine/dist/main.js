@@ -81,7 +81,7 @@ exports.methods = {
     },
     onBeforeBuild(options) {
         if (helper.isSupportUpdate(options.platform)) {
-            console.error(`请先执行【项目工具】->【引擎修正】->【同步自定义引擎】同步对引擎的修改，再构建，保证热更新部分能正常运行`);
+            console.warn(`打包平台为 : ${options.platform}，请确保已经执行过【项目工具】->【引擎修正】->【同步自定义引擎】，保证热更新部分能正常运行`);
         }
     },
 };
