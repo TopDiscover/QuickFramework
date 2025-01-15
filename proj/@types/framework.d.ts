@@ -405,7 +405,9 @@ interface BundleData{
 interface EntryUserData{
 	[key:string] : any;
 	/**@description 是否是预加载资源,并不会进入bundle */
-	isPreload : boolean;
+	isPreload ?: boolean;
+	/**@description 是否附加在当前 bundle 运行*/
+	isAttach ?: boolean;
 }
 
 /**@description 热更新导航数据 */

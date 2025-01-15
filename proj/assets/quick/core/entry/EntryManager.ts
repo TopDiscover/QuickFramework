@@ -91,7 +91,25 @@ export class EntryManager implements ISingleton{
     /**
      * @description 返回上一场景 
      * */
-    backBundle( userData ?: any ){
+    backBundle( userData ?: EntryUserData ){
+
+        // 需要检查是否存在附加运行的场景，如果有，先返回附加运行的上一场景
+        let attachWhere = App.stageData.attachWhere;
+        if ( attachWhere != Macro.UNKNOWN ){
+            // 存在附加运行的场景，返回附加运行的上一场景
+            let bundle = this.delegate.unloadAttachBundle(attachWhere);
+            if ( bundle ){
+                userData = userData || {};
+                userData.isAttach = true;
+                this.enterBundle(bundle,userData);
+                return;
+            }else{
+                Log.d(`${this.module}已经是最后一个附加场景，返回当前运行的场景`);
+                this.enterBundle(App.stageData.where,userData);
+                return;
+            }
+        }
+
         let bundle = App.stageData.prevWhere;
         if ( bundle ){
             this.enterBundle(bundle,userData);

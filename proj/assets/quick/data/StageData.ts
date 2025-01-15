@@ -10,7 +10,7 @@ import { EntryData } from "../core/entry/Entry";
 export class StageData extends GameData {
     static module = "【Stage数据】";
     /**@description 这个数据需要常驻，防止在第一次进时，被释放了不能准确的取出当前场景的位置 */
-    isResident = true; 
+    isResident = true;
 
     private readonly defaultData: BundleData[] = [
         { sort: 0, type: 0, name: { CN: "主包", EN: "Main" }, bundle: Macro.BUNDLE_RESOURCES },
@@ -41,6 +41,68 @@ export class StageData extends GameData {
             this.push(v);
         }
     }
+
+    get prevWhere() {
+        let scene: string | undefined = undefined;
+        if (this._sceneStack.length >= 2) {
+            scene = this._sceneStack[this._sceneStack.length - 2];
+        }
+        Log.d(`${this.module}获取的上一场景 : ${scene}`)
+        return scene;
+    }
+
+    /**@description 附加运行的场景堆栈 */
+    private _attachStack: { [key: string]: string[] } = {};
+    private _attachWhere: string = Macro.UNKNOWN;
+    /**@description 当前所在附加场景 */
+    get attachWhere() {
+        return this._attachWhere;
+    }
+    set attachWhere(v) {
+        Log.d(`${this.module}附加运行场景 ${String(this._attachWhere)} ==> ${v}`)
+        let prevWhere = this._attachWhere;
+        this._attachWhere = v;
+        if (prevWhere != v) {
+            this.pushAttach(v);
+        }
+    }
+
+    get prevAttachWhere() {
+        let scene: string | undefined = undefined;
+        let stack = this._attachStack[this.where];
+        if (stack && stack.length >= 2) {
+            scene = stack[stack.length - 2];
+        }
+        Log.d(`${this.module}获取的上一附加场景 : ${scene}`)
+        return scene;
+    }
+
+    /**
+     * @description 获取除当前附加运行的场景的其它所有场景
+     */
+    get excludeAttachWhere() {
+        const stack = this._attachStack[this.where];
+        if (stack) {
+            return stack.filter(v => v != this.attachWhere);
+        }
+        return [];
+    }
+
+    /**@description 返回当前附加运行的场景 */
+    get attachs(){
+        const stack = this._attachStack[this.where];
+        if (stack) {
+            return stack;
+        }
+        return [];
+    }
+
+    /**@description 清空附加运行的场景堆栈 */
+    clearAttachStack() {
+        this._attachStack[this.where] = [];
+        this._attachWhere = Macro.UNKNOWN;
+    }
+
     /**@description 所有入口配置信息 */
     private _entrys: EntryData[] = [];
     get entrys() {
@@ -139,13 +201,32 @@ export class StageData extends GameData {
         Log.d(`${this.module}当前场景堆栈 : ${this._sceneStack.toString()}`);
     }
 
-    get prevWhere() {
-        let scene: string | undefined = undefined;
-        if (this._sceneStack.length >= 2) {
-            scene = this._sceneStack[this._sceneStack.length - 2];
+    /**
+     * @description 向场景栈中压入场景
+     * */
+    private pushAttach(bundle: string) {
+        let count = 0;
+        let stack = this._attachStack[this.where];
+        if (stack) {
+            for (let i = stack.length - 1; i >= 0; i--) {
+                let v = stack[i];
+                if (v == bundle) {
+                    count = stack.length - i;
+                    break;
+                }
+            }
+        } else {
+            stack = [];
+            this._attachStack[this.where] = stack;
         }
-        Log.d(`${this.module}获取的上一场景 : ${scene}`)
-        return scene;
-    }
 
+        while (count > 0) {
+            stack.pop();
+            count--;
+        }
+
+        stack.push(bundle);
+        Log.d(`${this.module}附加运行压入场景 : ${bundle}`)
+        Log.d(`${this.module}附加运行当前场景堆栈 : ${stack.toString()}`);
+    }
 }
