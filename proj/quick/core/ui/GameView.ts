@@ -42,7 +42,7 @@ export default class GameView extends UIView {
      * @description 返回上一场景
      * @param userData 用户自定义数据
      */
-    backBundle(userData?:any){
+    backBundle(userData?:EntryUserData){
         App.entryManager.backBundle(userData);
     }
 
