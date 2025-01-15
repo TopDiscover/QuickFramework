@@ -1,5 +1,5 @@
 {
-  "__version__": "1.0.4",
+  "__version__": "1.0.6",
   "general": {
     "designResolution": {
       "width": 1280,
@@ -88,5 +88,8 @@
     "legacyFbxImporter": {
       "visible": true
     }
+  },
+  "script": {
+    "preserveSymlinks": true
   }
 }
