@@ -1,16 +1,10 @@
 
-import EventComponent from '../../quick/components/EventComponent';
 import { inject } from '../../quick/defines/Decorators';
 import { LogLevel } from '../../quick/defines/Enums';
 import { Singleton } from '../../quick/utils/Singleton';
 import { Macro } from '../../quick/defines/Macros';
 import UIView from '../../quick/core/ui/UIView';
 const { ccclass, property } = cc._decorator;
-
-interface Data {
-    text: string;
-    onEvent: () => void;
-}
 
 @ccclass
 export class DebugView extends UIView {
@@ -30,8 +24,16 @@ export class DebugView extends UIView {
     @inject("background", cc.Node, "logView")
     private logViewBackground: cc.Node = null!;
 
+    private get datas() {
+        const data = App.dataCenter.get(App.stageData.where);
+        if (data && data.debugConfig) {
+            return data.debugConfig
+        }
+        return [];
+    }
+
     get config() {
-        let config: Data[] = [
+        let config: DebugConfig[] = [
             {
                 text: "显示视图",
                 onEvent: this.onShowUI,
@@ -120,9 +122,9 @@ export class DebugView extends UIView {
     private initData(){
         const config = this.config;
         this.content.removeAllChildren();
-        config.forEach(v=>{
+        config.forEach((v,i)=>{
             const node = cc.instantiate(this.itemPrefab);
-            node.name = v.text;
+            node.name = `debug${i}`;
             cc.find("Label",node).getComponent(cc.Label).string = v.text;
             this.onN(node,cc.Node.EventType.TOUCH_END,v.onEvent);
             this.content.addChild(node);
@@ -136,6 +138,27 @@ export class DebugView extends UIView {
         this.doOther();
     }
 
+    onShow(): void {
+        super.onShow();
+        // 删除除内置外的其它高度按钮
+        for (let i = this.content.children.length - 1; i >= 0; i--) {
+            const node = this.content.children[i];
+            if (node.name.startsWith("extra_debug")) {
+                node.removeFromParent();
+            }
+        }
+
+        for (let i = 0; i < this.datas.length; i++) {
+            let data = this.datas[i];
+            let node = cc.instantiate(this.itemPrefab);
+            cc.find("Label", node).getComponent(cc.Label).string = data;
+            node.name = `extra_debug${i}`
+            node.userData = data;
+            this.onN(node, cc.Node.EventType.TOUCH_END, this.onExtraEvent);
+            this.content.addChild(node);
+        }
+    }
+
     private doOther() {
         if (this.logView) {
             this.logView.active = false;
@@ -145,6 +168,15 @@ export class DebugView extends UIView {
             if (this.args.onClose) this.args.onClose();
             this.close();
         });
+    }
+
+    onClose() {
+        const args : DebugViewArgs = this.args;
+        if (args && args.onClose) {
+            args.onClose();
+        }
+        super.onClose();
+        
     }
 
     private initLogView() {
@@ -283,6 +315,15 @@ export class DebugView extends UIView {
 
     private onSingleton() {
         Singleton.debug();
+    }
+
+    private onExtraEvent(event: cc.Event.EventTouch) {
+        let data = event.target.userData;
+        if (data) {
+            CC_DEBUG && Log.d(`派发调试事件:${data}`);
+            dispatch(data);
+        }
+        this.close();
     }
 }
 

@@ -423,3 +423,14 @@ interface NavigationData{
 	/**@description 线上运营热更新版本号 */
 	onlineVersion ?: string;
 }
+
+interface DebugConfig{
+    /**@description 按钮文本 */
+    text : string;
+    /**@description 回调 */
+    onEvent : ()=>void;
+}
+
+interface DebugViewArgs{
+    onClose?: () => void;
+}
