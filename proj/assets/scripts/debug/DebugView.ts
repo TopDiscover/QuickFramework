@@ -1,5 +1,6 @@
 
-import { _decorator, Node, find, Toggle, view, Input, profiler, screen, instantiate, Label } from 'cc';
+import { _decorator, Node, find, Toggle, view, Input, profiler, screen, instantiate, Label, EventTouch } from 'cc';
+import { DEBUG } from 'cc/env';
 import UIView from 'db://quick/core/ui/UIView';
 import { inject } from 'db://quick/defines/Decorators';
 import { LogLevel } from 'db://quick/defines/Enums';
@@ -28,6 +29,14 @@ export class DebugView extends UIView {
     private background: Node = null!;
     @inject("background", Node, "logView")
     private logViewBackground: Node = null!;
+
+    private get datas() {
+        const data = App.dataCenter.get(App.stageData.where);
+        if (data && data.debugConfig) {
+            return data.debugConfig
+        }
+        return [];
+    }
 
     get config() {
         let config: Data[] = [
@@ -119,9 +128,9 @@ export class DebugView extends UIView {
     private initData(){
         const config = this.config;
         this.content.removeAllChildren();
-        config.forEach(v=>{
+        config.forEach((v,i)=>{
             const node = instantiate(this.itemPrefab);
-            node.name = v.text;
+            node.name = `debug${i}`;
             find("Label",node)!.getComponent(Label)!.string = v.text;
             this.onN(node,Node.EventType.TOUCH_END,v.onEvent);
             this.content.addChild(node);
@@ -135,6 +144,27 @@ export class DebugView extends UIView {
         this.doOther();
     }
 
+    onShow(): void {
+        super.onShow();
+        // 删除除内置外的其它高度按钮
+        for (let i = this.content.children.length - 1; i >= 0; i--) {
+            const node = this.content.children[i];
+            if (node.name.startsWith("extra_debug")) {
+                node.removeFromParent();
+            }
+        }
+
+        for (let i = 0; i < this.datas.length; i++) {
+            let data = this.datas[i];
+            let node = instantiate(this.itemPrefab);
+            find("Label", node)!.getComponent(Label)!.string = data;
+            node.name = `extra_debug${i}`
+            node.userData = data;
+            this.onN(node, Node.EventType.TOUCH_END, this.onExtraEvent);
+            this.content.addChild(node);
+        }
+    }
+
     private doOther() {
         if (this.logView) {
             this.logView.active = false;
@@ -144,6 +174,15 @@ export class DebugView extends UIView {
             if ( this.args.onClose ) this.args.onClose();
             this.close();
         });
+    }
+
+    onClose() {
+        const args : DebugViewArgs = this.args;
+        if (args && args.onClose) {
+            args.onClose();
+        }
+        super.onClose();
+        
     }
 
     private initLogView() {
@@ -286,6 +325,15 @@ export class DebugView extends UIView {
 
     private onSingleton() {
         Singleton.debug();
+    }
+
+    private onExtraEvent(event: EventTouch) {
+        let data = event.target.userData;
+        if (data) {
+            DEBUG && Log.d(`派发调试事件:${data}`);
+            dispatch(data);
+        }
+        this.close();
     }
 }
 

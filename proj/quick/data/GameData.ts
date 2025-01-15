@@ -6,6 +6,11 @@ export abstract class GameData<LANG extends object = {}> implements ISingleton {
     /**@description 数据所有模块，由数据中心设置 */
     module: string = "";
 
+    /**@description 调试配置 */
+    get debugConfig() : string[] {
+        return []
+    }
+    
     /**@description 初始化 */
     init(...args: any[]): any {
 

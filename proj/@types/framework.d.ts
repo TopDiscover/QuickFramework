@@ -427,6 +427,17 @@ interface NavigationData{
 	onlineVersion ?: string;
 }
 
+interface DebugConfig{
+    /**@description 按钮文本 */
+    text : string;
+    /**@description 回调 */
+    onEvent : ()=>void;
+}
+
+interface DebugViewArgs{
+    onClose?: () => void;
+}
+
 /**@description 层级 配置 */
 interface LayerConfig {
 	/**@description 层级名 */
