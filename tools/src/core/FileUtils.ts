@@ -24,7 +24,10 @@ export default class FileUtils extends Handler {
      */
     symlinkSync(target: PathLike, path: PathLike, type?: symlink.Type | null) {
         if (existsSync(path)) {
-            unlinkSync(path);
+            const stat = statSync(path);
+            if ( stat.isSymbolicLink() ){
+                unlinkSync(path);
+            }
         }
         if (!existsSync(target)) {
             this.logger.error(`不存在 : ${target}`);
