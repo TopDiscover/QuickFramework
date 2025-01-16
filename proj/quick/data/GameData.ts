@@ -10,7 +10,7 @@ export abstract class GameData<LANG extends object = {}> implements ISingleton {
     get debugConfig() : string[] {
         return []
     }
-    
+
     /**@description 初始化 */
     init(...args: any[]): any {
 

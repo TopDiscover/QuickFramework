@@ -99,7 +99,9 @@ export class StageData extends GameData {
 
     /**@description 清空附加运行的场景堆栈 */
     clearAttachStack() {
-        this._attachStack[this.where] = [];
+        if ( this.where != Macro.UNKNOWN ){
+            this._attachStack[this.where] = [];
+        }
         this._attachWhere = Macro.UNKNOWN;
     }
 

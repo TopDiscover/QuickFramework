@@ -72,6 +72,7 @@ export class EntryDelegate {
             App.stageData.attachWhere = entry.bundle;
         } else {
             this.closeCurEntryGameView();
+            App.stageData.clearAttachStack();
             App.stageData.where = entry.bundle;
         }
         App.bundleManager.removeLoadedBundle(excludeBundles);
