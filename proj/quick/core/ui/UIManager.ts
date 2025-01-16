@@ -211,7 +211,7 @@ export class UIManager implements ISingleton {
                     } else {
                         viewData.isLoaded = true;
                         this._close(viewData);
-                        viewData.doCallback(null, className, "打开界面异常");
+                        viewData.doFinish(null, className, "打开界面异常");
                         reslove(<any>null);
                         let uiName = "";
                         if (DEBUG) {
@@ -276,7 +276,7 @@ export class UIManager implements ISingleton {
             reslove(null);
             if (DEBUG) Log.w(`${this.module}${className}正等待关闭`);
             //如果此时有地方正在获取界面，直接返回空
-            viewData.doCallback(null, className, "获取界内已经关闭");
+            viewData.doFinish(null, className, "获取界内已经关闭");
             return;
         }
 
@@ -293,7 +293,7 @@ export class UIManager implements ISingleton {
             view.hide();
             if (DEBUG) Log.w(`${this.module}加载过程隐藏了界面${className}`);
             reslove(view);
-            viewData.doCallback(view, className, "加载完成，但加载过程中被隐藏");
+            viewData.doFinish(view, className, "加载完成，但加载过程中被隐藏");
         }
         else {
             if (DEBUG) Log.d(`${this.module}open view : ${className}`)
@@ -302,7 +302,7 @@ export class UIManager implements ISingleton {
                 view.show(openOptions.args);
             }
             reslove(view)
-            viewData.doCallback(view, className, "加载完成，回调之前加载中的界面");
+            viewData.doFinish(view, className, "加载完成，回调之前加载中的界面");
         }
     }
 
@@ -511,7 +511,7 @@ export class UIManager implements ISingleton {
                 }
                 else {
                     //加载中
-                    viewData.getViewCb.push(onComplete!);
+                    viewData.finishCb.push(onComplete!);
                     return null!;
                 }
             }

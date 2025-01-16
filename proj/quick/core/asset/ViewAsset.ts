@@ -120,8 +120,6 @@ export namespace ViewAsset {
         view: UIView = null!;
         /**@description 等待加载完成回调 */
         finishCb: ((view: any) => void)[] = [];
-        /**@description 等待获取界面回调 */
-        getViewCb: ((view: any) => void)[] = [];
         /**是否预加载,不显示出来，但会加到当前场景上 */
         isPreload: boolean = false;
         /**@description 是否通过预置创建 */
@@ -141,19 +139,7 @@ export namespace ViewAsset {
             return this.loadData.name!;
         }
 
-        private doGet(view: UIView | null, className: string, msg: string) {
-            for (let i = 0; i < this.getViewCb.length; i++) {
-                let cb = this.getViewCb[i];
-                if (cb) {
-                    cb(view);
-                    if (DEBUG) Log.w(`ViewData do get view : ${className} msg : ${msg}`);
-                }
-            }
-
-            this.getViewCb = [];
-        }
-
-        private doFinish(view: UIView | null, className: string, msg: string) {
+        doFinish(view: UIView | null, className: string, msg: string) {
             for (let i = 0; i < this.finishCb.length; i++) {
                 let cb = this.finishCb[i];
                 if (cb) {
@@ -162,11 +148,6 @@ export namespace ViewAsset {
                 }
             }
             this.finishCb = [];
-        }
-
-        doCallback(view: UIView | null, className: string, msg: string) {
-            this.doFinish(view, className, msg);
-            this.doGet(view, className, msg);
         }
 
         resumeRelease() {
