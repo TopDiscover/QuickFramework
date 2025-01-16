@@ -525,16 +525,14 @@ export class UIManager implements ISingleton {
     /**
      * @description 获取指定视图,如果还没有加载完成，获取只是预加载，则返回空
      * @param className 
-     * @param onComplete 
      */
-    public getViewAsync(className: string, onComplete?: (view: UIView) => void): Promise<UIView>;
+    public getViewAsync(className: string): Promise<UIView>;
     /**
      * @description 获取指定视图,如果还没有加载完成，获取只是预加载，则返回空
-     * @param uiClass 
-     * @param onComplete 
+     * @param uiClass
      */
-    public getViewAsync<T extends UIView>(uiClass: UIClass<T>, onComplete?: (view: T) => void): Promise<T>;
-    public getViewAsync(data: any, onComplete?: (view: any) => void): Promise<any> {
+    public getViewAsync<T extends UIView>(uiClass: UIClass<T>): Promise<T>;
+    public getViewAsync(data: any): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             this.getView(data, (view) => {
                 resolve(view);
