@@ -18,7 +18,9 @@ export interface IWSServiceOptions extends IWSServerOptions {
     /**@description 进入后台的最大允许时间，超过了最大值，则进入网络重连,默认60秒 */
     maxEnterBackgroundTime?: number;
     /**@description 是否启用网络重连 默认为 true */
-    enableReconnect?: boolean
+    enableReconnect?: boolean;
+    /**@description 重连次数 默认为 3 */
+    reconnectTimes?: number;
 }
 
 export abstract class WSService implements IService{
@@ -48,6 +50,7 @@ export abstract class WSService implements IService{
         this.options.lostHeartbeat = this.options.lostHeartbeat || 5;
         this.options.maxEnterBackgroundTime = this.options.maxEnterBackgroundTime || 60000;
         this.options.enableReconnect = this.options.enableReconnect == undefined ? true : this.options.enableReconnect;
+        this.options.reconnectTimes = this.options.reconnectTimes || 3;
         const originalOpen = this.options.onOpen;
         this.options.onOpen = (ev: Event) => {
             originalOpen?.(ev);
@@ -271,10 +274,10 @@ export abstract class WSService implements IService{
     /**
      * @description 重新处理
      */
-    async reconnect() {
+    async reconnect( ) {
         let time = 0.3;
         let count = 1;
         await App.utils.delayMs(time * 1000);
-        
+
     }
 }
