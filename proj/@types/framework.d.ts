@@ -177,7 +177,7 @@ declare type Sender = import("../assets/quick/core/net/service/Sender").Sender;
 declare type Handler = import("../assets/quick/core/net/service/Handler").Handler;
 declare type ReconnectHandler = import("../assets/quick/core/net/service/ReconnectHandler").ReconnectHandler;
 
-declare type Service = import("../assets/quick/core/net/service/Service").Service;
+declare type Service = import("../assets/quick/core/net/ws/WSService").WSService;
 declare interface ServiceClass<T extends Service> extends ModuleClass<T> {
 }
 

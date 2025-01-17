@@ -346,9 +346,9 @@ export class Framewok implements GameEventInterface {
         App.releaseManger.onLoad(node);
     }
 
-    update(node: cc.Node) {
+    update(node: cc.Node,dt:number) {
         //Service 网络调试
-        App.serviceManager.update();
+        App.serviceManager.update(dt);
 
         //远程资源下载任务调度
         App.asset.remote.update();

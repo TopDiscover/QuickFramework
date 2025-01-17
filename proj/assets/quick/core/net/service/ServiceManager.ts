@@ -46,15 +46,13 @@ export class ServiceManager implements GameEventInterface , ISingleton {
             while (i--) {
                 if (this.services[i].module == name) {
                     //销毁前先关闭网络
-                    this.services[i].close();
-                    this.services[i].destory();
+                    this.services[i].stop();
                     this.services.splice(i, 1);
                 }
             }
         }else{
             this.clear();
         }
-       
     }
 
     /**@description 清除Service */
@@ -63,8 +61,7 @@ export class ServiceManager implements GameEventInterface , ISingleton {
         while (i--) {
             if (!this.isInExclude(this.services[i], exclude)) {
                 //销毁前先关闭网络
-                this.services[i].close();
-                this.services[i].destory();
+                this.services[i].stop();
                 this.services.splice(i, 1);
             }
         }
@@ -96,10 +93,10 @@ export class ServiceManager implements GameEventInterface , ISingleton {
         this.clear();
     }
 
-    update() {
+    update(dt:number) {
         this.services.forEach((service) => {
             if (service) {
-                service.handMessage();
+                service.update(dt);
             }
         });
     }
@@ -107,7 +104,7 @@ export class ServiceManager implements GameEventInterface , ISingleton {
     close() {
         this.services.forEach((service) => {
             if (service) {
-                service.close();
+                service.stop();
             }
         });
     }
@@ -230,7 +227,7 @@ export class ServiceManager implements GameEventInterface , ISingleton {
 
     /**@description 网络心跳超时 */
     reconnect(service: Service) {
-        if (!this.isWaiReconnect(service) && service.reconnectHandler && service.reconnectHandler.enabled) {
+        if (!this.isWaiReconnect(service) && service.options.enableReconnect) {
             this.waitReconnect.push(service);
         }
         this.sortWait();
@@ -315,16 +312,11 @@ export class ServiceManager implements GameEventInterface , ISingleton {
     debug() {
         Log.d(`-----------网络管理器中相关网络信息------------`);
         this.services.forEach((service) => {
-            let content = `Module : ${service.module} , 进入后台的最大允许时间 : ${service.maxEnterBackgroundTime} , 优先级 : ${service.priority}`;
+            let content = `Module : ${service.module} , 进入后台的最大允许时间 : ${service.options.maxEnterBackgroundTime} , 优先级 : ${service.priority}`;
             Log.d(content);
-            content = "重连信息 : "
-            if (service.reconnectHandler) {
-                content = `是否允许重连 : ${service.reconnectHandler.enabled}`
-            } else {
-                content += "无重连Handler";
-            }
+            content = `是否允许重连 : ${service.options.enableReconnect}`
             Log.d(content);
-            content = `状态信息 , 是否允许连接网络 : ${service.enabled} 是否连接 : ${service.isConnected} 网络数据类型 : ${service.serviceType}`
+            content = `状态信息 是否连接 : ${service.server.isConnected} 网络数据类型 : ${service.serviceType}`
             Log.d(content);
         });
     }
