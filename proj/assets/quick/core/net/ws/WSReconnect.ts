@@ -85,7 +85,6 @@ export class WSReconnect {
         return new Promise<boolean>((resolve, reject) => {
             this.delayCall(this.connectID, delay, async () => {
                 try {
-                    await this.service.stop();
                     resolve(await this.service.start());
                 } catch (error) {
                     resolve(false);

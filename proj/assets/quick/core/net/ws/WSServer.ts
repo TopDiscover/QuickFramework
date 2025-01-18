@@ -44,19 +44,36 @@ export class WSServer {
 
     /**@description 启动服务器 */
     async start() {
-        if (this.proxy) {
-            if (this.proxy.ws) {
-                throw new Error(`${this.options.tag}连接已经存在`);
+        return new Promise<boolean>(async (resolve, reject) => {
+            if (this.proxy) {
+                if (this.proxy.ws) {
+                    if (this.proxy.status == WebSocket.OPEN) {
+                        CC_DEBUG && Log.d(`${this.options.tag} 当前网络已连接`);
+                        resolve(true);
+                        return;
+                    } else {
+                        if (this.proxy.status == WebSocket.CONNECTING) {
+                            CC_DEBUG && Log.d(`${this.options.tag} 当前网络正在连接`);
+                            this.proxy.onOpenCb.push(resolve);
+                            return;
+                        } else if (this.proxy.status == WebSocket.CLOSING) {
+                            // 这步理论是不存在的
+                            CC_DEBUG && Log.w(`${this.options.tag} 当前网络 正在关闭`);
+                            resolve(false);
+                            return;
+                        }
+                    }
+                }
+            } else {
+                this.proxy = new WSProxy();
             }
-        } else {
-            this.proxy = new WSProxy();
-        }
-        this.proxy.options = this.options;
-        const success = await this.proxy.connect(this.options.url, this.options.timeOut);
-        if (!success) {
-            await this.stop();
-        }
-        return success;
+            this.proxy.options = this.options;
+            const success = await this.proxy.connect(this.options.url, this.options.timeOut);
+            if (!success) {
+                await this.stop();
+            }
+            resolve(success);
+        })
     }
 
     /**@description 停止服务器 */
