@@ -8,10 +8,6 @@ import { Macro } from 'db://quick/defines/Macros';
 import { Singleton } from 'db://quick/utils/Singleton';
 const { ccclass, property } = _decorator;
 
-interface Data {
-    text: string;
-    onEvent: () => void;
-}
 @ccclass('DebugView')
 export class DebugView extends UIView {
 
@@ -39,7 +35,7 @@ export class DebugView extends UIView {
     }
 
     get config() {
-        let config: Data[] = [
+        let config: DebugConfig[] = [
             {
                 text: "显示视图",
                 onEvent: this.onShowUI,
@@ -91,10 +87,6 @@ export class DebugView extends UIView {
             {
                 text: "Handlers",
                 onEvent: this.onHandler,
-            },
-            {
-                text: "Sandlers",
-                onEvent: this.onSender,
             },
             {
                 text: "网络管理器",
@@ -283,10 +275,6 @@ export class DebugView extends UIView {
 
     private onShowComp() {
         App.layerMgr.debug({ showComp: true });
-    }
-
-    private onSender() {
-        App.senderManager.debug();
     }
 
     private onHandler() {

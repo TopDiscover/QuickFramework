@@ -9,6 +9,7 @@ import * as PngCompress from "./png-compress/Helper";
 import * as Hotupdate from "./hotupdate/Helper";
 import { Environment } from "./core/Environment";
 import { SyncData, SyncType } from "./core/Defines";
+import * as Svr from "./test-server/Helper";
 
 const META = ".meta";
 
@@ -46,6 +47,8 @@ export class Helper extends Handler {
      * @description 热更新
      */
     private _hotupdate = new Hotupdate.default();
+
+    private svr = new Svr.default();
 
     /**@description 获取当前分支信息 */
     private async gitCurBranch() {
@@ -295,4 +298,7 @@ export class Helper extends Handler {
         this.log(`更新框架`, true);
     }
 
+    runWeb(){
+        this.svr.start();
+    }
 }

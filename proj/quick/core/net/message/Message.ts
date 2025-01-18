@@ -6,11 +6,11 @@ export abstract class IMessage {
     abstract get cmd(): string | number
 }
 
-export abstract class Codec extends IMessage {
+export abstract class MessageHead extends IMessage {
     //编码数据
-    abstract pack(data: IMessage): boolean
+    abstract encode(data: IMessage): boolean
     //解码数据
-    abstract unPack(data: MessageEvent): boolean
+    abstract decode(data: MessageEvent): boolean
 }
 
 

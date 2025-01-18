@@ -30,7 +30,7 @@ export class Launch extends EventComponent {
     }
 
     update(dt: number) {
-        App.update(this.node);
+        App.update(this.node,dt);
     }
 
     onDestroy() {

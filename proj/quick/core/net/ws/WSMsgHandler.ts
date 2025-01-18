@@ -1,11 +1,19 @@
-import { DefaultCodec } from "../message/DefaultCodec";
-import { Codec, Message } from "../message/Message";
+/**
+ * @description WebSocket 消息处理管理器
+ */
+
+import { DEBUG } from "cc/env";
 import { Net } from "../Net";
 
-export type MessageHandleFunc = (handleTypeData: any) => number;
+type MessageHandleFunc = (handleTypeData: any) => number;
 
-export class Process {
-    public Codec: new () => Codec = DefaultCodec;
+export class WSMsgHandler {
+
+    constructor(service: WSService) {
+        this.service = service;
+    }
+
+    private service: WSService;
 
     /** 监听集合*/
     protected _listeners: { [key: string]: Net.ListenerData[] } = {};
@@ -13,25 +21,14 @@ export class Process {
     protected _masseageQueue: Array<Net.ListenerData[]> = new Array<Net.ListenerData[]>();
 
 
-    /** 是否正在处理消息 ，消息队列处理消息有时间，如执行一个消息需要多少秒后才执行一下个*/
+    /** 是否正在处理消息，消息队列处理消息有时间，如执行一个消息需要多少秒后才执行一下个 */
     protected _isDoingMessage: boolean = false;
 
     /** @description 可能后面有其它特殊需要，特定情况下暂停消息队列的处理, true为停止消息队列处理 */
     public isPause: boolean = false;
     serviceType: Net.ServiceType = null!;
 
-    /**
-     * @description 暂停消息队列消息处理
-     */
-    public pauseMessageQueue() { this.isPause = true }
-
-    /**
-     * @description 恢复消息队列消息处理
-     */
-    public resumeMessageQueue() { this.isPause = false }
-
-
-    public handMessage() {
+    public update(dt: number) {
 
         //如果当前暂停了消息队列处理，不再处理消息队列
         if (this.isPause) return;
@@ -72,18 +69,18 @@ export class Process {
         }
     }
 
-    public onMessage(code: Codec) {
-        Log.d(`recv data main cmd : ${code.cmd}`);
-        let key = String(code.cmd);
+    public onMessage(data: Message, tag?: string) {
+        DEBUG && Log.d(`${tag} recv data main cmd : ${data.cmd}`);
+        let key = String(data.cmd);
         if (!this._listeners[key]) {
-            Log.w(`no find listener data main cmd : ${code.cmd}`);
+            DEBUG && Log.w(`${tag} no find listener data main cmd : ${data.cmd}`);
             return;
         }
         if (this._listeners[key].length <= 0) {
             return;
         }
 
-        this.addMessageQueue(key, code, true)
+        this.addQueue(key, data, true)
     }
 
     /**
@@ -93,15 +90,15 @@ export class Process {
         this._isDoingMessage = false;
         this._listeners = {};
         this._masseageQueue = [];
-        this.resumeMessageQueue();
+        this.isPause = false;
     }
 
-    public close() {
+    public stop() {
         this._masseageQueue = [];
         this._isDoingMessage = false;
     }
 
-    public addListener(cmd: string, handleType: any, handleFunc: MessageHandleFunc, isQueue: boolean, target: any) {
+    public onS(cmd: string, handleType: any, handleFunc: MessageHandleFunc, isQueue: boolean, target: any) {
         let key = cmd;
 
         if (this._listeners[key]) {
@@ -135,14 +132,14 @@ export class Process {
         }
     }
 
-    public removeListeners(target: any, eventName?: string) {
-        if (eventName) {
+    public offS(target: any, cmd?: string) {
+        if (cmd) {
             let self = this;
             Object.keys(this._listeners).forEach((value) => {
                 let datas = self._listeners[value];
                 let i = datas.length;
                 while (i--) {
-                    if (datas[i].target == target && datas[i].cmd == eventName) {
+                    if (datas[i].target == target && datas[i].cmd == cmd) {
                         datas.splice(i, 1);
                     }
                 }
@@ -157,7 +154,7 @@ export class Process {
                 let datas = this._masseageQueue[i];
                 let j = datas.length;
                 while (j--) {
-                    if (datas[j].target == target && datas[i].cmd == eventName) {
+                    if (datas[j].target == target && datas[i].cmd == cmd) {
                         datas.splice(j, 1);
                     }
                 }
@@ -200,37 +197,22 @@ export class Process {
         }
     }
 
-    protected decode(o: Net.ListenerData, header: Codec): Message | null {
-        let obj: Message = null!;
-        if ( this.serviceType == Net.ServiceType.Proto ){
-            if ( o.type && typeof o.type == "string" ){
-                let type = App.protoManager.lookup(o.type) as protobuf.Type;
-                if( type ){
-                    obj = App.protoManager.decode({
-                        className : o.type,
-                        buffer : header.buffer as Uint8Array,
-                    }) as any;
-                }else{
-                    obj = header.buffer as any;
-                }
-            }else{
-                obj = header.buffer as any;
-            }
-            return obj;
-        }else{
-            if (o.type && typeof o.type != "string") {
-                obj = new o.type();
-                //解包
-                obj.decode(header.buffer);
-            } else {
-                //把数据放到里面，让后面使用都自己解析,数据未解析，此消息推后解析
-                obj = header.buffer as any;
-            }
-            return obj
+    private async decode(o: Net.ListenerData, header: Message): Promise<Message | null> {
+        if (this.service.flows.decodeMessageFlow.nodes.length > 0) {
+            const result = await this.service.flows.decodeMessageFlow.exec({
+                service: this.service,
+                message: header,
+                listenerData: o,
+                result: null
+            });
+            return result.result
+        } else {
+            DEBUG && Log.e(`${this.service.options.tag} decodeMessageFlow 消息未注册`);
+            return null;
         }
     }
 
-    public addMessageQueue(key: string, data: any, encode: boolean) {
+    private async addQueue(key: string, data: Message, encode: boolean) {
         if (this._listeners[key].length <= 0) { return }
         let listenerDatas = this._listeners[key];
         let queueDatas = [];
@@ -238,12 +220,12 @@ export class Process {
         for (let i = 0; i < listenerDatas.length; i++) {
             let obj: Message = data
             if (encode) {
-                obj = this.decode(listenerDatas[i], data) as Message
+                obj = await this.decode(listenerDatas[i], data) as Message
             }
 
             if (listenerDatas[i].isQueue) {
                 //需要加入队列处理
-                queueDatas.push(this.copyListenerData(listenerDatas[i], obj));
+                queueDatas.push(this.copy(listenerDatas[i], obj));
             }
             else {
                 //不需要进入队列处理
@@ -265,7 +247,7 @@ export class Process {
      * @param input 
      * @param data 
      */
-    private copyListenerData(input: Net.ListenerData, data: any): Net.ListenerData {
+    private copy(input: Net.ListenerData, data: any): Net.ListenerData {
         return {
             type: input.type,
             func: input.func,
