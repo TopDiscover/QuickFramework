@@ -205,7 +205,7 @@ export class WSMsgHandler {
                 listenerData: o,
                 result: null
             });
-            return result.result
+            return result!.result
         } else {
             DEBUG && Log.e(`${this.service.options.tag} decodeMessageFlow 消息未注册`);
             return null;

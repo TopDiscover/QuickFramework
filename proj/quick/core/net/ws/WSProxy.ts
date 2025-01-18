@@ -32,6 +32,7 @@ export class WSProxy {
     /**@description 连接回调 */
     private rsOpen: (success: boolean) => void = null!
     private rsOpenTimeOut: number = -1
+    onOpenCb: ((success: boolean) => void)[] = []
 
     /**@description websocket */
     protected _ws: WebSocket = null!;
@@ -81,6 +82,10 @@ export class WSProxy {
             this.rsOpen(success);
         }
         this.rsOpen = null!;
+        for (let i = 0; i < this.onOpenCb.length; i++) {
+            this.onOpenCb[i](success);
+        }
+        this.onOpenCb = [];
         clearTimeout(this.rsOpenTimeOut);
     }
 
