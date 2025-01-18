@@ -240,12 +240,4 @@ export class Utils implements ISingleton {
     md5(data: string){
 		return CryptoJS.MD5(data).toString();
     }
-
-    delayMs(ms: number) {
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				resolve(null);
-			}, ms);
-		});
-	}
 }

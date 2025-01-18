@@ -1,5 +1,5 @@
 import { Net } from "../Net";
-import { Codec, Message } from "./Message";
+import { MessageHead, Message } from "./Message";
 
 /**
  * @description protobuf解析基类
@@ -38,7 +38,7 @@ export abstract class ProtoMessage<T> extends Message {
     }
 }
 
-export abstract class ProtoCodec extends Codec {
+export abstract class ProtoCodec extends MessageHead {
 
 }
 

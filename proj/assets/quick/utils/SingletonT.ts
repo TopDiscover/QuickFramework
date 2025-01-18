@@ -24,7 +24,7 @@ export class SingletonT<TYPE extends ISingleton> {
             if (typeOrkey.instance) {
                 data = typeOrkey.instance;
             } else {
-                data = new typeOrkey();
+                data = new typeOrkey(typeOrkey.module);
             }
             data.module = typeOrkey.module;
             Log.d(`${data.module}初始化`);

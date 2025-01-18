@@ -26,7 +26,9 @@ async function main() {
 
     let type = argv.shift();
     while (type) {
-        if (type == CmdType.GitBundles) {
+        if (type == "svr") {
+            await Helper.instance.runWeb();
+        } else if (type == CmdType.GitBundles) {
             await Helper.instance.gitBundles();
         } else if (type == CmdType.GitResources) {
             await Helper.instance.gitResources();

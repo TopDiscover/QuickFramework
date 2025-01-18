@@ -185,9 +185,8 @@ function _inject<T extends Logic | GameData | ISingleton>(type: ({ new(): T } | 
                                     return App.serviceManager.get(ele.type, false);
                                 } else if (ele.tag == "handler") {
                                     return App.handlerManager.get(ele.type, false);
-                                } else if (ele.tag == "sender") {
-                                    return App.senderManager.get(ele.type, false);
                                 }
+                                return null;
                             },
                         })
                     }
@@ -234,8 +233,7 @@ export function inject<T extends cc.Component | cc.Node>(path: string, type: FIN
 export function inject<T extends Logic>(data: InjectParam<T>):Function;
 export function inject<T extends GameData>(data: InjectParam<T>):Function;
 export function inject<T extends ISingleton>(data: InjectParam<T>):Function;
-export function inject<T extends Service>(data: InjectParam<T>):Function;
-export function inject<T extends Sender>(data: InjectParam<T>):Function;
+export function inject<T extends WSService>(data: InjectParam<T>):Function;
 export function inject<T extends Handler>(data: InjectParam<T>):Function;
 export function inject() : Function{
     if (typeof arguments[0] == "string") {

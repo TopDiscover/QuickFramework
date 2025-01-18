@@ -152,7 +152,7 @@ declare interface ISingleton {
 }
 
 declare interface ModuleClass<T> {
-	new(): T;
+	new(module?: string): T;
 	/**@description 模块名 */
 	module: string;
 }
@@ -173,12 +173,9 @@ declare type Logic = import("../assets/quick/core/logic/Logic").Logic;
 declare type GameView = import("../assets/quick/core/ui/GameView").default;
 declare type AudioComponent = import("../assets/quick/components/AudioComponent").default;
 
-declare type Sender = import("../assets/quick/core/net/service/Sender").Sender;
 declare type Handler = import("../assets/quick/core/net/service/Handler").Handler;
-declare type ReconnectHandler = import("../assets/quick/core/net/service/ReconnectHandler").ReconnectHandler;
-
-declare type Service = import("../assets/quick/core/net/ws/WSService").WSService;
-declare interface ServiceClass<T extends Service> extends ModuleClass<T> {
+declare type WSService = import("../assets/quick/core/net/ws/WSService").WSService;
+declare interface WSServiceClass<T extends WSService> extends ModuleClass<T> {
 }
 
 /**
@@ -261,13 +258,7 @@ declare function loadRes<T extends cc.Asset>(config: {
 declare type EntryDelegate = import("../assets/quick/core/entry/EntryDelegate").EntryDelegate;
 declare type Message = import("../assets/quick/core/net/message/Message").Message;
 
-interface IService {
-	addListener?(cmd: string, handleType: any, handleFunc: Function, isQueue: boolean, target: any): any;
-
-	removeListeners?(target: any, eventName?: string): any;
-
-	send?(msg: Message): any;
-}
+declare type IWSMsgHandler = import("../assets/quick/core/net/ws/IWSMsgHandler").IWSMsgHandler;
 
 /**@description 语言包相关 */
 declare namespace Language {
@@ -378,9 +369,9 @@ declare interface WaitToAppData{
 declare let WaitToApp : WaitToAppData;
 
 /**@description 注入类型 */
-type InjectType = "logic" | "data" | "singleton" | "service" | "sender" | "handler";
+type InjectType = "logic" | "data" | "singleton" | "service"  | "handler";
 interface InjectParam<T> {
-	type: ({ new(): T } | string);
+	type: ({ new(...args: any): T } | string);
 	name: InjectType;
 }
 

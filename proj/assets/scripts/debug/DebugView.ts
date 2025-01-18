@@ -87,10 +87,6 @@ export class DebugView extends UIView {
                 onEvent: this.onHandler,
             },
             {
-                text: "Sandlers",
-                onEvent: this.onSender,
-            },
-            {
                 text: "网络管理器",
                 onEvent: this.onServiceManager,
             },
@@ -273,10 +269,6 @@ export class DebugView extends UIView {
 
     private onShowComp() {
         App.uiManager.debug({ showComp: true });
-    }
-
-    private onSender() {
-        App.senderManager.debug();
     }
 
     private onHandler() {

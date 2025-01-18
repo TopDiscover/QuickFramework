@@ -28,9 +28,9 @@ export abstract class Handler extends EventProcessor implements ISingleton{
      * @param isQueue 接收到消息，是否进行队列处理
      */
     protected onS(cmd: string, func: (data: any) => void, handleType?: any, isQueue = true) {
-        let service : IService = this.service;
-        if (service && service.addListener ) {
-            service.addListener(cmd, handleType, func, isQueue, this);
+        let service : IWSMsgHandler = this.service;
+        if (service && service.onS ) {
+            service.onS(cmd, handleType, func, isQueue, this);
             return;
         }
         if( CC_DEBUG ){
@@ -43,13 +43,23 @@ export abstract class Handler extends EventProcessor implements ISingleton{
      * @param cmd 如果为null，则反注册当前对象注册过的所有处理过程，否则对特定cmd反注册
      **/
     protected offS(cmd?: string) {
-        let service : IService = this.service;
-        if (service && service.removeListeners) {
-            service.removeListeners(this, cmd)
+        let service : IWSMsgHandler = this.service;
+        if (service && service.offS) {
+            service.offS(this, cmd)
             return;
         }
         if( CC_DEBUG ){
             Log.w(`未绑定Service`);
+        }
+    }
+
+    protected send(msg: Message) {
+        if (this.service && this.service.send) {
+            this.service.send(msg);
+            return;
+        }
+        if( CC_DEBUG ){
+            Log.e(`必须绑定Service`);
         }
     }
 

@@ -32,7 +32,8 @@ export class WSProxy {
     private rsOpenTimeOut: number = -1
 
     /**@description websocket */
-    protected ws: WebSocket = null!;
+    protected _ws: WebSocket = null!;
+    get ws() { return this._ws; }
 
     /**
      * @description 连接
@@ -46,28 +47,28 @@ export class WSProxy {
             const protocol = url.indexOf("wss") == 0 ? "wss" : "ws";
             if (CC_JSB && protocol == "wss") {
                 if (!App.wssCacertUrl) {
-                    Log.e(`请先设置wss的证书url,Launch脚本中直接挂载证书`);
+                    Log.e(`${this.options.tag}请先设置wss的证书url,Launch脚本中直接挂载证书`);
                 }
-                this.ws = new (<any>(WebSocket))(url, [], App.wssCacertUrl);
+                this._ws = new (<any>(WebSocket))(url, [], App.wssCacertUrl);
             } else {
-                this.ws = new WebSocket(url, protocols);
+                this._ws = new WebSocket(url, protocols);
             }
-            this.ws.onopen = this.onOpen.bind(this);
-            this.ws.onclose = this.onClose.bind(this);
-            this.ws.onerror = this.onError.bind(this);
-            this.ws.onmessage = this.onMessage.bind(this);
+            this._ws.binaryType = "arraybuffer";
+            this._ws.onopen = this.onOpen.bind(this);
+            this._ws.onclose = this.onClose.bind(this);
+            this._ws.onerror = this.onError.bind(this);
+            this._ws.onmessage = this.onMessage.bind(this);
 
             this.rsOpen = resolve;
             this.rsOpenTimeOut = setTimeout(() => {
                 try {
                     if (this.status != WebSocket.OPEN) {
-                        CC_DEBUG && Log.w(this.options.tag, `连接超时`);
+                        CC_DEBUG && Log.w(`${this.options.tag}连接超时`);
                     }
                 } catch (error) {
-                    CC_DEBUG && Log.e("WebSocket连接时发生错误:", error);
+                    CC_DEBUG && Log.e(`${this.options.tag}WebSocket连接时发生错误:`, error);
                 } finally {
-                    this.rsOpen(false);
-                    this.rsOpen = null!;
+                    this.doOpen(false);
                 }
             }, timeOut);
         });
@@ -76,16 +77,17 @@ export class WSProxy {
     private doOpen(success: boolean) {
         if (this.rsOpen) {
             this.rsOpen(success);
-            this.rsOpen = null!;
         }
+        this.rsOpen = null!;
         clearTimeout(this.rsOpenTimeOut);
     }
 
     private doClose() {
         if (this.rsClose) {
             this.rsClose();
-            this.rsClose = null!;
         }
+        this.rsClose = null!;
+        this._ws = null!;
         this.waitSend = [];
         clearTimeout(this.rsCloseTimeOut);
     }
@@ -93,7 +95,6 @@ export class WSProxy {
     protected onClose(ev: CloseEvent) {
         CC_DEBUG && Log.d(`${this.options.tag} WebSocket 连接关闭`);
         this.options.onClose?.(ev);
-        this.ws = null!;
         this.doClose();
     }
 
@@ -127,21 +128,29 @@ export class WSProxy {
         return new Promise<void>((resolve, reject) => {
             if (!this.ws) {
                 resolve();
+                this.doClose();
                 CC_DEBUG && Log.w(this.options.tag, `关闭时，网络未连接`);
                 return
             }
+            if ( this.status == WebSocket.CLOSED ){
+                resolve();
+                this.doClose();
+                CC_DEBUG && Log.w(this.options.tag, `关闭时，网络已经关闭`);
+                return
+            }
+            if ( this.status != WebSocket.CLOSING ){
+                this.ws.close(code, reason);
+            }
             this.rsClose = resolve;
-            this.ws.close(code, reason);
             this.rsCloseTimeOut = setTimeout(() => {
                 try {
                     if (this.status != WebSocket.CLOSED) {
-                        CC_DEBUG && Log.w(this.options.tag, `关闭超时`);
+                        CC_DEBUG && Log.w(`${this.options.tag}关闭超时`);
                     }
                 } catch (error) {
-                    CC_DEBUG && Log.e("WebSocket关闭时发生错误:", error);
+                    CC_DEBUG && Log.e(`${this.options.tag}WebSocket关闭时发生错误:`, error);
                 } finally {
-                    this.rsClose();
-                    this.rsClose = null!;
+                    this.doClose();
                 }
             }, closeTimeOut);
         })

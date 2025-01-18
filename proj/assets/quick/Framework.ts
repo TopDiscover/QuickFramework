@@ -19,7 +19,6 @@ import { ReleaseManager } from "./core/asset/ReleaseManager";
 import { HttpClient } from "./core/net/http/HttpClient";
 import { Singleton } from "./utils/Singleton";
 import { LayoutManager } from "./core/layout/LayoutManager";
-import { SenderManager } from "./core/net/service/SenderManager";
 import { HandlerManager } from "./core/net/service/HandlerManager";
 import { Utils } from "./utils/Utils";
 import { CanvasHelper } from "./utils/CanvasHelper";
@@ -81,11 +80,6 @@ export class Framewok implements GameEventInterface {
     /**@description 网络Service管理器 */
     get serviceManager() {
         return Singleton.get(ServiceManager)!;
-    }
-
-    /**@description 网络消息发送管理器 */
-    get senderManager() {
-        return Singleton.get(SenderManager)!;
     }
 
     /**@description 网络消息处理管理器 */

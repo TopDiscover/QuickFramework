@@ -3,22 +3,23 @@
  */
 
 import { Macro } from "../../../defines/Macros";
+import { WSService } from "../ws/WSService";
 
-export class ServiceManager implements GameEventInterface , ISingleton {
+export class ServiceManager implements GameEventInterface, ISingleton {
     static module: string = "【Service管理器】";
     module: string = null!;
 
     /**@description 所有的网络 */
-    protected services: Service[] = [];
+    protected services: WSService[] = [];
 
     /**@description 等级重连的网络 */
-    protected waitReconnect: Service[] = [];
+    protected waitReconnect: WSService[] = [];
 
     /**@description 当前正在重连的Service */
-    protected curReconnect: Service | undefined = undefined;
+    protected curReconnect: WSService | undefined = undefined;
 
     /**@description 获取service */
-    get<T extends Service>(classOrModule: ServiceClass<T> | string, isCreate = false) {
+    get<T extends WSService>(classOrModule: WSServiceClass<T> | string, isCreate = false) {
         let module = this.getModule(classOrModule);
         if (module == Macro.UNKNOWN) {
             return null;
@@ -29,9 +30,12 @@ export class ServiceManager implements GameEventInterface , ISingleton {
         }
         if (typeof classOrModule != "string") {
             if (isCreate) {
-                service = new classOrModule();
-                service.module = module;
+                service = new classOrModule(module);
                 this.services.push(service);
+                service.flows.reconnectFlow.push(( service )=>{
+                    this.reconnect(service);
+                    return service;
+                })
                 return service;
             }
         }
@@ -39,7 +43,7 @@ export class ServiceManager implements GameEventInterface , ISingleton {
     }
 
     /**@description 销毁Service */
-    destory<T extends Service>(classOrName?: ServiceClass<T> | string) {
+    destory<T extends WSService>(classOrName?: WSServiceClass<T> | string) {
         if (classOrName) {
             let name = this.getModule(classOrName);
             let i = this.services.length;
@@ -50,13 +54,13 @@ export class ServiceManager implements GameEventInterface , ISingleton {
                     this.services.splice(i, 1);
                 }
             }
-        }else{
+        } else {
             this.clear();
         }
     }
 
     /**@description 清除Service */
-    clear<T extends Service>(exclude?: (ServiceClass<T> | string)[]) {
+    clear<T extends WSService>(exclude?: (WSServiceClass<T> | string)[]) {
         let i = this.services.length;
         while (i--) {
             if (!this.isInExclude(this.services[i], exclude)) {
@@ -67,7 +71,7 @@ export class ServiceManager implements GameEventInterface , ISingleton {
         }
     }
 
-    private isInExclude<T extends Service>(data: T, exclude?: (ServiceClass<T> | string)[]) {
+    private isInExclude<T extends WSService>(data: T, exclude?: (WSServiceClass<T> | string)[]) {
         if (!exclude) return false;
         for (let i = 0; i < exclude.length; i++) {
             let name = this.getModule(exclude[i]);
@@ -78,7 +82,7 @@ export class ServiceManager implements GameEventInterface , ISingleton {
         return false;
     }
 
-    private getModule<T extends Service>(classOrModule: ServiceClass<T> | string) {
+    private getModule<T extends WSService>(classOrModule: WSServiceClass<T> | string) {
         let name = Macro.UNKNOWN;
         if (typeof classOrModule == "string") {
             name = classOrModule;
@@ -93,7 +97,7 @@ export class ServiceManager implements GameEventInterface , ISingleton {
         this.clear();
     }
 
-    update(dt:number) {
+    update(dt: number) {
         this.services.forEach((service) => {
             if (service) {
                 service.update(dt);
@@ -101,7 +105,7 @@ export class ServiceManager implements GameEventInterface , ISingleton {
         });
     }
 
-    close() {
+    stop() {
         this.services.forEach((service) => {
             if (service) {
                 service.stop();
@@ -113,106 +117,6 @@ export class ServiceManager implements GameEventInterface , ISingleton {
 
     }
 
-    onError(ev: Event, service: Service) {
-        Log.d(`${service.module} 网络错误!!!`);
-        //连接错误，如果有重连组件，且为允许重连情况下，放入到重连队列中
-        if (!this.isWaiReconnect(service) && service.reconnectHandler && service.reconnectHandler.enabled) {
-            //在等级重连队列中
-            this.waitReconnect.push(service);
-        }
-        this.sortWait()
-        //如果有正常连接的，直接返回
-        if (this.curReconnect) {
-            if (this.curReconnect == service && service.reconnectHandler && service.reconnectHandler.enabled) {
-                service.reconnectHandler.onError(ev);
-            }
-            return;
-        }
-        //如果当前没有正在重连的，取出第一个进入重连
-        while (this.waitReconnect.length > 0) {
-            if (!this.curReconnect) {
-                this.curReconnect = this.waitReconnect.shift();
-                if (this.curReconnect && this.curReconnect.reconnectHandler && this.curReconnect.enabled) {
-                    this.curReconnect.reconnectHandler.onError(ev);
-                    break;
-                }
-                //该连接对象不满足重连条件，继续找下一个
-                this.curReconnect = undefined;
-            }
-        }
-    }
-
-    onClose(ev: Event, service: Service) {
-        if (ev.type == Macro.ON_CUSTOM_CLOSE) {
-            Log.d(`${service.module} 应用层主动关闭Socket`);
-            return;
-        }
-        Log.d(`${service.module} 网络关闭!!!`);
-        if (!this.isWaiReconnect(service) && service.reconnectHandler && service.reconnectHandler.enabled) {
-            this.waitReconnect.push(service);
-        }
-        this.sortWait();
-        //如果有正常连接的，直接返回
-        if (this.curReconnect) {
-            if (this.curReconnect == service && service.reconnectHandler && service.reconnectHandler.enabled) {
-                service.reconnectHandler.onClose(ev);
-            }
-            return;
-        }
-        //如果当前没有正在重连的，取出第一个进入重连
-        while (this.waitReconnect.length > 0) {
-            if (!this.curReconnect) {
-                this.curReconnect = this.waitReconnect.shift();
-                if (this.curReconnect && this.curReconnect.reconnectHandler && this.curReconnect.enabled) {
-                    this.curReconnect.reconnectHandler.onClose(ev);
-                    break;
-                }
-                //该连接对象不满足重连条件，继续找下一个
-                this.curReconnect = undefined;
-            }
-        }
-    }
-
-    onOpen(ev: Event, service: Service) {
-        //连接成功，从重连队列中移除
-        let isFind = false;
-        for (let i = 0; i < this.waitReconnect.length; i++) {
-            if (this.waitReconnect[i] == service) {
-                if (service.reconnectHandler) {
-                    service.reconnectHandler.onOpen(ev);
-                }
-                isFind = true;
-                this.waitReconnect.splice(i, 1);
-                break;
-            }
-        }
-        if ( !isFind && service && service.reconnectHandler && service.reconnectHandler.enabled ){
-            service.reconnectHandler.onOpen(ev);
-        }
-
-        Log.d(`${service.module}重连成功...`);
-
-        //每次只连接一个，这里面直接把当前重连的赋值为undefined就可以了
-        this.curReconnect = undefined;
-
-        //如果当前没有正在重连的，取出第一个进入重连
-        while (this.waitReconnect.length > 0) {
-            if (!this.curReconnect) {
-                this.curReconnect = this.waitReconnect.shift();
-                if (this.curReconnect && this.curReconnect.reconnectHandler && this.curReconnect.enabled) {
-                    this.curReconnect.reconnectHandler.reconnect();
-                    Log.d(`${this.curReconnect.module}进入重连...`);
-                    break;
-                }
-                //该连接对象不满足重连条件，继续找下一个
-                this.curReconnect = undefined;
-            }
-        }
-        if (!this.curReconnect) {
-            App.uiReconnect.hide();
-        }
-    }
-
     onEnterBackground(): void {
         this.services.forEach((service) => {
             service.onEnterBackground();
@@ -220,67 +124,87 @@ export class ServiceManager implements GameEventInterface , ISingleton {
     }
 
     onEnterForgeground(inBackgroundTime: number): void {
-        this.services.forEach((service) => {
-            service.onEnterForgeground(inBackgroundTime);
-        });
+        for (let i = 0; i < this.services.length; i++) {
+            const service = this.services[i];
+            const isReconnet = service.onEnterForgeground(inBackgroundTime);
+            if (isReconnet) {
+                service.stop().then(() => {
+                    this.reconnect(service);
+                });
+            }
+        }
     }
 
+
+    private reconnectTimer = -1;
+
     /**@description 网络心跳超时 */
-    reconnect(service: Service) {
+    private reconnect(service: WSService) {
         if (!this.isWaiReconnect(service) && service.options.enableReconnect) {
             this.waitReconnect.push(service);
         }
+
         this.sortWait();
-        //如果当前有正在连接的，直接返回
+
+        if (CC_DEBUG) {
+            for (let i = 0; i < this.waitReconnect.length; i++) {
+                const service = this.waitReconnect[i];
+                Log.d(`ServiceManager wait reconnect: ${service.module} , priority: ${service.priority}`);
+            }
+        }
+
+        clearTimeout(this.reconnectTimer);
+        this.reconnectTimer = setTimeout(() => {
+            CC_DEBUG && Log.d(`ServiceManager doReconnect`);
+            this.doReconnect();
+        }, 1000);
+    }
+
+    private onReconnected(service: WSService) {
+        for (let i = 0; i < this.waitReconnect.length; i++) {
+            if (this.waitReconnect[i] == service) {
+                this.waitReconnect.splice(i, 1);
+                this.sortWait();
+                break;
+            }
+        }
+        this.curReconnect = undefined;
+        this.doReconnect();
+    }
+
+    private async doReconnect() {
+        
+        // 如果当前有正在连接的，如果优化级更高的，就先断开
         if (this.curReconnect) {
             if (this.waitReconnect.length > 1) {
                 if (this.waitReconnect[0] != this.curReconnect) {
-                    //优化级低的正在连接中
-                    if (this.curReconnect.reconnectHandler && this.curReconnect.reconnectHandler.enabled && this.curReconnect.reconnectHandler.isConnecting) {
-                        Log.w(`优先级低的网络正常连接中 : ${this.curReconnect.module},正在连接中，将不会按照优先级进行重连`);
-                        return;
-                    } else {
-                        //把当前的放入重连队列重新排序
-                        if ( !this.isWaiReconnect(service) && service.reconnectHandler && service.reconnectHandler.enabled ){
-                            this.waitReconnect.push();
-                        }
-                        this.sortWait();
-                        Log.w(`当前网络:${this.curReconnect.module}不是优先级最高的，将为您重新切换到优先级高的网络进行重连!!!`);
-                        this.curReconnect = undefined;
-
-                        //如果当前没有正在重连的，取出第一个进入重连
-                        while (this.waitReconnect.length > 0) {
-                            if (!this.curReconnect) {
-                                this.curReconnect = this.waitReconnect.shift();
-                                if (this.curReconnect && this.curReconnect.reconnectHandler && this.curReconnect.enabled) {
-                                    Log.w(`已为您切换优先级高的:${this.curReconnect.module}进行重连!!!`);
-                                    this.curReconnect.reconnectHandler.reconnect();
-                                    break;
-                                }
-                                //该连接对象不满足重连条件，继续找下一个
-                                this.curReconnect = undefined;
-                            }
-                        }
-                    }
+                    await this.curReconnect.stop();
+                    this.sortWait();
+                    CC_DEBUG && Log.d(`ServiceManager 关闭了优先级不高的${this.curReconnect.module}`);
+                }else{
+                    CC_DEBUG && Log.d(`ServiceManager ${this.curReconnect.module} 正在连接1...`);
+                    this.curReconnect.reconnect.start(v=>this.onReconnected(v));
+                    return;
                 }
+            } else {
+                CC_DEBUG && Log.d(`ServiceManager ${this.curReconnect.module} 正在连接...`);
+                this.curReconnect.reconnect.start(v=>this.onReconnected(v));
+                return;
             }
+        }
+        CC_DEBUG && Log.d(`ServiceManager close network`);
 
-            if (this.curReconnect == service && service.reconnectHandler && service.reconnectHandler.enabled) {
-                service.reconnectHandler.reconnect();
-            }
+        if (this.waitReconnect.length == 0) {
             return;
         }
         //如果当前没有正在重连的，取出第一个进入重连
-        while (this.waitReconnect.length > 0) {
-            if (!this.curReconnect) {
-                this.curReconnect = this.waitReconnect.shift();
-                if (this.curReconnect && this.curReconnect.reconnectHandler && this.curReconnect.enabled) {
-                    this.curReconnect.reconnectHandler.reconnect();
-                    break;
-                }
-                //该连接对象不满足重连条件，继续找下一个
-                this.curReconnect = undefined;
+        this.curReconnect = this.waitReconnect.shift();
+        if (this.curReconnect) {
+            if ( this.curReconnect.reconnect.isWaiting || this.curReconnect.reconnect.isReconnecting ) {
+                return;
             }
+            await this.curReconnect.reconnect.start(v=>this.onReconnected(v));
+            this.curReconnect = undefined;
         }
     }
 
@@ -293,7 +217,7 @@ export class ServiceManager implements GameEventInterface , ISingleton {
         }
     }
 
-    private getService(name: string): Service | null {
+    private getService(name: string): WSService | null {
         for (let i = 0; i < this.services.length; i++) {
             if (this.services[i].module == name) {
                 return this.services[i];
@@ -302,9 +226,11 @@ export class ServiceManager implements GameEventInterface , ISingleton {
         return null;
     }
 
-    private isWaiReconnect(service: Service) {
-        if (this.waitReconnect.indexOf(service) != -1) {
-            return true;
+    private isWaiReconnect(service: WSService) {
+        for (let i = 0; i < this.waitReconnect.length; i++) {
+            if (this.waitReconnect[i] == service) {
+                return true;
+            }
         }
         return false;
     }
@@ -316,7 +242,7 @@ export class ServiceManager implements GameEventInterface , ISingleton {
             Log.d(content);
             content = `是否允许重连 : ${service.options.enableReconnect}`
             Log.d(content);
-            content = `状态信息 是否连接 : ${service.server.isConnected} 网络数据类型 : ${service.serviceType}`
+            content = `状态信息 是否连接 : ${service.isConnected} 网络数据类型 : ${service.serviceType}`
             Log.d(content);
         });
     }
