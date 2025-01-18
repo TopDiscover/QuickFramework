@@ -169,6 +169,14 @@ export class ServiceManager implements GameEventInterface, ISingleton {
                 break;
             }
         }
+
+        if (DEBUG) {
+            for (let i = 0; i < this.waitReconnect.length; i++) {
+                const service = this.waitReconnect[i];
+                Log.d(`ServiceManager onReconnected wait reconnect: ${service.module} , priority: ${service.priority}`);
+            }
+        }
+
         this.curReconnect = undefined;
         this.doReconnect();
     }
@@ -193,7 +201,6 @@ export class ServiceManager implements GameEventInterface, ISingleton {
                 return;
             }
         }
-        DEBUG && Log.d(`ServiceManager close network`);
 
         if (this.waitReconnect.length == 0) {
             return;

@@ -13,7 +13,7 @@ export class WSReconnect {
     }
 
     private get maxCount() {
-        return this.service.options.reconnectTimes;
+        return this.service.options.reconnectTimes!;
     }
     readonly connectID = 100;
     /**
@@ -27,10 +27,11 @@ export class WSReconnect {
     isReconnecting = false;
 
     async start(onConnected: (service: WSService) => void) {
-        DEBUG && Log.d(`WSReconnect start`);
+        
         if (this.isWaiting || this.isReconnecting) {
             return;
         }
+        DEBUG && Log.d(`${this.service?.module} WSReconnect start`);
         this.isReconnecting = true;
         for (let i = 0; i < this.maxCount; i++) {
             App.uiReconnect.show(App.getLanguage("tryReconnect", [this.service.module, i + 1]));
@@ -46,6 +47,8 @@ export class WSReconnect {
             }
         }
         this.isReconnecting = false;
+        DEBUG && Log.d(`${this.service?.module} WSReconnect end`);
+
 
         this.isWaiting = true;
         App.uiReconnect.hide();
