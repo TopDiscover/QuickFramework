@@ -97,7 +97,7 @@ export class WSFlow<T> {
         let index = this.nodes.indexOf(node);
         if (index >= 0) {
             this.nodes.splice(index, 1);
-            return this.nodes;
         }
+        return this.nodes;
     }
 }
