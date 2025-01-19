@@ -5,16 +5,16 @@ import { Macro } from "../../../defines/Macros";
 /**
  * @description 该模块只负责对网络消息的返回处理
  */
-export abstract class Handler extends EventProcessor implements ISingleton{
+export abstract class Handler extends EventProcessor implements ISingleton {
 
     /**@description Sender所属模块，如聊天,vip, */
     static module: string = Macro.UNKNOWN;
-    protected _module : string = Macro.UNKNOWN;
+    protected _module: string = Macro.UNKNOWN;
     /**@description 该字段由NetHelper指定 */
-    get module(){
+    get module() {
         return this._module;
     }
-    set module(value){
+    set module(value) {
         this._module = value
     }
 
@@ -29,8 +29,8 @@ export abstract class Handler extends EventProcessor implements ISingleton{
      * @param isQueue 接收到消息，是否进行队列处理
      */
     protected onS(cmd: string, func: (data: any) => void, handleType?: any, isQueue = true) {
-        let service : IWSMsgHandler = this.service;
-        if (service && service.onS ) {
+        let service: IWSMsgHandler = this.service;
+        if (service && service.onS) {
             service.onS(cmd, handleType, func, isQueue, this);
             return;
         }
@@ -55,13 +55,41 @@ export abstract class Handler extends EventProcessor implements ISingleton{
     }
 
     protected send(msg: Message) {
-        if (this.service && this.service.send) {
-            this.service.send(msg);
+        let service: IWSMsgHandler = this.service;
+        if (service && service.send) {
+            service.send(msg);
             return;
         }
         if( DEBUG ){
             Log.e(`必须绑定Service`);
         }
+    }
+
+    /**
+     * @description 发送RPC异步调用
+     * @param data 发送数据
+     * @param type RPC返回类型
+     * @param cmd 命令码
+     * @param timeout 超时时间
+     * @example
+     * ```ts
+     *  this.sendRPC(new LoginReq(), LoginRsp, 'LoginReq', 10).then(res => {
+     *      if (res) {
+     *          
+     *      }
+     *  })
+     * ```
+     * @returns 
+     */
+    async sendRPC<T extends Message>(data: Message, type: { new(): T } | string, cmd: string, timeout: number = Macro.DEFAULT_RPC_TIEMEOUT) {
+        let service: IWSMsgHandler = this.service;
+        if (service && service.sendRPC) {
+            return await service.sendRPC(data, type, cmd, timeout);
+        }
+        if (DEBUG) {
+            Log.e(`必须绑定Service`);
+        }
+        return null;
     }
 
     /**
@@ -73,15 +101,15 @@ export abstract class Handler extends EventProcessor implements ISingleton{
         super.onDestroy();
     }
 
-    debug(){
+    debug() {
         Log.d(this.module);
     }
 
-    destory(){
+    destory() {
         this.onDestroy();
     }
 
-    init(){
+    init() {
         this.onLoad();
     }
 }

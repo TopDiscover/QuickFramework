@@ -4,6 +4,7 @@
 
 import { DEBUG } from "cc/env";
 import { Macro } from "../../../defines/Macros";
+import { Message, RPCData } from "../message/Message";
 import { Net } from "../Net";
 import { WSFlow } from "./WSFlow";
 import { WSMsgHandler } from "./WSMsgHandler";
@@ -173,6 +174,7 @@ export abstract class WSService implements IWSMsgHandler {
             service: WSService,
             message: Message,
             listenerData: Net.ListenerData,
+            rpcData: RPCData,
             result: any,
         }>(true),
     }
@@ -266,11 +268,14 @@ export abstract class WSService implements IWSMsgHandler {
     async send(data: Message) {
         if (data.encode()) {
             let result = await this.doEncodeHeader(data);
-            if (!result!.isSuccess) {
-                DEBUG && Log.e(`${this.options.tag} encode header error`);
-                return;
+            if ( !result){
+                return false;
             }
-            data = result!.message
+            if (!result.isSuccess) {
+                DEBUG && Log.e(`${this.options.tag} encode header error`);
+                return false;
+            }
+            data = result.message;
             if (DEBUG) {
                 if (await this.doIsHeartBeat(data)) {
                     if (this.options.printHeartbeatLog) {
@@ -280,10 +285,38 @@ export abstract class WSService implements IWSMsgHandler {
                     Log.d(`${this.options.tag} send cmd : ${data.cmd} `);
                 }
             }
-            this.server.send(data.buffer);
-        } else {
-            DEBUG && Log.e(`${this.options.tag} encode error`)
-        }
+            return this.server.send(data.buffer);
+        } 
+        DEBUG && Log.e(`${this.options.tag} encode error`)
+        return false;
+    }
+
+    /**
+     * @description 发送RPC异步调用
+     * @param data 发送数据
+     * @param type RPC返回类型
+     * @param cmd 命令码
+     * @param timeout 超时时间
+     * @example
+     * ```ts
+     *  this.sendRPC(new LoginReq(), LoginRsp, 'LoginReq', 10).then(res => {
+     *      if (res) {
+     *          
+     *      }
+     *  })
+     * ```
+     * @returns 
+     */
+    async sendRPC<T extends Message>(data: Message, type : { new (): T } | string , cmd:string, timeout: number = Macro.DEFAULT_RPC_TIEMEOUT) {
+        return new Promise<T | null>(async (resolve, reject) => {
+            const rpcData = new RPCData(cmd, data, type, resolve, timeout);
+            this.handler.addRPC(rpcData);
+            const success = await this.send(data);
+            if (!success) {
+                this.handler.removeRPC(rpcData);
+                resolve(null);
+            }
+        })
     }
 
     onS(cmd: string, handleType: any, handleFunc: Function, isQueue: boolean, target: any) {

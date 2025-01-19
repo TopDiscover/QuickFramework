@@ -37,4 +37,6 @@ export namespace Macro{
     export const ON_UPDATE_DOWNLOADING = "ON_UPDATE_DOWNLOADING";
     /**@description 删除Bundle */
     export const ON_DELETE_BUNDLE_CACHE = "ON_DELETE_BUNDLE_CACHE";
+    /**@description 默认RPC超时 5秒 */
+    export const DEFAULT_RPC_TIEMEOUT = 5000;
 }

@@ -87,9 +87,9 @@ export class WSServer {
 
     send(data: SocketBuffer) {
         if (this.proxy) {
-            this.proxy.send(data);
-        } else {
-            DEBUG && Log.w(this.options.tag, `连接不存在`);
+            return this.proxy.send(data);
         }
+        DEBUG && Log.w(this.options.tag, `连接不存在`);
+        return false;
     }
 }
