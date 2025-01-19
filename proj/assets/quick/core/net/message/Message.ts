@@ -35,7 +35,8 @@ export class RPCData {
         this.timeout = timeout;
         this.type = type;
         this._timeOutId = setTimeout(() => {
-            Log.e(`${this.cmd} 超时`);
+            CC_DEBUG && Log.e(`${this.cmd} 超时`);
+            this.onTimeout?.();
             this.resolve(null);
         }, timeout);
     }
