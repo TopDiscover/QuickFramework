@@ -161,20 +161,22 @@ export class WSProxy {
         })
     }
 
-    send(data: SocketBuffer) {
+    send(data: SocketBuffer):boolean {
         if (!this.ws || !data) {
-            return;
+            return false;
         }
         if (this.status === WebSocket.OPEN) {
             this.ws.send(data);
+            return true;
         } else {
             if (this.status === WebSocket.CONNECTING) {
                 this.waitSend.push(data);
-                return;
+                return true;
             } else {
                 //关闭或者正在关闭状态
                 let content = this.status == WebSocket.CLOSING ? `网络正在关闭` : `网络已经关闭`;
                 CC_DEBUG && Log.w(this.options.tag, `发送消息失败: ${content}`);
+                return false;
             }
         }
     }

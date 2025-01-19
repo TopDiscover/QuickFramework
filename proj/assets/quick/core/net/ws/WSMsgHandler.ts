@@ -2,6 +2,7 @@
  * @description WebSocket 消息处理管理器
  */
 
+import { RPCData } from "../message/Message";
 import { Net } from "../Net";
 
 type MessageHandleFunc = (handleTypeData: any) => number;
@@ -19,13 +20,39 @@ export class WSMsgHandler {
     /** 消息处理队列 */
     protected _masseageQueue: Array<Net.ListenerData[]> = new Array<Net.ListenerData[]>();
 
-
     /** 是否正在处理消息，消息队列处理消息有时间，如执行一个消息需要多少秒后才执行一下个 */
     protected _isDoingMessage: boolean = false;
 
     /** @description 可能后面有其它特殊需要，特定情况下暂停消息队列的处理, true为停止消息队列处理 */
     public isPause: boolean = false;
     serviceType: Net.ServiceType = null!;
+
+    /** @description RPC消息队列 */
+    protected _RPCQueue: RPCData[] = [];
+
+    /**
+     * @description 添加RPC消息
+     * @param data RPC消息
+     */
+    addRPC(data: RPCData) {
+        data.onTimeout = () =>{
+            this.removeRPC(data)
+        };
+        this._RPCQueue.push(data);
+    }
+
+    /**
+     * @description 移除RPC消息
+     * @param data RPC消息
+     */
+    removeRPC(data: RPCData) {
+        for (let i = 0; i < this._RPCQueue.length; i++) {
+            if (this._RPCQueue[i] == data) {
+                this._RPCQueue.splice(i, 1);
+                break;
+            }
+        }
+    }
 
     public update(dt: number) {
 
@@ -94,6 +121,12 @@ export class WSMsgHandler {
 
     public stop() {
         this._masseageQueue = [];
+        // 一次回调完RPC消息
+        for (let i = 0; i < this._RPCQueue.length; i++) {
+            this._RPCQueue[i].resolve(null);
+            this._RPCQueue[i].stop();
+        }
+        this._RPCQueue = [];
         this._isDoingMessage = false;
     }
 
@@ -196,12 +229,13 @@ export class WSMsgHandler {
         }
     }
 
-    private async decode(o: Net.ListenerData, header: Message): Promise<Message | null> {
+    private async decode(o: Net.ListenerData, header: Message, rpcData: RPCData = null!): Promise<Message | null> {
         if (this.service.flows.decodeMessageFlow.nodes.length > 0) {
             const result = await this.service.flows.decodeMessageFlow.exec({
                 service: this.service,
                 message: header,
                 listenerData: o,
+                rpcData: rpcData,
                 result: null
             });
             return result.result
@@ -215,6 +249,22 @@ export class WSMsgHandler {
         if (this._listeners[key].length <= 0) { return }
         let listenerDatas = this._listeners[key];
         let queueDatas = [];
+
+        // 先处理RPC消息
+        for (let i = this._RPCQueue.length - 1; i >= 0; i--) {
+            const repData = this._RPCQueue[i];
+            let obj: Message = data
+            if (encode) {
+                obj = await this.decode(null!, data, repData) as Message
+                if (!obj) { continue }
+                if (data.cmd != repData.cmd) {
+                    continue;
+                }
+                repData.resolve(obj)
+                repData.stop();
+                this._RPCQueue.splice(i, 1);
+            }
+        }
 
         for (let i = 0; i < listenerDatas.length; i++) {
             let obj: Message = data
