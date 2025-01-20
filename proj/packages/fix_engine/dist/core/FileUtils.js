@@ -26,13 +26,8 @@ class FileUtils extends Handler_1.Handler {
      */
     async symlinkSync(target, path, type) {
         if ((0, fs_1.existsSync)(path)) {
-            let stat = (0, fs_1.statSync)(path);
-            if (stat.isDirectory()) {
-                // console.log(`删除目录:${path}`);
-                await this.delDir(path);
-            }
-            else {
-                // console.log(`删除文件:${path}`);
+            const stat = (0, fs_1.statSync)(path);
+            if (stat.isSymbolicLink()) {
                 (0, fs_1.unlinkSync)(path);
             }
         }

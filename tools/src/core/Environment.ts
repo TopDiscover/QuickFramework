@@ -18,7 +18,7 @@ class _Environment {
     readonly creatorVerion: string = "2.4.7";
 
     /**@description 支持版本 */
-    readonly supportVersions = ["2.4.7","2.4.8","2.4.9","2.4.10","2.4.11","2.4.12","2.4.13"];
+    readonly supportVersions = ["2.4.7","2.4.8","2.4.9","2.4.10","2.4.11","2.4.12","2.4.13","2.4.14"];
 
     /**@description 扩展插件目录名 */
     readonly extensionsName = "packages";
