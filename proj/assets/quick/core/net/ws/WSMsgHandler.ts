@@ -104,7 +104,7 @@ export class WSMsgHandler {
             return;
         }
 
-        this.addQueue(key, data, true)
+        this.addQueue(key, data)
     }
 
     /**
@@ -227,7 +227,7 @@ export class WSMsgHandler {
 
     private async decode(o: Net.ListenerData, header: Message, rpcData: Net.RPCData = null!): Promise<Message | null> {
         if (this.service.flows.decodeMessageFlow.nodes.length > 0) {
-            
+
             let decodeData: Net.DecodeData = rpcData;
             if (!decodeData) {
                 decodeData = o;
@@ -248,47 +248,56 @@ export class WSMsgHandler {
         }
     }
 
-    private async addQueue(key: string, data: Message, encode: boolean) {
+    private async addQueue(key: string, data: Message) {
         if (this._listeners[key].length <= 0) { return }
         let listenerDatas = this._listeners[key];
         let queueDatas = [];
 
         // 先处理RPC消息
+
+        // 记录已经解析过的数据，防止重新解析数据
+        let alreadyParse: { [key: string]: any } = [];
+
         for (let i = this._RPCQueue.length - 1; i >= 0; i--) {
             const repData = this._RPCQueue[i];
             let obj: Message = data
-            if (encode) {
-                obj = await this.decode(null!, data, repData) as Message
-                if (!obj) { continue }
-                if (data.cmd != repData.cmd) {
-                    continue;
-                }
-                repData.resolve(obj)
-                repData.stop();
-                this._RPCQueue.splice(i, 1);
+            obj = await this.decode(null!, data, repData) as Message
+            if (!obj) { continue }
+            alreadyParse[data.cmd] = obj;
+            if (data.cmd != repData.cmd) {
+                continue;
             }
+            repData.resolve(obj)
+            repData.stop();
+            this._RPCQueue.splice(i, 1);
         }
 
         for (let i = 0; i < listenerDatas.length; i++) {
+            const listenerData = listenerDatas[i];
             let obj: Message = data
-            if (encode) {
-                obj = await this.decode(listenerDatas[i], data) as Message
+            if ( alreadyParse[listenerData.cmd] ) {
+                obj = alreadyParse[listenerData.cmd];
+            }else{
+                obj = await this.decode(listenerData, data) as Message
             }
 
-            if (listenerDatas[i].isQueue) {
+            if (listenerData.isQueue) {
                 //需要加入队列处理
-                queueDatas.push(this.copy(listenerDatas[i], obj));
+                queueDatas.push(this.copy(listenerData, obj));
             }
             else {
                 //不需要进入队列处理
                 try {
-                    listenerDatas[i].func && listenerDatas[i].func.call(listenerDatas[i].target, obj);
+                    listenerData.func && listenerData.func.call(listenerData.target, obj);
                 } catch (err) {
                     Log.e(err);
                 }
 
             }
         }
+
+        alreadyParse = {};
+
         if (queueDatas.length > 0) {
             this._masseageQueue.push(queueDatas);
         }
