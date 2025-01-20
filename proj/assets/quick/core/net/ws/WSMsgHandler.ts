@@ -235,9 +235,12 @@ export class WSMsgHandler {
                 rpcData: rpcData,
                 result: null
             });
-            return result.result
+            if (result ) {
+                return result.result
+            }
+            return null!;
         } else {
-            CC_DEBUG && Log.e(`${this.service.options.tag} decodeMessageFlow 消息未注册`);
+            CC_DEBUG && Log.e(`${this.service.options.tag} decodeMessageFlow 未注册`);
             return null;
         }
     }
