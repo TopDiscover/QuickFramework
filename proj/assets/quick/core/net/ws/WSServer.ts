@@ -81,7 +81,7 @@ export class WSServer {
         if (this.proxy) {
             await this.proxy.close();
         }
-        this.proxy = null;
+        this.proxy = null!;
     }
 
     send(data: SocketBuffer) {

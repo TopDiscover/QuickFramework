@@ -26,6 +26,10 @@ export interface IWSServiceOptions extends IWSServerOptionsBase {
     reconnectTimes?: number;
     /**@description 是否输出心跳消息的日志 默认为 false */
     printHeartbeatLog?: boolean;
+    /**@description 最大函数回调处理超时时间(单位毫秒) 默认 5000毫秒，
+     * 如果需要处理动画等操作，如果默认时间不够，可自行调整时长 
+     * */
+    maxHandleTimeout?: number;
 }
 
 export abstract class WSService implements IWSMsgHandler, ISingleton {
@@ -61,6 +65,7 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
         this.options.enableReconnect = this.options.enableReconnect == undefined ? true : this.options.enableReconnect;
         this.options.reconnectTimes = this.options.reconnectTimes || 3;
         this.options.printHeartbeatLog = this.options.printHeartbeatLog == undefined ? false : this.options.printHeartbeatLog;
+        this.options.maxHandleTimeout = this.options.maxHandleTimeout || 5000;
 
         const serverOptions = this.options as IWSServerOptions;
         serverOptions.onOpen = async (ev: Event) => {
@@ -330,8 +335,8 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
         })
     }
 
-    onS(cmd: string, handleType: any, handleFunc: Function, isQueue: boolean, target: any) {
-        this.handler.onS(cmd, handleType, handleFunc as any, isQueue, target)
+    onS(cmd: string, type: any, func: Net.MessageHandleFunc, isQueue: boolean, target: any) {
+        this.handler.onS(cmd, type, func, isQueue, target)
     }
 
     offS(target: any, cmd?: string) {

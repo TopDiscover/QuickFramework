@@ -340,20 +340,6 @@ export class UIManager implements ISingleton {
         return this._componentRoot;
     }
 
-    private _mainController: cc.Component | null = null;
-    /*获取当前canvas的组件 */
-    public get mainController(): cc.Component | null {
-        if (!this._mainController && !cc.isValid(this._mainController)) {
-            return this._mainController;
-        }
-        let canvas = this.canvas;
-        if (canvas) {
-            this._mainController = canvas.getComponent("MainController");
-            return this._mainController;
-        }
-        return null;
-    }
-
     private _prefabs: cc.Node = null!;
     private get prefabs() {
         if (!this._prefabs && !cc.isValid(this._prefabs)) {

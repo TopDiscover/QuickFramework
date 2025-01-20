@@ -4,8 +4,6 @@
 
 import { Net } from "../Net";
 
-type MessageHandleFunc = (handleTypeData: any) => number;
-
 export class WSMsgHandler {
 
     constructor(service: WSService) {
@@ -52,7 +50,7 @@ export class WSMsgHandler {
         }
     }
 
-    public update(dt: number) {
+    public async update(dt: number) {
 
         //如果当前暂停了消息队列处理，不再处理消息队列
         if (this.isPause) return;
@@ -67,44 +65,18 @@ export class WSMsgHandler {
         if (datas.length == 0) return;
 
         this._isDoingMessage = true;
-        let handleTime = 0;
+        let result : any = null!;
         for (let i = 0; i < datas.length; i++) {
             let data = datas[i];
-            if (data.func instanceof Function) {
-                try {
-                    let tempTime = data.func.call(data.target, data.data);
-                    if (typeof tempTime == "number") {
-                        handleTime = Math.max(handleTime, tempTime);
-                    }
-                } catch (err) {
-                    Log.e(err);
-                }
-            }
+            result = await this.doSafeCall(data.func, data.data, data.target, result);
         }
 
-        if (handleTime == 0) {
-            //立即进行处理
-            this._isDoingMessage = false;
-        }
-        else {
-            App.uiManager.mainController?.scheduleOnce(() => {
-                this._isDoingMessage = false;
-            }, handleTime);
-        }
+        this._isDoingMessage = false;
     }
 
     public onMessage(data: Message, tag?: string) {
         CC_DEBUG && Log.d(`${tag} recv data main cmd : ${data.cmd}`);
-        let key = String(data.cmd);
-        if (!this._listeners[key]) {
-            CC_DEBUG && Log.w(`${tag} no find listener data main cmd : ${data.cmd}`);
-            return;
-        }
-        if (this._listeners[key].length <= 0) {
-            return;
-        }
-
-        this.addQueue(key, data)
+        this.addQueue(data)
     }
 
     /**
@@ -119,14 +91,19 @@ export class WSMsgHandler {
         this._masseageQueue = [];
         // 一次回调完RPC消息
         for (let i = 0; i < this._RPCQueue.length; i++) {
-            this._RPCQueue[i].resolve(null);
-            this._RPCQueue[i].stop();
+            const data = this._RPCQueue[i];
+            try {
+                data.resolve(null);
+            } catch (err) {
+                Log.e(err);
+            }
+            data.stop();
         }
         this._RPCQueue = [];
         this._isDoingMessage = false;
     }
 
-    public onS(cmd: string, handleType: any, handleFunc: MessageHandleFunc, isQueue: boolean, target: any) {
+    public onS(cmd: string, type: any, func: Net.MessageHandleFunc, isQueue: boolean, target: any) {
         let key = cmd;
 
         if (this._listeners[key]) {
@@ -142,8 +119,8 @@ export class WSMsgHandler {
             }
             this._listeners[key].push({
                 cmd: cmd,
-                func: handleFunc,
-                type: handleType,
+                func: func,
+                type: type,
                 isQueue: isQueue,
                 target: target
             });
@@ -152,8 +129,8 @@ export class WSMsgHandler {
             this._listeners[key] = [];
             this._listeners[key].push({
                 cmd: cmd,
-                func: handleFunc,
-                type: handleType,
+                func: func,
+                type: type,
                 isQueue: isQueue,
                 target: target
             });
@@ -248,13 +225,11 @@ export class WSMsgHandler {
         }
     }
 
-    private async addQueue(key: string, data: Message) {
-        if (this._listeners[key].length <= 0) { return }
-        let listenerDatas = this._listeners[key];
-        let queueDatas = [];
+    private async addQueue(data: Message) {
+        const recvCmd = data.cmd;
+        let queueDatas: Net.ListenerData[] = [];
 
         // 先处理RPC消息
-
         // 记录已经解析过的数据，防止重新解析数据
         let alreadyParse: { [key: string]: any } = [];
 
@@ -263,21 +238,32 @@ export class WSMsgHandler {
             let obj: Message = data
             obj = await this.decode(null!, data, repData) as Message
             if (!obj) { continue }
-            alreadyParse[data.cmd] = obj;
-            if (data.cmd != repData.cmd) {
+            alreadyParse[recvCmd] = obj;
+            if (recvCmd != repData.cmd) {
                 continue;
             }
-            repData.resolve(obj)
+            try {
+                repData.resolve(obj)
+            } catch (err) {
+                Log.e(err);
+            }
             repData.stop();
             this._RPCQueue.splice(i, 1);
         }
 
+        if (!(this._listeners[recvCmd] && this._listeners[recvCmd].length > 0)) {
+            alreadyParse = {};
+            return;
+        }
+        const listenerDatas = this._listeners[recvCmd];
+
+        let result : any = null!;
         for (let i = 0; i < listenerDatas.length; i++) {
             const listenerData = listenerDatas[i];
             let obj: Message = data
-            if ( alreadyParse[listenerData.cmd] ) {
+            if (alreadyParse[listenerData.cmd]) {
                 obj = alreadyParse[listenerData.cmd];
-            }else{
+            } else {
                 obj = await this.decode(listenerData, data) as Message
             }
 
@@ -287,12 +273,7 @@ export class WSMsgHandler {
             }
             else {
                 //不需要进入队列处理
-                try {
-                    listenerData.func && listenerData.func.call(listenerData.target, obj);
-                } catch (err) {
-                    Log.e(err);
-                }
-
+                result = await this.doSafeCall(listenerData.func, obj, listenerData.target, result);
             }
         }
 
@@ -317,5 +298,43 @@ export class WSMsgHandler {
             target: input.target,
             cmd: input.cmd
         };
+    }
+
+    private async doCall(func: Net.MessageHandleFunc, data: any, target: any, result: any) {
+        try {
+            let callResult = func.call(target, data, result);
+            if (callResult instanceof Promise) {
+                return await callResult;
+            } else {
+                return callResult;
+            }
+        } catch (err) {
+            Log.e(err);
+            return null;
+        }
+    }
+
+    /**
+     * @description 做一个调用超时处理
+     * @param func 
+     * @param data 
+     * @param target 
+     * @param result 
+     * @returns 
+     */
+    private async doSafeCall(func: Net.MessageHandleFunc, data: any, target: any, result: any): Promise<any> {
+        try {
+            // 设置调用超时
+            return await Promise.race([
+                this.doCall(func, data, target, result),
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Call timeout')), this.service.options.maxHandleTimeout)
+                )
+            ]);
+        } catch (error) {
+            Log.e(`Safe call failed: ${error}`);
+            // 即使调用失败也继续处理下一个消息
+            return null;
+        }
     }
 }
