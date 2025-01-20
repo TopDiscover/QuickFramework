@@ -53,15 +53,15 @@ export abstract class Handler extends EventProcessor implements ISingleton {
         }
     }
 
-    protected send(msg: Message) {
+    protected async send(msg: Message) {
         let service: IWSMsgHandler = this.service;
         if (service && service.send) {
-            service.send(msg);
-            return;
+            return await service.send(msg);
         }
         if (CC_DEBUG) {
             Log.e(`必须绑定Service`);
         }
+        return false;
     }
 
     /**
