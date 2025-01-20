@@ -41,22 +41,5 @@ export namespace Proto {
 		/**@description proto网络字节流 */
 		buffer: Uint8Array;
 	}
-
-	export interface File {
-		/**@description proto文件路径 */
-		url: string;
-		/**@description proto文件所有bundle */
-		bundle: BUNDLE_TYPE;
-		/**@description proto文件扩展名，默认为.proto */
-		ext: string;
-	}
-
-	/**@description 模块配置 */
-	export interface ModuleConfig {
-		/**@description 模块名 */
-		name: string;
-		/**@description 模块下所有proto文件 */
-		files: File[];
-	}
 }
 
