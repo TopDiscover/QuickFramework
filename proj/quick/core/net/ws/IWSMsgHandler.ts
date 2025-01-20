@@ -37,10 +37,10 @@ export interface IWSMsgHandler {
 	 * @param data 发送数据
 	 * @param type RPC返回处理类型
 	 * @param cmd 返回命令码
-	 * @param timeout 超时时间
+	 * @param timeout 超时时间 默认为 5000毫秒
 	 * @example
 	 * ```ts
-	 *  this.sendRPC(new LoginReq(), LoginRsp, 'LoginReq', 10).then(res => {
+	 *  this.sendRPC(new LoginReq(), LoginRsp, 'LoginReq').then(res => {
 	 *      if (res) {
 	 *          
 	 *      }

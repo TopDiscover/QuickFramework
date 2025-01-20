@@ -59,22 +59,6 @@ export abstract class Handler extends EventProcessor implements ISingleton, IWSM
         return false;
     }
 
-    /**
-     * @description 发送RPC异步调用
-     * @param data 发送数据
-     * @param type RPC返回类型
-     * @param cmd 命令码
-     * @param timeout 超时时间
-     * @example
-     * ```ts
-     *  this.sendRPC(new LoginReq(), LoginRsp, 'LoginReq', 10).then(res => {
-     *      if (res) {
-     *          
-     *      }
-     *  })
-     * ```
-     * @returns 
-     */
     async sendRPC<T extends Message>(data: Message, type: { new(): T } | string, cmd: string, timeout: number = Macro.DEFAULT_RPC_TIEMEOUT) {
         let service: IWSMsgHandler = this.service;
         if (service && service.sendRPC) {
