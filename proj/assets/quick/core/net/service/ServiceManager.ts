@@ -32,7 +32,7 @@ export class ServiceManager implements GameEventInterface, ISingleton {
             if (isCreate) {
                 service = new classOrModule(module);
                 this.services.push(service);
-                service.flows.reconnectFlow.push(( service )=>{
+                service.flows.reconnectFlow.push((service) => {
                     this.reconnect(service);
                     return service;
                 })
@@ -48,38 +48,23 @@ export class ServiceManager implements GameEventInterface, ISingleton {
             let name = this.getModule(classOrName);
             let i = this.services.length;
             while (i--) {
-                if (this.services[i].module == name) {
+                const service = this.services[i];
+                if (service.module == name) {
                     //销毁前先关闭网络
-                    this.services[i].stop();
+                    service.destory();
                     this.services.splice(i, 1);
                 }
             }
         } else {
-            this.clear();
-        }
-    }
-
-    /**@description 清除Service */
-    clear<T extends WSService>(exclude?: (WSServiceClass<T> | string)[]) {
-        let i = this.services.length;
-        while (i--) {
-            if (!this.isInExclude(this.services[i], exclude)) {
+            // 没不传入参数的情况下，清空所有
+            let i = this.services.length;
+            while (i--) {
+                const service = this.services[i];
                 //销毁前先关闭网络
-                this.services[i].stop();
+                service.destory();
                 this.services.splice(i, 1);
             }
         }
-    }
-
-    private isInExclude<T extends WSService>(data: T, exclude?: (WSServiceClass<T> | string)[]) {
-        if (!exclude) return false;
-        for (let i = 0; i < exclude.length; i++) {
-            let name = this.getModule(exclude[i]);
-            if (name == data.module) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private getModule<T extends WSService>(classOrModule: WSServiceClass<T> | string) {
@@ -94,7 +79,7 @@ export class ServiceManager implements GameEventInterface, ISingleton {
 
     onDestroy() {
         //场景被销毁，清除掉所有连接
-        this.clear();
+        this.destory();
     }
 
     update(dt: number) {
@@ -139,9 +124,9 @@ export class ServiceManager implements GameEventInterface, ISingleton {
             const result = await service.flows.enterForegroundFlow.exec({
                 service: service,
                 enterBackgroundTime: inBackgroundTime,
-                isNeedReconnect : false,
+                isNeedReconnect: false,
             });
-            if (result && result.isNeedReconnect ) {
+            if (result && result.isNeedReconnect) {
                 service.stop().then(() => {
                     this.reconnect(service);
                 });
@@ -195,7 +180,7 @@ export class ServiceManager implements GameEventInterface, ISingleton {
     }
 
     private async doReconnect() {
-        
+
         // 如果当前有正在连接的，如果优化级更高的，就先断开
         if (this.curReconnect) {
             if (this.waitReconnect.length > 1) {
@@ -221,10 +206,10 @@ export class ServiceManager implements GameEventInterface, ISingleton {
         //如果当前没有正在重连的，取出第一个进入重连
         this.curReconnect = this.waitReconnect.shift();
         if (this.curReconnect) {
-            if ( this.curReconnect.reconnect.isWaiting || this.curReconnect.reconnect.isReconnecting ) {
+            if (this.curReconnect.reconnect.isWaiting || this.curReconnect.reconnect.isReconnecting) {
                 return;
             }
-            await this.curReconnect.reconnect.start(v=>this.onReconnected(v));
+            await this.curReconnect.reconnect.start(v => this.onReconnected(v));
             this.curReconnect = undefined;
         }
     }

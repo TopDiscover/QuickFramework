@@ -28,7 +28,7 @@ export interface IWSServiceOptions extends IWSServerOptionsBase {
     printHeartbeatLog?: boolean;
 }
 
-export abstract class WSService implements IWSMsgHandler {
+export abstract class WSService implements IWSMsgHandler, ISingleton {
 
     /**@description Service所属模块，如Lobby,game */
     static module: string = Macro.UNKNOWN;
@@ -189,7 +189,7 @@ export abstract class WSService implements IWSMsgHandler {
         this.stopHeartbeat();
         this._heartbeatTimer = setInterval(() => {
             this._lostHeartbeat++;
-            if (this._lostHeartbeat > this.options.lostHeartbeat) {
+            if (this._lostHeartbeat > this.options.lostHeartbeat!) {
                 this.stopHeartbeat();
                 this.server.stop().then(() => {
                     this.flows.reconnectFlow.exec(this);
@@ -225,7 +225,10 @@ export abstract class WSService implements IWSMsgHandler {
     private async doIsHeartBeat(data: Message) {
         if (this.flows.isHeartBeatFlow.nodes.length > 0) {
             const result = await this.flows.isHeartBeatFlow.exec({ service: this, message: data, result: false });
-            return result.result
+            if ( result ) {
+                return result.result;
+            }
+            return false;
         } else {
             CC_DEBUG && Log.e(`${this.options.tag} 心跳 isHeartBeatFlow 消息未注册`);
             return false;
@@ -234,8 +237,11 @@ export abstract class WSService implements IWSMsgHandler {
 
     private async doDecodeHeader(data: MessageEvent) {
         if (this.flows.decodeHeaderFlow.nodes.length > 0) {
-            const result = await this.flows.decodeHeaderFlow.exec({ service: this, message: data, result: null });
-            return result.result
+            const result = await this.flows.decodeHeaderFlow.exec({ service: this, message: data, result: null! });
+            if ( result ) {
+                return result.result;
+            }
+            return null!;
         } else {
             CC_DEBUG && Log.e(`${this.options.tag} 心跳 decodeHeaderFlow 消息未注册`);
             return null;
@@ -244,8 +250,11 @@ export abstract class WSService implements IWSMsgHandler {
 
     private async doEncodeHeader(data: Message) {
         if (this.flows.encodeHeaderFlow.nodes.length > 0) {
-            const result = await this.flows.encodeHeaderFlow.exec({ service: this, message: data, result: null });
-            return result.result
+            const result = await this.flows.encodeHeaderFlow.exec({ service: this, message: data, result: null! });
+            if ( result ){
+                return result.result;
+            }
+            return null!;
         } else {
             CC_DEBUG && Log.e(`${this.options.tag} 心跳 encodeHeaderFlow 消息未注册`);
             return null;
@@ -350,5 +359,10 @@ export abstract class WSService implements IWSMsgHandler {
      */
     update(dt: number) {
         this.handler.update(dt);
+    }
+
+    destory() {
+        this.stop();
+        this.handler.destroy();
     }
 }

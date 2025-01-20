@@ -2,8 +2,8 @@
  * @description WebSocket 消息处理管理器
  */
 
-import { RPCData } from "../message/Message";
 import { Net } from "../Net";
+import { RPCData } from "../message/Message";
 
 type MessageHandleFunc = (handleTypeData: any) => number;
 
@@ -109,13 +109,11 @@ export class WSMsgHandler {
     }
 
     /**
-     * @description 重置
+     * @description 销毁
      */
-    public reset() {
-        this._isDoingMessage = false;
+    public destroy() {
+        this.stop();
         this._listeners = {};
-        this._masseageQueue = [];
-        this.isPause = false;
     }
 
     public stop() {
