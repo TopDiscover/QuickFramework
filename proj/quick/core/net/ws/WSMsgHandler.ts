@@ -112,11 +112,9 @@ export class WSMsgHandler {
     /**
      * @description 重置
      */
-    public reset() {
-        this._isDoingMessage = false;
+    public destroy() {
+        this.stop();
         this._listeners = {};
-        this._masseageQueue = [];
-        this.isPause = false;
     }
 
     public stop() {

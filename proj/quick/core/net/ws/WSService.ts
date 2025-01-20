@@ -29,7 +29,7 @@ export interface IWSServiceOptions extends IWSServerOptionsBase {
     printHeartbeatLog?: boolean;
 }
 
-export abstract class WSService implements IWSMsgHandler {
+export abstract class WSService implements IWSMsgHandler, ISingleton {
 
     /**@description Service所属模块，如Lobby,game */
     static module: string = Macro.UNKNOWN;
@@ -351,5 +351,10 @@ export abstract class WSService implements IWSMsgHandler {
      */
     update(dt: number) {
         this.handler.update(dt);
+    }
+
+    destory() {
+        this.stop();
+        this.handler.destroy();
     }
 }
