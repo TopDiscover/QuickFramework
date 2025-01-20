@@ -184,6 +184,11 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
             /**@description 返回值，是否需要进入重连 */
             isNeedReconnect: boolean
         }>(true),
+        /**@description 发送消息前调用 */
+        preSendFlow: new WSFlow<{
+            service: WSService,
+            message: Message,
+        }>(),
     }
 
     /**
@@ -307,26 +312,11 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
         return false;
     }
 
-    /**
-     * @description 发送RPC异步调用
-     * @param data 发送数据
-     * @param type RPC返回类型
-     * @param cmd 命令码
-     * @param timeout 超时时间
-     * @example
-     * ```ts
-     *  this.sendRPC(new LoginReq(), LoginRsp, 'LoginReq', 10).then(res => {
-     *      if (res) {
-     *          
-     *      }
-     *  })
-     * ```
-     * @returns 
-     */
     async sendRPC<T extends Message>(data: Message, type : { new (): T } | string , cmd:string, timeout: number = Macro.DEFAULT_RPC_TIEMEOUT) {
         return new Promise<T | null>(async (resolve, reject) => {
             const rpcData = new Net.RPCData(cmd, data, type, resolve, timeout);
             this.handler.addRPC(rpcData);
+            await this.flows.preSendFlow.exec({ service: this, message: data });
             const success = await this.send(data);
             if (!success) {
                 this.handler.removeRPC(rpcData);
