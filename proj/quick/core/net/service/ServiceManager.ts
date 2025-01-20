@@ -120,15 +120,29 @@ export class ServiceManager implements GameEventInterface, ISingleton {
 
     onEnterBackground(): void {
         this.services.forEach((service) => {
-            service.onEnterBackground();
+            if ( DEBUG ){
+                if ( service.flows.enterBackgroundFlow.nodes.length <= 0 ){
+                    Log.w(`${service.options.tag} 进入后台 enterBackgroundFlow 未注册`);
+                }
+            }
+            service.flows.enterBackgroundFlow.exec(service);
         });
     }
 
-    onEnterForgeground(inBackgroundTime: number): void {
+    async onEnterForgeground(inBackgroundTime: number): Promise<void> {
         for (let i = 0; i < this.services.length; i++) {
             const service = this.services[i];
-            const isReconnet = service.onEnterForgeground(inBackgroundTime);
-            if (isReconnet) {
+            if ( DEBUG ){
+                if ( service.flows.enterForegroundFlow.nodes.length <= 0 ){
+                    Log.w(`${service.options.tag} 进入前台 enterForegroundFlow 未注册`);
+                }
+            }
+            const result = await service.flows.enterForegroundFlow.exec({
+                service: service,
+                enterBackgroundTime: inBackgroundTime,
+                isNeedReconnect : false,
+            });
+            if (result && result.isNeedReconnect ) {
                 service.stop().then(() => {
                     this.reconnect(service);
                 });

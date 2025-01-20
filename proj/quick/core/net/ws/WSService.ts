@@ -15,11 +15,11 @@ import { IWSServerOptions, IWSServerOptionsBase, WSServer } from "./WSServer";
 export interface IWSServiceOptions extends IWSServerOptionsBase {
     /**@description 是否启用心跳 默认为 true */
     heartbeat?: boolean;
-    /**@description 心跳间隔 默认为 2000ms */
+    /**@description 心跳间隔(单位毫秒) 默认为 2000毫秒 */
     heartbeatInterval?: number;
     /**@description 丢包心跳次数 默认为 5次 如果5次收不到心跳，则认为连接已断开 */
     lostHeartbeat?: number;
-    /**@description 进入后台的最大允许时间，超过了最大值，则进入网络重连,默认60秒 */
+    /**@description 进入后台的最大允许时间(单位毫秒，超过了最大值，则进入网络重连,默认60000毫秒 */
     maxEnterBackgroundTime?: number;
     /**@description 是否启用网络重连 默认为 true */
     enableReconnect?: boolean;
@@ -47,8 +47,6 @@ export abstract class WSService implements IWSMsgHandler {
 
     /**@description 心跳超时计时器 */
     private _lostHeartbeat: number = 0;
-
-    private _backgroundTimeOutId: number = -1
 
     protected _options: IWSServiceOptions = null!
     get options() {
@@ -119,10 +117,6 @@ export abstract class WSService implements IWSMsgHandler {
         this.server.options = serverOptions
     }
 
-    private get data() {
-        return App.stageData;
-    }
-
     serviceType: Net.ServiceType = Net.ServiceType.Unknown;
 
     /**@description 服务器 */
@@ -176,6 +170,16 @@ export abstract class WSService implements IWSMsgHandler {
             listenerData: Net.ListenerData,
             rpcData: RPCData,
             result: any,
+        }>(true),
+        /**@description 进入后台 */
+        enterBackgroundFlow: new WSFlow<WSService>(true),
+        /**@description 进入前台 */
+        enterForegroundFlow: new WSFlow<{
+            service: WSService,
+            /**@description 进入后台总时长,单位秒 */
+            enterBackgroundTime: number,
+            /**@description 返回值，是否需要进入重连 */
+            isNeedReconnect: boolean
         }>(true),
     }
 
@@ -347,35 +351,5 @@ export abstract class WSService implements IWSMsgHandler {
      */
     update(dt: number) {
         this.handler.update(dt);
-    }
-
-    onEnterBackground() {
-        if (this.data.isLoginStage()) {
-            return;
-        }
-        this._backgroundTimeOutId = setTimeout(() => {
-            //进入后台超时，主动关闭网络
-            DEBUG && Log.d(`${this.options.tag} 进入后台时间过长，主动关闭网络，等玩家切回前台重新连接网络`);
-            App.alert.close(Macro.RECONNECT_ALERT_TAG);
-            this.server.stop();
-        }, this.options.maxEnterBackgroundTime);
-    }
-
-    onEnterForgeground(inBackgroundTime: number) {
-        if (this._backgroundTimeOutId != -1) {
-            DEBUG && Log.d(`${this.options.tag} 清除进入后台的超时关闭网络定时器`);
-            clearTimeout(this._backgroundTimeOutId);
-            DEBUG && Log.d(`${this.options.tag} 在后台时间${inBackgroundTime} , 最大时间为: ${this.options.maxEnterBackgroundTime}`)
-            //登录界面，不做处理
-            if (this.data.isLoginStage()) {
-                return;
-            }
-            if (inBackgroundTime * 1000 > this.options.maxEnterBackgroundTime!) {
-                DEBUG && Log.d(`${this.options.tag} 从回台切换，显示重新连接网络`);
-                App.alert.close(Macro.RECONNECT_ALERT_TAG);
-                return true;
-            }
-        }
-        return false;
     }
 }
