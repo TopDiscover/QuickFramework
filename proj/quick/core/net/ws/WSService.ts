@@ -216,7 +216,7 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
         if (this.flows.sendHeartbeatFlow.nodes.length > 0) {
             this.flows.sendHeartbeatFlow.exec(this);
         } else {
-            DEBUG && Log.e(`${this.options.tag} 心跳 sendHeartbeatFlow 消息未注册`);
+            DEBUG && Log.e(`${this.options.tag} sendHeartbeatFlow 未注册`);
         }
     }
 
@@ -231,7 +231,7 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
             }
             return false;
         } else {
-            DEBUG && Log.e(`${this.options.tag} 心跳 isHeartBeatFlow 消息未注册`);
+            DEBUG && Log.e(`${this.options.tag} isHeartBeatFlow 未注册`);
             return false;
         }
     }
@@ -244,7 +244,7 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
             }
             return null!;
         } else {
-            DEBUG && Log.e(`${this.options.tag} 心跳 decodeHeaderFlow 消息未注册`);
+            DEBUG && Log.e(`${this.options.tag} decodeHeaderFlow 未注册`);
             return null;
         }
     }
@@ -257,7 +257,7 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
             }
             return null!;
         } else {
-            DEBUG && Log.e(`${this.options.tag} 心跳 encodeHeaderFlow 消息未注册`);
+            DEBUG && Log.e(`${this.options.tag} encodeHeaderFlow 未注册`);
             return null;
         }
     }
