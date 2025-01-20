@@ -2,16 +2,19 @@ import { DEBUG } from "cc/env";
 
 /**@description 网络相关 */
 export namespace Net {
-	/** @description 处理函数声明 handleType 为你之前注册的handleType类型的数据 返回值number 为处理函数需要的时间 */
-	export type HandleFunc = (handleTypeData: any) => number;
-	
+	/**
+	 * @description 消息处理函数
+	 * 如果有多个处理函数，result 为上一个处理函数的返回处理结果
+	 * 首次调用时 result 为 null
+	 */
+	export type MessageHandleFunc = (data : any,result ?: any) => Promise<any> | any;
+
 	export interface DecodeData{
 		cmd: string,
 		type: (new () => Message) | string, //解包类型	
 	}
-
 	export interface ListenerData extends DecodeData{
-		func: HandleFunc, //处理函数
+		func: MessageHandleFunc, //处理函数
 		isQueue: boolean,//是否进入消息队列，如果不是，收到网络消息返回，会立即回调处理函数
 		data?: any, //解包后的数据
 		target?: any, //处理者
@@ -44,7 +47,12 @@ export namespace Net {
 			this._timeOutId = setTimeout(() => {
 				DEBUG && Log.e(`${this.cmd} 超时`);
 				this.onTimeout?.();
-				this.resolve(null);
+				try {
+					this.resolve(null);
+				} catch (err) {
+					Log.e(err);
+				}
+				this.stop();
 			}, timeout);
 		}
 		cmd: string;
