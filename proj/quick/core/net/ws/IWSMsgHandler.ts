@@ -3,7 +3,7 @@ export interface IWSMsgHandler {
 
 	offS?(target: any, cmd?: string): any;
 
-	send?(msg: Message): any;
+	send?(msg: Message): Promise<boolean>;
 
 	sendRPC?<T extends Message>(data: Message, type : { new (): T } | string, cmd:string, timeout: number): Promise<T | null>
 }
