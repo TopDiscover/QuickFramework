@@ -20,34 +20,3 @@ export abstract class Message extends IMessage {
     //解码数据
     abstract decode(data: SocketBuffer): boolean
 }
-
-export class RPCData {
-    constructor(
-        cmd : string, 
-        send : Message, 
-        type : { new (): Message } | string ,
-        resolve : (data : any) => void,
-        timeout : number,
-    ) {
-        this.cmd = cmd;
-        this.send = send;
-        this.resolve = resolve;
-        this.timeout = timeout;
-        this.type = type;
-        this._timeOutId = setTimeout(() => {
-            CC_DEBUG && Log.e(`${this.cmd} 超时`);
-            this.onTimeout?.();
-            this.resolve(null);
-        }, timeout);
-    }
-    cmd: string;
-    send: Message;
-    resolve: (data: any) => void;
-    timeout: number;
-    type : { new (): Message } | string ;
-    private _timeOutId: number = -1
-    onTimeout : () => void;
-    stop(){
-        clearTimeout(this._timeOutId);
-    }
-}

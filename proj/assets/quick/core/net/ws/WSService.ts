@@ -3,7 +3,7 @@
  */
 
 import { Macro } from "../../../defines/Macros";
-import { Message, RPCData } from "../message/Message";
+import { Message } from "../message/Message";
 import { Net } from "../Net";
 import { WSFlow } from "./WSFlow";
 import { WSMsgHandler } from "./WSMsgHandler";
@@ -166,8 +166,7 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
         decodeMessageFlow: new WSFlow<{
             service: WSService,
             message: Message,
-            listenerData: Net.ListenerData,
-            rpcData: RPCData,
+            decodeData: Net.DecodeData,
             result: any,
         }>(true),
         /**@description 进入后台 */
@@ -321,7 +320,7 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
      */
     async sendRPC<T extends Message>(data: Message, type : { new (): T } | string , cmd:string, timeout: number = Macro.DEFAULT_RPC_TIEMEOUT) {
         return new Promise<T | null>(async (resolve, reject) => {
-            const rpcData = new RPCData(cmd, data, type, resolve, timeout);
+            const rpcData = new Net.RPCData(cmd, data, type, resolve, timeout);
             this.handler.addRPC(rpcData);
             const success = await this.send(data);
             if (!success) {

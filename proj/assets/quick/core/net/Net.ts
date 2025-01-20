@@ -2,10 +2,14 @@
 export namespace Net {
 	/** @description 处理函数声明 handleType 为你之前注册的handleType类型的数据 返回值number 为处理函数需要的时间 */
 	export type HandleFunc = (handleTypeData: any) => number;
-	export interface ListenerData {
-		cmd: string,//事件名，如果是主命令跟子命令，按自己的需要返回固定组合如，mainCmd 1 subCmd 2 eventName = "1_2" | "12" 单个消夏码直接返回 "1"
+	
+	export interface DecodeData{
+		cmd: string,
+		type: (new () => Message) | string, //解包类型	
+	}
+
+	export interface ListenerData extends DecodeData{
 		func: HandleFunc, //处理函数
-		type: (new () => Message) | string, //解包类型
 		isQueue: boolean,//是否进入消息队列，如果不是，收到网络消息返回，会立即回调处理函数
 		data?: any, //解包后的数据
 		target?: any, //处理者
@@ -20,6 +24,37 @@ export namespace Net {
 	export interface HeartbeatClass<T extends Message> {
 		type: ServiceType;
 		new(): T;
+	}
+
+	export class RPCData implements DecodeData {
+		constructor(
+			cmd : string, 
+			send : Message, 
+			type : { new (): Message } | string ,
+			resolve : (data : any) => void,
+			timeout : number,
+		) {
+			this.cmd = cmd;
+			this.send = send;
+			this.resolve = resolve;
+			this.timeout = timeout;
+			this.type = type;
+			this._timeOutId = setTimeout(() => {
+				CC_DEBUG && Log.e(`${this.cmd} 超时`);
+				this.onTimeout?.();
+				this.resolve(null);
+			}, timeout);
+		}
+		cmd: string;
+		send: Message;
+		resolve: (data: any) => void;
+		timeout: number;
+		type : { new (): Message } | string ;
+		private _timeOutId: number = -1
+		onTimeout : () => void = null!;
+		stop(){
+			clearTimeout(this._timeOutId);
+		}
 	}
 }
 
