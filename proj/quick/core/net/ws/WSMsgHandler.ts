@@ -110,7 +110,7 @@ export class WSMsgHandler {
     }
 
     /**
-     * @description 重置
+     * @description 销毁
      */
     public destroy() {
         this.stop();

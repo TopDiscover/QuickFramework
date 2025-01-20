@@ -226,7 +226,10 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
     private async doIsHeartBeat(data: Message) {
         if (this.flows.isHeartBeatFlow.nodes.length > 0) {
             const result = await this.flows.isHeartBeatFlow.exec({ service: this, message: data, result: false });
-            return result!.result
+            if ( result ) {
+                return result.result;
+            }
+            return false;
         } else {
             DEBUG && Log.e(`${this.options.tag} 心跳 isHeartBeatFlow 消息未注册`);
             return false;
@@ -236,7 +239,10 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
     private async doDecodeHeader(data: MessageEvent) {
         if (this.flows.decodeHeaderFlow.nodes.length > 0) {
             const result = await this.flows.decodeHeaderFlow.exec({ service: this, message: data, result: null! });
-            return result!.result
+            if ( result ) {
+                return result.result;
+            }
+            return null!;
         } else {
             DEBUG && Log.e(`${this.options.tag} 心跳 decodeHeaderFlow 消息未注册`);
             return null;
@@ -246,7 +252,10 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
     private async doEncodeHeader(data: Message) {
         if (this.flows.encodeHeaderFlow.nodes.length > 0) {
             const result = await this.flows.encodeHeaderFlow.exec({ service: this, message: data, result: null! });
-            return result!.result
+            if ( result ){
+                return result.result;
+            }
+            return null!;
         } else {
             DEBUG && Log.e(`${this.options.tag} 心跳 encodeHeaderFlow 消息未注册`);
             return null;
