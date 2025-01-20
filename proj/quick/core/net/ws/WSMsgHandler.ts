@@ -26,7 +26,6 @@ export class WSMsgHandler {
 
     /** @description 可能后面有其它特殊需要，特定情况下暂停消息队列的处理, true为停止消息队列处理 */
     public isPause: boolean = false;
-    serviceType: Net.ServiceType = null!;
 
     /** @description RPC消息队列 */
     protected _RPCQueue: RPCData[] = [];
