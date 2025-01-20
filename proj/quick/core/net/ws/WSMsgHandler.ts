@@ -4,7 +4,6 @@
 
 import { DEBUG } from "cc/env";
 import { Net } from "../Net";
-import { RPCData } from "../message/Message";
 
 type MessageHandleFunc = (handleTypeData: any) => number;
 
@@ -28,14 +27,14 @@ export class WSMsgHandler {
     public isPause: boolean = false;
 
     /** @description RPC消息队列 */
-    protected _RPCQueue: RPCData[] = [];
+    protected _RPCQueue: Net.RPCData[] = [];
 
     /**
      * @description 添加RPC消息
      * @param data RPC消息
      */
-    addRPC(data: RPCData) {
-        data.onTimeout = () =>{
+    addRPC(data: Net.RPCData) {
+        data.onTimeout = () => {
             this.removeRPC(data)
         };
         this._RPCQueue.push(data);
@@ -45,7 +44,7 @@ export class WSMsgHandler {
      * @description 移除RPC消息
      * @param data RPC消息
      */
-    removeRPC(data: RPCData) {
+    removeRPC(data: Net.RPCData) {
         for (let i = 0; i < this._RPCQueue.length; i++) {
             if (this._RPCQueue[i] == data) {
                 this._RPCQueue.splice(i, 1);
@@ -227,16 +226,20 @@ export class WSMsgHandler {
         }
     }
 
-    private async decode(o: Net.ListenerData, header: Message, rpcData: RPCData = null!): Promise<Message | null> {
+    private async decode(o: Net.ListenerData, header: Message, rpcData: Net.RPCData = null!): Promise<Message | null> {
         if (this.service.flows.decodeMessageFlow.nodes.length > 0) {
+            
+            let decodeData: Net.DecodeData = rpcData;
+            if (!decodeData) {
+                decodeData = o;
+            }
             const result = await this.service.flows.decodeMessageFlow.exec({
                 service: this.service,
                 message: header,
-                listenerData: o,
-                rpcData: rpcData,
+                decodeData: decodeData,
                 result: null
             });
-            if (result ) {
+            if (result) {
                 return result.result
             }
             return null!;
