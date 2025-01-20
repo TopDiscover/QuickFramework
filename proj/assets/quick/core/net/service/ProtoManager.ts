@@ -1,4 +1,4 @@
-import { Net } from "../Net";
+import { Proto } from "../Net";
 
 export class ProtoManager implements ISingleton{
     
@@ -72,7 +72,7 @@ export class ProtoManager implements ISingleton{
         return null;
     }
 
-    decode<ProtoType>(config: Net.Proto.decodeConfig): ProtoType {
+    decode<ProtoType>(config: Proto.decodeConfig): ProtoType {
         let protoType = this.lookup(config.className) as protobuf.Type;
         if (protoType) {
             return protoType.decode(config.buffer) as any;

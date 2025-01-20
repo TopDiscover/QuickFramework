@@ -21,42 +21,25 @@ export namespace Net {
 		type: ServiceType;
 		new(): T;
 	}
+}
 
-	/**@description proto 网络相关 */
-	export namespace Proto {
+/**@description proto 网络相关 */
+export namespace Proto {
 
-		/**@description 绑定信息 */
-		export interface BindConfig {
-			/**@description cmd */
-			cmd: string | number;
-			/**@description  proto解析的类型名*/
-			className: string;
-		}
+	/**@description 绑定信息 */
+	export interface BindConfig {
+		/**@description cmd */
+		cmd: string | number;
+		/**@description  proto解析的类型名*/
+		className: string;
+	}
 
-		/**@description 解析配置 */
-		export interface decodeConfig {
-			/**@description  proto解析的类型名*/
-			className: string;
-			/**@description proto网络字节流 */
-			buffer: Uint8Array;
-		}
-
-		export interface File {
-			/**@description proto文件路径 */
-			url: string;
-			/**@description proto文件所有bundle */
-			bundle: BUNDLE_TYPE;
-			/**@description proto文件扩展名，默认为.proto */
-			ext: string;
-		}
-
-		/**@description 模块配置 */
-		export interface ModuleConfig {
-			/**@description 模块名 */
-			name: string;
-			/**@description 模块下所有proto文件 */
-			files: File[];
-		}
+	/**@description 解析配置 */
+	export interface decodeConfig {
+		/**@description  proto解析的类型名*/
+		className: string;
+		/**@description proto网络字节流 */
+		buffer: Uint8Array;
 	}
 }
 
