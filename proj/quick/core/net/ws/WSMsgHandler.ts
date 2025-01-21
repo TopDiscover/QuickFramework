@@ -5,7 +5,7 @@
 import { DEBUG } from "cc/env";
 import { Net } from "../Net";
 
-export class WSMsgHandler {
+export class WSMsgHandler implements IWSMsgHandler {
 
     constructor(service: WSService) {
         this.service = service;
