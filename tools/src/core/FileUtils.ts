@@ -1,6 +1,6 @@
 import archiver from "archiver";
 import { createHash } from "crypto";
-import { cp, createReadStream, createWriteStream, existsSync, mkdirSync, PathLike, readdirSync, readFileSync, statSync, symlink, symlinkSync, unlinkSync } from "fs";
+import { cp, createReadStream, createWriteStream, existsSync, lstatSync, mkdirSync, PathLike, readdirSync, statSync, symlink, symlinkSync, unlinkSync } from "fs";
 import { copyFile, rm } from "fs/promises";
 import { basename, dirname, join, parse, relative } from "path";
 import { Asset, CopyData, DirResult, FileResult } from "./Defines";
@@ -24,7 +24,7 @@ export default class FileUtils extends Handler {
      */
     async symlinkSync(target: PathLike, path: PathLike, type?: symlink.Type | null): Promise<void> {
         if (existsSync(path)) {
-            const stat = statSync(path);
+            const stat = lstatSync(path);
             if ( stat.isSymbolicLink() ){
                 unlinkSync(path);
             }
