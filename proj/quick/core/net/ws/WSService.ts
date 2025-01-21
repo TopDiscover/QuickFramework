@@ -6,11 +6,11 @@ import { DEBUG } from "cc/env";
 import { Macro } from "../../../defines/Macros";
 import { Message } from "../message/Message";
 import { Net } from "../Net";
-import { WSFlow } from "./WSFlow";
 import { WSMsgHandler } from "./WSMsgHandler";
 import { NORMAL_CLOSE_CODE } from "./WSProxy";
 import { WSReconnect } from "./WSReconnect";
 import { IWSServerOptions, IWSServerOptionsBase, WSServer } from "./WSServer";
+import { Flow } from "../../flow/Flow";
 
 export interface IWSServiceOptions extends IWSServerOptionsBase {
     /**@description 是否启用心跳 默认为 true */
@@ -143,42 +143,42 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
 
     readonly flows = {
         /**@description 网络连接成功调用 */
-        openFlow: new WSFlow<WSService>(),
+        openFlow: new Flow<WSService>(),
         /**@description 网络断开调用 */
-        closeFlow: new WSFlow<WSService>(),
+        closeFlow: new Flow<WSService>(),
         /**@description 重连调用 */
-        reconnectFlow: new WSFlow<WSService>(true),
+        reconnectFlow: new Flow<WSService>(true),
         /**@description 发送心跳调用 */
-        sendHeartbeatFlow: new WSFlow<WSService>(true),
+        sendHeartbeatFlow: new Flow<WSService>(true),
         /**@description 判断消息是否是心跳包 */
-        isHeartBeatFlow: new WSFlow<{
+        isHeartBeatFlow: new Flow<{
             service: WSService,
             message: Message,
             result: boolean,
         }>(true),
         /**@description 包头解析 */
-        decodeHeaderFlow: new WSFlow<{
+        decodeHeaderFlow: new Flow<{
             service: WSService,
             message: MessageEvent,
             result: Message
         }>(true),
         /**@description 包头打包 */
-        encodeHeaderFlow: new WSFlow<{
+        encodeHeaderFlow: new Flow<{
             service: WSService,
             message: Message
             result: { isSuccess: boolean, message: Message }
         }>(true),
         /**@description 解析数据(包体) */
-        decodeMessageFlow: new WSFlow<{
+        decodeMessageFlow: new Flow<{
             service: WSService,
             message: Message,
             decodeData: Net.DecodeData,
             result: any,
         }>(true),
         /**@description 进入后台 */
-        enterBackgroundFlow: new WSFlow<WSService>(true),
+        enterBackgroundFlow: new Flow<WSService>(true),
         /**@description 进入前台 */
-        enterForegroundFlow: new WSFlow<{
+        enterForegroundFlow: new Flow<{
             service: WSService,
             /**@description 进入后台总时长,单位秒 */
             enterBackgroundTime: number,
@@ -186,7 +186,7 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
             isNeedReconnect: boolean
         }>(true),
         /**@description 发送消息前调用 */
-        preSendFlow: new WSFlow<{
+        preSendFlow: new Flow<{
             service: WSService,
             message: Message,
         }>(),
