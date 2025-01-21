@@ -1,26 +1,26 @@
 /**
- * @description websocket 流量控制中间件
+ * @description 流量控制中间件
  */
 
 /**
  * @description 流程数据类型，从Flow泛型中推断实际类型
  */
-export type WSFlowData<T extends WSFlow<any>> = T extends WSFlow<infer R> ? R : unknown;
+export type FlowData<T extends Flow<any>> = T extends Flow<infer R> ? R : unknown;
 
 /**
  * @description 流程节点函数类型，接收输入并返回处理结果
  */
-export type WSFlowNode<T> = (item: T) => WSFlowNodeReturn<T> | Promise<WSFlowNodeReturn<T>>;
+export type FlowNode<T> = (item: T) => FlowNodeReturn<T> | Promise<FlowNodeReturn<T>>;
 
 /**
  * @description 流程节点返回类型，可以是原始类型、null或undefined
  */
-export type WSFlowNodeReturn<T> = T | null | undefined;
+export type FlowNodeReturn<T> = T | null | undefined;
 
 /**
  * @description 流程控制类，管理一系列节点的执行
  */
-export class WSFlow<T> {
+export class Flow<T> {
 
     /**
      * @description 是否只能允许一个节点函数,如果push多个，只会以最后一个为准
@@ -32,7 +32,7 @@ export class WSFlow<T> {
     /**
      * @description 所有节点函数的集合，可以通过修改此数组调整执行顺序
      */
-    nodes: WSFlowNode<T>[] = [];
+    nodes: FlowNode<T>[] = [];
 
     /**
      * @description 当节点函数抛出错误时触发的事件处理函数
@@ -55,7 +55,7 @@ export class WSFlow<T> {
      * @param input 第一个节点的输入
      * @returns 处理结果
      */
-    async exec(input: T): Promise<WSFlowNodeReturn<T>> {
+    async exec(input: T): Promise<FlowNodeReturn<T>> {
         let res: any = input;
         for (let i = 0; i < this.nodes.length; i++) {
             try {
@@ -79,12 +79,12 @@ export class WSFlow<T> {
      * @param node 要追加的节点函数
      * @returns 追加的节点函数
      */
-    push<K extends T>(node: WSFlowNode<K>): WSFlowNode<K> {
+    push<K extends T>(node: FlowNode<K>): FlowNode<K> {
         if (this.isUnique) {
-            CC_DEBUG && this.nodes.length > 0 && Log.w('WSFlow isUnique,只能生效最后一个节点');
+            CC_DEBUG && this.nodes.length > 0 && Log.w('Flow isUnique,只能生效最后一个节点');
             this.nodes = [];
         }
-        this.nodes.push(node);
+        this.nodes.push(node as any);
         return node;
     }
 
@@ -93,8 +93,8 @@ export class WSFlow<T> {
      * @param node 要移除的节点函数
      * @returns 移除后的节点函数数组
      */
-    remove<K extends T>(node: WSFlowNode<K>): WSFlowNode<T>[] {
-        let index = this.nodes.indexOf(node);
+    remove<K extends T>(node: FlowNode<K>): FlowNode<T>[] {
+        let index = this.nodes.indexOf(node as any);
         if (index >= 0) {
             this.nodes.splice(index, 1);
         }
