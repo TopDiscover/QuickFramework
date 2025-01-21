@@ -185,10 +185,21 @@ export class ServiceManager implements GameEventInterface, ISingleton {
         // 如果当前有正在连接的，如果优化级更高的，就先断开
         if (this.curReconnect) {
             if (this.waitReconnect.length > 1) {
-                if (this.waitReconnect[0] != this.curReconnect) {
-                    await this.curReconnect.stop();
-                    this.sortWait();
-                    DEBUG && Log.d(`ServiceManager 关闭了优先级不高的${this.curReconnect.module}`);
+                const first = this.waitReconnect[0];
+                if (first != this.curReconnect) {
+                    if (this.curReconnect.priority < first.priority) {
+                        await this.curReconnect.stop();
+                        // 把停止的重新放入待重连队列中
+                        if (!this.isWaiReconnect(this.curReconnect) && this.curReconnect.options.enableReconnect) {
+                            this.waitReconnect.push(this.curReconnect);
+                        }
+                        this.sortWait();
+                        DEBUG && Log.d(`ServiceManager 关闭了优先级不高的${this.curReconnect.module}`);
+                    }else{
+                        DEBUG && Log.d(`ServiceManager ${this.curReconnect.module} 正在连接2...`);
+                        this.curReconnect.reconnect.start(v => this.onReconnected(v));
+                        return;
+                    }
                 } else {
                     DEBUG && Log.d(`ServiceManager ${this.curReconnect.module} 正在连接1...`);
                     this.curReconnect.reconnect.start(v => this.onReconnected(v));
@@ -202,11 +213,13 @@ export class ServiceManager implements GameEventInterface, ISingleton {
         }
 
         if (this.waitReconnect.length == 0) {
+            DEBUG && Log.d(`ServiceManager 没有等待重连的网络`);
             return;
         }
         //如果当前没有正在重连的，取出第一个进入重连
         this.curReconnect = this.waitReconnect.shift();
         if (this.curReconnect) {
+            DEBUG && Log.d(`ServiceManager ${this.curReconnect.module} 是否在等待玩家操作 ${this.curReconnect.reconnect.isWaiting} 是否正常重连 ${this.curReconnect.reconnect.isReconnecting} 开始重连...`);
             if (this.curReconnect.reconnect.isWaiting || this.curReconnect.reconnect.isReconnecting) {
                 return;
             }
