@@ -19,14 +19,14 @@ export abstract class Handler extends EventProcessor implements ISingleton, IWSM
     }
 
     /**@description 绑定Service对象 */
-    protected abstract service: any;
+    protected abstract service : WSService;
 
     onS(
         cmd: string,
         type: any,
         func: Net.MessageHandleFunc,
         isQueue = true) {
-        let service: IWSMsgHandler = this.service;
+        let service = this.service;
         if (service && service.onS) {
             service.onS(cmd, type, func, isQueue, this);
             return;
@@ -37,7 +37,7 @@ export abstract class Handler extends EventProcessor implements ISingleton, IWSM
     }
 
     offS(cmd?: string) {
-        let service: IWSMsgHandler = this.service;
+        let service = this.service;
         if (service && service.offS) {
             service.offS(this, cmd)
             return;
@@ -48,7 +48,7 @@ export abstract class Handler extends EventProcessor implements ISingleton, IWSM
     }
 
     async send(msg: Message) {
-        let service: IWSMsgHandler = this.service;
+        let service = this.service;
         if (service && service.send) {
             return await service.send(msg);
         }
@@ -59,7 +59,7 @@ export abstract class Handler extends EventProcessor implements ISingleton, IWSM
     }
 
     async sendRPC<T extends Message>(data: Message, type: { new(): T } | string, cmd: string, timeout: number = Macro.DEFAULT_RPC_TIEMEOUT) {
-        let service: IWSMsgHandler = this.service;
+        let service = this.service;
         if (service && service.sendRPC) {
             return await service.sendRPC(data, type, cmd, timeout);
         }

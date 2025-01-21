@@ -282,10 +282,6 @@ export abstract class WSService implements IWSMsgHandler, ISingleton {
         return this.server.stop();
     }
 
-    /**
-     * @description 发送数据
-     * @param data 
-     */
     async send(data: Message) {
         if (data.encode()) {
             let result = await this.doEncodeHeader(data);
