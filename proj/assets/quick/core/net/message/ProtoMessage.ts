@@ -1,5 +1,5 @@
 import { Net } from "../Net";
-import { MessageHead, Message } from "./Message";
+import { Message } from "./Message";
 
 /**
  * @description protobuf解析基类
@@ -36,10 +36,6 @@ export abstract class ProtoMessage<T> extends Message {
         }
         return false;
     }
-}
-
-export abstract class ProtoCodec extends MessageHead {
-
 }
 
 export abstract class ProtoMessageHeartbeat extends Message{
