@@ -47,7 +47,7 @@ export class WSProxy {
      */
     connect(url: string, timeOut: number = 10000, protocols?: string | string[]) {
         return new Promise<boolean>((resolve, reject) => {
-            const protocol = url.indexOf("wss") == 0 ? "wss" : "ws";
+            const protocol = url.startsWith("wss") ? "wss" : "ws";
             if (JSB && protocol == "wss") {
                 if (!App.wssCacertUrl) {
                     Log.e(`${this.options.tag}请先设置wss的证书url,Launch脚本中直接挂载证书`);
@@ -70,7 +70,6 @@ export class WSProxy {
                     }
                 } catch (error) {
                     DEBUG && Log.e(`${this.options.tag}WebSocket连接时发生错误:`, error);
-                } finally {
                     this.doOpen(false);
                 }
             }, timeOut);
@@ -165,21 +164,22 @@ export class WSProxy {
 
     send(data: SocketBuffer):boolean {
         if (!this.ws || !data) {
+            DEBUG && Log.w(this.options.tag, `发送消息失败: 无效的连接或数据`);
             return false;
         }
-        if (this.status === WebSocket.OPEN) {
-            this.ws.send(data);
-            return true;
-        } else {
-            if (this.status === WebSocket.CONNECTING) {
+        switch (this.status) {
+            case WebSocket.OPEN:
+                this.ws.send(data);
+                return true;
+            case WebSocket.CONNECTING:
                 this.waitSend.push(data);
                 return true;
-            } else {
-                //关闭或者正在关闭状态
-                let content = this.status == WebSocket.CLOSING ? `网络正在关闭` : `网络已经关闭`;
-                DEBUG && Log.w(this.options.tag, `发送消息失败: ${content}`);
+            case WebSocket.CLOSING:
+            case WebSocket.CLOSED:
+                DEBUG && Log.w(this.options.tag, `发送消息失败: ${this.status === WebSocket.CLOSING ? '网络正在关闭' : '网络已经关闭'}`);
                 return false;
-            }
+            default:
+                return false;
         }
     }
 }
