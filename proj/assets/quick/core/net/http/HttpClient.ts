@@ -1,30 +1,44 @@
 
-export interface FetchResponse {
+export class FetchResponse {
     /**@description 请求是否成功 */
-    ok: boolean,
+    ok: boolean;
     /**@description 请求状态码 */
-    status: number,
+    status: number;
     /**@description 请求状态文本 */
-    statusText: string,
+    statusText: string;
     /**@description 请求url */
-    url: string,
+    url: string;
     /**@description 解析json */
-    json: () => Promise<any>,
+    json() {
+        return Promise.resolve(JSON.parse(this.responseText));
+    }
     /**@description 解析文本 */
-    text: () => Promise<string>,
+    text() {
+        return Promise.resolve(this.responseText);
+    }
     /**@description 解析arrayBuffer */
-    arrayBuffer: () => Promise<ArrayBuffer>,
+    arrayBuffer() {
+        return Promise.resolve(this.response);
+    }
     /**@description 解析blob */
-    blob: () => Promise<Blob>,
+    blob() {
+        return Promise.resolve(this.response);
+    }
     /**@description 解析formData */
-    formData: () => Promise<FormData>,
+    formData() {
+        return Promise.resolve(this.response);
+    }
+    /**@description 响应文本 */
+    responseText: any;
+    /**@description 响应数据 */
+    response: any;
 }
 
 export interface FetchOptions {
     /**@description 请求方法 默认为GET */
     method?: "POST" | "GET",
     /**@description 请求头 */
-    headers?:  [string, string][] | Record<string, string>,
+    headers?: [string, string][] | Record<string, string>,
     /**@description 超时时间 默认为10s*/
     timeout?: number,
     /**@description 请求体 */
@@ -34,81 +48,193 @@ export interface FetchOptions {
     /**@description 是否自动附加当前时间戳 */
     timestamp?: boolean,
     /**@description 是否同步 */
-    async?:boolean;
+    async?: boolean;
     /**@description 响应类型 */
     responseType?: XMLHttpRequestResponseType;
+
+    /**@description 是否启用缓存  默认为false*/
+    cache?: boolean;
+    /**@description 缓存时间（毫秒）默认为5分钟 */
+    cacheTime?: number;
+    /**@description 重试次数 默认为3 */
+    retries?: number;
+    /**@description 重试间隔（毫秒） 默认为2s */
+    retryDelay?: number;
+    /**@description 取消请求的信号 */
+    signal?: AbortSignal;
+}
+
+interface CacheData {
+    /**@description 缓存时间(毫秒) */
+    cacheTime: number;
+    /**@description 缓存时间戳 */
+    timestamp: number;
+    /**@description 缓存数据 */
+    data: FetchResponse;
 }
 
 export class HttpClient implements ISingleton {
     static module: string = "【Http管理器】";
     module: string = null!;
+
+    // 缓存存储
+    private _cache: Map<string, CacheData> = new Map();
+
+    // 清理过期缓存的方法
+    clear() {
+        const now = Date.now();
+        this._cache.forEach((value, key) => {
+            if (now - value.timestamp > value.cacheTime) {
+                this._cache.delete(key);
+            }
+        });
+    }
+
     protected convertParams(url: string, params: Object): string {
         if (!params || Object.keys(params).length === 0) {
             return url;
         }
-    
+
         // 兼容性更好的参数转换方法
         const queryParams = Object.entries(params)
             .filter(([, value]) => value !== null && value !== undefined)
-            .map(([key, value]) => 
-                `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`
+            .map(([key, value]) =>
+                value instanceof Object
+                    ? `${encodeURIComponent(key)}=${encodeURIComponent(JSON.stringify(value))}`
+                    : `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`
             )
             .join('&');
-    
+
         const separator = url.includes('?') ? '&' : '?';
         return `${url}${separator}${queryParams}`;
     }
 
-    fetch(url: string , options: FetchOptions = {}) {
+    private getCacheKey(url: string, options: FetchOptions): string {
+        // 生成包含URL和关键请求参数的唯一缓存键
+        const paramString = options.params ? JSON.stringify(options.params) : '';
+        return `${url}:${paramString}:${options.method || 'GET'}`;
+    }
+
+    fetch(url: string, options: FetchOptions = {}) {
         return new Promise<FetchResponse>((resolve, reject) => {
             // url为空
             if (!url) {
                 reject(new Error('URL is empty'));
                 return;
             }
-            let xhr = new XMLHttpRequest();
             // 设置默认参数
             const defaultOptions: FetchOptions = {
                 method: 'GET',
                 timeout: 10000,
                 async: true,
                 responseType: CC_JSB ? "text" : "",
+                cache: false,
+                cacheTime: 5 * 60 * 1000,
+                retries: 3,
+                retryDelay: 2000
             };
-
             // 合并参数
             const mergedOptions: FetchOptions = {
                 ...defaultOptions,
                 ...options,
             };
 
+            // 缓存处理
+            if (mergedOptions.cache) {
+                this.clear();
+                const cacheKey = this.getCacheKey(url, mergedOptions);
+                const cachedData = this._cache.get(cacheKey);
+                if (cachedData) {
+                    CC_DEBUG && Log.d(`${this.module} url : ${this.convertParams(url, options.params)} 从缓存中获取数据`);
+                    return resolve(cachedData.data);
+                }
+            }
+
+            // 重试处理
+            let retryCount = 0;
+
+            let isAborted = false;
+            let onAbort = () => {
+                isAborted = true;
+            };
+
+            const retry = () => {
+                this.execute(url, mergedOptions,onAbort)
+                    .then(resolve)
+                    .catch((error) => {
+                        if (isAborted) {
+                            CC_DEBUG && Log.d(`${this.module} url : ${this.convertParams(url, options.params)} 取消请求`);
+                            reject(new Error('Request aborted'));
+                            return;
+                        }
+                        if (retryCount < mergedOptions.retries) {
+                            retryCount++;
+                            CC_DEBUG && Log.d(`${this.module} url : ${this.convertParams(url, options.params)} 重试次数 : ${retryCount}`);
+                            setTimeout(() => {
+                                retry();
+                            }, mergedOptions.retryDelay);
+                        } else {
+                            reject(error);
+                        }
+                    });
+            };
+
+            // 执行请求
+            retry();
+
+        });
+    }
+
+    private execute(url: string, options: FetchOptions = {},onAbort : () => void = () => {}) {
+        return new Promise<FetchResponse>((resolve, reject) => {
+
+            const oringinalUrl = url;
             // 设置请求方法和 URL
-            const method = mergedOptions.method;
-            url = this.convertParams(url, mergedOptions.params);
-            if (mergedOptions.timestamp) {
+            const method = options.method;
+            url = this.convertParams(url, options.params);
+            if (options.timestamp) {
                 // 附加当前时间戳
                 const separator = url.includes('?') ? '&' : '?';
                 url = `${url}${separator}cur_loc_t=${Date.now()}`;
             }
 
-            xhr.responseType = mergedOptions.responseType;
+            let xhr = new XMLHttpRequest();
+            xhr.responseType = options.responseType;
 
+            // 处理取消请求
+            if (options.signal) {
+                options.signal.addEventListener('abort', () => {
+                    onAbort();
+                    xhr.abort();
+                    reject(new Error('Request aborted'));
+                });
+            }
+
+            const self = this;
             // 处理响应
-            xhr.onreadystatechange = function(){
+            xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status >= 200 && xhr.status < 300) {
                         // 解析响应数据
-                        const response: FetchResponse = {
-                            ok: true,
-                            status: xhr.status,
-                            statusText: xhr.statusText,
-                            url: xhr.responseURL,
-                            json: () => Promise.resolve(JSON.parse(xhr.responseText)),
-                            text: () => Promise.resolve(xhr.responseText),
-                            arrayBuffer: () => Promise.resolve(xhr.response),
-                            blob: () => Promise.resolve(xhr.response),
-                            formData: () => Promise.resolve(xhr.response),
-                        };
-                        resolve(response);
+                        let resp = new FetchResponse();
+                        resp.ok = true;
+                        resp.status = xhr.status;
+                        resp.statusText = xhr.statusText;
+                        resp.url = xhr.responseURL;
+                        resp.responseText = xhr.responseText;
+                        resp.response = xhr.response;
+                        // 缓存处理
+                        if (options.cache) {
+                            const cacheKey = self.getCacheKey(oringinalUrl, options);
+                            const now = Date.now();
+                            const cacheData: CacheData = {
+                                cacheTime: options.cacheTime,
+                                timestamp: now,
+                                data: resp,
+                            };
+                            self._cache.set(cacheKey, cacheData);
+                        }
+                        resolve(resp);
                     } else {
                         reject(new Error(`HTTP error status: ${xhr.status}`));
                     }
@@ -128,26 +254,26 @@ export class HttpClient implements ISingleton {
             };
 
             // 设置超时（可选)}
-            xhr.timeout = mergedOptions.timeout;
-            if (CC_DEBUG) Log.d(`[send] url : ${url} request type : ${method} , async : ${mergedOptions.async}`);
-            xhr.open(method, url,mergedOptions.async);
+            xhr.timeout = options.timeout;
+            if (CC_DEBUG) Log.d(`[send] url : ${url} request type : ${method} , async : ${options.async}`);
+            xhr.open(method, url, options.async);
 
             // 设置请求头
-            if (mergedOptions.headers) {
-                if (Array.isArray(mergedOptions.headers)) {
-                    mergedOptions.headers.forEach((header) => {
+            if (options.headers) {
+                if (Array.isArray(options.headers)) {
+                    options.headers.forEach((header) => {
                         xhr.setRequestHeader(header[0], header[1]);
                     });
                 } else {
-                    Object.keys(mergedOptions.headers).forEach(key => {
-                        xhr.setRequestHeader(key, mergedOptions.headers[key]);
+                    Object.keys(options.headers).forEach(key => {
+                        xhr.setRequestHeader(key, options.headers[key]);
                     });
                 }
             }
 
             // 发送请求
-            if (method === 'POST' && mergedOptions.body) {
-                xhr.send(mergedOptions.body);
+            if (method === 'POST' && options.body) {
+                xhr.send(options.body);
             } else {
                 xhr.send();
             }
