@@ -1,13 +1,13 @@
 
 export class FetchResponse {
     /**@description 请求是否成功 */
-    ok: boolean;
+    ok: boolean = false;
     /**@description 请求状态码 */
-    status: number;
+    status: number = 0;
     /**@description 请求状态文本 */
-    statusText: string;
+    statusText: string = "";
     /**@description 请求url */
-    url: string;
+    url: string = "";
     /**@description 解析json */
     json() {
         return Promise.resolve(JSON.parse(this.responseText));
@@ -90,19 +90,21 @@ export class HttpClient implements ISingleton {
         });
     }
 
-    protected convertParams(url: string, params: Object): string {
+    protected convertParams(url: string, params?: Object): string {
         if (!params || Object.keys(params).length === 0) {
             return url;
         }
 
-        // 兼容性更好的参数转换方法
-        const queryParams = Object.entries(params)
-            .filter(([, value]) => value !== null && value !== undefined)
-            .map(([key, value]) =>
-                value instanceof Object
+        const temp = params as any;
+        // More compatible method for converting object entries
+        const queryParams = Object.keys(temp)
+            .filter(key => temp[key] !== null && temp[key] !== undefined)
+            .map(key => {
+                const value = temp[key];
+                return value instanceof Object
                     ? `${encodeURIComponent(key)}=${encodeURIComponent(JSON.stringify(value))}`
-                    : `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`
-            )
+                    : `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`;
+            })
             .join('&');
 
         const separator = url.includes('?') ? '&' : '?';
@@ -167,7 +169,7 @@ export class HttpClient implements ISingleton {
                             reject(new Error('Request aborted'));
                             return;
                         }
-                        if (retryCount < mergedOptions.retries) {
+                        if (retryCount < mergedOptions.retries!) {
                             retryCount++;
                             CC_DEBUG && Log.d(`${this.module} url : ${this.convertParams(url, options.params)} 重试次数 : ${retryCount}`);
                             setTimeout(() => {
@@ -190,7 +192,7 @@ export class HttpClient implements ISingleton {
 
             const oringinalUrl = url;
             // 设置请求方法和 URL
-            const method = options.method;
+            const method = options.method!;
             url = this.convertParams(url, options.params);
             if (options.timestamp) {
                 // 附加当前时间戳
@@ -199,7 +201,7 @@ export class HttpClient implements ISingleton {
             }
 
             let xhr = new XMLHttpRequest();
-            xhr.responseType = options.responseType;
+            xhr.responseType = options.responseType!;
 
             // 处理取消请求
             if (options.signal) {
@@ -228,7 +230,7 @@ export class HttpClient implements ISingleton {
                             const cacheKey = self.getCacheKey(oringinalUrl, options);
                             const now = Date.now();
                             const cacheData: CacheData = {
-                                cacheTime: options.cacheTime,
+                                cacheTime: options.cacheTime!,
                                 timestamp: now,
                                 data: resp,
                             };
@@ -254,9 +256,9 @@ export class HttpClient implements ISingleton {
             };
 
             // 设置超时（可选)}
-            xhr.timeout = options.timeout;
+            xhr.timeout = options.timeout!;
             if (CC_DEBUG) Log.d(`[send] url : ${url} request type : ${method} , async : ${options.async}`);
-            xhr.open(method, url, options.async);
+            xhr.open(method, url, options.async!);
 
             // 设置请求头
             if (options.headers) {
@@ -265,8 +267,9 @@ export class HttpClient implements ISingleton {
                         xhr.setRequestHeader(header[0], header[1]);
                     });
                 } else {
-                    Object.keys(options.headers).forEach(key => {
-                        xhr.setRequestHeader(key, options.headers[key]);
+                    const headers = options.headers as Record<string, string>;
+                    Object.keys(headers).forEach(key => {
+                        xhr.setRequestHeader(key, headers[key]);
                     });
                 }
             }
