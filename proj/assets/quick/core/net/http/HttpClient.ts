@@ -43,52 +43,54 @@ export class HttpClient implements ISingleton {
     static module: string = "【Http管理器】";
     module: string = null!;
     protected convertParams(url: string, params: Object): string {
-        if (params == null || params == undefined) {
+        if (!params || Object.keys(params).length === 0) {
             return url;
         }
-        let result = "&";
-        if (url.indexOf("?") < 0) {
-            result = "?";
-        }
-        let keys = Object.keys(params)
-        for (let i = 0; i < keys.length; i++) {
-            if (i == 0) {
-                result += `${keys[i]}=${(<any>params)[keys[i]]}`;
-            } else {
-                result += `&${keys[i]}=${(<any>params)[keys[i]]}`
-            }
-        }
-        result = url + result;
-        return result;
+    
+        // 兼容性更好的参数转换方法
+        const queryParams = Object.entries(params)
+            .filter(([, value]) => value !== null && value !== undefined)
+            .map(([key, value]) => 
+                `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`
+            )
+            .join('&');
+    
+        const separator = url.includes('?') ? '&' : '?';
+        return `${url}${separator}${queryParams}`;
     }
 
     fetch(url: string , options: FetchOptions = {}) {
         return new Promise<FetchResponse>((resolve, reject) => {
+            // url为空
+            if (!url) {
+                reject(new Error('URL is empty'));
+                return;
+            }
             let xhr = new XMLHttpRequest();
+            // 设置默认参数
+            const defaultOptions: FetchOptions = {
+                method: 'GET',
+                timeout: 10000,
+                async: true,
+                responseType: CC_JSB ? "text" : "",
+            };
+
+            // 合并参数
+            const mergedOptions: FetchOptions = {
+                ...defaultOptions,
+                ...options,
+            };
 
             // 设置请求方法和 URL
-            const method = options.method || 'GET';
-            url = this.convertParams(url, options.params);
-            if (options.timestamp) {
-                if (url.indexOf("?") >= 0) {
-                    url = `${url}&cur_loc_t=${Date.now()}`;
-                } else {
-                    url = `${url}?cur_loc_t=${Date.now()}`;
-                }
+            const method = mergedOptions.method;
+            url = this.convertParams(url, mergedOptions.params);
+            if (mergedOptions.timestamp) {
+                // 附加当前时间戳
+                const separator = url.includes('?') ? '&' : '?';
+                url = `${url}${separator}cur_loc_t=${Date.now()}`;
             }
 
-            if ( options.async == undefined ) {
-                options.async = true;
-            }
-
-            if ( options.responseType == undefined ) {
-                options.responseType = "";
-                if ( CC_JSB ) {
-                    options.responseType = "text";
-                }
-            }
-
-            xhr.responseType = options.responseType;
+            xhr.responseType = mergedOptions.responseType;
 
             // 处理响应
             xhr.onreadystatechange = function(){
@@ -125,27 +127,27 @@ export class HttpClient implements ISingleton {
                 reject(new Error('Request timed out'));
             };
 
-            // 设置超时（可选）
-            xhr.timeout = options.timeout || 10000;
-            if (CC_DEBUG) Log.d(`[send] url : ${url} request type : ${method} , async : ${options.async}`);
-            xhr.open(method, url,options.async);
+            // 设置超时（可选)}
+            xhr.timeout = mergedOptions.timeout;
+            if (CC_DEBUG) Log.d(`[send] url : ${url} request type : ${method} , async : ${mergedOptions.async}`);
+            xhr.open(method, url,mergedOptions.async);
 
             // 设置请求头
-            if (options.headers) {
-                if (Array.isArray(options.headers)) {
-                    options.headers.forEach((header) => {
+            if (mergedOptions.headers) {
+                if (Array.isArray(mergedOptions.headers)) {
+                    mergedOptions.headers.forEach((header) => {
                         xhr.setRequestHeader(header[0], header[1]);
                     });
                 } else {
-                    Object.keys(options.headers).forEach(key => {
-                        xhr.setRequestHeader(key, options.headers[key]);
+                    Object.keys(mergedOptions.headers).forEach(key => {
+                        xhr.setRequestHeader(key, mergedOptions.headers[key]);
                     });
                 }
             }
 
             // 发送请求
-            if (method === 'POST' && options.body) {
-                xhr.send(options.body);
+            if (method === 'POST' && mergedOptions.body) {
+                xhr.send(mergedOptions.body);
             } else {
                 xhr.send();
             }
