@@ -24,7 +24,8 @@ declare type AssetDataType = import("cc").Asset | import("cc").Asset[]
  * @param name 
  * @param args 
  */
-declare function dispatch(name: string, ...args: any[]): void;
+declare function dispatch(name: string, ...args: any[]): any;
+declare function dispatchAsync(name: string, ...args: any[]): Promise<any>;
 
 declare interface Date {
 	/**

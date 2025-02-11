@@ -7,7 +7,8 @@ interface IEvent {
     type: string, // 事件类型
     target: any, //事件target
     callback: Function;//事件回调
-    once? : boolean;//是否只调用一次
+    once? : boolean;//是否只调用一次,
+    sort? : number;//优先级 默认为0
 }
 
 export class Dispatcher implements ISingleton {
@@ -30,7 +31,7 @@ export class Dispatcher implements ISingleton {
      * @param callback 事件回调
      * @param target target
      */
-    public add(type: string, callback: Function, target: any,once ?:boolean) {
+    public add(type: string, callback: Function, target: any,once ?:boolean,sort :number = 0) {
         if (!type || !callback || !target) return;
         let eventCaches: Array<IEvent> = this._eventCaches[type] || [];
         let hasSame = false;
@@ -43,8 +44,17 @@ export class Dispatcher implements ISingleton {
         if (hasSame) {
             return;
         }
-        let newEvent: IEvent = { type: type, callback: callback, target: target , once : once };
+        let newEvent: IEvent = { 
+            type: type, 
+            callback: callback, 
+            target: target , 
+            once : once ,
+            sort : sort == undefined ? 0 : sort
+        };
         eventCaches.push(newEvent);
+        eventCaches.sort((a: IEvent, b: IEvent) => {
+            return b.sort! - a.sort!;
+        });
         this._eventCaches[type] = eventCaches;
     }
 
@@ -77,23 +87,24 @@ export class Dispatcher implements ISingleton {
      * @param type 事件类型
      * @param data 事件数据
      */
-    public dispatch() {
-        if ( arguments.length < 1 ){
-            return;
+    public dispatch(...args: any[]) {
+        if (args.length < 1) {
+            return undefined;
         }
-        let type = arguments[0];
-        if (!type) return;
-        Array.prototype.shift.apply(arguments);
+        let type = args[0];
+        if (!type) return undefined;
+        const eventArgs = args.slice(1);
         let eventCaches: Array<IEvent> = this._eventCaches[type];
         if (!eventCaches) return;
         let onceEvent : IEvent[] = [];
+        let result : any = undefined;
         for (let i = 0; i < eventCaches.length; i++) {
             let event = eventCaches[i];
             try {
                 if (typeof Reflect == "object") {
-                    Reflect.apply(event.callback,event.target,arguments);
+                    result = Reflect.apply(event.callback,event.target,[...eventArgs,result]);
                 } else {
-                    event.callback.apply(event.target, arguments);
+                    result = event.callback.apply(event.target, [...eventArgs,result]);
                 }
                 if ( event.once ){
                     onceEvent.push(event);
@@ -106,14 +117,65 @@ export class Dispatcher implements ISingleton {
             const ele = onceEvent[i];
             this.remove(ele.type,ele.target);
         }
+        return result;
+    }
+
+    /**
+     * @description 派发事件
+     * @param type 事件类型
+     * @param data 事件数据
+     */
+    public async dispatchAsync(...args: any[]) {
+        if (args.length < 1) {
+            return undefined;
+        }
+        let type = args[0];
+        if (!type) return undefined;
+        const eventArgs = args.slice(1);
+        let eventCaches: Array<IEvent> = this._eventCaches[type];
+        if (!eventCaches) return;
+        let onceEvent : IEvent[] = [];
+        let result : any = undefined;
+        for (let i = 0; i < eventCaches.length; i++) {
+            let event = eventCaches[i];
+            try {
+                if (typeof Reflect == "object") {
+                    result = Reflect.apply(event.callback,event.target,[...eventArgs,result]);
+                } else {
+                    result = event.callback.apply(event.target, [...eventArgs,result]);
+                }
+                if ( result instanceof Promise ){
+                    result = await result;
+                }
+                if ( event.once ){
+                    onceEvent.push(event);
+                }
+            } catch (err) {
+                Log.e(err);
+            }
+        }
+        for(let i = 0 ; i < onceEvent.length ; i++){
+            const ele = onceEvent[i];
+            this.remove(ele.type,ele.target);
+        }
+        return result;
     }
 }
 
 window.dispatch = function () {
     //向自己封闭的管理器中也分发
     if ( App ){
-        Reflect.apply(App.dispatcher.dispatch,App.dispatcher,arguments);
+        return Reflect.apply(App.dispatcher.dispatch,App.dispatcher,arguments);
     }else{
-        Reflect.apply(Dispatcher.instance.dispatch,Dispatcher.instance,arguments);
+        return Reflect.apply(Dispatcher.instance.dispatch,Dispatcher.instance,arguments);
+    }
+}
+
+window.dispatchAsync = function () {
+    //向自己封闭的管理器中也分发
+    if ( App ){
+        return Reflect.apply(App.dispatcher.dispatchAsync,App.dispatcher,arguments);
+    }else{
+        return Reflect.apply(Dispatcher.instance.dispatchAsync,Dispatcher.instance,arguments);
     }
 }
