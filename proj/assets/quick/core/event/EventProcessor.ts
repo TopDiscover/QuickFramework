@@ -3,7 +3,6 @@
  */
 
 export type EventCallback = (...any: any[]) => void;
-
 export interface EventAgrs {
     /**
      * @description 绑定事件类型
@@ -23,6 +22,8 @@ export interface EventAgrs {
     useCapture?: any;
     /**@description 回调会在第一时间被触发后删除自身*/
     once?: boolean;
+    /**@description 优先级,仅 onD 有效*/
+    sort?: number
 }
 
 
@@ -145,11 +146,12 @@ export class EventProcessor implements IEventProcessor {
      * @param name 
      * @param func 
      */
-    onD(name: string, func: EventCallback) {
+    onD(name: string, func: EventCallback, sort: number = 0): void {
         this.on({
             bind: "Dispatcher",
             type: name,
-            cb: func
+            cb: func,
+            sort
         });
     }
 
@@ -290,7 +292,7 @@ export class EventProcessor implements IEventProcessor {
             Log.e(`${args.type} 重复注册`);
             return;
         }
-        App.dispatcher.add(args.type, args.cb!, args.target, args.once);
+        App.dispatcher.add(args.type, args.cb!, args.target, args.once,args.sort);
         this._eventsD.set(args.type, args);
     }
 
