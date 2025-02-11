@@ -10,7 +10,7 @@ export class Language implements ISingleton {
     /**@description 支持多语言切换组件 */
     private _components: Language.LanguageComponent[] = [];
     /**@description 总语言包数据 */
-    private _data: Language.Data = <any>{ language: Macro.UNKNOWN};
+    private _data: Language.Data = <any>{ language: Macro.UNKNOWN };
     /**@description 语言包数据代理 */
     private delegates: Map<string, LanguageDelegate> = new Map();
     /**@description 设置默认语言包 */
@@ -71,56 +71,47 @@ export class Language implements ISingleton {
     }
 
     public get(args: (string | number)[]) {
-        let result: any = "";
-        do {
-            if (!!!args) break;
-            if (args.length < 1) break;
-            let keyString = args[0];
-            if (typeof keyString != "string") {
-                Log.e("key error");
-                break;
+
+        // 参数校验
+        if (!args || args.length === 0) {
+            Log.e("Language get: 参数不能为空");
+            return "";
+        }
+
+        const keyString = args[0];
+        if (typeof keyString !== "string") {
+            Log.e("Language get: key 必须是字符串");
+            return "";
+        }
+
+        // 处理带有语言标识的 key
+        if (keyString.includes(Macro.USING_LAN_KEY)) {
+            const keys = keyString.split(".").slice(1); // 移除 i18n. 前缀
+
+            if (keys.length === 0) {
+                Log.e(`Language get: 无效的语言 key: ${keyString}`);
+                return "";
             }
-            if (keyString.indexOf(Macro.USING_LAN_KEY) > -1) {
 
-                let keys = keyString.split(".");
-                if (keys.length < 2) {
-                    Log.e("key error");
-                    break;
-                }
-                keys.shift();//删除掉i18n.的头部
-                args.shift();
-                let data : any = null;
-                while(keys.length > 0 ){
-                    let key = keys.shift();
-                    if ( key ){
-                        if ( !data ){
-                            data = this._data[key];
-                        }else{
-                            data = data[key];
-                        }
-                    }else{
-                        Log.e(`语言包不存在 : ${keyString}`);
-                        result = "";
-                        break;
-                    }
-                }
-                if (typeof (data) == "string") {
-                    result = String.format(data, args);
-                } else {
-                    result = data;
-                }
-
-            } else {
-                //已经是取出的正确语言包，直接格式化
-                let data = args.shift();
-                if (typeof (data) == "string") {
-                    return String.format(data, args);
-                } else {
-                    result = data;
+            let data: any = this._data;
+            for (const key of keys) {
+                data = data?.[key];
+                if (data === undefined) {
+                    Log.e(`Language get: 语言包不存在 : ${key}`);
+                    return "";
                 }
             }
-        } while (0);
-        return result;
+
+            return typeof data === "string"
+                ? String.format(data, ...args.slice(1))
+                : data;
+        }
+
+        // 直接格式化已取出的语言包
+        const data = args[0];
+        return typeof data === "string"
+            ? String.format(data, ...args.slice(1))
+            : String(data);
     }
 
     /**@description 获取语言包名 */
