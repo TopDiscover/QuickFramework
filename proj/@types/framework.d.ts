@@ -20,11 +20,27 @@ declare type BUNDLE_TYPE = string | import("cc").AssetManager.Bundle;
 declare type SocketBuffer = string | Uint8Array;
 declare type AssetDataType = import("cc").Asset | import("cc").Asset[]
 /**
- * @description 发事件 参考framework/extentions/extentions dispatch 方法
- * @param name 
- * @param args 
+ * @description 同步发事件
+ * @param name 事件名
+ * @param args 参数
+ * @example 
+ * ```ts
+ * const ret = dispatch("test",1,2,3);
+ * // todo
+ * ```
  */
 declare function dispatch(name: string, ...args: any[]): any;
+
+/**
+ * @description 异步发事件
+ * @param name 事件名
+ * @param args 参数
+ * @example 
+ * ```ts
+ * const ret = await dispatchAsync("test",1,2,3);
+ * // todo
+ * ```
+ */
 declare function dispatchAsync(name: string, ...args: any[]): Promise<any>;
 
 declare interface Date {
