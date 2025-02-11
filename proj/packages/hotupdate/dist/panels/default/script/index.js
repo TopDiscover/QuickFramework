@@ -159,9 +159,6 @@ module.exports = Editor.Panel.extend({
                 onCreateManifest() {
                     Helper_1.helper.createManifest();
                 },
-                onInsertHotupdate() {
-                    Helper_1.helper.insertHotupdate(Helper_1.helper.data.buildDir);
-                },
                 onBuildDirConfirm(url) {
                     if (Helper_1.helper.isDoing)
                         return;

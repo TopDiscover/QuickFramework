@@ -12,7 +12,7 @@ class _Environment {
         /**@description cocos creator 版本 */
         this.creatorVerion = "2.4.7";
         /**@description 支持版本 */
-        this.supportVersions = ["2.4.7", "2.4.8", "2.4.9", "2.4.10", "2.4.11", "2.4.12", "2.4.13"];
+        this.supportVersions = ["2.4.7", "2.4.8", "2.4.9", "2.4.10", "2.4.11", "2.4.12", "2.4.13", "2.4.14"];
         /**@description 扩展插件目录名 */
         this.extensionsName = "packages";
         this.build = {

@@ -196,9 +196,6 @@ module.exports = Editor.Panel.extend({
                 onCreateManifest() {
                     helper.createManifest();
                 },
-                onInsertHotupdate() {
-                    helper.insertHotupdate(helper.data!.buildDir);
-                },
                 onBuildDirConfirm(url: string) {
                     if ( helper.isDoing ) return;
                     let view: MyVue = this as any;
