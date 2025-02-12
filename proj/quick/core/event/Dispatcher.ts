@@ -36,7 +36,12 @@ export class Dispatcher implements ISingleton {
      * @param callback 事件回调
      * @param target target
      */
-    public add(type: string, callback: Function, target: any, once?: boolean, sort: number = 0) {
+    public add(
+        type: string,
+        callback: Function,
+        target: any,
+        options: { once?: boolean, sort?: number } = {},
+    ) {
         if (!type || !callback || !target) return;
         let eventCaches: Array<IEvent> = this._eventCaches[type] || [];
         let hasSame = false;
@@ -53,8 +58,8 @@ export class Dispatcher implements ISingleton {
             type: type,
             callback: callback,
             target: target,
-            once: once,
-            sort: sort == undefined ? 0 : sort
+            once: options.once,
+            sort: options.sort == undefined ? 0 : options.sort
         };
         eventCaches.push(newEvent);
         eventCaches.sort((a: IEvent, b: IEvent) => {

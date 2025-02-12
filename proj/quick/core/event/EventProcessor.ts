@@ -51,13 +51,13 @@ export interface IEventProcessor {
      * @param eventName 
      * @param func 
      */
-    onD(eventName: string, func: EventCallback): void;
+    onD(eventName: string, func: EventCallback,sort?: number): void;
     /**
      * @description 注册绑定到 App.dispatcher 只响应一次的事件
      * @param eventName 
      * @param func 
      */
-    onceD(eventName: string, func: EventCallback): void;
+    onceD(eventName: string, func: EventCallback,sort?: number): void;
     /**
      * @description 反注册绑定到 App.dispatcher 的事件
      * @param eventName 
@@ -155,11 +155,12 @@ export class EventProcessor implements IEventProcessor {
         });
     }
 
-    onceD(eventName: string, func: EventCallback): void {
+    onceD(eventName: string, func: EventCallback, sort: number = 0): void {
         this.once({
             bind: "Dispatcher",
             type: eventName,
             cb: func,
+            sort
         });
     }
     offD(eventName: string): void {
@@ -292,7 +293,7 @@ export class EventProcessor implements IEventProcessor {
             Log.e(`${args.type} 重复注册`);
             return;
         }
-        App.dispatcher.add(args.type, args.cb!, args.target, args.once,args.sort);
+        App.dispatcher.add(args.type, args.cb!, args.target, { once: args.once, sort: args.sort });
         this._eventsD.set(args.type, args);
     }
 
